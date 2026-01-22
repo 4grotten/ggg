@@ -304,9 +304,7 @@ const VerificationSuccess = () => {
               <AnimatedDrawerItem key={option.id} index={index}>
                 <button
                   onClick={() => handlePaymentSelect(option.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
-                    index < paymentOptions.length - 1 ? 'border-b border-border/50' : ''
-                  }`}
+                  className="w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors border-b border-border/50"
                 >
                   <div className={`w-12 h-12 rounded-xl ${option.iconBg} flex items-center justify-center`}>
                     <option.icon className={`w-6 h-6 ${option.iconColor}`} />
@@ -319,6 +317,19 @@ const VerificationSuccess = () => {
                 </button>
               </AnimatedDrawerItem>
             ))}
+            
+            {/* Pay Later option */}
+            <AnimatedDrawerItem index={paymentOptions.length}>
+              <button
+                onClick={() => {
+                  setIsPaymentDrawerOpen(false);
+                  navigate("/");
+                }}
+                className="w-full py-4 text-center text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t('verify.success.payLater')}
+              </button>
+            </AnimatedDrawerItem>
           </div>
         </DrawerContent>
       </Drawer>
