@@ -1,19 +1,25 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Wallet, ChevronRight, Landmark } from "lucide-react";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { motion } from "framer-motion";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { AnimatedDrawerItem } from "@/components/ui/animated-drawer-item";
 
 // Play success sound using Web Audio API
 const playSuccessSound = () => {
   try {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     
-    // Create a pleasant success chime with multiple notes
     const playNote = (frequency: number, startTime: number, duration: number) => {
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
@@ -33,17 +39,16 @@ const playSuccessSound = () => {
     };
     
     const now = audioContext.currentTime;
-    // Play a pleasant ascending chord (C-E-G-C)
-    playNote(523.25, now, 0.3);        // C5
-    playNote(659.25, now + 0.1, 0.3);  // E5
-    playNote(783.99, now + 0.2, 0.4);  // G5
-    playNote(1046.50, now + 0.3, 0.5); // C6
+    playNote(523.25, now, 0.3);
+    playNote(659.25, now + 0.1, 0.3);
+    playNote(783.99, now + 0.2, 0.4);
+    playNote(1046.50, now + 0.3, 0.5);
   } catch (e) {
     console.log('Audio not available');
   }
 };
 
-// Explosion confetti ribbon component - synced with card appearance
+// Explosion confetti ribbon component
 const ExplosionRibbon = ({ delay, angle, color, distance }: { delay: number; angle: number; color: string; distance: number }) => {
   const radian = (angle * Math.PI) / 180;
   const endX = Math.cos(radian) * distance;
@@ -63,11 +68,10 @@ const ExplosionRibbon = ({ delay, angle, color, distance }: { delay: number; ang
       }}
       transition={{ 
         duration: 2,
-        delay: 0.4 + delay * 0.1, // Sync with card animation
+        delay: 0.4 + delay * 0.1,
         ease: "easeOut",
       }}
     >
-      {/* Ribbon shape */}
       <svg width="20" height="40" viewBox="0 0 20 40">
         <motion.path
           d="M10 0 Q15 10 10 20 Q5 30 10 40"
@@ -97,17 +101,14 @@ const VerificationSuccess = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { clearProgress } = useVerificationProgress();
+  const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
 
-  // Clear verification progress and scroll to top
   useEffect(() => {
     clearProgress();
-    
-    // Force scroll to top immediately
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
-    // Play success sound after a short delay
     const timer = setTimeout(() => {
       playSuccessSound();
     }, 300);
@@ -115,17 +116,53 @@ const VerificationSuccess = () => {
     return () => clearTimeout(timer);
   }, [clearProgress]);
 
-  // Confetti colors
   const confettiColors = ['#34C759', '#FFD700', '#007AFF', '#FF3B30', '#AF52DE', '#FF9500'];
   
-  // Generate explosion confetti particles in all directions
   const confettiParticles = Array.from({ length: 24 }, (_, i) => ({
     id: i,
     delay: 0.5 + Math.random() * 0.3,
-    angle: (i * 15) + Math.random() * 10, // Spread in all directions
+    angle: (i * 15) + Math.random() * 10,
     color: confettiColors[i % confettiColors.length],
     distance: 100 + Math.random() * 150
   }));
+
+  const paymentOptions = [
+    {
+      id: "balance",
+      icon: CreditCard,
+      title: t('openCard.payFromBalance'),
+      subtitle: t('openCard.payFromBalanceDescription'),
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-500",
+    },
+    {
+      id: "crypto",
+      icon: Wallet,
+      title: t('openCard.payWithCrypto'),
+      subtitle: t('openCard.payWithCryptoDescription'),
+      iconBg: "bg-green-100",
+      iconColor: "text-green-500",
+    },
+    {
+      id: "bank",
+      icon: Landmark,
+      title: t('openCard.payWithBank'),
+      subtitle: t('openCard.payWithBankDescription'),
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-500",
+    },
+  ];
+
+  const handlePaymentSelect = (method: string) => {
+    setIsPaymentDrawerOpen(false);
+    if (method === "crypto") {
+      navigate("/open-card/pay-crypto?type=virtual");
+    } else if (method === "bank") {
+      navigate("/open-card/pay-bank?type=virtual");
+    } else {
+      navigate("/open-card/pay-balance?type=virtual");
+    }
+  };
 
   return (
     <MobileLayout
@@ -170,7 +207,7 @@ const VerificationSuccess = () => {
             {t('verify.success.description')}
           </motion.p>
 
-          {/* Virtual Card Preview - Flying in animation */}
+          {/* Virtual Card Preview */}
           <div className="w-full mb-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.3, y: 100 }}
@@ -187,7 +224,6 @@ const VerificationSuccess = () => {
                 aspectRatio: '1.586 / 1',
               }}
             >
-              {/* Glow effect */}
               <div 
                 className="absolute inset-0 opacity-40"
                 style={{
@@ -195,7 +231,6 @@ const VerificationSuccess = () => {
                 }}
               />
               
-              {/* Shine animation */}
               <motion.div
                 className="absolute inset-0"
                 style={{
@@ -206,7 +241,6 @@ const VerificationSuccess = () => {
                 transition={{ delay: 1, duration: 1.2, ease: "easeInOut" }}
               />
               
-              {/* Top row */}
               <div className="relative flex items-center justify-between">
                 <span className="text-xs font-semibold text-black/70 tracking-wide">VIRTUAL</span>
                 <span className="px-2 py-0.5 rounded-full bg-black/10 text-black/70 text-[10px] font-medium">
@@ -214,14 +248,12 @@ const VerificationSuccess = () => {
                 </span>
               </div>
               
-              {/* Benefits in center */}
               <div className="relative space-y-0.5 text-left">
                 <p className="text-[13px] text-black/60">• {t('openCard.virtualBenefit1')}</p>
                 <p className="text-[13px] text-black/60">• {t('openCard.virtualBenefit2')}</p>
                 <p className="text-[13px] text-black/60">• {t('openCard.virtualBenefit3')}</p>
               </div>
               
-              {/* Bottom row with price */}
               <div className="relative flex items-end justify-between">
                 <div className="text-left">
                   <p className="text-2xl font-bold text-black/90">183 AED</p>
@@ -232,7 +264,7 @@ const VerificationSuccess = () => {
             </motion.div>
           </div>
 
-          {/* Congratulations - Green color */}
+          {/* Congratulations */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -252,7 +284,7 @@ const VerificationSuccess = () => {
         {/* Button */}
         <div className="karta-footer-actions">
           <button 
-            onClick={() => navigate("/open-card")} 
+            onClick={() => setIsPaymentDrawerOpen(true)} 
             className="karta-btn-primary flex items-center justify-center gap-2"
           >
             <CreditCard className="w-5 h-5" />
@@ -260,6 +292,36 @@ const VerificationSuccess = () => {
           </button>
         </div>
       </div>
+
+      {/* Payment Method Drawer */}
+      <Drawer open={isPaymentDrawerOpen} onOpenChange={setIsPaymentDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t('openCard.selectPaymentMethod')}</DrawerTitle>
+          </DrawerHeader>
+          <div className="pb-6">
+            {paymentOptions.map((option, index) => (
+              <AnimatedDrawerItem key={option.id} index={index}>
+                <button
+                  onClick={() => handlePaymentSelect(option.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
+                    index < paymentOptions.length - 1 ? 'border-b border-border/50' : ''
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-xl ${option.iconBg} flex items-center justify-center`}>
+                    <option.icon className={`w-6 h-6 ${option.iconColor}`} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-base font-medium text-foreground">{option.title}</p>
+                    <p className="text-sm text-muted-foreground">{option.subtitle}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground/60" />
+                </button>
+              </AnimatedDrawerItem>
+            ))}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </MobileLayout>
   );
 };
