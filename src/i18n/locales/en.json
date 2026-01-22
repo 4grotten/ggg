@@ -248,7 +248,8 @@
       "button": "Order Your Card",
       "instantIssue": "Instant",
       "worldwide": "Worldwide",
-      "readyToUse": "Ready to use"
+      "readyToUse": "Ready to use",
+      "payLater": "Pay later"
     }
   },
 
