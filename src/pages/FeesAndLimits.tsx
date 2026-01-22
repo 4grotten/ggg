@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Receipt, ChevronRight, CreditCard, ArrowDownToLine, Send, ArrowLeftRight, SlidersHorizontal, X, Percent, Banknote, CircleDollarSign } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
@@ -184,6 +185,7 @@ const FeesAndLimits = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
+      rightAction={<LanguageSwitcher />}
     >
       <AnimatedFeeIcon />
       <div className="flex flex-col items-center pb-6">
