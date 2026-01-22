@@ -243,7 +243,8 @@
       "feature1": "Emisión instantánea de tarjeta virtual",
       "feature2": "Pagos aceptados en todo el mundo",
       "feature3": "Transacciones seguras",
-      "button": "Pedir tu tarjeta"
+      "button": "Pedir tu tarjeta",
+      "payLater": "Pagar después"
     }
   },
 

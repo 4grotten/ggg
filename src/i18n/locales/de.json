@@ -243,7 +243,8 @@
       "feature1": "Sofortige virtuelle Kartenausstellung",
       "feature2": "Weltweite Zahlungen akzeptiert",
       "feature3": "Sichere Transaktionen",
-      "button": "Karte bestellen"
+      "button": "Karte bestellen",
+      "payLater": "Später bezahlen"
     }
   },
 

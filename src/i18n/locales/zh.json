@@ -244,7 +244,8 @@
       "feature1": "即时发行虚拟卡",
       "feature2": "全球支付通行",
       "feature3": "安全交易",
-      "button": "订购您的卡"
+      "button": "订购您的卡",
+      "payLater": "稍后支付"
     }
   },
 
