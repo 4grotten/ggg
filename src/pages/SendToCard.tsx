@@ -274,10 +274,10 @@ const SendToCard = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {userCards.map((card) => (
-                    <SelectItem key={card.id} value={card.id}>
+                    <SelectItem key={card.id} value={card.id} className="data-[state=checked]:text-white">
                       <div className="flex items-center justify-between w-full gap-4">
                         <span>{card.name} •••• {card.lastFour}</span>
-                        <span className="text-muted-foreground">{card.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                        <span className="text-muted-foreground group-data-[state=checked]:text-white/90">{card.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
                       </div>
                     </SelectItem>
                   ))}
