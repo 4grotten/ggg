@@ -158,10 +158,7 @@ const OpenCardPayCrypto = () => {
             <SelectContent>
               {networks.map((network) => (
                 <SelectItem key={network.id} value={network.id}>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{network.name}</span>
-                    <span className="text-xs text-muted-foreground">({network.fee} USDT {t('openCard.fee')})</span>
-                  </div>
+                  {network.name}
                 </SelectItem>
               ))}
             </SelectContent>
