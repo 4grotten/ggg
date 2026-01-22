@@ -150,6 +150,83 @@ const GenderOption = ({
   );
 };
 
+// Animated "Not Specified" Option Component
+const NotSpecifiedOption = ({ 
+  isSelected, 
+  onSelect, 
+  label 
+}: { 
+  isSelected: boolean; 
+  onSelect: () => void; 
+  label: string;
+}) => {
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false);
+
+  useEffect(() => {
+    if (isSelected && !animationComplete) {
+      setShowEmoji(true);
+      const timer = setTimeout(() => {
+        setShowEmoji(false);
+        setAnimationComplete(true);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+    if (!isSelected) {
+      setShowEmoji(false);
+      setAnimationComplete(false);
+    }
+  }, [isSelected, animationComplete]);
+
+  return (
+    <motion.button
+      whileTap={{ scale: 0.98 }}
+      onClick={onSelect}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 }}
+      className={`w-full flex items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all ${
+        isSelected
+          ? "border-muted-foreground bg-muted/20"
+          : "border-border hover:border-muted-foreground/50"
+      }`}
+    >
+      <AnimatePresence mode="wait">
+        {showEmoji ? (
+          <motion.span
+            key="emoji"
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            className="text-3xl"
+          >
+            😂
+          </motion.span>
+        ) : (
+          <motion.div
+            key="content"
+            initial={animationComplete ? { opacity: 0, y: 10 } : { opacity: 1 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3"
+          >
+            <span className={`text-lg ${isSelected ? "text-muted-foreground" : ""}`}>{label}</span>
+            {isSelected && animationComplete && (
+              <motion.div 
+                initial={{ scale: 0 }} 
+                animate={{ scale: 1 }}
+                className="w-6 h-6 rounded-full bg-muted-foreground flex items-center justify-center"
+              >
+                <Check className="w-4 h-4 text-white" />
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.button>
+  );
+};
+
 const ProfileSteps = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -361,29 +438,11 @@ const ProfileSteps = () => {
             </div>
 
             {/* Prefer not to say option */}
-            <motion.button
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setGender("not_specified")}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className={`w-full flex items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all ${
-                gender === "not_specified"
-                  ? "border-muted-foreground bg-muted/20"
-                  : "border-border hover:border-muted-foreground/50"
-              }`}
-            >
-              <span className="text-lg">{t('auth.steps.gender.preferNotToSay')}</span>
-              {gender === "not_specified" && (
-                <motion.div 
-                  initial={{ scale: 0 }} 
-                  animate={{ scale: 1 }}
-                  className="w-6 h-6 rounded-full bg-muted-foreground flex items-center justify-center"
-                >
-                  <Check className="w-4 h-4 text-white" />
-                </motion.div>
-              )}
-            </motion.button>
+            <NotSpecifiedOption
+              isSelected={gender === "not_specified"}
+              onSelect={() => setGender("not_specified")}
+              label={t('auth.steps.gender.preferNotToSay')}
+            />
           </motion.div>
         );
 
