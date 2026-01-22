@@ -343,7 +343,7 @@
     "back": "返回",
     "notFound": "未找到交易",
     "topUp": "充值",
-    "annualCardFee": "虚拟卡年费",
+    "annualCardFee": "虚拟卡付款",
     "received": "已收到",
     "cardTransfer": "卡片转账",
     "paymentTo": "支付给 {{merchant}}",

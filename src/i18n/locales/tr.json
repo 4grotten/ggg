@@ -343,7 +343,7 @@
     "back": "Geri",
     "notFound": "İşlem bulunamadı",
     "topUp": "Yükleme",
-    "annualCardFee": "Yıllık Sanal Kart ücreti",
+    "annualCardFee": "Sanal Kart ödemesi",
     "received": "Alındı",
     "cardTransfer": "Kart Transferi",
     "paymentTo": "{{merchant}}'e ödeme",

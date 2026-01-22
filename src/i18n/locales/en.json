@@ -348,7 +348,7 @@
     "back": "Back",
     "notFound": "Transaction not found",
     "topUp": "Top up",
-    "annualCardFee": "Annual Virtual Card fee",
+    "annualCardFee": "Virtual Card payment",
     "received": "Received",
     "cardTransfer": "Card Transfer",
     "paymentTo": "Payment to {{merchant}}",
