@@ -75,6 +75,10 @@
     "profile": "Profil"
   },
   "verify": {
+    "progress": {
+      "resuming": "Doğrulama devam ediyor",
+      "resumingDescription": "Kaldığınız yerden devam ediyoruz"
+    },
     "privacy": {
       "title": "Verileriniz gizli\nve korumalı kalır",
       "description": "Kişisel verilerinizi saklamıyor ve işlem detaylarınızı\nüçüncü taraflarla paylaşmıyoruz.",
