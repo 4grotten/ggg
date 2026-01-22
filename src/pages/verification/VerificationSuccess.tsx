@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -8,52 +8,123 @@ import { Check, CreditCard } from "lucide-react";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { motion } from "framer-motion";
 
-// Confetti particle component
-const ConfettiParticle = ({ delay, x, color }: { delay: number; x: number; color: string }) => (
+// Play success sound using Web Audio API
+const playSuccessSound = () => {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    // Create a pleasant success chime with multiple notes
+    const playNote = (frequency: number, startTime: number, duration: number) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = frequency;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0, startTime);
+      gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+      
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+    };
+    
+    const now = audioContext.currentTime;
+    // Play a pleasant ascending chord (C-E-G-C)
+    playNote(523.25, now, 0.3);        // C5
+    playNote(659.25, now + 0.1, 0.3);  // E5
+    playNote(783.99, now + 0.2, 0.4);  // G5
+    playNote(1046.50, now + 0.3, 0.5); // C6
+  } catch (e) {
+    console.log('Audio not available');
+  }
+};
+
+// Ribbon confetti particle component
+const RibbonConfetti = ({ delay, x, color, rotation }: { delay: number; x: number; color: string; rotation: number }) => (
   <motion.div
-    className="absolute w-3 h-3 rounded-sm"
+    className="absolute"
     style={{ 
       left: `${x}%`, 
-      top: 0,
-      backgroundColor: color,
+      top: -20,
     }}
-    initial={{ y: -20, opacity: 1, rotate: 0, scale: 1 }}
+    initial={{ y: -20, opacity: 1, rotate: rotation }}
     animate={{ 
-      y: 400, 
-      opacity: [1, 1, 0],
-      rotate: [0, 180, 360],
-      scale: [1, 0.8, 0.5],
-      x: [0, (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 150]
+      y: 500, 
+      opacity: [1, 1, 0.8, 0],
+      rotate: [rotation, rotation + 180, rotation + 360, rotation + 540],
+      x: [0, (Math.random() - 0.5) * 80, (Math.random() - 0.5) * 120]
     }}
     transition={{ 
-      duration: 3,
+      duration: 4,
       delay: delay,
       ease: "easeOut",
       repeat: Infinity,
-      repeatDelay: 2
+      repeatDelay: 1.5
     }}
-  />
+  >
+    {/* Ribbon shape */}
+    <svg width="20" height="40" viewBox="0 0 20 40">
+      <motion.path
+        d="M10 0 Q15 10 10 20 Q5 30 10 40"
+        fill="none"
+        stroke={color}
+        strokeWidth="4"
+        strokeLinecap="round"
+        animate={{
+          d: [
+            "M10 0 Q15 10 10 20 Q5 30 10 40",
+            "M10 0 Q5 10 10 20 Q15 30 10 40",
+            "M10 0 Q15 10 10 20 Q5 30 10 40"
+          ]
+        }}
+        transition={{
+          duration: 0.8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+    </svg>
+  </motion.div>
 );
 
 const VerificationSuccess = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { clearProgress } = useVerificationProgress();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Clear verification progress when verification is complete
+  // Clear verification progress and scroll to top
   useEffect(() => {
     clearProgress();
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+    
+    // Play success sound after a short delay
+    const timer = setTimeout(() => {
+      playSuccessSound();
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [clearProgress]);
 
   // Confetti colors
   const confettiColors = ['#34C759', '#FFD700', '#007AFF', '#FF3B30', '#AF52DE', '#FF9500'];
   
-  // Generate confetti particles
-  const confettiParticles = Array.from({ length: 30 }, (_, i) => ({
+  // Generate ribbon confetti particles
+  const confettiParticles = Array.from({ length: 24 }, (_, i) => ({
     id: i,
-    delay: Math.random() * 2,
+    delay: Math.random() * 2.5,
     x: Math.random() * 100,
-    color: confettiColors[i % confettiColors.length]
+    color: confettiColors[i % confettiColors.length],
+    rotation: Math.random() * 360
   }));
 
   return (
@@ -63,19 +134,23 @@ const VerificationSuccess = () => {
       rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)] relative overflow-hidden">
-        {/* Confetti Effect */}
+        {/* Ribbon Confetti Effect */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {confettiParticles.map((particle) => (
-            <ConfettiParticle
+            <RibbonConfetti
               key={particle.id}
               delay={particle.delay}
               x={particle.x}
               color={particle.color}
+              rotation={particle.rotation}
             />
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-8 pb-28 flex flex-col items-center justify-center text-center relative z-10">
+        <div 
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto px-6 py-8 pb-28 flex flex-col items-center justify-center text-center relative z-10"
+        >
           {/* Animated Check Icon with Circle Border */}
           <div className="relative mb-6">
             {/* Animated circle border */}
