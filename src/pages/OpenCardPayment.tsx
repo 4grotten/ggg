@@ -4,6 +4,7 @@ import { ArrowLeft, CreditCard, Wallet, ChevronRight, Sparkles, Building2 } from
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE } from "@/lib/fees";
 
 type CardType = "virtual" | "metal";
@@ -50,6 +51,7 @@ const OpenCardPayment = () => {
           <h1 className="text-lg font-semibold">{t('openCard.title')}</h1>
         </div>
       }
+      rightAction={<LanguageSwitcher />}
     >
       <div className="px-4 py-6 space-y-4 pb-8">
         {/* Card Carousel */}
