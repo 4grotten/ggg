@@ -499,6 +499,8 @@
     "stepOf": "Adım {{step}} / {{total}}",
     "cardNumber": "Kart Numarası",
     "recipient": "Alıcı",
+    "recipientNotFound": "Alıcı bulunamadı",
+    "checkCardNumber": "Kart numarasını kontrol edin veya başka bir kart deneyin",
     "fromCard": "Kaynak Kart",
     "available": "Kullanılabilir",
     "amount": "Tutar",

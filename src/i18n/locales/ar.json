@@ -499,6 +499,8 @@
     "stepOf": "الخطوة {{step}} من {{total}}",
     "cardNumber": "رقم البطاقة",
     "recipient": "المستلم",
+    "recipientNotFound": "لم يتم العثور على المستلم",
+    "checkCardNumber": "تحقق من رقم البطاقة أو جرب بطاقة أخرى",
     "fromCard": "من البطاقة",
     "available": "متاح",
     "amount": "المبلغ",

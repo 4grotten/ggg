@@ -499,6 +499,8 @@
     "stepOf": "Paso {{step}} de {{total}}",
     "cardNumber": "Número de Tarjeta",
     "recipient": "Destinatario",
+    "recipientNotFound": "Destinatario no encontrado",
+    "checkCardNumber": "Verifica el número de tarjeta o intenta con otra",
     "fromCard": "Desde Tarjeta",
     "available": "Disponible",
     "amount": "Monto",

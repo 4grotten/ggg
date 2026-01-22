@@ -505,6 +505,8 @@
     "stepOf": "Шаг {{step}} из {{total}}",
     "cardNumber": "Номер карты",
     "recipient": "Получатель",
+    "recipientNotFound": "Получатель не найден",
+    "checkCardNumber": "Проверьте номер карты или попробуйте другую",
     "fromCard": "С карты",
     "available": "Доступно",
     "amount": "Сумма",

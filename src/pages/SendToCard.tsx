@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, CreditCard, Check, ClipboardPaste } from "lucide-react";
+import { ChevronLeft, CreditCard, Check, ClipboardPaste, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -22,18 +22,34 @@ const userCards = [
   { id: "2", name: "Visa Metal", lastFour: "4521", balance: 256508.98, type: "metal" },
 ];
 
-// Mock function to get recipient name by card number
-const getRecipientName = (cardNumber: string): string | null => {
+// API-ready function to get recipient name by card number
+// TODO: Replace with actual API call
+const getRecipientName = async (cardNumber: string): Promise<{ found: boolean; name: string | null }> => {
   const cleanNumber = cardNumber.replace(/\s/g, "");
+  
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
   if (cleanNumber.length === 16) {
-    // Simulate API response
+    // Card with all zeros - not found example
+    if (cleanNumber === "0000000000000000") {
+      return { found: false, name: null };
+    }
+    
+    // Mock successful responses for demo
     const mockNames: Record<string, string> = {
       "4532890123457890": "JOHN SMITH",
       "5425233430109903": "ANNA JOHNSON",
     };
-    return mockNames[cleanNumber] || "RECIPIENT NAME";
+    
+    // Return found for any valid 16-digit card (simulating real API)
+    return { 
+      found: true, 
+      name: mockNames[cleanNumber] || "RECIPIENT NAME" 
+    };
   }
-  return null;
+  
+  return { found: false, name: null };
 };
 
 // Format card number with spaces
@@ -51,6 +67,7 @@ const SendToCard = () => {
   const [step, setStep] = useState<Step>("card");
   const [cardNumber, setCardNumber] = useState("");
   const [recipientName, setRecipientName] = useState<string | null>(null);
+  const [recipientNotFound, setRecipientNotFound] = useState(false);
   const [amount, setAmount] = useState("");
   const [selectedCardId, setSelectedCardId] = useState(userCards[0].id);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,15 +88,25 @@ const SendToCard = () => {
   useEffect(() => {
     if (isCardValid) {
       setIsLoading(true);
-      // Simulate API delay
-      const timer = setTimeout(() => {
-        const name = getRecipientName(cardNumber);
-        setRecipientName(name);
+      setRecipientNotFound(false);
+      
+      getRecipientName(cardNumber).then((result) => {
+        if (result.found && result.name) {
+          setRecipientName(result.name);
+          setRecipientNotFound(false);
+        } else {
+          setRecipientName(null);
+          setRecipientNotFound(true);
+        }
         setIsLoading(false);
-      }, 500);
-      return () => clearTimeout(timer);
+      }).catch(() => {
+        setRecipientName(null);
+        setRecipientNotFound(true);
+        setIsLoading(false);
+      });
     } else {
       setRecipientName(null);
+      setRecipientNotFound(false);
     }
   }, [cardNumber, isCardValid]);
 
@@ -247,6 +274,18 @@ const SendToCard = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">{t('send.recipient')}</p>
                   <p className="font-semibold">{recipientName}</p>
+                </div>
+              </div>
+            )}
+
+            {recipientNotFound && !isLoading && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3 animate-fade-in">
+                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                  <X className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm text-red-500">{t('send.recipientNotFound')}</p>
+                  <p className="text-sm text-muted-foreground">{t('send.checkCardNumber')}</p>
                 </div>
               </div>
             )}
