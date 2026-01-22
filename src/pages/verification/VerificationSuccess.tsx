@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -43,69 +43,69 @@ const playSuccessSound = () => {
   }
 };
 
-// Ribbon confetti particle component
-const RibbonConfetti = ({ delay, x, color, rotation }: { delay: number; x: number; color: string; rotation: number }) => (
-  <motion.div
-    className="absolute"
-    style={{ 
-      left: `${x}%`, 
-      top: -20,
-    }}
-    initial={{ y: -20, opacity: 1, rotate: rotation }}
-    animate={{ 
-      y: 500, 
-      opacity: [1, 1, 0.8, 0],
-      rotate: [rotation, rotation + 180, rotation + 360, rotation + 540],
-      x: [0, (Math.random() - 0.5) * 80, (Math.random() - 0.5) * 120]
-    }}
-    transition={{ 
-      duration: 4,
-      delay: delay,
-      ease: "easeOut",
-      repeat: Infinity,
-      repeatDelay: 1.5
-    }}
-  >
-    {/* Ribbon shape */}
-    <svg width="20" height="40" viewBox="0 0 20 40">
-      <motion.path
-        d="M10 0 Q15 10 10 20 Q5 30 10 40"
-        fill="none"
-        stroke={color}
-        strokeWidth="4"
-        strokeLinecap="round"
-        animate={{
-          d: [
-            "M10 0 Q15 10 10 20 Q5 30 10 40",
-            "M10 0 Q5 10 10 20 Q15 30 10 40",
-            "M10 0 Q15 10 10 20 Q5 30 10 40"
-          ]
-        }}
-        transition={{
-          duration: 0.8,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-    </svg>
-  </motion.div>
-);
+// Explosion confetti ribbon component
+const ExplosionRibbon = ({ delay, angle, color, distance }: { delay: number; angle: number; color: string; distance: number }) => {
+  const radian = (angle * Math.PI) / 180;
+  const endX = Math.cos(radian) * distance;
+  const endY = Math.sin(radian) * distance;
+  
+  return (
+    <motion.div
+      className="absolute left-1/2 top-32"
+      style={{ marginLeft: -10 }}
+      initial={{ x: 0, y: 0, opacity: 0, scale: 0, rotate: angle }}
+      animate={{ 
+        x: endX,
+        y: endY,
+        opacity: [0, 1, 1, 0],
+        scale: [0, 1.2, 1, 0.5],
+        rotate: [angle, angle + 180, angle + 360]
+      }}
+      transition={{ 
+        duration: 2,
+        delay: delay,
+        ease: "easeOut",
+      }}
+    >
+      {/* Ribbon shape */}
+      <svg width="20" height="40" viewBox="0 0 20 40">
+        <motion.path
+          d="M10 0 Q15 10 10 20 Q5 30 10 40"
+          fill="none"
+          stroke={color}
+          strokeWidth="4"
+          strokeLinecap="round"
+          animate={{
+            d: [
+              "M10 0 Q15 10 10 20 Q5 30 10 40",
+              "M10 0 Q5 10 10 20 Q15 30 10 40",
+              "M10 0 Q15 10 10 20 Q5 30 10 40"
+            ]
+          }}
+          transition={{
+            duration: 0.4,
+            repeat: 3,
+            ease: "easeInOut"
+          }}
+        />
+      </svg>
+    </motion.div>
+  );
+};
 
 const VerificationSuccess = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { clearProgress } = useVerificationProgress();
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   // Clear verification progress and scroll to top
   useEffect(() => {
     clearProgress();
     
-    // Scroll to top
-    window.scrollTo(0, 0);
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = 0;
-    }
+    // Force scroll to top immediately
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     
     // Play success sound after a short delay
     const timer = setTimeout(() => {
@@ -118,13 +118,13 @@ const VerificationSuccess = () => {
   // Confetti colors
   const confettiColors = ['#34C759', '#FFD700', '#007AFF', '#FF3B30', '#AF52DE', '#FF9500'];
   
-  // Generate ribbon confetti particles
+  // Generate explosion confetti particles in all directions
   const confettiParticles = Array.from({ length: 24 }, (_, i) => ({
     id: i,
-    delay: Math.random() * 2.5,
-    x: Math.random() * 100,
+    delay: 0.5 + Math.random() * 0.3,
+    angle: (i * 15) + Math.random() * 10, // Spread in all directions
     color: confettiColors[i % confettiColors.length],
-    rotation: Math.random() * 360
+    distance: 100 + Math.random() * 150
   }));
 
   return (
@@ -134,21 +134,20 @@ const VerificationSuccess = () => {
       rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)] relative overflow-hidden">
-        {/* Ribbon Confetti Effect */}
+        {/* Explosion Confetti Effect */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {confettiParticles.map((particle) => (
-            <RibbonConfetti
+            <ExplosionRibbon
               key={particle.id}
               delay={particle.delay}
-              x={particle.x}
+              angle={particle.angle}
               color={particle.color}
-              rotation={particle.rotation}
+              distance={particle.distance}
             />
           ))}
         </div>
 
         <div 
-          ref={scrollRef}
           className="flex-1 overflow-y-auto px-6 py-8 pb-28 flex flex-col items-center justify-center text-center relative z-10"
         >
           {/* Animated Check Icon with Circle Border */}
