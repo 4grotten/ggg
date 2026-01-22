@@ -137,14 +137,6 @@ const VerificationSuccess = () => {
 
   const paymentOptions = [
     {
-      id: "balance",
-      icon: CreditCard,
-      title: t('openCard.payFromBalance'),
-      subtitle: t('openCard.payFromBalanceDescription'),
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-500",
-    },
-    {
       id: "crypto",
       icon: Wallet,
       title: t('openCard.payWithCrypto'),
