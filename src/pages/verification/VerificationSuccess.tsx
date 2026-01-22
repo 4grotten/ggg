@@ -171,62 +171,65 @@ const VerificationSuccess = () => {
           </motion.p>
 
           {/* Virtual Card Preview - Flying in animation */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.3, y: 100 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ 
-              delay: 0.4, 
-              duration: 0.6, 
-              type: "spring", 
-              bounce: 0.4 
-            }}
-            className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden p-5 flex flex-col justify-between mb-6"
-            style={{
-              background: 'linear-gradient(135deg, #d4f94e 0%, #a8e030 50%, #8bc926 100%)',
-            }}
-          >
-            {/* Glow effect */}
-            <div 
-              className="absolute inset-0 opacity-40"
-              style={{
-                background: 'radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 50%)',
-              }}
-            />
-            
-            {/* Shine animation */}
+          <div className="w-full mb-6">
             <motion.div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.3) 35%, rgba(255,255,255,0.5) 40%, rgba(255,255,255,0.3) 45%, transparent 60%)',
+              initial={{ opacity: 0, scale: 0.3, y: 100 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ 
+                delay: 0.4, 
+                duration: 0.6, 
+                type: "spring", 
+                bounce: 0.4 
               }}
-              initial={{ x: '-100%' }}
-              animate={{ x: '200%' }}
-              transition={{ delay: 1, duration: 1.2, ease: "easeInOut" }}
-            />
-            
-            {/* Top row */}
-            <div className="relative flex items-center justify-between">
-              <span className="text-xs font-semibold text-black/70 tracking-wide">VIRTUAL</span>
-              <span className="px-2 py-0.5 rounded-full bg-black/10 text-black/70 text-[10px] font-medium">
-                {t('verify.success.instantIssue')}
-              </span>
-            </div>
-            
-            {/* Benefits in center */}
-            <div className="relative space-y-0.5">
-              <p className="text-[13px] text-black/60">• {t('verify.success.feature1')}</p>
-              <p className="text-[13px] text-black/60">• {t('verify.success.feature2')}</p>
-              <p className="text-[13px] text-black/60">• {t('verify.success.feature3')}</p>
-            </div>
-            
-            {/* Bottom row */}
-            <div className="relative flex items-end justify-between">
-              <div>
-                <p className="text-[10px] text-black/60">{t('verify.success.readyToUse')}</p>
+              className="relative w-full rounded-2xl overflow-hidden p-5 flex flex-col justify-between"
+              style={{
+                background: 'linear-gradient(135deg, #d4f94e 0%, #a8e030 50%, #8bc926 100%)',
+                aspectRatio: '1.586 / 1',
+              }}
+            >
+              {/* Glow effect */}
+              <div 
+                className="absolute inset-0 opacity-40"
+                style={{
+                  background: 'radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 50%)',
+                }}
+              />
+              
+              {/* Shine animation */}
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.3) 35%, rgba(255,255,255,0.5) 40%, rgba(255,255,255,0.3) 45%, transparent 60%)',
+                }}
+                initial={{ x: '-100%' }}
+                animate={{ x: '200%' }}
+                transition={{ delay: 1, duration: 1.2, ease: "easeInOut" }}
+              />
+              
+              {/* Top row */}
+              <div className="relative flex items-center justify-between">
+                <span className="text-xs font-semibold text-black/70 tracking-wide">VIRTUAL</span>
+                <span className="px-2 py-0.5 rounded-full bg-black/10 text-black/70 text-[10px] font-medium">
+                  {t('verify.success.instantIssue')}
+                </span>
               </div>
-              <span className="text-xl font-bold text-[#1a1f71] italic">VISA</span>
-            </div>
-          </motion.div>
+              
+              {/* Benefits in center */}
+              <div className="relative space-y-0.5">
+                <p className="text-[13px] text-black/60">• {t('verify.success.feature1')}</p>
+                <p className="text-[13px] text-black/60">• {t('verify.success.feature2')}</p>
+                <p className="text-[13px] text-black/60">• {t('verify.success.feature3')}</p>
+              </div>
+              
+              {/* Bottom row */}
+              <div className="relative flex items-end justify-between">
+                <div>
+                  <p className="text-[10px] text-black/60">{t('verify.success.readyToUse')}</p>
+                </div>
+                <span className="text-xl font-bold text-[#1a1f71] italic">VISA</span>
+              </div>
+            </motion.div>
+          </div>
 
           {/* Congratulations - Green color */}
           <motion.div
