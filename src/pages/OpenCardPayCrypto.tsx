@@ -50,6 +50,11 @@ const OpenCardPayCrypto = () => {
   const cardIssuanceFee = cardType === "virtual" ? VIRTUAL_CARD_ANNUAL_FEE : METAL_CARD_ANNUAL_FEE;
   const cryptoAmountUsdt = (cardIssuanceFee / USDT_TO_AED_TOP_UP) + currentNetwork.fee;
 
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Start timer
   useEffect(() => {
     timerRef.current = setInterval(() => {
