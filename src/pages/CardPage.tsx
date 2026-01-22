@@ -81,9 +81,9 @@ const cardsData = {
       },
       {
         date: "December 21",
-        totalSpend: 183.50,
+        totalSpend: 204.55,
         transactions: [
-          { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 183.50, amountLocal: 183.50, localCurrency: "AED", color: "#CCFF00", type: "card_activation" as const },
+          { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", type: "card_activation" as const },
           { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as const },
         ],
       },

@@ -77,9 +77,9 @@ const mockTransactionGroups: TransactionGroup[] = [
   },
   {
     date: "December 21",
-    totalSpend: 5.00,
+    totalSpend: 204.55,
     transactions: [
-      { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 183.50, amountLocal: 183.50, localCurrency: "AED", color: "#CCFF00", type: "card_activation" },
+      { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", type: "card_activation" },
       { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
     ],
   },
