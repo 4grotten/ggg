@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, CreditCard, Check, ClipboardPaste, X, Loader2 } from "lucide-react";
+import { ChevronLeft, CreditCard, Check, ClipboardPaste, X, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -15,6 +16,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CARD_TO_CARD_FEE_PERCENT } from "@/lib/fees";
+
+// Transfer request/response types
+interface TransferRequest {
+  fromCardId: string;
+  toCardNumber: string;
+  recipientName: string;
+  amount: number;
+  fee: number;
+  totalAmount: number;
+}
+
+interface TransferResponse {
+  success: boolean;
+  transactionId?: string;
+  error?: string;
+}
+
+// API-ready function to submit card-to-card transfer
+// TODO: Replace with actual API call
+const submitTransfer = async (request: TransferRequest): Promise<TransferResponse> => {
+  console.log("Submitting transfer:", request);
+  
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Mock successful response
+  return {
+    success: true,
+    transactionId: `TXN-${Date.now()}`
+  };
+  
+  // Example error response for testing:
+  // return { success: false, error: "Transfer failed. Please try again." };
+};
 
 // Type for user card
 interface UserCard {
@@ -85,12 +120,16 @@ type Step = "card" | "amount" | "confirm";
 const SendToCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [step, setStep] = useState<Step>("card");
   const [cardNumber, setCardNumber] = useState("");
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [recipientNotFound, setRecipientNotFound] = useState(false);
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [transferSuccess, setTransferSuccess] = useState(false);
+  const [transferError, setTransferError] = useState<string | null>(null);
   
   // Cards state
   const [userCards, setUserCards] = useState<UserCard[]>([]);
@@ -212,13 +251,57 @@ const SendToCard = () => {
     }
   };
 
-  const handleConfirm = () => {
-    // Simulate transfer
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate("/");
-    }, 1500);
+  const handleConfirm = async () => {
+    if (!selectedCard || !recipientName) return;
+    
+    setIsSubmitting(true);
+    setTransferError(null);
+    
+    try {
+      const request: TransferRequest = {
+        fromCardId: selectedCardId,
+        toCardNumber: cardNumber.replace(/\s/g, ""),
+        recipientName: recipientName,
+        amount: numericAmount,
+        fee: fee,
+        totalAmount: totalAmount
+      };
+      
+      const response = await submitTransfer(request);
+      
+      if (response.success) {
+        setTransferSuccess(true);
+        toast({
+          title: t('send.transferSuccess'),
+          description: t('send.transferSuccessDescription', { 
+            amount: numericAmount.toFixed(2),
+            recipient: recipientName 
+          }),
+        });
+        
+        // Navigate after short delay to show success
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      } else {
+        setTransferError(response.error || t('send.transferFailed'));
+        toast({
+          variant: "destructive",
+          title: t('send.transferFailed'),
+          description: response.error || t('send.tryAgainLater'),
+        });
+      }
+    } catch (error) {
+      console.error("Transfer error:", error);
+      setTransferError(t('send.transferFailed'));
+      toast({
+        variant: "destructive",
+        title: t('send.transferFailed'),
+        description: t('send.tryAgainLater'),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fee = numericAmount * (CARD_TO_CARD_FEE_PERCENT / 100);
@@ -478,39 +561,70 @@ const SendToCard = () => {
         {/* Step 3: Confirm */}
         {step === "confirm" && (
           <div className="space-y-4 animate-fade-in">
-            <div className="bg-secondary rounded-2xl p-5 space-y-4">
-              <div className="text-center pb-4 border-b border-border">
-                <p className="text-sm text-muted-foreground mb-1">{t('send.youreSending')}</p>
-                <p className="text-3xl font-bold">{numericAmount.toFixed(2)} AED</p>
+            {/* Success State */}
+            {transferSuccess && (
+              <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 flex flex-col items-center gap-3 animate-fade-in">
+                <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
+                  <CheckCircle2 className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-lg font-semibold text-green-600">{t('send.transferSuccess')}</p>
+                <p className="text-sm text-muted-foreground text-center">
+                  {t('send.redirecting')}
+                </p>
               </div>
+            )}
 
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('send.to')}</span>
-                  <span className="font-medium">{recipientName}</span>
+            {/* Error State */}
+            {transferError && !transferSuccess && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3 animate-fade-in">
+                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-white" />
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('send.card')}</span>
-                  <span className="font-mono no-underline decoration-transparent">{cardNumber}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('send.from')}</span>
-                  <span className="font-medium">{selectedCard?.name} •••• {selectedCard?.lastFour}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('send.fee')} ({CARD_TO_CARD_FEE_PERCENT}%)</span>
-                  <span>{fee.toFixed(2)} AED</span>
-                </div>
-                <div className="flex justify-between pt-3 border-t border-border">
-                  <span className="font-medium">{t('send.total')}</span>
-                  <span className="font-bold">{totalAmount.toFixed(2)} AED</span>
+                <div>
+                  <p className="text-sm font-medium text-red-500">{t('send.transferFailed')}</p>
+                  <p className="text-sm text-muted-foreground">{transferError}</p>
                 </div>
               </div>
-            </div>
+            )}
 
-            <p className="text-xs text-center text-muted-foreground">
-              {t('send.transferTerms')}
-            </p>
+            {/* Transfer Details */}
+            {!transferSuccess && (
+              <div className="bg-secondary rounded-2xl p-5 space-y-4">
+                <div className="text-center pb-4 border-b border-border">
+                  <p className="text-sm text-muted-foreground mb-1">{t('send.youreSending')}</p>
+                  <p className="text-3xl font-bold">{numericAmount.toFixed(2)} AED</p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('send.to')}</span>
+                    <span className="font-medium">{recipientName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('send.card')}</span>
+                    <span className="font-mono no-underline decoration-transparent">{cardNumber}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('send.from')}</span>
+                    <span className="font-medium">{selectedCard?.name} •••• {selectedCard?.lastFour}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('send.fee')} ({CARD_TO_CARD_FEE_PERCENT}%)</span>
+                    <span>{fee.toFixed(2)} AED</span>
+                  </div>
+                  <div className="flex justify-between pt-3 border-t border-border">
+                    <span className="font-medium">{t('send.total')}</span>
+                    <span className="font-bold">{totalAmount.toFixed(2)} AED</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!transferSuccess && (
+              <p className="text-xs text-center text-muted-foreground">
+                {t('send.transferTerms')}
+              </p>
+            )}
 
             <PoweredByFooter />
           </div>
@@ -544,13 +658,20 @@ const SendToCard = () => {
             {t('send.continue')}
           </Button>
         )}
-        {step === "confirm" && (
+        {step === "confirm" && !transferSuccess && (
           <Button
             className="w-full h-14 text-base font-semibold bg-primary/90 hover:bg-primary text-white rounded-xl active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
             onClick={handleConfirm}
-            disabled={isLoading}
+            disabled={isSubmitting}
           >
-            {isLoading ? t('send.processing') : t('send.confirmTransfer')}
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                {t('send.processing')}
+              </span>
+            ) : (
+              t('send.confirmTransfer')
+            )}
           </Button>
         )}
       </div>
