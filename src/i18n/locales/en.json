@@ -245,7 +245,9 @@
       "feature1": "Instant virtual card issuance",
       "feature2": "Worldwide payments accepted",
       "feature3": "Secure transactions",
-      "button": "Order Your Card"
+      "button": "Order Your Card",
+      "instantIssue": "Instant",
+      "worldwide": "Worldwide"
     }
   },
 

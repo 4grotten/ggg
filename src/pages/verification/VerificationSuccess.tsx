@@ -43,7 +43,7 @@ const playSuccessSound = () => {
   }
 };
 
-// Explosion confetti ribbon component
+// Explosion confetti ribbon component - synced with card appearance
 const ExplosionRibbon = ({ delay, angle, color, distance }: { delay: number; angle: number; color: string; distance: number }) => {
   const radian = (angle * Math.PI) / 180;
   const endX = Math.cos(radian) * distance;
@@ -51,7 +51,7 @@ const ExplosionRibbon = ({ delay, angle, color, distance }: { delay: number; ang
   
   return (
     <motion.div
-      className="absolute left-1/2 top-32"
+      className="absolute left-1/2 top-48"
       style={{ marginLeft: -10 }}
       initial={{ x: 0, y: 0, opacity: 0, scale: 0, rotate: angle }}
       animate={{ 
@@ -63,7 +63,7 @@ const ExplosionRibbon = ({ delay, angle, color, distance }: { delay: number; ang
       }}
       transition={{ 
         duration: 2,
-        delay: delay,
+        delay: 0.4 + delay * 0.1, // Sync with card animation
         ease: "easeOut",
       }}
     >
@@ -170,19 +170,58 @@ const VerificationSuccess = () => {
             {t('verify.success.description')}
           </motion.p>
 
-          {/* Card Preview */}
+          {/* Virtual Card Preview - Flying in animation */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5 }}
-            className="w-full max-w-[280px] aspect-[1.6/1] rounded-2xl bg-gradient-to-br from-[#007AFF] to-[#5856D6] p-5 text-white text-left shadow-xl mb-6"
+            initial={{ opacity: 0, scale: 0.3, y: 100 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ 
+              delay: 0.4, 
+              duration: 0.6, 
+              type: "spring", 
+              bounce: 0.4 
+            }}
+            className="w-full max-w-[300px] aspect-[1.586/1] rounded-2xl bg-gradient-to-br from-[#007AFF] via-[#5856D6] to-[#AF52DE] p-5 text-white text-left mb-6 relative overflow-hidden"
           >
-            <div className="flex justify-between items-start mb-8">
-              <div className="w-10 h-7 bg-white/20 rounded" />
-              <span className="text-sm font-semibold">VISA</span>
+            {/* Shine effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+              initial={{ x: '-100%' }}
+              animate={{ x: '200%' }}
+              transition={{ delay: 1, duration: 1.2, ease: "easeInOut" }}
+            />
+            
+            {/* Virtual badge */}
+            <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-medium">VIRTUAL</span>
             </div>
-            <div className="text-sm tracking-widest mb-2">•••• •••• •••• ••••</div>
-            <div className="text-xs text-white/70">Easy Card</div>
+            
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-10 h-7 bg-white/30 rounded flex items-center justify-center">
+                <div className="w-6 h-4 border border-white/50 rounded-sm" />
+              </div>
+              <span className="text-sm font-bold tracking-wider">VISA</span>
+            </div>
+            
+            <div className="text-lg tracking-[0.2em] mb-3 font-mono">•••• •••• •••• ••••</div>
+            
+            <div className="flex justify-between items-end">
+              <div>
+                <div className="text-[10px] text-white/60 mb-0.5">CARDHOLDER</div>
+                <div className="text-xs font-medium">YOUR NAME</div>
+              </div>
+              <div className="text-right">
+                <div className="text-[10px] text-white/60 mb-0.5">VALID THRU</div>
+                <div className="text-xs font-medium">••/••</div>
+              </div>
+            </div>
+            
+            {/* Card benefits overlay */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/40 to-transparent p-3 pt-6">
+              <div className="flex gap-2 text-[9px]">
+                <span className="bg-white/20 px-1.5 py-0.5 rounded">💳 {t('verify.success.instantIssue')}</span>
+                <span className="bg-white/20 px-1.5 py-0.5 rounded">🌍 {t('verify.success.worldwide')}</span>
+              </div>
+            </div>
           </motion.div>
 
           {/* Congratulations - Green color */}
