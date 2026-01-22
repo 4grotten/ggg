@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Lock, RefreshCw, Eye, EyeOff, X, ChevronUp, Clock, Share2 } from "lucide-react";
+import { ChevronLeft, ChevronDown, Lock, LockOpen, RefreshCw, Eye, EyeOff, X, ChevronUp, Clock, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -560,7 +560,17 @@ const CardPage = () => {
               }}
               disabled={isUnlocking}
             >
-              <Lock className="w-4 h-4" />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={isUnlocking ? "unlocking-icon" : "lock-icon"}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {isUnlocking ? <LockOpen className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                </motion.div>
+              </AnimatePresence>
               <AnimatePresence mode="wait">
                 <motion.span
                   key={isUnlocking ? "unlocking" : isCardLocked ? "locked" : "lock"}
