@@ -318,7 +318,7 @@ const ProfileSteps = () => {
                 placeholder={t('auth.steps.name.placeholder')}
                 autoFocus
                 autoCapitalize="words"
-                className={`w-full text-center text-2xl font-medium bg-transparent border-b-2 py-4 text-foreground placeholder:text-muted-foreground outline-none transition-colors ${
+                className={`w-full text-left text-2xl font-medium bg-transparent border-b-2 py-4 text-foreground placeholder:text-muted-foreground outline-none transition-colors ${
                   showError 
                     ? 'border-destructive focus:border-destructive' 
                     : 'border-primary/30 focus:border-primary'
@@ -508,7 +508,7 @@ const ProfileSteps = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoFocus
-                className={`w-full text-center text-2xl font-medium bg-transparent border-b-2 py-4 text-foreground placeholder:text-muted-foreground outline-none transition-colors pr-12 ${
+                className={`w-full text-left text-2xl font-medium bg-transparent border-b-2 py-4 text-foreground placeholder:text-muted-foreground outline-none transition-colors pr-12 ${
                   showError 
                     ? 'border-destructive focus:border-destructive' 
                     : 'border-primary/30 focus:border-primary'
