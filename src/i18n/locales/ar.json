@@ -246,9 +246,9 @@
       "button": "اطلب بطاقتك",
       "payLater": "الدفع لاحقاً",
       "payLaterAlertTitle": "إصدار البطاقة",
-      "payLaterAlertMessage": "ستعود إلى الصفحة الرئيسية. لإصدار بطاقة، اضغط على «فتح بطاقة جديدة»",
+      "payLaterAlertMessage": "لإصدار البطاقة — اضغط «دفع».\nاضغط «الصفحة الرئيسية» — ستعود ويمكنك الدفع لاحقاً في قسم «فتح بطاقة جديدة».",
       "payLaterAlertPay": "دفع",
-      "payLaterAlertOk": "موافق"
+      "payLaterAlertHome": "الصفحة الرئيسية"
     }
   },
 

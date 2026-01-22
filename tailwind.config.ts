@@ -103,6 +103,14 @@ export default {
           "0%": { transform: "scale(0.8)", opacity: "1" },
           "100%": { transform: "scale(1.4)", opacity: "0" },
         },
+        "ios-alert-in": {
+          from: { opacity: "0", transform: "translate(-50%, -50%) scale(0.98)" },
+          to: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
+        },
+        "ios-alert-out": {
+          from: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
+          to: { opacity: "0", transform: "translate(-50%, -50%) scale(0.98)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -111,6 +119,8 @@ export default {
         "fade-in": "fade-in 0.2s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
         "pulse-ring": "pulse-ring 1.5s ease-out infinite",
+        "ios-alert-in": "ios-alert-in 0.2s ease-out forwards",
+        "ios-alert-out": "ios-alert-out 0.15s ease-in forwards",
       },
     },
   },

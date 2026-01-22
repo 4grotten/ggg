@@ -246,9 +246,9 @@
       "button": "Kartınızı sipariş edin",
       "payLater": "Daha sonra öde",
       "payLaterAlertTitle": "Kart Çıkarma",
-      "payLaterAlertMessage": "Ana sayfaya döneceksiniz. Kart çıkarmak için «Yeni Kart Aç»a dokunun",
+      "payLaterAlertMessage": "Kartı çıkarmak için — «Öde»ye dokunun.\n«Ana Sayfa»ya dokunun — geri döner ve «Yeni Kart Aç» bölümünden daha sonra ödeme yapabilirsiniz.",
       "payLaterAlertPay": "Öde",
-      "payLaterAlertOk": "Tamam"
+      "payLaterAlertHome": "Ana Sayfa"
     }
   },
 
