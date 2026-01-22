@@ -34,6 +34,7 @@ const GenderOption = ({
   label: string;
 }) => {
   const [showFinalIcon, setShowFinalIcon] = useState(false);
+  const [isShyAnimating, setIsShyAnimating] = useState(false);
   
   const isMale = type === "male";
   const color = isMale ? "#007AFF" : "#FF6B9D";
@@ -44,6 +45,15 @@ const GenderOption = ({
     const timer = setTimeout(() => setShowFinalIcon(true), 600);
     return () => clearTimeout(timer);
   }, []);
+
+  // Trigger shy animation when female is selected
+  useEffect(() => {
+    if (!isMale && isSelected) {
+      setIsShyAnimating(true);
+      const timer = setTimeout(() => setIsShyAnimating(false), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [isSelected, isMale]);
 
   // Male gender symbol (Mars) - ♂
   const MaleSymbol = () => (
@@ -68,6 +78,47 @@ const GenderOption = ({
     <span className="text-5xl">💝</span>
   );
 
+  // Shy animation keyframes for female
+  const shyAnimation = {
+    initial: { rotate: 0, scale: 1 },
+    shy: {
+      rotate: [0, -15, 15, -10, 10, -5, 5, 0],
+      scale: [1, 0.9, 0.85, 0.8, 0.85, 0.9, 0.95, 1],
+      transition: {
+        duration: 1.2,
+        times: [0, 0.1, 0.2, 0.35, 0.5, 0.65, 0.8, 1],
+        ease: "easeInOut" as const
+      }
+    }
+  };
+
+  // Crack animation for the circle border
+  const crackAnimation = {
+    initial: { 
+      boxShadow: isSelected ? `0 0 20px ${color}40` : 'none',
+      filter: 'none'
+    },
+    crack: {
+      boxShadow: [
+        `0 0 20px ${color}40`,
+        `0 0 30px ${color}60, inset 0 0 10px ${color}30`,
+        `0 0 40px ${color}80, inset 0 0 20px ${color}40`,
+        `0 0 20px ${color}40`
+      ],
+      filter: [
+        'none',
+        'brightness(1.1)',
+        'brightness(1.2) contrast(1.1)',
+        'none'
+      ],
+      transition: {
+        duration: 1.2,
+        times: [0, 0.3, 0.5, 1],
+        ease: "easeInOut" as const
+      }
+    }
+  };
+
   return (
     <motion.button
       whileTap={{ scale: 0.97 }}
@@ -80,12 +131,9 @@ const GenderOption = ({
           backgroundColor: isSelected ? `${color}15` : 'transparent',
           border: isSelected ? `3px solid ${color}` : '2px solid hsl(var(--border))',
         }}
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ 
-          scale: 1,
-          opacity: 1,
-          boxShadow: isSelected ? `0 0 20px ${color}40` : 'none'
-        }}
+        initial="initial"
+        animate={!isMale && isShyAnimating ? "crack" : "initial"}
+        variants={crackAnimation}
         transition={{ type: "spring", stiffness: 120, damping: 14, delay: isMale ? 0.1 : 0.15 }}
       >
         <AnimatePresence mode="wait">
@@ -108,16 +156,9 @@ const GenderOption = ({
           ) : (
             <motion.div
               key="final"
-              initial={{ opacity: 0, scale: 0.8, y: 10 }}
-              animate={{ 
-                opacity: 1,
-                scale: 1, 
-                y: 0
-              }}
-              transition={{ 
-                duration: 0.4,
-                ease: [0.25, 0.46, 0.45, 0.94]
-              }}
+              initial="initial"
+              animate={!isMale && isShyAnimating ? "shy" : "initial"}
+              variants={shyAnimation}
               style={{ color }}
               className="flex items-center justify-center"
             >
