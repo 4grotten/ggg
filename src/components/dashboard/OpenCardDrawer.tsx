@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, CreditCard, Wallet, ChevronRight, Sparkles, ChevronDown, Check, Building2 } from "lucide-react";
+import { X, CreditCard, Wallet, ChevronRight, ChevronLeft, Sparkles, ChevronDown, Check, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -195,19 +195,70 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
                 transition={{ duration: 0.2 }}
                 className="space-y-4"
               >
-                {/* Selected Card Summary */}
-                <div className="p-4 rounded-2xl bg-muted/50 border border-border/50">
-                  <div className="flex items-center gap-4">
-                    <div className="w-20 shrink-0">
-                      <CardMiniature type={selectedCard || "virtual"} />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">
-                        {selectedCard === "virtual" ? t('openCard.virtualCard') : t('openCard.metalCard')}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{t('openCard.annualFee')}</p>
+                {/* Card Carousel */}
+                <div className="relative">
+                  <div className="flex items-center justify-center gap-4">
+                    {/* Left Arrow */}
+                    <button
+                      onClick={() => setSelectedCard(selectedCard === "virtual" ? "metal" : "virtual")}
+                      className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors shrink-0"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+                    </button>
+
+                    {/* Card Display */}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={selectedCard}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        className="w-40"
+                      >
+                        <CardMiniature type={selectedCard || "virtual"} />
+                      </motion.div>
+                    </AnimatePresence>
+
+                    {/* Right Arrow */}
+                    <button
+                      onClick={() => setSelectedCard(selectedCard === "virtual" ? "metal" : "virtual")}
+                      className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors shrink-0"
+                    >
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </button>
+                  </div>
+
+                  {/* Card Info */}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={selectedCard}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-center mt-4"
+                    >
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <p className="font-semibold">
+                          {selectedCard === "virtual" ? t('openCard.virtualCard') : t('openCard.metalCard')}
+                        </p>
+                        {selectedCard === "virtual" ? (
+                          <span className="px-1.5 py-0.5 rounded bg-lime-500/20 text-lime-600 text-[10px] font-medium">
+                            {t('openCard.instant')}
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 text-[10px] font-medium flex items-center gap-0.5">
+                            <Sparkles className="w-2.5 h-2.5" />
+                            {t('openCard.premium')}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-2xl font-bold text-primary">{cardIssuanceFee} AED</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('openCard.annualFee')}</p>
+                      
                       {/* Benefits */}
-                      <div className="mt-2 space-y-0.5">
+                      <div className="mt-3 space-y-0.5">
                         {selectedCard === "virtual" ? (
                           <>
                             {['virtualBenefit1', 'virtualBenefit2', 'virtualBenefit3'].map((key, index) => (
@@ -215,7 +266,7 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
                                 key={key}
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.15 + index * 0.12, duration: 0.25 }}
+                                transition={{ delay: 0.1 + index * 0.08, duration: 0.2 }}
                                 className="text-[11px] text-muted-foreground"
                               >
                                 • {t(`openCard.${key}`)}
@@ -229,7 +280,7 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
                                 key={key}
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.15 + index * 0.12, duration: 0.25 }}
+                                transition={{ delay: 0.1 + index * 0.08, duration: 0.2 }}
                                 className="text-[11px] text-muted-foreground"
                               >
                                 • {t(`openCard.${key}`)}
@@ -238,8 +289,19 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
                           </>
                         )}
                       </div>
-                    </div>
-                    <span className="text-xl font-bold text-primary">{cardIssuanceFee} AED</span>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Dots Indicator */}
+                  <div className="flex justify-center gap-2 mt-3">
+                    <button
+                      onClick={() => setSelectedCard("virtual")}
+                      className={`w-2 h-2 rounded-full transition-colors ${selectedCard === "virtual" ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                    />
+                    <button
+                      onClick={() => setSelectedCard("metal")}
+                      className={`w-2 h-2 rounded-full transition-colors ${selectedCard === "metal" ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                    />
                   </div>
                 </div>
 
@@ -302,14 +364,6 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
                   </div>
-                </button>
-
-                {/* Back Button */}
-                <button
-                  onClick={handleBack}
-                  className="w-full py-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  ← {t('common.back')}
                 </button>
               </motion.div>
             ) : step === "payFromBalance" ? (
