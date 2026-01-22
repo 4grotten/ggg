@@ -4,6 +4,7 @@ import { ChevronLeft, CreditCard, Check, ClipboardPaste } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -160,6 +161,7 @@ const SendToCard = () => {
           <span className="text-sm">{t('send.back')}</span>
         </button>
       }
+      rightAction={<LanguageSwitcher />}
     >
       <div className="px-4 py-6 pb-32 space-y-6">
         {/* Header */}
