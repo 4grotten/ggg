@@ -235,6 +235,15 @@
       "identityDocument": "Documento de identidad",
       "livenessCheck": "Verificación de vida",
       "button": "Iniciar reenvío"
+    },
+    "success": {
+      "congratulations": "¡Felicitaciones!",
+      "title": "¡Verificación completada!",
+      "description": "Tu identidad ha sido verificada. Ahora puedes pedir tu tarjeta y empezar a usar todas las funciones.",
+      "feature1": "Emisión instantánea de tarjeta virtual",
+      "feature2": "Pagos aceptados en todo el mundo",
+      "feature3": "Transacciones seguras",
+      "button": "Pedir tu tarjeta"
     }
   },
 

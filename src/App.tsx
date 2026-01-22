@@ -24,6 +24,7 @@ import DocumentCaptureBack from "./pages/verification/DocumentCaptureBack";
 import LivenessCheck from "./pages/verification/LivenessCheck";
 import VerificationProcessing from "./pages/verification/VerificationProcessing";
 import VerificationComplete from "./pages/verification/VerificationComplete";
+import VerificationSuccess from "./pages/verification/VerificationSuccess";
 import Settings from "./pages/Settings";
 import FeesAndLimits from "./pages/FeesAndLimits";
 import ProfileVerification from "./pages/ProfileVerification";
@@ -101,6 +102,7 @@ const AppContent = () => {
         <Route path="/verify/liveness" element={<LivenessCheck />} />
         <Route path="/verify/processing" element={<VerificationProcessing />} />
         <Route path="/verify/complete" element={<VerificationComplete />} />
+        <Route path="/verify/success" element={<VerificationSuccess />} />
         <Route path="/auth/phone" element={<PhoneEntry />} />
         <Route path="/auth/profile" element={<ProfileSteps />} />
         <Route path="*" element={<NotFound />} />

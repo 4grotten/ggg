@@ -15,7 +15,8 @@ const VerificationProcessing = () => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => navigate("/verify/complete"), 500);
+          // Navigate to success page instead of complete
+          setTimeout(() => navigate("/verify/success"), 500);
           return 100;
         }
         return prev + 10;
