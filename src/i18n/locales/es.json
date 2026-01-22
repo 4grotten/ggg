@@ -244,7 +244,10 @@
       "feature2": "Pagos aceptados en todo el mundo",
       "feature3": "Transacciones seguras",
       "button": "Pedir tu tarjeta",
-      "payLater": "Pagar después"
+      "payLater": "Pagar después",
+      "payLaterAlertTitle": "Emisión de tarjeta",
+      "payLaterAlertMessage": "Para emitir una tarjeta, ve a la página principal y toca \"Abrir nueva tarjeta\"",
+      "payLaterAlertButton": "OK"
     }
   },
 

@@ -14,6 +14,14 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { AnimatedDrawerItem } from "@/components/ui/animated-drawer-item";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Play success sound using Web Audio API
 const playSuccessSound = () => {
@@ -102,6 +110,7 @@ const VerificationSuccess = () => {
   const { t } = useTranslation();
   const { clearProgress } = useVerificationProgress();
   const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
+  const [isPayLaterAlertOpen, setIsPayLaterAlertOpen] = useState(false);
 
   useEffect(() => {
     clearProgress();
@@ -323,7 +332,7 @@ const VerificationSuccess = () => {
               <button
                 onClick={() => {
                   setIsPaymentDrawerOpen(false);
-                  navigate("/");
+                  setTimeout(() => setIsPayLaterAlertOpen(true), 300);
                 }}
                 className="w-full py-4 text-center text-muted-foreground hover:text-foreground transition-colors"
               >
@@ -333,6 +342,31 @@ const VerificationSuccess = () => {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {/* iOS-style Pay Later Alert */}
+      <AlertDialog open={isPayLaterAlertOpen} onOpenChange={setIsPayLaterAlertOpen}>
+        <AlertDialogContent className="max-w-[270px] rounded-2xl p-0 gap-0 overflow-hidden">
+          <AlertDialogHeader className="p-4 pb-3">
+            <AlertDialogTitle className="text-center text-[17px] font-semibold">
+              {t('verify.success.payLaterAlertTitle')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground pt-1">
+              {t('verify.success.payLaterAlertMessage')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="p-0 border-t border-border/50 flex-col sm:flex-col">
+            <button
+              onClick={() => {
+                setIsPayLaterAlertOpen(false);
+                navigate("/");
+              }}
+              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] hover:bg-muted/50 transition-colors"
+            >
+              {t('verify.success.payLaterAlertButton')}
+            </button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MobileLayout>
   );
 };

@@ -244,7 +244,10 @@
       "feature2": "Weltweite Zahlungen akzeptiert",
       "feature3": "Sichere Transaktionen",
       "button": "Karte bestellen",
-      "payLater": "Später bezahlen"
+      "payLater": "Später bezahlen",
+      "payLaterAlertTitle": "Kartenausstellung",
+      "payLaterAlertMessage": "Um eine Karte auszustellen, gehen Sie zur Startseite und tippen Sie auf 'Neue Karte eröffnen'",
+      "payLaterAlertButton": "OK"
     }
   },
 
