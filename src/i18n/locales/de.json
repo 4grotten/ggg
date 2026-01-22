@@ -246,8 +246,9 @@
       "button": "Karte bestellen",
       "payLater": "Später bezahlen",
       "payLaterAlertTitle": "Kartenausstellung",
-      "payLaterAlertMessage": "Um eine Karte auszustellen, gehen Sie zur Startseite und tippen Sie auf 'Neue Karte eröffnen'",
-      "payLaterAlertButton": "OK"
+      "payLaterAlertMessage": "Sie kehren zur Startseite zurück. Um eine Karte auszustellen, tippen Sie auf «Neue Karte eröffnen»",
+      "payLaterAlertPay": "Bezahlen",
+      "payLaterAlertOk": "OK"
     }
   },
 
