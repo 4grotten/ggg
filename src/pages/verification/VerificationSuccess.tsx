@@ -180,47 +180,51 @@ const VerificationSuccess = () => {
               type: "spring", 
               bounce: 0.4 
             }}
-            className="w-full max-w-[300px] aspect-[1.586/1] rounded-2xl bg-gradient-to-br from-[#007AFF] via-[#5856D6] to-[#AF52DE] p-5 text-white text-left mb-6 relative overflow-hidden"
+            className="relative w-full max-w-[300px] aspect-[1.586/1] rounded-2xl overflow-hidden p-5 flex flex-col justify-between mb-6"
+            style={{
+              background: 'linear-gradient(135deg, #d4f94e 0%, #a8e030 50%, #8bc926 100%)',
+            }}
           >
-            {/* Shine effect */}
+            {/* Glow effect */}
+            <div 
+              className="absolute inset-0 opacity-40"
+              style={{
+                background: 'radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 50%)',
+              }}
+            />
+            
+            {/* Shine animation */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.3) 35%, rgba(255,255,255,0.5) 40%, rgba(255,255,255,0.3) 45%, transparent 60%)',
+              }}
               initial={{ x: '-100%' }}
               animate={{ x: '200%' }}
               transition={{ delay: 1, duration: 1.2, ease: "easeInOut" }}
             />
             
-            {/* Virtual badge */}
-            <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
-              <span className="text-[10px] font-medium">VIRTUAL</span>
+            {/* Top row */}
+            <div className="relative flex items-center justify-between">
+              <span className="text-xs font-semibold text-black/70 tracking-wide">VIRTUAL</span>
+              <span className="px-2 py-0.5 rounded-full bg-black/10 text-black/70 text-[10px] font-medium">
+                {t('verify.success.instantIssue')}
+              </span>
             </div>
             
-            <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-7 bg-white/30 rounded flex items-center justify-center">
-                <div className="w-6 h-4 border border-white/50 rounded-sm" />
-              </div>
-              <span className="text-sm font-bold tracking-wider">VISA</span>
+            {/* Benefits in center */}
+            <div className="relative space-y-0.5">
+              <p className="text-[13px] text-black/60">• {t('verify.success.feature1')}</p>
+              <p className="text-[13px] text-black/60">• {t('verify.success.feature2')}</p>
+              <p className="text-[13px] text-black/60">• {t('verify.success.feature3')}</p>
             </div>
             
-            <div className="text-lg tracking-[0.2em] mb-3 font-mono">•••• •••• •••• ••••</div>
-            
-            <div className="flex justify-between items-end">
+            {/* Bottom row */}
+            <div className="relative flex items-end justify-between">
               <div>
-                <div className="text-[10px] text-white/60 mb-0.5">CARDHOLDER</div>
-                <div className="text-xs font-medium">YOUR NAME</div>
+                <p className="text-[10px] text-black/60">{t('verify.success.readyToUse')}</p>
               </div>
-              <div className="text-right">
-                <div className="text-[10px] text-white/60 mb-0.5">VALID THRU</div>
-                <div className="text-xs font-medium">••/••</div>
-              </div>
-            </div>
-            
-            {/* Card benefits overlay */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/40 to-transparent p-3 pt-6">
-              <div className="flex gap-2 text-[9px]">
-                <span className="bg-white/20 px-1.5 py-0.5 rounded">💳 {t('verify.success.instantIssue')}</span>
-                <span className="bg-white/20 px-1.5 py-0.5 rounded">🌍 {t('verify.success.worldwide')}</span>
-              </div>
+              <span className="text-xl font-bold text-[#1a1f71] italic">VISA</span>
             </div>
           </motion.div>
 
