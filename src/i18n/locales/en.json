@@ -251,9 +251,9 @@
       "readyToUse": "Ready to use",
       "payLater": "Pay later",
       "payLaterAlertTitle": "Card Issuance",
-      "payLaterAlertMessage": "You will return to the main page. To issue a card, tap \"Open New Card\"",
+      "payLaterAlertMessage": "To issue the card — tap \"Pay\".\nTap \"Go Home\" — you'll return and can pay later in the \"Open New Card\" section.",
       "payLaterAlertPay": "Pay",
-      "payLaterAlertOk": "OK"
+      "payLaterAlertHome": "Go Home"
     }
   },
 
