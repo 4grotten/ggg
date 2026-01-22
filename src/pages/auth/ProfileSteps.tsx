@@ -185,44 +185,42 @@ const NotSpecifiedOption = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className={`w-full flex items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all ${
+      className={`w-full flex items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all min-h-[60px] ${
         isSelected
           ? "border-muted-foreground bg-muted/20"
           : "border-border hover:border-muted-foreground/50"
       }`}
     >
-      <AnimatePresence mode="wait">
-        {showEmoji ? (
-          <motion.span
-            key="emoji"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="text-3xl"
-          >
-            😂
-          </motion.span>
-        ) : (
-          <motion.div
-            key="content"
-            initial={animationComplete ? { opacity: 0, y: 10 } : { opacity: 1 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3"
-          >
-            <span className={`text-lg ${isSelected ? "text-muted-foreground" : ""}`}>{label}</span>
-            {isSelected && animationComplete && (
-              <motion.div 
-                initial={{ scale: 0 }} 
-                animate={{ scale: 1 }}
-                className="w-6 h-6 rounded-full bg-muted-foreground flex items-center justify-center"
-              >
-                <Check className="w-4 h-4 text-white" />
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {showEmoji ? (
+        <motion.span
+          key="emoji"
+          initial={{ x: -100, rotate: -720, opacity: 0 }}
+          animate={{ x: 0, rotate: 0, opacity: 1 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 100, 
+            damping: 12,
+            duration: 0.8
+          }}
+          className="text-2xl"
+        >
+          😂
+        </motion.span>
+      ) : (
+        <>
+          <span className={`text-lg ${isSelected ? "text-muted-foreground" : ""}`}>{label}</span>
+          {isSelected && animationComplete && (
+            <motion.div 
+              initial={{ scale: 0 }} 
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+              className="w-6 h-6 rounded-full bg-muted-foreground flex items-center justify-center"
+            >
+              <Check className="w-4 h-4 text-white" />
+            </motion.div>
+          )}
+        </>
+      )}
     </motion.button>
   );
 };
