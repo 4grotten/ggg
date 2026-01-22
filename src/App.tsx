@@ -34,6 +34,7 @@ import SendCrypto from "./pages/SendCrypto";
 import SendBank from "./pages/SendBank";
 import OpenCardPayCrypto from "./pages/OpenCardPayCrypto";
 import OpenCardPayBank from "./pages/OpenCardPayBank";
+import OpenCardPayment from "./pages/OpenCardPayment";
 import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
 import PhoneEntry from "./pages/auth/PhoneEntry";
@@ -81,6 +82,7 @@ const AppContent = () => {
         <Route path="/top-up/bank/details" element={<TopUpBankDetails />} />
         <Route path="/send/crypto" element={<SendCrypto />} />
         <Route path="/send/bank" element={<SendBank />} />
+        <Route path="/open-card" element={<OpenCardPayment />} />
         <Route path="/open-card/pay-crypto" element={<OpenCardPayCrypto />} />
         <Route path="/open-card/pay-bank" element={<OpenCardPayBank />} />
         <Route path="/transaction/:id" element={<TransactionDetails />} />
