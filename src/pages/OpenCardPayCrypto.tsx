@@ -127,14 +127,24 @@ const OpenCardPayCrypto = () => {
               <span className="text-muted-foreground">{t('openCard.exchangeRate')}</span>
               <span className="font-medium">1 USDT = {USDT_TO_AED_TOP_UP} AED</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <motion.div 
+              key={`fee-${selectedNetwork}`}
+              initial={{ opacity: 0.5 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-between text-sm"
+            >
               <span className="text-muted-foreground">{t('openCard.networkFee')}</span>
               <span className="font-medium">{currentNetwork.fee} USDT</span>
-            </div>
-            <div className="flex justify-between text-base pt-2 border-t border-border/50">
+            </motion.div>
+            <motion.div 
+              key={`total-${selectedNetwork}`}
+              initial={{ scale: 0.95, opacity: 0.5 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex justify-between text-base pt-2 border-t border-border/50"
+            >
               <span className="font-semibold">{t('openCard.totalToPay')}</span>
               <span className="font-bold text-primary">{formatCrypto(cryptoAmountUsdt)} USDT</span>
-            </div>
+            </motion.div>
           </div>
         </div>
 
