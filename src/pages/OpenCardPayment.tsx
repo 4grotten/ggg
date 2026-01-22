@@ -95,6 +95,12 @@ const OpenCardPayment = () => {
                       {t('openCard.instant')}
                     </span>
                   </div>
+                  {/* Benefits in center */}
+                  <div className="relative space-y-0.5">
+                    {benefits.virtual.map((key) => (
+                      <p key={key} className="text-[11px] text-black/60">• {t(`openCard.${key}`)}</p>
+                    ))}
+                  </div>
                   <div className="relative flex items-end justify-between">
                     <div>
                       <p className="text-2xl font-bold text-black/90">{cardIssuanceFee} AED</p>
@@ -124,6 +130,12 @@ const OpenCardPayment = () => {
                       {t('openCard.premium')}
                     </span>
                   </div>
+                  {/* Benefits in center */}
+                  <div className="relative space-y-0.5">
+                    {benefits.metal.map((key) => (
+                      <p key={key} className="text-[11px] text-white/50">• {t(`openCard.${key}`)}</p>
+                    ))}
+                  </div>
                   <div className="relative flex items-end justify-between">
                     <div>
                       <p className="text-2xl font-bold text-white">{cardIssuanceFee} AED</p>
@@ -152,36 +164,6 @@ const OpenCardPayment = () => {
             />
           </div>
         </div>
-
-        {/* Card Benefits */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedCard}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="p-4 rounded-2xl bg-muted/30 border border-border/50"
-          >
-            <p className="text-sm font-medium mb-2">
-              {selectedCard === "virtual" ? t('openCard.virtualCard') : t('openCard.metalCard')}
-            </p>
-            <div className="space-y-1.5">
-              {benefits[selectedCard].map((key, index) => (
-                <motion.div
-                  key={key}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.05 + index * 0.05, duration: 0.2 }}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  {t(`openCard.${key}`)}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
 
         {/* Payment Methods */}
         <div className="space-y-3">
