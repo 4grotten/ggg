@@ -492,7 +492,7 @@
   "send": {
     "back": "返回",
     "sendToCard": "转账到卡",
-    "easyCardTransfer": "Easy Card 转账",
+    "easyCardTransfer": "仅限 EASY CARD 卡",
     "sendLocalBankTransfer": "发送本地银行转账",
     "sendToStablecoins": "将AED发送到稳定币",
     "withdrawToWallet": "提现到外部钱包",

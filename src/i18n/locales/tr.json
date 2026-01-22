@@ -492,7 +492,7 @@
   "send": {
     "back": "Geri",
     "sendToCard": "Karta Gönder",
-    "easyCardTransfer": "Easy Card Transferi",
+    "easyCardTransfer": "Sadece EASY CARD kartlarına",
     "sendLocalBankTransfer": "Yerel Banka Transferi Gönder",
     "sendToStablecoins": "AED'yi Stablecoin'lere Gönder",
     "withdrawToWallet": "Harici cüzdana çek",

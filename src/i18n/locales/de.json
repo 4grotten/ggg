@@ -492,7 +492,7 @@
   "send": {
     "back": "Zurück",
     "sendToCard": "An Karte senden",
-    "easyCardTransfer": "Easy Card Überweisung",
+    "easyCardTransfer": "Nur auf EASY CARD Karten",
     "sendLocalBankTransfer": "Lokale Banküberweisung senden",
     "sendToStablecoins": "AED an Stablecoins senden",
     "withdrawToWallet": "Auf externe Wallet abheben",

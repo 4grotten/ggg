@@ -498,7 +498,7 @@
   "send": {
     "back": "Back",
     "sendToCard": "Send to Card",
-    "easyCardTransfer": "Easy Card Transfer",
+    "easyCardTransfer": "Only to EASY CARD cards",
     "sendLocalBankTransfer": "Send Local Bank Transfer",
     "sendToStablecoins": "Send AED to Stablecoins",
     "withdrawToWallet": "Withdraw to external wallet",
