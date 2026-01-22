@@ -150,11 +150,26 @@ const VerificationSuccess = () => {
         <div 
           className="flex-1 overflow-y-auto px-6 py-8 pb-28 flex flex-col items-center justify-center text-center relative z-10"
         >
+          {/* Card Preview */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="w-full max-w-[280px] aspect-[1.6/1] rounded-2xl bg-gradient-to-br from-[#007AFF] to-[#5856D6] p-5 text-white text-left shadow-xl mb-6"
+          >
+            <div className="flex justify-between items-start mb-8">
+              <div className="w-10 h-7 bg-white/20 rounded" />
+              <span className="text-sm font-semibold">VISA</span>
+            </div>
+            <div className="text-sm tracking-widest mb-2">•••• •••• •••• ••••</div>
+            <div className="text-xs text-white/70">Easy Card</div>
+          </motion.div>
+
           {/* Congratulations - Green color */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.4 }}
             className="flex items-center gap-2 mb-4"
           >
             <span className="text-2xl">🎉</span>
@@ -167,7 +182,7 @@ const VerificationSuccess = () => {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.5 }}
             className="text-2xl font-bold mb-3"
           >
             {t('verify.success.title')}
@@ -176,26 +191,11 @@ const VerificationSuccess = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.6 }}
             className="text-muted-foreground mb-6"
           >
             {t('verify.success.description')}
           </motion.p>
-
-          {/* Card Preview */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6 }}
-            className="w-full max-w-[280px] aspect-[1.6/1] rounded-2xl bg-gradient-to-br from-[#007AFF] to-[#5856D6] p-5 text-white text-left shadow-xl mb-6"
-          >
-            <div className="flex justify-between items-start mb-8">
-              <div className="w-10 h-7 bg-white/20 rounded" />
-              <span className="text-sm font-semibold">VISA</span>
-            </div>
-            <div className="text-sm tracking-widest mb-2">•••• •••• •••• ••••</div>
-            <div className="text-xs text-white/70">Easy Card</div>
-          </motion.div>
 
           {/* Features */}
           <motion.div
