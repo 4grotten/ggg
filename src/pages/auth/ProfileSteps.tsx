@@ -100,7 +100,7 @@ const GenderOption = ({
               className="flex items-center justify-center"
             >
               {isMale ? (
-                <Smartphone className="w-12 h-12" />
+                <span className="text-5xl">📱</span>
               ) : (
                 <GiftIcon />
               )}
