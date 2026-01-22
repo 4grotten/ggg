@@ -180,7 +180,7 @@ const VerificationSuccess = () => {
               type: "spring", 
               bounce: 0.4 
             }}
-            className="relative w-full max-w-[300px] aspect-[1.586/1] rounded-2xl overflow-hidden p-5 flex flex-col justify-between mb-6"
+            className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden p-5 flex flex-col justify-between mb-6"
             style={{
               background: 'linear-gradient(135deg, #d4f94e 0%, #a8e030 50%, #8bc926 100%)',
             }}
