@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -7,10 +7,13 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { RadioGroup } from "@/components/verification/RadioGroup";
 import { ChevronDown } from "lucide-react";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 
 const DocumentType = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { saveFormData, getFormData } = useVerificationProgress();
+  
   const [country] = useState("United Arab Emirates");
   const [documentType, setDocumentType] = useState<string | null>(null);
 
@@ -20,6 +23,17 @@ const DocumentType = () => {
     { id: "residence-permit", label: t('verify.documentType.residencePermit') },
     { id: "passport", label: t('verify.documentType.passport') },
   ];
+
+  // Load saved data on mount
+  useEffect(() => {
+    const saved = getFormData();
+    if (saved.documentType) setDocumentType(saved.documentType);
+  }, [getFormData]);
+
+  // Save data on change
+  useEffect(() => {
+    saveFormData({ documentType: documentType || undefined });
+  }, [documentType, saveFormData]);
 
   return (
     <MobileLayout

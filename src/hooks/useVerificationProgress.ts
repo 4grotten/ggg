@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const STORAGE_KEY = "verification_progress";
+const FORM_DATA_KEY = "verification_form_data";
 
 // Order of verification steps
 const VERIFICATION_STEPS = [
@@ -21,6 +22,26 @@ const VERIFICATION_STEPS = [
 ] as const;
 
 type VerificationStep = (typeof VERIFICATION_STEPS)[number];
+
+export interface VerificationFormData {
+  // PersonalInfo
+  occupation?: string;
+  salary?: string;
+  purpose?: string;
+  otherPurpose?: string;
+  // MonthlyVolume
+  volume?: string;
+  crypto?: string;
+  // AddressInfo
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  postalCode?: string;
+  countryCode?: string;
+  // DocumentType
+  documentType?: string;
+  issuingCountry?: string;
+}
 
 export const useVerificationProgress = () => {
   const navigate = useNavigate();
@@ -43,6 +64,24 @@ export const useVerificationProgress = () => {
   // Clear progress (when verification is complete)
   const clearProgress = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(FORM_DATA_KEY);
+  }, []);
+
+  // Save form data
+  const saveFormData = useCallback((data: Partial<VerificationFormData>) => {
+    const existing = getFormData();
+    const updated = { ...existing, ...data };
+    localStorage.setItem(FORM_DATA_KEY, JSON.stringify(updated));
+  }, []);
+
+  // Get form data
+  const getFormData = useCallback((): VerificationFormData => {
+    try {
+      const saved = localStorage.getItem(FORM_DATA_KEY);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   }, []);
 
   // Check if user should be redirected to saved progress
@@ -84,5 +123,7 @@ export const useVerificationProgress = () => {
     getSavedProgress,
     clearProgress,
     redirectToSavedProgress,
+    saveFormData,
+    getFormData,
   };
 };

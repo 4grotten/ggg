@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -9,6 +9,7 @@ import { RadioGroup } from "@/components/verification/RadioGroup";
 import { SearchableList } from "@/components/verification/SearchableList";
 import { ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 
 const getJobCategories = (t: (key: string) => string) => [
   { id: "chief-exec", label: t('verify.personal.jobs.chiefExec') },
@@ -51,11 +52,27 @@ const MAX_OTHER_LENGTH = 100;
 const PersonalInfo = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { saveFormData, getFormData } = useVerificationProgress();
+  
   const [showJobCategories, setShowJobCategories] = useState(false);
   const [occupation, setOccupation] = useState<string | null>(null);
   const [salary, setSalary] = useState<string | null>(null);
   const [purpose, setPurpose] = useState<string | null>(null);
   const [otherPurpose, setOtherPurpose] = useState("");
+
+  // Load saved data on mount
+  useEffect(() => {
+    const saved = getFormData();
+    if (saved.occupation) setOccupation(saved.occupation);
+    if (saved.salary) setSalary(saved.salary);
+    if (saved.purpose) setPurpose(saved.purpose);
+    if (saved.otherPurpose) setOtherPurpose(saved.otherPurpose);
+  }, [getFormData]);
+
+  // Save data on change
+  useEffect(() => {
+    saveFormData({ occupation: occupation || undefined, salary: salary || undefined, purpose: purpose || undefined, otherPurpose: otherPurpose || undefined });
+  }, [occupation, salary, purpose, otherPurpose, saveFormData]);
 
   const jobCategories = getJobCategories(t);
   const selectedJob = jobCategories.find((j) => j.id === occupation);
