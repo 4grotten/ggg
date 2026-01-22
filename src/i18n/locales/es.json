@@ -381,7 +381,9 @@
     "bankTransferIncoming": "Transferencia Bancaria",
     "iban": "IBAN",
     "bankName": "Nombre del banco",
-    "bankFee": "Comisión bancaria"
+    "bankFee": "Comisión bancaria",
+    "networkFeeFlat": "Comisión de red",
+    "networkFeeAed": "Comisión de red (AED)"
   },
   "topUp": {
     "selectAccount": "Seleccionar Cuenta para Abrir",

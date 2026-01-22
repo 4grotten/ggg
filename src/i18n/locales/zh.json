@@ -381,7 +381,9 @@
     "bankTransferIncoming": "银行转账",
     "iban": "IBAN",
     "bankName": "银行名称",
-    "bankFee": "银行手续费"
+    "bankFee": "银行手续费",
+    "networkFeeFlat": "网络费用",
+    "networkFeeAed": "网络费用 (AED)"
   },
   "topUp": {
     "selectAccount": "选择要开通的账户",

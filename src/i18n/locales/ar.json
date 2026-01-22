@@ -381,7 +381,9 @@
     "bankTransferIncoming": "تحويل مصرفي",
     "iban": "رقم الآيبان",
     "bankName": "اسم البنك",
-    "bankFee": "رسوم البنك"
+    "bankFee": "رسوم البنك",
+    "networkFeeFlat": "رسوم الشبكة",
+    "networkFeeAed": "رسوم الشبكة (AED)"
   },
   "topUp": {
     "selectAccount": "اختر الحساب للفتح",
