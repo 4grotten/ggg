@@ -35,8 +35,8 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
   const userCards = cardsData?.data || [];
 
   const handleCardSelect = (type: CardType) => {
-    setSelectedCard(type);
-    setStep("selectPayment");
+    onOpenChange(false);
+    navigate(`/open-card?type=${type}`);
   };
 
   const handlePaymentSelect = (method: "balance" | "crypto" | "bank") => {
