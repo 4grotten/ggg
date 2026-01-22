@@ -285,6 +285,7 @@
     "billingAddress": "Платёжный адрес",
     "lockCard": "Заблокировать",
     "cardLocked": "Заблокирована",
+    "cardUnlocked": "Разблокирована",
     "lockConfirmTitle": "Вы уверены, что хотите заблокировать карту?",
     "lockConfirmDescription": "Вы не сможете оплачивать или снимать средства, пока карта заблокирована.",
     "lockConfirmYes": "Да",

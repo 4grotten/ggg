@@ -149,6 +149,15 @@ const CardPage = () => {
   const [direction, setDirection] = useState(0);
   const [isCardLocked, setIsCardLocked] = useState(false);
   const [showLockDialog, setShowLockDialog] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+
+  const handleUnlock = () => {
+    setIsUnlocking(true);
+    setTimeout(() => {
+      setIsCardLocked(false);
+      setIsUnlocking(false);
+    }, 1000);
+  };
 
   const currentCardType = cardTypes[activeIndex];
   const cardData = cardsData[currentCardType];
@@ -535,16 +544,36 @@ const CardPage = () => {
           >
             <Button 
               variant="outline" 
-              className={`h-12 rounded-xl gap-2 border-none ${
-                isCardLocked 
+              className={`h-12 rounded-xl gap-2 border-none overflow-hidden ${
+                isCardLocked || isUnlocking
                   ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
                   : "bg-secondary hover:bg-muted"
               }`}
-              onClick={() => !isCardLocked && setShowLockDialog(true)}
-              disabled={isCardLocked}
+              onClick={() => {
+                if (isCardLocked && !isUnlocking) {
+                  handleUnlock();
+                } else if (!isCardLocked && !isUnlocking) {
+                  setShowLockDialog(true);
+                }
+              }}
+              disabled={isUnlocking}
             >
               <Lock className="w-4 h-4" />
-              {isCardLocked ? t("card.cardLocked") : t("card.lockCard")}
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={isUnlocking ? "unlocking" : isCardLocked ? "locked" : "lock"}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {isUnlocking 
+                    ? t("card.cardUnlocked") 
+                    : isCardLocked 
+                      ? t("card.cardLocked") 
+                      : t("card.lockCard")}
+                </motion.span>
+              </AnimatePresence>
             </Button>
             <Button 
               variant="outline"

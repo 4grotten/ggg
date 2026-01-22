@@ -285,6 +285,7 @@
     "billingAddress": "Billing Address",
     "lockCard": "Lock Card",
     "cardLocked": "Locked",
+    "cardUnlocked": "Unlocked",
     "lockConfirmTitle": "Are you sure you want to lock the card?",
     "lockConfirmDescription": "You will not be able to make payments or withdraw funds while the card is locked.",
     "lockConfirmYes": "Yes",
