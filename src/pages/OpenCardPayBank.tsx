@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Copy, Share2, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -25,6 +25,11 @@ const OpenCardPayBank = () => {
     swift: "EABORAE1XXX",
     reference: `CARD-${Date.now().toString(36).toUpperCase()}`
   };
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const formatBalance = (amount: number) => {
     return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
