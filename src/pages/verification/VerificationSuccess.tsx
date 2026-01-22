@@ -150,40 +150,6 @@ const VerificationSuccess = () => {
         <div 
           className="flex-1 overflow-y-auto px-6 py-8 pb-28 flex flex-col items-center justify-center text-center relative z-10"
         >
-          {/* Animated Check Icon with Circle Border */}
-          <div className="relative mb-6">
-            {/* Animated circle border */}
-            <svg className="w-24 h-24" viewBox="0 0 100 100">
-              <motion.circle
-                cx="50"
-                cy="50"
-                r="45"
-                fill="none"
-                stroke="hsl(var(--success))"
-                strokeWidth="4"
-                strokeLinecap="round"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-              />
-            </svg>
-            
-            {/* Checkmark */}
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5, type: "spring", duration: 0.5, bounce: 0.5 }}
-            >
-              <motion.div
-                initial={{ scale: 1 }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ delay: 1, duration: 0.3 }}
-              >
-                <Check className="w-12 h-12 text-success" strokeWidth={3} />
-              </motion.div>
-            </motion.div>
-          </div>
 
           {/* Congratulations - Green color */}
           <motion.div
