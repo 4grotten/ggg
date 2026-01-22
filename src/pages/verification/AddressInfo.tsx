@@ -32,7 +32,8 @@ const AddressInfo = () => {
     if (saved.city) setCity(saved.city);
     if (saved.postalCode) setPostalCode(saved.postalCode);
     if (saved.countryCode) setCountryCode(saved.countryCode);
-  }, [getFormData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Save data on change
   useEffect(() => {

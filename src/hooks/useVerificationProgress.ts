@@ -67,20 +67,25 @@ export const useVerificationProgress = () => {
     localStorage.removeItem(FORM_DATA_KEY);
   }, []);
 
-  // Save form data
-  const saveFormData = useCallback((data: Partial<VerificationFormData>) => {
-    const existing = getFormData();
-    const updated = { ...existing, ...data };
-    localStorage.setItem(FORM_DATA_KEY, JSON.stringify(updated));
-  }, []);
-
-  // Get form data
-  const getFormData = useCallback((): VerificationFormData => {
+  // Get form data (not using useCallback to avoid stale closures)
+  const getFormData = (): VerificationFormData => {
     try {
       const saved = localStorage.getItem(FORM_DATA_KEY);
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
+    }
+  };
+
+  // Save form data
+  const saveFormData = useCallback((data: Partial<VerificationFormData>) => {
+    try {
+      const saved = localStorage.getItem(FORM_DATA_KEY);
+      const existing = saved ? JSON.parse(saved) : {};
+      const updated = { ...existing, ...data };
+      localStorage.setItem(FORM_DATA_KEY, JSON.stringify(updated));
+    } catch {
+      // Ignore errors
     }
   }, []);
 

@@ -67,7 +67,8 @@ const PersonalInfo = () => {
     if (saved.salary) setSalary(saved.salary);
     if (saved.purpose) setPurpose(saved.purpose);
     if (saved.otherPurpose) setOtherPurpose(saved.otherPurpose);
-  }, [getFormData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Save data on change
   useEffect(() => {
