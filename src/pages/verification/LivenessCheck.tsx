@@ -126,7 +126,7 @@ const LivenessCheck = () => {
         <div className="flex flex-col h-[calc(100vh-56px)]">
           {/* Progress */}
           <div className="px-6 py-4">
-            <StepIndicator currentStep={4} totalSteps={4} />
+            <StepIndicator currentStep={5} totalSteps={6} />
           </div>
 
           <div className="flex-1 overflow-y-auto px-6 py-4 pb-28 flex flex-col items-center justify-center">

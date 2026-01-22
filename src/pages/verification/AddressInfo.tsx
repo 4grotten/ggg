@@ -44,7 +44,7 @@ const AddressInfo = () => {
       <div className="flex flex-col h-[calc(100vh-56px)]">
         {/* Progress */}
         <div className="px-6 py-4">
-          <StepIndicator currentStep={2} totalSteps={4} />
+          <StepIndicator currentStep={3} totalSteps={6} />
         </div>
 
         <div className="flex-1 px-6 py-4 overflow-y-auto pb-28">
