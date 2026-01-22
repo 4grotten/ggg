@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE, USDT_TO_AED_TOP_UP, TOP_UP_CRYPTO_FEE } from "@/lib/fees";
 import {
   Select,
@@ -92,14 +93,17 @@ const OpenCardPayCrypto = () => {
   return (
     <MobileLayout
       header={
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-semibold">{t('openCard.payWithCrypto')}</h1>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-lg font-semibold">{t('openCard.payWithCrypto')}</h1>
+          </div>
+          <LanguageSwitcher />
         </div>
       }
     >
