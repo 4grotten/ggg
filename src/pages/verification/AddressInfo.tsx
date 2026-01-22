@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronRight } from "lucide-react";
@@ -10,10 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CountrySearchableList } from "@/components/verification/CountrySearchableList";
 import { getCountryByCode } from "@/data/countries";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 
 const AddressInfo = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { saveFormData, getFormData } = useVerificationProgress();
   
   const [addressLine1, setAddressLine1] = useState("");
   const [addressLine2, setAddressLine2] = useState("");
@@ -21,6 +23,27 @@ const AddressInfo = () => {
   const [postalCode, setPostalCode] = useState("");
   const [countryCode, setCountryCode] = useState("AE");
   const [showCountryPicker, setShowCountryPicker] = useState(false);
+
+  // Load saved data on mount
+  useEffect(() => {
+    const saved = getFormData();
+    if (saved.addressLine1) setAddressLine1(saved.addressLine1);
+    if (saved.addressLine2) setAddressLine2(saved.addressLine2);
+    if (saved.city) setCity(saved.city);
+    if (saved.postalCode) setPostalCode(saved.postalCode);
+    if (saved.countryCode) setCountryCode(saved.countryCode);
+  }, [getFormData]);
+
+  // Save data on change
+  useEffect(() => {
+    saveFormData({ 
+      addressLine1: addressLine1 || undefined, 
+      addressLine2: addressLine2 || undefined, 
+      city: city || undefined, 
+      postalCode: postalCode || undefined, 
+      countryCode: countryCode || undefined 
+    });
+  }, [addressLine1, addressLine2, city, postalCode, countryCode, saveFormData]);
 
   const selectedCountry = getCountryByCode(countryCode);
   const isValid = addressLine1.trim() && city.trim();

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -6,6 +6,7 @@ import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { RadioGroup } from "@/components/verification/RadioGroup";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 
 const volumeOptions = [
   { id: "less-3700", label: "Less than 3,700 AED" },
@@ -18,6 +19,8 @@ const volumeOptions = [
 const MonthlyVolume = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { saveFormData, getFormData } = useVerificationProgress();
+  
   const [volume, setVolume] = useState<string | null>(null);
   const [crypto, setCrypto] = useState<string | null>(null);
 
@@ -26,6 +29,18 @@ const MonthlyVolume = () => {
     { id: "yes-occasionally", label: t('verify.volume.yesOccasionally') },
     { id: "no-interested", label: t('verify.volume.planningToStart') },
   ];
+
+  // Load saved data on mount
+  useEffect(() => {
+    const saved = getFormData();
+    if (saved.volume) setVolume(saved.volume);
+    if (saved.crypto) setCrypto(saved.crypto);
+  }, [getFormData]);
+
+  // Save data on change
+  useEffect(() => {
+    saveFormData({ volume: volume || undefined, crypto: crypto || undefined });
+  }, [volume, crypto, saveFormData]);
 
   const isValid = volume && crypto;
 
