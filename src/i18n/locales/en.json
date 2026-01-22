@@ -381,13 +381,15 @@
     "toAddress": "To address",
     "sentAmount": "Sent amount",
     "networkFee": "Network fee (1%)",
+    "networkFeeFlat": "Network fee",
     "debited": "Debited",
     "bankTransfer": "Bank Transfer",
     "bankTransferIncoming": "Bank Transfer",
     "iban": "IBAN",
     "bankName": "Bank Name",
     "bankFee": "Bank fee",
-    "statusChecked": "Status checked"
+    "statusChecked": "Status checked",
+    "networkFeeAed": "Network fee (AED)"
   },
   "topUp": {
     "selectAccount": "Select Account to Open",

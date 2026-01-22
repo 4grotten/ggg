@@ -566,15 +566,25 @@ const TransactionDetails = () => {
               </div>
             </>
           ) : isCardActivation ? (
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("transaction.cardType")}</span>
-              <button 
-                onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                className="font-medium text-[#007AFF] hover:underline transition-colors"
-              >
-                Visa {transaction.cardType}
-              </button>
-            </div>
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.cardType")}</span>
+                <button 
+                  onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
+                  className="font-medium text-[#007AFF] hover:underline transition-colors"
+                >
+                  Visa {transaction.cardType}
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
+                <span className="font-medium">5.90 USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.networkFeeAed")}</span>
+                <span className="font-medium">{(5.90 * 3.65).toFixed(2)} AED</span>
+              </div>
+            </>
           ) : isIncomingTransfer ? (
             <>
               <div className="flex items-center justify-between">

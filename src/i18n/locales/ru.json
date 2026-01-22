@@ -381,13 +381,15 @@
     "toAddress": "На адрес",
     "sentAmount": "Отправлено",
     "networkFee": "Сетевая комиссия (1%)",
+    "networkFeeFlat": "Сбор сети",
     "debited": "Списано",
     "bankTransfer": "Банковский перевод",
     "bankTransferIncoming": "Банковский перевод",
     "iban": "IBAN",
     "bankName": "Название банка",
     "bankFee": "Комиссия банка",
-    "statusChecked": "Статус проверен"
+    "statusChecked": "Статус проверен",
+    "networkFeeAed": "Сбор сети (AED)"
   },
   "topUp": {
     "selectAccount": "Выберите счёт для открытия",

@@ -381,7 +381,9 @@
     "bankTransferIncoming": "Banküberweisung",
     "iban": "IBAN",
     "bankName": "Bankname",
-    "bankFee": "Bankgebühr"
+    "bankFee": "Bankgebühr",
+    "networkFeeFlat": "Netzwerkgebühr",
+    "networkFeeAed": "Netzwerkgebühr (AED)"
   },
   "topUp": {
     "selectAccount": "Konto zum Öffnen auswählen",

@@ -381,7 +381,9 @@
     "bankTransferIncoming": "Banka Havalesi",
     "iban": "IBAN",
     "bankName": "Banka Adı",
-    "bankFee": "Banka ücreti"
+    "bankFee": "Banka ücreti",
+    "networkFeeFlat": "Ağ ücreti",
+    "networkFeeAed": "Ağ ücreti (AED)"
   },
   "topUp": {
     "selectAccount": "Açılacak Hesabı Seçin",
