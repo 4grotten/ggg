@@ -498,7 +498,7 @@
   "send": {
     "back": "Назад",
     "sendToCard": "Перевод на карту",
-    "easyCardTransfer": "Перевод Easy Card",
+    "easyCardTransfer": "Только на карты EASY CARD",
     "sendLocalBankTransfer": "Локальный банковский перевод",
     "sendToStablecoins": "Отправить AED в стейблкоины",
     "withdrawToWallet": "Вывод на внешний кошелёк",

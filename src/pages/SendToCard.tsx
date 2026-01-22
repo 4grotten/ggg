@@ -165,7 +165,11 @@ const SendToCard = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-2xl font-bold">{t('send.sendToCard')}</h1>
-          <p className="text-muted-foreground text-sm mt-1">{t('send.easyCardTransfer')}</p>
+          <p className="text-muted-foreground mt-1">
+            {t('send.easyCardTransfer').split('EASY CARD')[0]}
+            <span className="font-bold text-primary text-base">EASY CARD</span>
+            {t('send.easyCardTransfer').split('EASY CARD')[1]}
+          </p>
         </div>
 
         {/* Progress Indicator */}

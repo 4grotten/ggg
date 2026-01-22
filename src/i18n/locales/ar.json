@@ -492,7 +492,7 @@
   "send": {
     "back": "رجوع",
     "sendToCard": "إرسال إلى البطاقة",
-    "easyCardTransfer": "تحويل Easy Card",
+    "easyCardTransfer": "فقط لبطاقات EASY CARD",
     "sendLocalBankTransfer": "إرسال تحويل بنكي محلي",
     "sendToStablecoins": "إرسال AED إلى العملات المستقرة",
     "withdrawToWallet": "سحب إلى محفظة خارجية",
