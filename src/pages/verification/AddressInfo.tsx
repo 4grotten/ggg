@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronRight } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +39,7 @@ const AddressInfo = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate("/verify/monthly-volume")}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         {/* Progress */}

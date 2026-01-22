@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { CheckCircle, FileText, Smile, AlertCircle } from "lucide-react";
 
 const VerificationComplete = () => {
@@ -33,6 +34,7 @@ const VerificationComplete = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate("/")}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         <div className="flex-1 overflow-y-auto px-6 py-8 pb-28">

@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { Image, User } from "lucide-react";
 
@@ -94,6 +95,7 @@ const DocumentCaptureFront = () => {
         stopCamera();
         navigate("/verify/document-upload");
       }}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         {/* Progress */}

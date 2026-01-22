@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { RadioGroup } from "@/components/verification/RadioGroup";
 import { SearchableList } from "@/components/verification/SearchableList";
@@ -77,6 +78,7 @@ const PersonalInfo = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate("/verify/steps")}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         {/* Progress */}

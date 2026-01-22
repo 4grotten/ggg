@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { Sun, Scan, Glasses, ExternalLink, Image } from "lucide-react";
 
@@ -120,6 +121,7 @@ const LivenessCheck = () => {
       <MobileLayout
         showBackButton
         onBack={() => navigate("/verify/document-capture-back")}
+        rightAction={<LanguageSwitcher />}
       >
         <div className="flex flex-col h-[calc(100vh-56px)]">
           {/* Progress */}
@@ -197,6 +199,7 @@ const LivenessCheck = () => {
     <MobileLayout
       showBackButton
       onBack={handleBack}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         {/* Progress */}

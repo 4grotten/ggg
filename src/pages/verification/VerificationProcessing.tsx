@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 
 const VerificationProcessing = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const VerificationProcessing = () => {
   }, [navigate]);
 
   return (
-    <MobileLayout>
+    <MobileLayout rightAction={<LanguageSwitcher />}>
       <div className="flex flex-col min-h-[calc(100vh-56px)] items-center justify-center px-6">
         {/* Animated Face */}
         <div className="relative w-40 h-40 mb-8">
