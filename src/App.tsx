@@ -54,7 +54,7 @@ const hiddenNavRoutes = [
   "/transaction/",
   "/profile-verification",
   "/auth/",
-  "/open-card/",
+  "/open-card",
 ];
 
 const AppContent = () => {
