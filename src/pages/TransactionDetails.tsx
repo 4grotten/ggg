@@ -58,7 +58,7 @@ const mockTransactions: Record<string, {
   "12": { id: "12", merchant: "RESTAURANT", time: "03:21 AM", date: "December 30", amountUSDT: 424.81, amountLocal: 418.53, localCurrency: "AED", color: "#EF4444", cardLast4: "7617", exchangeRate: 0.985, status: "settled", cardType: "Virtual" },
   "13": { id: "13", merchant: "Top up", time: "02:30 AM", date: "December 30", amountUSDT: 494.10, amountLocal: 500.00, localCurrency: "USDT", color: "#22C55E", cardLast4: "4521", exchangeRate: 1, status: "settled", type: "topup", fromAddress: "TFVFktvwmaEnMVh6ZxZq2rvmLePfTxhX9L", tokenNetwork: "USDT, Tron (TRC20)", kartaFee: 5.90, cardType: "Metal" },
   "14": { id: "14", merchant: "LOGS", time: "11:27 PM", date: "December 29", amountUSDT: 67.01, amountLocal: 240.00, localCurrency: "AED", color: "#3B82F6", cardLast4: "7617", exchangeRate: 3.58, status: "settled", cardType: "Virtual" },
-  "15": { id: "15", merchant: "Annual Card fee", time: "11:31 PM", date: "December 21", amountUSDT: 183.50, amountLocal: 183.50, localCurrency: "AED", color: "#CCFF00", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "card_activation", cardType: "Virtual" },
+  "15": { id: "15", merchant: "Annual Card fee", time: "11:31 PM", date: "December 21", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", cardLast4: "7617", exchangeRate: 3.65, status: "settled", type: "card_activation", cardType: "Virtual", networkFee: 5.90 },
   "16": { id: "16", merchant: "Top up", time: "11:30 PM", date: "December 21", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "topup", fromAddress: "TFVFktvwmaEnMVh6ZxZq2rvmLePfTxhX9L", tokenNetwork: "USDT, Tron (TRC20)", kartaFee: 5.90, cardType: "Virtual" },
   "17": { id: "17", merchant: "Card Transfer", time: "03:30 PM", date: "January 12", amountUSDT: 250.00, amountLocal: 250.00, localCurrency: "AED", color: "#007AFF", cardLast4: "7617", exchangeRate: 1, status: "processing", type: "card_transfer", recipientCard: "4521", recipientCardFull: "4532 8921 0045 4521", recipientName: "JOHN SMITH", transferFee: 3.75, fromCardFull: "4147 2034 5567 7617", cardType: "Virtual" },
   "18": { id: "18", merchant: "Card Transfer", time: "12:15 PM", date: "January 12", amountUSDT: 100.00, amountLocal: 100.00, localCurrency: "AED", color: "#007AFF", cardLast4: "4521", exchangeRate: 1, status: "settled", type: "card_transfer", recipientCard: "8834", recipientCardFull: "4111 2233 4455 8834", recipientName: "ANNA JOHNSON", transferFee: 1.50, fromCardFull: "4532 8921 0045 4521", cardType: "Metal" },
@@ -577,12 +577,20 @@ const TransactionDetails = () => {
                 </button>
               </div>
               <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.annualCardFee")}</span>
+                <span className="font-medium">183.00 AED</span>
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
-                <span className="font-medium">5.90 USDT</span>
+                <span className="font-medium">{transaction.networkFee?.toFixed(2)} USDT</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.networkFeeAed")}</span>
-                <span className="font-medium">{(5.90 * 3.65).toFixed(2)} AED</span>
+                <span className="font-medium">{((transaction.networkFee || 5.90) * 3.65).toFixed(2)} AED</span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                <span className="text-muted-foreground font-medium">{t("transaction.total")}</span>
+                <span className="font-bold text-primary">{transaction.amountLocal.toFixed(2)} AED</span>
               </div>
             </>
           ) : isIncomingTransfer ? (
