@@ -235,6 +235,15 @@
       "identityDocument": "Identitätsdokument",
       "livenessCheck": "Lebenderkennung",
       "button": "Erneute Einreichung starten"
+    },
+    "success": {
+      "congratulations": "Herzlichen Glückwunsch!",
+      "title": "Verifizierung abgeschlossen!",
+      "description": "Ihre Identität wurde verifiziert. Sie können jetzt Ihre Karte bestellen und alle Funktionen nutzen.",
+      "feature1": "Sofortige virtuelle Kartenausstellung",
+      "feature2": "Weltweite Zahlungen akzeptiert",
+      "feature3": "Sichere Transaktionen",
+      "button": "Karte bestellen"
     }
   },
 

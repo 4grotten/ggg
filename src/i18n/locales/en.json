@@ -237,6 +237,15 @@
       "identityDocument": "Identity document",
       "livenessCheck": "Liveness check",
       "button": "Start resubmission"
+    },
+    "success": {
+      "congratulations": "Congratulations!",
+      "title": "Verification Complete!",
+      "description": "Your identity has been verified. You can now order your card and start using all features.",
+      "feature1": "Instant virtual card issuance",
+      "feature2": "Worldwide payments accepted",
+      "feature3": "Secure transactions",
+      "button": "Order Your Card"
     }
   },
 
