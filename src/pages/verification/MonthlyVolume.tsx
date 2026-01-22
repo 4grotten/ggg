@@ -35,7 +35,8 @@ const MonthlyVolume = () => {
     const saved = getFormData();
     if (saved.volume) setVolume(saved.volume);
     if (saved.crypto) setCrypto(saved.crypto);
-  }, [getFormData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Save data on change
   useEffect(() => {

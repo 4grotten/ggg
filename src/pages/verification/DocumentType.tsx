@@ -28,7 +28,8 @@ const DocumentType = () => {
   useEffect(() => {
     const saved = getFormData();
     if (saved.documentType) setDocumentType(saved.documentType);
-  }, [getFormData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Save data on change
   useEffect(() => {
