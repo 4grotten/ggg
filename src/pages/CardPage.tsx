@@ -14,6 +14,16 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
@@ -137,6 +147,8 @@ const CardPage = () => {
   const [balanceVisible, setBalanceVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [isCardLocked, setIsCardLocked] = useState(false);
+  const [showLockDialog, setShowLockDialog] = useState(false);
 
   const currentCardType = cardTypes[activeIndex];
   const cardData = cardsData[currentCardType];
@@ -523,10 +535,16 @@ const CardPage = () => {
           >
             <Button 
               variant="outline" 
-              className="h-12 rounded-xl gap-2 bg-secondary border-none hover:bg-muted"
+              className={`h-12 rounded-xl gap-2 border-none ${
+                isCardLocked 
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
+                  : "bg-secondary hover:bg-muted"
+              }`}
+              onClick={() => !isCardLocked && setShowLockDialog(true)}
+              disabled={isCardLocked}
             >
               <Lock className="w-4 h-4" />
-              {t("card.lockCard")}
+              {isCardLocked ? t("card.cardLocked") : t("card.lockCard")}
             </Button>
             <Button 
               variant="outline"
@@ -536,6 +554,27 @@ const CardPage = () => {
               {t("card.replaceCard")}
             </Button>
           </motion.div>
+
+          {/* Lock Card Confirmation Dialog */}
+          <AlertDialog open={showLockDialog} onOpenChange={setShowLockDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("card.lockConfirmTitle")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("card.lockConfirmDescription")}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => setIsCardLocked(true)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {t("card.lockConfirmYes")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {/* Balance Section */}
           <motion.div 
