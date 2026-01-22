@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE, TOP_UP_BANK_FEE_PERCENT } from "@/lib/fees";
 
 const OpenCardPayBank = () => {
@@ -75,6 +76,7 @@ ${t('openCard.totalToPay')}: ${formatBalance(totalAmount)} AED`;
           <h1 className="text-lg font-semibold">{t('openCard.payWithBank')}</h1>
         </div>
       }
+      rightAction={<LanguageSwitcher />}
     >
       <div className="px-4 py-6 space-y-4 pb-32">
         {/* Payment Details */}
