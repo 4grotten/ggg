@@ -26,9 +26,9 @@ interface NetworkInfo {
 }
 
 const networks: NetworkInfo[] = [
-  { id: "trc20", name: "TRC20 (Tron)", address: "TN7X8dH3qwP9mKvL2YnZ6bR4cF5jW1sA8e", fee: 1 },
-  { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21", fee: 5 },
-  { id: "bep20", name: "BEP20 (BSC)", address: "0x8B4d2F7E3a9C1bD5f6A8c0E3d9F2b7A4c6D1e8F3", fee: 0.5 },
+  { id: "trc20", name: "TRC20 (Tron)", address: "TN7X8dH3qwP9mKvL2YnZ6bR4cF5jW1sA8e", fee: TOP_UP_CRYPTO_FEE },
+  { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21", fee: TOP_UP_CRYPTO_FEE },
+  { id: "bep20", name: "BEP20 (BSC)", address: "0x8B4d2F7E3a9C1bD5f6A8c0E3d9F2b7A4c6D1e8F3", fee: TOP_UP_CRYPTO_FEE },
 ];
 
 const OpenCardPayCrypto = () => {
