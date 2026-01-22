@@ -247,8 +247,9 @@
       "button": "订购您的卡",
       "payLater": "稍后支付",
       "payLaterAlertTitle": "卡片发行",
-      "payLaterAlertMessage": "要发行卡片，请转到主页并点击'开通新卡'",
-      "payLaterAlertButton": "好的"
+      "payLaterAlertMessage": "您将返回主页。要发行卡片，请点击「开通新卡」",
+      "payLaterAlertPay": "支付",
+      "payLaterAlertOk": "好的"
     }
   },
 

@@ -345,7 +345,7 @@ const VerificationSuccess = () => {
 
       {/* iOS-style Pay Later Alert */}
       <AlertDialog open={isPayLaterAlertOpen} onOpenChange={setIsPayLaterAlertOpen}>
-        <AlertDialogContent className="max-w-[270px] rounded-2xl p-0 gap-0 overflow-hidden">
+        <AlertDialogContent className="max-w-[270px] rounded-2xl p-0 gap-0 overflow-hidden bg-background/95 backdrop-blur-xl">
           <AlertDialogHeader className="p-4 pb-3">
             <AlertDialogTitle className="text-center text-[17px] font-semibold">
               {t('verify.success.payLaterAlertTitle')}
@@ -354,15 +354,24 @@ const VerificationSuccess = () => {
               {t('verify.success.payLaterAlertMessage')}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="p-0 border-t border-border/50 flex-col sm:flex-col">
+          <AlertDialogFooter className="p-0 border-t border-border/30 flex-col sm:flex-col">
+            <button
+              onClick={() => {
+                setIsPayLaterAlertOpen(false);
+                setIsPaymentDrawerOpen(true);
+              }}
+              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] hover:bg-muted/50 transition-colors border-b border-border/30"
+            >
+              {t('verify.success.payLaterAlertPay')}
+            </button>
             <button
               onClick={() => {
                 setIsPayLaterAlertOpen(false);
                 navigate("/");
               }}
-              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] hover:bg-muted/50 transition-colors"
+              className="w-full py-3 text-[17px] text-[#007AFF] hover:bg-muted/50 transition-colors"
             >
-              {t('verify.success.payLaterAlertButton')}
+              {t('verify.success.payLaterAlertOk')}
             </button>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -246,8 +246,9 @@
       "button": "Pedir tu tarjeta",
       "payLater": "Pagar después",
       "payLaterAlertTitle": "Emisión de tarjeta",
-      "payLaterAlertMessage": "Para emitir una tarjeta, ve a la página principal y toca \"Abrir nueva tarjeta\"",
-      "payLaterAlertButton": "OK"
+      "payLaterAlertMessage": "Volverás a la página principal. Para emitir una tarjeta, toca «Abrir nueva tarjeta»",
+      "payLaterAlertPay": "Pagar",
+      "payLaterAlertOk": "OK"
     }
   },
 
