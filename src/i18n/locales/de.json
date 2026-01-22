@@ -76,8 +76,10 @@
   },
   "verify": {
     "progress": {
-      "resuming": "Verifizierung fortsetzen",
-      "resumingDescription": "Wir machen dort weiter, wo Sie aufgehört haben"
+      "resuming": "Verifizierung fortsetzen?",
+      "resumingDescription": "Sie haben gespeicherten Fortschritt. Möchten Sie fortfahren?",
+      "continue": "Fortsetzen",
+      "startOver": "Neu beginnen"
     },
     "privacy": {
       "title": "Ihre Daten bleiben privat\nund geschützt",

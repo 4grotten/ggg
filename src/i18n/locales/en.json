@@ -78,8 +78,10 @@
   },
   "verify": {
     "progress": {
-      "resuming": "Resuming verification",
-      "resumingDescription": "Continuing from where you left off"
+      "resuming": "Continue verification?",
+      "resumingDescription": "You have saved progress. Would you like to continue?",
+      "continue": "Continue",
+      "startOver": "Start over"
     },
     "privacy": {
       "title": "Your data stays private\nand protected",
