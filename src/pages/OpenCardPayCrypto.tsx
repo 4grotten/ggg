@@ -93,19 +93,17 @@ const OpenCardPayCrypto = () => {
   return (
     <MobileLayout
       header={
-        <div className="flex items-center justify-between w-full pr-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h1 className="text-lg font-semibold">{t('openCard.payWithCrypto')}</h1>
-          </div>
-          <LanguageSwitcher />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-lg font-semibold">{t('openCard.payWithCrypto')}</h1>
         </div>
       }
+      rightAction={<LanguageSwitcher />}
     >
       <div className="px-4 py-6 space-y-4 pb-32">
         {/* Payment Details */}
