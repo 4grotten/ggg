@@ -166,11 +166,6 @@ const NotSpecifiedOption = ({
   useEffect(() => {
     if (isSelected && !animationComplete) {
       setShowEmoji(true);
-      const timer = setTimeout(() => {
-        setShowEmoji(false);
-        setAnimationComplete(true);
-      }, 800);
-      return () => clearTimeout(timer);
     }
     if (!isSelected) {
       setShowEmoji(false);
@@ -185,42 +180,49 @@ const NotSpecifiedOption = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className={`w-full flex items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all min-h-[60px] ${
+      className={`w-full flex items-center justify-center p-4 rounded-2xl border-2 transition-all min-h-[60px] ${
         isSelected
           ? "border-muted-foreground bg-muted/20"
           : "border-border hover:border-muted-foreground/50"
       }`}
     >
-      {showEmoji ? (
-        <motion.span
-          key="emoji"
-          initial={{ x: -100, rotate: -720, opacity: 0 }}
-          animate={{ x: 0, rotate: 0, opacity: 1 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 100, 
-            damping: 12,
-            duration: 0.8
-          }}
-          className="text-2xl"
-        >
-          😂
-        </motion.span>
-      ) : (
-        <>
-          <span className={`text-lg ${isSelected ? "text-muted-foreground" : ""}`}>{label}</span>
-          {isSelected && animationComplete && (
+      <div className="relative flex items-center gap-2">
+        <span className={`text-lg ${isSelected ? "text-muted-foreground" : ""}`}>{label}</span>
+        
+        <div className="relative w-6 h-6">
+          {/* Rolling emoji */}
+          {showEmoji && (
+            <motion.span
+              initial={{ x: -200, rotate: -1080, opacity: 1 }}
+              animate={{ x: 0, rotate: 0, opacity: 1 }}
+              onAnimationComplete={() => {
+                setShowEmoji(false);
+                setAnimationComplete(true);
+              }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 80, 
+                damping: 12,
+              }}
+              className="absolute inset-0 flex items-center justify-center text-xl"
+            >
+              😂
+            </motion.span>
+          )}
+          
+          {/* Checkmark appears after emoji */}
+          {isSelected && animationComplete && !showEmoji && (
             <motion.div 
               initial={{ scale: 0 }} 
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
-              className="w-6 h-6 rounded-full bg-muted-foreground flex items-center justify-center"
+              className="absolute inset-0 w-6 h-6 rounded-full bg-muted-foreground flex items-center justify-center"
             >
               <Check className="w-4 h-4 text-white" />
             </motion.div>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </motion.button>
   );
 };
