@@ -8,6 +8,28 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE, USDT_TO_AED_TOP_UP, TOP_UP_CRYPTO_FEE } from "@/lib/fees";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type NetworkType = "trc20" | "erc20" | "bep20";
+
+interface NetworkInfo {
+  id: NetworkType;
+  name: string;
+  address: string;
+  fee: number;
+}
+
+const networks: NetworkInfo[] = [
+  { id: "trc20", name: "TRC20 (Tron)", address: "TN7X8dH3qwP9mKvL2YnZ6bR4cF5jW1sA8e", fee: 1 },
+  { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21", fee: 5 },
+  { id: "bep20", name: "BEP20 (BSC)", address: "0x8B4d2F7E3a9C1bD5f6A8c0E3d9F2b7A4c6D1e8F3", fee: 0.5 },
+];
 
 const OpenCardPayCrypto = () => {
   const navigate = useNavigate();
@@ -15,15 +37,18 @@ const OpenCardPayCrypto = () => {
   const [searchParams] = useSearchParams();
   const cardType = searchParams.get("type") as "virtual" | "metal" || "virtual";
   
+  // Network selection
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>("trc20");
+  
   // Timer for crypto payment (30 minutes = 1800 seconds)
   const [timeLeft, setTimeLeft] = useState(1800);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Crypto wallet address (mock)
-  const cryptoWalletAddress = "TN7X8dH3qwP9mKvL2YnZ6bR4cF5jW1sA8e";
+  const currentNetwork = networks.find(n => n.id === selectedNetwork) || networks[0];
+  const cryptoWalletAddress = currentNetwork.address;
 
   const cardIssuanceFee = cardType === "virtual" ? VIRTUAL_CARD_ANNUAL_FEE : METAL_CARD_ANNUAL_FEE;
-  const cryptoAmountUsdt = (cardIssuanceFee / USDT_TO_AED_TOP_UP) + TOP_UP_CRYPTO_FEE;
+  const cryptoAmountUsdt = (cardIssuanceFee / USDT_TO_AED_TOP_UP) + currentNetwork.fee;
 
   // Start timer
   useEffect(() => {
@@ -104,13 +129,33 @@ const OpenCardPayCrypto = () => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t('openCard.networkFee')}</span>
-              <span className="font-medium">{TOP_UP_CRYPTO_FEE} USDT</span>
+              <span className="font-medium">{currentNetwork.fee} USDT</span>
             </div>
             <div className="flex justify-between text-base pt-2 border-t border-border/50">
               <span className="font-semibold">{t('openCard.totalToPay')}</span>
               <span className="font-bold text-primary">{formatCrypto(cryptoAmountUsdt)} USDT</span>
             </div>
           </div>
+        </div>
+
+        {/* Network Selection */}
+        <div className="p-4 rounded-2xl bg-muted/50 border border-border/50">
+          <p className="text-xs text-muted-foreground mb-2">{t('openCard.selectNetwork')}</p>
+          <Select value={selectedNetwork} onValueChange={(value: NetworkType) => setSelectedNetwork(value)}>
+            <SelectTrigger className="w-full h-12 bg-background border-border/50 rounded-xl">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {networks.map((network) => (
+                <SelectItem key={network.id} value={network.id}>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{network.name}</span>
+                    <span className="text-xs text-muted-foreground">({network.fee} USDT {t('openCard.fee')})</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* QR Code and Address */}
@@ -123,7 +168,7 @@ const OpenCardPayCrypto = () => {
           />
           <p className="text-xs text-muted-foreground mb-2">{t('openCard.sendExactAmount')}</p>
           <p className="text-xl font-bold text-foreground">{formatCrypto(cryptoAmountUsdt)} USDT</p>
-          <p className="text-xs text-muted-foreground mt-2">{t('openCard.network')}: TRC20</p>
+          <p className="text-xs text-muted-foreground mt-2">{t('openCard.network')}: {currentNetwork.name}</p>
         </div>
 
         {/* Wallet Address */}
