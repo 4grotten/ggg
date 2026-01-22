@@ -80,7 +80,6 @@ const OpenCardPayment = () => {
                   className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden p-5 flex flex-col justify-between"
                   style={{
                     background: 'linear-gradient(135deg, #d4f94e 0%, #a8e030 50%, #8bc926 100%)',
-                    boxShadow: '0 8px 32px -8px rgba(168, 224, 48, 0.5)',
                   }}
                 >
                   <div 
@@ -114,7 +113,6 @@ const OpenCardPayment = () => {
                   className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden p-5 flex flex-col justify-between"
                   style={{
                     background: 'linear-gradient(145deg, #3a3a3a 0%, #1f1f1f 50%, #0a0a0a 100%)',
-                    boxShadow: '0 8px 32px -8px rgba(0, 0, 0, 0.6)',
                   }}
                 >
                   <div 
