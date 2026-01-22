@@ -4,7 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const AnimatedFingerprint = () => {
   const [step, setStep] = useState(0);
@@ -77,80 +82,108 @@ export const VerifyIdentityCard = ({
 }: VerifyIdentityCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { getSavedProgress } = useVerificationProgress();
+  const { getSavedProgress, clearProgress } = useVerificationProgress();
+  const [showDialog, setShowDialog] = useState(false);
 
   const handleClick = () => {
     const savedStep = getSavedProgress();
     
-    // If there's saved progress, show confirmation toast
+    // If there's saved progress, show confirmation dialog
     if (savedStep && savedStep !== "/verify") {
-      toast({
-        title: t('verify.progress.resuming'),
-        description: t('verify.progress.resumingDescription'),
-        action: (
-          <div className="flex gap-2">
-            <button
-              onClick={() => navigate(savedStep)}
-              className="px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90"
-            >
-              {t('verify.progress.continue')}
-            </button>
-            <button
-              onClick={() => navigate("/verify")}
-              className="px-3 py-1.5 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80"
-            >
-              {t('verify.progress.startOver')}
-            </button>
-          </div>
-        ),
-      });
+      setShowDialog(true);
     } else {
       // No saved progress, go to start
       navigate("/verify");
     }
   };
 
+  const handleContinue = () => {
+    const savedStep = getSavedProgress();
+    setShowDialog(false);
+    if (savedStep) {
+      navigate(savedStep);
+    }
+  };
+
+  const handleReset = () => {
+    clearProgress();
+    setShowDialog(false);
+    navigate("/verify");
+  };
+
   return (
-    <button
-      onClick={handleClick}
-      className="w-full rounded-2xl p-4 text-left group bg-[#007AFF]"
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          {/* Animated Fingerprint Icon */}
-          <AnimatedFingerprint />
+    <>
+      <button
+        onClick={handleClick}
+        className="w-full rounded-2xl p-4 text-left group bg-[#007AFF]"
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-3">
+            {/* Animated Fingerprint Icon */}
+            <AnimatedFingerprint />
+            
+            <div className="flex flex-col">
+              <p className="text-[10px] uppercase tracking-wider text-white/70 font-medium">
+                {t('dashboard.getYourCard')}
+              </p>
+              <p className="font-bold text-white text-lg">{t('dashboard.verifyIdentity')}</p>
+              <p className="text-sm text-white/70">{t('dashboard.verifyDescription')}</p>
+            </div>
+          </div>
           
-          <div className="flex flex-col">
-            <p className="text-[10px] uppercase tracking-wider text-white/70 font-medium">
-              {t('dashboard.getYourCard')}
-            </p>
-            <p className="font-bold text-white text-lg">{t('dashboard.verifyIdentity')}</p>
-            <p className="text-sm text-white/70">{t('dashboard.verifyDescription')}</p>
+          {/* Arrow Button */}
+          <div className="w-10 h-10 min-w-10 min-h-10 shrink-0 rounded-full border-2 border-white flex items-center justify-center group-hover:bg-white/10 transition-colors">
+            <ArrowRight className="w-5 h-5 text-white" />
           </div>
         </div>
-        
-        {/* Arrow Button */}
-        <div className="w-10 h-10 min-w-10 min-h-10 shrink-0 rounded-full border-2 border-white flex items-center justify-center group-hover:bg-white/10 transition-colors">
-          <ArrowRight className="w-5 h-5 text-white" />
+
+        {/* Progress Bar */}
+        <div className="mt-4 flex gap-2">
+          {Array.from({ length: totalSteps }).map((_, index) => (
+            <div
+              key={index}
+              className={`h-1.5 flex-1 rounded-full ${
+                index < progress ? "bg-white" : "bg-white/30"
+              }`}
+            />
+          ))}
         </div>
-      </div>
 
-      {/* Progress Bar */}
-      <div className="mt-4 flex gap-2">
-        {Array.from({ length: totalSteps }).map((_, index) => (
-          <div
-            key={index}
-            className={`h-1.5 flex-1 rounded-full ${
-              index < progress ? "bg-white" : "bg-white/30"
-            }`}
-          />
-        ))}
-      </div>
+        {/* Steps Counter */}
+        <p className="mt-2 text-sm text-white/70 font-medium">
+          {progress} {t('dashboard.of')} {totalSteps} {t('dashboard.stepsDone')}
+        </p>
+      </button>
 
-      {/* Steps Counter */}
-      <p className="mt-2 text-sm text-white/70 font-medium">
-        {progress} {t('dashboard.of')} {totalSteps} {t('dashboard.stepsDone')}
-      </p>
-    </button>
+      {/* iOS-style Alert Dialog */}
+      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+        <AlertDialogContent className="max-w-[270px] rounded-2xl p-0 overflow-hidden border-0 gap-0">
+          <div className="p-4 pb-3">
+            <AlertDialogTitle className="text-center text-[17px] font-semibold mb-1">
+              {t('verify.progress.resuming')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground">
+              {t('verify.progress.resumingDescription')}
+            </AlertDialogDescription>
+          </div>
+          
+          {/* iOS-style buttons */}
+          <div className="flex flex-col">
+            <button
+              onClick={handleContinue}
+              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] border-t border-border hover:bg-secondary/50 transition-colors"
+            >
+              {t('verify.progress.continue')}
+            </button>
+            <button
+              onClick={handleReset}
+              className="w-full py-3 text-[17px] font-normal text-destructive border-t border-border hover:bg-secondary/50 transition-colors"
+            >
+              {t('verify.progress.reset')}
+            </button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };

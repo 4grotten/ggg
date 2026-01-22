@@ -77,9 +77,10 @@
   "verify": {
     "progress": {
       "resuming": "Doğrulamaya devam et?",
-      "resumingDescription": "Kaydedilmiş ilerlemeniz var. Devam etmek ister misiniz?",
+      "resumingDescription": "Kaydedilmiş ilerlemeniz var. Devam mı yoksa yeniden mi başlamak istersiniz?",
       "continue": "Devam et",
-      "startOver": "Yeniden başla"
+      "startOver": "Yeniden başla",
+      "reset": "Sıfırla ve yeniden başla"
     },
     "privacy": {
       "title": "Verileriniz gizli\nve korumalı kalır",

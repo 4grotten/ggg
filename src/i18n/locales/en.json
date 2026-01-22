@@ -79,9 +79,10 @@
   "verify": {
     "progress": {
       "resuming": "Continue verification?",
-      "resumingDescription": "You have saved progress. Would you like to continue?",
+      "resumingDescription": "You have saved progress. Would you like to continue or start over?",
       "continue": "Continue",
-      "startOver": "Start over"
+      "startOver": "Start over",
+      "reset": "Reset and start over"
     },
     "privacy": {
       "title": "Your data stays private\nand protected",
