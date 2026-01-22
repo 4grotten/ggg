@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, CreditCard, Check, ClipboardPaste, X } from "lucide-react";
+import { ChevronLeft, CreditCard, Check, ClipboardPaste, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -16,11 +16,32 @@ import {
 } from "@/components/ui/select";
 import { CARD_TO_CARD_FEE_PERCENT } from "@/lib/fees";
 
-// Mock data for cards
-const userCards = [
-  { id: "1", name: "Visa Virtual", lastFour: "7617", balance: 213757.49, type: "virtual" },
-  { id: "2", name: "Visa Metal", lastFour: "4521", balance: 256508.98, type: "metal" },
-];
+// Type for user card
+interface UserCard {
+  id: string;
+  name: string;
+  lastFour: string;
+  balance: number;
+  type: "virtual" | "metal";
+}
+
+// API-ready function to fetch user cards
+// TODO: Replace with actual API call
+const fetchUserCards = async (): Promise<{ success: boolean; cards: UserCard[]; error?: string }> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  // Mock successful response
+  const mockCards: UserCard[] = [
+    { id: "1", name: "Visa Virtual", lastFour: "7617", balance: 213757.49, type: "virtual" },
+    { id: "2", name: "Visa Metal", lastFour: "4521", balance: 256508.98, type: "metal" },
+  ];
+  
+  return { success: true, cards: mockCards };
+  
+  // Example error response for testing:
+  // return { success: false, cards: [], error: "Failed to load cards" };
+};
 
 // API-ready function to get recipient name by card number
 // TODO: Replace with actual API call
@@ -69,10 +90,36 @@ const SendToCard = () => {
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [recipientNotFound, setRecipientNotFound] = useState(false);
   const [amount, setAmount] = useState("");
-  const [selectedCardId, setSelectedCardId] = useState(userCards[0].id);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Cards state
+  const [userCards, setUserCards] = useState<UserCard[]>([]);
+  const [selectedCardId, setSelectedCardId] = useState<string>("");
+  const [isLoadingCards, setIsLoadingCards] = useState(false);
+  const [cardsError, setCardsError] = useState<string | null>(null);
 
   const selectedCard = userCards.find((c) => c.id === selectedCardId);
+
+  // Fetch cards when entering amount step
+  useEffect(() => {
+    if (step === "amount" && userCards.length === 0) {
+      setIsLoadingCards(true);
+      setCardsError(null);
+      
+      fetchUserCards().then((result) => {
+        if (result.success && result.cards.length > 0) {
+          setUserCards(result.cards);
+          setSelectedCardId(result.cards[0].id);
+        } else {
+          setCardsError(result.error || t('send.failedToLoadCards'));
+        }
+        setIsLoadingCards(false);
+      }).catch(() => {
+        setCardsError(t('send.failedToLoadCards'));
+        setIsLoadingCards(false);
+      });
+    }
+  }, [step, userCards.length, t]);
   const cleanCardNumber = cardNumber.replace(/\s/g, "");
   const isCardValid = cleanCardNumber.length === 16;
   
@@ -306,28 +353,71 @@ const SendToCard = () => {
               </div>
             </div>
 
-            {/* Select Source Card */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{t('send.fromCard')}</label>
-              <Select value={selectedCardId} onValueChange={setSelectedCardId}>
-                <SelectTrigger className="h-14 rounded-xl">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {userCards.map((card) => (
-                    <SelectItem key={card.id} value={card.id} className="data-[state=checked]:text-white">
-                      <div className="flex items-center justify-between w-full gap-4">
-                        <span>{card.name} •••• {card.lastFour}</span>
-                        <span className="text-muted-foreground group-data-[state=checked]:text-white/90">{card.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-sm text-muted-foreground">
-                {t('send.available')}: <span className="font-medium text-foreground">{selectedCard?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
-              </p>
-            </div>
+            {/* Loading Cards State */}
+            {isLoadingCards && (
+              <div className="bg-secondary rounded-xl p-6 flex items-center justify-center gap-3 animate-pulse">
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                <span className="text-muted-foreground">{t('send.loadingCards')}</span>
+              </div>
+            )}
+
+            {/* Cards Error State */}
+            {cardsError && !isLoadingCards && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                  <X className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-red-500">{t('send.failedToLoadCards')}</p>
+                  <button 
+                    onClick={() => {
+                      setCardsError(null);
+                      setIsLoadingCards(true);
+                      fetchUserCards().then((result) => {
+                        if (result.success && result.cards.length > 0) {
+                          setUserCards(result.cards);
+                          setSelectedCardId(result.cards[0].id);
+                        } else {
+                          setCardsError(result.error || t('send.failedToLoadCards'));
+                        }
+                        setIsLoadingCards(false);
+                      }).catch(() => {
+                        setCardsError(t('send.failedToLoadCards'));
+                        setIsLoadingCards(false);
+                      });
+                    }}
+                    className="text-sm text-primary hover:underline mt-1"
+                  >
+                    {t('send.tryAgain')}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Select Source Card - Only show when cards loaded */}
+            {!isLoadingCards && !cardsError && userCards.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('send.fromCard')}</label>
+                <Select value={selectedCardId} onValueChange={setSelectedCardId}>
+                  <SelectTrigger className="h-14 rounded-xl">
+                    <SelectValue placeholder={t('send.selectCard')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {userCards.map((card) => (
+                      <SelectItem key={card.id} value={card.id} className="data-[state=checked]:text-white">
+                        <div className="flex items-center justify-between w-full gap-4">
+                          <span>{card.name} •••• {card.lastFour}</span>
+                          <span className="text-muted-foreground group-data-[state=checked]:text-white/90">{card.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  {t('send.available')}: <span className="font-medium text-foreground">{selectedCard?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                </p>
+              </div>
+            )}
 
             {/* Amount Input */}
             <div className="space-y-2">
