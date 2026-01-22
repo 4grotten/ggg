@@ -109,14 +109,22 @@ export const useVerificationProgress = () => {
     if (VERIFICATION_STEPS.includes(currentPath)) {
       // Don't save processing or complete steps
       if (currentPath !== "/verify/processing" && currentPath !== "/verify/complete") {
-        saveProgress(currentPath);
+        // Only save if current step is further than saved step
+        const savedStep = getSavedProgress();
+        const savedIndex = savedStep ? VERIFICATION_STEPS.indexOf(savedStep) : -1;
+        const currentIndex = VERIFICATION_STEPS.indexOf(currentPath);
+        
+        // Only update progress if we're moving forward or there's no saved progress
+        if (currentIndex > savedIndex) {
+          saveProgress(currentPath);
+        }
       }
       // Clear progress when complete
       if (currentPath === "/verify/complete") {
         clearProgress();
       }
     }
-  }, [location.pathname, saveProgress, clearProgress]);
+  }, [location.pathname, saveProgress, clearProgress, getSavedProgress]);
 
   return {
     saveProgress,
