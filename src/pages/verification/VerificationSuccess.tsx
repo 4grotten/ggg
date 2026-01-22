@@ -148,7 +148,7 @@ const VerificationSuccess = () => {
         </div>
 
         <div 
-          className="flex-1 overflow-y-auto px-6 py-8 pb-28 flex flex-col items-center justify-center text-center relative z-10"
+          className="flex-1 overflow-y-auto px-6 py-8 pb-28 flex flex-col items-center text-center relative z-10"
         >
           {/* Title */}
           <motion.h1
