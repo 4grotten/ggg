@@ -563,10 +563,10 @@ const CardPage = () => {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={isUnlocking ? "unlocking-icon" : isCardLocked ? "locked-icon" : "unlock-icon"}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ opacity: 0, scale: 0.8, rotate: -90 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, rotate: 90 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                 >
                   {isCardLocked && !isUnlocking ? <Lock className="w-4 h-4" /> : <LockOpen className="w-4 h-4" />}
                 </motion.div>
