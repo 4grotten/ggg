@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { Check, CreditCard } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { motion } from "framer-motion";
 
@@ -210,21 +210,22 @@ const VerificationSuccess = () => {
               <div className="relative flex items-center justify-between">
                 <span className="text-xs font-semibold text-black/70 tracking-wide">VIRTUAL</span>
                 <span className="px-2 py-0.5 rounded-full bg-black/10 text-black/70 text-[10px] font-medium">
-                  {t('verify.success.instantIssue')}
+                  {t('openCard.instant')}
                 </span>
               </div>
               
               {/* Benefits in center */}
-              <div className="relative space-y-0.5">
-                <p className="text-[13px] text-black/60">• {t('verify.success.feature1')}</p>
-                <p className="text-[13px] text-black/60">• {t('verify.success.feature2')}</p>
-                <p className="text-[13px] text-black/60">• {t('verify.success.feature3')}</p>
+              <div className="relative space-y-0.5 text-left">
+                <p className="text-[13px] text-black/60">• {t('openCard.virtualBenefit1')}</p>
+                <p className="text-[13px] text-black/60">• {t('openCard.virtualBenefit2')}</p>
+                <p className="text-[13px] text-black/60">• {t('openCard.virtualBenefit3')}</p>
               </div>
               
-              {/* Bottom row */}
+              {/* Bottom row with price */}
               <div className="relative flex items-end justify-between">
-                <div>
-                  <p className="text-[10px] text-black/60">{t('verify.success.readyToUse')}</p>
+                <div className="text-left">
+                  <p className="text-2xl font-bold text-black/90">183 AED</p>
+                  <p className="text-[10px] text-black/60">{t('openCard.annualFee')}</p>
                 </div>
                 <span className="text-xl font-bold text-[#1a1f71] italic">VISA</span>
               </div>
@@ -244,37 +245,6 @@ const VerificationSuccess = () => {
             </span>
             <span className="text-2xl">🎉</span>
           </motion.div>
-
-          {/* Features with left-to-right animation */}
-          <div className="space-y-2 w-full">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8, duration: 0.4 }}
-              className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
-            >
-              <Check className="w-5 h-5 text-success" />
-              <span className="text-sm">{t('verify.success.feature1')}</span>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.4, duration: 0.4 }}
-              className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
-            >
-              <Check className="w-5 h-5 text-success" />
-              <span className="text-sm">{t('verify.success.feature2')}</span>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 2.0, duration: 0.4 }}
-              className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
-            >
-              <Check className="w-5 h-5 text-success" />
-              <span className="text-sm">{t('verify.success.feature3')}</span>
-            </motion.div>
-          </div>
 
           <PoweredByFooter />
         </div>
