@@ -63,13 +63,9 @@ const GenderOption = ({
     </svg>
   );
 
-  // Lipstick icon for female
-  const LipstickIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12">
-      <path d="M12 2v6" />
-      <path d="M9 8h6l1 3v9a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-9l1-3Z" />
-      <path d="M9 11h6" />
-    </svg>
+  // Gift icon for female
+  const GiftIcon = () => (
+    <span className="text-5xl">💝</span>
   );
 
   return (
@@ -106,7 +102,7 @@ const GenderOption = ({
               {isMale ? (
                 <Smartphone className="w-12 h-12" />
               ) : (
-                <LipstickIcon />
+                <GiftIcon />
               )}
             </motion.div>
           ) : (
