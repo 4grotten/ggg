@@ -51,7 +51,7 @@ const OpenCardPayment = () => {
         </div>
       }
     >
-      <div className="px-4 py-6 space-y-4">
+      <div className="px-4 py-6 space-y-4 pb-8">
         {/* Card Carousel */}
         <div className="relative overflow-hidden">
           <AnimatePresence initial={false} mode="popLayout">
@@ -98,7 +98,7 @@ const OpenCardPayment = () => {
                   {/* Benefits in center */}
                   <div className="relative space-y-0.5">
                     {benefits.virtual.map((key) => (
-                      <p key={key} className="text-[11px] text-black/60">• {t(`openCard.${key}`)}</p>
+                      <p key={key} className="text-[13px] text-black/60">• {t(`openCard.${key}`)}</p>
                     ))}
                   </div>
                   <div className="relative flex items-end justify-between">
@@ -133,7 +133,7 @@ const OpenCardPayment = () => {
                   {/* Benefits in center */}
                   <div className="relative space-y-0.5">
                     {benefits.metal.map((key) => (
-                      <p key={key} className="text-[11px] text-white/50">• {t(`openCard.${key}`)}</p>
+                      <p key={key} className="text-[13px] text-white/50">• {t(`openCard.${key}`)}</p>
                     ))}
                   </div>
                   <div className="relative flex items-end justify-between">
