@@ -505,6 +505,8 @@
     "stepOf": "Step {{step}} of {{total}}",
     "cardNumber": "Card Number",
     "recipient": "Recipient",
+    "recipientNotFound": "Recipient not found",
+    "checkCardNumber": "Check the card number or try a different one",
     "fromCard": "From Card",
     "available": "Available",
     "amount": "Amount",

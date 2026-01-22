@@ -499,6 +499,8 @@
     "stepOf": "第 {{step}} 步，共 {{total}} 步",
     "cardNumber": "卡号",
     "recipient": "收款人",
+    "recipientNotFound": "未找到收款人",
+    "checkCardNumber": "请检查卡号或尝试其他卡",
     "fromCard": "从卡",
     "available": "可用",
     "amount": "金额",
