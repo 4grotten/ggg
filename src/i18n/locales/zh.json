@@ -76,6 +76,10 @@
     "profile": "个人资料"
   },
   "verify": {
+    "progress": {
+      "resuming": "继续验证",
+      "resumingDescription": "从上次停止的地方继续"
+    },
     "privacy": {
       "title": "您的数据保持私密\n且受保护",
       "description": "我们不存储您的个人数据，也不会与\n第三方分享您的交易详情。",

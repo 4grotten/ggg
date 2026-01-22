@@ -77,6 +77,10 @@
     "profile": "Profile"
   },
   "verify": {
+    "progress": {
+      "resuming": "Resuming verification",
+      "resumingDescription": "Continuing from where you left off"
+    },
     "privacy": {
       "title": "Your data stays private\nand protected",
       "description": "We don't store your personal data or share your\ntransaction details with third parties.",
