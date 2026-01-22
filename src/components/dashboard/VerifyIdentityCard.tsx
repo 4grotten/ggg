@@ -88,7 +88,8 @@ export const VerifyIdentityCard = ({
   const handleClick = () => {
     const savedStep = getSavedProgress();
     
-    // If there's saved progress, show confirmation dialog
+    // Always show dialog - user can choose to continue or start fresh
+    // If there's saved progress beyond /verify, show dialog
     if (savedStep && savedStep !== "/verify") {
       setShowDialog(true);
     } else {
