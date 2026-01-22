@@ -249,7 +249,10 @@
       "instantIssue": "Мгновенно",
       "worldwide": "Весь мир",
       "readyToUse": "Готова к использованию",
-      "payLater": "Оплатить позже"
+      "payLater": "Оплатить позже",
+      "payLaterAlertTitle": "Выпуск карты",
+      "payLaterAlertMessage": "Чтобы выпустить карту, на главной странице нажмите «Открыть новую карту»",
+      "payLaterAlertButton": "Хорошо"
     }
   },
 

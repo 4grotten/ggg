@@ -244,7 +244,10 @@
       "feature2": "Dünya çapında ödeme kabul edilir",
       "feature3": "Güvenli işlemler",
       "button": "Kartınızı sipariş edin",
-      "payLater": "Daha sonra öde"
+      "payLater": "Daha sonra öde",
+      "payLaterAlertTitle": "Kart Çıkarma",
+      "payLaterAlertMessage": "Kart çıkarmak için ana sayfaya gidin ve \"Yeni Kart Aç\"a dokunun",
+      "payLaterAlertButton": "Tamam"
     }
   },
 

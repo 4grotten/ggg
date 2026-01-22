@@ -249,7 +249,10 @@
       "instantIssue": "Instant",
       "worldwide": "Worldwide",
       "readyToUse": "Ready to use",
-      "payLater": "Pay later"
+      "payLater": "Pay later",
+      "payLaterAlertTitle": "Card Issuance",
+      "payLaterAlertMessage": "To issue a card, go to the main page and tap \"Open New Card\"",
+      "payLaterAlertButton": "OK"
     }
   },
 

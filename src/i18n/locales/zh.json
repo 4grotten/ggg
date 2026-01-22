@@ -245,7 +245,10 @@
       "feature2": "全球支付通行",
       "feature3": "安全交易",
       "button": "订购您的卡",
-      "payLater": "稍后支付"
+      "payLater": "稍后支付",
+      "payLaterAlertTitle": "卡片发行",
+      "payLaterAlertMessage": "要发行卡片，请转到主页并点击'开通新卡'",
+      "payLaterAlertButton": "好的"
     }
   },
 
