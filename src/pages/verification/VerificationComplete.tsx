@@ -1,13 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { CheckCircle, FileText, Smile, AlertCircle } from "lucide-react";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 
 const VerificationComplete = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { clearProgress } = useVerificationProgress();
+
+  // Clear verification progress when verification is complete
+  useEffect(() => {
+    clearProgress();
+  }, [clearProgress]);
 
   const steps = [
     {

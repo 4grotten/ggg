@@ -6,18 +6,27 @@ import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 
 const PrivacyProtection = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isLocked, setIsLocked] = useState(false);
+  const { redirectToSavedProgress } = useVerificationProgress();
 
   useEffect(() => {
+    // Check if user has saved progress and redirect
+    const savedStep = redirectToSavedProgress();
+    if (savedStep) {
+      navigate(savedStep, { replace: true });
+      return;
+    }
+
     const timer = setTimeout(() => {
       setIsLocked(true);
     }, 600);
     return () => clearTimeout(timer);
-  }, []);
+  }, [redirectToSavedProgress, navigate]);
 
   const benefits = [
     { icon: Shield, textKey: "verify.privacy.benefit1" },
