@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, CreditCard, Wallet, ChevronRight, ChevronLeft, Sparkles, ChevronDown, Check, Building2 } from "lucide-react";
+import { X, CreditCard, Wallet, ChevronRight, Sparkles, ChevronDown, Check, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -193,119 +193,87 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-4"
+                className="space-y-3"
               >
-                {/* Card Carousel */}
-                <div className="relative">
-                  <div className="flex items-center justify-center gap-4">
-                    {/* Left Arrow */}
-                    <button
-                      onClick={() => setSelectedCard(selectedCard === "virtual" ? "metal" : "virtual")}
-                      className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors shrink-0"
-                    >
-                      <ChevronLeft className="w-5 h-5 text-muted-foreground" />
-                    </button>
+                {/* Card Carousel with Swipe */}
+                <div className="relative overflow-hidden">
+                  <motion.div
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.2}
+                    onDragEnd={(_, info) => {
+                      if (info.offset.x > 50) {
+                        setSelectedCard(selectedCard === "metal" ? "virtual" : "metal");
+                      } else if (info.offset.x < -50) {
+                        setSelectedCard(selectedCard === "virtual" ? "metal" : "virtual");
+                      }
+                    }}
+                    className="cursor-grab active:cursor-grabbing"
+                  >
+                    <div className="flex items-center gap-3 px-2">
+                      {/* Card with Info - Compact Layout */}
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={selectedCard}
+                          initial={{ opacity: 0, x: selectedCard === "virtual" ? -30 : 30 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: selectedCard === "virtual" ? 30 : -30 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          className="flex items-center gap-4 p-3 rounded-2xl bg-muted/30 border border-border/50 w-full"
+                        >
+                          {/* Card Preview */}
+                          <div className="w-24 shrink-0">
+                            <CardMiniature type={selectedCard || "virtual"} />
+                          </div>
+                          
+                          {/* Card Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <p className="font-semibold text-sm">
+                                {selectedCard === "virtual" ? t('openCard.virtualCard') : t('openCard.metalCard')}
+                              </p>
+                              {selectedCard === "virtual" ? (
+                                <span className="px-1.5 py-0.5 rounded bg-lime-500/20 text-lime-600 text-[9px] font-medium">
+                                  {t('openCard.instant')}
+                                </span>
+                              ) : (
+                                <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 text-[9px] font-medium flex items-center gap-0.5">
+                                  <Sparkles className="w-2 h-2" />
+                                  {t('openCard.premium')}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-lg font-bold text-primary">{cardIssuanceFee} AED</p>
+                            <div className="flex flex-wrap gap-x-2 gap-y-0 mt-1">
+                              {(selectedCard === "virtual" 
+                                ? ['virtualBenefit1', 'virtualBenefit2', 'virtualBenefit3'] 
+                                : ['metalBenefit1', 'metalBenefit2', 'metalBenefit3']
+                              ).map((key) => (
+                                <span key={key} className="text-[10px] text-muted-foreground">
+                                  • {t(`openCard.${key}`)}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
 
-                    {/* Card Display */}
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={selectedCard}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.2 }}
-                        className="w-40"
-                      >
-                        <CardMiniature type={selectedCard || "virtual"} />
-                      </motion.div>
-                    </AnimatePresence>
-
-                    {/* Right Arrow */}
-                    <button
-                      onClick={() => setSelectedCard(selectedCard === "virtual" ? "metal" : "virtual")}
-                      className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors shrink-0"
-                    >
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </button>
-                  </div>
-
-                  {/* Card Info */}
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={selectedCard}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-center mt-4"
-                    >
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <p className="font-semibold">
-                          {selectedCard === "virtual" ? t('openCard.virtualCard') : t('openCard.metalCard')}
-                        </p>
-                        {selectedCard === "virtual" ? (
-                          <span className="px-1.5 py-0.5 rounded bg-lime-500/20 text-lime-600 text-[10px] font-medium">
-                            {t('openCard.instant')}
-                          </span>
-                        ) : (
-                          <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 text-[10px] font-medium flex items-center gap-0.5">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            {t('openCard.premium')}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-2xl font-bold text-primary">{cardIssuanceFee} AED</p>
-                      <p className="text-xs text-muted-foreground mt-1">{t('openCard.annualFee')}</p>
-                      
-                      {/* Benefits */}
-                      <div className="mt-3 space-y-0.5">
-                        {selectedCard === "virtual" ? (
-                          <>
-                            {['virtualBenefit1', 'virtualBenefit2', 'virtualBenefit3'].map((key, index) => (
-                              <motion.p
-                                key={key}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.1 + index * 0.08, duration: 0.2 }}
-                                className="text-[11px] text-muted-foreground"
-                              >
-                                • {t(`openCard.${key}`)}
-                              </motion.p>
-                            ))}
-                          </>
-                        ) : (
-                          <>
-                            {['metalBenefit1', 'metalBenefit2', 'metalBenefit3'].map((key, index) => (
-                              <motion.p
-                                key={key}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.1 + index * 0.08, duration: 0.2 }}
-                                className="text-[11px] text-muted-foreground"
-                              >
-                                • {t(`openCard.${key}`)}
-                              </motion.p>
-                            ))}
-                          </>
-                        )}
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-
-                  {/* Dots Indicator */}
-                  <div className="flex justify-center gap-2 mt-3">
+                  {/* Dots Indicator & Swipe Hint */}
+                  <div className="flex items-center justify-center gap-3 mt-2">
                     <button
                       onClick={() => setSelectedCard("virtual")}
-                      className={`w-2 h-2 rounded-full transition-colors ${selectedCard === "virtual" ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                      className={`w-1.5 h-1.5 rounded-full transition-all ${selectedCard === "virtual" ? 'bg-primary w-4' : 'bg-muted-foreground/30'}`}
                     />
                     <button
                       onClick={() => setSelectedCard("metal")}
-                      className={`w-2 h-2 rounded-full transition-colors ${selectedCard === "metal" ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                      className={`w-1.5 h-1.5 rounded-full transition-all ${selectedCard === "metal" ? 'bg-primary w-4' : 'bg-muted-foreground/30'}`}
                     />
                   </div>
                 </div>
 
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground text-center">
                   {t('openCard.selectPaymentMethod')}
                 </p>
 
