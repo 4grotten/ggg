@@ -93,7 +93,7 @@ const OpenCardPayCrypto = () => {
   return (
     <MobileLayout
       header={
-        <div className="flex items-center justify-between w-full">
+        <div className="flex items-center justify-between w-full pr-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
