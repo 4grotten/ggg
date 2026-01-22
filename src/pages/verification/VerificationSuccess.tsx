@@ -150,11 +150,31 @@ const VerificationSuccess = () => {
         <div 
           className="flex-1 overflow-y-auto px-6 py-8 pb-28 flex flex-col items-center justify-center text-center relative z-10"
         >
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-2xl font-bold mb-3"
+          >
+            {t('verify.success.title')}
+          </motion.h1>
+
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="text-muted-foreground mb-6"
+          >
+            {t('verify.success.description')}
+          </motion.p>
+
           {/* Card Preview */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.5 }}
             className="w-full max-w-[280px] aspect-[1.6/1] rounded-2xl bg-gradient-to-br from-[#007AFF] to-[#5856D6] p-5 text-white text-left shadow-xl mb-6"
           >
             <div className="flex justify-between items-start mb-8">
@@ -169,8 +189,8 @@ const VerificationSuccess = () => {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex items-center gap-2 mb-4"
+            transition={{ delay: 0.6 }}
+            className="flex items-center gap-2 mb-6"
           >
             <span className="text-2xl">🎉</span>
             <span className="text-lg font-bold text-success">
@@ -179,44 +199,36 @@ const VerificationSuccess = () => {
             <span className="text-2xl">🎉</span>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="text-2xl font-bold mb-3"
-          >
-            {t('verify.success.title')}
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="text-muted-foreground mb-6"
-          >
-            {t('verify.success.description')}
-          </motion.p>
-
-          {/* Features */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-            className="space-y-2 w-full"
-          >
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+          {/* Features with left-to-right animation */}
+          <div className="space-y-2 w-full">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8, duration: 0.4 }}
+              className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
+            >
               <Check className="w-5 h-5 text-success" />
               <span className="text-sm">{t('verify.success.feature1')}</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.4, duration: 0.4 }}
+              className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
+            >
               <Check className="w-5 h-5 text-success" />
               <span className="text-sm">{t('verify.success.feature2')}</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 2.0, duration: 0.4 }}
+              className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
+            >
               <Check className="w-5 h-5 text-success" />
               <span className="text-sm">{t('verify.success.feature3')}</span>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
 
           <PoweredByFooter />
         </div>
