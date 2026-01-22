@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { CreditCard, Sun, PenOff, ExternalLink } from "lucide-react";
 
@@ -13,6 +14,7 @@ const DocumentUpload = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate("/verify/document-type")}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         {/* Progress */}

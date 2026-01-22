@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
@@ -28,7 +29,7 @@ const PrivacyProtection = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate("/")}
-      rightAction={<span className="text-sm text-muted-foreground">•••</span>}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         <div className="flex-1 overflow-y-auto px-6 py-8 pb-28">
