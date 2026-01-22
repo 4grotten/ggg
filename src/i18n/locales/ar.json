@@ -77,9 +77,10 @@
   "verify": {
     "progress": {
       "resuming": "متابعة التحقق؟",
-      "resumingDescription": "لديك تقدم محفوظ. هل تريد المتابعة؟",
+      "resumingDescription": "لديك تقدم محفوظ. هل تريد المتابعة أو البدء من جديد؟",
       "continue": "متابعة",
-      "startOver": "البدء من جديد"
+      "startOver": "البدء من جديد",
+      "reset": "إعادة تعيين والبدء من جديد"
     },
     "privacy": {
       "title": "بياناتك تبقى خاصة\nومحمية",

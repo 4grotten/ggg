@@ -77,9 +77,10 @@
   "verify": {
     "progress": {
       "resuming": "Verifizierung fortsetzen?",
-      "resumingDescription": "Sie haben gespeicherten Fortschritt. Möchten Sie fortfahren?",
+      "resumingDescription": "Sie haben gespeicherten Fortschritt. Fortfahren oder neu beginnen?",
       "continue": "Fortsetzen",
-      "startOver": "Neu beginnen"
+      "startOver": "Neu beginnen",
+      "reset": "Zurücksetzen und neu beginnen"
     },
     "privacy": {
       "title": "Ihre Daten bleiben privat\nund geschützt",

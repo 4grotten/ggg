@@ -78,9 +78,10 @@
   "verify": {
     "progress": {
       "resuming": "继续验证？",
-      "resumingDescription": "您有已保存的进度。是否继续？",
+      "resumingDescription": "您有已保存的进度。继续还是重新开始？",
       "continue": "继续",
-      "startOver": "重新开始"
+      "startOver": "重新开始",
+      "reset": "重置并重新开始"
     },
     "privacy": {
       "title": "您的数据保持私密\n且受保护",
