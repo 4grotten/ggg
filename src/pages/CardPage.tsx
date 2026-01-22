@@ -544,10 +544,12 @@ const CardPage = () => {
           >
             <Button 
               variant="outline" 
-              className={`h-12 rounded-xl gap-2 border-none overflow-hidden ${
-                isCardLocked || isUnlocking
-                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
-                  : "bg-secondary hover:bg-muted"
+              className={`h-12 rounded-xl gap-2 border-none overflow-hidden transition-colors duration-300 ${
+                isUnlocking
+                  ? "bg-primary text-primary-foreground" 
+                  : isCardLocked 
+                    ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
+                    : "bg-secondary hover:bg-muted"
               }`}
               onClick={() => {
                 if (isCardLocked && !isUnlocking) {
@@ -584,24 +586,28 @@ const CardPage = () => {
             </Button>
           </motion.div>
 
-          {/* Lock Card Confirmation Dialog */}
+          {/* Lock Card Confirmation Dialog - iOS Style */}
           <AlertDialog open={showLockDialog} onOpenChange={setShowLockDialog}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t("card.lockConfirmTitle")}</AlertDialogTitle>
-                <AlertDialogDescription>
+            <AlertDialogContent className="max-w-[300px] rounded-2xl p-0 overflow-hidden gap-0">
+              <AlertDialogHeader className="p-5 pb-3 text-center">
+                <AlertDialogTitle className="text-center text-base font-semibold">
+                  {t("card.lockConfirmTitle")}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-center text-sm">
                   {t("card.lockConfirmDescription")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+              <div className="border-t border-border">
                 <AlertDialogAction 
                   onClick={() => setIsCardLocked(true)}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="w-full h-12 rounded-none bg-transparent text-destructive hover:bg-muted font-normal text-base border-b border-border"
                 >
                   {t("card.lockConfirmYes")}
                 </AlertDialogAction>
-              </AlertDialogFooter>
+                <AlertDialogCancel className="w-full h-12 rounded-none bg-transparent text-primary hover:bg-muted font-semibold text-base m-0 border-0">
+                  {t("common.cancel")}
+                </AlertDialogCancel>
+              </div>
             </AlertDialogContent>
           </AlertDialog>
 
