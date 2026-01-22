@@ -76,8 +76,10 @@
   },
   "verify": {
     "progress": {
-      "resuming": "استئناف التحقق",
-      "resumingDescription": "المتابعة من حيث توقفت"
+      "resuming": "متابعة التحقق؟",
+      "resumingDescription": "لديك تقدم محفوظ. هل تريد المتابعة؟",
+      "continue": "متابعة",
+      "startOver": "البدء من جديد"
     },
     "privacy": {
       "title": "بياناتك تبقى خاصة\nومحمية",

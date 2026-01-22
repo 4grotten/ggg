@@ -3,6 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
+import { toast } from "@/hooks/use-toast";
 
 const AnimatedFingerprint = () => {
   const [step, setStep] = useState(0);
@@ -75,10 +77,42 @@ export const VerifyIdentityCard = ({
 }: VerifyIdentityCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { getSavedProgress } = useVerificationProgress();
+
+  const handleClick = () => {
+    const savedStep = getSavedProgress();
+    
+    // If there's saved progress, show confirmation toast
+    if (savedStep && savedStep !== "/verify") {
+      toast({
+        title: t('verify.progress.resuming'),
+        description: t('verify.progress.resumingDescription'),
+        action: (
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate(savedStep)}
+              className="px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90"
+            >
+              {t('verify.progress.continue')}
+            </button>
+            <button
+              onClick={() => navigate("/verify")}
+              className="px-3 py-1.5 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80"
+            >
+              {t('verify.progress.startOver')}
+            </button>
+          </div>
+        ),
+      });
+    } else {
+      // No saved progress, go to start
+      navigate("/verify");
+    }
+  };
 
   return (
     <button
-      onClick={() => navigate("/verify")}
+      onClick={handleClick}
       className="w-full rounded-2xl p-4 text-left group bg-[#007AFF]"
     >
       <div className="flex items-start justify-between">
