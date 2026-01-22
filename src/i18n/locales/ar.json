@@ -343,7 +343,7 @@
     "back": "رجوع",
     "notFound": "لم يتم العثور على المعاملة",
     "topUp": "شحن",
-    "annualCardFee": "الرسوم السنوية للبطاقة الافتراضية",
+    "annualCardFee": "دفع البطاقة الافتراضية",
     "received": "مستلم",
     "cardTransfer": "تحويل بطاقة",
     "paymentTo": "دفع إلى {{merchant}}",

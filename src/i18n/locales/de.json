@@ -343,7 +343,7 @@
     "back": "Zurück",
     "notFound": "Transaktion nicht gefunden",
     "topUp": "Aufladung",
-    "annualCardFee": "Jährliche Gebühr für virtuelle Karte",
+    "annualCardFee": "Zahlung für virtuelle Karte",
     "received": "Empfangen",
     "cardTransfer": "Kartenüberweisung",
     "paymentTo": "Zahlung an {{merchant}}",

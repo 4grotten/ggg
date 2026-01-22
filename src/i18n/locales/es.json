@@ -343,7 +343,7 @@
     "back": "Atrás",
     "notFound": "Transacción no encontrada",
     "topUp": "Recarga",
-    "annualCardFee": "Cuota anual de tarjeta virtual",
+    "annualCardFee": "Pago de tarjeta virtual",
     "received": "Recibido",
     "cardTransfer": "Transferencia de tarjeta",
     "paymentTo": "Pago a {{merchant}}",
