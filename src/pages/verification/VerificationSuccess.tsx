@@ -346,53 +346,39 @@ const VerificationSuccess = () => {
       {/* iOS-style Pay Later Alert */}
       <AlertDialog open={isPayLaterAlertOpen} onOpenChange={setIsPayLaterAlertOpen}>
         <AlertDialogContent 
-          className="w-[270px] sm:w-[320px] max-w-[90vw] rounded-[14px] p-0 gap-0 overflow-hidden border-none data-[state=open]:animate-ios-alert-in data-[state=closed]:animate-ios-alert-out"
+          className="w-[280px] sm:w-[320px] max-w-[90vw] rounded-[14px] p-0 gap-0 overflow-hidden border-none data-[state=open]:animate-ios-alert-in data-[state=closed]:animate-ios-alert-out"
           style={{
             backgroundColor: '#FFFFFF',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           }}
+          onOverlayClick={() => setIsPayLaterAlertOpen(false)}
         >
           <AlertDialogHeader className="px-5 pt-5 pb-4">
-            <AlertDialogTitle className="text-center text-[17px] font-semibold leading-tight" style={{ color: '#000000', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}>
+            <AlertDialogTitle className="text-center text-lg font-semibold leading-tight text-foreground">
               {t('verify.success.payLaterAlertTitle')}
             </AlertDialogTitle>
-            <AlertDialogDescription 
-              className="text-center text-[13px] pt-2 whitespace-pre-line"
-              style={{ 
-                color: 'rgba(60, 60, 67, 0.8)', 
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
-                lineHeight: 1.3
-              }}
-            >
+            <AlertDialogDescription className="text-center text-sm pt-2 whitespace-pre-line text-muted-foreground leading-relaxed">
               {t('verify.success.payLaterAlertMessage')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="p-0 flex-col sm:flex-col mt-0">
-            <div style={{ height: '1px', backgroundColor: '#C6C6C8' }} />
+            <div className="h-px bg-border" />
             <button
               onClick={() => {
                 setIsPayLaterAlertOpen(false);
                 setIsPaymentDrawerOpen(true);
               }}
-              className="w-full h-[44px] text-[17px] font-semibold transition-colors active:bg-black/5"
-              style={{ 
-                color: '#007AFF',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif'
-              }}
+              className="w-full h-[48px] text-base font-semibold text-primary transition-colors active:bg-muted/50"
             >
               {t('verify.success.payLaterAlertPay')}
             </button>
-            <div style={{ height: '1px', backgroundColor: '#C6C6C8' }} />
+            <div className="h-px bg-border" />
             <button
               onClick={() => {
                 setIsPayLaterAlertOpen(false);
                 navigate("/");
               }}
-              className="w-full h-[44px] text-[17px] transition-colors active:bg-black/5"
-              style={{ 
-                color: '#007AFF',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif'
-              }}
+              className="w-full h-[48px] text-base text-primary transition-colors active:bg-muted/50"
             >
               {t('verify.success.payLaterAlertHome')}
             </button>
