@@ -2,14 +2,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface AnimatedBotHeadProps {
-  size?: "sm" | "lg";
+  size?: "sm" | "md" | "lg";
   isUserTyping?: boolean;
   isDancing?: boolean;
 }
 
 export const AnimatedBotHead = ({ size = "sm", isUserTyping = false, isDancing = false }: AnimatedBotHeadProps) => {
   const isLarge = size === "lg";
-  const containerSize = isLarge ? "w-12 h-14" : "w-5 h-6";
+  const isMedium = size === "md";
+  const containerSize = isLarge ? "w-12 h-14" : isMedium ? "w-8 h-10" : "w-5 h-6";
   const [animationPhase, setAnimationPhase] = useState<"idle" | "jumping" | "clapping" | "dancing">("idle");
   const [showHands, setShowHands] = useState(false);
 

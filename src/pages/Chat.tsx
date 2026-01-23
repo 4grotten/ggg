@@ -225,19 +225,19 @@ const Chat = () => {
                     y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
                     rotate: { duration: 3, repeat: Infinity, ease: "easeInOut" }
                   }}
-                  className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-lg"
+                  className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-lg"
                 >
-                  <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
+                  <AnimatedBotHead size="md" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
                 {/* Speech bubble */}
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.5, duration: 0.3 }}
-                  className="absolute -top-8 left-8 bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-lg whitespace-nowrap"
+                  className="absolute -top-10 left-12 bg-secondary text-secondary-foreground text-sm px-3 py-1.5 rounded-lg whitespace-nowrap shadow-md"
                 >
                   {isDancing ? "🎉 Готово!" : isLoading ? "Думаю..." : "Пиши! 👋"}
-                  <div className="absolute -bottom-1 left-2 w-2 h-2 bg-secondary rotate-45" />
+                  <div className="absolute -bottom-1 left-3 w-2 h-2 bg-secondary rotate-45" />
                 </motion.div>
               </motion.div>
             )}
