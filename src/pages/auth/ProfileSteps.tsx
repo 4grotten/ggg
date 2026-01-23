@@ -798,25 +798,34 @@ const ProfileSteps = () => {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="flex flex-col items-center pt-2"
           >
-            <h1 className="text-xl font-bold mb-1 text-center">{t('auth.steps.complete.title')}</h1>
-            <p className="text-muted-foreground text-sm text-center">{t('auth.steps.complete.description')}</p>
-            <p className="text-muted-foreground/70 text-xs text-center mb-4">
-              {t('auth.steps.complete.canEditInSettings')}
+            <h1 className="text-xl font-bold mb-1 text-center" style={{ color: '#333333' }}>
+              {t('auth.steps.complete.title')}
+            </h1>
+            <p className="text-sm text-center mb-6" style={{ color: '#333333' }}>
+              {t('auth.steps.complete.description')}
             </p>
             
-            {/* Telegram-style contact card - compact */}
+            {/* Telegram-style contact card - compact with slide animation */}
             <motion.div 
               className="w-full max-w-[280px] bg-card rounded-2xl overflow-hidden shadow-lg border border-border"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 20 }}
+              initial={{ opacity: 0, x: -100, rotate: -5 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0, 
+                rotate: [0, -3, 3, -2, 2, -1, 1, 0]
+              }}
+              transition={{ 
+                opacity: { delay: 0.2, duration: 0.3 },
+                x: { delay: 0.2, type: "spring", stiffness: 150, damping: 15 },
+                rotate: { delay: 0.5, duration: 0.8, ease: "easeOut" as const }
+              }}
             >
               {/* Photo - smaller */}
               <motion.div 
                 className="w-full p-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.4 }}
               >
                 {photoPreview ? (
                   <img 
@@ -836,7 +845,7 @@ const ProfileSteps = () => {
                 className="px-4 pb-4"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.5 }}
               >
                 {/* Name */}
                 <h3 className="text-lg font-bold text-foreground">{fullName}</h3>
@@ -858,12 +867,23 @@ const ProfileSteps = () => {
               </motion.div>
             </motion.div>
             
+            {/* Edit hint - moved below card */}
+            <motion.p 
+              className="text-xs text-center mt-4 max-w-[280px]"
+              style={{ color: '#333333', opacity: 0.7 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.7 }}
+              transition={{ delay: 0.7 }}
+            >
+              {t('auth.steps.complete.canEditInSettings')}
+            </motion.p>
+            
             {/* Success indicator */}
             <motion.div 
               className="mt-4 flex items-center gap-2 text-green-500"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.8 }}
             >
               <Check className="w-4 h-4" />
               <span className="text-sm font-medium">{t('auth.steps.complete.ready')}</span>
