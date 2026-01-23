@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedBotHead } from "./AnimatedBotHead";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { User } from "lucide-react";
+import { User, Volume2, VolumeX, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface ChatMessageProps {
   role: 'user' | 'assistant';
@@ -13,6 +15,63 @@ interface ChatMessageProps {
 export const ChatMessage = ({ role, content }: ChatMessageProps) => {
   const isUser = role === 'user';
   const { avatarUrl } = useAvatar();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  
+  const handleSpeak = async () => {
+    // If already playing, stop
+    if (isPlaying && audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      setIsPlaying(false);
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text: content }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`TTS request failed: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const newAudio = new Audio(audioUrl);
+      
+      newAudio.onended = () => {
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      newAudio.onerror = () => {
+        setIsPlaying(false);
+        toast.error("Ошибка воспроизведения");
+      };
+      
+      setAudio(newAudio);
+      await newAudio.play();
+      setIsPlaying(true);
+    } catch (error) {
+      console.error("TTS error:", error);
+      toast.error("Не удалось озвучить сообщение");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   return (
     <motion.div
@@ -39,13 +98,36 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
         )}
       </div>
       
-      <div className={cn(
-        "max-w-[80%] rounded-2xl px-4 py-2",
-        isUser 
-          ? "bg-primary text-primary-foreground rounded-tr-sm" 
-          : "bg-secondary text-secondary-foreground rounded-tl-sm"
-      )}>
-        <p className="text-sm whitespace-pre-wrap">{content}</p>
+      <div className="flex flex-col gap-1">
+        <div className={cn(
+          "max-w-[80%] rounded-2xl px-4 py-2",
+          isUser 
+            ? "bg-primary text-primary-foreground rounded-tr-sm" 
+            : "bg-secondary text-secondary-foreground rounded-tl-sm"
+        )}>
+          <p className="text-sm whitespace-pre-wrap">{content}</p>
+        </div>
+        
+        {/* TTS Button for assistant messages */}
+        {!isUser && (
+          <button
+            onClick={handleSpeak}
+            disabled={isLoading}
+            className={cn(
+              "flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors self-start ml-1",
+              isPlaying && "text-primary"
+            )}
+          >
+            {isLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : isPlaying ? (
+              <VolumeX className="w-3.5 h-3.5" />
+            ) : (
+              <Volume2 className="w-3.5 h-3.5" />
+            )}
+            <span>{isLoading ? "Загрузка..." : isPlaying ? "Стоп" : "Озвучить"}</span>
+          </button>
+        )}
       </div>
     </motion.div>
   );
