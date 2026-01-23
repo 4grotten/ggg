@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
@@ -121,6 +122,7 @@ const Settings = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col items-center pt-8 pb-6">
         <input
