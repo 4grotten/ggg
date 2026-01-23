@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
-import { ChevronDown, Phone, HelpCircle, MessageSquare, KeyRound } from "lucide-react";
+import { ChevronDown, Phone, HelpCircle, MessageSquare, KeyRound, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import {
   Drawer,
   DrawerContent,
@@ -223,6 +224,16 @@ const PhoneEntry = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showError, setShowError] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
+  
+  // Login flow states
+  const [isLoginMode, setIsLoginMode] = useState(false);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  
+  // Mock registered phone number (without dial code prefix)
+  const REGISTERED_PHONE = "585333939";
+  const REGISTERED_PASSWORD = "123456";
 
   const formatPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, "");
@@ -264,11 +275,25 @@ const PhoneEntry = () => {
 
   const isPhoneValid = phoneNumber.replace(/\D/g, "").length >= 9 && dialCode.length >= 2;
   const isValid = isPhoneValid && isNotRobot;
+  
+  // Check if phone number matches registered user
+  const checkIfRegistered = (phone: string): boolean => {
+    const cleanPhone = phone.replace(/\D/g, "");
+    return cleanPhone === REGISTERED_PHONE;
+  };
 
   const handleContinue = () => {
     if (isValid) {
-      sessionStorage.setItem("registerPhone", `${dialCode} ${phoneNumber}`);
-      navigate("/auth/profile");
+      const cleanPhone = phoneNumber.replace(/\D/g, "");
+      
+      // Check if this is a registered user
+      if (checkIfRegistered(cleanPhone)) {
+        setIsLoginMode(true);
+      } else {
+        // New user - go to registration
+        sessionStorage.setItem("registerPhone", `${dialCode} ${phoneNumber}`);
+        navigate("/auth/profile");
+      }
     } else {
       // Trigger phone error only if phone is invalid
       if (!isPhoneValid) {
@@ -283,6 +308,22 @@ const PhoneEntry = () => {
       }
     }
   };
+  
+  const handleLogin = () => {
+    if (password === REGISTERED_PASSWORD) {
+      toast.success(t('auth.login.success'));
+      navigate("/");
+    } else {
+      setPasswordError(true);
+      setTimeout(() => setPasswordError(false), 600);
+    }
+  };
+  
+  const handleBackToPhone = () => {
+    setIsLoginMode(false);
+    setPassword("");
+    setPasswordError(false);
+  };
 
   const filteredCountries = countries.filter(
     (c) =>
@@ -292,6 +333,121 @@ const PhoneEntry = () => {
   );
 
   const CurrentIcon = iconSequence[currentIconIndex].Icon;
+
+  // Login mode - password entry screen
+  if (isLoginMode) {
+    return (
+      <MobileLayout
+        showBackButton
+        onBack={handleBackToPhone}
+      >
+        <div className="flex flex-col h-[calc(100vh-56px)]">
+          <div className="flex-1 overflow-y-auto px-6 py-8 pb-28">
+            {/* Header */}
+            <motion.div 
+              className="text-center mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <motion.div 
+                className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 overflow-hidden transition-colors duration-300 ${
+                  passwordError 
+                    ? 'bg-destructive/10 ring-2 ring-destructive' 
+                    : 'bg-primary/10'
+                }`}
+                initial={{ scale: 0.8 }}
+                animate={{ 
+                  scale: 1,
+                  rotate: passwordError ? [0, -5, 5, -5, 5, -3, 3, 0] : 0,
+                  x: passwordError ? [0, -8, 8, -8, 8, -4, 4, 0] : 0
+                }}
+                transition={{ 
+                  scale: { duration: 0.3, delay: 0.2 },
+                  rotate: { duration: 0.5 },
+                  x: { duration: 0.5 }
+                }}
+              >
+                <Lock className={`w-12 h-12 transition-colors duration-300 ${passwordError ? 'text-destructive' : 'text-primary'}`} />
+              </motion.div>
+              <h1 className="text-2xl font-bold">{t('auth.login.title')}</h1>
+              <p className="text-muted-foreground mt-2">
+                {dialCode} {phoneNumber}
+              </p>
+            </motion.div>
+
+            {/* Password Input */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="space-y-6"
+            >
+              <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
+                passwordError ? 'border-destructive' : 'border-border'
+              }`}>
+                <Lock className={`w-5 h-5 ${passwordError ? 'text-destructive' : 'text-muted-foreground'}`} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={t('auth.login.passwordPlaceholder')}
+                  className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              
+              {passwordError && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-destructive text-sm"
+                >
+                  {t('auth.login.wrongPassword')}
+                </motion.p>
+              )}
+            </motion.div>
+
+            {/* Support Link */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="mt-8"
+            >
+              <button 
+                onClick={() => navigate("/chat")}
+                className="text-primary font-medium flex items-center gap-2"
+              >
+                <HelpCircle className="w-4 h-4" />
+                {t('auth.phone.support')}
+              </button>
+            </motion.div>
+
+            <PoweredByFooter />
+          </div>
+
+          {/* Login Button */}
+          <div className="karta-footer-actions">
+            <button
+              onClick={handleLogin}
+              disabled={password.length < 6}
+              className="karta-btn-primary disabled:opacity-50"
+            >
+              {t('auth.login.button')}
+            </button>
+          </div>
+        </div>
+      </MobileLayout>
+    );
+  }
 
   return (
     <MobileLayout

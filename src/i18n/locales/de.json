@@ -561,6 +561,13 @@
       "support": "Hilfe & Support",
       "continue": "Weiter"
     },
+    "login": {
+      "title": "Passwort eingeben",
+      "passwordPlaceholder": "Ihr Passwort",
+      "wrongPassword": "Falsches Passwort. Bitte versuchen Sie es erneut",
+      "button": "Anmelden",
+      "success": "Erfolgreich angemeldet!"
+    },
     "profile": {
       "header": "Profil",
       "moreInfo": "Mehr erfahren",

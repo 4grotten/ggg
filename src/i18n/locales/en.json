@@ -567,6 +567,13 @@
       "support": "Support & Help",
       "continue": "Continue"
     },
+    "login": {
+      "title": "Enter your password",
+      "passwordPlaceholder": "Your password",
+      "wrongPassword": "Wrong password. Please try again",
+      "button": "Sign In",
+      "success": "Successfully logged in!"
+    },
     "profile": {
       "header": "Profile",
       "moreInfo": "More info",

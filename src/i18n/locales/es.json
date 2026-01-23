@@ -561,6 +561,13 @@
       "support": "Soporte y Ayuda",
       "continue": "Continuar"
     },
+    "login": {
+      "title": "Ingresa tu contraseña",
+      "passwordPlaceholder": "Tu contraseña",
+      "wrongPassword": "Contraseña incorrecta. Inténtalo de nuevo",
+      "button": "Iniciar Sesión",
+      "success": "¡Sesión iniciada correctamente!"
+    },
     "profile": {
       "header": "Perfil",
       "moreInfo": "Más información",

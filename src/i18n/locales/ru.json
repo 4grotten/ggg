@@ -567,6 +567,13 @@
       "support": "Служба поддержки",
       "continue": "Далее"
     },
+    "login": {
+      "title": "Введите пароль",
+      "passwordPlaceholder": "Ваш пароль",
+      "wrongPassword": "Неверный пароль. Попробуйте снова",
+      "button": "Войти",
+      "success": "Вы успешно авторизовались!"
+    },
     "profile": {
       "header": "Профиль",
       "moreInfo": "Подробнее",
