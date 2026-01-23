@@ -558,24 +558,42 @@ const ProfileSteps = () => {
               {photoPreview ? (
                 <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <motion.div
-                  initial={{ y: -80, opacity: 0, scale: 0.5 }}
-                  animate={{ 
-                    y: 0, 
-                    opacity: 1, 
-                    scale: 1,
-                    x: showError ? [0, -8, 8, -8, 8, -4, 4, 0] : 0,
-                    rotate: showError ? [0, -10, 10, -10, 10, -5, 5, 0] : 0
-                  }}
-                  transition={showError ? { duration: 0.5 } : { 
-                    type: "spring", 
-                    stiffness: 200, 
-                    damping: 15, 
-                    delay: 0.2 
-                  }}
-                >
-                  <Camera className="w-16 h-16 text-white" />
-                </motion.div>
+                <>
+                  {/* Flash effect */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-white"
+                    initial={{ opacity: 0 }}
+                    animate={{ 
+                      opacity: [0, 0, 0.9, 0.7, 0],
+                    }}
+                    transition={{ 
+                      duration: 0.8,
+                      times: [0, 0.3, 0.4, 0.5, 0.8],
+                      delay: 0.4,
+                      ease: "easeOut" as const
+                    }}
+                  />
+                  
+                  <motion.div
+                    initial={{ y: -80, opacity: 0, scale: 0.5 }}
+                    animate={{ 
+                      y: 0, 
+                      opacity: 1, 
+                      scale: 1,
+                      x: showError ? [0, -8, 8, -8, 8, -4, 4, 0] : 0,
+                      rotate: showError ? [0, -10, 10, -10, 10, -5, 5, 0] : 0
+                    }}
+                    transition={showError ? { duration: 0.5 } : { 
+                      type: "spring", 
+                      stiffness: 200, 
+                      damping: 15, 
+                      delay: 0.2 
+                    }}
+                    className="relative z-10"
+                  >
+                    <Camera className="w-16 h-16 text-white" />
+                  </motion.div>
+                </>
               )}
               
               {/* Pulsing ring */}
