@@ -444,26 +444,48 @@ const ProfileSteps = () => {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="flex flex-col items-center"
           >
-            <motion.div 
-              className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-all duration-300 ${
-                showError 
-                  ? 'bg-destructive/10 ring-2 ring-destructive' 
-                  : 'bg-primary/10'
-              }`}
-              initial={iconAnimation.initial}
-              animate={iconAnimation.animate}
-              transition={iconTransition}
-            >
+            {/* Animated icon: Question -> User */}
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-primary/10 relative overflow-hidden">
+              {/* Question mark first */}
               <motion.div
-                animate={{
+                className="absolute flex items-center justify-center"
+                initial={{ opacity: 1, scale: 1 }}
+                animate={{ 
+                  opacity: [1, 1, 0],
+                  scale: [1, 1.1, 0.8],
+                  rotate: [0, 10, -10]
+                }}
+                transition={{ 
+                  duration: 1.2,
+                  times: [0, 0.6, 1],
+                  delay: 0.2
+                }}
+              >
+                <span className="text-5xl">❓</span>
+              </motion.div>
+
+              {/* User icon appears after */}
+              <motion.div
+                className="absolute"
+                initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                animate={{ 
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
                   x: showError ? [0, -8, 8, -8, 8, -4, 4, 0] : 0,
                   rotate: showError ? [0, -10, 10, -10, 10, -5, 5, 0] : 0
                 }}
-                transition={{ duration: 0.5 }}
+                transition={{ 
+                  opacity: { delay: 1.2, duration: 0.3 },
+                  scale: { delay: 1.2, type: "spring", stiffness: 200, damping: 15 },
+                  y: { delay: 1.2, type: "spring", stiffness: 200, damping: 15 },
+                  x: showError ? { duration: 0.5 } : undefined,
+                  rotate: showError ? { duration: 0.5 } : undefined
+                }}
               >
                 <User className={`w-12 h-12 ${showError ? 'text-destructive' : 'text-primary'}`} />
               </motion.div>
-            </motion.div>
+            </div>
             
             <h1 className="text-2xl font-bold mb-2 text-center">{t('auth.steps.name.title')}</h1>
             <p className="text-muted-foreground text-center mb-8">{t('auth.steps.name.description')}</p>
