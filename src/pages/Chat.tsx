@@ -9,6 +9,7 @@ import { AnimatedBotHead } from "@/components/chat/AnimatedBotHead";
 import { useAIChat } from "@/hooks/useAIChat";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ScrollArea } from "@/components/ui/scroll-area";
 // Single emoji for each state
 const STATE_EMOJIS = {
   idle: "💬",
@@ -122,75 +123,77 @@ const Chat = () => {
       </header>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto pb-40">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-start pt-8 text-center px-6 relative overflow-visible">
-            {/* Container for text and bot */}
-            <div className="relative flex flex-col items-center">
-              {/* Text first */}
-              <motion.div
-                animate={botFalling ? {
-                  opacity: 0,
-                  y: -20,
-                  scale: 0.9,
-                } : {
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                }}
-                transition={{ duration: 0.4 }}
-                className="mb-6"
-              >
-                <h2 className="text-xl font-semibold mb-2">{t('chat.aiAssistant')}</h2>
-                <p className="text-muted-foreground text-sm">
-                  {t('chat.description')}
-                </p>
-              </motion.div>
-              
-              {/* Bot below text */}
-              <motion.div
-                animate={botFalling ? {
-                  y: [0, 100, 200, 280, 300],
-                  x: [0, -30, -70, -110, -120],
-                  scale: [1, 0.7, 0.5, 0.38, 0.35],
-                  rotate: [0, 180, 450, 680, 720],
-                } : {
-                  y: 0,
-                  x: 0,
-                  scale: 1,
-                  rotate: 0,
-                }}
-                transition={botFalling ? {
-                  duration: 1.2,
-                  ease: "easeIn",
-                  times: [0, 0.3, 0.6, 0.9, 1]
-                } : {
-                  duration: 0.3
-                }}
-                className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary z-10 relative"
-              >
-                <AnimatedBotHead size="lg" isUserTyping={isUserTyping} />
-              </motion.div>
+      <ScrollArea className="flex-1">
+        <div className="pb-40">
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-start pt-8 text-center px-6 relative overflow-visible">
+              {/* Container for text and bot */}
+              <div className="relative flex flex-col items-center">
+                {/* Text first */}
+                <motion.div
+                  animate={botFalling ? {
+                    opacity: 0,
+                    y: -20,
+                    scale: 0.9,
+                  } : {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                  }}
+                  transition={{ duration: 0.4 }}
+                  className="mb-6"
+                >
+                  <h2 className="text-xl font-semibold mb-2">{t('chat.aiAssistant')}</h2>
+                  <p className="text-muted-foreground text-sm">
+                    {t('chat.description')}
+                  </p>
+                </motion.div>
+                
+                {/* Bot below text */}
+                <motion.div
+                  animate={botFalling ? {
+                    y: [0, 100, 200, 280, 300],
+                    x: [0, -30, -70, -110, -120],
+                    scale: [1, 0.7, 0.5, 0.38, 0.35],
+                    rotate: [0, 180, 450, 680, 720],
+                  } : {
+                    y: 0,
+                    x: 0,
+                    scale: 1,
+                    rotate: 0,
+                  }}
+                  transition={botFalling ? {
+                    duration: 1.2,
+                    ease: "easeIn",
+                    times: [0, 0.3, 0.6, 0.9, 1]
+                  } : {
+                    duration: 0.3
+                  }}
+                  className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary z-10 relative"
+                >
+                  <AnimatedBotHead size="lg" isUserTyping={isUserTyping} />
+                </motion.div>
+              </div>
             </div>
-          </div>
-        ) : (
-          <AnimatePresence>
-            {messages.map((message, index) => (
-              <ChatMessage key={index} role={message.role} content={message.content} />
-            ))}
-          </AnimatePresence>
-        )}
-        
-        {error && (
-          <div className="px-4 py-2">
-            <div className="bg-destructive/10 text-destructive text-sm rounded-lg px-4 py-2">
-              {error}
+          ) : (
+            <AnimatePresence>
+              {messages.map((message, index) => (
+                <ChatMessage key={index} role={message.role} content={message.content} />
+              ))}
+            </AnimatePresence>
+          )}
+          
+          {error && (
+            <div className="px-4 py-2">
+              <div className="bg-destructive/10 text-destructive text-sm rounded-lg px-4 py-2">
+                {error}
+              </div>
             </div>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
-      </div>
+          )}
+          
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
 
       {/* Input Area - Fixed at bottom */}
       <div className="fixed bottom-24 left-0 right-0 max-w-[800px] mx-auto bg-background">
