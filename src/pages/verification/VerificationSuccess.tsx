@@ -282,14 +282,20 @@ const VerificationSuccess = () => {
           <PoweredByFooter />
         </div>
 
-        {/* Button */}
-        <div className="karta-footer-actions">
+        {/* Buttons */}
+        <div className="karta-footer-actions flex flex-col gap-2">
           <button 
             onClick={() => setIsPaymentDrawerOpen(true)} 
             className="karta-btn-primary flex items-center justify-center gap-2"
           >
             <CreditCard className="w-5 h-5" />
             {t('verify.success.button')}
+          </button>
+          <button
+            onClick={() => setIsPayLaterAlertOpen(true)}
+            className="w-full py-3 text-center text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t('verify.success.payLater')}
           </button>
         </div>
       </div>
@@ -318,19 +324,6 @@ const VerificationSuccess = () => {
                 </button>
               </AnimatedDrawerItem>
             ))}
-            
-            {/* Pay Later option */}
-            <AnimatedDrawerItem index={paymentOptions.length}>
-              <button
-                onClick={() => {
-                  setIsPaymentDrawerOpen(false);
-                  setTimeout(() => setIsPayLaterAlertOpen(true), 300);
-                }}
-                className="w-full py-4 text-center text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {t('verify.success.payLater')}
-              </button>
-            </AnimatedDrawerItem>
           </div>
         </DrawerContent>
       </Drawer>
