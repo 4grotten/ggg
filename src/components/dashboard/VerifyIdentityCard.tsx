@@ -72,18 +72,19 @@ const AnimatedFingerprint = () => {
 };
 
 interface VerifyIdentityCardProps {
-  progress?: number;
   totalSteps?: number;
 }
 
 export const VerifyIdentityCard = ({
-  progress = 0,
   totalSteps = 3,
 }: VerifyIdentityCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { getSavedProgress, clearProgress } = useVerificationProgress();
+  const { getSavedProgress, clearProgress, getCompletedSteps } = useVerificationProgress();
   const [showDialog, setShowDialog] = useState(false);
+  
+  // Calculate progress based on saved verification step
+  const progress = getCompletedSteps();
 
   const handleClick = () => {
     const savedStep = getSavedProgress();

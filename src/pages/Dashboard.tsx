@@ -164,7 +164,7 @@ const Dashboard = () => {
           <ActionButtons onTopUp={() => setTopUpOpen(true)} onSend={() => setSendOpen(true)} />
 
           {/* Verify Identity Card */}
-          <VerifyIdentityCard progress={0} totalSteps={3} />
+          <VerifyIdentityCard />
 
           {/* Open New Card Button */}
           <OpenCardButton onClick={() => setOpenCardOpen(true)} />

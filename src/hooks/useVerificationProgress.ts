@@ -47,6 +47,27 @@ export const useVerificationProgress = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Calculate completed steps (0, 1, 2, or 3) based on saved progress
+  const getCompletedSteps = useCallback((): number => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return 0;
+    
+    // Step 1 (Questionnaire) complete after /verify/address
+    // Step 2 (Document) complete after /verify/document-capture-back
+    // Step 3 (Liveness) complete after /verify/liveness
+    const stepIndex = VERIFICATION_STEPS.indexOf(saved as VerificationStep);
+    
+    if (stepIndex >= VERIFICATION_STEPS.indexOf("/verify/document-type")) {
+      // Completed questionnaire (step 1)
+      if (stepIndex >= VERIFICATION_STEPS.indexOf("/verify/liveness")) {
+        // Completed document (step 2)
+        return 2;
+      }
+      return 1;
+    }
+    return 0;
+  }, []);
+
   // Save current step to localStorage
   const saveProgress = useCallback((step: VerificationStep) => {
     localStorage.setItem(STORAGE_KEY, step);
@@ -138,5 +159,6 @@ export const useVerificationProgress = () => {
     redirectToSavedProgress,
     saveFormData,
     getFormData,
+    getCompletedSteps,
   };
 };
