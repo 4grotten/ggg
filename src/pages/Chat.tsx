@@ -107,7 +107,7 @@ const Chat = () => {
       </header>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto pb-32">
+      <div className="flex-1 overflow-y-auto pb-40">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-start pt-8 text-center px-6 relative overflow-visible">
             {/* Container for text and bot */}
