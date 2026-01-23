@@ -100,18 +100,18 @@ const Chat = () => {
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="relative flex items-center justify-between h-14 px-4">
+        <div className="flex items-center justify-between h-14 px-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors z-0"
+            className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             <span className="text-sm">{t('common.back')}</span>
           </button>
           
-          <h1 className="text-lg font-semibold absolute left-1/2 -translate-x-1/2">{t('chat.aiAssistant')}</h1>
+          <h1 className="text-lg font-semibold">{t('chat.aiAssistant')}</h1>
           
-          <div className="flex items-center gap-1 z-0">
+          <div className="flex items-center gap-1">
             <VoiceCallButton />
             <LanguageSwitcher />
             {messages.length > 0 && (
