@@ -34,6 +34,7 @@
     "getYourCard": "获取您的卡",
     "stepsDone": "步骤已完成",
     "stepCompleted": "步骤 {{step}} 已完成 ✓",
+    "passportUpdateRequired": "更新护照信息",
     "openCard": "开设新卡"
   },
   "openCard": {

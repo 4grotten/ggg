@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const STORAGE_KEY = "verification_progress";
 const FORM_DATA_KEY = "verification_form_data";
+const PASSPORT_STATUS_KEY = "verification_passport_status";
 
 // Order of verification steps
 const VERIFICATION_STEPS = [
@@ -43,22 +44,51 @@ export interface VerificationFormData {
   issuingCountry?: string;
 }
 
+export interface PassportStatus {
+  needsUpdate: boolean;
+  completedSteps: number;
+}
+
 export const useVerificationProgress = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Get passport status (for passport holders who need to update data)
+  const getPassportStatus = useCallback((): PassportStatus | null => {
+    const saved = localStorage.getItem(PASSPORT_STATUS_KEY);
+    if (!saved) return null;
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Set passport status
+  const setPassportStatus = useCallback((status: PassportStatus | null) => {
+    if (status) {
+      localStorage.setItem(PASSPORT_STATUS_KEY, JSON.stringify(status));
+    } else {
+      localStorage.removeItem(PASSPORT_STATUS_KEY);
+    }
+  }, []);
+
   // Calculate completed steps (0, 1, 2, or 3) based on saved progress
   const getCompletedSteps = useCallback((): number => {
+    // Check passport status first
+    const passportStatus = getPassportStatus();
+    if (passportStatus?.needsUpdate) {
+      return passportStatus.completedSteps;
+    }
+
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return 0;
     
     const stepIndex = VERIFICATION_STEPS.indexOf(saved as VerificationStep);
     const addressIndex = VERIFICATION_STEPS.indexOf("/verify/address");
-    const documentTypeIndex = VERIFICATION_STEPS.indexOf("/verify/document-type");
     const livenessIndex = VERIFICATION_STEPS.indexOf("/verify/liveness");
     
     // Step 1 (Questionnaire) complete when we're at or past /verify/address
-    // (user fills personal-info, monthly-volume, address, then goes to document-type)
     if (stepIndex >= addressIndex) {
       // Step 2 (Document) complete when at or past liveness
       if (stepIndex >= livenessIndex) {
@@ -67,7 +97,7 @@ export const useVerificationProgress = () => {
       return 1;
     }
     return 0;
-  }, []);
+  }, [getPassportStatus]);
 
   // Save current step to localStorage
   const saveProgress = useCallback((step: VerificationStep) => {
@@ -161,5 +191,7 @@ export const useVerificationProgress = () => {
     saveFormData,
     getFormData,
     getCompletedSteps,
+    getPassportStatus,
+    setPassportStatus,
   };
 };

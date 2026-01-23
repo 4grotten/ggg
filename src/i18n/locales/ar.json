@@ -34,6 +34,7 @@
     "getYourCard": "احصل على بطاقتك",
     "stepsDone": "خطوات مكتملة",
     "stepCompleted": "الخطوة {{step}} مكتملة ✓",
+    "passportUpdateRequired": "تحديث بيانات جواز السفر",
     "openCard": "فتح بطاقة جديدة"
   },
   "openCard": {

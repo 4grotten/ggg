@@ -34,6 +34,7 @@
     "getYourCard": "Holen Sie sich Ihre Karte",
     "stepsDone": "SCHRITTE ERLEDIGT",
     "stepCompleted": "Schritt {{step}} abgeschlossen ✓",
+    "passportUpdateRequired": "Passdaten aktualisieren",
     "openCard": "Neue Karte eröffnen"
   },
   "openCard": {
