@@ -226,14 +226,32 @@ const Chat = () => {
                 >
                   <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
-                {/* Speech bubble */}
+                {/* Speech bubble with emojis */}
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.3 }}
-                  className="absolute -top-8 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-md z-20"
+                  className="absolute -top-9 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground px-2 py-1 rounded-lg whitespace-nowrap shadow-md z-20"
                 >
-                  {isDancing ? "🎉 Готово!" : isLoading ? "Думаю..." : "Пиши! 👋"}
+                  <motion.span
+                    animate={isDancing ? {
+                      scale: [1, 1.3, 1, 1.2, 1],
+                    } : isLoading ? {
+                      rotate: [0, 10, -10, 10, 0],
+                    } : isUserTyping ? {
+                      y: [0, -3, 0],
+                    } : {}}
+                    transition={{ duration: 0.8, repeat: Infinity }}
+                    className="text-base"
+                  >
+                    {isDancing 
+                      ? "🎉✨🥳💫🎊" 
+                      : isLoading 
+                        ? "🤔💭✨🔮" 
+                        : isUserTyping 
+                          ? "👀✍️💬" 
+                          : "👋😊💬✨"}
+                  </motion.span>
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-secondary rotate-45" />
                 </motion.div>
               </motion.div>
