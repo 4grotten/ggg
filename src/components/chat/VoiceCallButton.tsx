@@ -94,20 +94,33 @@ export const VoiceCallButton = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
           >
-            <Button
-              type="button"
-              variant={isConnecting ? "default" : "ghost"}
-              size="icon"
-              onClick={startCall}
-              disabled={isConnecting}
-              className="shrink-0 w-9 h-9 rounded-full"
+            <motion.div
+              animate={isConnecting ? { 
+                scale: [1, 1.1, 1],
+                boxShadow: [
+                  "0 0 0 0 hsl(var(--primary) / 0.4)",
+                  "0 0 0 8px hsl(var(--primary) / 0)",
+                  "0 0 0 0 hsl(var(--primary) / 0)"
+                ]
+              } : {}}
+              transition={{ repeat: Infinity, duration: 1.2 }}
+              className="rounded-full"
             >
-              {isConnecting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Phone className="w-4 h-4" />
-              )}
-            </Button>
+              <Button
+                type="button"
+                variant={isConnecting ? "default" : "ghost"}
+                size="icon"
+                onClick={startCall}
+                disabled={isConnecting}
+                className="shrink-0 w-9 h-9 rounded-full"
+              >
+                {isConnecting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Phone className="w-4 h-4" />
+                )}
+              </Button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
