@@ -108,14 +108,18 @@ export const VoiceCallButton = () => {
             >
               <Button
                 type="button"
-                variant={isConnecting ? "default" : "ghost"}
                 size="icon"
                 onClick={startCall}
                 disabled={isConnecting}
-                className="shrink-0 w-9 h-9 rounded-full"
+                className={cn(
+                  "shrink-0 w-9 h-9 rounded-full",
+                  isConnecting 
+                    ? "bg-primary hover:bg-primary/90" 
+                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                )}
               >
                 {isConnecting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin text-primary-foreground" />
                 ) : (
                   <Phone className="w-4 h-4" />
                 )}
