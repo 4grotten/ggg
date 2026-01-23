@@ -6,15 +6,14 @@ interface AnimatedBotHeadProps {
 
 export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
   const isLarge = size === "lg";
-  const containerSize = isLarge ? "w-10 h-10" : "w-4 h-4";
-  const eyeSize = isLarge ? "w-[8px] h-[8px]" : "w-[4px] h-[4px]";
-  const pupilSize = isLarge ? "w-[4px] h-[4px]" : "w-[2px] h-[2px]";
-  const eyeGap = isLarge ? "gap-[10px]" : "gap-[5px]";
-  const pupilMove = isLarge ? 3 : 1.5;
+  const containerSize = isLarge ? "w-14 h-14" : "w-6 h-6";
+  const eyeWidth = isLarge ? 3 : 1.5;
+  const eyeHeight = isLarge ? 6 : 3;
+  const eyeGap = isLarge ? 8 : 4;
 
   return (
     <div className={`relative ${containerSize}`}>
-      {/* Bot head */}
+      {/* Bot head SVG */}
       <svg
         viewBox="0 0 24 24"
         fill="none"
@@ -34,66 +33,51 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
         <path d="M22 15h-1" />
       </svg>
       
-      {/* Animated eyes container */}
-      <div className="absolute inset-0 flex items-center justify-center" style={{ top: '52%' }}>
-        <div className={`flex ${eyeGap}`}>
-          {/* Left eye */}
+      {/* Animated eyes container - positioned over the head */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ top: isLarge ? '54%' : '52%' }}
+      >
+        <div className="flex items-center" style={{ gap: `${eyeGap}px` }}>
+          {/* Left eye - vertical line */}
           <motion.div
-            className={`relative ${eyeSize} bg-current rounded-full overflow-hidden`}
+            className="bg-current rounded-full"
+            style={{ 
+              width: `${eyeWidth}px`, 
+              height: `${eyeHeight}px`,
+              originY: 0.5
+            }}
             animate={{
-              scaleY: [1, 1, 1, 1, 1, 1, 0.1, 1, 0.1, 1, 0.1, 1, 1, 1, 1],
+              scaleY: [1, 1, 1, 1, 1, 1, 0.2, 1, 0.2, 1, 0.2, 1, 1, 1, 1],
+              x: [0, 2, 2, -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             }}
             transition={{
               duration: 3,
               repeat: Infinity,
               ease: "easeInOut",
-              times: [0, 0.3, 0.33, 0.36, 0.5, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.9, 0.95, 1],
+              times: [0, 0.1, 0.33, 0.35, 0.5, 0.52, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.95, 1],
             }}
-          >
-            {/* Pupil */}
-            <motion.div
-              className={`absolute ${pupilSize} bg-background rounded-full`}
-              style={{ top: '25%', left: '25%' }}
-              animate={{
-                x: [0, pupilMove, pupilMove, -pupilMove, -pupilMove, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.1, 0.33, 0.35, 0.5, 0.52, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.95, 1],
-              }}
-            />
-          </motion.div>
+          />
           
-          {/* Right eye */}
+          {/* Right eye - vertical line */}
           <motion.div
-            className={`relative ${eyeSize} bg-current rounded-full overflow-hidden`}
+            className="bg-current rounded-full"
+            style={{ 
+              width: `${eyeWidth}px`, 
+              height: `${eyeHeight}px`,
+              originY: 0.5
+            }}
             animate={{
-              scaleY: [1, 1, 1, 1, 1, 1, 0.1, 1, 0.1, 1, 0.1, 1, 1, 1, 1],
+              scaleY: [1, 1, 1, 1, 1, 1, 0.2, 1, 0.2, 1, 0.2, 1, 1, 1, 1],
+              x: [0, 2, 2, -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             }}
             transition={{
               duration: 3,
               repeat: Infinity,
               ease: "easeInOut",
-              times: [0, 0.3, 0.33, 0.36, 0.5, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.9, 0.95, 1],
+              times: [0, 0.1, 0.33, 0.35, 0.5, 0.52, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.95, 1],
             }}
-          >
-            {/* Pupil */}
-            <motion.div
-              className={`absolute ${pupilSize} bg-background rounded-full`}
-              style={{ top: '25%', left: '25%' }}
-              animate={{
-                x: [0, pupilMove, pupilMove, -pupilMove, -pupilMove, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.1, 0.33, 0.35, 0.5, 0.52, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.95, 1],
-              }}
-            />
-          </motion.div>
+          />
         </div>
       </div>
     </div>
