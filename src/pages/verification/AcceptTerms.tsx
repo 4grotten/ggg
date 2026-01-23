@@ -25,16 +25,33 @@ const AcceptTerms = () => {
   const { t } = useTranslation();
   const [cardTermsOpen, setCardTermsOpen] = useState(false);
   const [terms, setTerms] = useState<TermItem[]>([
-    { id: "esign", labelKey: "verify.terms.esign", link: "#", checked: true },
-    { id: "card-terms", labelKey: "verify.terms.cardTerms", link: "#", checked: true },
-    { id: "privacy", labelKey: "verify.terms.privacyPolicy", link: "#", checked: true },
-    { id: "certify", labelKey: "verify.terms.certify", checked: true },
-    { id: "acknowledge", labelKey: "verify.terms.acknowledge", checked: true },
+    { id: "esign", labelKey: "verify.terms.esign", link: "#", checked: false },
+    { id: "card-terms", labelKey: "verify.terms.cardTerms", link: "#", checked: false },
+    { id: "privacy", labelKey: "verify.terms.privacyPolicy", link: "#", checked: false },
+    { id: "certify", labelKey: "verify.terms.certify", checked: false },
+    { id: "acknowledge", labelKey: "verify.terms.acknowledge", checked: false },
   ]);
+  const [animationComplete, setAnimationComplete] = useState(false);
+
+  // Auto-check animation
+  useEffect(() => {
+    const timers = terms.map((_, index) => 
+      setTimeout(() => {
+        setTerms(prev => prev.map((t, i) => 
+          i === index ? { ...t, checked: true } : t
+        ));
+        if (index === terms.length - 1) {
+          setAnimationComplete(true);
+        }
+      }, 800 + index * 300)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   const allChecked = terms.every((t) => t.checked);
 
   const toggleTerm = (id: string) => {
+    if (!animationComplete) return;
     setTerms(terms.map((t) => (t.id === id ? { ...t, checked: !t.checked } : t)));
   };
 
@@ -99,21 +116,37 @@ const AcceptTerms = () => {
 
         {/* Terms List */}
         <div className="flex-1 space-y-4">
-          {terms.map((term) => (
-            <button
+          {terms.map((term, index) => (
+            <motion.button
               key={term.id}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 + index * 0.1, duration: 0.4, ease: "easeOut" }}
               onClick={() => toggleTerm(term.id)}
               className="w-full flex items-start gap-3 text-left"
             >
-              <div
+              <motion.div
                 className={`w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center mt-0.5 transition-all ${
                   term.checked
                     ? "bg-primary text-white"
                     : "border-2 border-border"
                 }`}
+                animate={term.checked ? { scale: [1, 1.2, 1] } : { scale: 1 }}
+                transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
               >
-                {term.checked && <Check className="w-4 h-4" strokeWidth={3} />}
-              </div>
+                <AnimatePresence>
+                  {term.checked && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
+                    >
+                      <Check className="w-4 h-4" strokeWidth={3} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
               <span className="text-sm">
                 {term.link ? (
                   <>
@@ -129,7 +162,7 @@ const AcceptTerms = () => {
                   t(term.labelKey)
                 )}
               </span>
-            </button>
+            </motion.button>
             ))}
           </div>
 
