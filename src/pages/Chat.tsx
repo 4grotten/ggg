@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trash2, ChevronLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ const Chat = () => {
   const { t } = useTranslation();
   const { messages, isLoading, error, sendMessage, clearChat } = useAIChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isUserTyping, setIsUserTyping] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -57,7 +58,7 @@ const Chat = () => {
               animate={{ scale: 1, opacity: 1 }}
               className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary"
             >
-              <AnimatedBotHead size="lg" />
+              <AnimatedBotHead size="lg" isUserTyping={isUserTyping} />
             </motion.div>
             <h2 className="text-xl font-semibold mb-2">AI Ассистент</h2>
             <p className="text-muted-foreground text-sm">
@@ -89,6 +90,7 @@ const Chat = () => {
           onSend={sendMessage} 
           isLoading={isLoading} 
           placeholder={t("chat.messagePlaceholder")}
+          onTypingChange={setIsUserTyping}
         />
       </div>
     </div>

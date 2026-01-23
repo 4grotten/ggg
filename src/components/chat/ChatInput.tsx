@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,10 +7,15 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   placeholder?: string;
+  onTypingChange?: (isTyping: boolean) => void;
 }
 
-export const ChatInput = ({ onSend, isLoading, placeholder = "Напишите сообщение..." }: ChatInputProps) => {
+export const ChatInput = ({ onSend, isLoading, placeholder = "Напишите сообщение...", onTypingChange }: ChatInputProps) => {
   const [input, setInput] = useState("");
+
+  useEffect(() => {
+    onTypingChange?.(input.length > 0);
+  }, [input, onTypingChange]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
