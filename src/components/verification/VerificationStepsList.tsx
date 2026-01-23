@@ -20,9 +20,9 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
   const { t } = useTranslation();
   const isReturning = startFromStep !== undefined;
   
-  // For returning users: animate from startFromStep down to last, for new users: bottom to top
-  const [highlightedIndex, setHighlightedIndex] = useState(
-    isReturning ? startFromStep : steps.length - 1
+  // For returning users: highlight steps 2 and 3 together as they're in one block
+  const [highlightedIndices, setHighlightedIndices] = useState<number[]>(
+    isReturning ? [startFromStep] : [steps.length - 1]
   );
   const [animationComplete, setAnimationComplete] = useState(false);
   
@@ -32,18 +32,13 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
     const timers: NodeJS.Timeout[] = [];
     
     if (isReturning) {
-      // For returning users: start from completed step, animate to next steps
-      // First show the completed checkmark, then animate to steps 2 and 3
+      // For returning users: highlight steps 2 and 3 together
       timers.push(
         setTimeout(() => {
-          setHighlightedIndex(1); // Move to step 2 (document)
+          setHighlightedIndices([1, 2]); // Highlight both step 2 and 3 together
           setTimeout(() => {
-            setHighlightedIndex(2); // Move to step 3 (liveness)
-            setTimeout(() => {
-              setHighlightedIndex(1); // Return to step 2 (current step)
-              setAnimationComplete(true);
-            }, 400);
-          }, 400);
+            setAnimationComplete(true);
+          }, 600);
         }, 600)
       );
     } else {
@@ -52,7 +47,7 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
         const delay = (steps.length - 1 - i) * 400;
         timers.push(
           setTimeout(() => {
-            setHighlightedIndex(i);
+            setHighlightedIndices([i]);
             if (i === 0) {
               setTimeout(() => setAnimationComplete(true), 300);
             }
@@ -67,9 +62,9 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
   return (
     <div className="space-y-4">
       {steps.map((step, index) => {
-        const isHighlighted = highlightedIndex === index;
+        const isHighlighted = highlightedIndices.includes(index);
         const isCompleted = step.status === "completed";
-        const isCurrent = animationComplete && step.status === "current";
+        const isCurrent = animationComplete && (step.status === "current" || step.status === "pending") && index >= 1 && isReturning;
         
         return (
           <motion.div 
