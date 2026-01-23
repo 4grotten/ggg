@@ -17,21 +17,21 @@ const SplashScreen = () => {
             duration: 0.8, 
             ease: [0.16, 1, 0.3, 1]
           }}
-          className="relative"
+          className="relative w-[90vw] max-w-md"
         >
           {/* Card Shadow */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 0.4, scale: 1 }}
+            animate={{ opacity: 0.5, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="absolute inset-0 bg-primary/30 blur-3xl rounded-3xl transform translate-y-8"
+            className="absolute inset-0 bg-primary/40 blur-3xl rounded-3xl transform translate-y-10"
           />
           
           {/* OG Image */}
           <motion.img
             src="/og-image.png"
             alt="Easy Card"
-            className="relative w-72 h-auto rounded-xl shadow-2xl"
+            className="relative w-full h-auto rounded-2xl shadow-[0_25px_60px_-15px_rgba(59,130,246,0.5)]"
             initial={{ rotateY: -15 }}
             animate={{ rotateY: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
@@ -47,7 +47,7 @@ const SplashScreen = () => {
               repeat: Infinity,
               repeatDelay: 3
             }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 rounded-xl overflow-hidden pointer-events-none"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 rounded-2xl overflow-hidden pointer-events-none"
           />
         </motion.div>
         
