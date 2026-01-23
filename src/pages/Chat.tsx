@@ -17,6 +17,8 @@ const Chat = () => {
   const [isUserTyping, setIsUserTyping] = useState(false);
   const [botFalling, setBotFalling] = useState(false);
   const [showBotAtInput, setShowBotAtInput] = useState(false);
+  const [isDancing, setIsDancing] = useState(false);
+  const prevMessagesLengthRef = useRef(messages.length);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -25,6 +27,20 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Detect when AI response arrives and trigger dance
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (
+      messages.length > prevMessagesLengthRef.current && 
+      lastMessage?.role === 'assistant' &&
+      showBotAtInput
+    ) {
+      setIsDancing(true);
+      setTimeout(() => setIsDancing(false), 2000);
+    }
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages, showBotAtInput]);
 
   const handleSendMessage = (message: string) => {
     // Start falling animation
@@ -154,17 +170,24 @@ const Chat = () => {
                 className="absolute -top-12 left-4 z-10"
               >
                 <motion.div
-                  animate={{ 
+                  animate={isDancing ? { 
+                    y: [0, -15, 0, -15, 0, -10, 0, -5, 0],
+                    rotate: [0, -15, 15, -15, 15, -10, 10, -5, 0],
+                    scale: [1, 1.1, 1, 1.1, 1, 1.05, 1, 1.02, 1],
+                  } : { 
                     y: [0, -4, 0],
                   }}
-                  transition={{
+                  transition={isDancing ? {
+                    duration: 2,
+                    ease: "easeInOut"
+                  } : {
                     duration: 2,
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
                   className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-lg"
                 >
-                  <AnimatedBotHead size="sm" isUserTyping={isUserTyping} />
+                  <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
                 {/* Speech bubble */}
                 <motion.div
@@ -173,7 +196,7 @@ const Chat = () => {
                   transition={{ delay: 0.5, duration: 0.3 }}
                   className="absolute -top-8 left-8 bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-lg whitespace-nowrap"
                 >
-                  {isLoading ? "Думаю..." : "Пиши! 👋"}
+                  {isDancing ? "🎉 Готово!" : isLoading ? "Думаю..." : "Пиши! 👋"}
                   <div className="absolute -bottom-1 left-2 w-2 h-2 bg-secondary rotate-45" />
                 </motion.div>
               </motion.div>
