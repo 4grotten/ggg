@@ -209,7 +209,7 @@ const Chat = () => {
       </div>
 
       {/* Input Area - Fixed at bottom */}
-      <div className="fixed bottom-24 left-0 right-0 max-w-[800px] mx-auto bg-background border-t border-border">
+      <div className="fixed bottom-24 left-0 right-0 max-w-[800px] mx-auto bg-background">
         <ChatInput 
           onSend={handleSendMessage} 
           isLoading={isLoading} 
