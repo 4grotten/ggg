@@ -52,15 +52,16 @@ export const useVerificationProgress = () => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return 0;
     
-    // Step 1 (Questionnaire) complete after /verify/address
-    // Step 2 (Document) complete after /verify/document-capture-back
-    // Step 3 (Liveness) complete after /verify/liveness
     const stepIndex = VERIFICATION_STEPS.indexOf(saved as VerificationStep);
+    const addressIndex = VERIFICATION_STEPS.indexOf("/verify/address");
+    const documentTypeIndex = VERIFICATION_STEPS.indexOf("/verify/document-type");
+    const livenessIndex = VERIFICATION_STEPS.indexOf("/verify/liveness");
     
-    if (stepIndex >= VERIFICATION_STEPS.indexOf("/verify/document-type")) {
-      // Completed questionnaire (step 1)
-      if (stepIndex >= VERIFICATION_STEPS.indexOf("/verify/liveness")) {
-        // Completed document (step 2)
+    // Step 1 (Questionnaire) complete when we're at or past /verify/address
+    // (user fills personal-info, monthly-volume, address, then goes to document-type)
+    if (stepIndex >= addressIndex) {
+      // Step 2 (Document) complete when at or past liveness
+      if (stepIndex >= livenessIndex) {
         return 2;
       }
       return 1;
