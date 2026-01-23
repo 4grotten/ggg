@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { AnimatedBotHead } from "@/components/chat/AnimatedBotHead";
+import { VoiceCallButton } from "@/components/chat/VoiceCallButton";
 import { useAIChat } from "@/hooks/useAIChat";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-
 // Single emoji for each state
 const STATE_EMOJIS = {
   idle: "💬",
@@ -112,6 +112,7 @@ const Chat = () => {
           <h1 className="text-lg font-semibold">{t('chat.aiAssistant')}</h1>
           
           <div className="flex items-center gap-1">
+            <VoiceCallButton />
             <LanguageSwitcher />
             {messages.length > 0 && (
               <Button variant="ghost" size="icon" onClick={clearChat}>
