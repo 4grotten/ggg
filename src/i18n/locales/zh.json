@@ -518,6 +518,7 @@
   },
   "chat": {
     "aiAssistant": "AI 助手",
+    "description": "询问有关卡片、转账、限额或其他应用功能的问题",
     "owner": "所有者",
     "replyTo": "回复",
     "messagePlaceholder": "消息",

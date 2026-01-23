@@ -518,6 +518,7 @@
   },
   "chat": {
     "aiAssistant": "Yapay Zeka Asistanı",
+    "description": "Kartlar, transferler, limitler veya diğer uygulama özellikleri hakkında soru sorun",
     "owner": "Sahip",
     "replyTo": "yanıtla",
     "messagePlaceholder": "Mesaj",

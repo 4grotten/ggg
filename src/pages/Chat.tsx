@@ -93,7 +93,7 @@ const Chat = () => {
             <span className="text-sm">{t('common.back')}</span>
           </button>
           
-          <h1 className="text-lg font-semibold">AI Ассистент</h1>
+          <h1 className="text-lg font-semibold">{t('chat.aiAssistant')}</h1>
           
           <div className="flex items-center gap-1">
             <LanguageSwitcher />
@@ -126,9 +126,9 @@ const Chat = () => {
                 transition={{ duration: 0.4 }}
                 className="mb-6"
               >
-                <h2 className="text-xl font-semibold mb-2">AI Ассистент</h2>
+                <h2 className="text-xl font-semibold mb-2">{t('chat.aiAssistant')}</h2>
                 <p className="text-muted-foreground text-sm">
-                  Задайте вопрос о картах, переводах, лимитах или любой другой функции приложения
+                  {t('chat.description')}
                 </p>
               </motion.div>
               

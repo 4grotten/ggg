@@ -518,6 +518,7 @@
   },
   "chat": {
     "aiAssistant": "KI-Assistent",
+    "description": "Stellen Sie eine Frage zu Karten, Überweisungen, Limits oder anderen App-Funktionen",
     "owner": "Inhaber",
     "replyTo": "Antwort an",
     "messagePlaceholder": "Nachricht",
