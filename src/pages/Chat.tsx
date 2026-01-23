@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { AnimatedBotHead } from "@/components/chat/AnimatedBotHead";
-import { VoiceCallButton } from "@/components/chat/VoiceCallButton";
 import { useAIChat } from "@/hooks/useAIChat";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -100,7 +99,7 @@ const Chat = () => {
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="relative flex items-center justify-between h-14 px-4">
+        <div className="flex items-center justify-between h-14 px-4">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
@@ -109,16 +108,15 @@ const Chat = () => {
             <span className="text-sm">{t('common.back')}</span>
           </button>
           
-          <h1 className="absolute left-1/2 -translate-x-1/2 text-lg font-semibold">{t('chat.aiAssistant')}</h1>
+          <h1 className="text-lg font-semibold">{t('chat.aiAssistant')}</h1>
           
-          <div className="relative flex items-center gap-1">
+          <div className="flex items-center gap-1">
             <LanguageSwitcher />
             {messages.length > 0 && (
               <Button variant="ghost" size="icon" onClick={clearChat}>
                 <Trash2 className="w-5 h-5" />
               </Button>
             )}
-            <VoiceCallButton />
           </div>
         </div>
       </header>

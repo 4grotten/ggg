@@ -1,6 +1,7 @@
 import { useState, FormEvent, useEffect, ReactNode } from "react";
 import { Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { VoiceCallButton } from "./VoiceCallButton";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -35,18 +36,21 @@ export const ChatInput = ({ onSend, isLoading, placeholder = "Напишите �
           disabled={isLoading}
           className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground text-sm"
         />
-        <Button 
-          type="submit" 
-          size="icon" 
-          disabled={!input.trim() || isLoading}
-          className="shrink-0 w-9 h-9 rounded-full bg-primary hover:bg-primary/90"
-        >
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin text-primary-foreground" />
-          ) : (
-            <Send className="w-4 h-4 text-primary-foreground" />
-          )}
-        </Button>
+        <div className="flex items-center gap-1">
+          <VoiceCallButton />
+          <Button 
+            type="submit" 
+            size="icon" 
+            disabled={!input.trim() || isLoading}
+            className="shrink-0 w-9 h-9 rounded-full bg-primary hover:bg-primary/90"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-primary-foreground" />
+            ) : (
+              <Send className="w-4 h-4 text-primary-foreground" />
+            )}
+          </Button>
+        </div>
       </div>
     </form>
   );
