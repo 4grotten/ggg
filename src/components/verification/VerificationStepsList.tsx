@@ -25,7 +25,7 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
     isReturning ? startFromStep : steps.length - 1
   );
   const [animationComplete, setAnimationComplete] = useState(false);
-  const [showCompletedCheck, setShowCompletedCheck] = useState(isReturning);
+  
 
   // Elevator animation
   useEffect(() => {
@@ -100,34 +100,19 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
               transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
               style={{ borderStyle: "solid" }}
             >
-              {isCompleted && showCompletedCheck ? (
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ 
-                    type: "spring", 
-                    stiffness: 300, 
-                    damping: 15,
-                    delay: 0.3 
-                  }}
-                >
-                  <Check className="w-5 h-5" strokeWidth={3} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  animate={{ 
-                    scale: isHighlighted ? [1, 1.2, 1] : 1,
-                    color: isCurrent ? "#ffffff" : undefined
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {step.icon}
-                </motion.div>
-              )}
+              <motion.div
+                animate={{ 
+                  scale: isHighlighted ? [1, 1.2, 1] : 1,
+                  color: isCompleted || isCurrent ? "#ffffff" : undefined
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                {step.icon}
+              </motion.div>
             </motion.div>
             <div className="flex-1 pt-2">
               <motion.p 
-                className="text-xs"
+                className="text-xs flex items-center gap-1"
                 animate={{ 
                   color: isCompleted 
                     ? "rgb(34, 197, 94)" 
@@ -139,16 +124,16 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
                 }}
                 transition={{ duration: 0.3 }}
               >
-                {isCompleted ? (
+                {t('verify.steps.step')} {index + 1}
+                {isCompleted && (
                   <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
+                    className="flex items-center gap-1 ml-2"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5, type: "spring", stiffness: 300 }}
                   >
-                    ✓ {t('verify.steps.completed')}
+                    • {t('verify.steps.completed')} <Check className="w-3 h-3" strokeWidth={3} />
                   </motion.span>
-                ) : (
-                  <>{t('verify.steps.step')} {index + 1}</>
                 )}
               </motion.p>
               <motion.p 
