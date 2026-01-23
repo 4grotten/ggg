@@ -185,49 +185,55 @@ const Chat = () => {
           leftElement={
             showBotAtInput ? (
               <motion.div
-                initial={{ scale: 0, opacity: 0 }}
+                initial={{ 
+                  scale: 0.3, 
+                  opacity: 0,
+                  y: -200,
+                  rotate: -360
+                }}
                 animate={{ 
-                  scale: 1, 
+                  scale: [0.3, 1.2, 0.9, 1.1, 1],
                   opacity: 1,
+                  y: [null, 5, -3, 2, 0],
+                  rotate: 0
                 }}
                 transition={{ 
                   type: "spring",
-                  stiffness: 300,
-                  damping: 20,
+                  stiffness: 200,
+                  damping: 15,
+                  duration: 0.8
                 }}
                 className="relative"
               >
                 <motion.div
                   animate={isDancing ? { 
-                    rotate: [0, -10, 10, -10, 10, 0],
-                    scale: [1, 1.1, 1, 1.1, 1],
+                    rotate: [0, -15, 15, -15, 15, 0],
+                    scale: [1, 1.15, 1, 1.15, 1],
                   } : { 
                     y: [0, -2, 0],
+                    rotate: [0, -2, 2, 0],
                   }}
                   transition={isDancing ? {
-                    duration: 1,
+                    duration: 1.5,
                     ease: "easeInOut"
                   } : {
-                    y: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+                    y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                    rotate: { duration: 3, repeat: Infinity, ease: "easeInOut" },
                   }}
                   className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
                 >
                   <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
-                {/* Speech bubble - показываем только при загрузке или танце */}
-                <AnimatePresence>
-                  {(isLoading || isDancing) && (
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      className="absolute -top-8 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-md"
-                    >
-                      {isDancing ? "🎉" : "💭"}
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-secondary rotate-45" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* Speech bubble */}
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.3 }}
+                  className="absolute -top-8 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-md z-20"
+                >
+                  {isDancing ? "🎉 Готово!" : isLoading ? "Думаю..." : "Пиши! 👋"}
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-secondary rotate-45" />
+                </motion.div>
               </motion.div>
             ) : undefined
           }
