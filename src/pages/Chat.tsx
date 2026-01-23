@@ -99,7 +99,7 @@ const Chat = () => {
                 animate={botFalling ? {
                   y: [0, -60, 500],
                   x: [0, 0, -100],
-                  scale: [1, 1.3, 0.25],
+                  scale: [1, 1.3, 0.35],
                   rotate: [0, -30, 900],
                 } : {
                   y: 0,
