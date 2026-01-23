@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
-import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatedBotHead } from "./AnimatedBotHead";
+import { useAvatar } from "@/contexts/AvatarContext";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { User } from "lucide-react";
 
 interface ChatMessageProps {
   role: 'user' | 'assistant';
@@ -10,6 +12,7 @@ interface ChatMessageProps {
 
 export const ChatMessage = ({ role, content }: ChatMessageProps) => {
   const isUser = role === 'user';
+  const { avatarUrl } = useAvatar();
   
   return (
     <motion.div
@@ -21,11 +24,16 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
       )}
     >
       <div className={cn(
-        "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+        "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden",
         isUser ? "bg-primary" : "bg-secondary"
       )}>
         {isUser ? (
-          <User className="w-4 h-4 text-primary-foreground" />
+          <Avatar className="w-8 h-8">
+            <AvatarImage src={avatarUrl} alt="User" className="object-cover" />
+            <AvatarFallback className="bg-primary">
+              <User className="w-4 h-4 text-primary-foreground" />
+            </AvatarFallback>
+          </Avatar>
         ) : (
           <AnimatedBotHead />
         )}
