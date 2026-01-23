@@ -174,10 +174,10 @@ const Chat = () => {
                   opacity: 0
                 }}
                 animate={{ 
-                  y: 0,
+                  y: [null, 10, -8, 5, -3, 0],
                   x: 0,
-                  rotate: 0,
-                  scale: 1,
+                  rotate: [null, 5, -5, 3, -2, 0],
+                  scale: [null, 1.1, 0.95, 1.05, 0.98, 1],
                   opacity: 1
                 }}
                 exit={{
@@ -187,9 +187,12 @@ const Chat = () => {
                 }}
                 transition={{ 
                   type: "spring",
-                  stiffness: 200,
-                  damping: 15,
-                  mass: 1
+                  stiffness: 300,
+                  damping: 12,
+                  mass: 0.8,
+                  y: { duration: 0.8, times: [0, 0.3, 0.5, 0.7, 0.85, 1] },
+                  rotate: { duration: 1.2, times: [0, 0.25, 0.5, 0.7, 0.85, 1] },
+                  scale: { duration: 0.8, times: [0, 0.3, 0.5, 0.7, 0.85, 1] }
                 }}
                 className="absolute -top-12 left-4 z-10"
               >
@@ -199,15 +202,15 @@ const Chat = () => {
                     rotate: [0, -15, 15, -15, 15, -10, 10, -5, 0],
                     scale: [1, 1.1, 1, 1.1, 1, 1.05, 1, 1.02, 1],
                   } : { 
-                    y: [0, -4, 0],
+                    y: [0, -3, 0],
+                    rotate: [0, -3, 3, -2, 2, 0],
                   }}
                   transition={isDancing ? {
                     duration: 2,
                     ease: "easeInOut"
                   } : {
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
+                    y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                    rotate: { duration: 3, repeat: Infinity, ease: "easeInOut" }
                   }}
                   className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-lg"
                 >
