@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trash2, ChevronLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -10,6 +10,14 @@ import { useAIChat } from "@/hooks/useAIChat";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 
+// Emoji sets for different states
+const EMOJI_SETS = {
+  idle: ["👋", "😊", "💬", "✨", "🌟", "💫", "🤗", "😄", "🎈", "💭", "🌈", "🔮"],
+  typing: ["👀", "✍️", "💬", "🤔", "📝", "💡", "⌨️", "🖊️", "✏️", "📖", "🧐", "👁️"],
+  thinking: ["🤔", "💭", "✨", "🔮", "🧠", "⚡", "💫", "🌀", "🔍", "📊", "🎯", "💡"],
+  dancing: ["🎉", "✨", "🥳", "💫", "🎊", "🌟", "🎈", "🎁", "🎪", "🎭", "🎵", "💃"]
+};
+
 const Chat = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -20,7 +28,30 @@ const Chat = () => {
   const [showBotAtInput, setShowBotAtInput] = useState(false);
   const [isDancing, setIsDancing] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [currentEmojiIndex, setCurrentEmojiIndex] = useState(0);
   const prevMessagesLengthRef = useRef(messages.length);
+
+  // Get current emoji set based on state
+  const currentEmojiSet = useMemo(() => {
+    if (isDancing) return EMOJI_SETS.dancing;
+    if (isLoading) return EMOJI_SETS.thinking;
+    if (isUserTyping) return EMOJI_SETS.typing;
+    return EMOJI_SETS.idle;
+  }, [isDancing, isLoading, isUserTyping]);
+
+  // Cycle through emojis
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentEmojiIndex(prev => (prev + 1) % currentEmojiSet.length);
+    }, isDancing ? 300 : isLoading ? 400 : 600);
+    
+    return () => clearInterval(interval);
+  }, [currentEmojiSet, isDancing, isLoading]);
+
+  // Reset emoji index when state changes
+  useEffect(() => {
+    setCurrentEmojiIndex(0);
+  }, [isDancing, isLoading, isUserTyping]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -226,32 +257,43 @@ const Chat = () => {
                 >
                   <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
-                {/* Speech bubble with emojis */}
+                {/* Speech bubble with animated emoji */}
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.3 }}
-                  className="absolute -top-9 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground px-2 py-1 rounded-lg whitespace-nowrap shadow-md z-20"
+                  className="absolute -top-9 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground px-3 py-1.5 rounded-lg whitespace-nowrap shadow-md z-20 min-w-[40px] flex items-center justify-center"
                 >
-                  <motion.span
-                    animate={isDancing ? {
-                      scale: [1, 1.3, 1, 1.2, 1],
-                    } : isLoading ? {
-                      rotate: [0, 10, -10, 10, 0],
-                    } : isUserTyping ? {
-                      y: [0, -3, 0],
-                    } : {}}
-                    transition={{ duration: 0.8, repeat: Infinity }}
-                    className="text-base"
-                  >
-                    {isDancing 
-                      ? "🎉✨🥳💫🎊" 
-                      : isLoading 
-                        ? "🤔💭✨🔮" 
-                        : isUserTyping 
-                          ? "👀✍️💬" 
-                          : "👋😊💬✨"}
-                  </motion.span>
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={currentEmojiIndex + (isDancing ? 'dance' : isLoading ? 'load' : isUserTyping ? 'type' : 'idle')}
+                      initial={{ 
+                        scale: 0, 
+                        opacity: 0, 
+                        y: 10,
+                        rotate: -180 
+                      }}
+                      animate={{ 
+                        scale: [1, 1.3, 1], 
+                        opacity: 1, 
+                        y: 0,
+                        rotate: 0 
+                      }}
+                      exit={{ 
+                        scale: 0, 
+                        opacity: 0, 
+                        y: -10,
+                        rotate: 180 
+                      }}
+                      transition={{ 
+                        duration: 0.3,
+                        scale: { duration: 0.4 }
+                      }}
+                      className="text-xl inline-block"
+                    >
+                      {currentEmojiSet[currentEmojiIndex]}
+                    </motion.span>
+                  </AnimatePresence>
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-secondary rotate-45" />
                 </motion.div>
               </motion.div>
