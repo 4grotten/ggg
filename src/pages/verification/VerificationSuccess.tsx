@@ -209,7 +209,7 @@ const VerificationSuccess = () => {
           </motion.p>
 
           {/* Virtual Card Preview */}
-          <div className="w-full mb-6">
+          <div className="w-full max-w-[320px] mb-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.3, y: 100 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
