@@ -75,30 +75,21 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
             transition={{ delay: 0.2 + index * 0.1, duration: 0.4, ease: "easeOut" }}
           >
             <motion.div
-              className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                isCompleted
-                  ? "bg-green-500 text-white"
-                  : isCurrent
-                  ? "bg-[#007AFF] text-white"
-                  : "bg-secondary text-muted-foreground"
-              }`}
+              className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
               animate={{
-                borderWidth: isHighlighted || isCurrent ? 2 : 0,
-                borderColor: isHighlighted ? "#007AFF" : isCurrent ? "#007AFF" : "transparent",
                 scale: isHighlighted ? [1, 1.1, 1] : 1,
                 backgroundColor: isCompleted 
                   ? "rgb(34, 197, 94)" 
-                  : isCurrent 
+                  : isHighlighted || isCurrent
                   ? "#007AFF" 
-                  : undefined,
+                  : "hsl(var(--secondary))",
               }}
               transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-              style={{ borderStyle: "solid" }}
             >
               <motion.div
                 animate={{ 
                   scale: isHighlighted ? [1, 1.2, 1] : 1,
-                  color: isCompleted || isCurrent ? "#ffffff" : undefined
+                  color: isCompleted || isHighlighted || isCurrent ? "#ffffff" : "hsl(var(--muted-foreground))"
                 }}
                 transition={{ duration: 0.3 }}
               >
