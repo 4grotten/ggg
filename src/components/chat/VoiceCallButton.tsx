@@ -57,58 +57,60 @@ export const VoiceCallButton = () => {
   const isSpeaking = conversation.isSpeaking;
 
   return (
-    <AnimatePresence mode="wait">
-      {isConnected ? (
-        <motion.div
-          key="connected"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          className="flex items-center gap-1.5"
-        >
-          {/* Speaking indicator */}
+    <div className="bg-background/80 dark:bg-card/90 backdrop-blur-sm rounded-full border border-border/50 shadow-sm p-1">
+      <AnimatePresence mode="wait">
+        {isConnected ? (
           <motion.div
-            animate={isSpeaking ? { scale: [1, 1.3, 1], opacity: [1, 0.7, 1] } : {}}
-            transition={{ repeat: Infinity, duration: 0.8 }}
-            className={cn(
-              "w-2 h-2 rounded-full",
-              isSpeaking ? "bg-green-500" : "bg-yellow-500"
-            )}
-          />
-          
-          <Button
-            type="button"
-            variant="destructive"
-            size="icon"
-            onClick={endCall}
-            className="shrink-0 w-9 h-9 rounded-full"
+            key="connected"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="flex items-center gap-1.5 pl-2"
           >
-            <PhoneOff className="w-4 h-4" />
-          </Button>
-        </motion.div>
-      ) : (
-        <motion.div
-          key="disconnected"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-        >
-          <Button
-            type="button"
-            variant={isConnecting ? "default" : "ghost"}
-            size="icon"
-            onClick={startCall}
-            disabled={isConnecting}
-            className="shrink-0 w-9 h-9 rounded-full"
+            {/* Speaking indicator */}
+            <motion.div
+              animate={isSpeaking ? { scale: [1, 1.3, 1], opacity: [1, 0.7, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 0.8 }}
+              className={cn(
+                "w-2 h-2 rounded-full",
+                isSpeaking ? "bg-green-500" : "bg-yellow-500"
+              )}
+            />
+            
+            <Button
+              type="button"
+              variant="destructive"
+              size="icon"
+              onClick={endCall}
+              className="shrink-0 w-9 h-9 rounded-full"
+            >
+              <PhoneOff className="w-4 h-4" />
+            </Button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="disconnected"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
           >
-            {isConnecting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Phone className="w-4 h-4" />
-            )}
-          </Button>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            <Button
+              type="button"
+              variant={isConnecting ? "default" : "ghost"}
+              size="icon"
+              onClick={startCall}
+              disabled={isConnecting}
+              className="shrink-0 w-9 h-9 rounded-full"
+            >
+              {isConnecting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Phone className="w-4 h-4" />
+              )}
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
