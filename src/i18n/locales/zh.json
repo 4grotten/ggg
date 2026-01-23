@@ -197,7 +197,15 @@
       "residencePermit": "居留许可",
       "passport": "护照",
       "requiredFields": "*必填字段",
-      "continue": "继续"
+      "continue": "继续",
+      "unsupported": {
+        "title": "不支持此文件",
+        "description": "Easy Card不支持此国家的居留许可。该国家可能不在支持国家列表中。",
+        "countriesTitle": "不支持的国家包括：",
+        "suggestion": "尝试选择其他证件类型或提供其他支持国家的证件。",
+        "changeType": "更改证件类型",
+        "cancel": "取消"
+      }
     },
     "upload": {
       "title": "准备上传您的",

@@ -196,7 +196,15 @@
       "residencePermit": "Permiso de residencia",
       "passport": "Pasaporte",
       "requiredFields": "*Campos obligatorios",
-      "continue": "Continuar"
+      "continue": "Continuar",
+      "unsupported": {
+        "title": "Documento no compatible",
+        "description": "El permiso de residencia de este país no es compatible con Easy Card. El país puede no estar en la lista de países compatibles.",
+        "countriesTitle": "Países no compatibles incluyen:",
+        "suggestion": "Intenta seleccionar un tipo de documento diferente o proporciona documentos de otro país compatible.",
+        "changeType": "Cambiar tipo de documento",
+        "cancel": "Cancelar"
+      }
     },
     "upload": {
       "title": "Prepárate para subir tu",
