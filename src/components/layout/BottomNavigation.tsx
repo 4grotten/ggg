@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAvatar } from "@/contexts/AvatarContext";
+import { useVoiceCall } from "@/contexts/VoiceCallContext";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
 
@@ -17,6 +18,7 @@ const navItems = [
 export const BottomNavigation = () => {
   const location = useLocation();
   const { avatarUrl } = useAvatar();
+  const { isConnected, isSpeaking } = useVoiceCall();
   const { t, i18n } = useTranslation();
   const hasMountedRef = useRef(false);
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -121,13 +123,26 @@ export const BottomNavigation = () => {
                 ref={(el) => { tabRefs.current[index] = el; }}
                 className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10"
               >
-                <Icon
-                  className={cn(
-                    "w-6 h-6 transition-colors",
-                    active ? "text-primary" : "text-foreground"
+                <div className="relative">
+                  <Icon
+                    className={cn(
+                      "w-6 h-6 transition-colors",
+                      active ? "text-primary" : "text-foreground"
+                    )}
+                    strokeWidth={active ? 2.5 : 1.5}
+                  />
+                  {/* Active call indicator on chat icon */}
+                  {item.path === "/chat" && isConnected && (
+                    <motion.div
+                      animate={isSpeaking ? { scale: [1, 1.3, 1], opacity: [1, 0.7, 1] } : {}}
+                      transition={{ repeat: Infinity, duration: 0.8 }}
+                      className={cn(
+                        "absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-card",
+                        isSpeaking ? "bg-green-500" : "bg-yellow-500"
+                      )}
+                    />
                   )}
-                  strokeWidth={active ? 2.5 : 1.5}
-                />
+                </div>
                 <span
                   className={cn(
                     "text-xs font-medium transition-colors",
