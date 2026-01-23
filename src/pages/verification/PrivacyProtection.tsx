@@ -20,9 +20,9 @@ const PrivacyProtection = () => {
   }, []);
 
   const benefits = [
-    { icon: Shield, textKey: "verify.privacy.benefit1", color: "#22C55E", bgColor: "#22C55E" },
-    { icon: CreditCard, textKey: "verify.privacy.benefit2", color: "#3B82F6", bgColor: "#3B82F6" },
-    { icon: Wallet, textKey: "verify.privacy.benefit3", color: "#A855F7", bgColor: "#A855F7" },
+    { icon: Shield, textKey: "verify.privacy.benefit1", color: "#10B981", bgColor: "#10B981" },
+    { icon: CreditCard, textKey: "verify.privacy.benefit2", color: "#0EA5E9", bgColor: "#0EA5E9" },
+    { icon: Wallet, textKey: "verify.privacy.benefit3", color: "#F59E0B", bgColor: "#F59E0B" },
   ];
 
   return (
@@ -83,7 +83,7 @@ const PrivacyProtection = () => {
                 >
                   <motion.div 
                     className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: `${benefit.bgColor}15` }}
+                    style={{ backgroundColor: `${benefit.bgColor}20` }}
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.6 + index * 0.15, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
@@ -91,7 +91,7 @@ const PrivacyProtection = () => {
                     <benefit.icon className="w-4 h-4" style={{ color: benefit.color }} strokeWidth={2} />
                   </motion.div>
                   <motion.span 
-                    className="text-[15px] text-foreground flex-1"
+                    className="text-[15px] text-foreground text-left"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7 + index * 0.15, duration: 0.3 }}
@@ -99,13 +99,13 @@ const PrivacyProtection = () => {
                     {t(benefit.textKey)}
                   </motion.span>
                   <motion.div
-                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: `${benefit.color}15` }}
+                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ml-auto"
+                    style={{ backgroundColor: "#10B98120" }}
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 1.0 + index * 0.2, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
                   >
-                    <Check className="w-3.5 h-3.5" style={{ color: benefit.color }} strokeWidth={3} />
+                    <Check className="w-3.5 h-3.5 text-emerald-500" strokeWidth={3} />
                   </motion.div>
                 </motion.div>
               ))}
