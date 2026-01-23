@@ -50,7 +50,7 @@ const VerificationSteps = () => {
           <StepIndicator currentStep={isReturning ? 4 : 0} totalSteps={6} />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4 pb-28">
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           <h1 className="text-2xl font-bold mb-2">{t('verify.steps.title')}</h1>
           <p className="text-muted-foreground mb-8">
             {t('verify.steps.description')}
@@ -60,13 +60,11 @@ const VerificationSteps = () => {
             steps={steps} 
             startFromStep={isReturning ? 1 : undefined}
           />
-
-          <PoweredByFooter />
         </div>
-
 
         {/* Button */}
         <div className="karta-footer-actions">
+          <PoweredByFooter className="mb-4" />
           <button
             onClick={() => navigate(isReturning ? "/verify/document-type" : "/verify/personal-info")}
             className="karta-btn-primary"
