@@ -129,7 +129,8 @@
       "document": "提供身份证件",
       "liveness": "进行活体检测",
       "button": "开始验证",
-      "buttonKyc": "开始KYC"
+      "buttonKyc": "开始KYC",
+      "doLater": "稍后进行"
     },
     "personal": {
       "title": "请告诉我们关于您的信息",
