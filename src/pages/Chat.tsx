@@ -8,6 +8,7 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { AnimatedBotHead } from "@/components/chat/AnimatedBotHead";
 import { useAIChat } from "@/hooks/useAIChat";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -94,13 +95,14 @@ const Chat = () => {
           
           <h1 className="text-lg font-semibold">AI Ассистент</h1>
           
-          {messages.length > 0 ? (
-            <Button variant="ghost" size="icon" onClick={clearChat}>
-              <Trash2 className="w-5 h-5" />
-            </Button>
-          ) : (
-            <div className="w-10" />
-          )}
+          <div className="flex items-center gap-1">
+            <LanguageSwitcher />
+            {messages.length > 0 && (
+              <Button variant="ghost" size="icon" onClick={clearChat}>
+                <Trash2 className="w-5 h-5" />
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
