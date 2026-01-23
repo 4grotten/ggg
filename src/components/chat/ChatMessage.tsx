@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Bot, User } from "lucide-react";
+import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AnimatedBotHead } from "./AnimatedBotHead";
 
 interface ChatMessageProps {
   role: 'user' | 'assistant';
@@ -26,7 +27,7 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
         {isUser ? (
           <User className="w-4 h-4 text-primary-foreground" />
         ) : (
-          <Bot className="w-4 h-4 text-secondary-foreground" />
+          <AnimatedBotHead />
         )}
       </div>
       
