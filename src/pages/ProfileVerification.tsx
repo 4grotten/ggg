@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ShieldCheck, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -76,6 +77,7 @@ const ProfileVerification = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col items-center justify-center px-6 pt-16 pb-8">
         {/* Animated Icon */}
