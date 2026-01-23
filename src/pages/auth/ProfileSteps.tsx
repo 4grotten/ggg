@@ -34,7 +34,7 @@ const GenderOption = ({
   label: string;
 }) => {
   const [showFinalIcon, setShowFinalIcon] = useState(false);
-  const [isShyAnimating, setIsShyAnimating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   
   const isMale = type === "male";
   const color = isMale ? "#007AFF" : "#FF6B9D";
@@ -46,14 +46,14 @@ const GenderOption = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // Trigger shy animation when female is selected
+  // Trigger animation when selected
   useEffect(() => {
-    if (!isMale && isSelected) {
-      setIsShyAnimating(true);
-      const timer = setTimeout(() => setIsShyAnimating(false), 1200);
+    if (isSelected) {
+      setIsAnimating(true);
+      const timer = setTimeout(() => setIsAnimating(false), 1200);
       return () => clearTimeout(timer);
     }
-  }, [isSelected, isMale]);
+  }, [isSelected]);
 
   // Male gender symbol (Mars) - ♂
   const MaleSymbol = () => (
@@ -81,7 +81,7 @@ const GenderOption = ({
   // Shy animation keyframes for female
   const shyAnimation = {
     initial: { rotate: 0, scale: 1 },
-    shy: {
+    animate: {
       rotate: [0, -15, 15, -10, 10, -5, 5, 0],
       scale: [1, 0.9, 0.85, 0.8, 0.85, 0.9, 0.95, 1],
       transition: {
@@ -92,13 +92,27 @@ const GenderOption = ({
     }
   };
 
-  // Crack animation for the circle border
-  const crackAnimation = {
+  // Pump animation keyframes for male
+  const pumpAnimation = {
+    initial: { scale: 1, rotate: 0 },
+    animate: {
+      scale: [1, 1.15, 1.25, 1.3, 1.25, 1.15, 1.05, 1],
+      rotate: [0, -5, 5, -3, 3, -2, 2, 0],
+      transition: {
+        duration: 1.0,
+        times: [0, 0.1, 0.25, 0.4, 0.55, 0.7, 0.85, 1],
+        ease: "easeOut" as const
+      }
+    }
+  };
+
+  // Glow animation for female circle border
+  const femaleGlowAnimation = {
     initial: { 
       boxShadow: isSelected ? `0 0 20px ${color}40` : 'none',
       filter: 'none'
     },
-    crack: {
+    animate: {
       boxShadow: [
         `0 0 20px ${color}40`,
         `0 0 30px ${color}60, inset 0 0 10px ${color}30`,
@@ -119,6 +133,35 @@ const GenderOption = ({
     }
   };
 
+  // Flash animation for male circle border
+  const maleFlashAnimation = {
+    initial: { 
+      boxShadow: isSelected ? `0 0 20px ${color}40` : 'none',
+      filter: 'none'
+    },
+    animate: {
+      boxShadow: [
+        `0 0 20px ${color}40`,
+        `0 0 50px ${color}90, inset 0 0 15px ${color}50`,
+        `0 0 80px ${color}ff, inset 0 0 30px ${color}80`,
+        `0 0 50px ${color}90`,
+        `0 0 20px ${color}40`
+      ],
+      filter: [
+        'none',
+        'brightness(1.2)',
+        'brightness(1.5) contrast(1.2)',
+        'brightness(1.2)',
+        'none'
+      ],
+      transition: {
+        duration: 1.0,
+        times: [0, 0.2, 0.4, 0.7, 1],
+        ease: "easeOut" as const
+      }
+    }
+  };
+
   return (
     <motion.button
       whileTap={{ scale: 0.97 }}
@@ -132,8 +175,8 @@ const GenderOption = ({
           border: isSelected ? `3px solid ${color}` : '2px solid hsl(var(--border))',
         }}
         initial="initial"
-        animate={!isMale && isShyAnimating ? "crack" : "initial"}
-        variants={crackAnimation}
+        animate={isAnimating ? "animate" : "initial"}
+        variants={isMale ? maleFlashAnimation : femaleGlowAnimation}
         transition={{ type: "spring", stiffness: 120, damping: 14, delay: isMale ? 0.1 : 0.15 }}
       >
         <AnimatePresence mode="wait">
@@ -157,8 +200,8 @@ const GenderOption = ({
             <motion.div
               key="final"
               initial="initial"
-              animate={!isMale && isShyAnimating ? "shy" : "initial"}
-              variants={shyAnimation}
+              animate={isAnimating ? "animate" : "initial"}
+              variants={isMale ? pumpAnimation : shyAnimation}
               style={{ color }}
               className="flex items-center justify-center"
             >
