@@ -35,7 +35,7 @@
     "getYourCard": "Kartınızı Alın",
     "stepsDone": "ADIM TAMAMLANDI",
     "stepCompleted": "Adım {{step}} tamamlandı ✓",
-    "passportUpdateRequired": "Pasaport bilgilerini güncelleyin",
+    "canOpenCard": "Artık kart açabilirsiniz",
     "identityVerified": "Kimlik Doğrulandı",
     "verified": "Doğrulandı",
     "allStepsCompleted": "Tüm adımlar tamamlandı ✓",
