@@ -23,11 +23,25 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
         strokeLinejoin="round"
         className="w-full h-full text-current"
       >
-        {/* Head outline */}
-        <rect x="3" y="11" width="18" height="10" rx="2" />
-        {/* Antenna */}
-        <circle cx="12" cy="5" r="2" />
-        <path d="M12 7v4" />
+        {/* Square head outline */}
+        <rect x="3" y="11" width="18" height="10" />
+        
+        {/* Animated Antenna group */}
+        <motion.g
+          style={{ transformOrigin: "12px 11px" }}
+          animate={{
+            rotate: [0, 8, 0, -8, 0, 5, -5, 0],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <circle cx="12" cy="5" r="2" />
+          <path d="M12 7v4" />
+        </motion.g>
+        
         {/* Ears */}
         <path d="M3 15h-1" />
         <path d="M22 15h-1" />
