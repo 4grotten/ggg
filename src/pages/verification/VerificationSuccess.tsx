@@ -141,16 +141,16 @@ const VerificationSuccess = () => {
       icon: Wallet,
       title: t('openCard.payWithCrypto'),
       subtitle: t('openCard.payWithCryptoDescription'),
-      iconBg: "bg-green-500/15 dark:bg-green-500/20",
-      iconColor: "text-green-600 dark:text-green-400",
+      iconBg: "bg-green-100",
+      iconColor: "text-green-500",
     },
     {
       id: "bank",
       icon: Landmark,
       title: t('openCard.payWithBank'),
       subtitle: t('openCard.payWithBankDescription'),
-      iconBg: "bg-orange-500/15 dark:bg-orange-500/20",
-      iconColor: "text-orange-600 dark:text-orange-400",
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-500",
     },
   ];
 
@@ -296,16 +296,16 @@ const VerificationSuccess = () => {
 
       {/* Payment Method Drawer */}
       <Drawer open={isPaymentDrawerOpen} onOpenChange={setIsPaymentDrawerOpen}>
-        <DrawerContent className="max-w-[400px] mx-auto">
+        <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle className="text-center">{t('openCard.selectPaymentMethod')}</DrawerTitle>
+            <DrawerTitle>{t('openCard.selectPaymentMethod')}</DrawerTitle>
           </DrawerHeader>
-          <div className="pb-6 px-2">
+          <div className="pb-6">
             {paymentOptions.map((option, index) => (
               <AnimatedDrawerItem key={option.id} index={index}>
                 <button
                   onClick={() => handlePaymentSelect(option.id)}
-                  className="w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/50 active:bg-muted transition-colors rounded-xl"
+                  className="w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors border-b border-border/50"
                 >
                   <div className={`w-12 h-12 rounded-xl ${option.iconBg} flex items-center justify-center`}>
                     <option.icon className={`w-6 h-6 ${option.iconColor}`} />
