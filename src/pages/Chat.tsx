@@ -97,10 +97,10 @@ const Chat = () => {
               {/* Bot - always rendered, animates based on state */}
               <motion.div
                 animate={botFalling ? {
-                  y: [0, -60, 500],
-                  x: [0, 0, -100],
-                  scale: [1, 1.3, 0.35],
-                  rotate: [0, -30, 900],
+                  y: [0, 150, 350, 480, 500],
+                  x: [0, -30, -70, -110, -120],
+                  scale: [1, 0.7, 0.5, 0.38, 0.35],
+                  rotate: [0, 180, 450, 680, 720],
                 } : {
                   y: 0,
                   x: 0,
@@ -108,9 +108,9 @@ const Chat = () => {
                   rotate: 0,
                 }}
                 transition={botFalling ? {
-                  duration: 1,
-                  ease: [0.22, 0.03, 0.26, 1],
-                  times: [0, 0.15, 1]
+                  duration: 1.2,
+                  ease: "easeIn",
+                  times: [0, 0.3, 0.6, 0.9, 1]
                 } : {
                   duration: 0.3
                 }}
