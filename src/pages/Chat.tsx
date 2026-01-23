@@ -18,6 +18,7 @@ const Chat = () => {
   const [botFalling, setBotFalling] = useState(false);
   const [showBotAtInput, setShowBotAtInput] = useState(false);
   const [isDancing, setIsDancing] = useState(false);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const prevMessagesLengthRef = useRef(messages.length);
 
   const scrollToBottom = () => {
@@ -27,6 +28,21 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Detect mobile keyboard open/close
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        const isOpen = window.visualViewport.height < window.innerHeight * 0.75;
+        setIsKeyboardOpen(isOpen);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+      return () => window.visualViewport?.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   // Detect when AI response arrives and trigger dance
   useEffect(() => {
@@ -175,7 +191,7 @@ const Chat = () => {
                 }}
                 animate={{ 
                   y: [null, 10, -8, 5, -3, 0],
-                  x: 0,
+                  x: isKeyboardOpen ? "calc(50vw - 45px)" : 0,
                   rotate: [null, 5, -5, 3, -2, 0],
                   scale: [null, 1.1, 0.95, 1.05, 0.98, 1],
                   opacity: 1
@@ -192,9 +208,10 @@ const Chat = () => {
                   mass: 0.8,
                   y: { duration: 0.8, times: [0, 0.3, 0.5, 0.7, 0.85, 1] },
                   rotate: { duration: 1.2, times: [0, 0.25, 0.5, 0.7, 0.85, 1] },
-                  scale: { duration: 0.8, times: [0, 0.3, 0.5, 0.7, 0.85, 1] }
+                  scale: { duration: 0.8, times: [0, 0.3, 0.5, 0.7, 0.85, 1] },
+                  x: { duration: 0.4, ease: "easeOut" }
                 }}
-                className="absolute -top-12 left-4 z-10"
+                className="absolute -top-14 left-0 z-10"
               >
                 <motion.div
                   animate={isDancing ? { 
