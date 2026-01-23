@@ -1,10 +1,11 @@
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Bot, ChevronLeft } from "lucide-react";
+import { Trash2, ChevronLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
+import { AnimatedBotHead } from "@/components/chat/AnimatedBotHead";
 import { useAIChat } from "@/hooks/useAIChat";
 import { Button } from "@/components/ui/button";
 
@@ -54,9 +55,9 @@ const Chat = () => {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4"
+              className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary"
             >
-              <Bot className="w-10 h-10 text-primary" />
+              <AnimatedBotHead size="lg" />
             </motion.div>
             <h2 className="text-xl font-semibold mb-2">AI Ассистент</h2>
             <p className="text-muted-foreground text-sm">
