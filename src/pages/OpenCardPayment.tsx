@@ -55,7 +55,7 @@ const OpenCardPayment = () => {
     >
       <div className="px-4 py-6 space-y-4 pb-8">
         {/* Card Carousel */}
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden max-w-[400px] mx-auto">
           <AnimatePresence initial={false} mode="popLayout">
             <motion.div
               key={selectedCard}
