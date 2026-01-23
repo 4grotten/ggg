@@ -27,7 +27,7 @@ export const ChatInput = ({ onSend, isLoading, placeholder = "Напишите �
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 bg-transparent">
-      <div className="flex-1 flex items-center bg-background/80 dark:bg-card/90 backdrop-blur-sm rounded-full border border-border/50 shadow-sm pl-2 pr-1 py-1 gap-2">
+      <div className="flex-1 flex items-center bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-full border border-border/30 shadow-lg pl-2 pr-1 py-1 gap-2">
         {leftElement}
         <input
           value={input}
