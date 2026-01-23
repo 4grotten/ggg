@@ -41,7 +41,8 @@
     "allStepsCompleted": "Todos los pasos completados ✓",
     "passportUpdateTitle": "Actualizar datos",
     "passportUpdateDescription": "¿Desea actualizar los datos de su pasaporte? Se restablecerá todo el progreso de verificación.",
-    "openCard": "Abrir nueva tarjeta"
+    "openCard": "Abrir nueva tarjeta",
+    "payButton": "Pagar"
   },
   "openCard": {
     "title": "Abrir nueva tarjeta",

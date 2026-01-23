@@ -136,8 +136,9 @@ export const VerifyIdentityCard = ({
     navigate("/verify");
   };
 
-  const handlePassportUpdateCancel = () => {
+  const handlePayFromPassportDialog = () => {
     setShowPassportDialog(false);
+    navigate("/verify/success");
   };
 
   return (
@@ -255,10 +256,10 @@ export const VerifyIdentityCard = ({
               {t('common.yes')}
             </button>
             <button
-              onClick={handlePassportUpdateCancel}
-              className="w-full py-3 text-[17px] font-normal text-muted-foreground border-t border-border hover:bg-secondary/50 transition-colors"
+              onClick={handlePayFromPassportDialog}
+              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] border-t border-border hover:bg-secondary/50 transition-colors"
             >
-              {t('common.cancel')}
+              {t('dashboard.payButton')}
             </button>
           </div>
         </AlertDialogContent>

@@ -41,7 +41,8 @@
     "allStepsCompleted": "Alle Schritte abgeschlossen ✓",
     "passportUpdateTitle": "Daten aktualisieren",
     "passportUpdateDescription": "Möchten Sie Ihre Passdaten aktualisieren? Der gesamte Verifizierungsfortschritt wird zurückgesetzt.",
-    "openCard": "Neue Karte eröffnen"
+    "openCard": "Neue Karte eröffnen",
+    "payButton": "Bezahlen"
   },
   "openCard": {
     "title": "Neue Karte eröffnen",

@@ -41,7 +41,8 @@
     "allStepsCompleted": "Tüm adımlar tamamlandı ✓",
     "passportUpdateTitle": "Verileri Güncelle",
     "passportUpdateDescription": "Pasaport verilerinizi güncellemek istiyor musunuz? Tüm doğrulama ilerlemesi sıfırlanacaktır.",
-    "openCard": "Yeni Kart Aç"
+    "openCard": "Yeni Kart Aç",
+    "payButton": "Öde"
   },
   "openCard": {
     "title": "Yeni Kart Aç",

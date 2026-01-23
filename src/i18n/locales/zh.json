@@ -41,7 +41,8 @@
     "allStepsCompleted": "所有步骤已完成 ✓",
     "passportUpdateTitle": "更新数据",
     "passportUpdateDescription": "您要更新护照数据吗？所有验证进度将被重置。",
-    "openCard": "开设新卡"
+    "openCard": "开设新卡",
+    "payButton": "支付"
   },
   "openCard": {
     "title": "开通新卡",
