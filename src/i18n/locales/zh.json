@@ -114,6 +114,7 @@
     "steps": {
       "title": "让我们验证您的身份",
       "description": "请按照以下简单步骤操作",
+      "step": "步骤",
       "questionnaire": "完成问卷",
       "document": "提供身份证件",
       "liveness": "进行活体检测",

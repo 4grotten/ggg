@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 interface VerificationStep {
   id: string;
@@ -15,6 +16,7 @@ interface VerificationStepsListProps {
 }
 
 export const VerificationStepsList = ({ steps }: VerificationStepsListProps) => {
+  const { t } = useTranslation();
   const [highlightedIndex, setHighlightedIndex] = useState(steps.length - 1);
   const [animationComplete, setAnimationComplete] = useState(false);
 
@@ -85,13 +87,15 @@ export const VerificationStepsList = ({ steps }: VerificationStepsListProps) => 
             </motion.div>
             <div className="flex-1 pt-2">
               <motion.p 
-                className="text-xs text-muted-foreground"
+                className="text-xs"
                 animate={{ 
-                  color: isHighlighted && !animationComplete ? "#007AFF" : undefined 
+                  color: isHighlighted || isCurrent ? "#007AFF" : "hsl(var(--muted-foreground))",
+                  scale: isHighlighted ? [1, 1.05, 1] : 1,
+                  fontWeight: isHighlighted ? 600 : 400
                 }}
                 transition={{ duration: 0.3 }}
               >
-                Step {index + 1}
+                {t('verify.steps.step')} {index + 1}
               </motion.p>
               <motion.p 
                 className="font-medium"
