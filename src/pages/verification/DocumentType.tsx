@@ -19,7 +19,7 @@ import {
 const DocumentType = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { saveFormData, getFormData } = useVerificationProgress();
+  const { saveFormData, getFormData, setPassportStatus } = useVerificationProgress();
   
   const [country] = useState("United Arab Emirates");
   const [documentType, setDocumentType] = useState<string | null>(null);
@@ -50,6 +50,17 @@ const DocumentType = () => {
     // Show alert for residence permit
     if (type === "residence-permit") {
       setTimeout(() => setShowUnsupportedAlert(true), 300);
+    }
+    
+    // For passport - set status as "all steps completed but needs update"
+    if (type === "passport") {
+      setPassportStatus({
+        needsUpdate: true,
+        completedSteps: 3,
+      });
+    } else {
+      // Clear passport status for other document types
+      setPassportStatus(null);
     }
   };
 

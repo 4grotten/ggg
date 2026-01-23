@@ -80,11 +80,13 @@ export const VerifyIdentityCard = ({
 }: VerifyIdentityCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { getSavedProgress, clearProgress, getCompletedSteps } = useVerificationProgress();
+  const { getSavedProgress, clearProgress, getCompletedSteps, getPassportStatus } = useVerificationProgress();
   const [showDialog, setShowDialog] = useState(false);
   
   // Calculate progress based on saved verification step
   const progress = getCompletedSteps();
+  const passportStatus = getPassportStatus();
+  const needsPassportUpdate = passportStatus?.needsUpdate && passportStatus?.completedSteps === 3;
 
   const handleClick = () => {
     const savedStep = getSavedProgress();
@@ -153,9 +155,11 @@ export const VerifyIdentityCard = ({
 
         {/* Steps Counter */}
         <p className="mt-2 text-sm text-white/70 font-medium">
-          {progress > 0 
-            ? t('dashboard.stepCompleted', { step: progress })
-            : `${progress} ${t('dashboard.of')} ${totalSteps} ${t('dashboard.stepsDone')}`
+          {needsPassportUpdate 
+            ? t('dashboard.passportUpdateRequired')
+            : progress > 0 
+              ? t('dashboard.stepCompleted', { step: progress })
+              : `${progress} ${t('dashboard.of')} ${totalSteps} ${t('dashboard.stepsDone')}`
           }
         </p>
       </button>

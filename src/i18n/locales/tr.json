@@ -34,6 +34,7 @@
     "getYourCard": "Kartınızı Alın",
     "stepsDone": "ADIM TAMAMLANDI",
     "stepCompleted": "Adım {{step}} tamamlandı ✓",
+    "passportUpdateRequired": "Pasaport bilgilerini güncelleyin",
     "openCard": "Yeni Kart Aç"
   },
   "openCard": {

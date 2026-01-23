@@ -34,6 +34,7 @@
     "getYourCard": "Получите карту",
     "stepsDone": "ШАГОВ ВЫПОЛНЕНО",
     "stepCompleted": "Шаг {{step}} завершён ✓",
+    "passportUpdateRequired": "Обновите данные паспорта",
     "openCard": "Открыть новую карту"
   },
   "openCard": {
