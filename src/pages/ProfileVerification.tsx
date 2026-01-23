@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ShieldCheck, ArrowRight } from "lucide-react";
@@ -72,6 +73,7 @@ const AnimatedFingerprint = () => {
 
 const ProfileVerification = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <MobileLayout
@@ -85,12 +87,12 @@ const ProfileVerification = () => {
 
         {/* Title */}
         <h1 className="text-2xl font-bold text-foreground mb-3 text-center">
-          Verify Your Identity
+          {t('profileVerification.title')}
         </h1>
 
         {/* Description */}
         <p className="text-muted-foreground text-center mb-8 max-w-sm">
-          Complete the verification process to unlock all features and increase your account limits.
+          {t('profileVerification.description')}
         </p>
 
         {/* Benefits */}
@@ -100,8 +102,8 @@ const ProfileVerification = () => {
               <ShieldCheck className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="font-medium text-foreground">Secure & Private</p>
-              <p className="text-sm text-muted-foreground">Your data is encrypted and protected</p>
+              <p className="font-medium text-foreground">{t('profileVerification.secureTitle')}</p>
+              <p className="text-sm text-muted-foreground">{t('profileVerification.secureDescription')}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -109,8 +111,8 @@ const ProfileVerification = () => {
               <ArrowRight className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="font-medium text-foreground">Quick Process</p>
-              <p className="text-sm text-muted-foreground">Takes only 2-3 minutes to complete</p>
+              <p className="font-medium text-foreground">{t('profileVerification.quickTitle')}</p>
+              <p className="text-sm text-muted-foreground">{t('profileVerification.quickDescription')}</p>
             </div>
           </div>
         </div>
@@ -120,7 +122,7 @@ const ProfileVerification = () => {
           onClick={() => navigate("/verify")}
           className="w-full h-14 text-base font-semibold rounded-2xl bg-primary/90 backdrop-blur-2xl border-2 border-white/50 text-primary-foreground gap-2 shadow-lg hover:bg-primary"
         >
-          Start Verification
+          {t('profileVerification.startButton')}
           <ArrowRight className="w-5 h-5" />
         </Button>
       </div>

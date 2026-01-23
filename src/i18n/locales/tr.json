@@ -1,4 +1,13 @@
 {
+  "profileVerification": {
+    "title": "Kimliğinizi Doğrulayın",
+    "description": "Tüm özelliklerin kilidini açmak ve hesap limitlerini artırmak için doğrulama işlemini tamamlayın.",
+    "secureTitle": "Güvenli ve Özel",
+    "secureDescription": "Verileriniz şifrelenmiş ve korunmaktadır",
+    "quickTitle": "Hızlı İşlem",
+    "quickDescription": "Sadece 2-3 dakika sürer",
+    "startButton": "Doğrulamayı Başlat"
+  },
   "common": {
     "continue": "Devam",
     "back": "Geri",

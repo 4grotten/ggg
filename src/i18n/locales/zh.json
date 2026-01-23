@@ -1,4 +1,13 @@
 {
+  "profileVerification": {
+    "title": "验证您的身份",
+    "description": "完成验证流程以解锁所有功能并提高账户限额。",
+    "secureTitle": "安全且私密",
+    "secureDescription": "您的数据已加密并受到保护",
+    "quickTitle": "快速流程",
+    "quickDescription": "仅需2-3分钟",
+    "startButton": "开始验证"
+  },
   "common": {
     "continue": "继续",
     "back": "返回",

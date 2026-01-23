@@ -1,4 +1,13 @@
 {
+  "profileVerification": {
+    "title": "Verify Your Identity",
+    "description": "Complete the verification process to unlock all features and increase your account limits.",
+    "secureTitle": "Secure & Private",
+    "secureDescription": "Your data is encrypted and protected",
+    "quickTitle": "Quick Process",
+    "quickDescription": "Takes only 2-3 minutes to complete",
+    "startButton": "Start Verification"
+  },
   "common": {
     "continue": "Continue",
     "back": "Back",

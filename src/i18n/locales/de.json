@@ -1,4 +1,13 @@
 {
+  "profileVerification": {
+    "title": "Identität verifizieren",
+    "description": "Schließen Sie den Verifizierungsprozess ab, um alle Funktionen freizuschalten und Ihre Kontolimits zu erhöhen.",
+    "secureTitle": "Sicher & Privat",
+    "secureDescription": "Ihre Daten sind verschlüsselt und geschützt",
+    "quickTitle": "Schneller Prozess",
+    "quickDescription": "Dauert nur 2-3 Minuten",
+    "startButton": "Verifizierung starten"
+  },
   "common": {
     "continue": "Weiter",
     "back": "Zurück",

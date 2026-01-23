@@ -1,4 +1,13 @@
 {
+  "profileVerification": {
+    "title": "Verifica tu identidad",
+    "description": "Completa el proceso de verificación para desbloquear todas las funciones y aumentar los límites de tu cuenta.",
+    "secureTitle": "Seguro y Privado",
+    "secureDescription": "Tus datos están encriptados y protegidos",
+    "quickTitle": "Proceso Rápido",
+    "quickDescription": "Solo toma 2-3 minutos",
+    "startButton": "Iniciar Verificación"
+  },
   "common": {
     "continue": "Continuar",
     "back": "Atrás",
