@@ -98,36 +98,38 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
         )}
       </div>
       
-      <div className="flex flex-col gap-1">
-        <div className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2",
-          isUser 
-            ? "bg-primary text-primary-foreground rounded-tr-sm" 
-            : "bg-secondary text-secondary-foreground rounded-tl-sm"
-        )}>
-          <p className="text-sm whitespace-pre-wrap">{content}</p>
+      <div className="flex flex-col gap-1 flex-1">
+        <div className="flex items-end gap-2">
+          <div className={cn(
+            "max-w-[80%] rounded-2xl px-4 py-2",
+            isUser 
+              ? "bg-primary text-primary-foreground rounded-tr-sm" 
+              : "bg-secondary text-secondary-foreground rounded-tl-sm"
+          )}>
+            <p className="text-sm whitespace-pre-wrap">{content}</p>
+          </div>
+          
+          {/* TTS Button for assistant messages - on the right */}
+          {!isUser && (
+            <button
+              onClick={handleSpeak}
+              disabled={isLoading}
+              className={cn(
+                "flex-shrink-0 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
+                isPlaying && "text-primary"
+              )}
+              title={isLoading ? "Загрузка..." : isPlaying ? "Стоп" : "Озвучить"}
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isPlaying ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+            </button>
+          )}
         </div>
-        
-        {/* TTS Button for assistant messages */}
-        {!isUser && (
-          <button
-            onClick={handleSpeak}
-            disabled={isLoading}
-            className={cn(
-              "flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors self-start ml-1",
-              isPlaying && "text-primary"
-            )}
-          >
-            {isLoading ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : isPlaying ? (
-              <VolumeX className="w-3.5 h-3.5" />
-            ) : (
-              <Volume2 className="w-3.5 h-3.5" />
-            )}
-            <span>{isLoading ? "Загрузка..." : isPlaying ? "Стоп" : "Озвучить"}</span>
-          </button>
-        )}
       </div>
     </motion.div>
   );
