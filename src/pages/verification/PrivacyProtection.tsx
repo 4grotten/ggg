@@ -71,18 +71,20 @@ const PrivacyProtection = () => {
               {t('verify.privacy.description')}
             </p>
 
-            {/* Benefits */}
-            <div className="w-full space-y-3">
+            {/* Benefits - Telegram Style */}
+            <div className="w-full space-y-4">
               {benefits.map((benefit, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.15, duration: 0.4, ease: "easeOut" }}
-                  className="flex items-center gap-2 bg-[#007AFF] text-white text-sm px-4 py-2 rounded-full"
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + index * 0.15, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                  className="flex items-center gap-4 bg-[#007AFF] text-white px-5 py-4 rounded-2xl shadow-lg shadow-[#007AFF]/25"
                 >
-                  <benefit.icon className="w-4 h-4" />
-                  <span>{t(benefit.textKey)}</span>
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <benefit.icon className="w-5 h-5" strokeWidth={1.5} />
+                  </div>
+                  <span className="text-base font-medium">{t(benefit.textKey)}</span>
                 </motion.div>
               ))}
             </div>
