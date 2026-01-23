@@ -637,36 +637,36 @@ const ProfileSteps = () => {
           >
             {/* Animated Lock Sequence */}
             <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-primary/10 relative overflow-hidden">
-              {/* Step 1: Password dots typing */}
+              {/* Step 1: Password asterisks typing */}
               <motion.div
-                className="absolute flex items-center justify-center gap-1"
+                className="absolute flex items-center justify-center gap-0.5"
                 initial={{ opacity: 1 }}
                 animate={{ opacity: [1, 1, 0] }}
                 transition={{ 
-                  duration: 1.8,
-                  times: [0, 0.6, 0.7],
+                  duration: 1.5,
+                  times: [0, 0.8, 1],
                   delay: 0.2
                 }}
               >
                 {[0, 1, 2, 3].map((i) => (
                   <motion.span
                     key={i}
-                    className="text-2xl text-primary font-bold"
+                    className="text-3xl text-primary font-bold"
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ 
-                      delay: 0.3 + i * 0.15,
+                      delay: 0.3 + i * 0.2,
                       type: "spring",
                       stiffness: 300,
                       damping: 15
                     }}
                   >
-                    •
+                    *
                   </motion.span>
                 ))}
               </motion.div>
 
-              {/* Step 2: Open lock appears */}
+              {/* Step 2: Open lock appears (after asterisks disappear) */}
               <motion.div
                 className="absolute"
                 initial={{ opacity: 0, scale: 0.5, y: 20 }}
@@ -676,8 +676,9 @@ const ProfileSteps = () => {
                   y: [20, 20, 0, 0, 0]
                 }}
                 transition={{ 
-                  duration: 2.4,
-                  times: [0, 0.45, 0.55, 0.75, 0.85],
+                  duration: 1.8,
+                  times: [0, 0.1, 0.3, 0.7, 0.9],
+                  delay: 1.7,
                   ease: "easeOut" as const
                 }}
               >
@@ -694,8 +695,9 @@ const ProfileSteps = () => {
                   rotate: [-10, -10, 0]
                 }}
                 transition={{ 
-                  duration: 2.4,
-                  times: [0, 0.8, 1],
+                  duration: 0.5,
+                  times: [0, 0.3, 1],
+                  delay: 3.2,
                   ease: "easeOut" as const
                 }}
               >
@@ -705,14 +707,14 @@ const ProfileSteps = () => {
               {/* Flash effect when lock closes */}
               <motion.div
                 className="absolute inset-0 rounded-full bg-primary"
-                initial={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 1 }}
                 animate={{ 
-                  opacity: [0, 0, 0.6, 0],
-                  scale: [1, 1, 1.2, 1.3]
+                  opacity: [0, 0.7, 0],
+                  scale: [1, 1.3, 1.4]
                 }}
                 transition={{ 
-                  duration: 2.6,
-                  times: [0, 0.78, 0.85, 1],
+                  duration: 0.4,
+                  delay: 3.2,
                   ease: "easeOut" as const
                 }}
               />
