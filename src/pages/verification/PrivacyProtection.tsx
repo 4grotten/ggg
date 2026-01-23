@@ -72,24 +72,31 @@ const PrivacyProtection = () => {
             </p>
 
             {/* Benefits - Clean Modern Style */}
-            <div className="w-full space-y-5 mt-4">
+            <div className="w-full space-y-4 mt-4">
               {benefits.map((benefit, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.12, duration: 0.5, ease: "easeOut" }}
-                  className="flex items-center gap-4"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + index * 0.15, duration: 0.4, ease: "easeOut" }}
+                  className="flex items-center gap-3"
                 >
                   <motion.div 
-                    className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5 + index * 0.12, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                    className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.6 + index * 0.15, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
                   >
-                    <benefit.icon className="w-6 h-6 text-primary" strokeWidth={1.5} />
+                    <benefit.icon className="w-4 h-4 text-primary" strokeWidth={2} />
                   </motion.div>
-                  <span className="text-base text-foreground font-medium">{t(benefit.textKey)}</span>
+                  <motion.span 
+                    className="text-[15px] text-foreground"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7 + index * 0.15, duration: 0.3 }}
+                  >
+                    {t(benefit.textKey)}
+                  </motion.span>
                 </motion.div>
               ))}
             </div>
