@@ -242,44 +242,45 @@ const Chat = () => {
                 >
                   <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
-                {/* Small smoke cloud with single emoji */}
+                {/* Cloud speech bubble */}
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.3 }}
-                  className="absolute -top-10 left-1/2 -translate-x-1/2 z-20"
+                  className="absolute -top-14 left-1/2 -translate-x-1/2 z-20"
                 >
-                  {/* Smoke cloud shape */}
                   <motion.div 
-                    animate={{ 
-                      y: [0, -2, 0],
-                    }}
+                    animate={{ y: [0, -2, 0] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                     className="relative"
                   >
-                    {/* Cloud bumps */}
-                    <div className="absolute -left-1 top-1 w-3 h-3 bg-muted rounded-full" />
-                    <div className="absolute -right-1 top-0.5 w-2.5 h-2.5 bg-muted rounded-full" />
-                    
-                    {/* Main cloud body */}
-                    <div className="relative bg-muted px-2.5 py-1.5 rounded-full shadow-sm flex items-center justify-center">
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={currentEmoji}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-lg"
-                        >
-                          {currentEmoji}
-                        </motion.span>
-                      </AnimatePresence>
+                    {/* Cloud shape made of circles */}
+                    <div className="relative">
+                      {/* Top bumps */}
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-5 bg-muted rounded-full" />
+                      <div className="absolute -top-1 -left-1 w-4 h-4 bg-muted rounded-full" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-muted rounded-full" />
+                      
+                      {/* Main body */}
+                      <div className="relative bg-muted px-4 py-2 rounded-full flex items-center justify-center min-w-[44px] min-h-[32px]">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={currentEmoji}
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-xl"
+                          >
+                            {currentEmoji}
+                          </motion.span>
+                        </AnimatePresence>
+                      </div>
+                      
+                      {/* Tail - small circles going down */}
+                      <div className="absolute -bottom-2 left-3 w-2.5 h-2.5 bg-muted rounded-full" />
+                      <div className="absolute -bottom-4 left-1 w-1.5 h-1.5 bg-muted rounded-full" />
                     </div>
-                    
-                    {/* Small bubble connecting to bot */}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-2 h-2 bg-muted rounded-full" />
-                    <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-muted/70 rounded-full" />
                   </motion.div>
                 </motion.div>
               </motion.div>
