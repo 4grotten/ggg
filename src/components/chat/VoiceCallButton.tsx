@@ -96,14 +96,11 @@ export const VoiceCallButton = () => {
           >
             {isConnecting ? (
               <Button
-                variant="outline"
                 size="sm"
                 disabled
                 className="gap-2"
               >
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="hidden sm:inline">Вызов...</span>
-                <span className="sm:hidden">...</span>
+                Вызов...
               </Button>
             ) : (
               <Button
