@@ -162,7 +162,10 @@ export const VerifyIdentityCard = ({
 
       {/* iOS-style Alert Dialog */}
       <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
-        <AlertDialogContent className="max-w-[270px] rounded-2xl p-0 overflow-hidden border-0 gap-0">
+        <AlertDialogContent 
+          className="max-w-[270px] rounded-2xl p-0 overflow-hidden border-0 gap-0"
+          onOverlayClick={() => setShowDialog(false)}
+        >
           <div className="p-4 pb-3">
             <AlertDialogTitle className="text-center text-[17px] font-semibold mb-1">
               {t('verify.progress.resuming')}
