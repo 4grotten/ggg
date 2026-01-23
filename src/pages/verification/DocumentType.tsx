@@ -54,14 +54,15 @@ const DocumentType = () => {
   const handleDocumentTypeChange = (type: string) => {
     setDocumentType(type);
     
-    // Show alert for residence permit
-    if (type === "residence-permit") {
+    // Show alert for residence permit or passport (both are unsupported)
+    if (type === "residence-permit" || type === "passport") {
       setTimeout(() => setShowUnsupportedAlert(true), 300);
     }
   };
 
   const handleContinue = () => {
-    if (documentType === "residence-permit") {
+    // Block residence permit and passport
+    if (documentType === "residence-permit" || documentType === "passport") {
       setShowUnsupportedAlert(true);
     } else {
       navigate("/verify/document-upload");
