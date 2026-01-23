@@ -89,6 +89,12 @@ export const VerifyIdentityCard = ({
   const needsPassportUpdate = passportStatus?.needsUpdate && passportStatus?.completedSteps === 3;
 
   const handleClick = () => {
+    // If passport needs update, go directly to document type selection
+    if (needsPassportUpdate) {
+      navigate("/verify/document-type");
+      return;
+    }
+    
     const savedStep = getSavedProgress();
     
     // Always show dialog - user can choose to continue or start fresh
