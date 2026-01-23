@@ -190,10 +190,10 @@ const Chat = () => {
                   opacity: 0
                 }}
                 animate={{ 
-                  y: [null, 10, -8, 5, -3, 0],
+                  y: isKeyboardOpen ? -120 : 0,
                   x: isKeyboardOpen ? "calc(50vw - 45px)" : 0,
-                  rotate: [null, 5, -5, 3, -2, 0],
-                  scale: [null, 1.1, 0.95, 1.05, 0.98, 1],
+                  rotate: 0,
+                  scale: isKeyboardOpen ? 1.2 : 1,
                   opacity: 1
                 }}
                 exit={{
@@ -204,12 +204,8 @@ const Chat = () => {
                 transition={{ 
                   type: "spring",
                   stiffness: 300,
-                  damping: 12,
+                  damping: 20,
                   mass: 0.8,
-                  y: { duration: 0.8, times: [0, 0.3, 0.5, 0.7, 0.85, 1] },
-                  rotate: { duration: 1.2, times: [0, 0.25, 0.5, 0.7, 0.85, 1] },
-                  scale: { duration: 0.8, times: [0, 0.3, 0.5, 0.7, 0.85, 1] },
-                  x: { duration: 0.4, ease: "easeOut" }
                 }}
                 className="absolute -top-14 left-0 z-10"
               >
