@@ -941,7 +941,7 @@ const ProfileSteps = () => {
           </div>
         )}
 
-        <div className="flex-1 overflow-hidden px-6 py-4 pb-28">
+        <div className="flex-1 overflow-y-auto px-6 py-4 pb-28">
           <AnimatePresence mode="wait" custom={direction}>
             {renderStepContent()}
           </AnimatePresence>
