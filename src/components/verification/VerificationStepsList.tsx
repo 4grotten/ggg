@@ -23,6 +23,7 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
   // Animation states
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const [completedAnimationIndices, setCompletedAnimationIndices] = useState<number[]>([]);
+  const [currentStepsIndices, setCurrentStepsIndices] = useState<number[]>([]);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'step1' | 'step1-complete' | 'step2' | 'step3' | 'done'>('idle');
 
   // Elevator animation with delays between floors
@@ -52,21 +53,25 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
         setTimeout(() => {
           setAnimationPhase('step2');
           setHighlightedIndex(1);
+          setCurrentStepsIndices([1]);
         }, 1600)
       );
       
-      // Phase 4: Elevator moves to step 3
+      // Phase 4: Elevator moves to step 3, step 2 stays blue
       timers.push(
         setTimeout(() => {
           setAnimationPhase('step3');
           setHighlightedIndex(2);
+          setCurrentStepsIndices([1, 2]);
         }, 2200)
       );
       
-      // Phase 5: Both step 2 and 3 highlighted together
+      // Phase 5: Animation done, both step 2 and 3 stay highlighted
       timers.push(
         setTimeout(() => {
           setAnimationPhase('done');
+          setHighlightedIndex(null);
+          setCurrentStepsIndices([1, 2]);
         }, 2800)
       );
     } else {
@@ -93,8 +98,8 @@ export const VerificationStepsList = ({ steps, startFromStep }: VerificationStep
         const isHighlighted = highlightedIndex === index;
         const isCompletedByAnimation = completedAnimationIndices.includes(index);
         const isCompleted = step.status === "completed" || isCompletedByAnimation;
-        // After animation done, steps 2 and 3 should be highlighted as "current" (blue)
-        const isCurrent = animationPhase === 'done' && index >= 1 && isReturning;
+        // Steps in currentStepsIndices should be blue (current)
+        const isCurrent = currentStepsIndices.includes(index);
         
         return (
           <motion.div 
