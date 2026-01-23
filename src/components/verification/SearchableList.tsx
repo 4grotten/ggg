@@ -49,9 +49,10 @@ export const SearchableList = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background animate-slide-up">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+    <div className="fixed inset-0 z-50 bg-background animate-slide-up flex justify-center">
+      <div className="w-full max-w-[800px] flex flex-col">
+        {/* Header */}
+        <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         {/* Normal header with title */}
         {!isSearchOpen && (
           <div className="flex items-center justify-between h-14 px-4">
@@ -134,6 +135,7 @@ export const SearchableList = ({
             )}
           </button>
         ))}
+        </div>
       </div>
     </div>
   );
