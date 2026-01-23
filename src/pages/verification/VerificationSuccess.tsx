@@ -338,15 +338,14 @@ const VerificationSuccess = () => {
       {/* iOS-style Pay Later Alert */}
       <AlertDialog open={isPayLaterAlertOpen} onOpenChange={setIsPayLaterAlertOpen}>
         <AlertDialogContent 
-          className="w-[280px] sm:w-[320px] max-w-[90vw] rounded-[14px] p-0 gap-0 overflow-hidden border-none data-[state=open]:animate-ios-alert-in data-[state=closed]:animate-ios-alert-out"
+          className="w-[280px] sm:w-[320px] max-w-[90vw] rounded-[14px] p-0 gap-0 overflow-hidden border-none bg-card data-[state=open]:animate-ios-alert-in data-[state=closed]:animate-ios-alert-out"
           style={{
-            backgroundColor: '#FFFFFF',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           }}
           onOverlayClick={() => setIsPayLaterAlertOpen(false)}
         >
           <AlertDialogHeader className="px-5 pt-5 pb-4">
-            <AlertDialogTitle className="text-center text-lg font-semibold leading-tight text-foreground">
+            <AlertDialogTitle className="text-center text-lg font-semibold leading-tight text-card-foreground">
               {t('verify.success.payLaterAlertTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-sm pt-2 whitespace-pre-line text-muted-foreground leading-relaxed">
