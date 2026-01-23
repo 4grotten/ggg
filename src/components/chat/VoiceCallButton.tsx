@@ -61,30 +61,29 @@ export const VoiceCallButton = () => {
       {isConnected ? (
         <motion.div
           key="connected"
-          initial={{ scale: 0.8, opacity: 0, x: 20 }}
-          animate={{ scale: 1, opacity: 1, x: 0 }}
-          exit={{ scale: 0.8, opacity: 0, x: 20 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-background pr-0 pl-3 z-10"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          className="flex items-center gap-1.5"
         >
           {/* Speaking indicator */}
           <motion.div
             animate={isSpeaking ? { scale: [1, 1.3, 1], opacity: [1, 0.7, 1] } : {}}
             transition={{ repeat: Infinity, duration: 0.8 }}
             className={cn(
-              "w-2.5 h-2.5 rounded-full",
+              "w-2 h-2 rounded-full",
               isSpeaking ? "bg-green-500" : "bg-yellow-500"
             )}
           />
           
           <Button
+            type="button"
             variant="destructive"
-            size="sm"
+            size="icon"
             onClick={endCall}
-            className="gap-2"
+            className="shrink-0 w-9 h-9 rounded-full"
           >
             <PhoneOff className="w-4 h-4" />
-            Завершить
           </Button>
         </motion.div>
       ) : (
@@ -94,25 +93,20 @@ export const VoiceCallButton = () => {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
         >
-          {isConnecting ? (
-            <Button
-              size="sm"
-              disabled
-              className="gap-2"
-            >
-              Вызов...
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={startCall}
-              className="gap-2"
-            >
+          <Button
+            type="button"
+            variant={isConnecting ? "default" : "ghost"}
+            size="icon"
+            onClick={startCall}
+            disabled={isConnecting}
+            className="shrink-0 w-9 h-9 rounded-full"
+          >
+            {isConnecting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
               <Phone className="w-4 h-4" />
-              <span className="hidden sm:inline">Позвонить</span>
-            </Button>
-          )}
+            )}
+          </Button>
         </motion.div>
       )}
     </AnimatePresence>
