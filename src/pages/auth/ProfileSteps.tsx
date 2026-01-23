@@ -771,13 +771,13 @@ const ProfileSteps = () => {
         );
 
       case "complete":
-        // Get gender label (localized in all languages via auth.profile.*)
+        // Get gender label for display (with "Пол:" prefix) - localized
         const genderLabel =
           gender === 'male'
-            ? t('auth.profile.male')
+            ? t('auth.profile.maleDisplay')
             : gender === 'female'
-              ? t('auth.profile.female')
-              : t('auth.profile.notSelected');
+              ? t('auth.profile.femaleDisplay')
+              : t('auth.profile.notSelectedDisplay');
 
         const genderIcon = gender === 'male' ? '♂' : gender === 'female' ? '♀' : '•';
         const genderIconClass =
