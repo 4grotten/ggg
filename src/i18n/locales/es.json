@@ -113,6 +113,7 @@
     "steps": {
       "title": "Vamos a verificarte",
       "description": "Sigue los simples pasos a continuación",
+      "step": "Paso",
       "questionnaire": "Completar cuestionario",
       "document": "Proporcionar documento de identidad",
       "liveness": "Realizar verificación de vida",
