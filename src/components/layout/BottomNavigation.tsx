@@ -62,11 +62,11 @@ export const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 px-4 max-w-[800px] mx-auto">
-      <div className="bg-white/50 backdrop-blur-2xl rounded-3xl shadow-lg border border-white/30 px-2 py-1.5 max-w-[400px] mx-auto">
+      <div className="bg-white/50 dark:bg-card/70 backdrop-blur-2xl rounded-3xl shadow-lg border border-border/50 px-2 py-1.5 max-w-[400px] mx-auto">
         <div className="flex items-center justify-around relative">
           {/* Sliding selector */}
           <motion.div
-            className="absolute bg-gray-200/50 rounded-3xl"
+            className="absolute bg-gray-200/50 dark:bg-white/10 rounded-3xl"
             initial={false}
             animate={{
               left: selectorStyle.left,
@@ -104,7 +104,7 @@ export const BottomNavigation = () => {
                   <span
                     className={cn(
                       "text-xs font-medium transition-colors",
-                      active ? "text-primary" : "text-[#333333]"
+                      active ? "text-primary" : "text-foreground"
                     )}
                   >
                     {t(item.labelKey)}
@@ -124,14 +124,14 @@ export const BottomNavigation = () => {
                 <Icon
                   className={cn(
                     "w-6 h-6 transition-colors",
-                    active ? "text-primary" : "text-[#333333]"
+                    active ? "text-primary" : "text-foreground"
                   )}
                   strokeWidth={active ? 2.5 : 1.5}
                 />
                 <span
                   className={cn(
                     "text-xs font-medium transition-colors",
-                    active ? "text-primary" : "text-[#333333]"
+                    active ? "text-primary" : "text-foreground"
                   )}
                 >
                   {t(item.labelKey)}
