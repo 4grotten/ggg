@@ -112,13 +112,15 @@
     },
     "steps": {
       "title": "Vamos a verificarte",
+      "titleKyc": "Completemos el KYC",
       "description": "Sigue los simples pasos a continuación",
       "step": "Paso",
       "completed": "Completado",
       "questionnaire": "Completar cuestionario",
       "document": "Proporcionar documento de identidad",
       "liveness": "Realizar verificación de vida",
-      "button": "Iniciar verificación"
+      "button": "Iniciar verificación",
+      "buttonKyc": "Iniciar KYC"
     },
     "personal": {
       "title": "Cuéntanos sobre ti",

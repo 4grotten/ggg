@@ -112,13 +112,15 @@
     },
     "steps": {
       "title": "لنقم بالتحقق منك",
+      "titleKyc": "لنكمل KYC",
       "description": "اتبع الخطوات البسيطة أدناه",
       "step": "الخطوة",
       "completed": "مكتمل",
       "questionnaire": "أكمل الاستبيان",
       "document": "قدم وثيقة الهوية",
       "liveness": "قم بفحص الحيوية",
-      "button": "بدء التحقق"
+      "button": "بدء التحقق",
+      "buttonKyc": "بدء KYC"
     },
     "personal": {
       "title": "أخبرنا عن نفسك",

@@ -113,13 +113,15 @@
     },
     "steps": {
       "title": "让我们验证您的身份",
+      "titleKyc": "让我们完成KYC",
       "description": "请按照以下简单步骤操作",
       "step": "步骤",
       "completed": "已完成",
       "questionnaire": "完成问卷",
       "document": "提供身份证件",
       "liveness": "进行活体检测",
-      "button": "开始验证"
+      "button": "开始验证",
+      "buttonKyc": "开始KYC"
     },
     "personal": {
       "title": "请告诉我们关于您的信息",

@@ -51,7 +51,9 @@ const VerificationSteps = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <h1 className="text-2xl font-bold mb-2">{t('verify.steps.title')}</h1>
+          <h1 className="text-2xl font-bold mb-2">
+            {isReturning ? t('verify.steps.titleKyc') : t('verify.steps.title')}
+          </h1>
           <p className="text-muted-foreground mb-8">
             {t('verify.steps.description')}
           </p>
@@ -69,7 +71,7 @@ const VerificationSteps = () => {
             onClick={() => navigate(isReturning ? "/verify/document-type" : "/verify/personal-info")}
             className="karta-btn-primary"
           >
-            {t('verify.steps.button')}
+            {isReturning ? t('verify.steps.buttonKyc') : t('verify.steps.button')}
           </button>
         </div>
       </div>
