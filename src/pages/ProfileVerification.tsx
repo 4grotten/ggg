@@ -37,9 +37,10 @@ const AnimatedFingerprint = () => {
 
   return (
     <motion.div 
-      className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-6 relative"
-      animate={step === 3 ? { scale: [1, 1.1, 1] } : {}}
-      transition={{ duration: 0.3 }}
+      className="w-24 h-24 rounded-full bg-[#007AFF] flex items-center justify-center mb-6 relative shadow-lg"
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={step === 3 ? { scale: [1, 1.15, 1], opacity: 1 } : { scale: 1, opacity: 1 }}
+      transition={{ duration: 0.4 }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +52,7 @@ const AnimatedFingerprint = () => {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-primary"
+        className="text-white"
       >
         {arcs.map((arc, index) => (
           <motion.path
