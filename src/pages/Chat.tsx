@@ -91,13 +91,33 @@ const Chat = () => {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto pb-32">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-center px-6 relative overflow-visible">
-            {/* Container for bot and text */}
-            <div className="relative">
-              {/* Bot - always rendered, animates based on state */}
+          <div className="flex flex-col items-center justify-center h-[50vh] text-center px-6 relative overflow-visible">
+            {/* Container for text and bot */}
+            <div className="relative flex flex-col items-center">
+              {/* Text first */}
               <motion.div
                 animate={botFalling ? {
-                  y: [0, 150, 350, 480, 500],
+                  opacity: 0,
+                  y: -20,
+                  scale: 0.9,
+                } : {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                }}
+                transition={{ duration: 0.4 }}
+                className="mb-6"
+              >
+                <h2 className="text-xl font-semibold mb-2">AI Ассистент</h2>
+                <p className="text-muted-foreground text-sm">
+                  Задайте вопрос о картах, переводах, лимитах или любой другой функции приложения
+                </p>
+              </motion.div>
+              
+              {/* Bot below text */}
+              <motion.div
+                animate={botFalling ? {
+                  y: [0, 100, 200, 280, 300],
                   x: [0, -30, -70, -110, -120],
                   scale: [1, 0.7, 0.5, 0.38, 0.35],
                   rotate: [0, 180, 450, 680, 720],
@@ -114,28 +134,9 @@ const Chat = () => {
                 } : {
                   duration: 0.3
                 }}
-                className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary mx-auto z-10 relative"
+                className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary z-10 relative"
               >
                 <AnimatedBotHead size="lg" isUserTyping={isUserTyping} />
-              </motion.div>
-              
-              {/* Text that fades out */}
-              <motion.div
-                animate={botFalling ? {
-                  opacity: 0,
-                  y: 20,
-                  scale: 0.9,
-                } : {
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                }}
-                transition={{ duration: 0.4 }}
-              >
-                <h2 className="text-xl font-semibold mb-2">AI Ассистент</h2>
-                <p className="text-muted-foreground text-sm">
-                  Задайте вопрос о картах, переводах, лимитах или любой другой функции приложения
-                </p>
               </motion.div>
             </div>
           </div>
