@@ -57,65 +57,64 @@ export const VoiceCallButton = () => {
   const isSpeaking = conversation.isSpeaking;
 
   return (
-    <div className="relative">
-      <AnimatePresence mode="wait">
-        {isConnected ? (
+    <AnimatePresence mode="wait">
+      {isConnected ? (
+        <motion.div
+          key="connected"
+          initial={{ scale: 0.8, opacity: 0, x: 20 }}
+          animate={{ scale: 1, opacity: 1, x: 0 }}
+          exit={{ scale: 0.8, opacity: 0, x: 20 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-background pr-0 pl-3 z-10"
+        >
+          {/* Speaking indicator */}
           <motion.div
-            key="connected"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            className="flex items-center gap-2"
+            animate={isSpeaking ? { scale: [1, 1.3, 1], opacity: [1, 0.7, 1] } : {}}
+            transition={{ repeat: Infinity, duration: 0.8 }}
+            className={cn(
+              "w-2.5 h-2.5 rounded-full",
+              isSpeaking ? "bg-green-500" : "bg-yellow-500"
+            )}
+          />
+          
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={endCall}
+            className="gap-2"
           >
-            {/* Speaking indicator */}
-            <motion.div
-              animate={isSpeaking ? { scale: [1, 1.2, 1] } : {}}
-              transition={{ repeat: Infinity, duration: 0.5 }}
-              className={cn(
-                "w-2 h-2 rounded-full",
-                isSpeaking ? "bg-green-500" : "bg-yellow-500"
-              )}
-            />
-            
+            <PhoneOff className="w-4 h-4" />
+            Завершить
+          </Button>
+        </motion.div>
+      ) : (
+        <motion.div
+          key="disconnected"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+        >
+          {isConnecting ? (
             <Button
-              variant="destructive"
               size="sm"
-              onClick={endCall}
+              disabled
               className="gap-2"
             >
-              <PhoneOff className="w-4 h-4" />
-              Завершить
+              Вызов...
             </Button>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="disconnected"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-          >
-            {isConnecting ? (
-              <Button
-                size="sm"
-                disabled
-                className="gap-2"
-              >
-                Вызов...
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={startCall}
-                className="gap-2"
-              >
-                <Phone className="w-4 h-4" />
-                <span className="hidden sm:inline">Позвонить</span>
-              </Button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={startCall}
+              className="gap-2"
+            >
+              <Phone className="w-4 h-4" />
+              <span className="hidden sm:inline">Позвонить</span>
+            </Button>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
