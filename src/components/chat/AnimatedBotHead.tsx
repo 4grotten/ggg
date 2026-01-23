@@ -1,15 +1,66 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface AnimatedBotHeadProps {
   size?: "sm" | "lg";
+  isUserTyping?: boolean;
 }
 
-export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
+export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedBotHeadProps) => {
   const isLarge = size === "lg";
   const containerSize = isLarge ? "w-10 h-10" : "w-4 h-4";
+  const [animationPhase, setAnimationPhase] = useState<"idle" | "jumping" | "clapping">("idle");
+  const [showHands, setShowHands] = useState(false);
+
+  useEffect(() => {
+    if (isUserTyping && animationPhase === "idle") {
+      // Start jumping
+      setAnimationPhase("jumping");
+      
+      // After 3 jumps (~1.2s), start clapping
+      const clappingTimer = setTimeout(() => {
+        setShowHands(true);
+        setAnimationPhase("clapping");
+      }, 1200);
+
+      // After clapping (~1.5s more), back to idle
+      const idleTimer = setTimeout(() => {
+        setAnimationPhase("idle");
+        setShowHands(false);
+      }, 2700);
+
+      return () => {
+        clearTimeout(clappingTimer);
+        clearTimeout(idleTimer);
+      };
+    }
+  }, [isUserTyping, animationPhase]);
+
+  // Reset to idle when user stops typing
+  useEffect(() => {
+    if (!isUserTyping && animationPhase !== "idle") {
+      const resetTimer = setTimeout(() => {
+        setAnimationPhase("idle");
+        setShowHands(false);
+      }, 500);
+      return () => clearTimeout(resetTimer);
+    }
+  }, [isUserTyping, animationPhase]);
 
   return (
-    <div className={`relative ${containerSize}`}>
+    <motion.div 
+      className={`relative ${containerSize}`}
+      animate={
+        animationPhase === "jumping" 
+          ? { y: [0, -8, 0, -8, 0, -8, 0] }
+          : { y: 0 }
+      }
+      transition={
+        animationPhase === "jumping"
+          ? { duration: 1.2, ease: "easeOut" }
+          : { duration: 0.3 }
+      }
+    >
       {/* Bot head SVG - tall rectangular head like human */}
       <svg
         viewBox="0 0 24 28"
@@ -27,11 +78,13 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
         <motion.g
           style={{ transformOrigin: "12px 9px" }}
           animate={{
-            rotate: [0, 8, 0, -8, 0, 5, -5, 0],
+            rotate: animationPhase === "jumping" 
+              ? [0, -15, 15, -15, 15, -15, 15, 0]
+              : [0, 8, 0, -8, 0, 5, -5, 0],
           }}
           transition={{
-            duration: 2,
-            repeat: Infinity,
+            duration: animationPhase === "jumping" ? 1.2 : 2,
+            repeat: animationPhase === "jumping" ? 0 : Infinity,
             ease: "easeInOut",
           }}
         >
@@ -46,13 +99,17 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
         {/* Animated eyes */}
         <motion.g
           animate={{
-            scaleY: [1, 1, 1, 1, 1, 1, 0.1, 1, 0.1, 1, 0.1, 1, 1, 1, 1],
+            scaleY: animationPhase === "clapping"
+              ? [1, 0.1, 1] // Quick blinks during clapping
+              : [1, 1, 1, 1, 1, 1, 0.1, 1, 0.1, 1, 0.1, 1, 1, 1, 1],
           }}
           transition={{
-            duration: 3,
+            duration: animationPhase === "clapping" ? 0.3 : 3,
             repeat: Infinity,
             ease: "easeInOut",
-            times: [0, 0.3, 0.33, 0.36, 0.5, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.9, 0.95, 1],
+            times: animationPhase === "clapping" 
+              ? undefined 
+              : [0, 0.3, 0.33, 0.36, 0.5, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.9, 0.95, 1],
           }}
           style={{ transformOrigin: "12px 15px" }}
         >
@@ -61,11 +118,13 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
             cy="15" 
             r="1"
             animate={{
-              cx: [9, 10, 10, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
+              cx: animationPhase === "idle" 
+                ? [9, 10, 10, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
+                : 9,
             }}
             transition={{
               duration: 3,
-              repeat: Infinity,
+              repeat: animationPhase === "idle" ? Infinity : 0,
               ease: "easeInOut",
               times: [0, 0.1, 0.33, 0.35, 0.5, 0.52, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.95, 1],
             }}
@@ -75,17 +134,90 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
             cy="15" 
             r="1"
             animate={{
-              cx: [15, 16, 16, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
+              cx: animationPhase === "idle"
+                ? [15, 16, 16, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]
+                : 15,
             }}
             transition={{
               duration: 3,
-              repeat: Infinity,
+              repeat: animationPhase === "idle" ? Infinity : 0,
               ease: "easeInOut",
               times: [0, 0.1, 0.33, 0.35, 0.5, 0.52, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.95, 1],
             }}
           />
         </motion.g>
+
+        {/* Animated Hands */}
+        <AnimatePresence>
+          {showHands && (
+            <>
+              {/* Left hand */}
+              <motion.path
+                d="M2 20 L4 17"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ 
+                  pathLength: 1, 
+                  opacity: 1,
+                  rotate: animationPhase === "clapping" ? [0, 25, 0, 25, 0, 25, 0] : 0
+                }}
+                exit={{ pathLength: 0, opacity: 0 }}
+                transition={{ 
+                  duration: animationPhase === "clapping" ? 1.5 : 0.3,
+                  ease: "easeInOut"
+                }}
+                style={{ transformOrigin: "4px 17px" }}
+              />
+              {/* Left hand circle */}
+              <motion.circle
+                cx="1"
+                cy="21"
+                r="1.5"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1,
+                  x: animationPhase === "clapping" ? [0, 4, 0, 4, 0, 4, 0] : 0,
+                  y: animationPhase === "clapping" ? [0, -4, 0, -4, 0, -4, 0] : 0
+                }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: animationPhase === "clapping" ? 1.5 : 0.3 }}
+              />
+              
+              {/* Right hand */}
+              <motion.path
+                d="M22 20 L20 17"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ 
+                  pathLength: 1, 
+                  opacity: 1,
+                  rotate: animationPhase === "clapping" ? [0, -25, 0, -25, 0, -25, 0] : 0
+                }}
+                exit={{ pathLength: 0, opacity: 0 }}
+                transition={{ 
+                  duration: animationPhase === "clapping" ? 1.5 : 0.3,
+                  ease: "easeInOut"
+                }}
+                style={{ transformOrigin: "20px 17px" }}
+              />
+              {/* Right hand circle */}
+              <motion.circle
+                cx="23"
+                cy="21"
+                r="1.5"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1,
+                  x: animationPhase === "clapping" ? [0, -4, 0, -4, 0, -4, 0] : 0,
+                  y: animationPhase === "clapping" ? [0, -4, 0, -4, 0, -4, 0] : 0
+                }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: animationPhase === "clapping" ? 1.5 : 0.3 }}
+              />
+            </>
+          )}
+        </AnimatePresence>
       </svg>
-    </div>
+    </motion.div>
   );
 };
