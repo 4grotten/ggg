@@ -10,9 +10,9 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
 
   return (
     <div className={`relative ${containerSize}`}>
-      {/* Bot head SVG - original lucide design */}
+      {/* Bot head SVG - tall rectangular head like human */}
       <svg
-        viewBox="0 0 24 24"
+        viewBox="0 0 24 28"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
@@ -20,12 +20,12 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
         strokeLinejoin="round"
         className="w-full h-full text-current"
       >
-        {/* Rounded head outline */}
-        <rect x="3" y="11" width="18" height="10" rx="2" />
+        {/* Tall rectangular head */}
+        <rect x="4" y="9" width="16" height="16" rx="2" />
         
         {/* Animated Antenna group */}
         <motion.g
-          style={{ transformOrigin: "12px 11px" }}
+          style={{ transformOrigin: "12px 9px" }}
           animate={{
             rotate: [0, 8, 0, -8, 0, 5, -5, 0],
           }}
@@ -35,13 +35,13 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
             ease: "easeInOut",
           }}
         >
-          <circle cx="12" cy="5" r="2" />
-          <path d="M12 7v4" />
+          <circle cx="12" cy="4" r="2" />
+          <path d="M12 6v3" />
         </motion.g>
         
         {/* Ears */}
-        <path d="M3 15h-1" />
-        <path d="M22 15h-1" />
+        <path d="M4 17h-2" />
+        <path d="M22 17h-2" />
         
         {/* Animated eyes */}
         <motion.g
@@ -54,14 +54,14 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
             ease: "easeInOut",
             times: [0, 0.3, 0.33, 0.36, 0.5, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.9, 0.95, 1],
           }}
-          style={{ transformOrigin: "12px 16px" }}
+          style={{ transformOrigin: "12px 15px" }}
         >
           <motion.circle 
-            cx="8" 
-            cy="16" 
+            cx="9" 
+            cy="15" 
             r="1"
             animate={{
-              cx: [8, 9, 9, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+              cx: [9, 10, 10, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
             }}
             transition={{
               duration: 3,
@@ -71,11 +71,11 @@ export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
             }}
           />
           <motion.circle 
-            cx="16" 
-            cy="16" 
+            cx="15" 
+            cy="15" 
             r="1"
             animate={{
-              cx: [16, 17, 17, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
+              cx: [15, 16, 16, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
             }}
             transition={{
               duration: 3,
