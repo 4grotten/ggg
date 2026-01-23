@@ -1,4 +1,4 @@
-import { Shield, CreditCard, Wallet, LockKeyhole, LockKeyholeOpen } from "lucide-react";
+import { Shield, CreditCard, Wallet, LockKeyhole, LockKeyholeOpen, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -20,9 +20,9 @@ const PrivacyProtection = () => {
   }, []);
 
   const benefits = [
-    { icon: Shield, textKey: "verify.privacy.benefit1" },
-    { icon: CreditCard, textKey: "verify.privacy.benefit2" },
-    { icon: Wallet, textKey: "verify.privacy.benefit3" },
+    { icon: Shield, textKey: "verify.privacy.benefit1", color: "#22C55E", bgColor: "#22C55E" },
+    { icon: CreditCard, textKey: "verify.privacy.benefit2", color: "#3B82F6", bgColor: "#3B82F6" },
+    { icon: Wallet, textKey: "verify.privacy.benefit3", color: "#A855F7", bgColor: "#A855F7" },
   ];
 
   return (
@@ -82,21 +82,31 @@ const PrivacyProtection = () => {
                   className="flex items-center gap-3"
                 >
                   <motion.div 
-                    className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"
+                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: `${benefit.bgColor}15` }}
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.6 + index * 0.15, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
                   >
-                    <benefit.icon className="w-4 h-4 text-primary" strokeWidth={2} />
+                    <benefit.icon className="w-4 h-4" style={{ color: benefit.color }} strokeWidth={2} />
                   </motion.div>
                   <motion.span 
-                    className="text-[15px] text-foreground"
+                    className="text-[15px] text-foreground flex-1"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7 + index * 0.15, duration: 0.3 }}
                   >
                     {t(benefit.textKey)}
                   </motion.span>
+                  <motion.div
+                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: `${benefit.color}15` }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 1.0 + index * 0.2, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                  >
+                    <Check className="w-3.5 h-3.5" style={{ color: benefit.color }} strokeWidth={3} />
+                  </motion.div>
                 </motion.div>
               ))}
             </div>
