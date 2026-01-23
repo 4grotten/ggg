@@ -13,6 +13,7 @@
     "back": "Zurück",
     "cancel": "Abbrechen",
     "skip": "Überspringen",
+    "yes": "Ja",
     "aed": "AED",
     "usdt": "USDT"
   },
@@ -35,6 +36,11 @@
     "stepsDone": "SCHRITTE ERLEDIGT",
     "stepCompleted": "Schritt {{step}} abgeschlossen ✓",
     "passportUpdateRequired": "Passdaten aktualisieren",
+    "identityVerified": "Identität verifiziert",
+    "verified": "Verifiziert",
+    "allStepsCompleted": "Alle Schritte abgeschlossen ✓",
+    "passportUpdateTitle": "Daten aktualisieren",
+    "passportUpdateDescription": "Möchten Sie Ihre Passdaten aktualisieren? Der gesamte Verifizierungsfortschritt wird zurückgesetzt.",
     "openCard": "Neue Karte eröffnen"
   },
   "openCard": {

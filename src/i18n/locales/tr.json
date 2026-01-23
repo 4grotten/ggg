@@ -13,6 +13,7 @@
     "back": "Geri",
     "cancel": "İptal",
     "skip": "Atla",
+    "yes": "Evet",
     "aed": "AED",
     "usdt": "USDT"
   },
@@ -35,6 +36,11 @@
     "stepsDone": "ADIM TAMAMLANDI",
     "stepCompleted": "Adım {{step}} tamamlandı ✓",
     "passportUpdateRequired": "Pasaport bilgilerini güncelleyin",
+    "identityVerified": "Kimlik Doğrulandı",
+    "verified": "Doğrulandı",
+    "allStepsCompleted": "Tüm adımlar tamamlandı ✓",
+    "passportUpdateTitle": "Verileri Güncelle",
+    "passportUpdateDescription": "Pasaport verilerinizi güncellemek istiyor musunuz? Tüm doğrulama ilerlemesi sıfırlanacaktır.",
     "openCard": "Yeni Kart Aç"
   },
   "openCard": {

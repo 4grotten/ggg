@@ -13,6 +13,7 @@
     "back": "Назад",
     "cancel": "Отмена",
     "skip": "Пропустить",
+    "yes": "Да",
     "aed": "AED",
     "usdt": "USDT"
   },
@@ -35,6 +36,11 @@
     "stepsDone": "ШАГОВ ВЫПОЛНЕНО",
     "stepCompleted": "Шаг {{step}} завершён ✓",
     "passportUpdateRequired": "Обновите данные паспорта",
+    "identityVerified": "Личность верифицирована",
+    "verified": "Верифицировано",
+    "allStepsCompleted": "Все шаги выполнены ✓",
+    "passportUpdateTitle": "Обновить данные",
+    "passportUpdateDescription": "Вы хотите обновить данные паспорта? Весь прогресс верификации будет сброшен.",
     "openCard": "Открыть новую карту"
   },
   "openCard": {

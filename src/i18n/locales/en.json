@@ -13,6 +13,7 @@
     "back": "Back",
     "cancel": "Cancel",
     "skip": "Skip",
+    "yes": "Yes",
     "aed": "AED",
     "usdt": "USDT"
   },
@@ -35,6 +36,11 @@
     "stepsDone": "STEPS DONE",
     "stepCompleted": "Step {{step}} completed ✓",
     "passportUpdateRequired": "Update passport data",
+    "identityVerified": "Identity Verified",
+    "verified": "Verified",
+    "allStepsCompleted": "All steps completed ✓",
+    "passportUpdateTitle": "Update Data",
+    "passportUpdateDescription": "Do you want to update your passport data? All verification progress will be reset.",
     "openCard": "Open New Card"
   },
   "openCard": {

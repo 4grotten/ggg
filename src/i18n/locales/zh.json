@@ -13,6 +13,7 @@
     "back": "返回",
     "cancel": "取消",
     "skip": "跳过",
+    "yes": "是",
     "aed": "AED",
     "usdt": "USDT"
   },
@@ -35,6 +36,11 @@
     "stepsDone": "步骤已完成",
     "stepCompleted": "步骤 {{step}} 已完成 ✓",
     "passportUpdateRequired": "更新护照信息",
+    "identityVerified": "身份已验证",
+    "verified": "已验证",
+    "allStepsCompleted": "所有步骤已完成 ✓",
+    "passportUpdateTitle": "更新数据",
+    "passportUpdateDescription": "您要更新护照数据吗？所有验证进度将被重置。",
     "openCard": "开设新卡"
   },
   "openCard": {

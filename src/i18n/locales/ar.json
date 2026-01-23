@@ -13,6 +13,7 @@
     "back": "رجوع",
     "cancel": "إلغاء",
     "skip": "تخطي",
+    "yes": "نعم",
     "aed": "AED",
     "usdt": "USDT"
   },
@@ -35,6 +36,11 @@
     "stepsDone": "خطوات مكتملة",
     "stepCompleted": "الخطوة {{step}} مكتملة ✓",
     "passportUpdateRequired": "تحديث بيانات جواز السفر",
+    "identityVerified": "تم التحقق من الهوية",
+    "verified": "تم التحقق",
+    "allStepsCompleted": "جميع الخطوات مكتملة ✓",
+    "passportUpdateTitle": "تحديث البيانات",
+    "passportUpdateDescription": "هل تريد تحديث بيانات جواز السفر؟ سيتم إعادة تعيين جميع تقدم التحقق.",
     "openCard": "فتح بطاقة جديدة"
   },
   "openCard": {

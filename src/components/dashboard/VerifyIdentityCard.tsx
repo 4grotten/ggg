@@ -80,8 +80,9 @@ export const VerifyIdentityCard = ({
 }: VerifyIdentityCardProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { getSavedProgress, clearProgress, getCompletedSteps, getPassportStatus } = useVerificationProgress();
+  const { getSavedProgress, clearProgress, getCompletedSteps, getPassportStatus, setPassportStatus } = useVerificationProgress();
   const [showDialog, setShowDialog] = useState(false);
+  const [showPassportDialog, setShowPassportDialog] = useState(false);
   
   // Calculate progress based on saved verification step
   const progress = getCompletedSteps();
@@ -89,9 +90,9 @@ export const VerifyIdentityCard = ({
   const needsPassportUpdate = passportStatus?.needsUpdate && passportStatus?.completedSteps === 3;
 
   const handleClick = () => {
-    // If passport needs update, go directly to document type selection
+    // If passport needs update, show confirmation dialog
     if (needsPassportUpdate) {
-      navigate("/verify/document-type");
+      setShowPassportDialog(true);
       return;
     }
     
@@ -121,6 +122,18 @@ export const VerifyIdentityCard = ({
     navigate("/verify");
   };
 
+  const handlePassportUpdateConfirm = () => {
+    // Clear verification and passport status
+    clearProgress();
+    setPassportStatus(null);
+    setShowPassportDialog(false);
+    navigate("/verify/document-type");
+  };
+
+  const handlePassportUpdateCancel = () => {
+    setShowPassportDialog(false);
+  };
+
   return (
     <>
       <button
@@ -134,10 +147,14 @@ export const VerifyIdentityCard = ({
             
             <div className="flex flex-col">
               <p className="text-[10px] uppercase tracking-wider text-white/70 font-medium">
-                {t('dashboard.getYourCard')}
+                {needsPassportUpdate ? t('dashboard.verified') : t('dashboard.getYourCard')}
               </p>
-              <p className="font-bold text-white text-lg">{t('dashboard.verifyIdentity')}</p>
-              <p className="text-sm text-white/70">{t('dashboard.verifyDescription')}</p>
+              <p className="font-bold text-white text-lg">
+                {needsPassportUpdate ? t('dashboard.identityVerified') : t('dashboard.verifyIdentity')}
+              </p>
+              <p className="text-sm text-white/70">
+                {needsPassportUpdate ? t('dashboard.passportUpdateRequired') : t('dashboard.verifyDescription')}
+              </p>
             </div>
           </div>
           
@@ -150,21 +167,14 @@ export const VerifyIdentityCard = ({
         {/* Progress Bar */}
         <div className="mt-4 flex gap-2">
           {Array.from({ length: totalSteps }).map((_, index) => {
-            // For passport update: step 1 and 3 white, step 2 red
-            const isPassportUpdateStep = needsPassportUpdate && index === 1;
-            const isCompleted = needsPassportUpdate 
-              ? (index === 0 || index === 2) 
-              : index < progress;
+            // For passport update: all 3 steps are white (completed)
+            const isCompleted = needsPassportUpdate || index < progress;
             
             return (
               <div
                 key={index}
                 className={`h-1.5 flex-1 rounded-full ${
-                  isPassportUpdateStep 
-                    ? "bg-red-500" 
-                    : isCompleted 
-                      ? "bg-white" 
-                      : "bg-white/30"
+                  isCompleted ? "bg-white" : "bg-white/30"
                 }`}
               />
             );
@@ -174,7 +184,7 @@ export const VerifyIdentityCard = ({
         {/* Steps Counter */}
         <p className="mt-2 text-sm text-white/70 font-medium">
           {needsPassportUpdate 
-            ? t('dashboard.passportUpdateRequired')
+            ? t('dashboard.allStepsCompleted')
             : progress > 0 
               ? t('dashboard.stepCompleted', { step: progress })
               : `${progress} ${t('dashboard.of')} ${totalSteps} ${t('dashboard.stepsDone')}`
@@ -182,7 +192,7 @@ export const VerifyIdentityCard = ({
         </p>
       </button>
 
-      {/* iOS-style Alert Dialog */}
+      {/* iOS-style Alert Dialog for resuming */}
       <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
         <AlertDialogContent 
           className="max-w-[270px] rounded-2xl p-0 overflow-hidden border-0 gap-0"
@@ -210,6 +220,39 @@ export const VerifyIdentityCard = ({
               className="w-full py-3 text-[17px] font-normal text-destructive border-t border-border hover:bg-secondary/50 transition-colors"
             >
               {t('verify.progress.reset')}
+            </button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* iOS-style Alert Dialog for passport update */}
+      <AlertDialog open={showPassportDialog} onOpenChange={setShowPassportDialog}>
+        <AlertDialogContent 
+          className="max-w-[270px] rounded-2xl p-0 overflow-hidden border-0 gap-0"
+          onOverlayClick={() => setShowPassportDialog(false)}
+        >
+          <div className="p-4 pb-3">
+            <AlertDialogTitle className="text-center text-[17px] font-semibold mb-1">
+              {t('dashboard.passportUpdateTitle')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground">
+              {t('dashboard.passportUpdateDescription')}
+            </AlertDialogDescription>
+          </div>
+          
+          {/* iOS-style buttons */}
+          <div className="flex flex-col">
+            <button
+              onClick={handlePassportUpdateConfirm}
+              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] border-t border-border hover:bg-secondary/50 transition-colors"
+            >
+              {t('common.yes')}
+            </button>
+            <button
+              onClick={handlePassportUpdateCancel}
+              className="w-full py-3 text-[17px] font-normal text-muted-foreground border-t border-border hover:bg-secondary/50 transition-colors"
+            >
+              {t('common.cancel')}
             </button>
           </div>
         </AlertDialogContent>

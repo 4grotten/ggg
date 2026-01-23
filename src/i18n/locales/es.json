@@ -13,6 +13,7 @@
     "back": "Atrás",
     "cancel": "Cancelar",
     "skip": "Omitir",
+    "yes": "Sí",
     "aed": "AED",
     "usdt": "USDT"
   },
@@ -35,6 +36,11 @@
     "stepsDone": "PASOS COMPLETADOS",
     "stepCompleted": "Paso {{step}} completado ✓",
     "passportUpdateRequired": "Actualizar datos del pasaporte",
+    "identityVerified": "Identidad verificada",
+    "verified": "Verificado",
+    "allStepsCompleted": "Todos los pasos completados ✓",
+    "passportUpdateTitle": "Actualizar datos",
+    "passportUpdateDescription": "¿Desea actualizar los datos de su pasaporte? Se restablecerá todo el progreso de verificación.",
     "openCard": "Abrir nueva tarjeta"
   },
   "openCard": {
