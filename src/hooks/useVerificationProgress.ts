@@ -85,15 +85,20 @@ export const useVerificationProgress = () => {
     if (!saved) return 0;
     
     const stepIndex = VERIFICATION_STEPS.indexOf(saved as VerificationStep);
-    const addressIndex = VERIFICATION_STEPS.indexOf("/verify/address");
+    const stepsIndex = VERIFICATION_STEPS.indexOf("/verify/steps");
+    const documentTypeIndex = VERIFICATION_STEPS.indexOf("/verify/document-type");
     const livenessIndex = VERIFICATION_STEPS.indexOf("/verify/liveness");
     
-    // Step 1 (Questionnaire) complete when we're at or past /verify/address
-    if (stepIndex >= addressIndex) {
-      // Step 2 (Document) complete when at or past liveness
-      if (stepIndex >= livenessIndex) {
-        return 2;
-      }
+    // Step 3 (Liveness) complete when at or past liveness
+    if (stepIndex >= livenessIndex) {
+      return 3;
+    }
+    // Step 2 (Document) complete when at or past document-type
+    if (stepIndex >= documentTypeIndex) {
+      return 2;
+    }
+    // Step 1 (Questionnaire) - in progress when past /verify/steps
+    if (stepIndex > stepsIndex) {
       return 1;
     }
     return 0;
