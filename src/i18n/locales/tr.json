@@ -112,13 +112,15 @@
     },
     "steps": {
       "title": "Sizi doğrulayalım",
+      "titleKyc": "KYC'yi tamamlayalım",
       "description": "Aşağıdaki basit adımları izleyin",
       "step": "Adım",
       "completed": "Tamamlandı",
       "questionnaire": "Anketi tamamlayın",
       "document": "Kimlik belgesi sağlayın",
       "liveness": "Canlılık kontrolü yapın",
-      "button": "Doğrulamayı başlat"
+      "button": "Doğrulamayı başlat",
+      "buttonKyc": "KYC'yi başlat"
     },
     "personal": {
       "title": "Kendiniz hakkında bilgi verin",

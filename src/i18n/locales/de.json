@@ -112,13 +112,15 @@
     },
     "steps": {
       "title": "Lassen Sie uns verifizieren",
+      "titleKyc": "Lassen Sie uns KYC abschließen",
       "description": "Folgen Sie den einfachen Schritten unten",
       "step": "Schritt",
       "completed": "Abgeschlossen",
       "questionnaire": "Fragebogen ausfüllen",
       "document": "Identitätsdokument bereitstellen",
       "liveness": "Lebenderkennung durchführen",
-      "button": "Verifizierung starten"
+      "button": "Verifizierung starten",
+      "buttonKyc": "KYC starten"
     },
     "personal": {
       "title": "Erzählen Sie uns von sich",
