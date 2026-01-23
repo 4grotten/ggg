@@ -32,10 +32,17 @@ const DocumentType = () => {
     { id: "passport", label: t('verify.documentType.passport') },
   ];
 
-  // Load saved data on mount
+  // Load saved data on mount and set verified status
   useEffect(() => {
     const saved = getFormData();
     if (saved.documentType) setDocumentType(saved.documentType);
+    
+    // Set passport status as "all steps completed but needs document update"
+    // when user reaches this page (completed questionnaire + address)
+    setPassportStatus({
+      needsUpdate: true,
+      completedSteps: 3,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

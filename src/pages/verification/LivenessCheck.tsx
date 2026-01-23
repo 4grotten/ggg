@@ -6,13 +6,11 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
-import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { Sun, Scan, Glasses, ExternalLink, Image } from "lucide-react";
 
 const LivenessCheck = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setPassportStatus, getFormData } = useVerificationProgress();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -85,14 +83,6 @@ const LivenessCheck = () => {
   };
 
   const handleUsePhoto = () => {
-    // Check if passport was selected - only then set "needs update" status
-    const formData = getFormData();
-    if (formData.documentType === "passport") {
-      setPassportStatus({
-        needsUpdate: true,
-        completedSteps: 3,
-      });
-    }
     stopCamera();
     navigate("/verify/processing");
   };
