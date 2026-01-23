@@ -196,7 +196,7 @@ const Chat = () => {
       </ScrollArea>
 
       {/* Input Area - Fixed at bottom */}
-      <div className="fixed bottom-24 left-0 right-0 max-w-[800px] mx-auto bg-background">
+      <div className="fixed bottom-24 left-0 right-0 max-w-[800px] mx-auto">
         <ChatInput 
           onSend={handleSendMessage} 
           isLoading={isLoading} 
