@@ -45,9 +45,9 @@ const VerificationSteps = () => {
       rightAction={<LanguageSwitcher />}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
-        {/* Progress */}
+        {/* Progress - show step 5 (document + liveness) when returning */}
         <div className="px-6 py-4">
-          <StepIndicator currentStep={0} totalSteps={6} />
+          <StepIndicator currentStep={isReturning ? 4 : 0} totalSteps={6} />
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 pb-28">
