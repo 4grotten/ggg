@@ -257,44 +257,83 @@ const Chat = () => {
                 >
                   <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
-                {/* Speech bubble with animated emoji */}
+                {/* Smoke bubble with animated emojis */}
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.3 }}
-                  className="absolute -top-9 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground px-3 py-1.5 rounded-lg whitespace-nowrap shadow-md z-20 min-w-[40px] flex items-center justify-center"
+                  className="absolute -top-12 left-1/2 -translate-x-1/2 z-20"
                 >
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={currentEmojiIndex + (isDancing ? 'dance' : isLoading ? 'load' : isUserTyping ? 'type' : 'idle')}
-                      initial={{ 
-                        scale: 0, 
-                        opacity: 0, 
-                        y: 10,
-                        rotate: -180 
-                      }}
+                  {/* Smoke cloud effect */}
+                  <div className="relative">
+                    {/* Main cloud */}
+                    <motion.div 
                       animate={{ 
-                        scale: [1, 1.3, 1], 
-                        opacity: 1, 
-                        y: 0,
-                        rotate: 0 
+                        scale: [1, 1.05, 1],
+                        y: [0, -2, 0]
                       }}
-                      exit={{ 
-                        scale: 0, 
-                        opacity: 0, 
-                        y: -10,
-                        rotate: 180 
-                      }}
-                      transition={{ 
-                        duration: 0.3,
-                        scale: { duration: 0.4 }
-                      }}
-                      className="text-xl inline-block"
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="relative flex items-center justify-center"
                     >
-                      {currentEmojiSet[currentEmojiIndex]}
-                    </motion.span>
-                  </AnimatePresence>
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-secondary rotate-45" />
+                      {/* Cloud bubbles */}
+                      <div className="absolute -left-2 -top-1 w-5 h-5 bg-muted/80 rounded-full blur-[2px]" />
+                      <div className="absolute -right-2 -top-1 w-4 h-4 bg-muted/70 rounded-full blur-[2px]" />
+                      <div className="absolute left-1 -top-3 w-4 h-4 bg-muted/60 rounded-full blur-[2px]" />
+                      
+                      {/* Main emoji container */}
+                      <div className="relative bg-muted/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg min-w-[50px] flex items-center justify-center">
+                        <AnimatePresence mode="popLayout">
+                          <motion.span
+                            key={`emoji-${currentEmojiIndex}-${isDancing ? 'dance' : isLoading ? 'load' : isUserTyping ? 'type' : 'idle'}`}
+                            initial={{ 
+                              scale: 0, 
+                              opacity: 0,
+                              y: 15,
+                              filter: "blur(4px)"
+                            }}
+                            animate={{ 
+                              scale: 1, 
+                              opacity: 1, 
+                              y: 0,
+                              filter: "blur(0px)"
+                            }}
+                            exit={{ 
+                              scale: 0.5, 
+                              opacity: 0, 
+                              y: -15,
+                              filter: "blur(4px)"
+                            }}
+                            transition={{ 
+                              duration: 0.25,
+                              ease: "easeOut"
+                            }}
+                            className="text-2xl inline-block"
+                          >
+                            {currentEmojiSet[currentEmojiIndex]}
+                          </motion.span>
+                        </AnimatePresence>
+                      </div>
+                    </motion.div>
+                    
+                    {/* Smoke trail connecting to bot */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
+                      <motion.div 
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.8, 0.6] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="w-3 h-3 bg-muted/60 rounded-full blur-[1px]" 
+                      />
+                      <motion.div 
+                        animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.6, 0.4] }}
+                        transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }}
+                        className="w-2 h-2 bg-muted/40 rounded-full blur-[1px]" 
+                      />
+                      <motion.div 
+                        animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.5, 0.3] }}
+                        transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+                        className="w-1.5 h-1.5 bg-muted/30 rounded-full blur-[1px]" 
+                      />
+                    </div>
+                  </div>
                 </motion.div>
               </motion.div>
             ) : undefined
