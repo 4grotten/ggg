@@ -91,30 +91,64 @@ const Chat = () => {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto pb-32">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-center px-6">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center px-6 relative overflow-hidden">
+            {/* Text container that fades out */}
             <AnimatePresence>
               {!botFalling && (
                 <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   exit={{ 
-                    y: 400,
-                    x: -100,
-                    rotate: 720,
-                    scale: 0.3,
                     opacity: 0,
-                    transition: { duration: 0.8, ease: [0.36, 0, 0.66, -0.56] }
+                    scale: 0.8,
+                    transition: { duration: 0.3 }
                   }}
-                  className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary"
+                  className="relative"
                 >
-                  <AnimatedBotHead size="lg" isUserTyping={isUserTyping} />
+                  {/* Bot sitting on top of text */}
+                  <motion.div
+                    className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary mx-auto"
+                  >
+                    <AnimatedBotHead size="lg" isUserTyping={isUserTyping} />
+                  </motion.div>
+                  
+                  <h2 className="text-xl font-semibold mb-2">AI Ассистент</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Задайте вопрос о картах, переводах, лимитах или любой другой функции приложения
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
-            <h2 className="text-xl font-semibold mb-2">AI Ассистент</h2>
-            <p className="text-muted-foreground text-sm">
-              Задайте вопрос о картах, переводах, лимитах или любой другой функции приложения
-            </p>
+
+            {/* Falling bot animation - appears when botFalling is true */}
+            <AnimatePresence>
+              {botFalling && (
+                <motion.div
+                  initial={{ 
+                    y: 0,
+                    x: 0,
+                    scale: 1,
+                    opacity: 1,
+                  }}
+                  animate={{ 
+                    y: [0, -50, 400],
+                    x: [0, 0, -80],
+                    scale: [1, 1.2, 0.3],
+                    rotate: [0, -20, 720],
+                    opacity: [1, 1, 0],
+                  }}
+                  transition={{ 
+                    duration: 0.8,
+                    ease: [0.36, 0, 0.66, -0.2],
+                    times: [0, 0.2, 1]
+                  }}
+                  className="absolute w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+                  style={{ top: '50%', left: '50%', marginLeft: '-40px', marginTop: '-40px' }}
+                >
+                  <AnimatedBotHead size="lg" isUserTyping={false} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         ) : (
           <AnimatePresence>
