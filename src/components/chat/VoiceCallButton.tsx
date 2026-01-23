@@ -57,7 +57,7 @@ export const VoiceCallButton = () => {
   const isSpeaking = conversation.isSpeaking;
 
   return (
-    <div className="bg-background/80 dark:bg-card/90 backdrop-blur-sm rounded-full border border-border/50 shadow-sm p-1">
+    <div className="rounded-full border border-border/50 p-1">
       <AnimatePresence mode="wait">
         {isConnected ? (
           <motion.div
