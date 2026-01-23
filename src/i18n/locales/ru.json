@@ -33,6 +33,7 @@
     "transactions": "Транзакции",
     "getYourCard": "Получите карту",
     "stepsDone": "ШАГОВ ВЫПОЛНЕНО",
+    "stepCompleted": "Шаг {{step}} завершён ✓",
     "openCard": "Открыть новую карту"
   },
   "openCard": {

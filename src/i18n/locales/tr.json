@@ -33,6 +33,7 @@
     "transactions": "İşlemler",
     "getYourCard": "Kartınızı Alın",
     "stepsDone": "ADIM TAMAMLANDI",
+    "stepCompleted": "Adım {{step}} tamamlandı ✓",
     "openCard": "Yeni Kart Aç"
   },
   "openCard": {

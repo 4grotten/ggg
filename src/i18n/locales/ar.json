@@ -33,6 +33,7 @@
     "transactions": "المعاملات",
     "getYourCard": "احصل على بطاقتك",
     "stepsDone": "خطوات مكتملة",
+    "stepCompleted": "الخطوة {{step}} مكتملة ✓",
     "openCard": "فتح بطاقة جديدة"
   },
   "openCard": {

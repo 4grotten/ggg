@@ -33,6 +33,7 @@
     "transactions": "Transacciones",
     "getYourCard": "Obtén tu tarjeta",
     "stepsDone": "PASOS COMPLETADOS",
+    "stepCompleted": "Paso {{step}} completado ✓",
     "openCard": "Abrir nueva tarjeta"
   },
   "openCard": {
