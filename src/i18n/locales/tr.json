@@ -196,7 +196,15 @@
       "residencePermit": "Oturma izni",
       "passport": "Pasaport",
       "requiredFields": "*Zorunlu alanlar",
-      "continue": "Devam"
+      "continue": "Devam",
+      "unsupported": {
+        "title": "Belge desteklenmiyor",
+        "description": "Bu ülkeden oturma izni Easy Card tarafından desteklenmiyor. Ülke desteklenen ülkeler listesinde olmayabilir.",
+        "countriesTitle": "Desteklenmeyen ülkeler:",
+        "suggestion": "Farklı bir belge türü seçmeyi deneyin veya desteklenen başka bir ülkeden belgeler sağlayın.",
+        "changeType": "Belge türünü değiştir",
+        "cancel": "İptal"
+      }
     },
     "upload": {
       "title": "Yüklemeye hazır olun",

@@ -198,7 +198,15 @@
       "residencePermit": "Residence permit",
       "passport": "Passport",
       "requiredFields": "*Required fields",
-      "continue": "Continue"
+      "continue": "Continue",
+      "unsupported": {
+        "title": "Document Not Supported",
+        "description": "The residence permit from this country is not supported by Easy Card. The country may not be on the list of supported countries.",
+        "countriesTitle": "Unsupported countries include:",
+        "suggestion": "Try selecting a different document type or provide documents from another supported country.",
+        "changeType": "Change Document Type",
+        "cancel": "Cancel"
+      }
     },
     "upload": {
       "title": "Get ready to upload your",

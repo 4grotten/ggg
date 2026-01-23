@@ -196,7 +196,15 @@
       "residencePermit": "Aufenthaltserlaubnis",
       "passport": "Reisepass",
       "requiredFields": "*Pflichtfelder",
-      "continue": "Weiter"
+      "continue": "Weiter",
+      "unsupported": {
+        "title": "Dokument nicht unterstützt",
+        "description": "Die Aufenthaltserlaubnis aus diesem Land wird von Easy Card nicht unterstützt. Das Land ist möglicherweise nicht auf der Liste der unterstützten Länder.",
+        "countriesTitle": "Nicht unterstützte Länder:",
+        "suggestion": "Versuchen Sie, einen anderen Dokumenttyp auszuwählen oder Dokumente aus einem anderen unterstützten Land bereitzustellen.",
+        "changeType": "Dokumenttyp ändern",
+        "cancel": "Abbrechen"
+      }
     },
     "upload": {
       "title": "Bereiten Sie sich vor, Ihr hochzuladen",

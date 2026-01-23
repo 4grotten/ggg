@@ -6,8 +6,15 @@ import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { RadioGroup } from "@/components/verification/RadioGroup";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, AlertTriangle } from "lucide-react";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const DocumentType = () => {
   const navigate = useNavigate();
@@ -16,6 +23,7 @@ const DocumentType = () => {
   
   const [country] = useState("United Arab Emirates");
   const [documentType, setDocumentType] = useState<string | null>(null);
+  const [showUnsupportedAlert, setShowUnsupportedAlert] = useState(false);
 
   const documentTypes = [
     { id: "drivers-license", label: t('verify.documentType.driversLicense') },
@@ -35,6 +43,28 @@ const DocumentType = () => {
   useEffect(() => {
     saveFormData({ documentType: documentType || undefined });
   }, [documentType, saveFormData]);
+
+  const handleDocumentTypeChange = (type: string) => {
+    setDocumentType(type);
+    
+    // Show alert for residence permit
+    if (type === "residence-permit") {
+      setTimeout(() => setShowUnsupportedAlert(true), 300);
+    }
+  };
+
+  const handleContinue = () => {
+    if (documentType === "residence-permit") {
+      setShowUnsupportedAlert(true);
+    } else {
+      navigate("/verify/document-upload");
+    }
+  };
+
+  const handleChangeDocumentType = () => {
+    setShowUnsupportedAlert(false);
+    setDocumentType(null);
+  };
 
   return (
     <MobileLayout
@@ -76,7 +106,7 @@ const DocumentType = () => {
             <RadioGroup
               options={documentTypes}
               value={documentType}
-              onChange={setDocumentType}
+              onChange={handleDocumentTypeChange}
             />
           </div>
 
@@ -88,7 +118,7 @@ const DocumentType = () => {
         {/* Button */}
         <div className="karta-footer-actions">
           <button
-            onClick={() => navigate("/verify/document-upload")}
+            onClick={handleContinue}
             disabled={!documentType}
             className={`karta-btn-primary ${
               !documentType ? "opacity-50 cursor-not-allowed" : ""
@@ -98,6 +128,76 @@ const DocumentType = () => {
           </button>
         </div>
       </div>
+
+      {/* Unsupported Document Alert */}
+      <AlertDialog open={showUnsupportedAlert} onOpenChange={setShowUnsupportedAlert}>
+        <AlertDialogContent className="max-w-[320px] rounded-2xl p-0 overflow-hidden border-0 gap-0">
+          <div className="p-5 pb-4">
+            {/* Warning Icon */}
+            <motion.div 
+              className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center"
+              initial={{ scale: 0 }}
+              animate={{ scale: [0, 1.2, 1] }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <AlertTriangle className="w-8 h-8 text-amber-500" />
+              </motion.div>
+            </motion.div>
+
+            <AlertDialogTitle className="text-center text-[17px] font-semibold mb-2">
+              {t('verify.documentType.unsupported.title')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground mb-4">
+              {t('verify.documentType.unsupported.description')}
+            </AlertDialogDescription>
+
+            {/* Unsupported countries list */}
+            <div className="bg-secondary/50 rounded-xl p-3 mb-3">
+              <p className="text-xs font-medium text-muted-foreground mb-2">
+                {t('verify.documentType.unsupported.countriesTitle')}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {["🇦🇫 Afghanistan", "🇮🇷 Iran", "🇰🇵 North Korea", "🇸🇾 Syria", "🇨🇺 Cuba"].map((country, i) => (
+                  <motion.span 
+                    key={country}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3 + i * 0.1 }}
+                    className="text-xs bg-destructive/10 text-destructive px-2 py-1 rounded-md"
+                  >
+                    {country}
+                  </motion.span>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center">
+              {t('verify.documentType.unsupported.suggestion')}
+            </p>
+          </div>
+          
+          {/* iOS-style buttons */}
+          <div className="flex flex-col">
+            <button
+              onClick={handleChangeDocumentType}
+              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] border-t border-border hover:bg-secondary/50 transition-colors"
+            >
+              {t('verify.documentType.unsupported.changeType')}
+            </button>
+            <button
+              onClick={() => setShowUnsupportedAlert(false)}
+              className="w-full py-3 text-[17px] font-normal text-muted-foreground border-t border-border hover:bg-secondary/50 transition-colors"
+            >
+              {t('verify.documentType.unsupported.cancel')}
+            </button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </MobileLayout>
   );
 };
