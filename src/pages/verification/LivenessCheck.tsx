@@ -6,11 +6,13 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { StepIndicator } from "@/components/verification/StepIndicator";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { Sun, Scan, Glasses, ExternalLink, Image } from "lucide-react";
 
 const LivenessCheck = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { setPassportStatus } = useVerificationProgress();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -83,6 +85,11 @@ const LivenessCheck = () => {
   };
 
   const handleUsePhoto = () => {
+    // Set verified status - all steps completed
+    setPassportStatus({
+      needsUpdate: true,
+      completedSteps: 3,
+    });
     stopCamera();
     navigate("/verify/processing");
   };
