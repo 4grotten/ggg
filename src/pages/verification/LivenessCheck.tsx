@@ -12,7 +12,7 @@ import { Sun, Scan, Glasses, ExternalLink, Image } from "lucide-react";
 const LivenessCheck = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setPassportStatus } = useVerificationProgress();
+  const { setPassportStatus, getFormData } = useVerificationProgress();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -85,11 +85,14 @@ const LivenessCheck = () => {
   };
 
   const handleUsePhoto = () => {
-    // Set verified status - all steps completed
-    setPassportStatus({
-      needsUpdate: true,
-      completedSteps: 3,
-    });
+    // Check if passport was selected - only then set "needs update" status
+    const formData = getFormData();
+    if (formData.documentType === "passport") {
+      setPassportStatus({
+        needsUpdate: true,
+        completedSteps: 3,
+      });
+    }
     stopCamera();
     navigate("/verify/processing");
   };
