@@ -609,6 +609,8 @@
       "complete": {
         "title": "All done!",
         "description": "Your account is ready to use",
+        "congratulations": "Congratulations!",
+        "profileCreated": "Profile created successfully",
         "canEditInSettings": "You can always edit your profile in settings",
         "button": "Get Started",
         "ready": "Profile created successfully"

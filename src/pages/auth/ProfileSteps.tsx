@@ -787,6 +787,65 @@ const ProfileSteps = () => {
               ? 'text-pink-500'
               : 'text-muted-foreground';
         
+        // Confetti colors and particles for explosion effect
+        const confettiColors = ['#34C759', '#FFD700', '#007AFF', '#FF3B30', '#AF52DE', '#FF9500'];
+        const confettiParticles = Array.from({ length: 24 }, (_, i) => ({
+          id: i,
+          delay: 0.3 + Math.random() * 0.3,
+          angle: (i * 15) + Math.random() * 10,
+          color: confettiColors[i % confettiColors.length],
+          distance: 80 + Math.random() * 120
+        }));
+
+        // Explosion confetti ribbon component
+        const ExplosionRibbon = ({ delay, angle, color, distance }: { delay: number; angle: number; color: string; distance: number }) => {
+          const radian = (angle * Math.PI) / 180;
+          const endX = Math.cos(radian) * distance;
+          const endY = Math.sin(radian) * distance;
+          
+          return (
+            <motion.div
+              className="absolute left-1/2 top-20"
+              style={{ marginLeft: -10 }}
+              initial={{ x: 0, y: 0, opacity: 0, scale: 0, rotate: angle }}
+              animate={{ 
+                x: endX,
+                y: endY,
+                opacity: [0, 1, 1, 0],
+                scale: [0, 1.2, 1, 0.5],
+                rotate: [angle, angle + 180, angle + 360]
+              }}
+              transition={{ 
+                duration: 2,
+                delay: delay,
+                ease: "easeOut" as const,
+              }}
+            >
+              <svg width="16" height="32" viewBox="0 0 20 40">
+                <motion.path
+                  d="M10 0 Q15 10 10 20 Q5 30 10 40"
+                  fill="none"
+                  stroke={color}
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  animate={{
+                    d: [
+                      "M10 0 Q15 10 10 20 Q5 30 10 40",
+                      "M10 0 Q5 10 10 20 Q15 30 10 40",
+                      "M10 0 Q15 10 10 20 Q5 30 10 40"
+                    ]
+                  }}
+                  transition={{
+                    duration: 0.4,
+                    repeat: 3,
+                    ease: "easeInOut" as const
+                  }}
+                />
+              </svg>
+            </motion.div>
+          );
+        };
+
         return (
           <motion.div
             key="complete"
@@ -796,14 +855,40 @@ const ProfileSteps = () => {
             animate="center"
             exit="exit"
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="flex flex-col items-center pt-2"
+            className="flex flex-col items-center pt-2 relative"
           >
-            <h1 className="text-xl font-bold mb-1 text-center" style={{ color: '#333333' }}>
-              {t('auth.steps.complete.title')}
-            </h1>
-            <p className="text-sm text-center mb-6" style={{ color: '#333333' }}>
-              {t('auth.steps.complete.description')}
-            </p>
+            {/* Explosion Confetti Effect */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {confettiParticles.map((particle) => (
+                <ExplosionRibbon
+                  key={particle.id}
+                  delay={particle.delay}
+                  angle={particle.angle}
+                  color={particle.color}
+                  distance={particle.distance}
+                />
+              ))}
+            </div>
+
+            {/* Title with animation */}
+            <motion.h1 
+              className="text-2xl font-bold mb-1 text-center"
+              style={{ color: '#333333' }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+            >
+              🎉 {t('auth.steps.complete.congratulations') || 'Поздравляем!'}
+            </motion.h1>
+            <motion.p 
+              className="text-base text-center mb-6"
+              style={{ color: '#333333' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              {t('auth.steps.complete.profileCreated') || 'Профиль успешно создан'}
+            </motion.p>
             
             {/* Telegram-style contact card - compact with slide animation */}
             <motion.div 
