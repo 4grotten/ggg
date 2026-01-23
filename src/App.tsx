@@ -43,7 +43,9 @@ import Chat from "./pages/Chat";
 import PhoneEntry from "./pages/auth/PhoneEntry";
 import ProfileSteps from "./pages/auth/ProfileSteps";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
+import { ActiveCallIndicator } from "./components/layout/ActiveCallIndicator";
 import { AvatarProvider } from "./contexts/AvatarContext";
+import { VoiceCallProvider } from "./contexts/VoiceCallContext";
 
 const queryClient = new QueryClient();
 
@@ -123,6 +125,9 @@ const AppContent = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        <ActiveCallIndicator />
+      </AnimatePresence>
     </>
   );
 };
@@ -149,7 +154,9 @@ const App = () => {
           ) : (
             <BrowserRouter>
               <AvatarProvider>
-                <AppContent />
+                <VoiceCallProvider>
+                  <AppContent />
+                </VoiceCallProvider>
               </AvatarProvider>
             </BrowserRouter>
           )}
