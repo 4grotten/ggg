@@ -7,7 +7,8 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { 
   User, 
   Camera, 
-  Lock, 
+  Lock,
+  LockOpen,
   Eye, 
   EyeOff, 
   Check,
@@ -634,26 +635,88 @@ const ProfileSteps = () => {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="flex flex-col items-center"
           >
-            <motion.div 
-              className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-all duration-300 ${
-                showError 
-                  ? 'bg-destructive/10 ring-2 ring-destructive' 
-                  : 'bg-primary/10'
-              }`}
-              initial={iconAnimation.initial}
-              animate={iconAnimation.animate}
-              transition={iconTransition}
-            >
+            {/* Animated Lock Sequence */}
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-primary/10 relative overflow-hidden">
+              {/* Step 1: Password dots typing */}
               <motion.div
-                animate={{
-                  x: showError ? [0, -8, 8, -8, 8, -4, 4, 0] : 0,
-                  rotate: showError ? [0, -10, 10, -10, 10, -5, 5, 0] : 0
+                className="absolute flex items-center justify-center gap-1"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: [1, 1, 0] }}
+                transition={{ 
+                  duration: 1.8,
+                  times: [0, 0.6, 0.7],
+                  delay: 0.2
                 }}
-                transition={{ duration: 0.5 }}
+              >
+                {[0, 1, 2, 3].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="text-2xl text-primary font-bold"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      delay: 0.3 + i * 0.15,
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 15
+                    }}
+                  >
+                    •
+                  </motion.span>
+                ))}
+              </motion.div>
+
+              {/* Step 2: Open lock appears */}
+              <motion.div
+                className="absolute"
+                initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                animate={{ 
+                  opacity: [0, 0, 1, 1, 0],
+                  scale: [0.5, 0.5, 1.1, 1, 0.9],
+                  y: [20, 20, 0, 0, 0]
+                }}
+                transition={{ 
+                  duration: 2.4,
+                  times: [0, 0.45, 0.55, 0.75, 0.85],
+                  ease: "easeOut" as const
+                }}
+              >
+                <LockOpen className="w-12 h-12 text-primary" />
+              </motion.div>
+
+              {/* Step 3: Closed lock with flash */}
+              <motion.div
+                className="absolute"
+                initial={{ opacity: 0, scale: 1.5, rotate: -10 }}
+                animate={{ 
+                  opacity: [0, 0, 1],
+                  scale: [1.5, 1.5, 1],
+                  rotate: [-10, -10, 0]
+                }}
+                transition={{ 
+                  duration: 2.4,
+                  times: [0, 0.8, 1],
+                  ease: "easeOut" as const
+                }}
               >
                 <Lock className={`w-12 h-12 ${showError ? 'text-destructive' : 'text-primary'}`} />
               </motion.div>
-            </motion.div>
+
+              {/* Flash effect when lock closes */}
+              <motion.div
+                className="absolute inset-0 rounded-full bg-primary"
+                initial={{ opacity: 0 }}
+                animate={{ 
+                  opacity: [0, 0, 0.6, 0],
+                  scale: [1, 1, 1.2, 1.3]
+                }}
+                transition={{ 
+                  duration: 2.6,
+                  times: [0, 0.78, 0.85, 1],
+                  ease: "easeOut" as const
+                }}
+              />
+            </div>
             
             <h1 className="text-2xl font-bold mb-2 text-center">{t('auth.steps.password.title')}</h1>
             <p className="text-muted-foreground text-center mb-8">{t('auth.steps.password.description')}</p>
