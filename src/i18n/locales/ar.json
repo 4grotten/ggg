@@ -1,4 +1,13 @@
 {
+  "profileVerification": {
+    "title": "تحقق من هويتك",
+    "description": "أكمل عملية التحقق لفتح جميع الميزات وزيادة حدود حسابك.",
+    "secureTitle": "آمن وخاص",
+    "secureDescription": "بياناتك مشفرة ومحمية",
+    "quickTitle": "عملية سريعة",
+    "quickDescription": "تستغرق 2-3 دقائق فقط",
+    "startButton": "بدء التحقق"
+  },
   "common": {
     "continue": "متابعة",
     "back": "رجوع",
