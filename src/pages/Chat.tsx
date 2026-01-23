@@ -10,12 +10,12 @@ import { useAIChat } from "@/hooks/useAIChat";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 
-// Emoji sets for different states
-const EMOJI_SETS = {
-  idle: ["👋", "😊", "💬", "✨", "🌟", "💫", "🤗", "😄", "🎈", "💭", "🌈", "🔮"],
-  typing: ["👀", "✍️", "💬", "🤔", "📝", "💡", "⌨️", "🖊️", "✏️", "📖", "🧐", "👁️"],
-  thinking: ["🤔", "💭", "✨", "🔮", "🧠", "⚡", "💫", "🌀", "🔍", "📊", "🎯", "💡"],
-  dancing: ["🎉", "✨", "🥳", "💫", "🎊", "🌟", "🎈", "🎁", "🎪", "🎭", "🎵", "💃"]
+// Single emoji for each state
+const STATE_EMOJIS = {
+  idle: "💬",
+  typing: "👀", 
+  thinking: "🤔",
+  dancing: "🎉"
 };
 
 const Chat = () => {
@@ -28,29 +28,14 @@ const Chat = () => {
   const [showBotAtInput, setShowBotAtInput] = useState(false);
   const [isDancing, setIsDancing] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  const [currentEmojiIndex, setCurrentEmojiIndex] = useState(0);
   const prevMessagesLengthRef = useRef(messages.length);
 
-  // Get current emoji set based on state
-  const currentEmojiSet = useMemo(() => {
-    if (isDancing) return EMOJI_SETS.dancing;
-    if (isLoading) return EMOJI_SETS.thinking;
-    if (isUserTyping) return EMOJI_SETS.typing;
-    return EMOJI_SETS.idle;
-  }, [isDancing, isLoading, isUserTyping]);
-
-  // Cycle through emojis
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentEmojiIndex(prev => (prev + 1) % currentEmojiSet.length);
-    }, isDancing ? 300 : isLoading ? 400 : 600);
-    
-    return () => clearInterval(interval);
-  }, [currentEmojiSet, isDancing, isLoading]);
-
-  // Reset emoji index when state changes
-  useEffect(() => {
-    setCurrentEmojiIndex(0);
+  // Get current emoji based on state
+  const currentEmoji = useMemo(() => {
+    if (isDancing) return STATE_EMOJIS.dancing;
+    if (isLoading) return STATE_EMOJIS.thinking;
+    if (isUserTyping) return STATE_EMOJIS.typing;
+    return STATE_EMOJIS.idle;
   }, [isDancing, isLoading, isUserTyping]);
 
   const scrollToBottom = () => {
@@ -257,83 +242,45 @@ const Chat = () => {
                 >
                   <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
-                {/* Smoke bubble with animated emojis */}
+                {/* Small smoke cloud with single emoji */}
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.3 }}
-                  className="absolute -top-12 left-1/2 -translate-x-1/2 z-20"
+                  className="absolute -top-10 left-1/2 -translate-x-1/2 z-20"
                 >
-                  {/* Smoke cloud effect */}
-                  <div className="relative">
-                    {/* Main cloud */}
-                    <motion.div 
-                      animate={{ 
-                        scale: [1, 1.05, 1],
-                        y: [0, -2, 0]
-                      }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      className="relative flex items-center justify-center"
-                    >
-                      {/* Cloud bubbles */}
-                      <div className="absolute -left-2 -top-1 w-5 h-5 bg-muted/80 rounded-full blur-[2px]" />
-                      <div className="absolute -right-2 -top-1 w-4 h-4 bg-muted/70 rounded-full blur-[2px]" />
-                      <div className="absolute left-1 -top-3 w-4 h-4 bg-muted/60 rounded-full blur-[2px]" />
-                      
-                      {/* Main emoji container */}
-                      <div className="relative bg-muted/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg min-w-[50px] flex items-center justify-center">
-                        <AnimatePresence mode="popLayout">
-                          <motion.span
-                            key={`emoji-${currentEmojiIndex}-${isDancing ? 'dance' : isLoading ? 'load' : isUserTyping ? 'type' : 'idle'}`}
-                            initial={{ 
-                              scale: 0, 
-                              opacity: 0,
-                              y: 15,
-                              filter: "blur(4px)"
-                            }}
-                            animate={{ 
-                              scale: 1, 
-                              opacity: 1, 
-                              y: 0,
-                              filter: "blur(0px)"
-                            }}
-                            exit={{ 
-                              scale: 0.5, 
-                              opacity: 0, 
-                              y: -15,
-                              filter: "blur(4px)"
-                            }}
-                            transition={{ 
-                              duration: 0.25,
-                              ease: "easeOut"
-                            }}
-                            className="text-2xl inline-block"
-                          >
-                            {currentEmojiSet[currentEmojiIndex]}
-                          </motion.span>
-                        </AnimatePresence>
-                      </div>
-                    </motion.div>
+                  {/* Smoke cloud shape */}
+                  <motion.div 
+                    animate={{ 
+                      y: [0, -2, 0],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="relative"
+                  >
+                    {/* Cloud bumps */}
+                    <div className="absolute -left-1 top-1 w-3 h-3 bg-muted rounded-full" />
+                    <div className="absolute -right-1 top-0.5 w-2.5 h-2.5 bg-muted rounded-full" />
                     
-                    {/* Smoke trail connecting to bot */}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
-                      <motion.div 
-                        animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.8, 0.6] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        className="w-3 h-3 bg-muted/60 rounded-full blur-[1px]" 
-                      />
-                      <motion.div 
-                        animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.6, 0.4] }}
-                        transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }}
-                        className="w-2 h-2 bg-muted/40 rounded-full blur-[1px]" 
-                      />
-                      <motion.div 
-                        animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.5, 0.3] }}
-                        transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
-                        className="w-1.5 h-1.5 bg-muted/30 rounded-full blur-[1px]" 
-                      />
+                    {/* Main cloud body */}
+                    <div className="relative bg-muted px-2.5 py-1.5 rounded-full shadow-sm flex items-center justify-center">
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={currentEmoji}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-lg"
+                        >
+                          {currentEmoji}
+                        </motion.span>
+                      </AnimatePresence>
                     </div>
-                  </div>
+                    
+                    {/* Small bubble connecting to bot */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-2 h-2 bg-muted rounded-full" />
+                    <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-muted/70 rounded-full" />
+                  </motion.div>
                 </motion.div>
               </motion.div>
             ) : undefined
