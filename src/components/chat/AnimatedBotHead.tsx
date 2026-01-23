@@ -8,7 +8,7 @@ interface AnimatedBotHeadProps {
 
 export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedBotHeadProps) => {
   const isLarge = size === "lg";
-  const containerSize = isLarge ? "w-10 h-10" : "w-4 h-4";
+  const containerSize = isLarge ? "w-12 h-14" : "w-5 h-6";
   const [animationPhase, setAnimationPhase] = useState<"idle" | "jumping" | "clapping">("idle");
   const [showHands, setShowHands] = useState(false);
 
@@ -23,11 +23,11 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
         setAnimationPhase("clapping");
       }, 1200);
 
-      // After clapping (~1.5s more), back to idle
+      // After clapping (~1.8s more), back to idle
       const idleTimer = setTimeout(() => {
         setAnimationPhase("idle");
         setShowHands(false);
-      }, 2700);
+      }, 3000);
 
       return () => {
         clearTimeout(clappingTimer);
@@ -52,7 +52,7 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
       className={`relative ${containerSize}`}
       animate={
         animationPhase === "jumping" 
-          ? { y: [0, -8, 0, -8, 0, -8, 0] }
+          ? { y: [0, -6, 0, -6, 0, -6, 0] }
           : { y: 0 }
       }
       transition={
@@ -61,15 +61,15 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
           : { duration: 0.3 }
       }
     >
-      {/* Bot head SVG - tall rectangular head like human */}
+      {/* Bot SVG with extended viewBox for hands */}
       <svg
-        viewBox="0 0 24 28"
+        viewBox="-6 0 36 32"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="w-full h-full text-current"
+        className="w-full h-full text-current overflow-visible"
       >
         {/* Tall rectangular head */}
         <rect x="4" y="9" width="16" height="16" rx="2" />
@@ -100,7 +100,7 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
         <motion.g
           animate={{
             scaleY: animationPhase === "clapping"
-              ? [1, 0.1, 1] // Quick blinks during clapping
+              ? [1, 0.1, 1]
               : [1, 1, 1, 1, 1, 1, 0.1, 1, 0.1, 1, 0.1, 1, 1, 1, 1],
           }}
           transition={{
@@ -151,69 +151,69 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
         <AnimatePresence>
           {showHands && (
             <>
-              {/* Left hand */}
-              <motion.path
-                d="M2 20 L4 17"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ 
-                  pathLength: 1, 
-                  opacity: 1,
-                  rotate: animationPhase === "clapping" ? [0, 25, 0, 25, 0, 25, 0] : 0
-                }}
-                exit={{ pathLength: 0, opacity: 0 }}
-                transition={{ 
-                  duration: animationPhase === "clapping" ? 1.5 : 0.3,
-                  ease: "easeInOut"
-                }}
-                style={{ transformOrigin: "4px 17px" }}
-              />
-              {/* Left hand circle */}
-              <motion.circle
-                cx="1"
-                cy="21"
-                r="1.5"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ 
-                  scale: 1, 
-                  opacity: 1,
-                  x: animationPhase === "clapping" ? [0, 4, 0, 4, 0, 4, 0] : 0,
-                  y: animationPhase === "clapping" ? [0, -4, 0, -4, 0, -4, 0] : 0
-                }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: animationPhase === "clapping" ? 1.5 : 0.3 }}
-              />
+              {/* Left arm and hand */}
+              <motion.g
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <motion.line
+                  x1="4"
+                  y1="18"
+                  x2="-2"
+                  y2="22"
+                  strokeWidth="2"
+                  animate={{
+                    x2: animationPhase === "clapping" ? [-2, 6, -2, 6, -2, 6, -2] : -2,
+                    y2: animationPhase === "clapping" ? [22, 16, 22, 16, 22, 16, 22] : 22,
+                  }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                />
+                <motion.circle
+                  cx="-3"
+                  cy="23"
+                  r="2"
+                  fill="currentColor"
+                  animate={{
+                    cx: animationPhase === "clapping" ? [-3, 7, -3, 7, -3, 7, -3] : -3,
+                    cy: animationPhase === "clapping" ? [23, 15, 23, 15, 23, 15, 23] : 23,
+                  }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                />
+              </motion.g>
               
-              {/* Right hand */}
-              <motion.path
-                d="M22 20 L20 17"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ 
-                  pathLength: 1, 
-                  opacity: 1,
-                  rotate: animationPhase === "clapping" ? [0, -25, 0, -25, 0, -25, 0] : 0
-                }}
-                exit={{ pathLength: 0, opacity: 0 }}
-                transition={{ 
-                  duration: animationPhase === "clapping" ? 1.5 : 0.3,
-                  ease: "easeInOut"
-                }}
-                style={{ transformOrigin: "20px 17px" }}
-              />
-              {/* Right hand circle */}
-              <motion.circle
-                cx="23"
-                cy="21"
-                r="1.5"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ 
-                  scale: 1, 
-                  opacity: 1,
-                  x: animationPhase === "clapping" ? [0, -4, 0, -4, 0, -4, 0] : 0,
-                  y: animationPhase === "clapping" ? [0, -4, 0, -4, 0, -4, 0] : 0
-                }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: animationPhase === "clapping" ? 1.5 : 0.3 }}
-              />
+              {/* Right arm and hand */}
+              <motion.g
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <motion.line
+                  x1="20"
+                  y1="18"
+                  x2="26"
+                  y2="22"
+                  strokeWidth="2"
+                  animate={{
+                    x2: animationPhase === "clapping" ? [26, 18, 26, 18, 26, 18, 26] : 26,
+                    y2: animationPhase === "clapping" ? [22, 16, 22, 16, 22, 16, 22] : 22,
+                  }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                />
+                <motion.circle
+                  cx="27"
+                  cy="23"
+                  r="2"
+                  fill="currentColor"
+                  animate={{
+                    cx: animationPhase === "clapping" ? [27, 17, 27, 17, 27, 17, 27] : 27,
+                    cy: animationPhase === "clapping" ? [23, 15, 23, 15, 23, 15, 23] : 23,
+                  }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                />
+              </motion.g>
             </>
           )}
         </AnimatePresence>
