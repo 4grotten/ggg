@@ -98,7 +98,12 @@ export const VerifyIdentityCard = ({
     
     const savedStep = getSavedProgress();
     
-    // Always show dialog - user can choose to continue or start fresh
+    // If user has completed step 1 (questionnaire), go directly to KYC steps with animation
+    if (progress >= 1) {
+      navigate("/verify/steps", { state: { completedSteps: [0] } });
+      return;
+    }
+    
     // If there's saved progress beyond /verify, show dialog
     if (savedStep && savedStep !== "/verify") {
       setShowDialog(true);
