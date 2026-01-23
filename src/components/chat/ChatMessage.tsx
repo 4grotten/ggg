@@ -63,8 +63,29 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
       };
       
       setAudio(newAudio);
-      await newAudio.play();
-      setIsPlaying(true);
+      
+      // Handle autoplay restrictions - try to play, if blocked show a message
+      try {
+        await newAudio.play();
+        setIsPlaying(true);
+      } catch (playError) {
+        if (playError instanceof Error && playError.name === 'NotAllowedError') {
+          // Create a user gesture handler
+          const playOnInteraction = async () => {
+            try {
+              await newAudio.play();
+              setIsPlaying(true);
+            } catch {
+              toast.error("Не удалось озвучить сообщение");
+            }
+            document.removeEventListener('click', playOnInteraction);
+          };
+          document.addEventListener('click', playOnInteraction, { once: true });
+          toast.info("Нажмите ещё раз для воспроизведения", { duration: 2000 });
+        } else {
+          throw playError;
+        }
+      }
     } catch (error) {
       console.error("TTS error:", error);
       toast.error("Не удалось озвучить сообщение");
