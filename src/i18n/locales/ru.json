@@ -300,7 +300,10 @@
     "accountDetailsCopied": "Реквизиты счёта скопированы",
     "cardNumberCopied": "Номер карты скопирован",
     "cardDetailsCopied": "Данные карты скопированы",
-    "dataUpdated": "Данные обновлены"
+    "dataUpdated": "Данные обновлены",
+    "appInstalled": "Приложение установлено на главный экран",
+    "appAlreadyInstalled": "Приложение уже установлено",
+    "installInstructions": "Нажмите «Поделиться» → «На экран Домой» для установки"
   },
   "settings": {
     "personalDetails": "Личные данные",
@@ -310,6 +313,7 @@
     "appearance": "Оформление",
     "limitsAndFees": "Лимиты и комиссии",
     "askQuestion": "Задать вопрос",
+    "addToHomeScreen": "На главный экран",
     "privacyPolicy": "Политика конфиденциальности",
     "applicationLanguage": "Язык приложения",
     "languages": {

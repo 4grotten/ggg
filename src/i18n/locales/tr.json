@@ -295,7 +295,10 @@
     "accountDetailsCopied": "Hesap bilgileri kopyalandı",
     "cardNumberCopied": "Kart numarası kopyalandı",
     "cardDetailsCopied": "Kart bilgileri kopyalandı",
-    "dataUpdated": "Veriler güncellendi"
+    "dataUpdated": "Veriler güncellendi",
+    "appInstalled": "Uygulama ana ekrana yüklendi",
+    "appAlreadyInstalled": "Uygulama zaten yüklü",
+    "installInstructions": "Yüklemek için Paylaş → Ana Ekrana Ekle'ye dokunun"
   },
   "settings": {
     "personalDetails": "Kişisel Bilgiler",
@@ -305,6 +308,7 @@
     "appearance": "Görünüm",
     "limitsAndFees": "Limitler ve Ücretler",
     "askQuestion": "Soru sor",
+    "addToHomeScreen": "Ana Ekrana Ekle",
     "privacyPolicy": "Gizlilik Politikası",
     "applicationLanguage": "Uygulama dili",
     "languages": {

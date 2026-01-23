@@ -295,7 +295,10 @@
     "accountDetailsCopied": "تم نسخ تفاصيل الحساب",
     "cardNumberCopied": "تم نسخ رقم البطاقة",
     "cardDetailsCopied": "تم نسخ تفاصيل البطاقة",
-    "dataUpdated": "تم تحديث البيانات"
+    "dataUpdated": "تم تحديث البيانات",
+    "appInstalled": "تم تثبيت التطبيق على الشاشة الرئيسية",
+    "appAlreadyInstalled": "التطبيق مثبت بالفعل",
+    "installInstructions": "اضغط على مشاركة → إضافة إلى الشاشة الرئيسية للتثبيت"
   },
   "settings": {
     "personalDetails": "البيانات الشخصية",
@@ -305,6 +308,7 @@
     "appearance": "المظهر",
     "limitsAndFees": "الحدود والرسوم",
     "askQuestion": "طرح سؤال",
+    "addToHomeScreen": "إضافة للشاشة الرئيسية",
     "privacyPolicy": "سياسة الخصوصية",
     "applicationLanguage": "لغة التطبيق",
     "languages": {
