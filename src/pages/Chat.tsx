@@ -177,79 +177,61 @@ const Chat = () => {
 
       {/* Input Area - Fixed at bottom */}
       <div className="fixed bottom-24 left-0 right-0 max-w-[800px] mx-auto bg-background border-t border-border">
-        <div className="relative">
-          {/* Bot at input area */}
-          <AnimatePresence>
-            {showBotAtInput && (
+        <ChatInput 
+          onSend={handleSendMessage} 
+          isLoading={isLoading} 
+          placeholder={t("chat.messagePlaceholder")}
+          onTypingChange={setIsUserTyping}
+          leftElement={
+            showBotAtInput ? (
               <motion.div
-                initial={{ 
-                  y: -300,
-                  x: 0,
-                  rotate: -360,
-                  scale: 0.2,
-                  opacity: 0
-                }}
+                initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
-                  y: isKeyboardOpen ? -120 : 0,
-                  x: isKeyboardOpen ? "calc(50vw - 45px)" : 0,
-                  rotate: 0,
-                  scale: isKeyboardOpen ? 1.2 : 1,
-                  opacity: 1
-                }}
-                exit={{
-                  y: -100,
-                  scale: 0,
-                  opacity: 0
+                  scale: 1, 
+                  opacity: 1,
                 }}
                 transition={{ 
                   type: "spring",
                   stiffness: 300,
                   damping: 20,
-                  mass: 0.8,
                 }}
-                className="absolute -top-14 left-0 z-10"
+                className="relative"
               >
                 <motion.div
                   animate={isDancing ? { 
-                    y: [0, -15, 0, -15, 0, -10, 0, -5, 0],
-                    rotate: [0, -15, 15, -15, 15, -10, 10, -5, 0],
-                    scale: [1, 1.1, 1, 1.1, 1, 1.05, 1, 1.02, 1],
+                    rotate: [0, -10, 10, -10, 10, 0],
+                    scale: [1, 1.1, 1, 1.1, 1],
                   } : { 
-                    y: [0, -3, 0],
-                    rotate: [0, -3, 3, -2, 2, 0],
+                    y: [0, -2, 0],
                   }}
                   transition={isDancing ? {
-                    duration: 2,
+                    duration: 1,
                     ease: "easeInOut"
                   } : {
-                    y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                    rotate: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+                    y: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
                   }}
-                  className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-lg"
+                  className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
                 >
-                  <AnimatedBotHead size="md" isUserTyping={isUserTyping} isDancing={isDancing} />
+                  <AnimatedBotHead size="sm" isUserTyping={isUserTyping} isDancing={isDancing} />
                 </motion.div>
-                {/* Speech bubble */}
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.3 }}
-                  className="absolute -top-10 left-12 bg-secondary text-secondary-foreground text-sm px-3 py-1.5 rounded-lg whitespace-nowrap shadow-md"
-                >
-                  {isDancing ? "🎉 Готово!" : isLoading ? "Думаю..." : "Пиши! 👋"}
-                  <div className="absolute -bottom-1 left-3 w-2 h-2 bg-secondary rotate-45" />
-                </motion.div>
+                {/* Speech bubble - показываем только при загрузке или танце */}
+                <AnimatePresence>
+                  {(isLoading || isDancing) && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-md"
+                    >
+                      {isDancing ? "🎉" : "💭"}
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-secondary rotate-45" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
-            )}
-          </AnimatePresence>
-          
-          <ChatInput 
-            onSend={handleSendMessage} 
-            isLoading={isLoading} 
-            placeholder={t("chat.messagePlaceholder")}
-            onTypingChange={setIsUserTyping}
-          />
-        </div>
+            ) : undefined
+          }
+        />
       </div>
     </div>
   );

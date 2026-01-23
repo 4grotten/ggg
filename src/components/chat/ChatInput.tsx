@@ -1,16 +1,16 @@
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, ReactNode } from "react";
 import { Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   placeholder?: string;
   onTypingChange?: (isTyping: boolean) => void;
+  leftElement?: ReactNode;
 }
 
-export const ChatInput = ({ onSend, isLoading, placeholder = "Напишите сообщение...", onTypingChange }: ChatInputProps) => {
+export const ChatInput = ({ onSend, isLoading, placeholder = "Напишите сообщение...", onTypingChange, leftElement }: ChatInputProps) => {
   const [input, setInput] = useState("");
 
   useEffect(() => {
@@ -26,7 +26,8 @@ export const ChatInput = ({ onSend, isLoading, placeholder = "Напишите �
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 bg-transparent">
-      <div className="flex-1 flex items-center bg-background/80 dark:bg-card/90 backdrop-blur-sm rounded-full border border-border/50 shadow-sm pl-4 pr-1 py-1">
+      <div className="flex-1 flex items-center bg-background/80 dark:bg-card/90 backdrop-blur-sm rounded-full border border-border/50 shadow-sm pl-2 pr-1 py-1 gap-2">
+        {leftElement}
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
