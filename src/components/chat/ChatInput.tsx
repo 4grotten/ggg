@@ -26,7 +26,7 @@ export const ChatInput = ({ onSend, isLoading, placeholder = "Напишите �
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 bg-transparent">
-      <div className="flex-1 flex items-center bg-white/80 backdrop-blur-sm rounded-full border border-white/50 shadow-sm pl-4 pr-1 py-1">
+      <div className="flex-1 flex items-center bg-background/80 dark:bg-card/90 backdrop-blur-sm rounded-full border border-border/50 shadow-sm pl-4 pr-1 py-1">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
