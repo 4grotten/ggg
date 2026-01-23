@@ -32,10 +32,17 @@ const DocumentType = () => {
     { id: "passport", label: t('verify.documentType.passport') },
   ];
 
-  // Load saved data on mount
+  // Load saved data on mount and set verified status
   useEffect(() => {
     const saved = getFormData();
     if (saved.documentType) setDocumentType(saved.documentType);
+    
+    // Set passport status as "all steps completed but needs document update"
+    // when user reaches this page (completed questionnaire + address)
+    setPassportStatus({
+      needsUpdate: true,
+      completedSteps: 3,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -50,17 +57,6 @@ const DocumentType = () => {
     // Show alert for residence permit
     if (type === "residence-permit") {
       setTimeout(() => setShowUnsupportedAlert(true), 300);
-    }
-    
-    // For passport - set status as "all steps completed but needs update"
-    if (type === "passport") {
-      setPassportStatus({
-        needsUpdate: true,
-        completedSteps: 3,
-      });
-    } else {
-      // Clear passport status for other document types
-      setPassportStatus(null);
     }
   };
 
