@@ -561,6 +561,13 @@
       "support": "Destek ve Yardım",
       "continue": "Devam"
     },
+    "login": {
+      "title": "Şifrenizi girin",
+      "passwordPlaceholder": "Şifreniz",
+      "wrongPassword": "Yanlış şifre. Tekrar deneyin",
+      "button": "Giriş Yap",
+      "success": "Başarıyla giriş yapıldı!"
+    },
     "profile": {
       "header": "Profil",
       "moreInfo": "Daha fazla bilgi",
