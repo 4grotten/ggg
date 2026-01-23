@@ -41,7 +41,8 @@
     "allStepsCompleted": "All steps completed ✓",
     "passportUpdateTitle": "Update Data",
     "passportUpdateDescription": "Do you want to update your passport data? All verification progress will be reset.",
-    "openCard": "Open New Card"
+    "openCard": "Open New Card",
+    "payButton": "Pay"
   },
   "openCard": {
     "title": "Open New Card",

@@ -41,7 +41,8 @@
     "allStepsCompleted": "Все шаги выполнены ✓",
     "passportUpdateTitle": "Обновить данные",
     "passportUpdateDescription": "Вы хотите обновить данные паспорта? Весь прогресс верификации будет сброшен.",
-    "openCard": "Открыть новую карту"
+    "openCard": "Открыть новую карту",
+    "payButton": "Оплатить"
   },
   "openCard": {
     "title": "Открыть новую карту",
