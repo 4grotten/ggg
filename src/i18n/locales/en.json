@@ -116,6 +116,7 @@
       "title": "Let's get you verified",
       "description": "Follow the simple steps below",
       "step": "Step",
+      "completed": "Completed",
       "questionnaire": "Complete questionnaire",
       "document": "Provide identity document",
       "liveness": "Perform a liveness check",

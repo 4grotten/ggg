@@ -159,7 +159,7 @@ const AddressInfo = () => {
         {/* Button */}
         <div className="karta-footer-actions">
           <button
-            onClick={() => navigate("/verify/document-type")}
+            onClick={() => navigate("/verify/steps", { state: { completedSteps: [0] } })}
             disabled={!isValid}
             className={`karta-btn-primary ${
               !isValid ? "opacity-50 cursor-not-allowed" : ""

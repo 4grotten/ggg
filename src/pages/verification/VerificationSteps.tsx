@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -9,20 +9,25 @@ import { FileText, Camera, Smile } from "lucide-react";
 
 const VerificationSteps = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
+
+  // Check if we're returning after completing questionnaire
+  const completedSteps = (location.state as { completedSteps?: number[] })?.completedSteps || [];
+  const isReturning = completedSteps.length > 0;
 
   const steps = [
     {
       id: "questionnaire",
       title: t('verify.steps.questionnaire'),
       icon: <FileText className="w-5 h-5" />,
-      status: "current" as const,
+      status: completedSteps.includes(0) ? "completed" as const : "current" as const,
     },
     {
       id: "document",
       title: t('verify.steps.document'),
       icon: <Camera className="w-5 h-5" />,
-      status: "pending" as const,
+      status: completedSteps.includes(0) ? "current" as const : "pending" as const,
     },
     {
       id: "liveness",
@@ -51,7 +56,10 @@ const VerificationSteps = () => {
             {t('verify.steps.description')}
           </p>
 
-          <VerificationStepsList steps={steps} />
+          <VerificationStepsList 
+            steps={steps} 
+            startFromStep={isReturning ? 1 : undefined}
+          />
 
           <PoweredByFooter />
         </div>
@@ -60,7 +68,7 @@ const VerificationSteps = () => {
         {/* Button */}
         <div className="karta-footer-actions">
           <button
-            onClick={() => navigate("/verify/personal-info")}
+            onClick={() => navigate(isReturning ? "/verify/document-type" : "/verify/personal-info")}
             className="karta-btn-primary"
           >
             {t('verify.steps.button')}

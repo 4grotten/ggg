@@ -114,6 +114,7 @@
       "title": "Vamos a verificarte",
       "description": "Sigue los simples pasos a continuación",
       "step": "Paso",
+      "completed": "Completado",
       "questionnaire": "Completar cuestionario",
       "document": "Proporcionar documento de identidad",
       "liveness": "Realizar verificación de vida",

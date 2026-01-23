@@ -114,6 +114,7 @@
       "title": "Sizi doğrulayalım",
       "description": "Aşağıdaki basit adımları izleyin",
       "step": "Adım",
+      "completed": "Tamamlandı",
       "questionnaire": "Anketi tamamlayın",
       "document": "Kimlik belgesi sağlayın",
       "liveness": "Canlılık kontrolü yapın",
