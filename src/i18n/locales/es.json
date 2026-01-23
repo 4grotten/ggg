@@ -518,6 +518,7 @@
   },
   "chat": {
     "aiAssistant": "Asistente IA",
+    "description": "Haz una pregunta sobre tarjetas, transferencias, límites o cualquier otra función de la app",
     "owner": "Propietario",
     "replyTo": "en respuesta a",
     "messagePlaceholder": "Mensaje",

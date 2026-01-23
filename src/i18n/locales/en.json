@@ -524,6 +524,7 @@
   },
   "chat": {
     "aiAssistant": "AI Assistant",
+    "description": "Ask a question about cards, transfers, limits, or any other app feature",
     "owner": "Owner",
     "replyTo": "replying to",
     "messagePlaceholder": "Message",
