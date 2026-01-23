@@ -35,7 +35,7 @@
     "getYourCard": "获取您的卡",
     "stepsDone": "步骤已完成",
     "stepCompleted": "步骤 {{step}} 已完成 ✓",
-    "passportUpdateRequired": "更新护照信息",
+    "canOpenCard": "现在可以开卡了",
     "identityVerified": "身份已验证",
     "verified": "已验证",
     "allStepsCompleted": "所有步骤已完成 ✓",

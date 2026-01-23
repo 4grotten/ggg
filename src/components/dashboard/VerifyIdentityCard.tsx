@@ -153,7 +153,7 @@ export const VerifyIdentityCard = ({
                 {needsPassportUpdate ? t('dashboard.identityVerified') : t('dashboard.verifyIdentity')}
               </p>
               <p className="text-sm text-white/70">
-                {needsPassportUpdate ? t('dashboard.passportUpdateRequired') : t('dashboard.verifyDescription')}
+                {needsPassportUpdate ? t('dashboard.canOpenCard') : t('dashboard.verifyDescription')}
               </p>
             </div>
           </div>

@@ -35,7 +35,7 @@
     "getYourCard": "Get Your Card",
     "stepsDone": "STEPS DONE",
     "stepCompleted": "Step {{step}} completed ✓",
-    "passportUpdateRequired": "Update passport data",
+    "canOpenCard": "Now you can open a card",
     "identityVerified": "Identity Verified",
     "verified": "Verified",
     "allStepsCompleted": "All steps completed ✓",

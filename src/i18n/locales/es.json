@@ -35,7 +35,7 @@
     "getYourCard": "Obtén tu tarjeta",
     "stepsDone": "PASOS COMPLETADOS",
     "stepCompleted": "Paso {{step}} completado ✓",
-    "passportUpdateRequired": "Actualizar datos del pasaporte",
+    "canOpenCard": "Ahora puedes abrir una tarjeta",
     "identityVerified": "Identidad verificada",
     "verified": "Verificado",
     "allStepsCompleted": "Todos los pasos completados ✓",
