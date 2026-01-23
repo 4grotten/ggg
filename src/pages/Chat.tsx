@@ -15,6 +15,8 @@ const Chat = () => {
   const { messages, isLoading, error, sendMessage, clearChat } = useAIChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isUserTyping, setIsUserTyping] = useState(false);
+  const [botFalling, setBotFalling] = useState(false);
+  const [showBotAtInput, setShowBotAtInput] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -23,6 +25,27 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleSendMessage = (message: string) => {
+    // Start falling animation
+    setBotFalling(true);
+    
+    // After fall animation, show bot at input
+    setTimeout(() => {
+      setBotFalling(false);
+      setShowBotAtInput(true);
+    }, 800);
+
+    // Send the actual message
+    sendMessage(message);
+  };
+
+  // Hide bot from input when chat is cleared
+  useEffect(() => {
+    if (messages.length === 0) {
+      setShowBotAtInput(false);
+    }
+  }, [messages.length]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto">
@@ -53,13 +76,25 @@ const Chat = () => {
       <div className="flex-1 overflow-y-auto pb-32">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center px-6">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary"
-            >
-              <AnimatedBotHead size="lg" isUserTyping={isUserTyping} />
-            </motion.div>
+            <AnimatePresence>
+              {!botFalling && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ 
+                    y: 400,
+                    x: -100,
+                    rotate: 720,
+                    scale: 0.3,
+                    opacity: 0,
+                    transition: { duration: 0.8, ease: [0.36, 0, 0.66, -0.56] }
+                  }}
+                  className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary"
+                >
+                  <AnimatedBotHead size="lg" isUserTyping={isUserTyping} />
+                </motion.div>
+              )}
+            </AnimatePresence>
             <h2 className="text-xl font-semibold mb-2">AI Ассистент</h2>
             <p className="text-muted-foreground text-sm">
               Задайте вопрос о картах, переводах, лимитах или любой другой функции приложения
@@ -86,12 +121,72 @@ const Chat = () => {
 
       {/* Input Area - Fixed at bottom */}
       <div className="fixed bottom-16 left-0 right-0 max-w-[800px] mx-auto bg-background border-t border-border">
-        <ChatInput 
-          onSend={sendMessage} 
-          isLoading={isLoading} 
-          placeholder={t("chat.messagePlaceholder")}
-          onTypingChange={setIsUserTyping}
-        />
+        <div className="relative">
+          {/* Bot at input area */}
+          <AnimatePresence>
+            {showBotAtInput && (
+              <motion.div
+                initial={{ 
+                  y: -300,
+                  x: 0,
+                  rotate: -360,
+                  scale: 0.2,
+                  opacity: 0
+                }}
+                animate={{ 
+                  y: 0,
+                  x: 0,
+                  rotate: 0,
+                  scale: 1,
+                  opacity: 1
+                }}
+                exit={{
+                  y: -100,
+                  scale: 0,
+                  opacity: 0
+                }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 15,
+                  mass: 1
+                }}
+                className="absolute -top-12 left-4 z-10"
+              >
+                <motion.div
+                  animate={{ 
+                    y: [0, -4, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-lg"
+                >
+                  <AnimatedBotHead size="sm" isUserTyping={isUserTyping} />
+                </motion.div>
+                {/* Speech bubble */}
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.3 }}
+                  className="absolute -top-8 left-8 bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-lg whitespace-nowrap"
+                >
+                  {isLoading ? "Думаю..." : "Пиши! 👋"}
+                  <div className="absolute -bottom-1 left-2 w-2 h-2 bg-secondary rotate-45" />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          <ChatInput 
+            onSend={handleSendMessage} 
+            isLoading={isLoading} 
+            placeholder={t("chat.messagePlaceholder")}
+            onTypingChange={setIsUserTyping}
+          />
+        </div>
       </div>
     </div>
   );
