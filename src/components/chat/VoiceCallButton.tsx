@@ -94,20 +94,26 @@ export const VoiceCallButton = () => {
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
           >
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={startCall}
-              disabled={isConnecting}
-              className="gap-2"
-            >
-              {isConnecting ? (
+            {isConnecting ? (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                className="gap-2"
+              >
                 <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
+                Вызов...
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={startCall}
+                className="h-8 w-8"
+              >
                 <Phone className="w-4 h-4" />
-              )}
-              {isConnecting ? "Соединение..." : "Позвонить"}
-            </Button>
+              </Button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
