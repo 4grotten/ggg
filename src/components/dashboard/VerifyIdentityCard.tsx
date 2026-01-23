@@ -123,11 +123,12 @@ export const VerifyIdentityCard = ({
   };
 
   const handlePassportUpdateConfirm = () => {
-    // Clear verification and passport status
+    // Clear verification and passport status completely
     clearProgress();
     setPassportStatus(null);
     setShowPassportDialog(false);
-    navigate("/verify/document-type");
+    // Navigate to the beginning of verification, not document-type
+    navigate("/verify");
   };
 
   const handlePassportUpdateCancel = () => {
