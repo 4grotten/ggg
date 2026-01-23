@@ -295,7 +295,10 @@
     "copied": "{{label}}已复制",
     "accountDetailsCopied": "账户信息已复制",
     "cardNumberCopied": "卡号已复制",
-    "dataUpdated": "数据已更新"
+    "dataUpdated": "数据已更新",
+    "appInstalled": "应用已添加到主屏幕",
+    "appAlreadyInstalled": "应用已安装",
+    "installInstructions": "点击分享 → 添加到主屏幕进行安装"
   },
   "settings": {
     "personalDetails": "个人信息",
@@ -305,6 +308,7 @@
     "appearance": "外观",
     "limitsAndFees": "限额和费用",
     "askQuestion": "提问",
+    "addToHomeScreen": "添加到主屏幕",
     "privacyPolicy": "隐私政策",
     "applicationLanguage": "应用语言",
     "languages": {

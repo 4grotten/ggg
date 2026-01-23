@@ -300,7 +300,10 @@
     "accountDetailsCopied": "Account details copied",
     "cardNumberCopied": "Card number copied",
     "cardDetailsCopied": "Card details copied",
-    "dataUpdated": "Data updated"
+    "dataUpdated": "Data updated",
+    "appInstalled": "App installed to home screen",
+    "appAlreadyInstalled": "App is already installed",
+    "installInstructions": "Tap Share → Add to Home Screen to install"
   },
   "settings": {
     "personalDetails": "Personal Details",
@@ -310,6 +313,7 @@
     "appearance": "Appearance",
     "limitsAndFees": "Limits and Fees",
     "askQuestion": "Ask question",
+    "addToHomeScreen": "Add to Home Screen",
     "privacyPolicy": "Privacy Policy",
     "applicationLanguage": "Application language",
     "languages": {

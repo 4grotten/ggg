@@ -295,7 +295,10 @@
     "accountDetailsCopied": "Datos de la cuenta copiados",
     "cardNumberCopied": "Número de tarjeta copiado",
     "cardDetailsCopied": "Datos de tarjeta copiados",
-    "dataUpdated": "Datos actualizados"
+    "dataUpdated": "Datos actualizados",
+    "appInstalled": "App instalada en la pantalla de inicio",
+    "appAlreadyInstalled": "La app ya está instalada",
+    "installInstructions": "Toca Compartir → Añadir a pantalla de inicio para instalar"
   },
   "settings": {
     "personalDetails": "Datos personales",
@@ -305,6 +308,7 @@
     "appearance": "Apariencia",
     "limitsAndFees": "Límites y tarifas",
     "askQuestion": "Hacer una pregunta",
+    "addToHomeScreen": "Añadir a inicio",
     "privacyPolicy": "Política de privacidad",
     "applicationLanguage": "Idioma de la aplicación",
     "languages": {

@@ -8,7 +8,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera } from "lucide-react";
+import { useInstallPrompt } from "@/hooks/useInstallPrompt";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Download } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
@@ -57,12 +58,30 @@ const Settings = () => {
   const { theme, setTheme } = useTheme();
   const { i18n, t } = useTranslation();
   const { avatarUrl, setAvatarUrl } = useAvatar();
+  const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isAppearanceOpen, setIsAppearanceOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || "en");
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleInstallClick = async () => {
+    if (isInstalled) {
+      toast.info(t("toast.appAlreadyInstalled"));
+      return;
+    }
+    
+    if (isInstallable) {
+      const success = await promptInstall();
+      if (success) {
+        toast.success(t("toast.appInstalled"));
+      }
+    } else {
+      // Show instructions for iOS or browsers that don't support install prompt
+      toast.info(t("toast.installInstructions"));
+    }
+  };
 
   const languages = getLanguages(t);
   const themes = getThemes(t);
@@ -185,6 +204,17 @@ const Settings = () => {
             onClick={() => navigate("/fees-and-limits")}
           />
         </div>
+
+        {/* Add to Home Screen */}
+        {!isInstalled && (
+          <div className="bg-card rounded-2xl overflow-hidden">
+            <SettingsItem
+              icon={<Download className="w-5 h-5" />}
+              label={t("settings.addToHomeScreen")}
+              onClick={handleInstallClick}
+            />
+          </div>
+        )}
 
         {/* Support & Legal */}
         <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
