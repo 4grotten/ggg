@@ -1,8 +1,19 @@
 import { motion } from "framer-motion";
 
-export const AnimatedBotHead = () => {
+interface AnimatedBotHeadProps {
+  size?: "sm" | "lg";
+}
+
+export const AnimatedBotHead = ({ size = "sm" }: AnimatedBotHeadProps) => {
+  const isLarge = size === "lg";
+  const containerSize = isLarge ? "w-10 h-10" : "w-4 h-4";
+  const eyeSize = isLarge ? "w-[8px] h-[8px]" : "w-[4px] h-[4px]";
+  const pupilSize = isLarge ? "w-[4px] h-[4px]" : "w-[2px] h-[2px]";
+  const eyeGap = isLarge ? "gap-[10px]" : "gap-[5px]";
+  const pupilMove = isLarge ? 3 : 1.5;
+
   return (
-    <div className="relative w-4 h-4">
+    <div className={`relative ${containerSize}`}>
       {/* Bot head */}
       <svg
         viewBox="0 0 24 24"
@@ -11,7 +22,7 @@ export const AnimatedBotHead = () => {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="w-full h-full text-secondary-foreground"
+        className="w-full h-full text-current"
       >
         {/* Head outline */}
         <rect x="3" y="11" width="18" height="10" rx="2" />
@@ -25,10 +36,10 @@ export const AnimatedBotHead = () => {
       
       {/* Animated eyes container */}
       <div className="absolute inset-0 flex items-center justify-center" style={{ top: '52%' }}>
-        <div className="flex gap-[5px]">
+        <div className={`flex ${eyeGap}`}>
           {/* Left eye */}
           <motion.div
-            className="relative w-[4px] h-[4px] bg-secondary-foreground rounded-full overflow-hidden"
+            className={`relative ${eyeSize} bg-current rounded-full overflow-hidden`}
             animate={{
               scaleY: [1, 1, 1, 1, 1, 1, 0.1, 1, 0.1, 1, 0.1, 1, 1, 1, 1],
             }}
@@ -41,10 +52,10 @@ export const AnimatedBotHead = () => {
           >
             {/* Pupil */}
             <motion.div
-              className="absolute w-[2px] h-[2px] bg-background rounded-full"
+              className={`absolute ${pupilSize} bg-background rounded-full`}
               style={{ top: '25%', left: '25%' }}
               animate={{
-                x: [0, 1.5, 1.5, -1.5, -1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                x: [0, pupilMove, pupilMove, -pupilMove, -pupilMove, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               }}
               transition={{
                 duration: 3,
@@ -57,7 +68,7 @@ export const AnimatedBotHead = () => {
           
           {/* Right eye */}
           <motion.div
-            className="relative w-[4px] h-[4px] bg-secondary-foreground rounded-full overflow-hidden"
+            className={`relative ${eyeSize} bg-current rounded-full overflow-hidden`}
             animate={{
               scaleY: [1, 1, 1, 1, 1, 1, 0.1, 1, 0.1, 1, 0.1, 1, 1, 1, 1],
             }}
@@ -70,10 +81,10 @@ export const AnimatedBotHead = () => {
           >
             {/* Pupil */}
             <motion.div
-              className="absolute w-[2px] h-[2px] bg-background rounded-full"
+              className={`absolute ${pupilSize} bg-background rounded-full`}
               style={{ top: '25%', left: '25%' }}
               animate={{
-                x: [0, 1.5, 1.5, -1.5, -1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                x: [0, pupilMove, pupilMove, -pupilMove, -pupilMove, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               }}
               transition={{
                 duration: 3,
