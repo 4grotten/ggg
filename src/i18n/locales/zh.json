@@ -33,6 +33,7 @@
     "transactions": "交易记录",
     "getYourCard": "获取您的卡",
     "stepsDone": "步骤已完成",
+    "stepCompleted": "步骤 {{step}} 已完成 ✓",
     "openCard": "开设新卡"
   },
   "openCard": {

@@ -153,7 +153,10 @@ export const VerifyIdentityCard = ({
 
         {/* Steps Counter */}
         <p className="mt-2 text-sm text-white/70 font-medium">
-          {progress} {t('dashboard.of')} {totalSteps} {t('dashboard.stepsDone')}
+          {progress > 0 
+            ? t('dashboard.stepCompleted', { step: progress })
+            : `${progress} ${t('dashboard.of')} ${totalSteps} ${t('dashboard.stepsDone')}`
+          }
         </p>
       </button>
 

@@ -33,6 +33,7 @@
     "transactions": "Transactions",
     "getYourCard": "Get Your Card",
     "stepsDone": "STEPS DONE",
+    "stepCompleted": "Step {{step}} completed ✓",
     "openCard": "Open New Card"
   },
   "openCard": {
