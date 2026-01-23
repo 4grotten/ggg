@@ -167,14 +167,21 @@ export const VerifyIdentityCard = ({
         {/* Progress Bar */}
         <div className="mt-4 flex gap-2">
           {Array.from({ length: totalSteps }).map((_, index) => {
-            // For passport update: all 3 steps are white (completed)
-            const isCompleted = needsPassportUpdate || index < progress;
+            // For passport update: step 1 and 3 white, step 2 red (document needs update)
+            const isPassportDocumentStep = needsPassportUpdate && index === 1;
+            const isCompleted = needsPassportUpdate 
+              ? (index === 0 || index === 2)  // Steps 1 and 3 completed
+              : index < progress;
             
             return (
               <div
                 key={index}
                 className={`h-1.5 flex-1 rounded-full ${
-                  isCompleted ? "bg-white" : "bg-white/30"
+                  isPassportDocumentStep 
+                    ? "bg-red-500" 
+                    : isCompleted 
+                      ? "bg-white" 
+                      : "bg-white/30"
                 }`}
               />
             );
