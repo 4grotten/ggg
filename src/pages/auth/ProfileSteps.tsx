@@ -867,27 +867,27 @@ const ProfileSteps = () => {
               </motion.div>
             </motion.div>
             
-            {/* Edit hint - moved below card */}
-            <motion.p 
-              className="text-xs text-center mt-4 max-w-[280px]"
-              style={{ color: '#333333', opacity: 0.7 }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.7 }}
-              transition={{ delay: 0.7 }}
-            >
-              {t('auth.steps.complete.canEditInSettings')}
-            </motion.p>
-            
             {/* Success indicator */}
             <motion.div 
               className="mt-4 flex items-center gap-2 text-green-500"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
+              transition={{ delay: 0.7 }}
             >
               <Check className="w-4 h-4" />
-              <span className="text-sm font-medium">{t('auth.steps.complete.ready')}</span>
+              <span className="text-base font-medium">{t('auth.steps.complete.ready')}</span>
             </motion.div>
+            
+            {/* Edit hint - below success indicator */}
+            <motion.p 
+              className="text-center mt-4 max-w-[280px]"
+              style={{ color: '#333333', opacity: 0.7, fontSize: '14px' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.7 }}
+              transition={{ delay: 0.8 }}
+            >
+              {t('auth.steps.complete.canEditInSettings')}
+            </motion.p>
           </motion.div>
         );
     }
