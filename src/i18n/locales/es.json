@@ -128,7 +128,8 @@
       "document": "Proporcionar documento de identidad",
       "liveness": "Realizar verificación de vida",
       "button": "Iniciar verificación",
-      "buttonKyc": "Iniciar KYC"
+      "buttonKyc": "Iniciar KYC",
+      "doLater": "Hacerlo después"
     },
     "personal": {
       "title": "Cuéntanos sobre ti",

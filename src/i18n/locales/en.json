@@ -130,7 +130,8 @@
       "document": "Provide identity document",
       "liveness": "Perform a liveness check",
       "button": "Start verification",
-      "buttonKyc": "Start KYC"
+      "buttonKyc": "Start KYC",
+      "doLater": "Do it later"
     },
     "personal": {
       "title": "Please tell us about yourself",

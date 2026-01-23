@@ -128,7 +128,8 @@
       "document": "قدم وثيقة الهوية",
       "liveness": "قم بفحص الحيوية",
       "button": "بدء التحقق",
-      "buttonKyc": "بدء KYC"
+      "buttonKyc": "بدء KYC",
+      "doLater": "القيام بذلك لاحقاً"
     },
     "personal": {
       "title": "أخبرنا عن نفسك",

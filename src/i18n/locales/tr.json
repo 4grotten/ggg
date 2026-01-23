@@ -128,7 +128,8 @@
       "document": "Kimlik belgesi sağlayın",
       "liveness": "Canlılık kontrolü yapın",
       "button": "Doğrulamayı başlat",
-      "buttonKyc": "KYC'yi başlat"
+      "buttonKyc": "KYC'yi başlat",
+      "doLater": "Daha sonra yap"
     },
     "personal": {
       "title": "Kendiniz hakkında bilgi verin",

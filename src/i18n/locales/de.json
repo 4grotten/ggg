@@ -128,7 +128,8 @@
       "document": "Identitätsdokument bereitstellen",
       "liveness": "Lebenderkennung durchführen",
       "button": "Verifizierung starten",
-      "buttonKyc": "KYC starten"
+      "buttonKyc": "KYC starten",
+      "doLater": "Später erledigen"
     },
     "personal": {
       "title": "Erzählen Sie uns von sich",

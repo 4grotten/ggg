@@ -64,7 +64,7 @@ const VerificationSteps = () => {
           />
         </div>
 
-        {/* Button */}
+        {/* Buttons */}
         <div className="karta-footer-actions">
           <PoweredByFooter className="mb-4" />
           <button
@@ -72,6 +72,12 @@ const VerificationSteps = () => {
             className="karta-btn-primary"
           >
             {isReturning ? t('verify.steps.buttonKyc') : t('verify.steps.button')}
+          </button>
+          <button
+            onClick={() => navigate("/")}
+            className="w-full py-3 text-[15px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t('verify.steps.doLater')}
           </button>
         </div>
       </div>
