@@ -114,6 +114,7 @@
       "title": "Lassen Sie uns verifizieren",
       "description": "Folgen Sie den einfachen Schritten unten",
       "step": "Schritt",
+      "completed": "Abgeschlossen",
       "questionnaire": "Fragebogen ausfüllen",
       "document": "Identitätsdokument bereitstellen",
       "liveness": "Lebenderkennung durchführen",
