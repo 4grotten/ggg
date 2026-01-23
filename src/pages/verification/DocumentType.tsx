@@ -131,7 +131,10 @@ const DocumentType = () => {
 
       {/* Unsupported Document Alert */}
       <AlertDialog open={showUnsupportedAlert} onOpenChange={setShowUnsupportedAlert}>
-        <AlertDialogContent className="max-w-[320px] rounded-2xl p-0 overflow-hidden border-0 gap-0">
+        <AlertDialogContent 
+          className="max-w-[320px] rounded-2xl p-0 overflow-hidden border-0 gap-0"
+          onOverlayClick={() => setShowUnsupportedAlert(false)}
+        >
           <div className="p-5 pb-4">
             {/* Warning Icon */}
             <motion.div 
