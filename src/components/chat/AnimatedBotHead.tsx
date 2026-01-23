@@ -4,13 +4,25 @@ import { useEffect, useState } from "react";
 interface AnimatedBotHeadProps {
   size?: "sm" | "lg";
   isUserTyping?: boolean;
+  isDancing?: boolean;
 }
 
-export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedBotHeadProps) => {
+export const AnimatedBotHead = ({ size = "sm", isUserTyping = false, isDancing = false }: AnimatedBotHeadProps) => {
   const isLarge = size === "lg";
   const containerSize = isLarge ? "w-12 h-14" : "w-5 h-6";
-  const [animationPhase, setAnimationPhase] = useState<"idle" | "jumping" | "clapping">("idle");
+  const [animationPhase, setAnimationPhase] = useState<"idle" | "jumping" | "clapping" | "dancing">("idle");
   const [showHands, setShowHands] = useState(false);
+
+  // Handle dancing state from parent
+  useEffect(() => {
+    if (isDancing) {
+      setAnimationPhase("dancing");
+      setShowHands(true);
+    } else if (animationPhase === "dancing") {
+      setAnimationPhase("idle");
+      setShowHands(false);
+    }
+  }, [isDancing]);
 
   useEffect(() => {
     if (isUserTyping && animationPhase === "idle") {
@@ -25,8 +37,10 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
 
       // After clapping (~1.8s more), back to idle
       const idleTimer = setTimeout(() => {
-        setAnimationPhase("idle");
-        setShowHands(false);
+        if (!isDancing) {
+          setAnimationPhase("idle");
+          setShowHands(false);
+        }
       }, 3000);
 
       return () => {
@@ -34,18 +48,20 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
         clearTimeout(idleTimer);
       };
     }
-  }, [isUserTyping, animationPhase]);
+  }, [isUserTyping, animationPhase, isDancing]);
 
   // Reset to idle when user stops typing
   useEffect(() => {
-    if (!isUserTyping && animationPhase !== "idle") {
+    if (!isUserTyping && animationPhase !== "idle" && animationPhase !== "dancing") {
       const resetTimer = setTimeout(() => {
-        setAnimationPhase("idle");
-        setShowHands(false);
+        if (!isDancing) {
+          setAnimationPhase("idle");
+          setShowHands(false);
+        }
       }, 500);
       return () => clearTimeout(resetTimer);
     }
-  }, [isUserTyping, animationPhase]);
+  }, [isUserTyping, animationPhase, isDancing]);
 
   return (
     <motion.div 
@@ -53,11 +69,15 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
       animate={
         animationPhase === "jumping" 
           ? { y: [0, -6, 0, -6, 0, -6, 0] }
+          : animationPhase === "dancing"
+          ? { rotate: [0, -5, 5, -5, 5, 0] }
           : { y: 0 }
       }
       transition={
         animationPhase === "jumping"
           ? { duration: 1.2, ease: "easeOut" }
+          : animationPhase === "dancing"
+          ? { duration: 0.5, repeat: 3, ease: "easeInOut" }
           : { duration: 0.3 }
       }
     >
@@ -80,11 +100,13 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
           animate={{
             rotate: animationPhase === "jumping" 
               ? [0, -15, 15, -15, 15, -15, 15, 0]
+              : animationPhase === "dancing"
+              ? [0, -20, 20, -20, 20, -15, 15, 0]
               : [0, 8, 0, -8, 0, 5, -5, 0],
           }}
           transition={{
-            duration: animationPhase === "jumping" ? 1.2 : 2,
-            repeat: animationPhase === "jumping" ? 0 : Infinity,
+            duration: animationPhase === "jumping" ? 1.2 : animationPhase === "dancing" ? 0.5 : 2,
+            repeat: animationPhase === "dancing" ? 3 : animationPhase === "jumping" ? 0 : Infinity,
             ease: "easeInOut",
           }}
         >
@@ -99,15 +121,15 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
         {/* Animated eyes */}
         <motion.g
           animate={{
-            scaleY: animationPhase === "clapping"
+            scaleY: animationPhase === "clapping" || animationPhase === "dancing"
               ? [1, 0.1, 1]
               : [1, 1, 1, 1, 1, 1, 0.1, 1, 0.1, 1, 0.1, 1, 1, 1, 1],
           }}
           transition={{
-            duration: animationPhase === "clapping" ? 0.3 : 3,
+            duration: animationPhase === "clapping" || animationPhase === "dancing" ? 0.3 : 3,
             repeat: Infinity,
             ease: "easeInOut",
-            times: animationPhase === "clapping" 
+            times: animationPhase === "clapping" || animationPhase === "dancing"
               ? undefined 
               : [0, 0.3, 0.33, 0.36, 0.5, 0.7, 0.73, 0.76, 0.79, 0.82, 0.85, 0.88, 0.9, 0.95, 1],
           }}
@@ -147,6 +169,17 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
           />
         </motion.g>
 
+        {/* Smile when dancing */}
+        {animationPhase === "dancing" && (
+          <motion.path
+            d="M8 20 Q12 24 16 20"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+
         {/* Animated Hands */}
         <AnimatePresence>
           {showHands && (
@@ -165,10 +198,18 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
                   y2="22"
                   strokeWidth="2"
                   animate={{
-                    x2: animationPhase === "clapping" ? [-2, 6, -2, 6, -2, 6, -2] : -2,
-                    y2: animationPhase === "clapping" ? [22, 16, 22, 16, 22, 16, 22] : 22,
+                    x2: animationPhase === "clapping" 
+                      ? [-2, 6, -2, 6, -2, 6, -2] 
+                      : animationPhase === "dancing"
+                      ? [-4, 0, -4, 0, -4, 0, -4]
+                      : -2,
+                    y2: animationPhase === "clapping" 
+                      ? [22, 16, 22, 16, 22, 16, 22] 
+                      : animationPhase === "dancing"
+                      ? [14, 22, 14, 22, 14, 22, 14]
+                      : 22,
                   }}
-                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                  transition={{ duration: animationPhase === "dancing" ? 0.5 : 1.5, repeat: animationPhase === "dancing" ? 3 : 0, ease: "easeInOut" }}
                 />
                 <motion.circle
                   cx="-3"
@@ -176,10 +217,18 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
                   r="2"
                   fill="currentColor"
                   animate={{
-                    cx: animationPhase === "clapping" ? [-3, 7, -3, 7, -3, 7, -3] : -3,
-                    cy: animationPhase === "clapping" ? [23, 15, 23, 15, 23, 15, 23] : 23,
+                    cx: animationPhase === "clapping" 
+                      ? [-3, 7, -3, 7, -3, 7, -3] 
+                      : animationPhase === "dancing"
+                      ? [-5, 1, -5, 1, -5, 1, -5]
+                      : -3,
+                    cy: animationPhase === "clapping" 
+                      ? [23, 15, 23, 15, 23, 15, 23] 
+                      : animationPhase === "dancing"
+                      ? [13, 23, 13, 23, 13, 23, 13]
+                      : 23,
                   }}
-                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                  transition={{ duration: animationPhase === "dancing" ? 0.5 : 1.5, repeat: animationPhase === "dancing" ? 3 : 0, ease: "easeInOut" }}
                 />
               </motion.g>
               
@@ -197,10 +246,18 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
                   y2="22"
                   strokeWidth="2"
                   animate={{
-                    x2: animationPhase === "clapping" ? [26, 18, 26, 18, 26, 18, 26] : 26,
-                    y2: animationPhase === "clapping" ? [22, 16, 22, 16, 22, 16, 22] : 22,
+                    x2: animationPhase === "clapping" 
+                      ? [26, 18, 26, 18, 26, 18, 26] 
+                      : animationPhase === "dancing"
+                      ? [28, 24, 28, 24, 28, 24, 28]
+                      : 26,
+                    y2: animationPhase === "clapping" 
+                      ? [22, 16, 22, 16, 22, 16, 22] 
+                      : animationPhase === "dancing"
+                      ? [14, 22, 14, 22, 14, 22, 14]
+                      : 22,
                   }}
-                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                  transition={{ duration: animationPhase === "dancing" ? 0.5 : 1.5, repeat: animationPhase === "dancing" ? 3 : 0, ease: "easeInOut" }}
                 />
                 <motion.circle
                   cx="27"
@@ -208,10 +265,18 @@ export const AnimatedBotHead = ({ size = "sm", isUserTyping = false }: AnimatedB
                   r="2"
                   fill="currentColor"
                   animate={{
-                    cx: animationPhase === "clapping" ? [27, 17, 27, 17, 27, 17, 27] : 27,
-                    cy: animationPhase === "clapping" ? [23, 15, 23, 15, 23, 15, 23] : 23,
+                    cx: animationPhase === "clapping" 
+                      ? [27, 17, 27, 17, 27, 17, 27] 
+                      : animationPhase === "dancing"
+                      ? [29, 23, 29, 23, 29, 23, 29]
+                      : 27,
+                    cy: animationPhase === "clapping" 
+                      ? [23, 15, 23, 15, 23, 15, 23] 
+                      : animationPhase === "dancing"
+                      ? [13, 23, 13, 23, 13, 23, 13]
+                      : 23,
                   }}
-                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                  transition={{ duration: animationPhase === "dancing" ? 0.5 : 1.5, repeat: animationPhase === "dancing" ? 3 : 0, ease: "easeInOut" }}
                 />
               </motion.g>
             </>
