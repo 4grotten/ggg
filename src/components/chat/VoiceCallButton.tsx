@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useConversation } from "@elevenlabs/react";
-import { Phone, PhoneOff, Loader2 } from "lucide-react";
+import { Phone, PhoneOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -119,7 +119,19 @@ export const VoiceCallButton = () => {
                 )}
               >
                 {isConnecting ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-primary-foreground" />
+                  <motion.div
+                    animate={{ 
+                      rotate: [-10, 10, -10, 10, 0],
+                      x: [-1, 1, -1, 1, 0]
+                    }}
+                    transition={{ 
+                      repeat: Infinity, 
+                      duration: 0.5,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <Phone className="w-4 h-4 text-primary-foreground" />
+                  </motion.div>
                 ) : (
                   <Phone className="w-4 h-4" />
                 )}
