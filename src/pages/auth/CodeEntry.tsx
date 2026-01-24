@@ -43,6 +43,7 @@ const CodeEntry = () => {
   const [resendCooldown, setResendCooldown] = useState(RESEND_COOLDOWN);
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const verifyingRef = useRef(false);
   
   // Redirect if no phone number
   useEffect(() => {
@@ -75,7 +76,7 @@ const CodeEntry = () => {
     
     // Auto-submit when all digits entered
     const fullCode = newCode.join("");
-    if (fullCode.length === 6) {
+    if (fullCode.length === 6 && !isLoading) {
       handleVerify(fullCode);
     }
   };
@@ -112,6 +113,10 @@ const CodeEntry = () => {
   
   // Verify code
   const handleVerify = async (codeStr?: string) => {
+    // Prevent double-submit (auto-submit + button tap, etc.)
+    if (isLoading || verifyingRef.current) return;
+    verifyingRef.current = true;
+
     const fullCode = codeStr || code.join("");
     
     // Validate
@@ -156,6 +161,7 @@ const CodeEntry = () => {
       setError(t("auth.code.error") || "Verification failed");
     } finally {
       setIsLoading(false);
+      verifyingRef.current = false;
     }
   };
   
