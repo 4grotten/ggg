@@ -344,10 +344,6 @@
     "addAccount": "添加账户",
     "addAccountDesc": "登录其他账户",
     "switchAccount": "切换账户",
-    "switchAccountTitle": "切换账户？",
-    "switchAccountDescription": "您要切换到",
-    "switchingAccount": "正在切换账户...",
-    "switchAccountError": "切换账户失败",
     "otherAccounts": "其他账户",
     "otherAccountsMock": "示例（未找到已保存的账户）",
     "editProfile": "编辑资料"
@@ -388,8 +384,7 @@
     "shareHolder": "持卡人",
     "shareCard": "卡号",
     "shareExpiry": "有效期",
-    "shareCvv": "CVV",
-    "transfer": "转账"
+    "shareCvv": "CVV"
   },
   "history": {
     "title": "交易历史",
@@ -633,13 +628,7 @@
       "searchCountry": "搜索国家或代码",
       "notRobot": "我不是机器人",
       "support": "支持与帮助",
-      "continue": "继续",
-      "codeSent": "验证码已发送！",
-      "whatsappCodeSent": "验证码已通过WhatsApp发送！",
-      "error": "出了点问题，请重试。",
-      "rateLimitError": "请求过多，请等待几分钟。",
-      "invalidFormat": "手机号格式无效",
-      "serviceUnavailable": "服务暂时不可用，请稍后再试。"
+      "continue": "继续"
     },
     "code": {
       "title": "输入验证码",
@@ -655,14 +644,7 @@
       "invalidCode": "请输入有效的6位数验证码",
       "wrongCode": "验证码错误，请重试。",
       "success": "验证成功！",
-      "error": "验证失败",
-      "attemptsRemaining": "剩余{{count}}次尝试",
-      "sendNewCode": "发送新验证码",
-      "newCodeSent": "新验证码已发送！",
-      "cooldownActive": "请等待后再请求新验证码",
-      "otpExpired": "验证码已过期，请重新请求。",
-      "maxAttempts": "已超过最大尝试次数，请重新请求验证码。",
-      "noActiveOtp": "未找到有效验证码，请重新请求。"
+      "error": "验证失败"
     },
     "login": {
       "title": "输入密码",

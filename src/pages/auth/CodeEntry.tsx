@@ -1,6 +1,7 @@
 /**
- * CodeEntry — экран ввода кода подтверждения
- * WhatsApp OTP: POST /otp/verify/ + /otp/resend/
+ * CodeEntry — экран ввода SMS-кода
+ * POST /verify_code/ для подтверждения
+ * POST /resend_code/ для повторной отправки
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -12,9 +13,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { MessageSquare, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyCode as verifySmsCode, resendCode as resendSmsCode, getCurrentUser } from "@/services/api/authApi";
-import { verifyOtp, resendOtp, parseAttemptsRemaining, sendOtp } from "@/services/api/otpApi";
-import { setAuthToken } from "@/services/api/apiClient";
+import { verifyCode, resendCode } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -24,38 +23,24 @@ const codeSchema = z.string()
 
 const RESEND_COOLDOWN = 60; // seconds
 
-interface LocationState {
-  phoneNumber?: string;
-  authType?: 'sms' | 'whatsapp';
-  otpId?: string;
-  expiresAt?: string;
-  username?: string;   // For registration
-  password?: string;   // For registration
-}
-
 const CodeEntry = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   
   // Get phone number and auth type from navigation state
-  const locationState = location.state as LocationState | null;
+  const locationState = location.state as { phoneNumber?: string; authType?: 'sms' | 'whatsapp' } | null;
   const phoneNumber = locationState?.phoneNumber || "";
-  const authType = locationState?.authType || 'whatsapp';
-  const registrationUsername = locationState?.username;
-  const registrationPassword = locationState?.password;
+  const authType = locationState?.authType || 'sms';
   
-  // Check if it's WhatsApp auth
+  // Check if it's WhatsApp auth (non-+996 countries)
   const isWhatsAppAuth = authType === 'whatsapp';
   
-  // Code entry state
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState("");
-  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
   const [resendCooldown, setResendCooldown] = useState(RESEND_COOLDOWN);
-  const [showSendNewCode, setShowSendNewCode] = useState(false);
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   
@@ -82,7 +67,6 @@ const CodeEntry = () => {
     newCode[index] = value.slice(-1);
     setCode(newCode);
     setError("");
-    setAttemptsRemaining(null);
     
     // Auto-focus next input
     if (value && index < 5) {
@@ -139,96 +123,30 @@ const CodeEntry = () => {
     
     setIsLoading(true);
     setError("");
-    setShowSendNewCode(false);
     
     try {
-      if (isWhatsAppAuth) {
-        // WhatsApp OTP verification — pass credentials if available
-        const response = await verifyOtp(phoneNumber, fullCode, registrationUsername, registrationPassword);
+      const response = await verifyCode(phoneNumber, parseInt(fullCode, 10));
+      
+      if (response.error) {
+        setError(response.error.message || t("auth.code.wrongCode"));
+        setCode(["", "", "", "", "", ""]);
+        inputRefs.current[0]?.focus();
+        return;
+      }
+      
+      if (response.data) {
+        toast.success(t("auth.code.success") || "Code verified!");
         
-        // Handle username taken error (status 400) — redirect to register
-        if (response.error?.status === 400 && response.error.message.includes("Username")) {
-          toast.error(response.error.message);
-          navigate("/auth/register", { 
-            replace: true, 
-            state: { phoneNumber, usernameError: response.error.message } 
+        // Navigate based on user status
+        if (response.data.is_new_user) {
+          // New user - go to profile setup
+          navigate("/auth/profile", { 
+            replace: true,
+            state: { phoneNumber, isNewUser: true }
           });
-          return;
-        }
-        
-        // Handle "username and password required" error — redirect to register
-        if (response.error?.status === 400 && response.error.message.includes("required for registration")) {
-          navigate("/auth/register", { 
-            replace: true, 
-            state: { phoneNumber } 
-          });
-          return;
-        }
-        
-        if (response.error || !response.data?.is_valid) {
-          const errorMsg = response.error?.message || response.data?.error || t("auth.code.wrongCode");
-          
-          // Parse attempts remaining
-          const attempts = parseAttemptsRemaining(errorMsg);
-          if (attempts !== null) {
-            setAttemptsRemaining(attempts);
-          }
-          
-          // Check for terminal errors
-          if (errorMsg.includes("Max attempts exceeded") || errorMsg.includes("OTP expired") || errorMsg.includes("No active OTP")) {
-            setShowSendNewCode(true);
-            setError(t(`auth.code.${errorMsg.includes("expired") ? "otpExpired" : errorMsg.includes("Max") ? "maxAttempts" : "noActiveOtp"}`) || errorMsg);
-          } else {
-            setError(errorMsg);
-          }
-          
-          setCode(["", "", "", "", "", ""]);
-          inputRefs.current[0]?.focus();
-          return;
-        }
-        
-        // WhatsApp OTP verified successfully — token is in response
-        if (response.data?.is_valid && response.data.token) {
-          setAuthToken(response.data.token);
-          toast.success(t("auth.code.success") || "Code verified!");
-          
-          if (response.data.is_new_user) {
-            // New user — go to profile setup
-            navigate("/auth/profile", { 
-              replace: true,
-              state: { phoneNumber, isNewUser: true }
-            });
-          } else {
-            // Existing user — fetch profile and go to home
-            await getCurrentUser();
-            navigate("/", { replace: true });
-          }
         } else {
-          // Fallback: is_valid but no token (shouldn't happen)
-          toast.error(t("auth.code.error") || "Verification failed");
-        }
-      } else {
-        // SMS verification
-        const response = await verifySmsCode(phoneNumber, parseInt(fullCode, 10));
-        
-        if (response.error) {
-          setError(response.error.message || t("auth.code.wrongCode"));
-          setCode(["", "", "", "", "", ""]);
-          inputRefs.current[0]?.focus();
-          return;
-        }
-        
-        if (response.data) {
-          toast.success(t("auth.code.success") || "Code verified!");
-          
-          if (response.data.is_new_user) {
-            navigate("/auth/profile", { 
-              replace: true,
-              state: { phoneNumber, isNewUser: true }
-            });
-          } else {
-            navigate("/", { replace: true });
-          }
+          // Existing user - go to home
+          navigate("/", { replace: true });
         }
       }
     } catch {
@@ -238,83 +156,27 @@ const CodeEntry = () => {
     }
   };
   
-  // Resend code
+  // Resend code - use appropriate type based on auth method
   const handleResend = async () => {
     if (resendCooldown > 0 || isResending) return;
     
     setIsResending(true);
-    setError("");
-    setShowSendNewCode(false);
-    setAttemptsRemaining(null);
     
     try {
-      if (isWhatsAppAuth) {
-        // WhatsApp OTP resend
-        const response = await resendOtp(phoneNumber);
-        
-        if (response.error) {
-          if (response.error.secondsRemaining) {
-            // Cooldown active
-            setResendCooldown(response.error.secondsRemaining);
-            toast.error(t("auth.code.cooldownActive") || `Please wait ${response.error.secondsRemaining} seconds`);
-          } else {
-            toast.error(response.error.message || t("auth.code.resendError"));
-          }
-        } else {
-          toast.success(t("auth.code.resendSuccess") || "Code sent!");
-          setResendCooldown(RESEND_COOLDOWN);
-          setCode(["", "", "", "", "", ""]);
-          inputRefs.current[0]?.focus();
-        }
+      // Use WhatsApp type for non-+996 countries (when enabled)
+      const resendType = isWhatsAppAuth ? 'whatsapp_auth_type' : 'register_auth_type';
+      const response = await resendCode(phoneNumber, resendType);
+      
+      if (response.error) {
+        toast.error(response.error.message || t("auth.code.resendError"));
       } else {
-        // SMS resend
-        const response = await resendSmsCode(phoneNumber, 'register_auth_type');
-        
-        if (response.error) {
-          toast.error(response.error.message || t("auth.code.resendError"));
-        } else {
-          toast.success(t("auth.code.resendSuccess") || "Code sent!");
-          setResendCooldown(RESEND_COOLDOWN);
-          setCode(["", "", "", "", "", ""]);
-          inputRefs.current[0]?.focus();
-        }
+        toast.success(t("auth.code.resendSuccess") || "Code sent!");
+        setResendCooldown(RESEND_COOLDOWN);
+        setCode(["", "", "", "", "", ""]);
+        inputRefs.current[0]?.focus();
       }
     } catch {
       toast.error(t("auth.code.resendError") || "Failed to resend code");
-    } finally {
-      setIsResending(false);
-    }
-  };
-  
-  // Send new code (after expiry or max attempts)
-  const handleSendNewCode = async () => {
-    setIsResending(true);
-    setError("");
-    setShowSendNewCode(false);
-    setAttemptsRemaining(null);
-    
-    try {
-      if (isWhatsAppAuth) {
-        const response = await sendOtp(phoneNumber);
-        
-        if (response.error) {
-          if (response.error.status === 429) {
-            toast.error(t("auth.phone.rateLimitError") || "Too many requests. Please wait.");
-          } else {
-            toast.error(response.error.message || t("auth.code.resendError"));
-          }
-        } else if (response.data?.sent) {
-          toast.success(t("auth.code.newCodeSent") || "New code sent!");
-          setResendCooldown(RESEND_COOLDOWN);
-          setCode(["", "", "", "", "", ""]);
-          inputRefs.current[0]?.focus();
-        }
-      } else {
-        // For SMS, just resend
-        await handleResend();
-      }
-    } catch {
-      toast.error(t("auth.code.resendError") || "Failed to send code");
     } finally {
       setIsResending(false);
     }
@@ -418,52 +280,32 @@ const CodeEntry = () => {
             </div>
             
             {error && (
-              <motion.div
+              <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center"
+                className="text-destructive text-sm text-center"
               >
-                <p className="text-destructive text-sm">{error}</p>
-                {attemptsRemaining !== null && (
-                  <p className="text-muted-foreground text-xs mt-1">
-                    {t("auth.code.attemptsRemaining", { count: attemptsRemaining }) || `${attemptsRemaining} attempts remaining`}
-                  </p>
-                )}
-              </motion.div>
+                {error}
+              </motion.p>
             )}
             
-            {/* Resend / Send New Code button */}
+            {/* Resend button */}
             <div className="text-center">
-              {showSendNewCode ? (
-                <button
-                  onClick={handleSendNewCode}
-                  disabled={isResending}
-                  className="text-primary font-medium flex items-center gap-2 mx-auto"
-                >
-                  {isResending ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="w-4 h-4" />
-                  )}
-                  {t("auth.code.sendNewCode") || "Send new code"}
-                </button>
-              ) : (
-                <button
-                  onClick={handleResend}
-                  disabled={resendCooldown > 0 || isResending}
-                  className="text-primary font-medium disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
-                >
-                  {isResending ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="w-4 h-4" />
-                  )}
-                  {resendCooldown > 0 
-                    ? `${t("auth.code.resendIn") || "Resend in"} ${resendCooldown}s`
-                    : t("auth.code.resend") || "Resend code"
-                  }
-                </button>
-              )}
+              <button
+                onClick={handleResend}
+                disabled={resendCooldown > 0 || isResending}
+                className="text-primary font-medium disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+              >
+                {isResending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4" />
+                )}
+                {resendCooldown > 0 
+                  ? `${t("auth.code.resendIn") || "Resend in"} ${resendCooldown}s`
+                  : t("auth.code.resend") || "Resend code"
+                }
+              </button>
             </div>
           </motion.div>
 

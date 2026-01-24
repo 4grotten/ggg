@@ -7,7 +7,12 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { 
   User, 
   Camera, 
+  Lock,
+  LockOpen,
+  Eye, 
+  EyeOff, 
   Check,
+  Smartphone,
   Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,10 +20,10 @@ import { toast } from "sonner";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { StepIndicator } from "@/components/verification/StepIndicator";
-import { initProfile, uploadAvatar } from "@/services/api/authApi";
+import { initProfile, setPassword as apiSetPassword, uploadAvatar } from "@/services/api/authApi";
 import { getAuthToken } from "@/services/api/apiClient";
 
-type Step = "name" | "gender" | "photo" | "complete";
+type Step = "name" | "gender" | "photo" | "password" | "complete";
 
 // Animated Gender Option Component
 const GenderOption = ({ 
@@ -331,6 +336,8 @@ const ProfileSteps = () => {
   const [gender, setGender] = useState<"male" | "female" | "not_specified" | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null); // Store file for API upload
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Auto-capitalize name input
   const handleNameChange = (value: string) => {
@@ -355,7 +362,7 @@ const ProfileSteps = () => {
     }
   }, [isNewUser, navigate]);
 
-  const steps: Step[] = ["name", "gender", "photo", "complete"];
+  const steps: Step[] = ["name", "gender", "photo", "password", "complete"];
   const currentStepIndex = steps.indexOf(currentStep);
 
   const goNext = () => {
@@ -434,6 +441,16 @@ const ProfileSteps = () => {
         toast.error(profileResponse.error.message || t("auth.profile.error"));
         setIsLoading(false);
         return;
+      }
+      
+      // Set password if provided
+      if (password.length >= 6) {
+        const passwordResponse = await apiSetPassword(password);
+        
+        if (passwordResponse.error) {
+          // Profile saved, but password failed - still continue
+          console.warn("Password set failed:", passwordResponse.error);
+        }
       }
       
       // Save to session for local use
@@ -696,6 +713,152 @@ const ProfileSteps = () => {
           </motion.div>
         );
 
+      case "password":
+        return (
+          <motion.div
+            key="password"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="flex flex-col items-center"
+          >
+            {/* Animated Lock Sequence */}
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-primary/10 relative overflow-hidden">
+              {/* Step 1: Password asterisks typing */}
+              <motion.div
+                className="absolute flex items-center justify-center gap-0.5"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: [1, 1, 0] }}
+                transition={{ 
+                  duration: 1.5,
+                  times: [0, 0.8, 1],
+                  delay: 0.2
+                }}
+              >
+                {[0, 1, 2, 3].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="text-3xl text-primary font-bold"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      delay: 0.3 + i * 0.2,
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 15
+                    }}
+                  >
+                    *
+                  </motion.span>
+                ))}
+              </motion.div>
+
+              {/* Step 2: Open lock appears (after asterisks disappear) */}
+              <motion.div
+                className="absolute"
+                initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                animate={{ 
+                  opacity: [0, 0, 1, 1, 0],
+                  scale: [0.5, 0.5, 1.1, 1, 0.9],
+                  y: [20, 20, 0, 0, 0]
+                }}
+                transition={{ 
+                  duration: 1.8,
+                  times: [0, 0.1, 0.3, 0.7, 0.9],
+                  delay: 1.7,
+                  ease: "easeOut" as const
+                }}
+              >
+                <LockOpen className="w-12 h-12 text-primary" />
+              </motion.div>
+
+              {/* Step 3: Closed lock with flash */}
+              <motion.div
+                className="absolute"
+                initial={{ opacity: 0, scale: 1.5, rotate: -10 }}
+                animate={{ 
+                  opacity: [0, 0, 1],
+                  scale: [1.5, 1.5, 1],
+                  rotate: [-10, -10, 0]
+                }}
+                transition={{ 
+                  duration: 0.5,
+                  times: [0, 0.3, 1],
+                  delay: 3.2,
+                  ease: "easeOut" as const
+                }}
+              >
+                <Lock className={`w-12 h-12 ${showError ? 'text-destructive' : 'text-primary'}`} />
+              </motion.div>
+
+              {/* Flash effect when lock closes */}
+              <motion.div
+                className="absolute inset-0 rounded-full bg-primary"
+                initial={{ opacity: 0, scale: 1 }}
+                animate={{ 
+                  opacity: [0, 0.7, 0],
+                  scale: [1, 1.3, 1.4]
+                }}
+                transition={{ 
+                  duration: 0.4,
+                  delay: 3.2,
+                  ease: "easeOut" as const
+                }}
+              />
+            </div>
+            
+            <h1 className="text-2xl font-bold mb-2 text-center">{t('auth.steps.password.title')}</h1>
+            <p className="text-muted-foreground text-center mb-8">{t('auth.steps.password.description')}</p>
+            
+            <div className="w-full relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoFocus
+                className={`w-full text-left text-2xl font-medium bg-transparent border-b-2 py-4 text-foreground placeholder:text-muted-foreground outline-none transition-colors pr-12 ${
+                  showError 
+                    ? 'border-destructive focus:border-destructive' 
+                    : 'border-primary/30 focus:border-primary'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground p-2"
+              >
+                {showPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
+              </button>
+            </div>
+            
+            {/* Password strength indicator */}
+            <div className="w-full mt-6">
+              <div className="flex gap-1 mb-2">
+                {[1, 2, 3, 4].map((level) => (
+                  <div
+                    key={level}
+                    className={`h-1 flex-1 rounded-full transition-colors ${
+                      password.length >= level * 2
+                        ? password.length >= 8
+                          ? "bg-green-500"
+                          : password.length >= 6
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                        : "bg-border"
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="text-muted-foreground text-sm text-center">
+                {t('auth.steps.password.hint')}
+              </p>
+            </div>
+          </motion.div>
+        );
 
       case "complete":
         // Get gender label for display (with "Пол:" prefix) - localized
@@ -905,7 +1068,8 @@ const ProfileSteps = () => {
         return { disabled: false, text: gender ? continueText : skipText };
       case "photo":
         return { disabled: !photoPreview, text: continueText };
-      case "complete":
+      case "password":
+        return { disabled: password.length < 6, text: continueText };
       case "complete":
         return { disabled: isLoading, text: isLoading ? t('common.loading') || 'Loading...' : (t('auth.steps.complete.button') !== 'auth.steps.complete.button' ? t('auth.steps.complete.button') : 'Начать') };
       default:
@@ -937,7 +1101,7 @@ const ProfileSteps = () => {
         {/* Progress */}
         {currentStep !== "complete" && (
           <div className="px-6 py-4">
-            <StepIndicator currentStep={currentStepIndex} totalSteps={3} />
+            <StepIndicator currentStep={currentStepIndex} totalSteps={4} />
           </div>
         )}
 

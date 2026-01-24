@@ -65,7 +65,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Роуты, которые не требуют авторизации
-const PUBLIC_ROUTES = ['/auth/phone', '/auth/code', '/auth/profile', '/auth/register'];
+const PUBLIC_ROUTES = ['/auth/phone', '/auth/code', '/auth/profile'];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);

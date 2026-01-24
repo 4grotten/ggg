@@ -343,11 +343,7 @@
     "accounts": "الحسابات",
     "addAccount": "إضافة حساب",
     "addAccountDesc": "تسجيل الدخول إلى حساب آخر",
-    "switchAccount": "تبديل",
-    "switchAccountTitle": "تبديل الحساب؟",
-    "switchAccountDescription": "هل تريد التبديل إلى",
-    "switchingAccount": "جاري تبديل الحساب...",
-    "switchAccountError": "فشل تبديل الحساب",
+    "switchAccount": "تبديل الحساب",
     "otherAccounts": "حسابات أخرى",
     "otherAccountsMock": "أمثلة (لم يتم العثور على حسابات محفوظة)",
     "editProfile": "تعديل الملف الشخصي"
@@ -388,8 +384,7 @@
     "shareHolder": "الحامل",
     "shareCard": "البطاقة",
     "shareExpiry": "الانتهاء",
-    "shareCvv": "CVV",
-    "transfer": "تحويل"
+    "shareCvv": "CVV"
   },
   "history": {
     "title": "سجل المعاملات",
@@ -633,13 +628,7 @@
       "searchCountry": "ابحث عن الدولة أو الرمز",
       "notRobot": "أنا لست روبوت",
       "support": "الدعم والمساعدة",
-      "continue": "متابعة",
-      "codeSent": "تم إرسال رمز التحقق!",
-      "whatsappCodeSent": "تم إرسال الرمز عبر واتساب!",
-      "error": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
-      "rateLimitError": "طلبات كثيرة جداً. يرجى الانتظار بضع دقائق.",
-      "invalidFormat": "صيغة رقم الهاتف غير صالحة",
-      "serviceUnavailable": "الخدمة غير متاحة مؤقتاً. يرجى المحاولة لاحقاً."
+      "continue": "متابعة"
     },
     "code": {
       "title": "أدخل رمز التحقق",
@@ -655,14 +644,7 @@
       "invalidCode": "الرجاء إدخال رمز صالح من 6 أرقام",
       "wrongCode": "رمز خاطئ. حاول مرة أخرى.",
       "success": "تم التحقق من الرمز!",
-      "error": "فشل التحقق",
-      "attemptsRemaining": "{{count}} محاولات متبقية",
-      "sendNewCode": "إرسال رمز جديد",
-      "newCodeSent": "تم إرسال رمز جديد!",
-      "cooldownActive": "يرجى الانتظار قبل طلب رمز جديد",
-      "otpExpired": "انتهت صلاحية الرمز. يرجى طلب رمز جديد.",
-      "maxAttempts": "تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.",
-      "noActiveOtp": "لم يتم العثور على رمز نشط. يرجى طلب رمز جديد."
+      "error": "فشل التحقق"
     },
     "login": {
       "title": "أدخل كلمة المرور",

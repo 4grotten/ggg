@@ -343,11 +343,7 @@
     "accounts": "Cuentas",
     "addAccount": "Añadir cuenta",
     "addAccountDesc": "Iniciar sesión en otra cuenta",
-    "switchAccount": "Cambiar",
-    "switchAccountTitle": "¿Cambiar cuenta?",
-    "switchAccountDescription": "¿Quieres cambiar a",
-    "switchingAccount": "Cambiando cuenta...",
-    "switchAccountError": "Error al cambiar cuenta",
+    "switchAccount": "Cambiar cuenta",
     "otherAccounts": "Otras cuentas",
     "otherAccountsMock": "Ejemplos (no se encontraron cuentas guardadas)",
     "editProfile": "Editar perfil"
@@ -388,8 +384,7 @@
     "shareHolder": "Titular",
     "shareCard": "Tarjeta",
     "shareExpiry": "Vencimiento",
-    "shareCvv": "CVV",
-    "transfer": "Transferir"
+    "shareCvv": "CVV"
   },
   "history": {
     "title": "Historial de transacciones",
@@ -633,13 +628,7 @@
       "searchCountry": "Buscar país o código",
       "notRobot": "No soy un robot",
       "support": "Soporte y Ayuda",
-      "continue": "Continuar",
-      "codeSent": "¡Código de verificación enviado!",
-      "whatsappCodeSent": "¡Código enviado por WhatsApp!",
-      "error": "Algo salió mal. Por favor, inténtalo de nuevo.",
-      "rateLimitError": "Demasiadas solicitudes. Por favor, espera unos minutos.",
-      "invalidFormat": "Formato de número de teléfono inválido",
-      "serviceUnavailable": "Servicio temporalmente no disponible. Inténtalo más tarde."
+      "continue": "Continuar"
     },
     "code": {
       "title": "Ingresa el código de verificación",
@@ -655,14 +644,7 @@
       "invalidCode": "Por favor ingresa un código válido de 6 dígitos",
       "wrongCode": "Código incorrecto. Inténtalo de nuevo.",
       "success": "¡Código verificado!",
-      "error": "Error de verificación",
-      "attemptsRemaining": "{{count}} intentos restantes",
-      "sendNewCode": "Enviar nuevo código",
-      "newCodeSent": "¡Nuevo código enviado!",
-      "cooldownActive": "Por favor espera antes de solicitar un nuevo código",
-      "otpExpired": "Código expirado. Por favor solicita uno nuevo.",
-      "maxAttempts": "Máximo de intentos excedido. Por favor solicita un nuevo código.",
-      "noActiveOtp": "No se encontró código activo. Por favor solicita uno nuevo."
+      "error": "Error de verificación"
     },
     "login": {
       "title": "Ingresa tu contraseña",

@@ -15,9 +15,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { login as apiLogin, forgotPassword, getCurrentUser } from "@/services/api/authApi";
+import { login as apiLogin, forgotPassword, registerAuth, getCurrentUser } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
-import { sendOtp, checkPhone } from "@/services/api/otpApi";
 import { z } from "zod";
 
 interface Country {
@@ -197,22 +196,6 @@ const PhoneEntry = () => {
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [dialCode, setDialCode] = useState("+971");
   const [currentIconIndex, setCurrentIconIndex] = useState(0);
-  // Check if adding new account - reset all state for fresh registration
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const isAddingAccount = searchParams.get('add_account') === 'true';
-    
-    if (isAddingAccount) {
-      // Reset all form state for new registration
-      setPhoneNumber("");
-      setIsNotRobot(false);
-      setIsLoginMode(false);
-      setPassword("");
-      setShowPassword(false);
-      setPasswordError(false);
-      setErrorMessage("");
-    }
-  }, []);
 
   // Auto-detect country on mount
   useEffect(() => {
@@ -315,6 +298,7 @@ const PhoneEntry = () => {
       // Validate phone with zod
       const cleanPhone = phoneNumber.replace(/\D/g, "");
       const validation = phoneSchema.safeParse(cleanPhone);
+      
       if (!validation.success) {
         setShowError(true);
         setTimeout(() => setShowError(false), 600);
@@ -326,25 +310,51 @@ const PhoneEntry = () => {
       
       try {
         const fullPhone = getFullPhoneNumber();
+        const response = await registerAuth(fullPhone);
         
-        // All countries: check if user exists via check-phone endpoint
-        const checkResponse = await checkPhone(fullPhone);
-        
-        if (checkResponse.error) {
+        if (response.error) {
           setShowError(true);
-          setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
+          setErrorMessage(response.error.message || t("auth.phone.error"));
           setTimeout(() => setShowError(false), 600);
           return;
         }
         
-        if (checkResponse.data?.exists) {
-          // Existing user → show password login
-          setIsLoginMode(true);
-        } else {
-          // New user → go to registration form (username/password)
-          navigate("/auth/register", {
-            state: { phoneNumber: fullPhone }
-          });
+        if (response.data) {
+          const { is_new_user, token, temporary_code_enabled } = response.data;
+          
+          if (token) {
+            // Token received immediately (non-+996 countries) - skip OTP
+            setAuthToken(token);
+            if (is_new_user) {
+              // New user with token - go to profile setup
+              navigate("/auth/profile", { 
+                state: { phoneNumber: fullPhone }
+              });
+            } else {
+              // Existing user with token - fetch and save profile, then go to dashboard
+              await getCurrentUser();
+              toast.success(t("auth.login.success"));
+              navigate("/", { replace: true });
+            }
+          } else if (is_new_user && temporary_code_enabled) {
+            // Check if this is a +996 country (SMS) or other (WhatsApp - when API ready)
+            const isKyrgyzstan = dialCode === '+996';
+            
+            // TODO: When WhatsApp API is ready, uncomment the following line and remove 'sms':
+            // const authType = isKyrgyzstan ? 'sms' : 'whatsapp';
+            const authType: 'sms' | 'whatsapp' = 'sms'; // Currently always SMS
+            
+            toast.success(t("auth.phone.codeSent") || "Verification code sent!");
+            navigate("/auth/code", { 
+              state: { 
+                phoneNumber: fullPhone,
+                authType: authType // Pass auth type to CodeEntry
+              }
+            });
+          } else if (!is_new_user) {
+            // Existing user without token - needs password login
+            setIsLoginMode(true);
+          }
         }
       } catch {
         setShowError(true);
@@ -528,52 +538,15 @@ const PhoneEntry = () => {
                 </motion.p>
               )}
               
-              {/* Forgot Password & WhatsApp Login Links */}
-              <div className="flex flex-col gap-3">
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  disabled={isLoading}
-                  className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
-                >
-                  {t('auth.login.forgotPassword') || 'Forgot password?'}
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={async () => {
-                    setIsLoading(true);
-                    try {
-                      const fullPhone = getFullPhoneNumber();
-                      const otpResponse = await sendOtp(fullPhone);
-                      
-                      if (otpResponse.error) {
-                        toast.error(otpResponse.error.message || t('auth.phone.error'));
-                        return;
-                      }
-                      
-                      toast.success(t('auth.phone.codeSent') || 'Code sent via WhatsApp!');
-                      navigate('/auth/code', {
-                        state: { 
-                          phoneNumber: fullPhone, 
-                          authType: 'whatsapp',
-                          otpId: otpResponse.data?.otp_id,
-                          expiresAt: otpResponse.data?.expires_at
-                        }
-                      });
-                    } catch {
-                      toast.error(t('auth.phone.error') || 'Failed to send code');
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }}
-                  disabled={isLoading}
-                  className="text-[#25D366] text-sm font-medium hover:underline disabled:opacity-50 flex items-center justify-start gap-1"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  {t('auth.login.loginViaWhatsapp') || 'Login via WhatsApp'}
-                </button>
-              </div>
+              {/* Forgot Password Link */}
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={isLoading}
+                className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
+              >
+                {t('auth.login.forgotPassword') || 'Forgot password?'}
+              </button>
             </motion.div>
 
             {/* Support Link */}

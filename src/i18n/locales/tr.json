@@ -343,11 +343,7 @@
     "accounts": "Hesaplar",
     "addAccount": "Hesap Ekle",
     "addAccountDesc": "Başka bir hesaba giriş yap",
-    "switchAccount": "Değiştir",
-    "switchAccountTitle": "Hesap değiştirilsin mi?",
-    "switchAccountDescription": "Şu hesaba geçmek istiyor musunuz",
-    "switchingAccount": "Hesap değiştiriliyor...",
-    "switchAccountError": "Hesap değiştirilemedi",
+    "switchAccount": "Hesap Değiştir",
     "otherAccounts": "Diğer hesaplar",
     "otherAccountsMock": "Örnekler (kayıtlı hesap bulunamadı)",
     "editProfile": "Profili Düzenle"
@@ -388,8 +384,7 @@
     "shareHolder": "Sahibi",
     "shareCard": "Kart",
     "shareExpiry": "Son Kullanma",
-    "shareCvv": "CVV",
-    "transfer": "Transfer"
+    "shareCvv": "CVV"
   },
   "history": {
     "title": "İşlem Geçmişi",
@@ -633,13 +628,7 @@
       "searchCountry": "Ülke veya kod ara",
       "notRobot": "Ben robot değilim",
       "support": "Destek ve Yardım",
-      "continue": "Devam",
-      "codeSent": "Doğrulama kodu gönderildi!",
-      "whatsappCodeSent": "Kod WhatsApp ile gönderildi!",
-      "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
-      "rateLimitError": "Çok fazla istek. Lütfen birkaç dakika bekleyin.",
-      "invalidFormat": "Geçersiz telefon numarası formatı",
-      "serviceUnavailable": "Hizmet geçici olarak kullanılamıyor. Daha sonra tekrar deneyin."
+      "continue": "Devam"
     },
     "code": {
       "title": "Doğrulama kodunu girin",
@@ -655,14 +644,7 @@
       "invalidCode": "Lütfen geçerli bir 6 haneli kod girin",
       "wrongCode": "Yanlış kod. Tekrar deneyin.",
       "success": "Kod doğrulandı!",
-      "error": "Doğrulama başarısız",
-      "attemptsRemaining": "{{count}} deneme kaldı",
-      "sendNewCode": "Yeni kod gönder",
-      "newCodeSent": "Yeni kod gönderildi!",
-      "cooldownActive": "Yeni kod istemeden önce lütfen bekleyin",
-      "otpExpired": "Kod süresi doldu. Yeni bir tane isteyin.",
-      "maxAttempts": "Maksimum deneme sayısı aşıldı. Yeni bir kod isteyin.",
-      "noActiveOtp": "Aktif kod bulunamadı. Yeni bir tane isteyin."
+      "error": "Doğrulama başarısız"
     },
     "login": {
       "title": "Şifrenizi girin",

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Lock, RefreshCw, Eye, EyeOff, X, Copy, ChevronUp, Send } from "lucide-react";
+import { ChevronLeft, ChevronDown, Lock, RefreshCw, Eye, EyeOff, X, Copy, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -107,22 +107,13 @@ const VirtualCard = () => {
   return (
     <MobileLayout
       header={
-        <div className="flex items-center justify-between w-full">
-          <button 
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span className="text-sm">{t("card.back")}</span>
-          </button>
-          <button
-            onClick={() => navigate("/send-to-card")}
-            className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors"
-          >
-            <Send className="w-4 h-4" />
-            <span className="text-sm font-medium">{t("card.transfer")}</span>
-          </button>
-        </div>
+        <button 
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <span className="text-sm">{t("card.back")}</span>
+        </button>
       }
     >
       <PullToRefresh onRefresh={handleRefresh}>
