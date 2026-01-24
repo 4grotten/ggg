@@ -42,6 +42,8 @@ export interface ResendCodeResponse {
 export interface LoginRequest {
   phone_number: string;
   password: string;
+  location?: string;
+  device?: string;
 }
 
 export interface AvatarData {
@@ -179,10 +181,16 @@ export async function resendCode(
  * Логин с паролем
  * POST /login/
  */
-export async function login(phone_number: string, password: string) {
+export async function login(
+  phone_number: string, 
+  password: string,
+  options?: { location?: string; device?: string }
+) {
   const response = await apiPost<LoginResponse>('/login/', { 
     phone_number, 
-    password 
+    password,
+    ...(options?.location && { location: options.location }),
+    ...(options?.device && { device: options.device }),
   });
   
   // При успехе сохраняем токен и данные пользователя

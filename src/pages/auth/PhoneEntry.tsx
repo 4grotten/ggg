@@ -162,13 +162,19 @@ const countries: Country[] = [
 ];
 
 // Detect country by geolocation API
-const detectCountryByGeo = async (): Promise<string | null> => {
+interface GeoData {
+  country_code?: string;
+  country_name?: string;
+  city?: string;
+}
+
+const detectCountryByGeo = async (): Promise<GeoData | null> => {
   try {
     const response = await fetch('https://ipapi.co/json/', { 
       signal: AbortSignal.timeout(3000) 
     });
     const data = await response.json();
-    return data.country_code || null;
+    return data || null;
   } catch {
     return null;
   }
@@ -200,12 +206,18 @@ const PhoneEntry = () => {
   // Auto-detect country on mount
   useEffect(() => {
     const detectCountry = async () => {
-      const countryCode = await detectCountryByGeo();
-      if (countryCode) {
-        const found = countries.find(c => c.code === countryCode);
+      const geoData = await detectCountryByGeo();
+      if (geoData?.country_code) {
+        const found = countries.find(c => c.code === geoData.country_code);
         if (found) {
           setSelectedCountry(found);
           setDialCode(found.dialCode);
+        }
+        
+        // Store location for login request (e.g., "UAE, Dubai")
+        const locationParts = [geoData.country_name, geoData.city].filter(Boolean);
+        if (locationParts.length > 0) {
+          sessionStorage.setItem('user_geo_location', locationParts.join(', '));
         }
       } else {
         // Default to UAE
@@ -399,7 +411,25 @@ const PhoneEntry = () => {
     
     try {
       const fullPhone = getFullPhoneNumber();
-      const response = await apiLogin(fullPhone, password);
+      
+      // Get device info from User-Agent
+      const getDeviceInfo = (): string => {
+        const ua = navigator.userAgent;
+        if (/iPhone/.test(ua)) return `iPhone ${ua.match(/iPhone OS (\d+)/)?.[1] || ''}`.trim();
+        if (/iPad/.test(ua)) return 'iPad';
+        if (/Android/.test(ua)) return `Android ${ua.match(/Android (\d+)/)?.[1] || ''}`.trim();
+        if (/Windows/.test(ua)) return 'Windows PC';
+        if (/Mac/.test(ua)) return 'Mac';
+        return 'Unknown Device';
+      };
+      
+      // Get location from stored geo data (detected on component mount)
+      const storedLocation = sessionStorage.getItem('user_geo_location');
+      
+      const response = await apiLogin(fullPhone, password, {
+        device: getDeviceInfo(),
+        ...(storedLocation && { location: storedLocation }),
+      });
       
       if (response.error) {
         setPasswordError(true);
