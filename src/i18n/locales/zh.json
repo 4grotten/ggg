@@ -339,7 +339,28 @@
     "apply": "应用",
     "logout": "退出登录",
     "guest": "访客",
-    "loginToAccess": "登录以访问所有功能"
+    "loginToAccess": "登录以访问所有功能",
+    "accounts": "账户",
+    "addAccount": "添加账户",
+    "addAccountDesc": "登录其他账户",
+    "switchAccount": "切换账户",
+    "otherAccounts": "其他账户",
+    "otherAccountsMock": "示例（未找到已保存的账户）",
+    "editProfile": "编辑资料"
+  },
+  "editProfile": {
+    "title": "编辑资料",
+    "fullName": "姓名",
+    "fullNamePlaceholder": "请输入您的姓名",
+    "email": "电子邮箱",
+    "emailPlaceholder": "请输入您的电子邮箱",
+    "dateOfBirth": "出生日期",
+    "selectDateOfBirth": "选择出生日期",
+    "gender": "性别",
+    "selectGender": "选择性别",
+    "save": "保存更改",
+    "saved": "资料更新成功",
+    "saveFailed": "资料更新失败"
   },
   "card": {
     "back": "返回",
