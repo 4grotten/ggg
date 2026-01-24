@@ -204,20 +204,32 @@ const Settings = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [switchAccountDialog, setSwitchAccountDialog] = useState<SavedAccount | null>(null);
+  const [isSwitchingAccount, setIsSwitchingAccount] = useState(false);
+  const [switchingToUser, setSwitchingToUser] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSwitchAccount = async (account: SavedAccount) => {
+    // Close dialog and show loading overlay
+    setSwitchAccountDialog(null);
+    setSwitchingToUser(account.user.full_name);
+    setIsSwitchingAccount(true);
+    
+    // Wait for animation to show
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     // Save current account before switching
     if (user) {
       saveCurrentAccount(user);
     }
+    
     // Perform the switch
     switchToAccount(account);
-    // Close dialog and navigate - AuthContext will pick up the new user from localStorage
-    setSwitchAccountDialog(null);
-    navigate('/');
-    // Trigger a full refresh of auth context by reloading the page softly
-    window.location.reload();
+    
+    // Wait a bit more for dramatic effect
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Reload to apply the new session
+    window.location.href = '/';
   };
 
   const handleInstallClick = () => {
@@ -725,6 +737,37 @@ const Settings = () => {
           </div>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Account Switching Overlay */}
+      {isSwitchingAccount && (
+        <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center animate-fade-in">
+          {/* Animated avatar circle */}
+          <div className="relative mb-6">
+            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+              <User className="w-12 h-12 text-primary" />
+            </div>
+            {/* Spinning ring */}
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+          </div>
+          
+          {/* Text with fade animation */}
+          <div className="text-center space-y-2">
+            <p className="text-lg font-semibold text-foreground animate-fade-in">
+              {t("settings.switchingAccount") || "Switching account..."}
+            </p>
+            <p className="text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              {switchingToUser}
+            </p>
+          </div>
+          
+          {/* Decorative dots */}
+          <div className="flex gap-2 mt-8">
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      )}
     </MobileLayout>
   );
 };
