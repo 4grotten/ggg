@@ -343,7 +343,11 @@
     "accounts": "Hesaplar",
     "addAccount": "Hesap Ekle",
     "addAccountDesc": "Başka bir hesaba giriş yap",
-    "switchAccount": "Hesap Değiştir",
+    "switchAccount": "Değiştir",
+    "switchAccountTitle": "Hesap değiştirilsin mi?",
+    "switchAccountDescription": "Şu hesaba geçmek istiyor musunuz",
+    "switchingAccount": "Hesap değiştiriliyor...",
+    "switchAccountError": "Hesap değiştirilemedi",
     "otherAccounts": "Diğer hesaplar",
     "otherAccountsMock": "Örnekler (kayıtlı hesap bulunamadı)",
     "editProfile": "Profili Düzenle"

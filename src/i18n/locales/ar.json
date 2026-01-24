@@ -343,7 +343,11 @@
     "accounts": "الحسابات",
     "addAccount": "إضافة حساب",
     "addAccountDesc": "تسجيل الدخول إلى حساب آخر",
-    "switchAccount": "تبديل الحساب",
+    "switchAccount": "تبديل",
+    "switchAccountTitle": "تبديل الحساب؟",
+    "switchAccountDescription": "هل تريد التبديل إلى",
+    "switchingAccount": "جاري تبديل الحساب...",
+    "switchAccountError": "فشل تبديل الحساب",
     "otherAccounts": "حسابات أخرى",
     "otherAccountsMock": "أمثلة (لم يتم العثور على حسابات محفوظة)",
     "editProfile": "تعديل الملف الشخصي"
