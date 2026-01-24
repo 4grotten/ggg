@@ -165,20 +165,62 @@ const Dashboard = () => {
           <div className="flex items-center gap-2">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            <button 
+            <motion.button 
               onClick={() => isAuthenticated ? navigate("/settings") : navigate("/auth/phone")}
               className="relative"
+              initial={isAuthenticated ? { scale: 0, rotate: -180 } : { scale: 1 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 260, 
+                damping: 20,
+                delay: 0.2 
+              }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={displayAvatar} alt={displayName} />
-                <AvatarFallback>{initials}</AvatarFallback>
-              </Avatar>
+              <motion.div
+                initial={isAuthenticated ? { boxShadow: "0 0 0 0 rgba(var(--primary), 0)" } : {}}
+                animate={isAuthenticated ? { 
+                  boxShadow: [
+                    "0 0 0 0 hsl(var(--primary) / 0.4)",
+                    "0 0 0 8px hsl(var(--primary) / 0)",
+                    "0 0 0 0 hsl(var(--primary) / 0)"
+                  ]
+                } : {}}
+                transition={{ duration: 1.5, delay: 0.5 }}
+                className="rounded-full"
+              >
+                <Avatar className="w-10 h-10 ring-2 ring-transparent transition-all duration-300 hover:ring-primary/50">
+                  <AvatarImage src={displayAvatar} alt={displayName} className="object-cover" />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">{initials}</AvatarFallback>
+                </Avatar>
+              </motion.div>
               {!isAuthenticated && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center border-2 border-background">
+                <motion.div 
+                  className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center border-2 border-background"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", delay: 0.4 }}
+                >
                   <span className="text-[8px] text-white font-bold">+</span>
-                </div>
+                </motion.div>
               )}
-            </button>
+              {isAuthenticated && (
+                <motion.div 
+                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center border-2 border-background"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", delay: 0.6 }}
+                >
+                  <motion.div
+                    className="w-1.5 h-1.5 rounded-full bg-white"
+                    animate={{ opacity: [1, 0.5, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                </motion.div>
+              )}
+            </motion.button>
           </div>
         }
       >
