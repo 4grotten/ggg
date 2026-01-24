@@ -532,51 +532,7 @@ const Settings = () => {
           />
         </div>
 
-        {/* Other Accounts (mockups if empty) */}
-        <div className="bg-card rounded-2xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <p className="text-sm font-semibold text-foreground">
-              {t("settings.otherAccounts") || "Other accounts"}
-            </p>
-            {otherAccounts.length === 0 && (
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t("settings.otherAccountsMock") || "Mockups (saved accounts not found)"}
-              </p>
-            )}
-          </div>
-
-          <div className="divide-y divide-border">
-            {accountsToRender.map((account) => {
-              const isMock = (account as any).isMock === true;
-              const name = account.user.full_name;
-              const phone = account.user.phone_number;
-              const avatar = account.user.avatar?.medium || account.user.avatar?.file;
-
-              return (
-                <button
-                  key={`${isMock ? "mock" : "acc"}-${account.id}`}
-                  type="button"
-                  disabled
-                  className="w-full flex items-center gap-3 px-4 py-4 text-left opacity-80"
-                >
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={avatar || undefined} alt={name} />
-                    <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
-                      {getInitials(name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="text-base font-medium text-foreground">{name}</p>
-                    <p className="text-sm text-muted-foreground">{phone}</p>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                    <LogOut className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        {/* Other Accounts section hidden for now */}
 
         {/* Logout Button */}
         {isAuthenticated && (
