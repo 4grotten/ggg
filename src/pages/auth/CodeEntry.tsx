@@ -156,8 +156,8 @@ const CodeEntry = () => {
             navigate("/", { replace: true });
           }
         } else {
-          // New user - go to registration page
-          navigate("/auth/register", { 
+          // New user - go to profile setup page (name, photo, gender)
+          navigate("/auth/profile", { 
             replace: true,
             state: { phoneNumber, otpVerified: true }
           });
