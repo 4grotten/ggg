@@ -4,7 +4,7 @@
  * Без авторизации
  */
 
-const OTP_BASE_URL = 'https://api.apofiz.com/api/v1';
+const OTP_BASE_URL = 'https://test.apofiz.com/api/v1';
 
 // ============ Types ============
 
