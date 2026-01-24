@@ -13,7 +13,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { MessageSquare, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyCode, resendCode } from "@/services/api/authApi";
+import { verifyCode, sendOtp } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -156,21 +156,24 @@ const CodeEntry = () => {
     }
   };
   
-  // Resend code - use appropriate type based on auth method
+  // Resend code - use sendOtp with appropriate type
   const handleResend = async () => {
     if (resendCooldown > 0 || isResending) return;
     
     setIsResending(true);
     
     try {
-      // Use WhatsApp type for non-+996 countries (when enabled)
-      const resendType = isWhatsAppAuth ? 'whatsapp_auth_type' : 'register_auth_type';
-      const response = await resendCode(phoneNumber, resendType);
+      // Use WhatsApp for non-+996 countries, SMS for +996
+      const otpType: 'sms' | 'whatsapp' = isWhatsAppAuth ? 'whatsapp' : 'sms';
+      const response = await sendOtp(phoneNumber, otpType);
       
       if (response.error) {
         toast.error(response.error.message || t("auth.code.resendError"));
       } else {
-        toast.success(t("auth.code.resendSuccess") || "Code sent!");
+        const successMessage = isWhatsAppAuth 
+          ? (t("auth.code.resendSuccessWhatsApp") || "Code sent via WhatsApp!")
+          : (t("auth.code.resendSuccess") || "Code sent!");
+        toast.success(successMessage);
         setResendCooldown(RESEND_COOLDOWN);
         setCode(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
