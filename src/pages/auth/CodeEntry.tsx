@@ -13,9 +13,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { MessageSquare, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyOtp, sendOtp, getCurrentUser } from "@/services/api/authApi";
-import { setAuthToken } from "@/services/api/apiClient";
-import { useAuth } from "@/contexts/AuthContext";
+import { verifyOtp, sendOtp } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -29,7 +27,6 @@ const CodeEntry = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const { login: authLogin } = useAuth();
   
   // Get phone number and auth type from navigation state
   const locationState = location.state as { phoneNumber?: string; authType?: 'sms' | 'whatsapp' } | null;
@@ -142,26 +139,11 @@ const CodeEntry = () => {
       if (response.data?.is_valid) {
         toast.success(t("auth.code.success") || "Code verified!");
         
-        // Check if existing user with token - login immediately
-        if (response.data.token && response.data.is_new_user === false) {
-          // Existing user - set token and fetch profile
-          setAuthToken(response.data.token);
-          
-          const userResponse = await getCurrentUser();
-          if (userResponse.data) {
-            authLogin(userResponse.data);
-            navigate("/", { replace: true });
-          } else {
-            // Fallback - navigate to main anyway
-            navigate("/", { replace: true });
-          }
-        } else {
-          // New user - go to profile setup page (name, photo, gender)
-          navigate("/auth/profile", { 
-            replace: true,
-            state: { phoneNumber, otpVerified: true }
-          });
-        }
+        // OTP verified - go to registration page
+        navigate("/auth/register", { 
+          replace: true,
+          state: { phoneNumber, otpVerified: true }
+        });
       } else {
         // API returns error message in data.error field
         const errorMessage = (response.data as { error?: string })?.error || t("auth.code.wrongCode");
