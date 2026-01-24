@@ -187,7 +187,25 @@ const Settings = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
-      rightAction={<LanguageSwitcher />}
+      rightAction={
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          {isAuthenticated && (
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-destructive/10 hover:bg-destructive/20 transition-colors disabled:opacity-50"
+              aria-label="Logout"
+            >
+              {isLoggingOut ? (
+                <Loader2 className="w-4 h-4 text-destructive animate-spin" />
+              ) : (
+                <LogOut className="w-4 h-4 text-destructive" />
+              )}
+            </button>
+          )}
+        </div>
+      }
     >
       <div className="flex flex-col items-center pt-8 pb-6">
         <input
