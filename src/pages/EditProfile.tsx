@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MobileLayout } from "@/components/layout/MobileLayout";
+
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -136,157 +136,174 @@ const EditProfile = () => {
   };
 
   const genderOptions = [
-    { value: "male", label: t("auth.profile.genderMale") || "Male" },
-    { value: "female", label: t("auth.profile.genderFemale") || "Female" },
-    { value: "", label: t("auth.profile.genderNotSpecified") || "Prefer not to say" },
+    { value: "male", label: t("auth.profile.male") },
+    { value: "female", label: t("auth.profile.female") },
+    { value: "", label: t("auth.profile.gender.preferNotToSay") },
   ];
 
   const selectedGenderLabel = genderOptions.find(g => g.value === form.watch("gender"))?.label || t("editProfile.selectGender");
 
   return (
-    <MobileLayout
-      showBackButton
-      onBack={() => navigate(-1)}
-    >
-      <div className="px-4 py-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">{t("editProfile.title") || "Edit Profile"}</h1>
-
-        {/* Avatar */}
-        <div className="flex justify-center mb-8">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*"
-            className="hidden"
-          />
+    <div className="flex flex-col h-screen bg-background">
+      {/* Fixed Header */}
+      <div className="sticky top-0 z-10 bg-background border-b border-border">
+        <div className="flex items-center h-14 px-4">
           <button
-            onClick={handleAvatarClick}
-            disabled={isUploadingAvatar}
-            className="relative group"
+            onClick={() => navigate(-1)}
+            className="flex items-center text-foreground hover:text-muted-foreground transition-colors"
           >
-            <Avatar className="w-28 h-28">
-              <AvatarImage src={displayAvatar} alt={user?.full_name || "User"} />
-              <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
-            </Avatar>
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-              {isUploadingAvatar ? (
-                <Loader2 className="w-6 h-6 text-white animate-spin" />
-              ) : (
-                <Camera className="w-6 h-6 text-white" />
-              )}
-            </div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
-              <Camera className="w-4 h-4 text-primary-foreground" />
-            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>{t("common.back")}</span>
           </button>
         </div>
+      </div>
 
-        {/* Form */}
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Full Name */}
-            <FormField
-              control={form.control}
-              name="full_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("editProfile.fullName") || "Full Name"}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder={t("editProfile.fullNamePlaceholder") || "Enter your full name"}
-                      className="h-12"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-4 py-6">
+          <h1 className="text-2xl font-bold text-foreground mb-6">{t("editProfile.title")}</h1>
+
+          {/* Avatar */}
+          <div className="flex justify-center mb-8">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
             />
-
-            {/* Email */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("editProfile.email") || "Email"}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="email"
-                      placeholder={t("editProfile.emailPlaceholder") || "Enter your email"}
-                      className="h-12"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Date of Birth */}
-            <FormField
-              control={form.control}
-              name="date_of_birth"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("editProfile.dateOfBirth") || "Date of Birth"}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="date"
-                      className="h-12"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Gender */}
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("editProfile.gender") || "Gender"}</FormLabel>
-                  <FormControl>
-                    <button
-                      type="button"
-                      onClick={() => setIsGenderOpen(true)}
-                      className="w-full h-12 px-3 text-left border border-input rounded-md bg-background hover:bg-muted/50 transition-colors flex items-center justify-between"
-                    >
-                      <span className={field.value ? "text-foreground" : "text-muted-foreground"}>
-                        {selectedGenderLabel}
-                      </span>
-                    </button>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={isSaving}
-              className="w-full h-14 text-lg font-semibold"
+            <button
+              onClick={handleAvatarClick}
+              disabled={isUploadingAvatar}
+              className="relative group"
             >
-              {isSaving ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                t("editProfile.save") || "Save Changes"
-              )}
-            </Button>
-          </form>
-        </Form>
+              <Avatar className="w-28 h-28">
+                <AvatarImage src={displayAvatar} alt={user?.full_name || "User"} />
+                <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
+              </Avatar>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                {isUploadingAvatar ? (
+                  <Loader2 className="w-6 h-6 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-6 h-6 text-white" />
+                )}
+              </div>
+              <div className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                <Camera className="w-4 h-4 text-primary-foreground" />
+              </div>
+            </button>
+          </div>
+
+          {/* Form */}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-32">
+              {/* Full Name */}
+              <FormField
+                control={form.control}
+                name="full_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("editProfile.fullName")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder={t("editProfile.fullNamePlaceholder")}
+                        className="h-12"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Email */}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("editProfile.email")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder={t("editProfile.emailPlaceholder")}
+                        className="h-12"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Date of Birth */}
+              <FormField
+                control={form.control}
+                name="date_of_birth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("editProfile.dateOfBirth")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="date"
+                        className="h-12"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Gender */}
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("editProfile.gender")}</FormLabel>
+                    <FormControl>
+                      <button
+                        type="button"
+                        onClick={() => setIsGenderOpen(true)}
+                        className="w-full h-12 px-3 text-left border border-input rounded-md bg-background hover:bg-muted/50 transition-colors flex items-center justify-between"
+                      >
+                        <span className={field.value ? "text-foreground" : "text-muted-foreground"}>
+                          {selectedGenderLabel}
+                        </span>
+                      </button>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </div>
+      </div>
+
+      {/* Fixed Bottom Button */}
+      <div className="sticky bottom-0 z-10 bg-background border-t border-border p-4">
+        <Button
+          onClick={form.handleSubmit(onSubmit)}
+          disabled={isSaving}
+          className="w-full h-14 text-lg font-semibold"
+        >
+          {isSaving ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            t("editProfile.save")
+          )}
+        </Button>
       </div>
 
       {/* Gender Drawer */}
       <Drawer open={isGenderOpen} onOpenChange={setIsGenderOpen}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>{t("editProfile.selectGender") || "Select Gender"}</DrawerTitle>
+            <DrawerTitle>{t("editProfile.selectGender")}</DrawerTitle>
           </DrawerHeader>
           <AnimatedDrawerContainer>
             <div className="px-4 pb-8 space-y-2">
@@ -318,7 +335,7 @@ const EditProfile = () => {
         imageSrc={cropImageSrc}
         onCropComplete={handleCropComplete}
       />
-    </MobileLayout>
+    </div>
   );
 };
 
