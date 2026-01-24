@@ -493,7 +493,7 @@ const Settings = () => {
               if (user) {
                 saveCurrentAccount(user);
               }
-              navigate("/auth/phone");
+              navigate("/auth/phone?add_account=true");
             }}
           />
         </div>
