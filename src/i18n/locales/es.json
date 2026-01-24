@@ -388,7 +388,8 @@
     "shareHolder": "Titular",
     "shareCard": "Tarjeta",
     "shareExpiry": "Vencimiento",
-    "shareCvv": "CVV"
+    "shareCvv": "CVV",
+    "transfer": "Transferir"
   },
   "history": {
     "title": "Historial de transacciones",

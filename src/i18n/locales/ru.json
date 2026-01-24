@@ -397,7 +397,8 @@
     "shareHolder": "Держатель",
     "shareCard": "Карта",
     "shareExpiry": "Срок",
-    "shareCvv": "CVV"
+    "shareCvv": "CVV",
+    "transfer": "Перевод"
   },
   "history": {
     "title": "История транзакций",
