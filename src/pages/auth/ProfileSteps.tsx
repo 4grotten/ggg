@@ -354,13 +354,16 @@ const ProfileSteps = () => {
 
   const phone = phoneFromState || sessionStorage.getItem("registerPhone") || "+971 50 123 4567";
 
-  // Check if user has token (required for profile setup)
+  // Check if this is a valid profile setup flow (either has token or otpVerified)
+  const otpVerified = (location.state as { otpVerified?: boolean })?.otpVerified;
+  
   useEffect(() => {
-    if (isNewUser && !getAuthToken()) {
-      // No token, redirect back to auth
+    // Allow access if OTP was just verified (new user) or if user has token
+    if (!otpVerified && !getAuthToken()) {
+      // No valid entry point, redirect back to auth
       navigate("/auth/phone", { replace: true });
     }
-  }, [isNewUser, navigate]);
+  }, [otpVerified, navigate]);
 
   const steps: Step[] = ["name", "gender", "photo", "password", "complete"];
   const currentStepIndex = steps.indexOf(currentStep);
