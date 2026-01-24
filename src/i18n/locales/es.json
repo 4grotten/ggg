@@ -343,7 +343,11 @@
     "accounts": "Cuentas",
     "addAccount": "Añadir cuenta",
     "addAccountDesc": "Iniciar sesión en otra cuenta",
-    "switchAccount": "Cambiar cuenta",
+    "switchAccount": "Cambiar",
+    "switchAccountTitle": "¿Cambiar cuenta?",
+    "switchAccountDescription": "¿Quieres cambiar a",
+    "switchingAccount": "Cambiando cuenta...",
+    "switchAccountError": "Error al cambiar cuenta",
     "otherAccounts": "Otras cuentas",
     "otherAccountsMock": "Ejemplos (no se encontraron cuentas guardadas)",
     "editProfile": "Editar perfil"

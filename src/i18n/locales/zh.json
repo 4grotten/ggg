@@ -344,6 +344,10 @@
     "addAccount": "添加账户",
     "addAccountDesc": "登录其他账户",
     "switchAccount": "切换账户",
+    "switchAccountTitle": "切换账户？",
+    "switchAccountDescription": "您要切换到",
+    "switchingAccount": "正在切换账户...",
+    "switchAccountError": "切换账户失败",
     "otherAccounts": "其他账户",
     "otherAccountsMock": "示例（未找到已保存的账户）",
     "editProfile": "编辑资料"
