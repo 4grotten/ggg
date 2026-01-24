@@ -10,9 +10,8 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { User, Lock, Eye, EyeOff, Loader2, HelpCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
 import { sendOtp } from "@/services/api/otpApi";
 import { z } from "zod";
 
@@ -50,6 +49,9 @@ const Register = () => {
   const [usernameError, setUsernameError] = useState(initialUsernameError);
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  
+  // Error state for shake animation
+  const hasError = !!(usernameError || passwordError || confirmPasswordError);
   
   // Redirect if no phone number
   useEffect(() => {
@@ -146,7 +148,7 @@ const Register = () => {
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         <div className="flex-1 overflow-y-auto px-6 py-8 pb-28">
-          {/* Header */}
+          {/* Header Animation - matching PhoneEntry style */}
           <motion.div 
             className="text-center mb-10"
             initial={{ opacity: 0, y: 20 }}
@@ -154,12 +156,38 @@ const Register = () => {
             transition={{ duration: 0.4 }}
           >
             <motion.div 
-              className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6"
+              className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 overflow-hidden transition-colors duration-300 ${
+                hasError 
+                  ? 'bg-destructive/10 ring-2 ring-destructive' 
+                  : 'bg-primary/10'
+              }`}
               initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
+              animate={{ 
+                scale: 1,
+                rotate: hasError ? [0, -5, 5, -5, 5, -3, 3, 0] : 0,
+                x: hasError ? [0, -8, 8, -8, 8, -4, 4, 0] : 0
+              }}
+              transition={{ 
+                scale: { duration: 0.3, delay: 0.2 },
+                rotate: { duration: 0.5 },
+                x: { duration: 0.5 }
+              }}
             >
-              <User className="w-12 h-12 text-primary" />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={hasError ? 'error' : 'normal'}
+                  initial={{ y: 30, opacity: 0, scale: 0.8 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  exit={{ y: -30, opacity: 0, scale: 0.8 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 20 
+                  }}
+                >
+                  <User className={`w-12 h-12 transition-colors duration-300 ${hasError ? 'text-destructive' : 'text-primary'}`} />
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
             <h1 className="text-2xl font-bold">
               {t("auth.register.title") || "Create Account"}
@@ -169,7 +197,7 @@ const Register = () => {
             </p>
           </motion.div>
 
-          {/* Form */}
+          {/* Form - matching PhoneEntry input style */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -178,12 +206,14 @@ const Register = () => {
           >
             {/* Username */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">
+              <label className="text-sm font-medium text-muted-foreground">
                 {t("auth.register.username") || "Username"}
               </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
+              <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
+                usernameError ? 'border-destructive' : 'border-border'
+              }`}>
+                <User className={`w-5 h-5 ${usernameError ? 'text-destructive' : 'text-muted-foreground'}`} />
+                <input
                   type="text"
                   value={username}
                   onChange={(e) => {
@@ -191,12 +221,19 @@ const Register = () => {
                     setUsernameError("");
                   }}
                   placeholder={t("auth.register.usernamePlaceholder") || "Enter username"}
-                  className={`pl-10 h-12 ${usernameError ? 'border-destructive' : ''}`}
+                  className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
                   autoComplete="username"
+                  autoFocus
                 />
               </div>
               {usernameError && (
-                <p className="text-sm text-destructive">{usernameError}</p>
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-destructive text-sm"
+                >
+                  {usernameError}
+                </motion.p>
               )}
               <p className="text-xs text-muted-foreground">
                 {t("auth.register.usernameHint") || "Letters, numbers, and underscores only"}
@@ -205,12 +242,14 @@ const Register = () => {
 
             {/* Password */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">
+              <label className="text-sm font-medium text-muted-foreground">
                 {t("auth.register.password") || "Password"}
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
+              <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
+                passwordError ? 'border-destructive' : 'border-border'
+              }`}>
+                <Lock className={`w-5 h-5 ${passwordError ? 'text-destructive' : 'text-muted-foreground'}`} />
+                <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => {
@@ -218,30 +257,38 @@ const Register = () => {
                     setPasswordError("");
                   }}
                   placeholder={t("auth.register.passwordPlaceholder") || "Enter password"}
-                  className={`pl-10 pr-10 h-12 ${passwordError ? 'border-destructive' : ''}`}
+                  className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
                   autoComplete="new-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {passwordError && (
-                <p className="text-sm text-destructive">{passwordError}</p>
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-destructive text-sm"
+                >
+                  {passwordError}
+                </motion.p>
               )}
             </div>
 
             {/* Confirm Password */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">
+              <label className="text-sm font-medium text-muted-foreground">
                 {t("auth.register.confirmPassword") || "Confirm Password"}
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
+              <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
+                confirmPasswordError ? 'border-destructive' : 'border-border'
+              }`}>
+                <Lock className={`w-5 h-5 ${confirmPasswordError ? 'text-destructive' : 'text-muted-foreground'}`} />
+                <input
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => {
@@ -249,19 +296,25 @@ const Register = () => {
                     setConfirmPasswordError("");
                   }}
                   placeholder={t("auth.register.confirmPasswordPlaceholder") || "Confirm password"}
-                  className={`pl-10 pr-10 h-12 ${confirmPasswordError ? 'border-destructive' : ''}`}
+                  className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
                   autoComplete="new-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {confirmPasswordError && (
-                <p className="text-sm text-destructive">{confirmPasswordError}</p>
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-destructive text-sm"
+                >
+                  {confirmPasswordError}
+                </motion.p>
               )}
             </div>
           </motion.div>
