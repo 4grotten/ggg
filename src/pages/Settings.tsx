@@ -13,6 +13,7 @@ import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
+import { saveCurrentAccount } from "@/hooks/useMultiAccount";
 
 interface SettingsItemProps {
   icon: React.ReactNode;
@@ -465,7 +466,13 @@ const Settings = () => {
           <SettingsItem
             icon={<UserPlus className="w-5 h-5" />}
             label={t("settings.addAccount") || "Add Account"}
-            onClick={() => navigate("/auth/phone")}
+            onClick={() => {
+              // Save current account before adding new one
+              if (user) {
+                saveCurrentAccount(user);
+              }
+              navigate("/auth/phone");
+            }}
           />
         </div>
 

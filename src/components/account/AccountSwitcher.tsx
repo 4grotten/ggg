@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, LogOut, X } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { useMultiAccount, SavedAccount } from '@/hooks/useMultiAccount';
+import { useMultiAccount, SavedAccount, saveCurrentAccount } from '@/hooks/useMultiAccount';
 import { useAuth } from '@/contexts/AuthContext';
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from '@/components/ui/animated-drawer-item';
 
@@ -34,6 +34,10 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
   };
 
   const handleAddAccount = () => {
+    // Save current account BEFORE navigating to add new one
+    if (user) {
+      saveCurrentAccount(user);
+    }
     onOpenChange(false);
     navigate('/auth/phone');
   };

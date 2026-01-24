@@ -19,6 +19,7 @@ import {
   isAuthenticated as checkIsAuthenticated,
   AUTH_USER_KEY 
 } from '@/services/api/apiClient';
+import { saveCurrentAccount } from '@/hooks/useMultiAccount';
 
 // Синхронизация токена с основным сайтом Apofiz
 const syncWithApofiz = (token: string, user: UserProfile | null) => {
@@ -153,6 +154,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const token = getAuthToken();
     if (token) {
       syncWithApofiz(token, userData);
+      // Save to multi-account storage
+      saveCurrentAccount(userData);
     }
   }, []);
 
