@@ -327,7 +327,8 @@
       "system": "Sistem"
     },
     "cropPhoto": "Fotoğrafı kırp",
-    "apply": "Uygula"
+    "apply": "Uygula",
+    "logout": "Çıkış Yap"
   },
   "card": {
     "back": "Geri",

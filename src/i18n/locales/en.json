@@ -334,7 +334,8 @@
       "system": "System"
     },
     "cropPhoto": "Crop Photo",
-    "apply": "Apply"
+    "apply": "Apply",
+    "logout": "Log Out"
   },
   "card": {
     "back": "Back",
