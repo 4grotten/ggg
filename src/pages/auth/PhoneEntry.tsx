@@ -646,7 +646,23 @@ const PhoneEntry = () => {
               <Drawer open={countryDrawerOpen} onOpenChange={setCountryDrawerOpen}>
                 <DrawerTrigger asChild>
                   <button className="flex items-center gap-1 text-lg font-medium flex-shrink-0 hover:opacity-80 transition-opacity">
-                    <span className="text-2xl">{selectedCountry?.flag || "🌍"}</span>
+                    <AnimatePresence mode="wait">
+                      <motion.span 
+                        key={selectedCountry?.code || 'globe'}
+                        className="text-2xl"
+                        initial={{ scale: 0.5, opacity: 0, rotateY: -90 }}
+                        animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                        exit={{ scale: 0.5, opacity: 0, rotateY: 90 }}
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 500, 
+                          damping: 25,
+                          duration: 0.3
+                        }}
+                      >
+                        {selectedCountry?.flag || "🌍"}
+                      </motion.span>
+                    </AnimatePresence>
                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </DrawerTrigger>
