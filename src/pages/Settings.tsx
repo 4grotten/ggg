@@ -143,7 +143,6 @@ const InstallStepsContent = ({ isOpen, onShare, t }: InstallStepsContentProps) =
       >
         <Share2 className="w-5 h-5" />
         <span>{t("settings.openShare") || "Open Share"}</span>
-        <ExternalLink className="w-4 h-4" />
       </button>
     </div>
   );
