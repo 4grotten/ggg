@@ -27,6 +27,8 @@ export interface OtpVerifyRequest {
 export interface OtpVerifyResponse {
   is_valid: boolean;
   error: string | null;
+  token: string | null;
+  is_new_user: boolean | null;
 }
 
 export interface OtpResendResponse extends OtpSendResponse {}
