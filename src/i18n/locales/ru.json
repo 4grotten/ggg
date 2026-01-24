@@ -354,7 +354,21 @@
     "addAccountDesc": "Войти в другой аккаунт",
     "switchAccount": "Сменить аккаунт",
     "otherAccounts": "Другие аккаунты",
-    "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)"
+    "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)",
+    "editProfile": "Редактировать профиль"
+  },
+  "editProfile": {
+    "title": "Редактирование профиля",
+    "fullName": "Полное имя",
+    "fullNamePlaceholder": "Введите ваше полное имя",
+    "email": "Email",
+    "emailPlaceholder": "Введите ваш email",
+    "dateOfBirth": "Дата рождения",
+    "gender": "Пол",
+    "selectGender": "Выберите пол",
+    "save": "Сохранить изменения",
+    "saved": "Профиль успешно обновлён",
+    "saveFailed": "Не удалось обновить профиль"
   },
   "card": {
     "back": "Назад",

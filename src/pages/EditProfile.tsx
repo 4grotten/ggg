@@ -1,0 +1,325 @@
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { MobileLayout } from "@/components/layout/MobileLayout";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
+import { useAvatar } from "@/contexts/AvatarContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Camera, Loader2, Check } from "lucide-react";
+import { toast } from "sonner";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
+
+const profileSchema = z.object({
+  full_name: z.string().min(2, "Name must be at least 2 characters").max(100),
+  email: z.string().email("Invalid email").optional().or(z.literal("")),
+  date_of_birth: z.string().optional(),
+  gender: z.enum(["male", "female", ""]).optional(),
+});
+
+type ProfileFormData = z.infer<typeof profileSchema>;
+
+const EditProfile = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { avatarUrl, setAvatarUrl } = useAvatar();
+  const { user, isAuthenticated, updateAvatar, updateUserProfile, refreshUser } = useAuth();
+  
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [isGenderOpen, setIsGenderOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const form = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      full_name: user?.full_name || "",
+      email: user?.email || "",
+      date_of_birth: user?.date_of_birth || "",
+      gender: (user?.gender as "male" | "female" | "") || "",
+    },
+  });
+
+  // Update form when user data loads
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        full_name: user.full_name || "",
+        email: user.email || "",
+        date_of_birth: user.date_of_birth || "",
+        gender: (user.gender as "male" | "female" | "") || "",
+      });
+    }
+  }, [user, form]);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/auth/phone");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const displayAvatar = user?.avatar?.medium || user?.avatar?.file || avatarUrl;
+  const initials = (user?.full_name || "U").split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error(t("toast.selectImageFile"));
+        return;
+      }
+      setPendingFile(file);
+      const url = URL.createObjectURL(file);
+      setCropImageSrc(url);
+      setIsCropDialogOpen(true);
+    }
+    event.target.value = '';
+  };
+
+  const handleCropComplete = async (croppedImage: string) => {
+    setAvatarUrl(croppedImage);
+    setCropImageSrc(null);
+    setIsCropDialogOpen(false);
+    
+    if (isAuthenticated && pendingFile) {
+      setIsUploadingAvatar(true);
+      try {
+        await updateAvatar(pendingFile);
+        toast.success(t("toast.avatarUpdated"));
+      } catch (error) {
+        console.error('Failed to upload avatar:', error);
+        toast.error(t("toast.avatarUploadFailed") || "Failed to upload avatar");
+      } finally {
+        setIsUploadingAvatar(false);
+        setPendingFile(null);
+      }
+    } else {
+      toast.success(t("toast.avatarUpdated"));
+      setPendingFile(null);
+    }
+  };
+
+  const onSubmit = async (data: ProfileFormData) => {
+    setIsSaving(true);
+    try {
+      await updateUserProfile({
+        full_name: data.full_name,
+        email: data.email || undefined,
+        date_of_birth: data.date_of_birth || undefined,
+        gender: data.gender || undefined,
+        avatar_id: user?.avatar?.id,
+      });
+      toast.success(t("editProfile.saved") || "Profile updated successfully");
+      navigate(-1);
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      toast.error(t("editProfile.saveFailed") || "Failed to update profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const genderOptions = [
+    { value: "male", label: t("auth.profile.genderMale") || "Male" },
+    { value: "female", label: t("auth.profile.genderFemale") || "Female" },
+    { value: "", label: t("auth.profile.genderNotSpecified") || "Prefer not to say" },
+  ];
+
+  const selectedGenderLabel = genderOptions.find(g => g.value === form.watch("gender"))?.label || t("editProfile.selectGender");
+
+  return (
+    <MobileLayout
+      showBackButton
+      onBack={() => navigate(-1)}
+    >
+      <div className="px-4 py-6">
+        <h1 className="text-2xl font-bold text-foreground mb-6">{t("editProfile.title") || "Edit Profile"}</h1>
+
+        {/* Avatar */}
+        <div className="flex justify-center mb-8">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
+          />
+          <button
+            onClick={handleAvatarClick}
+            disabled={isUploadingAvatar}
+            className="relative group"
+          >
+            <Avatar className="w-28 h-28">
+              <AvatarImage src={displayAvatar} alt={user?.full_name || "User"} />
+              <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+              {isUploadingAvatar ? (
+                <Loader2 className="w-6 h-6 text-white animate-spin" />
+              ) : (
+                <Camera className="w-6 h-6 text-white" />
+              )}
+            </div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
+              <Camera className="w-4 h-4 text-primary-foreground" />
+            </div>
+          </button>
+        </div>
+
+        {/* Form */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Full Name */}
+            <FormField
+              control={form.control}
+              name="full_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("editProfile.fullName") || "Full Name"}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder={t("editProfile.fullNamePlaceholder") || "Enter your full name"}
+                      className="h-12"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Email */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("editProfile.email") || "Email"}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder={t("editProfile.emailPlaceholder") || "Enter your email"}
+                      className="h-12"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Date of Birth */}
+            <FormField
+              control={form.control}
+              name="date_of_birth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("editProfile.dateOfBirth") || "Date of Birth"}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="date"
+                      className="h-12"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Gender */}
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("editProfile.gender") || "Gender"}</FormLabel>
+                  <FormControl>
+                    <button
+                      type="button"
+                      onClick={() => setIsGenderOpen(true)}
+                      className="w-full h-12 px-3 text-left border border-input rounded-md bg-background hover:bg-muted/50 transition-colors flex items-center justify-between"
+                    >
+                      <span className={field.value ? "text-foreground" : "text-muted-foreground"}>
+                        {selectedGenderLabel}
+                      </span>
+                    </button>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={isSaving}
+              className="w-full h-14 text-lg font-semibold"
+            >
+              {isSaving ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                t("editProfile.save") || "Save Changes"
+              )}
+            </Button>
+          </form>
+        </Form>
+      </div>
+
+      {/* Gender Drawer */}
+      <Drawer open={isGenderOpen} onOpenChange={setIsGenderOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t("editProfile.selectGender") || "Select Gender"}</DrawerTitle>
+          </DrawerHeader>
+          <AnimatedDrawerContainer>
+            <div className="px-4 pb-8 space-y-2">
+              {genderOptions.map((option, index) => (
+                <AnimatedDrawerItem key={option.value} index={index}>
+                  <button
+                    onClick={() => {
+                      form.setValue("gender", option.value as "male" | "female" | "");
+                      setIsGenderOpen(false);
+                    }}
+                    className="w-full flex items-center justify-between py-4 px-4 rounded-xl hover:bg-muted/50 transition-colors"
+                  >
+                    <span className="text-foreground font-medium">{option.label}</span>
+                    {form.watch("gender") === option.value && (
+                      <Check className="w-5 h-5 text-primary" />
+                    )}
+                  </button>
+                </AnimatedDrawerItem>
+              ))}
+            </div>
+          </AnimatedDrawerContainer>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Avatar Crop Dialog */}
+      <AvatarCropDialog
+        open={isCropDialogOpen}
+        onOpenChange={setIsCropDialogOpen}
+        imageSrc={cropImageSrc}
+        onCropComplete={handleCropComplete}
+      />
+    </MobileLayout>
+  );
+};
+
+export default EditProfile;
