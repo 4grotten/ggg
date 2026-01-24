@@ -110,7 +110,7 @@ export async function sendOtp(phone_number: string, type: 'sms' | 'whatsapp' = '
  * POST /otp/verify/
  */
 export async function verifyOtp(phone_number: string, code: string) {
-  return apiPost<{ 
+  const response = await apiPost<{ 
     is_valid: boolean; 
     error?: string; 
     token?: string | null; 
@@ -119,6 +119,18 @@ export async function verifyOtp(phone_number: string, code: string) {
     phone_number, 
     code 
   });
+  
+  // При успешной верификации сохраняем токен
+  if (response.data?.is_valid && response.data?.token) {
+    setAuthToken(response.data.token);
+    
+    // Для существующего пользователя сразу подтягиваем профиль
+    if (!response.data.is_new_user) {
+      await getCurrentUser();
+    }
+  }
+  
+  return response;
 }
 
 /**
