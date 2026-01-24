@@ -15,7 +15,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { login as apiLogin, forgotPassword } from "@/services/api/authApi";
+import { login as apiLogin, forgotPassword, registerAuth } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { z } from "zod";
 
@@ -293,7 +293,7 @@ const PhoneEntry = () => {
   const isPhoneValid = phoneNumber.replace(/\D/g, "").length >= 9 && dialCode.length >= 2;
   const isValid = isPhoneValid && isNotRobot;
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (isValid) {
       // Validate phone with zod
       const cleanPhone = phoneNumber.replace(/\D/g, "");
@@ -305,8 +305,46 @@ const PhoneEntry = () => {
         return;
       }
       
-      // Go directly to login mode (no registration flow)
-      setIsLoginMode(true);
+      setIsLoading(true);
+      setErrorMessage("");
+      
+      try {
+        const fullPhone = getFullPhoneNumber();
+        const response = await registerAuth(fullPhone);
+        
+        if (response.error) {
+          setShowError(true);
+          setErrorMessage(response.error.message || t("auth.phone.error"));
+          setTimeout(() => setShowError(false), 600);
+          return;
+        }
+        
+        if (response.data) {
+          const { is_new_user, token } = response.data;
+          
+          if (is_new_user) {
+            // New user - SMS code sent, go to code entry
+            toast.success(t("auth.phone.codeSent") || "Verification code sent!");
+            navigate("/auth/code", { 
+              state: { phoneNumber: fullPhone }
+            });
+          } else if (token) {
+            // Existing user with valid token - already logged in
+            setAuthToken(token);
+            toast.success(t("auth.login.success"));
+            navigate("/", { replace: true });
+          } else {
+            // Existing user without token - needs password
+            setIsLoginMode(true);
+          }
+        }
+      } catch {
+        setShowError(true);
+        setErrorMessage(t("auth.phone.error") || "Something went wrong");
+        setTimeout(() => setShowError(false), 600);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       // Trigger phone error only if phone is invalid
       if (!isPhoneValid) {
