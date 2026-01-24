@@ -59,7 +59,7 @@ const Settings = () => {
   const { theme, setTheme } = useTheme();
   const { i18n, t } = useTranslation();
   const { avatarUrl, setAvatarUrl } = useAvatar();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, updateAvatar } = useAuth();
   const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isAppearanceOpen, setIsAppearanceOpen] = useState(false);
@@ -67,6 +67,8 @@ const Settings = () => {
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = async () => {
@@ -103,6 +105,8 @@ const Settings = () => {
         toast.error(t("toast.selectImageFile"));
         return;
       }
+      // Store the file for later upload
+      setPendingFile(file);
       const url = URL.createObjectURL(file);
       setCropImageSrc(url);
       setIsCropDialogOpen(true);
@@ -111,10 +115,29 @@ const Settings = () => {
     event.target.value = '';
   };
 
-  const handleCropComplete = (croppedImage: string) => {
+  const handleCropComplete = async (croppedImage: string) => {
+    // Update local preview immediately
     setAvatarUrl(croppedImage);
     setCropImageSrc(null);
-    toast.success(t("toast.avatarUpdated"));
+    setIsCropDialogOpen(false);
+    
+    // If authenticated and have file, upload to API
+    if (isAuthenticated && pendingFile) {
+      setIsUploadingAvatar(true);
+      try {
+        await updateAvatar(pendingFile);
+        toast.success(t("toast.avatarUpdated"));
+      } catch (error) {
+        console.error('Failed to upload avatar:', error);
+        toast.error(t("toast.avatarUploadFailed") || "Failed to upload avatar");
+      } finally {
+        setIsUploadingAvatar(false);
+        setPendingFile(null);
+      }
+    } else {
+      toast.success(t("toast.avatarUpdated"));
+      setPendingFile(null);
+    }
   };
 
   const handleLanguageSelect = (code: string) => {
@@ -152,8 +175,12 @@ const Settings = () => {
     }
   };
 
-  // Get user display name
+  // Get user display data from API or fallback
   const displayName = user?.full_name || 'Guest';
+  const displayEmail = user?.email;
+  const displayPhone = user?.phone_number;
+  // Priority: API avatar (medium size) > local avatar > fallback
+  const displayAvatar = user?.avatar?.medium || user?.avatar?.file || avatarUrl;
   const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
@@ -172,22 +199,30 @@ const Settings = () => {
         />
         <button
           onClick={handleAvatarClick}
+          disabled={isUploadingAvatar}
           className="relative group mb-4"
         >
           <Avatar className="w-24 h-24">
             <AvatarImage 
-              src={user?.avatar?.file || avatarUrl} 
+              src={displayAvatar} 
               alt={displayName} 
             />
             <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
           </Avatar>
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-            <Camera className="w-6 h-6 text-white" />
+            {isUploadingAvatar ? (
+              <Loader2 className="w-6 h-6 text-white animate-spin" />
+            ) : (
+              <Camera className="w-6 h-6 text-white" />
+            )}
           </div>
         </button>
         <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
-        {user?.phone_number && (
-          <p className="text-sm text-muted-foreground mt-1">{user.phone_number}</p>
+        {displayPhone && (
+          <p className="text-sm text-muted-foreground mt-1">{displayPhone}</p>
+        )}
+        {displayEmail && (
+          <p className="text-sm text-muted-foreground">{displayEmail}</p>
         )}
       </div>
 
