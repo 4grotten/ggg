@@ -1,23 +1,14 @@
 import apofizLogo from "@/assets/apofiz-logo.svg";
-import { getAuthToken } from "@/services/api/apiClient";
 
 interface PoweredByFooterProps {
   className?: string;
 }
 
 /**
- * Opens test.apofiz.com with automatic authentication via token
+ * Opens test.apofiz.com
  */
 export const openApofizWithAuth = () => {
-  const token = getAuthToken();
-  const ts = Date.now();
-  
-  // Open with token as query parameter for SSO authentication
-  const url = token 
-    ? `https://test.apofiz.com/?token=${encodeURIComponent(token)}&ts=${ts}`
-    : `https://test.apofiz.com/?ts=${ts}`;
-  
-  window.open(url, '_blank', 'noopener,noreferrer');
+  window.open('https://test.apofiz.com', '_blank', 'noopener,noreferrer');
 };
 
 export const PoweredByFooter = ({ className = "" }: PoweredByFooterProps) => {
