@@ -139,8 +139,8 @@ const CodeEntry = () => {
       if (response.data?.is_valid) {
         toast.success(t("auth.code.success") || "Code verified!");
         
-        // OTP verified - go to registration page
-        navigate("/auth/register", { 
+        // OTP verified - go to profile setup page
+        navigate("/auth/profile", { 
           replace: true,
           state: { phoneNumber, otpVerified: true }
         });
