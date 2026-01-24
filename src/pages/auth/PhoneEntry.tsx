@@ -416,7 +416,13 @@ const PhoneEntry = () => {
       }
       
       if (response.data) {
-        toast.success(t('auth.login.success'));
+        // Show personalized welcome message with user name
+        const userName = response.data.user?.full_name || response.data.user?.username;
+        if (userName) {
+          toast.success(`${t('auth.login.welcomeBack') || 'Welcome back'}, ${userName}!`);
+        } else {
+          toast.success(t('auth.login.success'));
+        }
         navigate("/", { replace: true });
       }
     } catch {
