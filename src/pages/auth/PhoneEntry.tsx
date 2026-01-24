@@ -341,9 +341,30 @@ const PhoneEntry = () => {
           // Existing user → show password login
           setIsLoginMode(true);
         } else {
-          // New user → go to registration form
-          navigate("/auth/register", {
-            state: { phoneNumber: fullPhone }
+          // New user → send OTP and go directly to code entry
+          const otpResponse = await sendOtp(fullPhone);
+          
+          if (otpResponse.error) {
+            const errorMsg = otpResponse.error.status === 429
+              ? (t("auth.phone.rateLimitError") || "Too many requests. Please wait.")
+              : otpResponse.error.status === 503
+                ? (t("auth.phone.serviceUnavailable") || "Service temporarily unavailable")
+                : (t("auth.phone.otpSendError") || "Failed to send code. You can retry on the next screen.");
+            
+            toast.warning(errorMsg);
+          } else if (otpResponse.data?.sent) {
+            toast.success(t("auth.phone.whatsappCodeSent") || "Code sent via WhatsApp!");
+          }
+          
+          // Navigate to code entry (even if OTP send failed, user can retry there)
+          navigate("/auth/code", {
+            state: { 
+              phoneNumber: fullPhone,
+              authType: 'whatsapp',
+              isNewUser: true,
+              otpId: otpResponse.data?.otp_id,
+              expiresAt: otpResponse.data?.expires_at
+            }
           });
         }
       } catch {
