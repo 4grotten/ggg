@@ -15,7 +15,8 @@
     "skip": "Skip",
     "yes": "Yes",
     "aed": "AED",
-    "usdt": "USDT"
+    "usdt": "USDT",
+    "loading": "Loading..."
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",
