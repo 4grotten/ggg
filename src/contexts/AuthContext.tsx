@@ -2,7 +2,7 @@
  * AuthContext — глобальное состояние авторизации
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   getCurrentUser, 
@@ -35,9 +35,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const hasCheckedRef = useRef(false);
 
   // Проверка токена при загрузке приложения
   const checkAuth = useCallback(async () => {
+    // Выполняем проверку один раз при загрузке приложения,
+    // чтобы не делать GET /users/me/ на каждый переход между страницами.
+    if (hasCheckedRef.current) return;
+    hasCheckedRef.current = true;
+
     const token = getAuthToken();
     
     if (!token) {
@@ -65,7 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       
       // Редирект на страницу входа, если не на публичном роуте
-      if (!PUBLIC_ROUTES.some(route => location.pathname.startsWith(route))) {
+      const pathname = window.location.pathname;
+      if (!PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
         navigate('/auth/phone', { replace: true });
       }
     } else {
@@ -73,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     setIsLoading(false);
-  }, [navigate, location.pathname]);
+  }, [navigate]);
 
   useEffect(() => {
     checkAuth();
