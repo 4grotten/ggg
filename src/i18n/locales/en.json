@@ -347,7 +347,11 @@
     "apply": "Apply",
     "logout": "Log Out",
     "guest": "Guest",
-    "loginToAccess": "Sign in to access all features"
+    "loginToAccess": "Sign in to access all features",
+    "accounts": "Accounts",
+    "addAccount": "Add Account",
+    "addAccountDesc": "Sign in to another account",
+    "switchAccount": "Switch Account"
   },
   "card": {
     "back": "Back",

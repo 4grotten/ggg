@@ -18,6 +18,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { OpenCardButton } from "@/components/dashboard/OpenCardButton";
 import { OpenCardDrawer } from "@/components/dashboard/OpenCardDrawer";
+import { AccountSwitcher } from "@/components/account/AccountSwitcher";
 
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { TopUpDrawer } from "@/components/dashboard/TopUpDrawer";
@@ -32,6 +33,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { TransactionGroup, Transaction } from "@/types/transaction";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
+import { useMultiAccount } from "@/hooks/useMultiAccount";
 
 type FilterType = "all" | "income" | "expenses" | "transfers";
 
@@ -44,7 +46,12 @@ const Dashboard = () => {
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [openCardOpen, setOpenCardOpen] = useState(false);
+  const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  
+  // Long press handling for avatar
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const { addCurrentAccount } = useMultiAccount();
 
   // Refs for sliding indicator
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -69,6 +76,7 @@ const Dashboard = () => {
   
 
   // Show welcome toast once per session for authenticated users
+  // Also save current account to multi-account storage
   useEffect(() => {
     if (isAuthenticated && user?.full_name) {
       const welcomeKey = `welcome_shown_${user.id || user.phone_number}`;
@@ -80,8 +88,11 @@ const Dashboard = () => {
           duration: 3000,
         });
       }
+      
+      // Save current account to multi-account storage
+      addCurrentAccount(user);
     }
-  }, [isAuthenticated, user?.full_name, user?.id, user?.phone_number, firstName, t]);
+  }, [isAuthenticated, user?.full_name, user?.id, user?.phone_number, firstName, t, user, addCurrentAccount]);
 
   // Filter options
   const filterOptions: { key: FilterType; label: string }[] = [
@@ -173,6 +184,23 @@ const Dashboard = () => {
             {isAuthenticated ? (
               <motion.button 
                 onClick={() => navigate("/settings")}
+                onPointerDown={() => {
+                  longPressTimer.current = setTimeout(() => {
+                    setAccountSwitcherOpen(true);
+                  }, 500);
+                }}
+                onPointerUp={() => {
+                  if (longPressTimer.current) {
+                    clearTimeout(longPressTimer.current);
+                    longPressTimer.current = null;
+                  }
+                }}
+                onPointerLeave={() => {
+                  if (longPressTimer.current) {
+                    clearTimeout(longPressTimer.current);
+                    longPressTimer.current = null;
+                  }
+                }}
                 className="relative"
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -336,6 +364,7 @@ const Dashboard = () => {
     <TopUpDrawer open={topUpOpen} onOpenChange={setTopUpOpen} />
     <SendDrawer open={sendOpen} onOpenChange={setSendOpen} />
     <OpenCardDrawer open={openCardOpen} onOpenChange={setOpenCardOpen} />
+    <AccountSwitcher open={accountSwitcherOpen} onOpenChange={setAccountSwitcherOpen} />
   </>
 );
 };
