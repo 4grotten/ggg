@@ -639,13 +639,13 @@ const PhoneEntry = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="space-y-6"
           >
-            <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
+            <div className={`flex items-center gap-3 border-b pb-4 transition-colors duration-300 ${
               showError ? 'border-destructive' : 'border-border'
             }`}>
-              {/* Country flag selector */}
+              {/* Country flag selector (Telegram style) */}
               <Drawer open={countryDrawerOpen} onOpenChange={setCountryDrawerOpen}>
                 <DrawerTrigger asChild>
-                  <button className="flex items-center gap-1 text-lg font-medium flex-shrink-0">
+                  <button className="flex items-center gap-1 text-lg font-medium flex-shrink-0 hover:opacity-80 transition-opacity">
                     <span className="text-2xl">{selectedCountry?.flag || "🌍"}</span>
                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   </button>
@@ -682,26 +682,44 @@ const PhoneEntry = () => {
                 </DrawerContent>
               </Drawer>
               
-              {/* Editable dial code */}
+              {/* Combined phone input (Telegram style: +971 50 123 4567) */}
               <input
                 type="tel"
                 inputMode="tel"
-                value={dialCode}
-                onChange={handleDialCodeChange}
-                className="w-16 text-lg font-medium bg-transparent border-none outline-none text-foreground"
-                maxLength={5}
-              />
-              
-              {/* Phone number */}
-              <input
-                type="tel"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={phoneNumber}
-                onChange={handlePhoneChange}
-                placeholder="50 123 4567"
+                value={`${dialCode} ${phoneNumber}`}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  
+                  // Parse the combined input
+                  // Find where dial code ends (after + and digits, before space or when phone starts)
+                  const match = value.match(/^(\+\d{1,4})\s*(.*)$/);
+                  
+                  if (match) {
+                    const newDialCode = match[1];
+                    const phonePartRaw = match[2].replace(/\D/g, "");
+                    
+                    // Update dial code and find matching country
+                    setDialCode(newDialCode);
+                    const matchedCountry = countries.find(c => c.dialCode === newDialCode);
+                    setSelectedCountry(matchedCountry || null);
+                    
+                    // Format phone number
+                    setPhoneNumber(formatPhoneNumber(phonePartRaw));
+                  } else if (value.startsWith("+")) {
+                    // Just typing dial code, no phone yet
+                    const digits = value.replace(/[^0-9+]/g, "");
+                    setDialCode(digits);
+                    const matchedCountry = countries.find(c => c.dialCode === digits);
+                    setSelectedCountry(matchedCountry || null);
+                    setPhoneNumber("");
+                  } else {
+                    // No + at start, reset to default
+                    setDialCode("+");
+                    setPhoneNumber("");
+                  }
+                }}
+                placeholder={`${dialCode} 50 123 4567`}
                 className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
-                maxLength={12}
               />
             </div>
 
