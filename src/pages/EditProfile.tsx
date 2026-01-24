@@ -284,8 +284,8 @@ const EditProfile = () => {
         </div>
       </div>
 
-      {/* Fixed Bottom Button - above bottom navigation */}
-      <div className="fixed bottom-16 left-0 right-0 z-20 bg-background border-t border-border p-4 safe-area-bottom">
+      {/* Fixed Bottom Button */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 bg-background border-t border-border p-4 pb-safe">
         <Button
           onClick={form.handleSubmit(onSubmit)}
           disabled={isSaving}

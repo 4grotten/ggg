@@ -63,6 +63,7 @@ const hiddenNavRoutes = [
   "/profile-verification",
   "/auth/",
   "/open-card",
+  "/settings/edit-profile",
 ];
 
 const AppContent = () => {
