@@ -664,6 +664,9 @@
       "maleDisplay": "Geschlecht: Männlich",
       "femaleDisplay": "Geschlecht: Weiblich",
       "notSelectedDisplay": "Geschlecht: Nicht angegeben",
+      "gender": {
+        "preferNotToSay": "Keine Angabe"
+      },
       "fullNamePlaceholder": "Vollständiger Name (erforderlich)",
       "passwordPlaceholder": "Passwort erstellen (erforderlich)",
       "passwordHint": "Passwort muss mindestens 6 Zeichen haben",

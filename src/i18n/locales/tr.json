@@ -664,6 +664,9 @@
       "maleDisplay": "Cinsiyet: Erkek",
       "femaleDisplay": "Cinsiyet: Kadın",
       "notSelectedDisplay": "Cinsiyet: Belirtilmedi",
+      "gender": {
+        "preferNotToSay": "Belirtmek istemiyorum"
+      },
       "fullNamePlaceholder": "Ad Soyad (zorunlu)",
       "passwordPlaceholder": "Şifre oluşturun (zorunlu)",
       "passwordHint": "Şifre en az 6 karakter olmalıdır",

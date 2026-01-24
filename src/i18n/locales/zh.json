@@ -664,6 +664,9 @@
       "maleDisplay": "性别：男",
       "femaleDisplay": "性别：女",
       "notSelectedDisplay": "性别：未指定",
+      "gender": {
+        "preferNotToSay": "不愿透露"
+      },
       "fullNamePlaceholder": "全名（必填）",
       "passwordPlaceholder": "创建密码（必填）",
       "passwordHint": "密码至少需要6个字符",
