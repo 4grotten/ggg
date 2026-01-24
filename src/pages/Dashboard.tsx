@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import apofizLogo from "@/assets/apofiz-logo.svg";
+import { getAuthToken } from "@/services/api/apiClient";
 import { BalanceCard } from "@/components/dashboard/BalanceCard";
 import { ActionButtons } from "@/components/dashboard/ActionButtons";
 import { VerifyIdentityCard } from "@/components/dashboard/VerifyIdentityCard";
@@ -148,13 +149,22 @@ const Dashboard = () => {
     <>
       <MobileLayout
         header={
-          <div className="flex items-center gap-1">
+          <button 
+            onClick={() => {
+              const token = getAuthToken();
+              const url = token 
+                ? `https://apofiz.com?token=${encodeURIComponent(token)}`
+                : 'https://apofiz.com';
+              window.open(url, '_blank', 'noopener,noreferrer');
+            }}
+            className="flex items-center gap-1 hover:opacity-80 transition-opacity"
+          >
             <p className="text-xs text-muted-foreground">
               {t('dashboard.poweredBy')}
             </p>
             <img src={apofizLogo} alt="Apofiz" className="w-4 h-4" />
             <span className="text-xs font-semibold text-foreground">Apofiz</span>
-          </div>
+          </button>
         }
         rightAction={
           <div className="flex items-center gap-2">
