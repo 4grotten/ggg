@@ -683,7 +683,7 @@
       "femaleDisplay": "Пол: Женский",
       "notSelectedDisplay": "Пол: Не указан",
       "gender": {
-        "preferNotToSay": "Не указывать"
+        "preferNotToSay": "Не указан"
       },
       "fullNamePlaceholder": "ФИО (обязательно)",
       "passwordPlaceholder": "Создайте пароль (обязательно)",
