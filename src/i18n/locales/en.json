@@ -619,7 +619,10 @@
     },
     "code": {
       "title": "Enter verification code",
+      "titleWhatsApp": "Enter WhatsApp code",
       "sentTo": "Code sent to",
+      "sentToWhatsApp": "Code sent via WhatsApp to",
+      "whatsappRegionNotice": "In your region, authorization works only through WhatsApp",
       "verify": "Verify",
       "resend": "Resend code",
       "resendIn": "Resend in",

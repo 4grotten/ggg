@@ -619,7 +619,10 @@
     },
     "code": {
       "title": "Введите код подтверждения",
+      "titleWhatsApp": "Введите код из WhatsApp",
       "sentTo": "Код отправлен на",
+      "sentToWhatsApp": "Код отправлен через WhatsApp на",
+      "whatsappRegionNotice": "В вашем регионе авторизация работает только через WhatsApp",
       "verify": "Подтвердить",
       "resend": "Отправить код повторно",
       "resendIn": "Повторить через",

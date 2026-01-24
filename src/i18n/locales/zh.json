@@ -607,6 +607,22 @@
       "support": "支持与帮助",
       "continue": "继续"
     },
+    "code": {
+      "title": "输入验证码",
+      "titleWhatsApp": "输入WhatsApp验证码",
+      "sentTo": "验证码已发送至",
+      "sentToWhatsApp": "验证码已通过WhatsApp发送至",
+      "whatsappRegionNotice": "在您所在的地区，授权仅通过WhatsApp进行",
+      "verify": "验证",
+      "resend": "重新发送验证码",
+      "resendIn": "重发倒计时",
+      "resendSuccess": "新验证码已发送！",
+      "resendError": "发送验证码失败",
+      "invalidCode": "请输入有效的6位数验证码",
+      "wrongCode": "验证码错误，请重试。",
+      "success": "验证成功！",
+      "error": "验证失败"
+    },
     "login": {
       "title": "输入密码",
       "passwordPlaceholder": "您的密码",
