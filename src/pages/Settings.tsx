@@ -231,6 +231,12 @@ const Settings = () => {
     }
 
     // Perform the switch
+    // Mark that we are switching to avoid token being cleared by in-flight requests
+    try {
+      sessionStorage.setItem('switching_account', '1');
+    } catch {
+      // ignore
+    }
     switchToAccount(fresh);
     
     // Wait a bit more for dramatic effect
