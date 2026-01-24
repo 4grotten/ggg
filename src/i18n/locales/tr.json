@@ -608,7 +608,10 @@
       "searchCountry": "Ülke veya kod ara",
       "notRobot": "Ben robot değilim",
       "support": "Destek ve Yardım",
-      "continue": "Devam"
+      "continue": "Devam",
+      "codeSent": "Doğrulama kodu gönderildi!",
+      "codeSentWhatsApp": "Kod WhatsApp ile gönderildi!",
+      "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin."
     },
     "code": {
       "title": "Doğrulama kodunu girin",
@@ -620,6 +623,7 @@
       "resend": "Kodu tekrar gönder",
       "resendIn": "Tekrar gönder",
       "resendSuccess": "Yeni kod gönderildi!",
+      "resendSuccessWhatsApp": "Kod WhatsApp ile gönderildi!",
       "resendError": "Kod tekrar gönderilemedi",
       "invalidCode": "Lütfen geçerli bir 6 haneli kod girin",
       "wrongCode": "Yanlış kod. Tekrar deneyin.",

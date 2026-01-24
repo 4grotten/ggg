@@ -641,6 +641,7 @@
       "support": "Support & Help",
       "continue": "Continue",
       "codeSent": "Verification code sent!",
+      "codeSentWhatsApp": "Code sent via WhatsApp!",
       "error": "Something went wrong. Please try again."
     },
     "code": {
@@ -653,6 +654,7 @@
       "resend": "Resend code",
       "resendIn": "Resend in",
       "resendSuccess": "New code sent!",
+      "resendSuccessWhatsApp": "Code sent via WhatsApp!",
       "resendError": "Failed to resend code",
       "invalidCode": "Please enter a valid 6-digit code",
       "wrongCode": "Wrong code. Please try again.",

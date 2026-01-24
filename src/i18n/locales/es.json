@@ -608,7 +608,10 @@
       "searchCountry": "Buscar país o código",
       "notRobot": "No soy un robot",
       "support": "Soporte y Ayuda",
-      "continue": "Continuar"
+      "continue": "Continuar",
+      "codeSent": "¡Código de verificación enviado!",
+      "codeSentWhatsApp": "¡Código enviado por WhatsApp!",
+      "error": "Algo salió mal. Por favor, inténtalo de nuevo."
     },
     "code": {
       "title": "Ingresa el código de verificación",
@@ -620,6 +623,7 @@
       "resend": "Reenviar código",
       "resendIn": "Reenviar en",
       "resendSuccess": "¡Nuevo código enviado!",
+      "resendSuccessWhatsApp": "¡Código enviado por WhatsApp!",
       "resendError": "Error al reenviar el código",
       "invalidCode": "Por favor ingresa un código válido de 6 dígitos",
       "wrongCode": "Código incorrecto. Inténtalo de nuevo.",
