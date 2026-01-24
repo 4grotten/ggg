@@ -63,27 +63,42 @@ interface InstallStepsContentProps {
 
 const InstallStepsContent = ({ isOpen, onShare, t }: InstallStepsContentProps) => {
   const [step1Visible, setStep1Visible] = useState(false);
+  const [icon1Visible, setIcon1Visible] = useState(false);
   const [step2Visible, setStep2Visible] = useState(false);
+  const [icon2Visible, setIcon2Visible] = useState(false);
   const [buttonVisible, setButtonVisible] = useState(false);
+  const [buttonIconVisible, setButtonIconVisible] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       // Reset states
       setStep1Visible(false);
+      setIcon1Visible(false);
       setStep2Visible(false);
+      setIcon2Visible(false);
       setButtonVisible(false);
+      setButtonIconVisible(false);
       
       // Elevator animation: step 1 appears first
       const timer1 = setTimeout(() => setStep1Visible(true), 150);
-      // Step 2 appears after step 1
-      const timer2 = setTimeout(() => setStep2Visible(true), 400);
+      // Icon 1 appears after step 1
+      const timer1Icon = setTimeout(() => setIcon1Visible(true), 350);
+      // Step 2 appears after icon 1
+      const timer2 = setTimeout(() => setStep2Visible(true), 500);
+      // Icon 2 appears after step 2
+      const timer2Icon = setTimeout(() => setIcon2Visible(true), 700);
       // Button appears last
-      const timer3 = setTimeout(() => setButtonVisible(true), 650);
+      const timer3 = setTimeout(() => setButtonVisible(true), 850);
+      // Button icon appears last
+      const timer3Icon = setTimeout(() => setButtonIconVisible(true), 1000);
       
       return () => {
         clearTimeout(timer1);
+        clearTimeout(timer1Icon);
         clearTimeout(timer2);
+        clearTimeout(timer2Icon);
         clearTimeout(timer3);
+        clearTimeout(timer3Icon);
       };
     }
   }, [isOpen]);
@@ -105,7 +120,13 @@ const InstallStepsContent = ({ isOpen, onShare, t }: InstallStepsContentProps) =
           <div>
             <p className="font-medium text-foreground flex items-center gap-2">
               {t("settings.installStep1") || "Tap the Share button"}
-              <Upload className="w-4 h-4 text-primary" />
+              <Upload 
+                className={`w-4 h-4 text-primary transition-all duration-300 ease-out ${
+                  icon1Visible 
+                    ? 'opacity-100 scale-100' 
+                    : 'opacity-0 scale-50'
+                }`} 
+              />
             </p>
             <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep1Desc") || "Look for the share icon in your browser"}</p>
           </div>
@@ -124,8 +145,20 @@ const InstallStepsContent = ({ isOpen, onShare, t }: InstallStepsContentProps) =
           <div>
             <p className="font-medium text-foreground flex items-center gap-2">
               {t("settings.installStep2") || "Select 'Add to Home Screen'"}
-              <Plus className="w-4 h-4 text-primary" />
-              <Home className="w-4 h-4 text-primary" />
+              <Plus 
+                className={`w-4 h-4 text-primary transition-all duration-300 ease-out ${
+                  icon2Visible 
+                    ? 'opacity-100 scale-100' 
+                    : 'opacity-0 scale-50'
+                }`} 
+              />
+              <Home 
+                className={`w-4 h-4 text-primary transition-all duration-300 ease-out delay-100 ${
+                  icon2Visible 
+                    ? 'opacity-100 scale-100' 
+                    : 'opacity-0 scale-50'
+                }`} 
+              />
             </p>
             <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep2Desc") || "Scroll down in the share menu to find this option"}</p>
           </div>
@@ -141,7 +174,13 @@ const InstallStepsContent = ({ isOpen, onShare, t }: InstallStepsContentProps) =
             : 'opacity-0 -translate-y-4'
         }`}
       >
-        <Share2 className="w-5 h-5" />
+        <Share2 
+          className={`w-5 h-5 transition-all duration-300 ease-out ${
+            buttonIconVisible 
+              ? 'opacity-100 scale-100' 
+              : 'opacity-0 scale-50'
+          }`} 
+        />
         <span>{t("settings.openShare") || "Open Share"}</span>
       </button>
     </div>
