@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock } from "lucide-react";
+import { Clock, LogIn } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -213,19 +213,19 @@ const Dashboard = () => {
             ) : (
               <motion.button 
                 onClick={() => navigate("/auth/phone")}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full font-medium text-sm shadow-lg shadow-primary/25"
-                initial={{ scale: 0, x: 20 }}
-                animate={{ scale: 1, x: 0 }}
+                className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/25"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
                 transition={{ 
                   type: "spring", 
                   stiffness: 260, 
                   damping: 20,
                   delay: 0.2 
                 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {t('auth.phone.continue') || 'Sign In'}
+                <LogIn className="w-5 h-5 text-primary-foreground" />
               </motion.button>
             )}
           </div>
