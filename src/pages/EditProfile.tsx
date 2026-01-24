@@ -145,8 +145,8 @@ const EditProfile = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
-      {/* Fixed Header */}
-      <div className="sticky top-0 z-20 bg-background border-b border-border">
+      {/* Fixed Header - glassmorphism style */}
+      <div className="fixed top-0 left-0 right-0 z-20 bg-white/50 dark:bg-card/70 backdrop-blur-2xl border-b border-border/50">
         <div className="flex items-center justify-between h-14 px-4">
           <button
             onClick={() => navigate(-1)}
@@ -162,8 +162,8 @@ const EditProfile = () => {
         </div>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40">
+      {/* Scrollable Content - with top padding for fixed header */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pt-14 pb-28">
         <div className="px-4 py-6">
           {/* Avatar */}
           <div className="flex justify-center mb-8">
@@ -284,8 +284,8 @@ const EditProfile = () => {
         </div>
       </div>
 
-      {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 bg-background border-t border-border p-4 pb-safe">
+      {/* Fixed Bottom Button - transparent glassmorphism */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-safe">
         <Button
           onClick={form.handleSubmit(onSubmit)}
           disabled={isSaving}
