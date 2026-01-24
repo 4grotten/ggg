@@ -337,18 +337,19 @@ const PhoneEntry = () => {
               navigate("/", { replace: true });
             }
           } else if (is_new_user && temporary_code_enabled) {
-            // Check if this is a +996 country (SMS) or other (WhatsApp - when API ready)
+            // Check if this is a +996 country (SMS) or other (WhatsApp)
             const isKyrgyzstan = dialCode === '+996';
+            const authType: 'sms' | 'whatsapp' = isKyrgyzstan ? 'sms' : 'whatsapp';
             
-            // TODO: When WhatsApp API is ready, uncomment the following line and remove 'sms':
-            // const authType = isKyrgyzstan ? 'sms' : 'whatsapp';
-            const authType: 'sms' | 'whatsapp' = 'sms'; // Currently always SMS
+            const successMessage = isKyrgyzstan 
+              ? (t("auth.phone.codeSent") || "Verification code sent!")
+              : (t("auth.phone.codeSentWhatsApp") || "Code sent via WhatsApp!");
+            toast.success(successMessage);
             
-            toast.success(t("auth.phone.codeSent") || "Verification code sent!");
             navigate("/auth/code", { 
               state: { 
                 phoneNumber: fullPhone,
-                authType: authType // Pass auth type to CodeEntry
+                authType: authType
               }
             });
           } else if (!is_new_user) {
