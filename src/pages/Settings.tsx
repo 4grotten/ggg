@@ -359,6 +359,11 @@ const Settings = () => {
   };
 
   const otherAccounts = accounts.filter((a) => a.user.id !== user?.id);
+  
+  // Debug: log accounts info
+  console.log('All saved accounts:', accounts);
+  console.log('Current user id:', user?.id);
+  console.log('Other accounts:', otherAccounts);
 
   // Only show real accounts, no mocks
   const accountsToRender = otherAccounts;
