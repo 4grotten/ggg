@@ -2,7 +2,7 @@
  * Auth API endpoints для Apofiz Backend
  */
 
-import { apiPost, apiGet, setAuthToken, AUTH_USER_KEY } from './apiClient';
+import { apiPost, apiGet, setAuthToken, getAuthToken, AUTH_USER_KEY } from './apiClient';
 
 // ============ Types ============
 
@@ -43,12 +43,21 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface AvatarData {
+  id: number;
+  file: string;
+  name?: string;
+  large: string | null;
+  medium: string | null;
+  small: string | null;
+}
+
 export interface UserProfile {
   id: number;
   full_name: string;
   phone_number: string;
   email: string | null;
-  avatar: { id: number; file: string } | null;
+  avatar: AvatarData | null;
   username: string | null;
   date_of_birth: string | null;
   gender: 'male' | 'female' | null;
@@ -193,4 +202,53 @@ export async function logout() {
  */
 export async function forgotPassword(phone_number: string) {
   return apiPost<{ message: string }>('/users/forgot_password/', { phone_number });
+}
+
+/**
+ * Загрузка аватарки
+ * POST /files/
+ */
+export async function uploadAvatar(file: File): Promise<AvatarData> {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const url = 'https://test.apofiz.com/api/v1/files/';
+  const token = getAuthToken();
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Token ${token}`
+      // НЕ указывать Content-Type — браузер сам поставит multipart boundary
+    },
+    body: formData
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to upload avatar');
+  }
+  
+  return response.json();
+}
+
+/**
+ * Обновить профиль (с привязкой аватарки)
+ * POST /init_profile/
+ */
+export async function updateProfile(data: {
+  full_name: string;
+  avatar_id?: number;
+  email?: string;
+  gender?: string;
+  date_of_birth?: string;
+  username?: string;
+}) {
+  const response = await apiPost<UserProfile>('/init_profile/', data);
+  
+  // При успехе сохраняем данные пользователя
+  if (response.data) {
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
+  }
+  
+  return response;
 }

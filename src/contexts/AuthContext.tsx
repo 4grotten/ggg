@@ -7,7 +7,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   getCurrentUser, 
   logout as apiLogout, 
-  type UserProfile 
+  uploadAvatar as apiUploadAvatar,
+  updateProfile as apiUpdateProfile,
+  type UserProfile,
+  type AvatarData
 } from '@/services/api/authApi';
 import { 
   getAuthToken, 
@@ -23,6 +26,15 @@ interface AuthContextType {
   login: (user: UserProfile) => void;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  updateAvatar: (file: File) => Promise<void>;
+  updateUserProfile: (data: {
+    full_name: string;
+    avatar_id?: number;
+    email?: string;
+    gender?: string;
+    date_of_birth?: string;
+    username?: string;
+  }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -118,8 +130,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const response = await getCurrentUser();
     if (response.data) {
       setUser(response.data);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
     }
   }, []);
+
+  const updateAvatar = useCallback(async (file: File) => {
+    // 1. Загружаем файл и получаем id
+    const avatarData = await apiUploadAvatar(file);
+    
+    // 2. Обновляем профиль с новым avatar_id
+    if (user) {
+      await apiUpdateProfile({
+        full_name: user.full_name,
+        avatar_id: avatarData.id,
+        email: user.email || undefined,
+        gender: user.gender || undefined,
+        date_of_birth: user.date_of_birth || undefined,
+        username: user.username || undefined,
+      });
+    }
+    
+    // 3. Обновляем данные пользователя
+    await refreshUser();
+  }, [user, refreshUser]);
+
+  const updateUserProfile = useCallback(async (data: {
+    full_name: string;
+    avatar_id?: number;
+    email?: string;
+    gender?: string;
+    date_of_birth?: string;
+    username?: string;
+  }) => {
+    await apiUpdateProfile(data);
+    await refreshUser();
+  }, [refreshUser]);
 
   const value: AuthContextType = {
     user,
@@ -128,6 +173,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     logout,
     refreshUser,
+    updateAvatar,
+    updateUserProfile,
   };
 
   return (
