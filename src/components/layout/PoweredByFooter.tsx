@@ -10,11 +10,12 @@ interface PoweredByFooterProps {
  */
 export const openApofizWithAuth = () => {
   const token = getAuthToken();
+  const ts = Date.now();
   
   // Open with token as query parameter for SSO authentication
   const url = token 
-    ? `https://test.apofiz.com/?token=${encodeURIComponent(token)}`
-    : 'https://test.apofiz.com';
+    ? `https://test.apofiz.com/?token=${encodeURIComponent(token)}&ts=${ts}`
+    : `https://test.apofiz.com/?ts=${ts}`;
   
   window.open(url, '_blank', 'noopener,noreferrer');
 };
