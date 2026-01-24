@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useAvatar } from "@/contexts/AvatarContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { StepIndicator } from "@/components/verification/StepIndicator";
 import { initProfile, setPassword as apiSetPassword, uploadAvatar } from "@/services/api/authApi";
@@ -319,6 +320,7 @@ const ProfileSteps = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { refreshUser } = useAuth();
   const { setAvatarUrl } = useAvatar();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -456,9 +458,8 @@ const ProfileSteps = () => {
         }
       }
       
-      // Save to session for local use
-      sessionStorage.setItem("userName", fullName);
-      sessionStorage.setItem("userGender", gender || "");
+      // Sync profile to AuthContext so name/avatar appear globally
+      await refreshUser();
       
       toast.success(t('auth.profile.success'));
       navigate("/", { replace: true });
