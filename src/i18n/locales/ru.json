@@ -18,6 +18,7 @@
     "usdt": "USDT"
   },
   "dashboard": {
+    "greeting": "Привет, {{name}}!",
     "poweredBy": "При поддержке",
     "balance": "Баланс",
     "topUp": "Пополнить",
@@ -294,6 +295,7 @@
     "shareNotSupported": "Поделиться не поддерживается, адрес скопирован",
     "selectImageFile": "Пожалуйста, выберите файл изображения",
     "avatarUpdated": "Аватар успешно обновлён",
+    "avatarUploadFailed": "Не удалось загрузить аватар",
     "languageSystem": "Язык установлен на системный ({{language}})",
     "languageChanged": "Язык изменён на {{language}}",
     "copied": "{{label}} скопировано",

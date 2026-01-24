@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -28,12 +28,16 @@ import { useCards, useTotalBalance } from "@/hooks/useCards";
 import { useTransactionGroups } from "@/hooks/useTransactions";
 import { useQueryClient } from "@tanstack/react-query";
 import { TransactionGroup, Transaction } from "@/types/transaction";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAvatar } from "@/contexts/AvatarContext";
 
 type FilterType = "all" | "income" | "expenses" | "transfers";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user, isAuthenticated } = useAuth();
+  const { avatarUrl } = useAvatar();
   const queryClient = useQueryClient();
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
@@ -54,6 +58,12 @@ const Dashboard = () => {
   const cards = cardsData?.data || [];
   const totalBalance = balanceData?.balance || 0;
   const transactionGroups = transactionsData?.groups || [];
+
+  // User display data
+  const displayName = user?.full_name || 'Guest';
+  const displayAvatar = user?.avatar?.small || user?.avatar?.file || avatarUrl;
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const firstName = displayName.split(' ')[0];
 
   // Filter options
   const filterOptions: { key: FilterType; label: string }[] = [
@@ -127,26 +137,35 @@ const Dashboard = () => {
     <>
       <MobileLayout
         header={
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            {t('dashboard.poweredBy')}{" "}
-            <img src={apofizLogo} alt="Apofiz" className="w-4 h-4 inline-block" />{" "}
-            <span className="font-semibold text-foreground">Apofiz</span>
-          </p>
+          <div className="flex flex-col">
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              {t('dashboard.poweredBy')}{" "}
+              <img src={apofizLogo} alt="Apofiz" className="w-4 h-4 inline-block" />{" "}
+              <span className="font-semibold text-foreground">Apofiz</span>
+            </p>
+            {isAuthenticated && (
+              <p className="text-sm font-medium text-foreground mt-0.5">
+                {t('dashboard.greeting', { name: firstName })}
+              </p>
+            )}
+          </div>
         }
         rightAction={
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <button 
-              onClick={() => navigate("/auth/phone")}
+              onClick={() => isAuthenticated ? navigate("/settings") : navigate("/auth/phone")}
               className="relative"
             >
               <Avatar className="w-10 h-10">
-                <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="User" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarImage src={displayAvatar} alt={displayName} />
+                <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
-              <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center border-2 border-background">
-                <span className="text-[8px] text-white font-bold">+</span>
-              </div>
+              {!isAuthenticated && (
+                <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center border-2 border-background">
+                  <span className="text-[8px] text-white font-bold">+</span>
+                </div>
+              )}
             </button>
           </div>
         }
