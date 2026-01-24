@@ -66,17 +66,22 @@ const Dashboard = () => {
   const displayAvatar = user?.avatar?.small || user?.avatar?.file || avatarUrl;
   const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   const firstName = displayName.split(' ')[0];
-  const welcomeShownRef = useRef(false);
+  
 
-  // Show welcome toast once on mount for authenticated users
+  // Show welcome toast once per session for authenticated users
   useEffect(() => {
-    if (isAuthenticated && user?.full_name && !welcomeShownRef.current) {
-      welcomeShownRef.current = true;
-      toast.success(t('dashboard.welcome', { name: firstName }), {
-        duration: 3000,
-      });
+    if (isAuthenticated && user?.full_name) {
+      const welcomeKey = `welcome_shown_${user.id || user.phone_number}`;
+      const alreadyShown = sessionStorage.getItem(welcomeKey);
+      
+      if (!alreadyShown) {
+        sessionStorage.setItem(welcomeKey, 'true');
+        toast.success(t('dashboard.welcome', { name: firstName }), {
+          duration: 3000,
+        });
+      }
     }
-  }, [isAuthenticated, user?.full_name, firstName, t]);
+  }, [isAuthenticated, user?.full_name, user?.id, user?.phone_number, firstName, t]);
 
   // Filter options
   const filterOptions: { key: FilterType; label: string }[] = [
