@@ -47,6 +47,7 @@ import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { AvatarSync } from "./components/AvatarSync";
 
 const queryClient = new QueryClient();
 
@@ -154,6 +155,7 @@ const App = () => {
             <BrowserRouter>
               <AuthProvider>
                 <AvatarProvider>
+                  <AvatarSync />
                   <VoiceCallProvider>
                     <AppContent />
                   </VoiceCallProvider>
