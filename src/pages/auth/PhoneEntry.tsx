@@ -15,7 +15,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { login as apiLogin, forgotPassword, registerAuth } from "@/services/api/authApi";
+import { login as apiLogin, forgotPassword, registerAuth, getCurrentUser } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { z } from "zod";
 
@@ -331,7 +331,8 @@ const PhoneEntry = () => {
                 state: { phoneNumber: fullPhone }
               });
             } else {
-              // Existing user with token - go to dashboard
+              // Existing user with token - fetch and save profile, then go to dashboard
+              await getCurrentUser();
               toast.success(t("auth.login.success"));
               navigate("/", { replace: true });
             }

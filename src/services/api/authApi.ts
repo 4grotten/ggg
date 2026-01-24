@@ -111,9 +111,14 @@ export async function verifyCode(phone_number: string, code: number) {
     code 
   });
   
-  // При успехе сохраняем токен
+  // При успехе сохраняем токен и подтягиваем профиль
   if (response.data?.token) {
     setAuthToken(response.data.token);
+    
+    // Для существующего пользователя сразу подтягиваем профиль
+    if (!response.data.is_new_user) {
+      await getCurrentUser();
+    }
   }
   
   return response;
