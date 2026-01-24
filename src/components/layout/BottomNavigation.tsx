@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAvatar } from "@/contexts/AvatarContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useVoiceCall } from "@/contexts/VoiceCallContext";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -18,8 +19,15 @@ const navItems = [
 export const BottomNavigation = () => {
   const location = useLocation();
   const { avatarUrl } = useAvatar();
+  const { user } = useAuth();
   const { isConnected, isSpeaking } = useVoiceCall();
   const { t, i18n } = useTranslation();
+  
+  // Priority: API avatar (small) > local avatar > fallback
+  const displayAvatar = user?.avatar?.small || user?.avatar?.file || avatarUrl;
+  const displayName = user?.full_name || 'User';
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  
   const hasMountedRef = useRef(false);
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [selectorStyle, setSelectorStyle] = useState({ left: 0, width: 0 });
@@ -100,8 +108,8 @@ export const BottomNavigation = () => {
                     "w-6 h-6 transition-all",
                     active ? "ring-2 ring-primary" : ""
                   )}>
-                    <AvatarImage src={avatarUrl} alt="Profile" />
-                    <AvatarFallback className="text-xs">AW</AvatarFallback>
+                    <AvatarImage src={displayAvatar} alt="Profile" />
+                    <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <span
                     className={cn(
