@@ -47,7 +47,8 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
     removeAccountById(userId);
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
