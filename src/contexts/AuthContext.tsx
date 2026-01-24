@@ -135,13 +135,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, [checkAuth]);
 
-  // Редирект неавторизованных пользователей
+  // Редирект авторизованных пользователей со страниц авторизации на главную
   useEffect(() => {
-    if (!isLoading && !user) {
-      const isPublicRoute = PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
-      if (!isPublicRoute && location.pathname !== '/') {
-        // Разрешаем главную страницу без авторизации для демо
-        // В production можно убрать это условие
+    if (!isLoading && user) {
+      const isAuthRoute = PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
+      if (isAuthRoute) {
+        navigate('/', { replace: true });
       }
     }
   }, [isLoading, user, location.pathname, navigate]);
