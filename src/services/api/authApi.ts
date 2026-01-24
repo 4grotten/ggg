@@ -110,7 +110,12 @@ export async function sendOtp(phone_number: string, type: 'sms' | 'whatsapp' = '
  * POST /otp/verify/
  */
 export async function verifyOtp(phone_number: string, code: number) {
-  return apiPost<{ message: string; is_valid: boolean }>('/otp/verify/', { 
+  return apiPost<{ 
+    is_valid: boolean; 
+    error?: string; 
+    token?: string | null; 
+    is_new_user?: boolean | null;
+  }>('/otp/verify/', { 
     phone_number, 
     code 
   });
