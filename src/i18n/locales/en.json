@@ -608,7 +608,13 @@
       "passwordPlaceholder": "Your password",
       "wrongPassword": "Wrong password. Please try again",
       "button": "Sign In",
-      "success": "Successfully logged in!"
+      "success": "Successfully logged in!",
+      "forgotPassword": "Forgot password?",
+      "forgotPasswordSent": "Password reset code sent to your phone",
+      "forgotPasswordError": "Failed to send reset code",
+      "userBlocked": "Your account is blocked",
+      "tooManyAttempts": "Too many attempts. Please try again later.",
+      "error": "Login failed. Please try again."
     },
     "profile": {
       "header": "Profile",
