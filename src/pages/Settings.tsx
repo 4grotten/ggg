@@ -10,7 +10,7 @@ import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
@@ -457,6 +457,15 @@ const Settings = () => {
           <SettingsItem
             icon={<Briefcase className="w-5 h-5" />}
             label={t("settings.privacyPolicy")}
+          />
+        </div>
+
+        {/* Add Account Button */}
+        <div className="bg-card rounded-2xl overflow-hidden">
+          <SettingsItem
+            icon={<UserPlus className="w-5 h-5" />}
+            label={t("settings.addAccount") || "Add Account"}
+            onClick={() => navigate("/auth/phone")}
           />
         </div>
 
