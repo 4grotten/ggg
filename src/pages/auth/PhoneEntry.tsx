@@ -197,6 +197,22 @@ const PhoneEntry = () => {
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [dialCode, setDialCode] = useState("+971");
   const [currentIconIndex, setCurrentIconIndex] = useState(0);
+  // Check if adding new account - reset all state for fresh registration
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const isAddingAccount = searchParams.get('add_account') === 'true';
+    
+    if (isAddingAccount) {
+      // Reset all form state for new registration
+      setPhoneNumber("");
+      setIsNotRobot(false);
+      setIsLoginMode(false);
+      setPassword("");
+      setShowPassword(false);
+      setPasswordError(false);
+      setErrorMessage("");
+    }
+  }, []);
 
   // Auto-detect country on mount
   useEffect(() => {
