@@ -323,11 +323,12 @@ const Settings = () => {
   const displayPhone = user?.phone_number;
   // Priority: API avatar (medium size) > local avatar > fallback
   const displayAvatar = user?.avatar?.medium || user?.avatar?.file || avatarUrl;
-  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = displayName ? displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return '?';
     const parts = name.trim().split(/\s+/).filter(Boolean);
-    return parts.map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+    return parts.map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
   };
 
   const otherAccounts = accounts.filter((a) => a.user.id !== user?.id);
