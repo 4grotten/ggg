@@ -686,37 +686,48 @@ const PhoneEntry = () => {
               <input
                 type="tel"
                 inputMode="tel"
-                value={`${dialCode} ${phoneNumber}`}
+                value={`${dialCode}${phoneNumber ? ' ' + phoneNumber : ''}`}
                 onChange={(e) => {
-                  const value = e.target.value;
+                  let value = e.target.value;
                   
-                  // Parse the combined input
-                  // Find where dial code ends (after + and digits, before space or when phone starts)
-                  const match = value.match(/^(\+\d{1,4})\s*(.*)$/);
-                  
-                  if (match) {
-                    const newDialCode = match[1];
-                    const phonePartRaw = match[2].replace(/\D/g, "");
-                    
-                    // Update dial code and find matching country
-                    setDialCode(newDialCode);
-                    const matchedCountry = countries.find(c => c.dialCode === newDialCode);
-                    setSelectedCountry(matchedCountry || null);
-                    
-                    // Format phone number
-                    setPhoneNumber(formatPhoneNumber(phonePartRaw));
-                  } else if (value.startsWith("+")) {
-                    // Just typing dial code, no phone yet
-                    const digits = value.replace(/[^0-9+]/g, "");
-                    setDialCode(digits);
-                    const matchedCountry = countries.find(c => c.dialCode === digits);
-                    setSelectedCountry(matchedCountry || null);
-                    setPhoneNumber("");
-                  } else {
-                    // No + at start, reset to default
-                    setDialCode("+");
-                    setPhoneNumber("");
+                  // Ensure starts with +
+                  if (!value.startsWith("+")) {
+                    value = "+" + value.replace(/[^0-9]/g, "");
                   }
+                  
+                  // Remove all non-digit except + at start
+                  const cleanValue = "+" + value.slice(1).replace(/[^0-9 ]/g, "");
+                  
+                  // Split into potential dial code and phone parts
+                  // Try to find a matching country code from longest to shortest
+                  const digitsOnly = cleanValue.replace(/[^0-9]/g, "");
+                  
+                  let foundDialCode = "+";
+                  let remainingDigits = digitsOnly;
+                  
+                  // Try matching dial codes (max 4 digits after +)
+                  for (let len = Math.min(4, digitsOnly.length); len >= 1; len--) {
+                    const testCode = "+" + digitsOnly.slice(0, len);
+                    const matchedCountry = countries.find(c => c.dialCode === testCode);
+                    if (matchedCountry) {
+                      foundDialCode = testCode;
+                      remainingDigits = digitsOnly.slice(len);
+                      setSelectedCountry(matchedCountry);
+                      break;
+                    }
+                  }
+                  
+                  // If no match found, just use what was typed as dial code
+                  if (foundDialCode === "+" && digitsOnly.length > 0) {
+                    // Use first 1-4 digits as dial code
+                    const codeLen = Math.min(4, digitsOnly.length);
+                    foundDialCode = "+" + digitsOnly.slice(0, codeLen);
+                    remainingDigits = digitsOnly.slice(codeLen);
+                    setSelectedCountry(null);
+                  }
+                  
+                  setDialCode(foundDialCode);
+                  setPhoneNumber(formatPhoneNumber(remainingDigits));
                 }}
                 placeholder={`${dialCode} 50 123 4567`}
                 className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
