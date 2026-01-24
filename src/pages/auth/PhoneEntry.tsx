@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { ChevronDown, Phone, HelpCircle, MessageSquare, KeyRound, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { ChevronDown, Phone, HelpCircle, MessageSquare, KeyRound, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -15,6 +15,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
+import { login as apiLogin, forgotPassword } from "@/services/api/authApi";
+import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
+import { z } from "zod";
 
 interface Country {
   code: string;
@@ -178,6 +181,15 @@ const iconSequence = [
   { Icon: Phone, label: "phone" },
 ];
 
+// Validation schema
+const phoneSchema = z.string()
+  .min(9, "Phone number too short")
+  .max(15, "Phone number too long")
+  .regex(/^\d+$/, "Only digits allowed");
+
+const passwordSchema = z.string()
+  .min(1, "Password is required");
+
 const PhoneEntry = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -231,10 +243,8 @@ const PhoneEntry = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
-  
-  // Mock registered phone number (without dial code prefix)
-  const REGISTERED_PHONE = "585333939";
-  const REGISTERED_PASSWORD = "123456";
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const formatPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, "");
@@ -274,27 +284,29 @@ const PhoneEntry = () => {
     setSearchQuery("");
   };
 
+  // Get full phone number in international format
+  const getFullPhoneNumber = (): string => {
+    const cleanPhone = phoneNumber.replace(/\D/g, "");
+    return `${dialCode}${cleanPhone}`;
+  };
+
   const isPhoneValid = phoneNumber.replace(/\D/g, "").length >= 9 && dialCode.length >= 2;
   const isValid = isPhoneValid && isNotRobot;
-  
-  // Check if phone number matches registered user
-  const checkIfRegistered = (phone: string): boolean => {
-    const cleanPhone = phone.replace(/\D/g, "");
-    return cleanPhone === REGISTERED_PHONE;
-  };
 
   const handleContinue = () => {
     if (isValid) {
+      // Validate phone with zod
       const cleanPhone = phoneNumber.replace(/\D/g, "");
+      const validation = phoneSchema.safeParse(cleanPhone);
       
-      // Check if this is a registered user
-      if (checkIfRegistered(cleanPhone)) {
-        setIsLoginMode(true);
-      } else {
-        // New user - go to registration
-        sessionStorage.setItem("registerPhone", `${dialCode} ${phoneNumber}`);
-        navigate("/auth/profile");
+      if (!validation.success) {
+        setShowError(true);
+        setTimeout(() => setShowError(false), 600);
+        return;
       }
+      
+      // Go directly to login mode (no registration flow)
+      setIsLoginMode(true);
     } else {
       // Trigger phone error only if phone is invalid
       if (!isPhoneValid) {
@@ -310,13 +322,66 @@ const PhoneEntry = () => {
     }
   };
   
-  const handleLogin = () => {
-    if (password === REGISTERED_PASSWORD) {
-      toast.success(t('auth.login.success'));
-      navigate("/");
-    } else {
+  const handleLogin = async () => {
+    // Validate password
+    const validation = passwordSchema.safeParse(password);
+    if (!validation.success) {
       setPasswordError(true);
+      setErrorMessage(t('auth.login.wrongPassword'));
       setTimeout(() => setPasswordError(false), 600);
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage("");
+    
+    try {
+      const fullPhone = getFullPhoneNumber();
+      const response = await apiLogin(fullPhone, password);
+      
+      if (response.error) {
+        setPasswordError(true);
+        // Handle different error types
+        if (response.status === 403) {
+          setErrorMessage(t('auth.login.userBlocked') || 'User is not active');
+        } else if (response.status === 429) {
+          setErrorMessage(t('auth.login.tooManyAttempts') || 'Too many attempts. Please try again later.');
+        } else {
+          setErrorMessage(response.error.message || t('auth.login.wrongPassword'));
+        }
+        setTimeout(() => setPasswordError(false), 600);
+        return;
+      }
+      
+      if (response.data) {
+        toast.success(t('auth.login.success'));
+        navigate("/", { replace: true });
+      }
+    } catch {
+      setPasswordError(true);
+      setErrorMessage(t('auth.login.error') || 'Login failed');
+      setTimeout(() => setPasswordError(false), 600);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleForgotPassword = async () => {
+    const fullPhone = getFullPhoneNumber();
+    setIsLoading(true);
+    
+    try {
+      const response = await forgotPassword(fullPhone);
+      
+      if (response.error) {
+        toast.error(response.error.message || t('auth.login.forgotPasswordError'));
+      } else {
+        toast.success(t('auth.login.forgotPasswordSent') || 'Password reset code sent');
+      }
+    } catch {
+      toast.error(t('auth.login.forgotPasswordError') || 'Failed to send reset code');
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -324,6 +389,7 @@ const PhoneEntry = () => {
     setIsLoginMode(false);
     setPassword("");
     setPasswordError(false);
+    setErrorMessage("");
   };
 
   const filteredCountries = countries.filter(
@@ -406,15 +472,25 @@ const PhoneEntry = () => {
                 </button>
               </div>
               
-              {passwordError && (
+              {(passwordError || errorMessage) && (
                 <motion.p
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-destructive text-sm"
                 >
-                  {t('auth.login.wrongPassword')}
+                  {errorMessage || t('auth.login.wrongPassword')}
                 </motion.p>
               )}
+              
+              {/* Forgot Password Link */}
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={isLoading}
+                className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
+              >
+                {t('auth.login.forgotPassword') || 'Forgot password?'}
+              </button>
             </motion.div>
 
             {/* Support Link */}
@@ -440,10 +516,17 @@ const PhoneEntry = () => {
           <div className="karta-footer-actions">
             <button
               onClick={handleLogin}
-              disabled={password.length < 6}
-              className="karta-btn-primary disabled:opacity-50"
+              disabled={password.length < 1 || isLoading}
+              className="karta-btn-primary disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {t('auth.login.button')}
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {t('common.loading') || 'Loading...'}
+                </>
+              ) : (
+                t('auth.login.button')
+              )}
             </button>
           </div>
         </div>

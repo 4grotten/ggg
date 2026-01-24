@@ -45,6 +45,7 @@ import ProfileSteps from "./pages/auth/ProfileSteps";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -149,11 +150,13 @@ const App = () => {
             <SplashScreen key="splash" />
           ) : (
             <BrowserRouter>
-              <AvatarProvider>
-                <VoiceCallProvider>
-                  <AppContent />
-                </VoiceCallProvider>
-              </AvatarProvider>
+              <AuthProvider>
+                <AvatarProvider>
+                  <VoiceCallProvider>
+                    <AppContent />
+                  </VoiceCallProvider>
+                </AvatarProvider>
+              </AuthProvider>
             </BrowserRouter>
           )}
         </AnimatePresence>

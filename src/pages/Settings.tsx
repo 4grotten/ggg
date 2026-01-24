@@ -8,8 +8,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Download } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Download, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
@@ -58,12 +59,14 @@ const Settings = () => {
   const { theme, setTheme } = useTheme();
   const { i18n, t } = useTranslation();
   const { avatarUrl, setAvatarUrl } = useAvatar();
+  const { user, isAuthenticated, logout } = useAuth();
   const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isAppearanceOpen, setIsAppearanceOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || "en");
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = async () => {
@@ -137,6 +140,22 @@ const Settings = () => {
     setIsAppearanceOpen(false);
   };
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      toast.success(t('settings.logoutSuccess') || 'Successfully logged out');
+    } catch {
+      toast.error(t('settings.logoutError') || 'Failed to logout');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  // Get user display name
+  const displayName = user?.full_name || 'Guest';
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
   return (
     <MobileLayout
       showBackButton
@@ -157,16 +176,19 @@ const Settings = () => {
         >
           <Avatar className="w-24 h-24">
             <AvatarImage 
-              src={avatarUrl} 
-              alt="User" 
+              src={user?.avatar?.file || avatarUrl} 
+              alt={displayName} 
             />
-            <AvatarFallback className="text-2xl">AW</AvatarFallback>
+            <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
           </Avatar>
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
             <Camera className="w-6 h-6 text-white" />
           </div>
         </button>
-        <h1 className="text-xl font-bold text-foreground">Adam Walter</h1>
+        <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
+        {user?.phone_number && (
+          <p className="text-sm text-muted-foreground mt-1">{user.phone_number}</p>
+        )}
       </div>
 
       <div className="space-y-3 px-4 pb-28">
@@ -228,6 +250,28 @@ const Settings = () => {
             label={t("settings.privacyPolicy")}
           />
         </div>
+
+        {/* Logout Button */}
+        {isAuthenticated && (
+          <div className="bg-card rounded-2xl overflow-hidden">
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="w-full flex items-center justify-between py-4 px-4 hover:bg-destructive/10 transition-colors disabled:opacity-50"
+            >
+              <div className="flex items-center gap-3">
+                {isLoggingOut ? (
+                  <Loader2 className="w-5 h-5 text-destructive animate-spin" />
+                ) : (
+                  <LogOut className="w-5 h-5 text-destructive" />
+                )}
+                <span className="text-destructive font-medium">
+                  {t("settings.logout") || "Log Out"}
+                </span>
+              </div>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Language Selection Drawer */}
