@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { MessageSquare, HelpCircle, Loader2, RefreshCw } from "lucide-react";
+import { MessageSquare, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { verifyCode, resendCode } from "@/services/api/authApi";
@@ -28,8 +28,13 @@ const CodeEntry = () => {
   const location = useLocation();
   const { t } = useTranslation();
   
-  // Get phone number from navigation state
-  const phoneNumber = (location.state as { phoneNumber?: string })?.phoneNumber || "";
+  // Get phone number and auth type from navigation state
+  const locationState = location.state as { phoneNumber?: string; authType?: 'sms' | 'whatsapp' } | null;
+  const phoneNumber = locationState?.phoneNumber || "";
+  const authType = locationState?.authType || 'sms';
+  
+  // Check if it's WhatsApp auth (non-+996 countries)
+  const isWhatsAppAuth = authType === 'whatsapp';
   
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
@@ -151,14 +156,16 @@ const CodeEntry = () => {
     }
   };
   
-  // Resend code
+  // Resend code - use appropriate type based on auth method
   const handleResend = async () => {
     if (resendCooldown > 0 || isResending) return;
     
     setIsResending(true);
     
     try {
-      const response = await resendCode(phoneNumber, "register_auth_type");
+      // Use WhatsApp type for non-+996 countries (when enabled)
+      const resendType = isWhatsAppAuth ? 'whatsapp_auth_type' : 'register_auth_type';
+      const response = await resendCode(phoneNumber, resendType);
       
       if (response.error) {
         toast.error(response.error.message || t("auth.code.resendError"));
@@ -199,7 +206,9 @@ const CodeEntry = () => {
               className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 overflow-hidden transition-colors duration-300 ${
                 error 
                   ? 'bg-destructive/10 ring-2 ring-destructive' 
-                  : 'bg-primary/10'
+                  : isWhatsAppAuth 
+                    ? 'bg-emerald-500/10' 
+                    : 'bg-primary/10'
               }`}
               initial={{ scale: 0.8 }}
               animate={{ 
@@ -213,12 +222,29 @@ const CodeEntry = () => {
                 x: { duration: 0.5 }
               }}
             >
-              <MessageSquare className={`w-12 h-12 transition-colors duration-300 ${error ? 'text-destructive' : 'text-primary'}`} />
+              {isWhatsAppAuth ? (
+                <MessageCircle className={`w-12 h-12 transition-colors duration-300 ${error ? 'text-destructive' : 'text-emerald-500'}`} />
+              ) : (
+                <MessageSquare className={`w-12 h-12 transition-colors duration-300 ${error ? 'text-destructive' : 'text-primary'}`} />
+              )}
             </motion.div>
-            <h1 className="text-2xl font-bold">{t("auth.code.title") || "Enter verification code"}</h1>
+            <h1 className="text-2xl font-bold">
+              {isWhatsAppAuth 
+                ? (t("auth.code.titleWhatsApp") || "Enter WhatsApp code")
+                : (t("auth.code.title") || "Enter verification code")
+              }
+            </h1>
             <p className="text-muted-foreground mt-2">
-              {t("auth.code.sentTo") || "Code sent to"} {formatPhoneDisplay(phoneNumber)}
+              {isWhatsAppAuth 
+                ? (t("auth.code.sentToWhatsApp") || "Code sent via WhatsApp to")
+                : (t("auth.code.sentTo") || "Code sent to")
+              } {formatPhoneDisplay(phoneNumber)}
             </p>
+            {isWhatsAppAuth && (
+              <p className="text-emerald-600 dark:text-emerald-400 text-sm mt-3 font-medium">
+                {t("auth.code.whatsappRegionNotice") || "In your region, authorization works only through WhatsApp"}
+              </p>
+            )}
           </motion.div>
 
           {/* Code Input */}

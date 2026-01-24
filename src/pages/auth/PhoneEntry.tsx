@@ -336,10 +336,19 @@ const PhoneEntry = () => {
               navigate("/", { replace: true });
             }
           } else if (is_new_user && temporary_code_enabled) {
-            // +996 new user - SMS code sent, go to code entry
+            // Check if this is a +996 country (SMS) or other (WhatsApp - when API ready)
+            const isKyrgyzstan = dialCode === '+996';
+            
+            // TODO: When WhatsApp API is ready, uncomment the following line and remove 'sms':
+            // const authType = isKyrgyzstan ? 'sms' : 'whatsapp';
+            const authType: 'sms' | 'whatsapp' = 'sms'; // Currently always SMS
+            
             toast.success(t("auth.phone.codeSent") || "Verification code sent!");
             navigate("/auth/code", { 
-              state: { phoneNumber: fullPhone }
+              state: { 
+                phoneNumber: fullPhone,
+                authType: authType // Pass auth type to CodeEntry
+              }
             });
           } else if (!is_new_user) {
             // Existing user without token - needs password login

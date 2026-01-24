@@ -607,6 +607,22 @@
       "support": "Soporte y Ayuda",
       "continue": "Continuar"
     },
+    "code": {
+      "title": "Ingresa el código de verificación",
+      "titleWhatsApp": "Ingresa el código de WhatsApp",
+      "sentTo": "Código enviado a",
+      "sentToWhatsApp": "Código enviado por WhatsApp a",
+      "whatsappRegionNotice": "En tu región, la autorización solo funciona a través de WhatsApp",
+      "verify": "Verificar",
+      "resend": "Reenviar código",
+      "resendIn": "Reenviar en",
+      "resendSuccess": "¡Nuevo código enviado!",
+      "resendError": "Error al reenviar el código",
+      "invalidCode": "Por favor ingresa un código válido de 6 dígitos",
+      "wrongCode": "Código incorrecto. Inténtalo de nuevo.",
+      "success": "¡Código verificado!",
+      "error": "Error de verificación"
+    },
     "login": {
       "title": "Ingresa tu contraseña",
       "passwordPlaceholder": "Tu contraseña",

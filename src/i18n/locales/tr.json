@@ -607,6 +607,22 @@
       "support": "Destek ve Yardım",
       "continue": "Devam"
     },
+    "code": {
+      "title": "Doğrulama kodunu girin",
+      "titleWhatsApp": "WhatsApp kodunu girin",
+      "sentTo": "Kod şuraya gönderildi",
+      "sentToWhatsApp": "Kod WhatsApp ile şuraya gönderildi",
+      "whatsappRegionNotice": "Bölgenizde yetkilendirme yalnızca WhatsApp üzerinden çalışır",
+      "verify": "Doğrula",
+      "resend": "Kodu tekrar gönder",
+      "resendIn": "Tekrar gönder",
+      "resendSuccess": "Yeni kod gönderildi!",
+      "resendError": "Kod tekrar gönderilemedi",
+      "invalidCode": "Lütfen geçerli bir 6 haneli kod girin",
+      "wrongCode": "Yanlış kod. Tekrar deneyin.",
+      "success": "Kod doğrulandı!",
+      "error": "Doğrulama başarısız"
+    },
     "login": {
       "title": "Şifrenizi girin",
       "passwordPlaceholder": "Şifreniz",

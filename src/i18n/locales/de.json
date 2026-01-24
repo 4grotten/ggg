@@ -607,6 +607,22 @@
       "support": "Hilfe & Support",
       "continue": "Weiter"
     },
+    "code": {
+      "title": "Bestätigungscode eingeben",
+      "titleWhatsApp": "WhatsApp-Code eingeben",
+      "sentTo": "Code gesendet an",
+      "sentToWhatsApp": "Code per WhatsApp gesendet an",
+      "whatsappRegionNotice": "In Ihrer Region funktioniert die Autorisierung nur über WhatsApp",
+      "verify": "Bestätigen",
+      "resend": "Code erneut senden",
+      "resendIn": "Erneut senden in",
+      "resendSuccess": "Neuer Code gesendet!",
+      "resendError": "Code konnte nicht erneut gesendet werden",
+      "invalidCode": "Bitte geben Sie einen gültigen 6-stelligen Code ein",
+      "wrongCode": "Falscher Code. Bitte versuchen Sie es erneut.",
+      "success": "Code verifiziert!",
+      "error": "Verifizierung fehlgeschlagen"
+    },
     "login": {
       "title": "Passwort eingeben",
       "passwordPlaceholder": "Ihr Passwort",
