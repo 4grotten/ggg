@@ -608,7 +608,10 @@
       "searchCountry": "搜索国家或代码",
       "notRobot": "我不是机器人",
       "support": "支持与帮助",
-      "continue": "继续"
+      "continue": "继续",
+      "codeSent": "验证码已发送！",
+      "codeSentWhatsApp": "验证码已通过WhatsApp发送！",
+      "error": "出现问题，请重试。"
     },
     "code": {
       "title": "输入验证码",
@@ -620,6 +623,7 @@
       "resend": "重新发送验证码",
       "resendIn": "重发倒计时",
       "resendSuccess": "新验证码已发送！",
+      "resendSuccessWhatsApp": "验证码已通过WhatsApp发送！",
       "resendError": "发送验证码失败",
       "invalidCode": "请输入有效的6位数验证码",
       "wrongCode": "验证码错误，请重试。",

@@ -608,7 +608,10 @@
       "searchCountry": "Land oder Code suchen",
       "notRobot": "Ich bin kein Roboter",
       "support": "Hilfe & Support",
-      "continue": "Weiter"
+      "continue": "Weiter",
+      "codeSent": "Bestätigungscode gesendet!",
+      "codeSentWhatsApp": "Code per WhatsApp gesendet!",
+      "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
     },
     "code": {
       "title": "Bestätigungscode eingeben",
@@ -620,6 +623,7 @@
       "resend": "Code erneut senden",
       "resendIn": "Erneut senden in",
       "resendSuccess": "Neuer Code gesendet!",
+      "resendSuccessWhatsApp": "Code per WhatsApp gesendet!",
       "resendError": "Code konnte nicht erneut gesendet werden",
       "invalidCode": "Bitte geben Sie einen gültigen 6-stelligen Code ein",
       "wrongCode": "Falscher Code. Bitte versuchen Sie es erneut.",
