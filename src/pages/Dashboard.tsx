@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock } from "lucide-react";
+import { Clock, LogOut, Loader2 } from "lucide-react";
+import { logout } from "@/services/api/authApi";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -45,6 +46,19 @@ const Dashboard = () => {
   const [sendOpen, setSendOpen] = useState(false);
   const [openCardOpen, setOpenCardOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      navigate("/auth/phone");
+    } catch (error) {
+      toast.error(t('settings.logoutError'));
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   // Refs for sliding indicator
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -165,7 +179,21 @@ const Dashboard = () => {
           <div className="flex items-center gap-2">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            <motion.button 
+            {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-destructive/10 hover:bg-destructive/20 transition-colors disabled:opacity-50"
+                aria-label="Logout"
+              >
+                {isLoggingOut ? (
+                  <Loader2 className="w-4 h-4 text-destructive animate-spin" />
+                ) : (
+                  <LogOut className="w-4 h-4 text-destructive" />
+                )}
+              </button>
+            )}
+            <motion.button
               onClick={() => isAuthenticated ? navigate("/settings") : navigate("/auth/phone")}
               className="relative"
               initial={isAuthenticated ? { scale: 0, rotate: -180 } : { scale: 1 }}
