@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedBotHead } from "./AnimatedBotHead";
 import { useAvatar } from "@/contexts/AvatarContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User, Volume2, VolumeX, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -15,9 +16,13 @@ interface ChatMessageProps {
 export const ChatMessage = ({ role, content }: ChatMessageProps) => {
   const isUser = role === 'user';
   const { avatarUrl } = useAvatar();
+  const { user } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  
+  // Priority: API avatar > local avatar
+  const displayAvatar = user?.avatar?.medium || user?.avatar?.small || user?.avatar?.file || avatarUrl;
   
   const handleSpeak = async () => {
     // If already playing, stop
@@ -109,7 +114,7 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
       )}>
         {isUser ? (
           <Avatar className="w-8 h-8">
-            <AvatarImage src={avatarUrl} alt="User" className="object-cover" />
+            <AvatarImage src={displayAvatar} alt="User" className="object-cover" />
             <AvatarFallback className="bg-primary">
               <User className="w-4 h-4 text-primary-foreground" />
             </AvatarFallback>
