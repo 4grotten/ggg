@@ -687,6 +687,21 @@
       "tooManyAttempts": "Too many attempts. Please try again later.",
       "error": "Login failed. Please try again."
     },
+    "register": {
+      "title": "Create Account",
+      "username": "Username",
+      "usernamePlaceholder": "Enter username",
+      "usernameHint": "Letters, numbers, and underscores only",
+      "usernameInvalid": "Username must be 3-30 characters (letters, numbers, underscores)",
+      "password": "Password",
+      "passwordPlaceholder": "Enter password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm password",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordsMismatch": "Passwords don't match",
+      "usernameTaken": "This username is already taken",
+      "error": "Something went wrong. Please try again."
+    },
     "profile": {
       "header": "Profile",
       "moreInfo": "More info",

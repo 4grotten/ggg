@@ -30,6 +30,8 @@ interface LocationState {
   authType?: 'sms' | 'whatsapp';
   otpId?: string;
   expiresAt?: string;
+  username?: string;   // For registration
+  password?: string;   // For registration
 }
 
 const CodeEntry = () => {
@@ -41,6 +43,8 @@ const CodeEntry = () => {
   const locationState = location.state as LocationState | null;
   const phoneNumber = locationState?.phoneNumber || "";
   const authType = locationState?.authType || 'sms';
+  const registrationUsername = locationState?.username;
+  const registrationPassword = locationState?.password;
   
   // Check if it's WhatsApp auth (non-+996 countries)
   const isWhatsAppAuth = authType === 'whatsapp';
@@ -140,7 +144,18 @@ const CodeEntry = () => {
     try {
       if (isWhatsAppAuth) {
         // WhatsApp OTP verification — token comes directly from /otp/verify/
-        const response = await verifyOtp(phoneNumber, fullCode);
+        // Pass username and password for registration if provided
+        const response = await verifyOtp(phoneNumber, fullCode, registrationUsername, registrationPassword);
+        
+        // Handle username taken error (status 400)
+        if (response.error?.status === 400 && response.error.message.includes("Username")) {
+          toast.error(response.error.message);
+          navigate("/auth/register", { 
+            replace: true, 
+            state: { phoneNumber, usernameError: response.error.message } 
+          });
+          return;
+        }
         
         if (response.error || !response.data?.is_valid) {
           const errorMsg = response.error?.message || response.data?.error || t("auth.code.wrongCode");
