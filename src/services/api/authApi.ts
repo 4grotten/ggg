@@ -3,6 +3,7 @@
  */
 
 import { apiPost, apiGet, setAuthToken, getAuthToken, AUTH_USER_KEY } from './apiClient';
+import { saveCurrentAccount } from '@/hooks/useMultiAccount';
 
 // ============ Types ============
 
@@ -150,6 +151,8 @@ export async function login(phone_number: string, password: string) {
     setAuthToken(response.data.token);
     if (response.data.user) {
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data.user));
+      // Persist for multi-account switching
+      saveCurrentAccount(response.data.user);
     }
   }
   
@@ -166,6 +169,8 @@ export async function initProfile(data: InitProfileRequest) {
   // При успехе сохраняем данные пользователя
   if (response.data) {
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
+    // Persist for multi-account switching
+    saveCurrentAccount(response.data);
   }
   
   return response;
@@ -189,6 +194,8 @@ export async function getCurrentUser() {
   // При успехе сохраняем данные пользователя
   if (response.data) {
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
+    // Persist for multi-account switching
+    saveCurrentAccount(response.data);
   }
   
   return response;
@@ -254,6 +261,8 @@ export async function updateProfile(data: {
   // При успехе сохраняем данные пользователя
   if (response.data) {
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
+    // Persist for multi-account switching
+    saveCurrentAccount(response.data);
   }
   
   return response;
