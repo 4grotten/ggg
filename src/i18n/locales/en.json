@@ -644,7 +644,11 @@
       "support": "Support & Help",
       "continue": "Continue",
       "codeSent": "Verification code sent!",
-      "error": "Something went wrong. Please try again."
+      "whatsappCodeSent": "Code sent via WhatsApp!",
+      "error": "Something went wrong. Please try again.",
+      "rateLimitError": "Too many requests. Please wait a few minutes.",
+      "invalidFormat": "Invalid phone number format",
+      "serviceUnavailable": "Service temporarily unavailable. Please try later."
     },
     "code": {
       "title": "Enter verification code",
@@ -660,7 +664,14 @@
       "invalidCode": "Please enter a valid 6-digit code",
       "wrongCode": "Wrong code. Please try again.",
       "success": "Code verified!",
-      "error": "Verification failed"
+      "error": "Verification failed",
+      "attemptsRemaining": "{{count}} attempts remaining",
+      "sendNewCode": "Send new code",
+      "newCodeSent": "New code sent!",
+      "cooldownActive": "Please wait before requesting a new code",
+      "otpExpired": "Code expired. Please request a new one.",
+      "maxAttempts": "Maximum attempts exceeded. Please request a new code.",
+      "noActiveOtp": "No active code found. Please request a new one."
     },
     "login": {
       "title": "Enter your password",

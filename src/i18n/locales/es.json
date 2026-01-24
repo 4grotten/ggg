@@ -632,7 +632,13 @@
       "searchCountry": "Buscar país o código",
       "notRobot": "No soy un robot",
       "support": "Soporte y Ayuda",
-      "continue": "Continuar"
+      "continue": "Continuar",
+      "codeSent": "¡Código de verificación enviado!",
+      "whatsappCodeSent": "¡Código enviado por WhatsApp!",
+      "error": "Algo salió mal. Por favor, inténtalo de nuevo.",
+      "rateLimitError": "Demasiadas solicitudes. Por favor, espera unos minutos.",
+      "invalidFormat": "Formato de número de teléfono inválido",
+      "serviceUnavailable": "Servicio temporalmente no disponible. Inténtalo más tarde."
     },
     "code": {
       "title": "Ingresa el código de verificación",
@@ -648,7 +654,14 @@
       "invalidCode": "Por favor ingresa un código válido de 6 dígitos",
       "wrongCode": "Código incorrecto. Inténtalo de nuevo.",
       "success": "¡Código verificado!",
-      "error": "Error de verificación"
+      "error": "Error de verificación",
+      "attemptsRemaining": "{{count}} intentos restantes",
+      "sendNewCode": "Enviar nuevo código",
+      "newCodeSent": "¡Nuevo código enviado!",
+      "cooldownActive": "Por favor espera antes de solicitar un nuevo código",
+      "otpExpired": "Código expirado. Por favor solicita uno nuevo.",
+      "maxAttempts": "Máximo de intentos excedido. Por favor solicita un nuevo código.",
+      "noActiveOtp": "No se encontró código activo. Por favor solicita uno nuevo."
     },
     "login": {
       "title": "Ingresa tu contraseña",

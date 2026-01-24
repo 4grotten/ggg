@@ -1,7 +1,7 @@
 /**
- * CodeEntry — экран ввода SMS-кода
- * POST /verify_code/ для подтверждения
- * POST /resend_code/ для повторной отправки
+ * CodeEntry — экран ввода кода подтверждения
+ * SMS (Kyrgyzstan +996): POST /verify_code/ + /resend_code/
+ * WhatsApp (все остальные): POST /otp/verify/ + /otp/resend/
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -13,7 +13,9 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { MessageSquare, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyCode, resendCode } from "@/services/api/authApi";
+import { verifyCode as verifySmsCode, resendCode as resendSmsCode, registerAuth, getCurrentUser } from "@/services/api/authApi";
+import { verifyOtp, resendOtp, parseAttemptsRemaining, sendOtp } from "@/services/api/otpApi";
+import { setAuthToken } from "@/services/api/apiClient";
 import { z } from "zod";
 
 // Validation schema
@@ -23,13 +25,20 @@ const codeSchema = z.string()
 
 const RESEND_COOLDOWN = 60; // seconds
 
+interface LocationState {
+  phoneNumber?: string;
+  authType?: 'sms' | 'whatsapp';
+  otpId?: string;
+  expiresAt?: string;
+}
+
 const CodeEntry = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   
   // Get phone number and auth type from navigation state
-  const locationState = location.state as { phoneNumber?: string; authType?: 'sms' | 'whatsapp' } | null;
+  const locationState = location.state as LocationState | null;
   const phoneNumber = locationState?.phoneNumber || "";
   const authType = locationState?.authType || 'sms';
   
@@ -40,7 +49,9 @@ const CodeEntry = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState("");
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
   const [resendCooldown, setResendCooldown] = useState(RESEND_COOLDOWN);
+  const [showSendNewCode, setShowSendNewCode] = useState(false);
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   
@@ -67,6 +78,7 @@ const CodeEntry = () => {
     newCode[index] = value.slice(-1);
     setCode(newCode);
     setError("");
+    setAttemptsRemaining(null);
     
     // Auto-focus next input
     if (value && index < 5) {
@@ -123,30 +135,83 @@ const CodeEntry = () => {
     
     setIsLoading(true);
     setError("");
+    setShowSendNewCode(false);
     
     try {
-      const response = await verifyCode(phoneNumber, parseInt(fullCode, 10));
-      
-      if (response.error) {
-        setError(response.error.message || t("auth.code.wrongCode"));
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
-        return;
-      }
-      
-      if (response.data) {
+      if (isWhatsAppAuth) {
+        // WhatsApp OTP verification
+        const response = await verifyOtp(phoneNumber, fullCode);
+        
+        if (response.error || !response.data?.is_valid) {
+          const errorMsg = response.error?.message || response.data?.error || t("auth.code.wrongCode");
+          
+          // Parse attempts remaining
+          const attempts = parseAttemptsRemaining(errorMsg);
+          if (attempts !== null) {
+            setAttemptsRemaining(attempts);
+          }
+          
+          // Check for terminal errors
+          if (errorMsg.includes("Max attempts exceeded") || errorMsg.includes("OTP expired") || errorMsg.includes("No active OTP")) {
+            setShowSendNewCode(true);
+            setError(t(`auth.code.${errorMsg.includes("expired") ? "otpExpired" : errorMsg.includes("Max") ? "maxAttempts" : "noActiveOtp"}`) || errorMsg);
+          } else {
+            setError(errorMsg);
+          }
+          
+          setCode(["", "", "", "", "", ""]);
+          inputRefs.current[0]?.focus();
+          return;
+        }
+        
+        // WhatsApp OTP verified successfully
+        // Now we need to complete registration via backend
         toast.success(t("auth.code.success") || "Code verified!");
         
-        // Navigate based on user status
-        if (response.data.is_new_user) {
-          // New user - go to profile setup
+        // After OTP verification, call register_auth to get token
+        const registerResponse = await registerAuth(phoneNumber);
+        
+        if (registerResponse.data?.token) {
+          setAuthToken(registerResponse.data.token);
+          
+          if (registerResponse.data.is_new_user) {
+            navigate("/auth/profile", { 
+              replace: true,
+              state: { phoneNumber, isNewUser: true }
+            });
+          } else {
+            await getCurrentUser();
+            navigate("/", { replace: true });
+          }
+        } else {
+          // New user flow - go to profile setup
           navigate("/auth/profile", { 
             replace: true,
             state: { phoneNumber, isNewUser: true }
           });
-        } else {
-          // Existing user - go to home
-          navigate("/", { replace: true });
+        }
+      } else {
+        // SMS verification (Kyrgyzstan)
+        const response = await verifySmsCode(phoneNumber, parseInt(fullCode, 10));
+        
+        if (response.error) {
+          setError(response.error.message || t("auth.code.wrongCode"));
+          setCode(["", "", "", "", "", ""]);
+          inputRefs.current[0]?.focus();
+          return;
+        }
+        
+        if (response.data) {
+          toast.success(t("auth.code.success") || "Code verified!");
+          
+          if (response.data.is_new_user) {
+            navigate("/auth/profile", { 
+              replace: true,
+              state: { phoneNumber, isNewUser: true }
+            });
+          } else {
+            navigate("/", { replace: true });
+          }
         }
       }
     } catch {
@@ -156,27 +221,83 @@ const CodeEntry = () => {
     }
   };
   
-  // Resend code - use appropriate type based on auth method
+  // Resend code
   const handleResend = async () => {
     if (resendCooldown > 0 || isResending) return;
     
     setIsResending(true);
+    setError("");
+    setShowSendNewCode(false);
+    setAttemptsRemaining(null);
     
     try {
-      // Use WhatsApp type for non-+996 countries (when enabled)
-      const resendType = isWhatsAppAuth ? 'whatsapp_auth_type' : 'register_auth_type';
-      const response = await resendCode(phoneNumber, resendType);
-      
-      if (response.error) {
-        toast.error(response.error.message || t("auth.code.resendError"));
+      if (isWhatsAppAuth) {
+        // WhatsApp OTP resend
+        const response = await resendOtp(phoneNumber);
+        
+        if (response.error) {
+          if (response.error.secondsRemaining) {
+            // Cooldown active
+            setResendCooldown(response.error.secondsRemaining);
+            toast.error(t("auth.code.cooldownActive") || `Please wait ${response.error.secondsRemaining} seconds`);
+          } else {
+            toast.error(response.error.message || t("auth.code.resendError"));
+          }
+        } else {
+          toast.success(t("auth.code.resendSuccess") || "Code sent!");
+          setResendCooldown(RESEND_COOLDOWN);
+          setCode(["", "", "", "", "", ""]);
+          inputRefs.current[0]?.focus();
+        }
       } else {
-        toast.success(t("auth.code.resendSuccess") || "Code sent!");
-        setResendCooldown(RESEND_COOLDOWN);
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        // SMS resend (Kyrgyzstan)
+        const response = await resendSmsCode(phoneNumber, 'register_auth_type');
+        
+        if (response.error) {
+          toast.error(response.error.message || t("auth.code.resendError"));
+        } else {
+          toast.success(t("auth.code.resendSuccess") || "Code sent!");
+          setResendCooldown(RESEND_COOLDOWN);
+          setCode(["", "", "", "", "", ""]);
+          inputRefs.current[0]?.focus();
+        }
       }
     } catch {
       toast.error(t("auth.code.resendError") || "Failed to resend code");
+    } finally {
+      setIsResending(false);
+    }
+  };
+  
+  // Send new code (after expiry or max attempts)
+  const handleSendNewCode = async () => {
+    setIsResending(true);
+    setError("");
+    setShowSendNewCode(false);
+    setAttemptsRemaining(null);
+    
+    try {
+      if (isWhatsAppAuth) {
+        const response = await sendOtp(phoneNumber);
+        
+        if (response.error) {
+          if (response.error.status === 429) {
+            toast.error(t("auth.phone.rateLimitError") || "Too many requests. Please wait.");
+          } else {
+            toast.error(response.error.message || t("auth.code.resendError"));
+          }
+        } else if (response.data?.sent) {
+          toast.success(t("auth.code.newCodeSent") || "New code sent!");
+          setResendCooldown(RESEND_COOLDOWN);
+          setCode(["", "", "", "", "", ""]);
+          inputRefs.current[0]?.focus();
+        }
+      } else {
+        // For SMS, just resend
+        await handleResend();
+      }
+    } catch {
+      toast.error(t("auth.code.resendError") || "Failed to send code");
     } finally {
       setIsResending(false);
     }
@@ -280,32 +401,52 @@ const CodeEntry = () => {
             </div>
             
             {error && (
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-destructive text-sm text-center"
+                className="text-center"
               >
-                {error}
-              </motion.p>
+                <p className="text-destructive text-sm">{error}</p>
+                {attemptsRemaining !== null && (
+                  <p className="text-muted-foreground text-xs mt-1">
+                    {t("auth.code.attemptsRemaining", { count: attemptsRemaining }) || `${attemptsRemaining} attempts remaining`}
+                  </p>
+                )}
+              </motion.div>
             )}
             
-            {/* Resend button */}
+            {/* Resend / Send New Code button */}
             <div className="text-center">
-              <button
-                onClick={handleResend}
-                disabled={resendCooldown > 0 || isResending}
-                className="text-primary font-medium disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
-              >
-                {isResending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="w-4 h-4" />
-                )}
-                {resendCooldown > 0 
-                  ? `${t("auth.code.resendIn") || "Resend in"} ${resendCooldown}s`
-                  : t("auth.code.resend") || "Resend code"
-                }
-              </button>
+              {showSendNewCode ? (
+                <button
+                  onClick={handleSendNewCode}
+                  disabled={isResending}
+                  className="text-primary font-medium flex items-center gap-2 mx-auto"
+                >
+                  {isResending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
+                  {t("auth.code.sendNewCode") || "Send new code"}
+                </button>
+              ) : (
+                <button
+                  onClick={handleResend}
+                  disabled={resendCooldown > 0 || isResending}
+                  className="text-primary font-medium disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+                >
+                  {isResending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
+                  {resendCooldown > 0 
+                    ? `${t("auth.code.resendIn") || "Resend in"} ${resendCooldown}s`
+                    : t("auth.code.resend") || "Resend code"
+                  }
+                </button>
+              )}
             </div>
           </motion.div>
 
