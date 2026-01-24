@@ -4,6 +4,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import { 
   getCurrentUser, 
   logout as apiLogout, 
@@ -18,6 +19,28 @@ import {
   isAuthenticated as checkIsAuthenticated,
   AUTH_USER_KEY 
 } from '@/services/api/apiClient';
+
+// Синхронизация токена с основным сайтом Apofiz
+const syncWithApofiz = (token: string, user: UserProfile | null) => {
+  const apofizState = {
+    userStore: {
+      user: user,
+      token: token
+    }
+  };
+  
+  // Записываем cookie которую читает Apofiz фронтенд
+  Cookies.set('state', JSON.stringify(apofizState), { 
+    expires: 7,        // 7 дней, как у Apofiz
+    path: '/',         // доступна на всём домене
+    sameSite: 'Lax'
+  });
+};
+
+// Удаление синхронизации при logout
+const clearApofizSync = () => {
+  Cookies.remove('state', { path: '/' });
+};
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -112,6 +135,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback((userData: UserProfile) => {
     setUser(userData);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userData));
+    
+    // Синхронизируем с Apofiz
+    const token = getAuthToken();
+    if (token) {
+      syncWithApofiz(token, userData);
+    }
   }, []);
 
   const logout = useCallback(async () => {
@@ -121,6 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Игнорируем ошибки при logout
     } finally {
       removeAuthToken();
+      clearApofizSync(); // Удаляем cookie при logout
       setUser(null);
       navigate('/auth/phone', { replace: true });
     }
@@ -131,6 +161,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (response.data) {
       setUser(response.data);
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
+      
+      // Синхронизируем с Apofiz при обновлении профиля
+      const token = getAuthToken();
+      if (token) {
+        syncWithApofiz(token, response.data);
+      }
     }
   }, []);
 
