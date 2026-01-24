@@ -10,7 +10,7 @@ import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
@@ -105,7 +105,7 @@ const InstallStepsContent = ({ isOpen, onShare, t }: InstallStepsContentProps) =
           <div>
             <p className="font-medium text-foreground flex items-center gap-2">
               {t("settings.installStep1") || "Tap the Share button"}
-              <Share2 className="w-4 h-4 text-primary" />
+              <Upload className="w-4 h-4 text-primary" />
             </p>
             <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep1Desc") || "Look for the share icon in your browser"}</p>
           </div>
