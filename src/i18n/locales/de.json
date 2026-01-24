@@ -339,7 +339,28 @@
     "apply": "Anwenden",
     "logout": "Abmelden",
     "guest": "Gast",
-    "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen"
+    "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen",
+    "accounts": "Konten",
+    "addAccount": "Konto hinzufügen",
+    "addAccountDesc": "Bei einem anderen Konto anmelden",
+    "switchAccount": "Konto wechseln",
+    "otherAccounts": "Andere Konten",
+    "otherAccountsMock": "Beispiele (keine gespeicherten Konten gefunden)",
+    "editProfile": "Profil bearbeiten"
+  },
+  "editProfile": {
+    "title": "Profil bearbeiten",
+    "fullName": "Vollständiger Name",
+    "fullNamePlaceholder": "Geben Sie Ihren vollständigen Namen ein",
+    "email": "E-Mail",
+    "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
+    "dateOfBirth": "Geburtsdatum",
+    "selectDateOfBirth": "Geburtsdatum auswählen",
+    "gender": "Geschlecht",
+    "selectGender": "Geschlecht auswählen",
+    "save": "Änderungen speichern",
+    "saved": "Profil erfolgreich aktualisiert",
+    "saveFailed": "Profil konnte nicht aktualisiert werden"
   },
   "card": {
     "back": "Zurück",

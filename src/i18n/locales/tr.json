@@ -339,7 +339,28 @@
     "apply": "Uygula",
     "logout": "Çıkış Yap",
     "guest": "Misafir",
-    "loginToAccess": "Tüm özelliklere erişmek için giriş yapın"
+    "loginToAccess": "Tüm özelliklere erişmek için giriş yapın",
+    "accounts": "Hesaplar",
+    "addAccount": "Hesap Ekle",
+    "addAccountDesc": "Başka bir hesaba giriş yap",
+    "switchAccount": "Hesap Değiştir",
+    "otherAccounts": "Diğer hesaplar",
+    "otherAccountsMock": "Örnekler (kayıtlı hesap bulunamadı)",
+    "editProfile": "Profili Düzenle"
+  },
+  "editProfile": {
+    "title": "Profili Düzenle",
+    "fullName": "Tam Ad",
+    "fullNamePlaceholder": "Tam adınızı girin",
+    "email": "E-posta",
+    "emailPlaceholder": "E-posta adresinizi girin",
+    "dateOfBirth": "Doğum Tarihi",
+    "selectDateOfBirth": "Doğum tarihi seçin",
+    "gender": "Cinsiyet",
+    "selectGender": "Cinsiyet seçin",
+    "save": "Değişiklikleri Kaydet",
+    "saved": "Profil başarıyla güncellendi",
+    "saveFailed": "Profil güncellenemedi"
   },
   "card": {
     "back": "Geri",
