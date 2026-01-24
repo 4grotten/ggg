@@ -293,6 +293,7 @@
     "languageSystem": "Dil Sistem olarak ayarlandı ({{language}})",
     "languageChanged": "Dil {{language}} olarak değiştirildi",
     "copied": "{{label}} kopyalandı",
+    "linkCopied": "Bağlantı panoya kopyalandı",
     "accountDetailsCopied": "Hesap bilgileri kopyalandı",
     "cardNumberCopied": "Kart numarası kopyalandı",
     "cardDetailsCopied": "Kart bilgileri kopyalandı",

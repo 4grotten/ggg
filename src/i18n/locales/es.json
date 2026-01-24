@@ -293,6 +293,7 @@
     "languageSystem": "Idioma configurado como Sistema ({{language}})",
     "languageChanged": "Idioma cambiado a {{language}}",
     "copied": "{{label}} copiado",
+    "linkCopied": "Enlace copiado al portapapeles",
     "accountDetailsCopied": "Datos de la cuenta copiados",
     "cardNumberCopied": "Número de tarjeta copiado",
     "cardDetailsCopied": "Datos de tarjeta copiados",
