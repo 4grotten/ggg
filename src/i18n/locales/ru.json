@@ -356,6 +356,7 @@
     "switchAccountTitle": "Сменить аккаунт?",
     "switchAccountDescription": "Вы хотите переключиться на",
     "switchingAccount": "Смена аккаунта...",
+    "switchAccountError": "Не удалось сменить аккаунт",
     "otherAccounts": "Другие аккаунты",
     "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)",
     "editProfile": "Редактировать профиль"
