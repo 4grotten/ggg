@@ -132,6 +132,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Сохраняем актуальные данные пользователя
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
     }
+
+    // Account switch complete (success or fail)
+    try {
+      sessionStorage.removeItem('switching_account');
+    } catch {
+      // ignore
+    }
     
     setIsLoading(false);
   }, [navigate]);

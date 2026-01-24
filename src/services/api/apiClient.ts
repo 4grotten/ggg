@@ -80,10 +80,23 @@ export async function apiRequest<T = unknown>(
     
     // Обработка 401 - невалидный токен
     if (response.status === 401) {
-      removeAuthToken();
-      // Редирект на страницу входа
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
-        window.location.href = '/auth/phone';
+      // During account switching, avoid wiping token due to in-flight requests
+      const isSwitching =
+        typeof window !== 'undefined' &&
+        (() => {
+          try {
+            return sessionStorage.getItem('switching_account') === '1';
+          } catch {
+            return false;
+          }
+        })();
+
+      if (!isSwitching) {
+        removeAuthToken();
+        // Редирект на страницу входа
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
+          window.location.href = '/auth/phone';
+        }
       }
       return {
         data: null,
