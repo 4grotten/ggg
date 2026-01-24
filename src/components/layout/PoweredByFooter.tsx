@@ -6,16 +6,15 @@ interface PoweredByFooterProps {
 }
 
 /**
- * Opens Apofiz.com with automatic authentication
- * Uses the same token format as the API (Token header style)
+ * Opens test.apofiz.com with automatic authentication via token
  */
 export const openApofizWithAuth = () => {
   const token = getAuthToken();
   
-  // Open with token as query parameter for SSO
+  // Open with token as query parameter for SSO authentication
   const url = token 
-    ? `https://apofiz.com/auth/sso/?token=${encodeURIComponent(token)}`
-    : 'https://apofiz.com';
+    ? `https://test.apofiz.com/?token=${encodeURIComponent(token)}`
+    : 'https://test.apofiz.com';
   
   window.open(url, '_blank', 'noopener,noreferrer');
 };
