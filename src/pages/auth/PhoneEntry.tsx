@@ -15,7 +15,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { login as apiLogin, forgotPassword, getCurrentUser, sendOtp } from "@/services/api/authApi";
+import { login as apiLogin, forgotPassword, getCurrentUser, sendOtp, registerAuth } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { z } from "zod";
 
@@ -311,31 +311,57 @@ const PhoneEntry = () => {
       try {
         const fullPhone = getFullPhoneNumber();
         
-        // Determine OTP type based on country
-        const isKyrgyzstan = dialCode === '+996';
-        const otpType: 'sms' | 'whatsapp' = isKyrgyzstan ? 'sms' : 'whatsapp';
+        // First check if user already exists in database
+        const checkResponse = await registerAuth(fullPhone);
         
-        // Send OTP first (without registering phone in database)
-        const otpResponse = await sendOtp(fullPhone, otpType);
-        
-        if (otpResponse.error) {
-          // If OTP fails, show error but still allow navigation for retry
-          console.warn('OTP send failed:', otpResponse.error.message);
-          toast.error(otpResponse.error.message || t("auth.phone.error"));
-        } else {
-          const successMessage = isKyrgyzstan 
-            ? (t("auth.phone.codeSent") || "Verification code sent!")
-            : (t("auth.phone.codeSentWhatsApp") || "Code sent via WhatsApp!");
-          toast.success(successMessage);
+        if (checkResponse.error) {
+          setShowError(true);
+          setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
+          setTimeout(() => setShowError(false), 600);
+          return;
         }
         
-        // Navigate to code entry page
-        navigate("/auth/code", { 
-          state: { 
-            phoneNumber: fullPhone,
-            authType: otpType
+        if (checkResponse.data) {
+          const { is_new_user, token } = checkResponse.data;
+          
+          if (is_new_user) {
+            // New user - send OTP (phone is NOT registered yet)
+            const isKyrgyzstan = dialCode === '+996';
+            const otpType: 'sms' | 'whatsapp' = isKyrgyzstan ? 'sms' : 'whatsapp';
+            
+            const otpResponse = await sendOtp(fullPhone, otpType);
+            
+            if (otpResponse.error) {
+              console.warn('OTP send failed:', otpResponse.error.message);
+              toast.error(otpResponse.error.message || t("auth.phone.error"));
+            } else {
+              const successMessage = isKyrgyzstan 
+                ? (t("auth.phone.codeSent") || "Verification code sent!")
+                : (t("auth.phone.codeSentWhatsApp") || "Code sent via WhatsApp!");
+              toast.success(successMessage);
+            }
+            
+            // Navigate to code entry page
+            navigate("/auth/code", { 
+              state: { 
+                phoneNumber: fullPhone,
+                authType: otpType
+              }
+            });
+          } else {
+            // Existing user - show password login (NO OTP)
+            if (token) {
+              // Token received - user logged in automatically
+              setAuthToken(token);
+              await getCurrentUser();
+              toast.success(t("auth.login.success"));
+              navigate("/", { replace: true });
+            } else {
+              // No token - needs password login
+              setIsLoginMode(true);
+            }
           }
-        });
+        }
       } catch {
         setShowError(true);
         setErrorMessage(t("auth.phone.error") || "Something went wrong");
