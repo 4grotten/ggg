@@ -352,7 +352,9 @@
     "accounts": "Accounts",
     "addAccount": "Add Account",
     "addAccountDesc": "Sign in to another account",
-    "switchAccount": "Switch Account",
+    "switchAccount": "Switch",
+    "switchAccountTitle": "Switch account?",
+    "switchAccountDescription": "Do you want to switch to",
     "otherAccounts": "Other accounts",
     "otherAccountsMock": "Mockups (no saved accounts found)",
     "editProfile": "Edit Profile"

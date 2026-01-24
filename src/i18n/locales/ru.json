@@ -352,7 +352,9 @@
     "accounts": "Аккаунты",
     "addAccount": "Добавить аккаунт",
     "addAccountDesc": "Войти в другой аккаунт",
-    "switchAccount": "Сменить аккаунт",
+    "switchAccount": "Сменить",
+    "switchAccountTitle": "Сменить аккаунт?",
+    "switchAccountDescription": "Вы хотите переключиться на",
     "otherAccounts": "Другие аккаунты",
     "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)",
     "editProfile": "Редактировать профиль"
