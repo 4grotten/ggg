@@ -39,7 +39,7 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
       saveCurrentAccount(user);
     }
     onOpenChange(false);
-    navigate('/auth/phone');
+    navigate('/auth/phone?add_account=true');
   };
 
   const handleRemoveAccount = (e: React.MouseEvent, userId: number) => {

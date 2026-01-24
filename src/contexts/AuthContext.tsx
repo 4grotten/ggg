@@ -136,14 +136,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [checkAuth]);
 
   // Редирект авторизованных пользователей со страниц авторизации на главную
+  // Но НЕ редиректить если идёт добавление нового аккаунта (add_account=true в URL)
   useEffect(() => {
     if (!isLoading && user) {
       const isAuthRoute = PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
-      if (isAuthRoute) {
+      const searchParams = new URLSearchParams(location.search);
+      const isAddingAccount = searchParams.get('add_account') === 'true';
+      
+      if (isAuthRoute && !isAddingAccount) {
         navigate('/', { replace: true });
       }
     }
-  }, [isLoading, user, location.pathname, navigate]);
+  }, [isLoading, user, location.pathname, location.search, navigate]);
 
   const login = useCallback((userData: UserProfile) => {
     setUser(userData);
