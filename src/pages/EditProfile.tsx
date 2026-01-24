@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Loader2, Check, ChevronDown } from "lucide-react";
+import { Camera, Loader2, Check, ChevronDown, ChevronLeft } from "lucide-react";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -155,13 +156,11 @@ const EditProfile = () => {
             onClick={() => navigate(-1)}
             className="flex items-center text-foreground hover:text-muted-foreground transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            <ChevronLeft className="w-5 h-5 mr-1" />
             <span>{t("common.back")}</span>
           </button>
-          <h1 className="text-lg font-semibold text-foreground">{t("editProfile.title")}</h1>
-          <div className="w-16" /> {/* Spacer for centering */}
+          <h1 className="text-base font-medium text-foreground absolute left-1/2 -translate-x-1/2">{t("editProfile.title")}</h1>
+          <LanguageSwitcher />
         </div>
       </div>
 
