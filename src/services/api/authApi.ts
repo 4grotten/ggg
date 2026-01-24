@@ -72,6 +72,7 @@ export interface LoginResponse {
 
 export interface InitProfileRequest {
   full_name: string;
+  avatar_id?: number;
   email?: string;
   gender?: 'male' | 'female';
   date_of_birth?: string; // YYYY-MM-DD

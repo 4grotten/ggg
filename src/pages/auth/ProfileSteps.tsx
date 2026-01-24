@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { StepIndicator } from "@/components/verification/StepIndicator";
-import { initProfile, setPassword as apiSetPassword } from "@/services/api/authApi";
+import { initProfile, setPassword as apiSetPassword, uploadAvatar } from "@/services/api/authApi";
 import { getAuthToken } from "@/services/api/apiClient";
 
 type Step = "name" | "gender" | "photo" | "password" | "complete";
@@ -335,6 +335,7 @@ const ProfileSteps = () => {
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState<"male" | "female" | "not_specified" | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null); // Store file for API upload
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -394,6 +395,9 @@ const ProfileSteps = () => {
       return;
     }
 
+    // Store the file for later API upload
+    setPhotoFile(file);
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
@@ -413,10 +417,24 @@ const ProfileSteps = () => {
     setIsLoading(true);
     
     try {
-      // Call init_profile API
+      let avatarId: number | undefined;
+      
+      // Upload avatar first if we have a photo file
+      if (photoFile) {
+        try {
+          const avatarData = await uploadAvatar(photoFile);
+          avatarId = avatarData.id;
+        } catch (error) {
+          console.warn("Avatar upload failed:", error);
+          // Continue without avatar - not critical
+        }
+      }
+      
+      // Call init_profile API with avatar_id if available
       const profileResponse = await initProfile({
         full_name: fullName,
         gender: gender === "not_specified" ? undefined : gender || undefined,
+        avatar_id: avatarId,
       });
       
       if (profileResponse.error) {
