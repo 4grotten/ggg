@@ -82,20 +82,16 @@ const Settings = () => {
 
   const handleShareForInstall = async () => {
     try {
+      // Always copy link to clipboard first
+      await navigator.clipboard.writeText(window.location.origin);
+      toast.success(t("toast.linkCopied") || "Link copied to clipboard");
+      
+      // Then try to open native share dialog
       if (navigator.share) {
         await navigator.share({
           title: 'Easy Card',
           url: window.location.origin
         });
-      } else if (isInstallable) {
-        const success = await promptInstall();
-        if (success) {
-          toast.success(t("toast.appInstalled"));
-          setIsInstallOpen(false);
-        }
-      } else {
-        await navigator.clipboard.writeText(window.location.origin);
-        toast.success(t("toast.copied", { label: "Link" }));
       }
     } catch (error) {
       console.log('Share cancelled:', error);
