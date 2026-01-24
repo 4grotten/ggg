@@ -388,7 +388,8 @@
     "shareHolder": "الحامل",
     "shareCard": "البطاقة",
     "shareExpiry": "الانتهاء",
-    "shareCvv": "CVV"
+    "shareCvv": "CVV",
+    "transfer": "تحويل"
   },
   "history": {
     "title": "سجل المعاملات",

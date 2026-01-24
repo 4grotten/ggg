@@ -388,7 +388,8 @@
     "shareHolder": "Sahibi",
     "shareCard": "Kart",
     "shareExpiry": "Son Kullanma",
-    "shareCvv": "CVV"
+    "shareCvv": "CVV",
+    "transfer": "Transfer"
   },
   "history": {
     "title": "İşlem Geçmişi",

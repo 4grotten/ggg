@@ -397,7 +397,8 @@
     "shareHolder": "Holder",
     "shareCard": "Card",
     "shareExpiry": "Expiry",
-    "shareCvv": "CVV"
+    "shareCvv": "CVV",
+    "transfer": "Transfer"
   },
   "history": {
     "title": "Transaction History",

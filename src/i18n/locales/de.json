@@ -388,7 +388,8 @@
     "shareHolder": "Inhaber",
     "shareCard": "Karte",
     "shareExpiry": "Ablauf",
-    "shareCvv": "CVV"
+    "shareCvv": "CVV",
+    "transfer": "Überweisung"
   },
   "history": {
     "title": "Transaktionsverlauf",

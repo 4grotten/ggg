@@ -388,7 +388,8 @@
     "shareHolder": "持卡人",
     "shareCard": "卡号",
     "shareExpiry": "有效期",
-    "shareCvv": "CVV"
+    "shareCvv": "CVV",
+    "transfer": "转账"
   },
   "history": {
     "title": "交易历史",
