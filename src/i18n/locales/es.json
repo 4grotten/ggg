@@ -312,6 +312,11 @@
     "addToHomeScreen": "Añadir a inicio",
     "installApp": "Instalar aplicación",
     "shareApp": "Compartir aplicación",
+    "installStep1": "Toca el botón Compartir",
+    "installStep1Desc": "Busca el icono de compartir en tu navegador",
+    "installStep2": "Selecciona 'Añadir a pantalla de inicio'",
+    "installStep2Desc": "Desplázate en el menú compartir para encontrar esta opción",
+    "openShare": "Abrir Compartir",
     "privacyPolicy": "Política de privacidad",
     "applicationLanguage": "Idioma de la aplicación",
     "languages": {

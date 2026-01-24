@@ -312,6 +312,11 @@
     "addToHomeScreen": "Ana Ekrana Ekle",
     "installApp": "Uygulamayı Yükle",
     "shareApp": "Uygulamayı Paylaş",
+    "installStep1": "Paylaş düğmesine dokunun",
+    "installStep1Desc": "Tarayıcınızda paylaş simgesini bulun",
+    "installStep2": "'Ana Ekrana Ekle' seçeneğini seçin",
+    "installStep2Desc": "Bu seçeneği bulmak için paylaş menüsünde kaydırın",
+    "openShare": "Paylaşımı Aç",
     "privacyPolicy": "Gizlilik Politikası",
     "applicationLanguage": "Uygulama dili",
     "languages": {

@@ -312,6 +312,11 @@
     "addToHomeScreen": "添加到主屏幕",
     "installApp": "安装应用",
     "shareApp": "分享应用",
+    "installStep1": "点击分享按钮",
+    "installStep1Desc": "在浏览器中找到分享图标",
+    "installStep2": "选择'添加到主屏幕'",
+    "installStep2Desc": "在分享菜单中向下滚动找到此选项",
+    "openShare": "打开分享",
     "privacyPolicy": "隐私政策",
     "applicationLanguage": "应用语言",
     "languages": {

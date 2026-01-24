@@ -319,6 +319,11 @@
     "addToHomeScreen": "Add to Home Screen",
     "installApp": "Install App",
     "shareApp": "Share App",
+    "installStep1": "Tap the Share button",
+    "installStep1Desc": "Look for the share icon in your browser",
+    "installStep2": "Select 'Add to Home Screen'",
+    "installStep2Desc": "Scroll down in the share menu to find this option",
+    "openShare": "Open Share",
     "privacyPolicy": "Privacy Policy",
     "applicationLanguage": "Application language",
     "languages": {
