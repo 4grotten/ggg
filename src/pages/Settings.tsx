@@ -285,7 +285,7 @@ const Settings = () => {
           <div className="bg-card rounded-2xl overflow-hidden">
             <SettingsItem
               icon={<Smartphone className="w-5 h-5" />}
-              label={t("settings.installApp") || "Install App"}
+              label={t("settings.installApp")}
               onClick={handleInstallClick}
             />
           </div>
