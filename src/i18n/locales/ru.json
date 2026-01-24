@@ -94,7 +94,8 @@
     "home": "Главная",
     "info": "Инфо",
     "chat": "Чат",
-    "profile": "Профиль"
+    "profile": "Профиль",
+    "login": "Гость"
   },
   "verify": {
     "progress": {
