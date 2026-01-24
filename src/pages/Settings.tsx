@@ -10,7 +10,7 @@ import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, LogOut, Loader2 } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
@@ -85,6 +85,27 @@ const Settings = () => {
     } else {
       // Show instructions for iOS or browsers that don't support install prompt
       toast.info(t("toast.installInstructions"));
+    }
+  };
+
+  const handleShareInstallInstructions = async () => {
+    const shareData = {
+      title: 'Easy Card',
+      text: t("toast.installInstructions"),
+      url: window.location.origin
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+        toast.success(t("toast.copied", { label: "Link" }));
+      }
+    } catch (error) {
+      // User cancelled or share failed
+      console.log('Share cancelled or failed:', error);
     }
   };
 
@@ -255,6 +276,27 @@ const Settings = () => {
           />
         </div>
 
+        {/* Install App - moved up with share button */}
+        {!isInstalled && (
+          <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
+            <SettingsItem
+              icon={<Smartphone className="w-5 h-5" />}
+              label={t("settings.installApp")}
+              onClick={handleInstallClick}
+            />
+            <button
+              onClick={handleShareInstallInstructions}
+              className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Share className="w-5 h-5 text-foreground" />
+                <span className="text-foreground font-medium">{t("settings.shareApp") || "Share App"}</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+          </div>
+        )}
+
         {/* Language & Appearance */}
         <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
           <SettingsItem
@@ -280,17 +322,6 @@ const Settings = () => {
           />
         </div>
 
-        {/* Add to Home Screen */}
-        {!isInstalled && (
-          <div className="bg-card rounded-2xl overflow-hidden">
-            <SettingsItem
-              icon={<Smartphone className="w-5 h-5" />}
-              label={t("settings.installApp")}
-              onClick={handleInstallClick}
-            />
-          </div>
-        )}
-
         {/* Support & Legal */}
         <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
           <SettingsItem
@@ -303,28 +334,6 @@ const Settings = () => {
             label={t("settings.privacyPolicy")}
           />
         </div>
-
-        {/* Logout Button */}
-        {isAuthenticated && (
-          <div className="bg-card rounded-2xl overflow-hidden">
-            <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="w-full flex items-center justify-between py-4 px-4 hover:bg-destructive/10 transition-colors disabled:opacity-50"
-            >
-              <div className="flex items-center gap-3">
-                {isLoggingOut ? (
-                  <Loader2 className="w-5 h-5 text-destructive animate-spin" />
-                ) : (
-                  <LogOut className="w-5 h-5 text-destructive" />
-                )}
-                <span className="text-destructive font-medium">
-                  {t("settings.logout") || "Log Out"}
-                </span>
-              </div>
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Language Selection Drawer */}
