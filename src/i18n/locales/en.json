@@ -356,6 +356,7 @@
     "switchAccountTitle": "Switch account?",
     "switchAccountDescription": "Do you want to switch to",
     "switchingAccount": "Switching account...",
+    "switchAccountError": "Failed to switch account",
     "otherAccounts": "Other accounts",
     "otherAccountsMock": "Mockups (no saved accounts found)",
     "editProfile": "Edit Profile"

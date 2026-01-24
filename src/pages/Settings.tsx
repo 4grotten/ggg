@@ -13,7 +13,7 @@ import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
-import { saveCurrentAccount, useMultiAccount, switchToAccount, type SavedAccount } from "@/hooks/useMultiAccount";
+import { getSavedAccounts, saveCurrentAccount, useMultiAccount, switchToAccount, type SavedAccount } from "@/hooks/useMultiAccount";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface SettingsItemProps {
@@ -222,8 +222,16 @@ const Settings = () => {
       saveCurrentAccount(user);
     }
     
+    // IMPORTANT: load the freshest token from storage (avoid stale in-memory data)
+    const fresh = getSavedAccounts().find(a => a.id === account.id);
+    if (!fresh?.token) {
+      setIsSwitchingAccount(false);
+      toast.error(t("settings.switchAccountError") || "Failed to switch account");
+      return;
+    }
+
     // Perform the switch
-    switchToAccount(account);
+    switchToAccount(fresh);
     
     // Wait a bit more for dramatic effect
     await new Promise(resolve => setTimeout(resolve, 800));
