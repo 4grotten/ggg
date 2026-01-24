@@ -294,6 +294,7 @@
     "languageSystem": "语言设置为系统 ({{language}})",
     "languageChanged": "语言已更改为{{language}}",
     "copied": "{{label}}已复制",
+    "linkCopied": "链接已复制到剪贴板",
     "accountDetailsCopied": "账户信息已复制",
     "cardNumberCopied": "卡号已复制",
     "dataUpdated": "数据已更新",

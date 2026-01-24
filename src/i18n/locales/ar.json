@@ -293,6 +293,7 @@
     "languageSystem": "تم تعيين اللغة على النظام ({{language}})",
     "languageChanged": "تم تغيير اللغة إلى {{language}}",
     "copied": "تم نسخ {{label}}",
+    "linkCopied": "تم نسخ الرابط",
     "accountDetailsCopied": "تم نسخ تفاصيل الحساب",
     "cardNumberCopied": "تم نسخ رقم البطاقة",
     "cardDetailsCopied": "تم نسخ تفاصيل البطاقة",

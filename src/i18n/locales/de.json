@@ -293,6 +293,7 @@
     "languageSystem": "Sprache auf System gesetzt ({{language}})",
     "languageChanged": "Sprache geändert zu {{language}}",
     "copied": "{{label}} kopiert",
+    "linkCopied": "Link in Zwischenablage kopiert",
     "accountDetailsCopied": "Kontodaten kopiert",
     "cardNumberCopied": "Kartennummer kopiert",
     "cardDetailsCopied": "Kartendaten kopiert",
