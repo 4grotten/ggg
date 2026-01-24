@@ -446,10 +446,21 @@ const Settings = () => {
       </div>
 
       <div className="space-y-3 px-4 pb-28">
-        {/* Personal Details */}
+        {/* Edit Profile - only for authenticated users */}
+        {isAuthenticated && (
+          <div className="bg-card rounded-2xl overflow-hidden">
+            <SettingsItem
+              icon={<User className="w-5 h-5" />}
+              label={t("settings.editProfile") || "Edit Profile"}
+              onClick={() => navigate("/settings/edit-profile")}
+            />
+          </div>
+        )}
+
+        {/* Personal Details / Verification */}
         <div className="bg-card rounded-2xl overflow-hidden">
           <SettingsItem
-            icon={<User className="w-5 h-5" />}
+            icon={<Briefcase className="w-5 h-5" />}
             label={t("settings.personalDetails")}
             value={t("settings.notVerified")}
             onClick={() => navigate("/profile-verification")}

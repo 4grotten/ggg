@@ -354,7 +354,21 @@
     "addAccountDesc": "Sign in to another account",
     "switchAccount": "Switch Account",
     "otherAccounts": "Other accounts",
-    "otherAccountsMock": "Mockups (no saved accounts found)"
+    "otherAccountsMock": "Mockups (no saved accounts found)",
+    "editProfile": "Edit Profile"
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "dateOfBirth": "Date of Birth",
+    "gender": "Gender",
+    "selectGender": "Select gender",
+    "save": "Save Changes",
+    "saved": "Profile updated successfully",
+    "saveFailed": "Failed to update profile"
   },
   "card": {
     "back": "Back",

@@ -43,6 +43,7 @@ import Chat from "./pages/Chat";
 import PhoneEntry from "./pages/auth/PhoneEntry";
 import ProfileSteps from "./pages/auth/ProfileSteps";
 import CodeEntry from "./pages/auth/CodeEntry";
+import EditProfile from "./pages/EditProfile";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
@@ -79,6 +80,7 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/settings/edit-profile" element={<EditProfile />} />
         <Route path="/fees-and-limits" element={<FeesAndLimits />} />
         <Route path="/profile-verification" element={<ProfileVerification />} />
         <Route path="/profile" element={<ProfileVerification />} />
