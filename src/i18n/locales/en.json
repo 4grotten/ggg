@@ -364,6 +364,7 @@
     "email": "Email",
     "emailPlaceholder": "Enter your email",
     "dateOfBirth": "Date of Birth",
+    "selectDateOfBirth": "Select date of birth",
     "gender": "Gender",
     "selectGender": "Select gender",
     "save": "Save Changes",

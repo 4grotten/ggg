@@ -364,6 +364,7 @@
     "email": "Email",
     "emailPlaceholder": "Введите ваш email",
     "dateOfBirth": "Дата рождения",
+    "selectDateOfBirth": "Указать дату рождения",
     "gender": "Пол",
     "selectGender": "Выберите пол",
     "save": "Сохранить изменения",

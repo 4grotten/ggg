@@ -4,19 +4,20 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { format } from "date-fns";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Loader2, Check } from "lucide-react";
+import { Camera, Loader2, Check, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
+import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 
 const profileSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -39,6 +40,8 @@ const EditProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isGenderOpen, setIsGenderOpen] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(false);
+  const [tempDate, setTempDate] = useState<Date | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormData>({
@@ -242,19 +245,33 @@ const EditProfile = () => {
               <FormField
                 control={form.control}
                 name="date_of_birth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("editProfile.dateOfBirth")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="date"
-                        className="h-12"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const dateValue = field.value ? new Date(field.value) : undefined;
+                  const displayValue = dateValue && !isNaN(dateValue.getTime()) 
+                    ? format(dateValue, "dd.MM.yyyy")
+                    : null;
+                  
+                  return (
+                    <FormItem>
+                      <FormLabel>{t("editProfile.dateOfBirth")}</FormLabel>
+                      <FormControl>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTempDate(dateValue || new Date(2000, 0, 1));
+                            setIsDateOpen(true);
+                          }}
+                          className="w-full h-12 px-3 text-left border border-input rounded-md bg-background hover:bg-muted/50 transition-colors flex items-center justify-between"
+                        >
+                          <span className={displayValue ? "text-foreground" : "text-muted-foreground"}>
+                            {displayValue || t("editProfile.selectDateOfBirth")}
+                          </span>
+                        </button>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               {/* Gender */}
@@ -325,6 +342,47 @@ const EditProfile = () => {
               ))}
             </div>
           </AnimatedDrawerContainer>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Date of Birth Drawer */}
+      <Drawer open={isDateOpen} onOpenChange={setIsDateOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t("editProfile.selectDateOfBirth")}</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-8">
+            <div className="bg-muted/30 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-4 px-2">
+                <button 
+                  onClick={() => setIsDateOpen(false)}
+                  className="text-muted-foreground"
+                >
+                  <ChevronDown className="w-5 h-5 rotate-180" />
+                </button>
+                <span className="text-sm text-muted-foreground">
+                  {t("editProfile.dateOfBirth")}
+                </span>
+                <button 
+                  onClick={() => {
+                    if (tempDate) {
+                      form.setValue("date_of_birth", format(tempDate, "yyyy-MM-dd"));
+                    }
+                    setIsDateOpen(false);
+                  }}
+                  className="text-primary font-semibold"
+                >
+                  {t("history.done")}
+                </button>
+              </div>
+              <DateWheelPicker
+                value={tempDate}
+                onChange={setTempDate}
+                minYear={1920}
+                maxYear={new Date().getFullYear()}
+              />
+            </div>
+          </div>
         </DrawerContent>
       </Drawer>
 
