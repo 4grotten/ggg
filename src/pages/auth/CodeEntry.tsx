@@ -13,7 +13,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { MessageSquare, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyOtp, sendOtp } from "@/services/api/authApi";
+import { verifyCode, resendCode } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -125,10 +125,8 @@ const CodeEntry = () => {
     setError("");
     
     try {
-      // IMPORTANT: send as string to preserve leading zeros (server expects 6 chars)
-      const response = await verifyOtp(phoneNumber, fullCode);
+      const response = await verifyCode(phoneNumber, parseInt(fullCode, 10));
       
-      // Check for API-level error
       if (response.error) {
         setError(response.error.message || t("auth.code.wrongCode"));
         setCode(["", "", "", "", "", ""]);
@@ -136,21 +134,20 @@ const CodeEntry = () => {
         return;
       }
       
-      // Check response data - API returns error in data.error field
-      if (response.data?.is_valid) {
+      if (response.data) {
         toast.success(t("auth.code.success") || "Code verified!");
         
-        // OTP verified - go to profile setup page
-        navigate("/auth/profile", { 
-          replace: true,
-          state: { phoneNumber, otpVerified: true }
-        });
-      } else {
-        // API returns error message in data.error field
-        const errorMessage = (response.data as { error?: string })?.error || t("auth.code.wrongCode");
-        setError(errorMessage);
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        // Navigate based on user status
+        if (response.data.is_new_user) {
+          // New user - go to profile setup
+          navigate("/auth/profile", { 
+            replace: true,
+            state: { phoneNumber, isNewUser: true }
+          });
+        } else {
+          // Existing user - go to home
+          navigate("/", { replace: true });
+        }
       }
     } catch {
       setError(t("auth.code.error") || "Verification failed");
@@ -159,24 +156,21 @@ const CodeEntry = () => {
     }
   };
   
-  // Resend code - use sendOtp with appropriate type
+  // Resend code - use appropriate type based on auth method
   const handleResend = async () => {
     if (resendCooldown > 0 || isResending) return;
     
     setIsResending(true);
     
     try {
-      // Use WhatsApp for non-+996 countries, SMS for +996
-      const otpType: 'sms' | 'whatsapp' = isWhatsAppAuth ? 'whatsapp' : 'sms';
-      const response = await sendOtp(phoneNumber, otpType);
+      // Use WhatsApp type for non-+996 countries (when enabled)
+      const resendType = isWhatsAppAuth ? 'whatsapp_auth_type' : 'register_auth_type';
+      const response = await resendCode(phoneNumber, resendType);
       
       if (response.error) {
         toast.error(response.error.message || t("auth.code.resendError"));
       } else {
-        const successMessage = isWhatsAppAuth 
-          ? (t("auth.code.resendSuccessWhatsApp") || "Code sent via WhatsApp!")
-          : (t("auth.code.resendSuccess") || "Code sent!");
-        toast.success(successMessage);
+        toast.success(t("auth.code.resendSuccess") || "Code sent!");
         setResendCooldown(RESEND_COOLDOWN);
         setCode(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
