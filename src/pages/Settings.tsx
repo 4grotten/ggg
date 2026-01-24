@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
@@ -53,6 +53,94 @@ const getThemes = (t: (key: string) => string) => [
   { code: "dark", name: t("settings.themes.dark"), icon: Moon },
   { code: "system", name: t("settings.themes.system"), icon: Monitor },
 ];
+
+// Install Steps Component with elevator animation
+interface InstallStepsContentProps {
+  isOpen: boolean;
+  onShare: () => void;
+  t: (key: string) => string;
+}
+
+const InstallStepsContent = ({ isOpen, onShare, t }: InstallStepsContentProps) => {
+  const [step1Visible, setStep1Visible] = useState(false);
+  const [step2Visible, setStep2Visible] = useState(false);
+  const [buttonVisible, setButtonVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Reset states
+      setStep1Visible(false);
+      setStep2Visible(false);
+      setButtonVisible(false);
+      
+      // Elevator animation: step 1 appears first
+      const timer1 = setTimeout(() => setStep1Visible(true), 150);
+      // Step 2 appears after step 1
+      const timer2 = setTimeout(() => setStep2Visible(true), 400);
+      // Button appears last
+      const timer3 = setTimeout(() => setButtonVisible(true), 650);
+      
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+    }
+  }, [isOpen]);
+
+  return (
+    <div className="px-6 pb-8 space-y-6">
+      {/* Instructions */}
+      <div className="space-y-4">
+        <div 
+          className={`flex items-start gap-4 p-4 bg-muted/50 rounded-xl transition-all duration-300 ease-out ${
+            step1Visible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 -translate-y-4'
+          }`}
+        >
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span className="text-sm font-bold text-primary">1</span>
+          </div>
+          <div>
+            <p className="font-medium text-foreground">{t("settings.installStep1") || "Tap the Share button"}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep1Desc") || "Look for the share icon in your browser"}</p>
+          </div>
+        </div>
+        
+        <div 
+          className={`flex items-start gap-4 p-4 bg-muted/50 rounded-xl transition-all duration-300 ease-out ${
+            step2Visible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 -translate-y-4'
+          }`}
+        >
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span className="text-sm font-bold text-primary">2</span>
+          </div>
+          <div>
+            <p className="font-medium text-foreground">{t("settings.installStep2") || "Select 'Add to Home Screen'"}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep2Desc") || "Scroll down in the share menu to find this option"}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Share Button */}
+      <button
+        onClick={onShare}
+        className={`w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 ease-out ${
+          buttonVisible 
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 -translate-y-4'
+        }`}
+      >
+        <Share2 className="w-5 h-5" />
+        <span>{t("settings.openShare") || "Open Share"}</span>
+        <ExternalLink className="w-4 h-4" />
+      </button>
+    </div>
+  );
+};
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -415,40 +503,11 @@ const Settings = () => {
             </button>
           </DrawerHeader>
           
-          <div className="px-6 pb-8 space-y-6">
-            {/* Instructions */}
-            <div className="space-y-4">
-              <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-xl">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-bold text-primary">1</span>
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">{t("settings.installStep1") || "Tap the Share button"}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep1Desc") || "Look for the share icon in your browser"}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-xl">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-bold text-primary">2</span>
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">{t("settings.installStep2") || "Select 'Add to Home Screen'"}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep2Desc") || "Scroll down in the share menu to find this option"}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Share Button */}
-            <button
-              onClick={handleShareForInstall}
-              className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors"
-            >
-              <Share2 className="w-5 h-5" />
-              <span>{t("settings.openShare") || "Open Share"}</span>
-              <ExternalLink className="w-4 h-4" />
-            </button>
-          </div>
+          <InstallStepsContent 
+            isOpen={isInstallOpen} 
+            onShare={handleShareForInstall} 
+            t={t} 
+          />
         </DrawerContent>
       </Drawer>
       {/* Avatar Crop Dialog */}
