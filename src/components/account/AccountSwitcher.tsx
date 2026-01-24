@@ -88,6 +88,25 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
             </div>
           )}
 
+          {/* Add Account Button */}
+          <motion.button
+            onClick={handleAddAccount}
+            className="w-full flex items-center gap-3 px-4 py-4 bg-muted/50 rounded-xl hover:bg-muted/80 transition-colors"
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Plus className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-base font-medium text-foreground">
+                {t('settings.addAccount') || 'Add Account'}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {t('settings.addAccountDesc') || 'Sign in to another account'}
+              </p>
+            </div>
+          </motion.button>
+
           {/* Other Accounts */}
           {otherAccounts.length > 0 && (
             <AnimatedDrawerContainer className="bg-muted/50 rounded-xl overflow-hidden">
@@ -123,25 +142,6 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
               ))}
             </AnimatedDrawerContainer>
           )}
-
-          {/* Add Account Button */}
-          <motion.button
-            onClick={handleAddAccount}
-            className="w-full flex items-center gap-3 px-4 py-4 bg-muted/50 rounded-xl hover:bg-muted/80 transition-colors"
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Plus className="w-6 h-6 text-primary" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-base font-medium text-foreground">
-                {t('settings.addAccount') || 'Add Account'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {t('settings.addAccountDesc') || 'Sign in to another account'}
-              </p>
-            </div>
-          </motion.button>
         </div>
       </DrawerContent>
     </Drawer>
