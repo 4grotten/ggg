@@ -15,6 +15,7 @@ import { VerifyIdentityCard } from "@/components/dashboard/VerifyIdentityCard";
 import { CardsList } from "@/components/dashboard/CardsList";
 import { SendToCardButton } from "@/components/dashboard/SendToCardButton";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { OpenCardButton } from "@/components/dashboard/OpenCardButton";
 import { OpenCardDrawer } from "@/components/dashboard/OpenCardDrawer";
 
@@ -162,6 +163,7 @@ const Dashboard = () => {
         }
         rightAction={
           <div className="flex items-center gap-2">
+            <ThemeSwitcher />
             <LanguageSwitcher />
             <button 
               onClick={() => isAuthenticated ? navigate("/settings") : navigate("/auth/phone")}
