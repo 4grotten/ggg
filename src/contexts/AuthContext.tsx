@@ -134,6 +134,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  // Если токен появляется после первичной загрузки (например, после логина на /auth/phone),
+  // подтягиваем профиль и обновляем UI.
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) return;
+    if (isLoading) return;
+    if (user) return;
+
+    // Не блокируем UI — просто синхронизируем профиль
+    refreshUser();
+  }, [location.pathname, isLoading, user, refreshUser]);
+
   const updateAvatar = useCallback(async (file: File) => {
     // 1. Загружаем файл и получаем id
     const avatarData = await apiUploadAvatar(file);
