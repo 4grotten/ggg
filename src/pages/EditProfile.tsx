@@ -144,10 +144,10 @@ const EditProfile = () => {
   const selectedGenderLabel = genderOptions.find(g => g.value === form.watch("gender"))?.label || t("editProfile.selectGender");
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
       {/* Fixed Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center h-14 px-4">
+      <div className="sticky top-0 z-20 bg-background border-b border-border">
+        <div className="flex items-center justify-between h-14 px-4">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center text-foreground hover:text-muted-foreground transition-colors"
@@ -157,14 +157,14 @@ const EditProfile = () => {
             </svg>
             <span>{t("common.back")}</span>
           </button>
+          <h1 className="text-lg font-semibold text-foreground">{t("editProfile.title")}</h1>
+          <div className="w-16" /> {/* Spacer for centering */}
         </div>
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40">
         <div className="px-4 py-6">
-          <h1 className="text-2xl font-bold text-foreground mb-6">{t("editProfile.title")}</h1>
-
           {/* Avatar */}
           <div className="flex justify-center mb-8">
             <input
@@ -198,7 +198,7 @@ const EditProfile = () => {
 
           {/* Form */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-32">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Full Name */}
               <FormField
                 control={form.control}
@@ -284,8 +284,8 @@ const EditProfile = () => {
         </div>
       </div>
 
-      {/* Fixed Bottom Button */}
-      <div className="sticky bottom-0 z-10 bg-background border-t border-border p-4">
+      {/* Fixed Bottom Button - above bottom navigation */}
+      <div className="fixed bottom-16 left-0 right-0 z-20 bg-background border-t border-border p-4 safe-area-bottom">
         <Button
           onClick={form.handleSubmit(onSubmit)}
           disabled={isSaving}
