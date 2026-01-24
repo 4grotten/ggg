@@ -94,7 +94,8 @@
     "home": "Home",
     "info": "Info",
     "chat": "Chat",
-    "profile": "Profile"
+    "profile": "Profile",
+    "login": "Guest"
   },
   "verify": {
     "progress": {
