@@ -72,6 +72,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const location = useLocation();
   const hasCheckedRef = useRef(false);
 
+  // Keep Apofiz cookie in sync whenever we have both token + user.
+  // This avoids any ordering issues where token is persisted slightly before/after user is set.
+  useEffect(() => {
+    const token = getAuthToken();
+    if (token && user) {
+      syncWithApofiz(token, user);
+    }
+    if (!token) {
+      // If token disappears (e.g. manual removal), ensure Apofiz cookie is cleared too.
+      clearApofizSync();
+    }
+  }, [user]);
+
   // Проверка токена при загрузке приложения
   const checkAuth = useCallback(async () => {
     // Выполняем проверку один раз при загрузке приложения,
