@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -12,13 +12,16 @@ import {
   Eye, 
   EyeOff, 
   Check,
-  Smartphone
+  Smartphone,
+  Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { StepIndicator } from "@/components/verification/StepIndicator";
+import { initProfile, setPassword as apiSetPassword } from "@/services/api/authApi";
+import { getAuthToken } from "@/services/api/apiClient";
 
 type Step = "name" | "gender" | "photo" | "password" | "complete";
 
@@ -314,13 +317,19 @@ const NotSpecifiedOption = ({
 
 const ProfileSteps = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const { setAvatarUrl } = useAvatar();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Check if this is a new user from registration flow
+  const isNewUser = (location.state as { isNewUser?: boolean })?.isNewUser ?? true;
+  const phoneFromState = (location.state as { phoneNumber?: string })?.phoneNumber;
+  
   const [currentStep, setCurrentStep] = useState<Step>("name");
   const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
   const [showError, setShowError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Form data
   const [fullName, setFullName] = useState("");
@@ -342,7 +351,15 @@ const ProfileSteps = () => {
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [tempImageUrl, setTempImageUrl] = useState<string>("");
 
-  const phone = sessionStorage.getItem("registerPhone") || "+971 50 123 4567";
+  const phone = phoneFromState || sessionStorage.getItem("registerPhone") || "+971 50 123 4567";
+
+  // Check if user has token (required for profile setup)
+  useEffect(() => {
+    if (isNewUser && !getAuthToken()) {
+      // No token, redirect back to auth
+      navigate("/auth/phone", { replace: true });
+    }
+  }, [isNewUser, navigate]);
 
   const steps: Step[] = ["name", "gender", "photo", "password", "complete"];
   const currentStepIndex = steps.indexOf(currentStep);
@@ -392,11 +409,44 @@ const ProfileSteps = () => {
     setCropDialogOpen(false);
   };
 
-  const handleComplete = () => {
-    sessionStorage.setItem("userName", fullName);
-    sessionStorage.setItem("userGender", gender || "");
-    toast.success(t('auth.profile.success'));
-    navigate("/");
+  const handleComplete = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Call init_profile API
+      const profileResponse = await initProfile({
+        full_name: fullName,
+        gender: gender === "not_specified" ? undefined : gender || undefined,
+      });
+      
+      if (profileResponse.error) {
+        toast.error(profileResponse.error.message || t("auth.profile.error"));
+        setIsLoading(false);
+        return;
+      }
+      
+      // Set password if provided
+      if (password.length >= 6) {
+        const passwordResponse = await apiSetPassword(password);
+        
+        if (passwordResponse.error) {
+          // Profile saved, but password failed - still continue
+          console.warn("Password set failed:", passwordResponse.error);
+        }
+      }
+      
+      // Save to session for local use
+      sessionStorage.setItem("userName", fullName);
+      sessionStorage.setItem("userGender", gender || "");
+      
+      toast.success(t('auth.profile.success'));
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Profile init error:", error);
+      toast.error(t("auth.profile.error") || "Failed to save profile");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Animation variants
@@ -1003,7 +1053,7 @@ const ProfileSteps = () => {
       case "password":
         return { disabled: password.length < 6, text: continueText };
       case "complete":
-        return { disabled: false, text: t('auth.steps.complete.button') !== 'auth.steps.complete.button' ? t('auth.steps.complete.button') : 'Начать' };
+        return { disabled: isLoading, text: isLoading ? t('common.loading') || 'Loading...' : (t('auth.steps.complete.button') !== 'auth.steps.complete.button' ? t('auth.steps.complete.button') : 'Начать') };
       default:
         return { disabled: true, text: continueText };
     }
@@ -1049,9 +1099,13 @@ const ProfileSteps = () => {
         <div className="karta-footer-actions">
           <motion.button
             onClick={handleButtonClick}
+            disabled={isLoading}
             whileTap={{ scale: 0.98 }}
-            className="karta-btn-primary"
+            className="karta-btn-primary disabled:opacity-50 flex items-center justify-center gap-2"
           >
+            {isLoading && currentStep === "complete" && (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            )}
             {buttonState.text}
           </motion.button>
         </div>

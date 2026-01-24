@@ -42,6 +42,7 @@ import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
 import PhoneEntry from "./pages/auth/PhoneEntry";
 import ProfileSteps from "./pages/auth/ProfileSteps";
+import CodeEntry from "./pages/auth/CodeEntry";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
@@ -110,6 +111,7 @@ const AppContent = () => {
         <Route path="/verify/complete" element={<VerificationComplete />} />
         <Route path="/verify/success" element={<VerificationSuccess />} />
         <Route path="/auth/phone" element={<PhoneEntry />} />
+        <Route path="/auth/code" element={<CodeEntry />} />
         <Route path="/auth/profile" element={<ProfileSteps />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -601,7 +601,22 @@
       "searchCountry": "Search country or code",
       "notRobot": "I'm not a robot",
       "support": "Support & Help",
-      "continue": "Continue"
+      "continue": "Continue",
+      "codeSent": "Verification code sent!",
+      "error": "Something went wrong. Please try again."
+    },
+    "code": {
+      "title": "Enter verification code",
+      "sentTo": "Code sent to",
+      "verify": "Verify",
+      "resend": "Resend code",
+      "resendIn": "Resend in",
+      "resendSuccess": "New code sent!",
+      "resendError": "Failed to resend code",
+      "invalidCode": "Please enter a valid 6-digit code",
+      "wrongCode": "Wrong code. Please try again.",
+      "success": "Code verified!",
+      "error": "Verification failed"
     },
     "login": {
       "title": "Enter your password",
