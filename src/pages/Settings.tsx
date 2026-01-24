@@ -206,15 +206,18 @@ const Settings = () => {
   const [switchAccountDialog, setSwitchAccountDialog] = useState<SavedAccount | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSwitchAccount = (account: SavedAccount) => {
+  const handleSwitchAccount = async (account: SavedAccount) => {
     // Save current account before switching
     if (user) {
       saveCurrentAccount(user);
     }
     // Perform the switch
     switchToAccount(account);
-    // Reload to apply the new session
-    window.location.href = '/';
+    // Close dialog and navigate - AuthContext will pick up the new user from localStorage
+    setSwitchAccountDialog(null);
+    navigate('/');
+    // Trigger a full refresh of auth context by reloading the page softly
+    window.location.reload();
   };
 
   const handleInstallClick = () => {
@@ -690,21 +693,36 @@ const Settings = () => {
         />
       )}
 
-      {/* Switch Account Confirmation Dialog */}
+      {/* iOS-style Switch Account Confirmation Dialog */}
       <AlertDialog open={!!switchAccountDialog} onOpenChange={(open) => !open && setSwitchAccountDialog(null)}>
-        <AlertDialogContent className="max-w-[90%] rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("settings.switchAccountTitle") || "Switch account?"}</AlertDialogTitle>
-            <AlertDialogDescription>
+        <AlertDialogContent 
+          className="max-w-[270px] rounded-2xl p-0 overflow-hidden border-0 gap-0"
+          onOverlayClick={() => setSwitchAccountDialog(null)}
+        >
+          <div className="p-4 pb-3">
+            <AlertDialogTitle className="text-center text-[17px] font-semibold mb-1">
+              {t("settings.switchAccountTitle") || "Switch account?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground">
               {t("settings.switchAccountDescription") || "Do you want to switch to"} {switchAccountDialog?.user.full_name}?
             </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel") || "Cancel"}</AlertDialogCancel>
-            <AlertDialogAction onClick={() => switchAccountDialog && handleSwitchAccount(switchAccountDialog)}>
+          </div>
+          
+          {/* iOS-style buttons */}
+          <div className="flex flex-col">
+            <button
+              onClick={() => switchAccountDialog && handleSwitchAccount(switchAccountDialog)}
+              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] border-t border-border hover:bg-secondary/50 transition-colors"
+            >
               {t("settings.switchAccount") || "Switch"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
+            </button>
+            <button
+              onClick={() => setSwitchAccountDialog(null)}
+              className="w-full py-3 text-[17px] font-normal text-muted-foreground border-t border-border hover:bg-secondary/50 transition-colors"
+            >
+              {t("common.cancel") || "Cancel"}
+            </button>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </MobileLayout>
