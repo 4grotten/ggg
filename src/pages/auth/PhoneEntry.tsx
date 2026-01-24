@@ -364,37 +364,70 @@ const PhoneEntry = () => {
             }
           }
         } else {
-          // All other countries: use WhatsApp OTP API
-          const otpResponse = await sendOtp(fullPhone);
+          // All other countries: first check if user exists via registerAuth
+          const registerResponse = await registerAuth(fullPhone);
           
-          if (otpResponse.error) {
+          if (registerResponse.error) {
             setShowError(true);
-            
-            // Handle specific error statuses
-            if (otpResponse.error.status === 429) {
-              setErrorMessage(t("auth.phone.rateLimitError") || "Too many requests. Please wait a few minutes.");
-            } else if (otpResponse.error.status === 400) {
-              setErrorMessage(t("auth.phone.invalidFormat") || "Invalid phone number format");
-            } else if (otpResponse.error.status === 503) {
-              setErrorMessage(t("auth.phone.serviceUnavailable") || "Service temporarily unavailable");
-            } else {
-              setErrorMessage(otpResponse.error.message || t("auth.phone.error"));
-            }
-            
+            setErrorMessage(registerResponse.error.message || t("auth.phone.error"));
             setTimeout(() => setShowError(false), 600);
             return;
           }
           
-          if (otpResponse.data?.sent) {
-            toast.success(t("auth.phone.whatsappCodeSent") || "Code sent via WhatsApp!");
-            navigate("/auth/code", { 
-              state: { 
-                phoneNumber: fullPhone, 
-                authType: 'whatsapp',
-                otpId: otpResponse.data.otp_id,
-                expiresAt: otpResponse.data.expires_at
+          if (registerResponse.data) {
+            const { is_new_user, token } = registerResponse.data;
+            
+            // If user already has a token (auto-login case)
+            if (token) {
+              setAuthToken(token);
+              if (is_new_user) {
+                navigate("/auth/profile", { state: { phoneNumber: fullPhone } });
+              } else {
+                await getCurrentUser();
+                toast.success(t("auth.login.success"));
+                navigate("/", { replace: true });
               }
-            });
+              return;
+            }
+            
+            // Existing user without token - show password form
+            if (!is_new_user) {
+              setIsLoginMode(true);
+              return;
+            }
+            
+            // New user - send WhatsApp OTP
+            const otpResponse = await sendOtp(fullPhone);
+            
+            if (otpResponse.error) {
+              setShowError(true);
+              
+              // Handle specific error statuses
+              if (otpResponse.error.status === 429) {
+                setErrorMessage(t("auth.phone.rateLimitError") || "Too many requests. Please wait a few minutes.");
+              } else if (otpResponse.error.status === 400) {
+                setErrorMessage(t("auth.phone.invalidFormat") || "Invalid phone number format");
+              } else if (otpResponse.error.status === 503) {
+                setErrorMessage(t("auth.phone.serviceUnavailable") || "Service temporarily unavailable");
+              } else {
+                setErrorMessage(otpResponse.error.message || t("auth.phone.error"));
+              }
+              
+              setTimeout(() => setShowError(false), 600);
+              return;
+            }
+            
+            if (otpResponse.data?.sent) {
+              toast.success(t("auth.phone.whatsappCodeSent") || "Code sent via WhatsApp!");
+              navigate("/auth/code", { 
+                state: { 
+                  phoneNumber: fullPhone, 
+                  authType: 'whatsapp',
+                  otpId: otpResponse.data.otp_id,
+                  expiresAt: otpResponse.data.expires_at
+                }
+              });
+            }
           }
         }
       } catch {
