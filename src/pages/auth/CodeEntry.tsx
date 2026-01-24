@@ -13,7 +13,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { MessageSquare, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyCode, sendOtp } from "@/services/api/authApi";
+import { verifyOtp, sendOtp } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -125,7 +125,7 @@ const CodeEntry = () => {
     setError("");
     
     try {
-      const response = await verifyCode(phoneNumber, parseInt(fullCode, 10));
+      const response = await verifyOtp(phoneNumber, parseInt(fullCode, 10));
       
       if (response.error) {
         setError(response.error.message || t("auth.code.wrongCode"));
@@ -134,20 +134,18 @@ const CodeEntry = () => {
         return;
       }
       
-      if (response.data) {
+      if (response.data?.is_valid) {
         toast.success(t("auth.code.success") || "Code verified!");
         
-        // Navigate based on user status
-        if (response.data.is_new_user) {
-          // New user - go to profile setup
-          navigate("/auth/profile", { 
-            replace: true,
-            state: { phoneNumber, isNewUser: true }
-          });
-        } else {
-          // Existing user - go to home
-          navigate("/", { replace: true });
-        }
+        // OTP verified - go to registration page
+        navigate("/auth/register", { 
+          replace: true,
+          state: { phoneNumber, otpVerified: true }
+        });
+      } else {
+        setError(t("auth.code.wrongCode") || "Invalid code");
+        setCode(["", "", "", "", "", ""]);
+        inputRefs.current[0]?.focus();
       }
     } catch {
       setError(t("auth.code.error") || "Verification failed");
