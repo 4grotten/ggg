@@ -15,7 +15,8 @@
     "skip": "Пропустить",
     "yes": "Да",
     "aed": "AED",
-    "usdt": "USDT"
+    "usdt": "USDT",
+    "loading": "Загрузка..."
   },
   "dashboard": {
     "greeting": "Привет, {{name}}!",
