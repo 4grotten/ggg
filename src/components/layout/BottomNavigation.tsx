@@ -1,4 +1,4 @@
-import { Home, Info, MessageCircle } from "lucide-react";
+import { Home, Info, MessageCircle, LogIn } from "lucide-react";
 import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ const navItems = [
 export const BottomNavigation = () => {
   const location = useLocation();
   const { avatarUrl } = useAvatar();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { isConnected, isSpeaking } = useVoiceCall();
   const { t, i18n } = useTranslation();
   
@@ -97,6 +97,33 @@ export const BottomNavigation = () => {
             const active = isActive(item.path);
             
             if (item.path === "/settings") {
+              // For unauthenticated users, show login button instead of avatar
+              if (!isAuthenticated) {
+                return (
+                  <RouterNavLink
+                    key={item.path}
+                    to="/auth/phone"
+                    ref={(el) => { tabRefs.current[index] = el; }}
+                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10"
+                  >
+                    <div className={cn(
+                      "w-6 h-6 rounded-full bg-primary flex items-center justify-center transition-all",
+                      active ? "ring-2 ring-primary/50" : ""
+                    )}>
+                      <LogIn className="w-3.5 h-3.5 text-primary-foreground" />
+                    </div>
+                    <span
+                      className={cn(
+                        "text-xs font-medium transition-colors",
+                        active ? "text-primary" : "text-foreground"
+                      )}
+                    >
+                      {t("nav.login") || t(item.labelKey)}
+                    </span>
+                  </RouterNavLink>
+                );
+              }
+              
               return (
                 <RouterNavLink
                   key={item.path}

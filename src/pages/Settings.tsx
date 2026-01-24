@@ -10,7 +10,7 @@ import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
@@ -355,32 +355,48 @@ const Settings = () => {
           accept="image/*"
           className="hidden"
         />
-        <button
-          onClick={handleAvatarClick}
-          disabled={isUploadingAvatar}
-          className="relative group mb-4"
-        >
-          <Avatar className="w-24 h-24">
-            <AvatarImage 
-              src={displayAvatar} 
-              alt={displayName} 
-            />
-            <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
-          </Avatar>
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-            {isUploadingAvatar ? (
-              <Loader2 className="w-6 h-6 text-white animate-spin" />
-            ) : (
-              <Camera className="w-6 h-6 text-white" />
+        
+        {isAuthenticated ? (
+          <>
+            <button
+              onClick={handleAvatarClick}
+              disabled={isUploadingAvatar}
+              className="relative group mb-4"
+            >
+              <Avatar className="w-24 h-24">
+                <AvatarImage 
+                  src={displayAvatar} 
+                  alt={displayName} 
+                />
+                <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
+              </Avatar>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                {isUploadingAvatar ? (
+                  <Loader2 className="w-6 h-6 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-6 h-6 text-white" />
+                )}
+              </div>
+            </button>
+            <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
+            {displayPhone && (
+              <p className="text-sm text-muted-foreground mt-1">{displayPhone}</p>
             )}
-          </div>
-        </button>
-        <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
-        {displayPhone && (
-          <p className="text-sm text-muted-foreground mt-1">{displayPhone}</p>
-        )}
-        {displayEmail && (
-          <p className="text-sm text-muted-foreground">{displayEmail}</p>
+            {displayEmail && (
+              <p className="text-sm text-muted-foreground">{displayEmail}</p>
+            )}
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => navigate("/auth/phone")}
+              className="w-24 h-24 rounded-full bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/25 hover:bg-primary/90 transition-colors"
+            >
+              <LogIn className="w-10 h-10 text-primary-foreground" />
+            </button>
+            <h1 className="text-xl font-bold text-foreground">{t("settings.guest") || "Guest"}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t("settings.loginToAccess") || "Sign in to access all features"}</p>
+          </>
         )}
       </div>
 
