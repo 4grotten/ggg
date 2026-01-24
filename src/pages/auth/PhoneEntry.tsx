@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { login as apiLogin, forgotPassword, registerAuth, getCurrentUser } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
-import { sendOtp } from "@/services/api/otpApi";
+import { sendOtp, checkPhone } from "@/services/api/otpApi";
 import { z } from "zod";
 
 interface Country {
@@ -364,64 +364,23 @@ const PhoneEntry = () => {
             }
           }
         } else {
-          // All other countries: first check if user exists via registerAuth
-          const registerResponse = await registerAuth(fullPhone);
+          // All other countries: check if user exists via new check-phone endpoint
+          const checkResponse = await checkPhone(fullPhone);
           
-          if (registerResponse.error) {
+          if (checkResponse.error) {
             setShowError(true);
-            setErrorMessage(registerResponse.error.message || t("auth.phone.error"));
+            setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
             setTimeout(() => setShowError(false), 600);
             return;
           }
           
-          if (registerResponse.data) {
-            const { is_new_user, token } = registerResponse.data;
-            
-            // If user already has a token (auto-login case)
-            if (token) {
-              setAuthToken(token);
-              if (is_new_user) {
-                navigate("/auth/profile", { state: { phoneNumber: fullPhone } });
-              } else {
-                await getCurrentUser();
-                toast.success(t("auth.login.success"));
-                navigate("/", { replace: true });
-              }
-              return;
-            }
-            
-            // Existing user without token - show password form
-            if (!is_new_user) {
-              setIsLoginMode(true);
-              return;
-            }
-            
-            // New user - send WhatsApp OTP
-            const otpResponse = await sendOtp(fullPhone);
-            
-            // Navigate to code page regardless of OTP send result
-            // User can request resend from there
-            if (otpResponse.error) {
-              // Show warning but still navigate
-              const errorMsg = otpResponse.error.status === 429
-                ? (t("auth.phone.rateLimitError") || "Too many requests. Please wait.")
-                : otpResponse.error.status === 503
-                  ? (t("auth.phone.serviceUnavailable") || "Service temporarily unavailable")
-                  : (t("auth.phone.otpSendError") || "Failed to send code. You can retry on the next screen.");
-              
-              toast.warning(errorMsg);
-            } else if (otpResponse.data?.sent) {
-              toast.success(t("auth.phone.whatsappCodeSent") || "Code sent via WhatsApp!");
-            }
-            
-            // Always navigate to code entry page
-            navigate("/auth/code", { 
-              state: { 
-                phoneNumber: fullPhone, 
-                authType: 'whatsapp',
-                otpId: otpResponse.data?.otp_id,
-                expiresAt: otpResponse.data?.expires_at
-              }
+          if (checkResponse.data?.exists) {
+            // Existing user → show password login
+            setIsLoginMode(true);
+          } else {
+            // New user → go to registration form
+            navigate("/auth/register", {
+              state: { phoneNumber: fullPhone }
             });
           }
         }

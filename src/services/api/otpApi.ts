@@ -31,6 +31,10 @@ export interface OtpVerifyResponse {
   is_new_user: boolean | null;
 }
 
+export interface CheckPhoneResponse {
+  exists: boolean;
+}
+
 export interface OtpResendResponse extends OtpSendResponse {}
 
 export interface OtpCooldownError {
@@ -130,18 +134,60 @@ export async function sendOtp(phoneNumber: string): Promise<OtpApiResult<OtpSend
 }
 
 /**
+ * Check if phone number exists in the system
+ * POST /otp/check-phone/
+ */
+export async function checkPhone(phoneNumber: string): Promise<OtpApiResult<CheckPhoneResponse>> {
+  try {
+    const response = await fetch(`${OTP_BASE_URL}/otp/check-phone/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone_number: phoneNumber }),
+    });
+
+    if (!response.ok) {
+      return {
+        data: null,
+        error: {
+          message: 'Failed to check phone',
+          status: response.status,
+        },
+      };
+    }
+
+    const data = await response.json();
+    return { data, error: null };
+  } catch (error) {
+    return {
+      data: null,
+      error: {
+        message: 'Network error',
+        status: 0,
+      },
+    };
+  }
+}
+
+/**
  * Verify OTP code
  * POST /otp/verify/
+ * Optionally accepts username and password for registration
  */
 export async function verifyOtp(
   phoneNumber: string, 
-  code: string
+  code: string,
+  username?: string,
+  password?: string
 ): Promise<OtpApiResult<OtpVerifyResponse>> {
   try {
+    const body: Record<string, string> = { phone_number: phoneNumber, code };
+    if (username) body.username = username;
+    if (password) body.password = password;
+
     const response = await fetch(`${OTP_BASE_URL}/otp/verify/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone_number: phoneNumber, code }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
