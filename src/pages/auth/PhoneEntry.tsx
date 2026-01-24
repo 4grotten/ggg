@@ -646,19 +646,14 @@ const PhoneEntry = () => {
               <Drawer open={countryDrawerOpen} onOpenChange={setCountryDrawerOpen}>
                 <DrawerTrigger asChild>
                   <button className="flex items-center gap-1 text-lg font-medium flex-shrink-0 hover:opacity-80 transition-opacity">
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence mode="popLayout">
                       <motion.span 
                         key={selectedCountry?.code || 'globe'}
-                        className="text-2xl"
-                        initial={{ scale: 0.5, opacity: 0, rotateY: -90 }}
-                        animate={{ scale: 1, opacity: 1, rotateY: 0 }}
-                        exit={{ scale: 0.5, opacity: 0, rotateY: 90 }}
-                        transition={{ 
-                          type: "spring", 
-                          stiffness: 500, 
-                          damping: 25,
-                          duration: 0.3
-                        }}
+                        className="text-2xl inline-block"
+                        initial={{ scale: 0.6, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.6, opacity: 0 }}
+                        transition={{ duration: 0.12 }}
                       >
                         {selectedCountry?.flag || "🌍"}
                       </motion.span>
