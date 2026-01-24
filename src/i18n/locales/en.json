@@ -1,8 +1,4 @@
 {
-  "settings": {
-    "otherAccounts": "Other accounts",
-    "otherAccountsMock": "Mockups (no saved accounts found)"
-  },
   "profileVerification": {
     "title": "Verify Your Identity",
     "description": "Complete the verification process to unlock all features and increase your account limits.",
@@ -356,7 +352,9 @@
     "accounts": "Accounts",
     "addAccount": "Add Account",
     "addAccountDesc": "Sign in to another account",
-    "switchAccount": "Switch Account"
+    "switchAccount": "Switch Account",
+    "otherAccounts": "Other accounts",
+    "otherAccountsMock": "Mockups (no saved accounts found)"
   },
   "card": {
     "back": "Back",

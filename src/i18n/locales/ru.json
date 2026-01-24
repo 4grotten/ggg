@@ -1,8 +1,4 @@
 {
-  "settings": {
-    "otherAccounts": "Другие аккаунты",
-    "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)"
-  },
   "profileVerification": {
     "title": "Подтвердите личность",
     "description": "Пройдите верификацию, чтобы разблокировать все функции и увеличить лимиты аккаунта.",
@@ -356,7 +352,9 @@
     "accounts": "Аккаунты",
     "addAccount": "Добавить аккаунт",
     "addAccountDesc": "Войти в другой аккаунт",
-    "switchAccount": "Сменить аккаунт"
+    "switchAccount": "Сменить аккаунт",
+    "otherAccounts": "Другие аккаунты",
+    "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)"
   },
   "card": {
     "back": "Назад",
