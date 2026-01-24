@@ -315,7 +315,6 @@ const PhoneEntry = () => {
       // Validate phone with zod
       const cleanPhone = phoneNumber.replace(/\D/g, "");
       const validation = phoneSchema.safeParse(cleanPhone);
-      
       if (!validation.success) {
         setShowError(true);
         setTimeout(() => setShowError(false), 600);
