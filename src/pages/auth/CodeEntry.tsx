@@ -13,7 +13,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { MessageSquare, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyCode as verifySmsCode, resendCode as resendSmsCode, registerAuth, getCurrentUser } from "@/services/api/authApi";
+import { verifyCode as verifySmsCode, resendCode as resendSmsCode, getCurrentUser } from "@/services/api/authApi";
 import { verifyOtp, resendOtp, parseAttemptsRemaining, sendOtp } from "@/services/api/otpApi";
 import { setAuthToken } from "@/services/api/apiClient";
 import { z } from "zod";
@@ -139,7 +139,7 @@ const CodeEntry = () => {
     
     try {
       if (isWhatsAppAuth) {
-        // WhatsApp OTP verification
+        // WhatsApp OTP verification — token comes directly from /otp/verify/
         const response = await verifyOtp(phoneNumber, fullCode);
         
         if (response.error || !response.data?.is_valid) {
@@ -164,31 +164,25 @@ const CodeEntry = () => {
           return;
         }
         
-        // WhatsApp OTP verified successfully
-        // Now we need to complete registration via backend
-        toast.success(t("auth.code.success") || "Code verified!");
-        
-        // After OTP verification, call register_auth to get token
-        const registerResponse = await registerAuth(phoneNumber);
-        
-        if (registerResponse.data?.token) {
-          setAuthToken(registerResponse.data.token);
+        // WhatsApp OTP verified successfully — token is in response
+        if (response.data?.is_valid && response.data.token) {
+          setAuthToken(response.data.token);
+          toast.success(t("auth.code.success") || "Code verified!");
           
-          if (registerResponse.data.is_new_user) {
+          if (response.data.is_new_user) {
+            // New user — go to profile setup
             navigate("/auth/profile", { 
               replace: true,
               state: { phoneNumber, isNewUser: true }
             });
           } else {
+            // Existing user — fetch profile and go to home
             await getCurrentUser();
             navigate("/", { replace: true });
           }
         } else {
-          // New user flow - go to profile setup
-          navigate("/auth/profile", { 
-            replace: true,
-            state: { phoneNumber, isNewUser: true }
-          });
+          // Fallback: is_valid but no token (shouldn't happen)
+          toast.error(t("auth.code.error") || "Verification failed");
         }
       } else {
         // SMS verification (Kyrgyzstan)
