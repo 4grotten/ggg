@@ -320,21 +320,29 @@ const PhoneEntry = () => {
         }
         
         if (response.data) {
-          const { is_new_user, token } = response.data;
+          const { is_new_user, token, temporary_code_enabled } = response.data;
           
-          if (is_new_user) {
-            // New user - SMS code sent, go to code entry
+          if (token) {
+            // Token received immediately (non-+996 countries) - skip OTP
+            setAuthToken(token);
+            if (is_new_user) {
+              // New user with token - go to profile setup
+              navigate("/auth/profile", { 
+                state: { phoneNumber: fullPhone }
+              });
+            } else {
+              // Existing user with token - go to dashboard
+              toast.success(t("auth.login.success"));
+              navigate("/", { replace: true });
+            }
+          } else if (is_new_user && temporary_code_enabled) {
+            // +996 new user - SMS code sent, go to code entry
             toast.success(t("auth.phone.codeSent") || "Verification code sent!");
             navigate("/auth/code", { 
               state: { phoneNumber: fullPhone }
             });
-          } else if (token) {
-            // Existing user with valid token - already logged in
-            setAuthToken(token);
-            toast.success(t("auth.login.success"));
-            navigate("/", { replace: true });
-          } else {
-            // Existing user without token - needs password
+          } else if (!is_new_user) {
+            // Existing user without token - needs password login
             setIsLoginMode(true);
           }
         }
