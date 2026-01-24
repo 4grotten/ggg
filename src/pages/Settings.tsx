@@ -10,7 +10,7 @@ import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share, LogOut, Loader2 } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
@@ -63,6 +63,7 @@ const Settings = () => {
   const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isAppearanceOpen, setIsAppearanceOpen] = useState(false);
+  const [isInstallOpen, setIsInstallOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || "en");
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
@@ -71,56 +72,33 @@ const Settings = () => {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleInstallClick = async () => {
+  const handleInstallClick = () => {
     if (isInstalled) {
       toast.info(t("toast.appAlreadyInstalled"));
       return;
     }
-    
-    // Always try to use native share (which includes "Add to Home Screen" on iOS)
-    const shareData = {
-      title: 'Easy Card',
-      text: t("toast.installInstructions"),
-      url: window.location.origin
-    };
+    setIsInstallOpen(true);
+  };
 
+  const handleShareForInstall = async () => {
     try {
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: 'Easy Card',
+          url: window.location.origin
+        });
       } else if (isInstallable) {
-        // Fallback to PWA install prompt on supported browsers
         const success = await promptInstall();
         if (success) {
           toast.success(t("toast.appInstalled"));
+          setIsInstallOpen(false);
         }
       } else {
-        // Last fallback: show instructions
-        toast.info(t("toast.installInstructions"));
-      }
-    } catch (error) {
-      // User cancelled share
-      console.log('Share cancelled:', error);
-    }
-  };
-
-  const handleShareInstallInstructions = async () => {
-    const shareData = {
-      title: 'Easy Card',
-      text: t("toast.installInstructions"),
-      url: window.location.origin
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+        await navigator.clipboard.writeText(window.location.origin);
         toast.success(t("toast.copied", { label: "Link" }));
       }
     } catch (error) {
-      // User cancelled or share failed
-      console.log('Share cancelled or failed:', error);
+      console.log('Share cancelled:', error);
     }
   };
 
@@ -291,24 +269,14 @@ const Settings = () => {
           />
         </div>
 
-        {/* Install App - moved up with share button */}
+        {/* Install App */}
         {!isInstalled && (
-          <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
+          <div className="bg-card rounded-2xl overflow-hidden">
             <SettingsItem
               icon={<Smartphone className="w-5 h-5" />}
               label={t("settings.installApp")}
               onClick={handleInstallClick}
             />
-            <button
-              onClick={handleShareInstallInstructions}
-              className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Share className="w-5 h-5 text-foreground" />
-                <span className="text-foreground font-medium">{t("settings.shareApp") || "Share App"}</span>
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </button>
           </div>
         )}
 
@@ -432,6 +400,58 @@ const Settings = () => {
                 );
               })}
             </AnimatedDrawerContainer>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Install App Drawer */}
+      <Drawer open={isInstallOpen} onOpenChange={setIsInstallOpen} shouldScaleBackground={false}>
+        <DrawerContent className="bg-background/95 backdrop-blur-xl">
+          <DrawerHeader className="relative flex items-center justify-center py-4">
+            <DrawerTitle className="text-center text-base font-semibold">
+              {t("settings.installApp")}
+            </DrawerTitle>
+            <button 
+              onClick={() => setIsInstallOpen(false)}
+              className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+            >
+              <X className="w-3.5 h-3.5 text-primary" />
+            </button>
+          </DrawerHeader>
+          
+          <div className="px-6 pb-8 space-y-6">
+            {/* Instructions */}
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-xl">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-bold text-primary">1</span>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">{t("settings.installStep1") || "Tap the Share button"}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep1Desc") || "Look for the share icon in your browser"}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-xl">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-bold text-primary">2</span>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">{t("settings.installStep2") || "Select 'Add to Home Screen'"}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t("settings.installStep2Desc") || "Scroll down in the share menu to find this option"}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Share Button */}
+            <button
+              onClick={handleShareForInstall}
+              className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+            >
+              <Share2 className="w-5 h-5" />
+              <span>{t("settings.openShare") || "Open Share"}</span>
+              <ExternalLink className="w-4 h-4" />
+            </button>
           </div>
         </DrawerContent>
       </Drawer>

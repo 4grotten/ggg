@@ -312,6 +312,11 @@
     "addToHomeScreen": "Zum Startbildschirm",
     "installApp": "App installieren",
     "shareApp": "App teilen",
+    "installStep1": "Tippen Sie auf die Teilen-Taste",
+    "installStep1Desc": "Suchen Sie das Teilen-Symbol in Ihrem Browser",
+    "installStep2": "Wählen Sie 'Zum Home-Bildschirm'",
+    "installStep2Desc": "Scrollen Sie im Teilen-Menü, um diese Option zu finden",
+    "openShare": "Teilen öffnen",
     "privacyPolicy": "Datenschutzrichtlinie",
     "applicationLanguage": "Anwendungssprache",
     "languages": {

@@ -312,6 +312,11 @@
     "addToHomeScreen": "إضافة للشاشة الرئيسية",
     "installApp": "تثبيت التطبيق",
     "shareApp": "مشاركة التطبيق",
+    "installStep1": "اضغط على زر المشاركة",
+    "installStep1Desc": "ابحث عن أيقونة المشاركة في متصفحك",
+    "installStep2": "اختر 'إضافة للشاشة الرئيسية'",
+    "installStep2Desc": "مرر للأسفل في قائمة المشاركة للعثور على هذا الخيار",
+    "openShare": "فتح المشاركة",
     "privacyPolicy": "سياسة الخصوصية",
     "applicationLanguage": "لغة التطبيق",
     "languages": {
