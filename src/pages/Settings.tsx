@@ -79,25 +79,22 @@ const InstallStepsContent = ({ isOpen, onShare, t }: InstallStepsContentProps) =
       setButtonVisible(false);
       setButtonIconVisible(false);
       
-      // Elevator animation: step 1 appears first
-      const timer1 = setTimeout(() => setStep1Visible(true), 150);
-      // Icon 1 appears after step 1
-      const timer1Icon = setTimeout(() => setIcon1Visible(true), 350);
-      // Step 2 appears after icon 1
+      // Phase 1: Steps and button appear first (elevator animation)
+      const timer1 = setTimeout(() => setStep1Visible(true), 200);
       const timer2 = setTimeout(() => setStep2Visible(true), 500);
-      // Icon 2 appears after step 2
-      const timer2Icon = setTimeout(() => setIcon2Visible(true), 700);
-      // Button appears last
-      const timer3 = setTimeout(() => setButtonVisible(true), 850);
-      // Button icon appears last
-      const timer3Icon = setTimeout(() => setButtonIconVisible(true), 1000);
+      const timer3 = setTimeout(() => setButtonVisible(true), 800);
+      
+      // Phase 2: Icons appear one by one with 500ms delay after all steps visible
+      const timer1Icon = setTimeout(() => setIcon1Visible(true), 1300);   // 800 + 500
+      const timer2Icon = setTimeout(() => setIcon2Visible(true), 1800);   // 1300 + 500
+      const timer3Icon = setTimeout(() => setButtonIconVisible(true), 2300); // 1800 + 500
       
       return () => {
         clearTimeout(timer1);
-        clearTimeout(timer1Icon);
         clearTimeout(timer2);
-        clearTimeout(timer2Icon);
         clearTimeout(timer3);
+        clearTimeout(timer1Icon);
+        clearTimeout(timer2Icon);
         clearTimeout(timer3Icon);
       };
     }
