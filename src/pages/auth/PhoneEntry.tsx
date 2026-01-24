@@ -15,7 +15,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { login as apiLogin, forgotPassword, registerAuth, getCurrentUser } from "@/services/api/authApi";
+import { login as apiLogin, forgotPassword, registerAuth, getCurrentUser, sendOtp } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { z } from "zod";
 
@@ -310,27 +310,37 @@ const PhoneEntry = () => {
       
       try {
         const fullPhone = getFullPhoneNumber();
-        const response = await registerAuth(fullPhone);
         
-        if (response.error) {
+        // First check if user exists
+        const checkResponse = await registerAuth(fullPhone);
+        
+        if (checkResponse.error) {
           setShowError(true);
-          setErrorMessage(response.error.message || t("auth.phone.error"));
+          setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
           setTimeout(() => setShowError(false), 600);
           return;
         }
         
-        if (response.data) {
-          const { is_new_user, token } = response.data;
+        if (checkResponse.data) {
+          const { is_new_user, token } = checkResponse.data;
           
           if (is_new_user) {
-            // New user - save token if provided and go to OTP verification
+            // New user - send OTP first (before registration is complete)
+            const isKyrgyzstan = dialCode === '+996';
+            const otpType: 'sms' | 'whatsapp' = isKyrgyzstan ? 'sms' : 'whatsapp';
+            
+            // Send OTP
+            const otpResponse = await sendOtp(fullPhone, otpType);
+            
+            if (otpResponse.error) {
+              // Even if OTP send fails, navigate to code page to allow resend
+              console.warn('OTP send failed:', otpResponse.error.message);
+            }
+            
+            // Save token if provided
             if (token) {
               setAuthToken(token);
             }
-            
-            // Determine auth type: SMS for +996, WhatsApp for others
-            const isKyrgyzstan = dialCode === '+996';
-            const authType: 'sms' | 'whatsapp' = isKyrgyzstan ? 'sms' : 'whatsapp';
             
             const successMessage = isKyrgyzstan 
               ? (t("auth.phone.codeSent") || "Verification code sent!")
@@ -340,7 +350,8 @@ const PhoneEntry = () => {
             navigate("/auth/code", { 
               state: { 
                 phoneNumber: fullPhone,
-                authType: authType
+                authType: otpType,
+                isNewUser: true
               }
             });
           } else {
