@@ -19,6 +19,7 @@
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",
+    "welcome": "Welcome, {{name}}!",
     "poweredBy": "Powered by",
     "balance": "Balance",
     "topUp": "Top up",
