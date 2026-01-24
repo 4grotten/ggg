@@ -337,7 +337,9 @@
     },
     "cropPhoto": "裁剪照片",
     "apply": "应用",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "guest": "访客",
+    "loginToAccess": "登录以访问所有功能"
   },
   "card": {
     "back": "返回",
