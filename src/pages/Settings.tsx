@@ -13,8 +13,7 @@ import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
-import { getSavedAccounts, saveCurrentAccount, useMultiAccount, switchToAccount, type SavedAccount } from "@/hooks/useMultiAccount";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/useMultiAccount";
 
 interface SettingsItemProps {
   icon: React.ReactNode;
@@ -203,48 +202,7 @@ const Settings = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [switchAccountDialog, setSwitchAccountDialog] = useState<SavedAccount | null>(null);
-  const [isSwitchingAccount, setIsSwitchingAccount] = useState(false);
-  const [switchingToUser, setSwitchingToUser] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleSwitchAccount = async (account: SavedAccount) => {
-    // Close dialog and show loading overlay
-    setSwitchAccountDialog(null);
-    setSwitchingToUser(account.user.full_name);
-    setIsSwitchingAccount(true);
-    
-    // Wait for animation to show
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Save current account before switching
-    if (user) {
-      saveCurrentAccount(user);
-    }
-    
-    // IMPORTANT: load the freshest token from storage (avoid stale in-memory data)
-    const fresh = getSavedAccounts().find(a => a.id === account.id);
-    if (!fresh?.token) {
-      setIsSwitchingAccount(false);
-      toast.error(t("settings.switchAccountError") || "Failed to switch account");
-      return;
-    }
-
-    // Perform the switch
-    // Mark that we are switching to avoid token being cleared by in-flight requests
-    try {
-      sessionStorage.setItem('switching_account', '1');
-    } catch {
-      // ignore
-    }
-    switchToAccount(fresh);
-    
-    // Wait a bit more for dramatic effect
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Reload to apply the new session
-    window.location.href = '/';
-  };
 
   const handleInstallClick = () => {
     if (isInstalled) {
@@ -374,8 +332,41 @@ const Settings = () => {
 
   const otherAccounts = accounts.filter((a) => a.user.id !== user?.id);
 
-  // Only show real accounts, no mocks
-  const accountsToRender = otherAccounts;
+  const mockAccounts: Array<Pick<SavedAccount, "id" | "user"> & { isMock: true }> = [
+    {
+      id: -1,
+      user: {
+        id: -1,
+        full_name: "Alex Johnson",
+        phone_number: "+971 50 123 4567",
+        email: null,
+        avatar: null,
+        username: null,
+        date_of_birth: null,
+        gender: null,
+        has_empty_fields: false,
+      },
+      isMock: true,
+    },
+    {
+      id: -2,
+      user: {
+        id: -2,
+        full_name: "Maria Petrova",
+        phone_number: "+996 555 111 222",
+        email: null,
+        avatar: null,
+        username: null,
+        date_of_birth: null,
+        gender: null,
+        has_empty_fields: false,
+      },
+      isMock: true,
+    },
+  ];
+
+  const accountsToRender: Array<SavedAccount | (Pick<SavedAccount, "id" | "user"> & { isMock: true })> =
+    otherAccounts.length > 0 ? otherAccounts : mockAccounts;
 
   return (
     <MobileLayout
@@ -535,52 +526,56 @@ const Settings = () => {
               if (user) {
                 saveCurrentAccount(user);
               }
-              navigate("/auth/phone?add_account=true");
+              navigate("/auth/phone");
             }}
           />
         </div>
 
-        {/* Other Accounts - only show if there are real accounts */}
-        {accountsToRender.length > 0 && (
-          <div className="bg-card rounded-2xl overflow-hidden">
-            <div className="px-4 py-3 border-b border-border">
-              <p className="text-sm font-semibold text-foreground">
-                {t("settings.otherAccounts") || "Other accounts"}
+        {/* Other Accounts (mockups if empty) */}
+        <div className="bg-card rounded-2xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-sm font-semibold text-foreground">
+              {t("settings.otherAccounts") || "Other accounts"}
+            </p>
+            {otherAccounts.length === 0 && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {t("settings.otherAccountsMock") || "Mockups (saved accounts not found)"}
               </p>
-            </div>
-
-            <div className="divide-y divide-border">
-              {accountsToRender.map((account) => {
-                const name = account.user.full_name;
-                const phone = account.user.phone_number;
-                const avatar = account.user.avatar?.medium || account.user.avatar?.file;
-
-                return (
-                  <button
-                    key={`acc-${account.id}`}
-                    type="button"
-                    onClick={() => setSwitchAccountDialog(account)}
-                    className="w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-muted/50 transition-colors"
-                  >
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src={avatar || undefined} alt={name} />
-                      <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
-                        {getInitials(name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-base font-medium text-foreground">{name}</p>
-                      <p className="text-sm text-muted-foreground">{phone}</p>
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <LogIn className="w-4 h-4 text-primary" />
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            )}
           </div>
-        )}
+
+          <div className="divide-y divide-border">
+            {accountsToRender.map((account) => {
+              const isMock = (account as any).isMock === true;
+              const name = account.user.full_name;
+              const phone = account.user.phone_number;
+              const avatar = account.user.avatar?.medium || account.user.avatar?.file;
+
+              return (
+                <button
+                  key={`${isMock ? "mock" : "acc"}-${account.id}`}
+                  type="button"
+                  disabled
+                  className="w-full flex items-center gap-3 px-4 py-4 text-left opacity-80"
+                >
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={avatar || undefined} alt={name} />
+                    <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
+                      {getInitials(name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="text-base font-medium text-foreground">{name}</p>
+                    <p className="text-sm text-muted-foreground">{phone}</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                    <LogOut className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Logout Button */}
         {isAuthenticated && (
@@ -717,70 +712,6 @@ const Settings = () => {
           imageSrc={cropImageSrc}
           onCropComplete={handleCropComplete}
         />
-      )}
-
-      {/* iOS-style Switch Account Confirmation Dialog */}
-      <AlertDialog open={!!switchAccountDialog} onOpenChange={(open) => !open && setSwitchAccountDialog(null)}>
-        <AlertDialogContent 
-          className="max-w-[270px] rounded-2xl p-0 overflow-hidden border-0 gap-0"
-          onOverlayClick={() => setSwitchAccountDialog(null)}
-        >
-          <div className="p-4 pb-3">
-            <AlertDialogTitle className="text-center text-[17px] font-semibold mb-1">
-              {t("settings.switchAccountTitle") || "Switch account?"}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground">
-              {t("settings.switchAccountDescription") || "Do you want to switch to"} {switchAccountDialog?.user.full_name}?
-            </AlertDialogDescription>
-          </div>
-          
-          {/* iOS-style buttons */}
-          <div className="flex flex-col">
-            <button
-              onClick={() => switchAccountDialog && handleSwitchAccount(switchAccountDialog)}
-              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] border-t border-border hover:bg-secondary/50 transition-colors"
-            >
-              {t("settings.switchAccount") || "Switch"}
-            </button>
-            <button
-              onClick={() => setSwitchAccountDialog(null)}
-              className="w-full py-3 text-[17px] font-normal text-muted-foreground border-t border-border hover:bg-secondary/50 transition-colors"
-            >
-              {t("common.cancel") || "Cancel"}
-            </button>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Account Switching Overlay */}
-      {isSwitchingAccount && (
-        <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center animate-fade-in">
-          {/* Animated avatar circle */}
-          <div className="relative mb-6">
-            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
-              <User className="w-12 h-12 text-primary" />
-            </div>
-            {/* Spinning ring */}
-            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
-          </div>
-          
-          {/* Text with fade animation */}
-          <div className="text-center space-y-2">
-            <p className="text-lg font-semibold text-foreground animate-fade-in">
-              {t("settings.switchingAccount") || "Switching account..."}
-            </p>
-            <p className="text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              {switchingToUser}
-            </p>
-          </div>
-          
-          {/* Decorative dots */}
-          <div className="flex gap-2 mt-8">
-            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
-        </div>
       )}
     </MobileLayout>
   );

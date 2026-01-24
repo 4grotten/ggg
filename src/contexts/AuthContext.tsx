@@ -17,8 +17,7 @@ import {
   getAuthToken, 
   removeAuthToken, 
   isAuthenticated as checkIsAuthenticated,
-  AUTH_USER_KEY,
-  AUTH_TOKEN_KEY
+  AUTH_USER_KEY 
 } from '@/services/api/apiClient';
 import { saveCurrentAccount } from '@/hooks/useMultiAccount';
 
@@ -116,10 +115,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const response = await getCurrentUser();
     
     if (response.error || !response.data) {
-      // Токен невалидный - но НЕ удаляем сохранённые аккаунты
-      // Удаляем только текущий токен, saved_accounts остаются
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(AUTH_USER_KEY);
+      // Токен невалидный
+      removeAuthToken();
       setUser(null);
       
       // Редирект на страницу входа, если не на публичном роуте
@@ -129,15 +126,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } else {
       setUser(response.data);
-      // Сохраняем актуальные данные пользователя
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
-    }
-
-    // Account switch complete (success or fail)
-    try {
-      sessionStorage.removeItem('switching_account');
-    } catch {
-      // ignore
     }
     
     setIsLoading(false);
@@ -147,19 +135,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, [checkAuth]);
 
-  // Редирект авторизованных пользователей со страниц авторизации на главную
-  // Но НЕ редиректить если идёт добавление нового аккаунта (add_account=true в URL)
+  // Редирект неавторизованных пользователей
   useEffect(() => {
-    if (!isLoading && user) {
-      const isAuthRoute = PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
-      const searchParams = new URLSearchParams(location.search);
-      const isAddingAccount = searchParams.get('add_account') === 'true';
-      
-      if (isAuthRoute && !isAddingAccount) {
-        navigate('/', { replace: true });
+    if (!isLoading && !user) {
+      const isPublicRoute = PUBLIC_ROUTES.some(route => location.pathname.startsWith(route));
+      if (!isPublicRoute && location.pathname !== '/') {
+        // Разрешаем главную страницу без авторизации для демо
+        // В production можно убрать это условие
       }
     }
-  }, [isLoading, user, location.pathname, location.search, navigate]);
+  }, [isLoading, user, location.pathname, navigate]);
 
   const login = useCallback((userData: UserProfile) => {
     setUser(userData);

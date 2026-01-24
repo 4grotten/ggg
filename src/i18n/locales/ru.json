@@ -352,11 +352,7 @@
     "accounts": "Аккаунты",
     "addAccount": "Добавить аккаунт",
     "addAccountDesc": "Войти в другой аккаунт",
-    "switchAccount": "Сменить",
-    "switchAccountTitle": "Сменить аккаунт?",
-    "switchAccountDescription": "Вы хотите переключиться на",
-    "switchingAccount": "Смена аккаунта...",
-    "switchAccountError": "Не удалось сменить аккаунт",
+    "switchAccount": "Сменить аккаунт",
     "otherAccounts": "Другие аккаунты",
     "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)",
     "editProfile": "Редактировать профиль"
@@ -687,7 +683,7 @@
       "femaleDisplay": "Пол: Женский",
       "notSelectedDisplay": "Пол: Не указан",
       "gender": {
-        "preferNotToSay": "Не указан"
+        "preferNotToSay": "Не указывать"
       },
       "fullNamePlaceholder": "ФИО (обязательно)",
       "passwordPlaceholder": "Создайте пароль (обязательно)",
