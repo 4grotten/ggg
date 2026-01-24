@@ -300,6 +300,7 @@
     "languageSystem": "Язык установлен на системный ({{language}})",
     "languageChanged": "Язык изменён на {{language}}",
     "copied": "{{label}} скопировано",
+    "linkCopied": "Ссылка скопирована",
     "accountDetailsCopied": "Реквизиты счёта скопированы",
     "cardNumberCopied": "Номер карты скопирован",
     "cardDetailsCopied": "Данные карты скопированы",

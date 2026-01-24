@@ -300,6 +300,7 @@
     "languageSystem": "Language set to System ({{language}})",
     "languageChanged": "Language changed to {{language}}",
     "copied": "{{label}} copied",
+    "linkCopied": "Link copied to clipboard",
     "accountDetailsCopied": "Account details copied",
     "cardNumberCopied": "Card number copied",
     "cardDetailsCopied": "Card details copied",
