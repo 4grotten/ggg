@@ -8,7 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import apofizLogo from "@/assets/apofiz-logo.svg";
-import { getAuthToken } from "@/services/api/apiClient";
+import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { BalanceCard } from "@/components/dashboard/BalanceCard";
 import { ActionButtons } from "@/components/dashboard/ActionButtons";
 import { VerifyIdentityCard } from "@/components/dashboard/VerifyIdentityCard";
@@ -150,13 +150,7 @@ const Dashboard = () => {
       <MobileLayout
         header={
           <button 
-            onClick={() => {
-              const token = getAuthToken();
-              const url = token 
-                ? `https://apofiz.com?token=${encodeURIComponent(token)}`
-                : 'https://apofiz.com';
-              window.open(url, '_blank', 'noopener,noreferrer');
-            }}
+            onClick={openApofizWithAuth}
             className="flex items-center gap-1 hover:opacity-80 transition-opacity"
           >
             <p className="text-xs text-muted-foreground">
