@@ -125,7 +125,8 @@ const CodeEntry = () => {
     setError("");
     
     try {
-      const response = await verifyOtp(phoneNumber, parseInt(fullCode, 10));
+      // IMPORTANT: send as string to preserve leading zeros (server expects 6 chars)
+      const response = await verifyOtp(phoneNumber, fullCode);
       
       // Check for API-level error
       if (response.error) {
