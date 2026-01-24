@@ -13,7 +13,8 @@ import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
-import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/useMultiAccount";
+import { saveCurrentAccount, useMultiAccount, switchToAccount, type SavedAccount } from "@/hooks/useMultiAccount";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface SettingsItemProps {
   icon: React.ReactNode;
@@ -202,7 +203,19 @@ const Settings = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [switchAccountDialog, setSwitchAccountDialog] = useState<SavedAccount | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSwitchAccount = (account: SavedAccount) => {
+    // Save current account before switching
+    if (user) {
+      saveCurrentAccount(user);
+    }
+    // Perform the switch
+    switchToAccount(account);
+    // Reload to apply the new session
+    window.location.href = '/';
+  };
 
   const handleInstallClick = () => {
     if (isInstalled) {
@@ -517,8 +530,8 @@ const Settings = () => {
                   <button
                     key={`acc-${account.id}`}
                     type="button"
-                    disabled
-                    className="w-full flex items-center gap-3 px-4 py-4 text-left opacity-80"
+                    onClick={() => setSwitchAccountDialog(account)}
+                    className="w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-muted/50 transition-colors"
                   >
                     <Avatar className="w-12 h-12">
                       <AvatarImage src={avatar || undefined} alt={name} />
@@ -530,8 +543,8 @@ const Settings = () => {
                       <p className="text-base font-medium text-foreground">{name}</p>
                       <p className="text-sm text-muted-foreground">{phone}</p>
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <LogOut className="w-4 h-4 text-muted-foreground" />
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <LogIn className="w-4 h-4 text-primary" />
                     </div>
                   </button>
                 );
@@ -676,6 +689,24 @@ const Settings = () => {
           onCropComplete={handleCropComplete}
         />
       )}
+
+      {/* Switch Account Confirmation Dialog */}
+      <AlertDialog open={!!switchAccountDialog} onOpenChange={(open) => !open && setSwitchAccountDialog(null)}>
+        <AlertDialogContent className="max-w-[90%] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("settings.switchAccountTitle") || "Switch account?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("settings.switchAccountDescription") || "Do you want to switch to"} {switchAccountDialog?.user.full_name}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel") || "Cancel"}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => switchAccountDialog && handleSwitchAccount(switchAccountDialog)}>
+              {t("settings.switchAccount") || "Switch"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MobileLayout>
   );
 };
