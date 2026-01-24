@@ -399,35 +399,30 @@ const PhoneEntry = () => {
             // New user - send WhatsApp OTP
             const otpResponse = await sendOtp(fullPhone);
             
+            // Navigate to code page regardless of OTP send result
+            // User can request resend from there
             if (otpResponse.error) {
-              setShowError(true);
+              // Show warning but still navigate
+              const errorMsg = otpResponse.error.status === 429
+                ? (t("auth.phone.rateLimitError") || "Too many requests. Please wait.")
+                : otpResponse.error.status === 503
+                  ? (t("auth.phone.serviceUnavailable") || "Service temporarily unavailable")
+                  : (t("auth.phone.otpSendError") || "Failed to send code. You can retry on the next screen.");
               
-              // Handle specific error statuses
-              if (otpResponse.error.status === 429) {
-                setErrorMessage(t("auth.phone.rateLimitError") || "Too many requests. Please wait a few minutes.");
-              } else if (otpResponse.error.status === 400) {
-                setErrorMessage(t("auth.phone.invalidFormat") || "Invalid phone number format");
-              } else if (otpResponse.error.status === 503) {
-                setErrorMessage(t("auth.phone.serviceUnavailable") || "Service temporarily unavailable");
-              } else {
-                setErrorMessage(otpResponse.error.message || t("auth.phone.error"));
-              }
-              
-              setTimeout(() => setShowError(false), 600);
-              return;
+              toast.warning(errorMsg);
+            } else if (otpResponse.data?.sent) {
+              toast.success(t("auth.phone.whatsappCodeSent") || "Code sent via WhatsApp!");
             }
             
-            if (otpResponse.data?.sent) {
-              toast.success(t("auth.phone.whatsappCodeSent") || "Code sent via WhatsApp!");
-              navigate("/auth/code", { 
-                state: { 
-                  phoneNumber: fullPhone, 
-                  authType: 'whatsapp',
-                  otpId: otpResponse.data.otp_id,
-                  expiresAt: otpResponse.data.expires_at
-                }
-              });
-            }
+            // Always navigate to code entry page
+            navigate("/auth/code", { 
+              state: { 
+                phoneNumber: fullPhone, 
+                authType: 'whatsapp',
+                otpId: otpResponse.data?.otp_id,
+                expiresAt: otpResponse.data?.expires_at
+              }
+            });
           }
         }
       } catch {
