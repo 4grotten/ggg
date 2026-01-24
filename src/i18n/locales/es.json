@@ -327,7 +327,8 @@
       "system": "Sistema"
     },
     "cropPhoto": "Recortar foto",
-    "apply": "Aplicar"
+    "apply": "Aplicar",
+    "logout": "Cerrar sesión"
   },
   "card": {
     "back": "Atrás",

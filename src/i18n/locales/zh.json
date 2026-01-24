@@ -327,7 +327,8 @@
       "system": "跟随系统"
     },
     "cropPhoto": "裁剪照片",
-    "apply": "应用"
+    "apply": "应用",
+    "logout": "退出登录"
   },
   "card": {
     "back": "返回",
