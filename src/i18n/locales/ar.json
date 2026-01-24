@@ -18,6 +18,7 @@
     "usdt": "USDT"
   },
   "dashboard": {
+    "welcome": "مرحباً، {{name}}!",
     "poweredBy": "مدعوم من",
     "balance": "الرصيد",
     "topUp": "شحن",

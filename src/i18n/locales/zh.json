@@ -18,6 +18,7 @@
     "usdt": "USDT"
   },
   "dashboard": {
+    "welcome": "欢迎，{{name}}！",
     "poweredBy": "技术支持",
     "balance": "余额",
     "topUp": "充值",

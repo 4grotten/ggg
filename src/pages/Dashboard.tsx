@@ -64,6 +64,17 @@ const Dashboard = () => {
   const displayAvatar = user?.avatar?.small || user?.avatar?.file || avatarUrl;
   const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   const firstName = displayName.split(' ')[0];
+  const welcomeShownRef = useRef(false);
+
+  // Show welcome toast once on mount for authenticated users
+  useEffect(() => {
+    if (isAuthenticated && user?.full_name && !welcomeShownRef.current) {
+      welcomeShownRef.current = true;
+      toast.success(t('dashboard.welcome', { name: firstName }), {
+        duration: 3000,
+      });
+    }
+  }, [isAuthenticated, user?.full_name, firstName, t]);
 
   // Filter options
   const filterOptions: { key: FilterType; label: string }[] = [
@@ -137,17 +148,12 @@ const Dashboard = () => {
     <>
       <MobileLayout
         header={
-          <div className="flex flex-col">
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              {t('dashboard.poweredBy')}{" "}
-              <img src={apofizLogo} alt="Apofiz" className="w-4 h-4 inline-block" />{" "}
-              <span className="font-semibold text-foreground">Apofiz</span>
+          <div className="flex items-center gap-1">
+            <p className="text-xs text-muted-foreground">
+              {t('dashboard.poweredBy')}
             </p>
-            {isAuthenticated && (
-              <p className="text-sm font-medium text-foreground mt-0.5">
-                {t('dashboard.greeting', { name: firstName })}
-              </p>
-            )}
+            <img src={apofizLogo} alt="Apofiz" className="w-4 h-4" />
+            <span className="text-xs font-semibold text-foreground">Apofiz</span>
           </div>
         }
         rightAction={

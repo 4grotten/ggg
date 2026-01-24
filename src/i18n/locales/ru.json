@@ -19,6 +19,7 @@
   },
   "dashboard": {
     "greeting": "Привет, {{name}}!",
+    "welcome": "Добро пожаловать, {{name}}!",
     "poweredBy": "При поддержке",
     "balance": "Баланс",
     "topUp": "Пополнить",
