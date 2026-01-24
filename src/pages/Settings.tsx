@@ -10,7 +10,7 @@ import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Download, LogOut, Loader2 } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
@@ -284,8 +284,8 @@ const Settings = () => {
         {!isInstalled && (
           <div className="bg-card rounded-2xl overflow-hidden">
             <SettingsItem
-              icon={<Download className="w-5 h-5" />}
-              label={t("settings.addToHomeScreen")}
+              icon={<Smartphone className="w-5 h-5" />}
+              label={t("settings.installApp") || "Install App"}
               onClick={handleInstallClick}
             />
           </div>
