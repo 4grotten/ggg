@@ -77,14 +77,29 @@ const Settings = () => {
       return;
     }
     
-    if (isInstallable) {
-      const success = await promptInstall();
-      if (success) {
-        toast.success(t("toast.appInstalled"));
+    // Always try to use native share (which includes "Add to Home Screen" on iOS)
+    const shareData = {
+      title: 'Easy Card',
+      text: t("toast.installInstructions"),
+      url: window.location.origin
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else if (isInstallable) {
+        // Fallback to PWA install prompt on supported browsers
+        const success = await promptInstall();
+        if (success) {
+          toast.success(t("toast.appInstalled"));
+        }
+      } else {
+        // Last fallback: show instructions
+        toast.info(t("toast.installInstructions"));
       }
-    } else {
-      // Show instructions for iOS or browsers that don't support install prompt
-      toast.info(t("toast.installInstructions"));
+    } catch (error) {
+      // User cancelled share
+      console.log('Share cancelled:', error);
     }
   };
 
