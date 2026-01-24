@@ -127,6 +127,7 @@ const CodeEntry = () => {
     try {
       const response = await verifyOtp(phoneNumber, parseInt(fullCode, 10));
       
+      // Check for API-level error
       if (response.error) {
         setError(response.error.message || t("auth.code.wrongCode"));
         setCode(["", "", "", "", "", ""]);
@@ -134,6 +135,7 @@ const CodeEntry = () => {
         return;
       }
       
+      // Check response data - API returns error in data.error field
       if (response.data?.is_valid) {
         toast.success(t("auth.code.success") || "Code verified!");
         
@@ -143,7 +145,9 @@ const CodeEntry = () => {
           state: { phoneNumber, otpVerified: true }
         });
       } else {
-        setError(t("auth.code.wrongCode") || "Invalid code");
+        // API returns error message in data.error field
+        const errorMessage = (response.data as { error?: string })?.error || t("auth.code.wrongCode");
+        setError(errorMessage);
         setCode(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
       }
