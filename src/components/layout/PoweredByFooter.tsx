@@ -6,34 +6,18 @@ interface PoweredByFooterProps {
 }
 
 /**
- * Opens Apofiz.com with automatic authentication via POST form
+ * Opens Apofiz.com with automatic authentication
+ * Uses the same token format as the API (Token header style)
  */
 export const openApofizWithAuth = () => {
   const token = getAuthToken();
   
-  if (!token) {
-    window.open('https://apofiz.com', '_blank', 'noopener,noreferrer');
-    return;
-  }
-
-  // Create a hidden form for POST-based authentication
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = 'https://apofiz.com/auth/token/';
-  form.target = '_blank';
-  form.style.display = 'none';
-
-  // Add token as hidden input
-  const tokenInput = document.createElement('input');
-  tokenInput.type = 'hidden';
-  tokenInput.name = 'token';
-  tokenInput.value = token;
-  form.appendChild(tokenInput);
-
-  // Submit form
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
+  // Open with token as query parameter for SSO
+  const url = token 
+    ? `https://apofiz.com/auth/sso/?token=${encodeURIComponent(token)}`
+    : 'https://apofiz.com';
+  
+  window.open(url, '_blank', 'noopener,noreferrer');
 };
 
 export const PoweredByFooter = ({ className = "" }: PoweredByFooterProps) => {
