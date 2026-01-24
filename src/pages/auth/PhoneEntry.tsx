@@ -15,7 +15,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { login as apiLogin, forgotPassword, registerAuth, getCurrentUser } from "@/services/api/authApi";
+import { login as apiLogin, forgotPassword, getCurrentUser } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { sendOtp, checkPhone } from "@/services/api/otpApi";
 import { z } from "zod";
@@ -327,61 +327,24 @@ const PhoneEntry = () => {
       try {
         const fullPhone = getFullPhoneNumber();
         
-        // Check if this is a +996 country (SMS via old API) or other (WhatsApp via new OTP API)
-        const isKyrgyzstan = dialCode === '+996';
+        // All countries: check if user exists via check-phone endpoint
+        const checkResponse = await checkPhone(fullPhone);
         
-        if (isKyrgyzstan) {
-          // Kyrgyzstan: use old SMS flow via register_auth
-          const response = await registerAuth(fullPhone);
-          
-          if (response.error) {
-            setShowError(true);
-            setErrorMessage(response.error.message || t("auth.phone.error"));
-            setTimeout(() => setShowError(false), 600);
-            return;
-          }
-          
-          if (response.data) {
-            const { is_new_user, token, temporary_code_enabled } = response.data;
-            
-            if (token) {
-              setAuthToken(token);
-              if (is_new_user) {
-                navigate("/auth/profile", { state: { phoneNumber: fullPhone } });
-              } else {
-                await getCurrentUser();
-                toast.success(t("auth.login.success"));
-                navigate("/", { replace: true });
-              }
-            } else if (is_new_user && temporary_code_enabled) {
-              toast.success(t("auth.phone.codeSent") || "Verification code sent!");
-              navigate("/auth/code", { 
-                state: { phoneNumber: fullPhone, authType: 'sms' }
-              });
-            } else if (!is_new_user) {
-              setIsLoginMode(true);
-            }
-          }
+        if (checkResponse.error) {
+          setShowError(true);
+          setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
+          setTimeout(() => setShowError(false), 600);
+          return;
+        }
+        
+        if (checkResponse.data?.exists) {
+          // Existing user → show password login
+          setIsLoginMode(true);
         } else {
-          // All other countries: check if user exists via new check-phone endpoint
-          const checkResponse = await checkPhone(fullPhone);
-          
-          if (checkResponse.error) {
-            setShowError(true);
-            setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
-            setTimeout(() => setShowError(false), 600);
-            return;
-          }
-          
-          if (checkResponse.data?.exists) {
-            // Existing user → show password login
-            setIsLoginMode(true);
-          } else {
-            // New user → go to registration form
-            navigate("/auth/register", {
-              state: { phoneNumber: fullPhone }
-            });
-          }
+          // New user → go to registration form
+          navigate("/auth/register", {
+            state: { phoneNumber: fullPhone }
+          });
         }
       } catch {
         setShowError(true);
@@ -565,15 +528,52 @@ const PhoneEntry = () => {
                 </motion.p>
               )}
               
-              {/* Forgot Password Link */}
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                disabled={isLoading}
-                className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
-              >
-                {t('auth.login.forgotPassword') || 'Forgot password?'}
-              </button>
+              {/* Forgot Password & WhatsApp Login Links */}
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={isLoading}
+                  className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
+                >
+                  {t('auth.login.forgotPassword') || 'Forgot password?'}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setIsLoading(true);
+                    try {
+                      const fullPhone = getFullPhoneNumber();
+                      const otpResponse = await sendOtp(fullPhone);
+                      
+                      if (otpResponse.error) {
+                        toast.error(otpResponse.error.message || t('auth.phone.error'));
+                        return;
+                      }
+                      
+                      toast.success(t('auth.phone.codeSent') || 'Code sent via WhatsApp!');
+                      navigate('/auth/code', {
+                        state: { 
+                          phoneNumber: fullPhone, 
+                          authType: 'whatsapp',
+                          otpId: otpResponse.data?.otp_id,
+                          expiresAt: otpResponse.data?.expires_at
+                        }
+                      });
+                    } catch {
+                      toast.error(t('auth.phone.error') || 'Failed to send code');
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  disabled={isLoading}
+                  className="text-[#25D366] text-sm font-medium hover:underline disabled:opacity-50 flex items-center justify-start gap-1"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  {t('auth.login.loginViaWhatsapp') || 'Login via WhatsApp'}
+                </button>
+              </div>
             </motion.div>
 
             {/* Support Link */}

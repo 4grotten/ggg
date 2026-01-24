@@ -685,7 +685,8 @@
       "forgotPasswordError": "Failed to send reset code",
       "userBlocked": "Your account is blocked",
       "tooManyAttempts": "Too many attempts. Please try again later.",
-      "error": "Login failed. Please try again."
+      "error": "Login failed. Please try again.",
+      "loginViaWhatsapp": "Login via WhatsApp"
     },
     "register": {
       "title": "Create Account",
