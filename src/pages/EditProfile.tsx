@@ -100,10 +100,16 @@ const EditProfile = () => {
     setCropImageSrc(null);
     setIsCropDialogOpen(false);
     
-    if (isAuthenticated && pendingFile) {
+    if (isAuthenticated) {
       setIsUploadingAvatar(true);
       try {
-        await updateAvatar(pendingFile);
+        // Convert base64 cropped image to File
+        const response = await fetch(croppedImage);
+        const blob = await response.blob();
+        const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+        
+        await updateAvatar(croppedFile);
+        await refreshUser(); // Refresh to get updated avatar URL
         toast.success(t("toast.avatarUpdated"));
       } catch (error) {
         console.error('Failed to upload avatar:', error);
