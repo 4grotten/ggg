@@ -338,6 +338,7 @@
     "cropPhoto": "Fotoğrafı kırp",
     "apply": "Uygula",
     "logout": "Çıkış Yap",
+    "logoutSuccess": "Başarıyla çıkış yapıldı",
     "guest": "Misafir",
     "loginToAccess": "Tüm özelliklere erişmek için giriş yapın"
   },
@@ -630,7 +631,8 @@
       "passwordPlaceholder": "Şifreniz",
       "wrongPassword": "Yanlış şifre. Tekrar deneyin",
       "button": "Giriş Yap",
-      "success": "Başarıyla giriş yapıldı!"
+      "success": "Başarıyla giriş yapıldı!",
+      "welcomeBack": "Tekrar hoşgeldiniz"
     },
     "profile": {
       "header": "Profil",

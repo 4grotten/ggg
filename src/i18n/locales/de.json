@@ -338,6 +338,7 @@
     "cropPhoto": "Foto zuschneiden",
     "apply": "Anwenden",
     "logout": "Abmelden",
+    "logoutSuccess": "Erfolgreich abgemeldet",
     "guest": "Gast",
     "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen"
   },
@@ -630,7 +631,8 @@
       "passwordPlaceholder": "Ihr Passwort",
       "wrongPassword": "Falsches Passwort. Bitte versuchen Sie es erneut",
       "button": "Anmelden",
-      "success": "Erfolgreich angemeldet!"
+      "success": "Erfolgreich angemeldet!",
+      "welcomeBack": "Willkommen zurück"
     },
     "profile": {
       "header": "Profil",

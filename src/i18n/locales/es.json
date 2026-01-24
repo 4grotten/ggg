@@ -338,6 +338,7 @@
     "cropPhoto": "Recortar foto",
     "apply": "Aplicar",
     "logout": "Cerrar sesión",
+    "logoutSuccess": "Sesión cerrada correctamente",
     "guest": "Invitado",
     "loginToAccess": "Inicia sesión para acceder a todas las funciones"
   },
@@ -630,7 +631,8 @@
       "passwordPlaceholder": "Tu contraseña",
       "wrongPassword": "Contraseña incorrecta. Inténtalo de nuevo",
       "button": "Iniciar Sesión",
-      "success": "¡Sesión iniciada correctamente!"
+      "success": "¡Sesión iniciada correctamente!",
+      "welcomeBack": "Bienvenido de nuevo"
     },
     "profile": {
       "header": "Perfil",
