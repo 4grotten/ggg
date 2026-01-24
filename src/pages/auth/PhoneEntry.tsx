@@ -320,24 +320,15 @@ const PhoneEntry = () => {
         }
         
         if (response.data) {
-          const { is_new_user, token, temporary_code_enabled } = response.data;
+          const { is_new_user, token } = response.data;
           
-          if (token) {
-            // Token received immediately (non-+996 countries) - skip OTP
-            setAuthToken(token);
-            if (is_new_user) {
-              // New user with token - go to profile setup
-              navigate("/auth/profile", { 
-                state: { phoneNumber: fullPhone }
-              });
-            } else {
-              // Existing user with token - fetch and save profile, then go to dashboard
-              await getCurrentUser();
-              toast.success(t("auth.login.success"));
-              navigate("/", { replace: true });
+          if (is_new_user) {
+            // New user - save token if provided and go to OTP verification
+            if (token) {
+              setAuthToken(token);
             }
-          } else if (is_new_user && temporary_code_enabled) {
-            // Check if this is a +996 country (SMS) or other (WhatsApp)
+            
+            // Determine auth type: SMS for +996, WhatsApp for others
             const isKyrgyzstan = dialCode === '+996';
             const authType: 'sms' | 'whatsapp' = isKyrgyzstan ? 'sms' : 'whatsapp';
             
@@ -352,9 +343,18 @@ const PhoneEntry = () => {
                 authType: authType
               }
             });
-          } else if (!is_new_user) {
-            // Existing user without token - needs password login
-            setIsLoginMode(true);
+          } else {
+            // Existing user
+            if (token) {
+              // Token received - fetch profile and go to dashboard
+              setAuthToken(token);
+              await getCurrentUser();
+              toast.success(t("auth.login.success"));
+              navigate("/", { replace: true });
+            } else {
+              // No token - needs password login
+              setIsLoginMode(true);
+            }
           }
         }
       } catch {
