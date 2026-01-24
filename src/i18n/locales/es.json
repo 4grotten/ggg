@@ -339,28 +339,7 @@
     "apply": "Aplicar",
     "logout": "Cerrar sesión",
     "guest": "Invitado",
-    "loginToAccess": "Inicia sesión para acceder a todas las funciones",
-    "accounts": "Cuentas",
-    "addAccount": "Añadir cuenta",
-    "addAccountDesc": "Iniciar sesión en otra cuenta",
-    "switchAccount": "Cambiar cuenta",
-    "otherAccounts": "Otras cuentas",
-    "otherAccountsMock": "Ejemplos (no se encontraron cuentas guardadas)",
-    "editProfile": "Editar perfil"
-  },
-  "editProfile": {
-    "title": "Editar perfil",
-    "fullName": "Nombre completo",
-    "fullNamePlaceholder": "Ingresa tu nombre completo",
-    "email": "Correo electrónico",
-    "emailPlaceholder": "Ingresa tu correo electrónico",
-    "dateOfBirth": "Fecha de nacimiento",
-    "selectDateOfBirth": "Seleccionar fecha de nacimiento",
-    "gender": "Género",
-    "selectGender": "Seleccionar género",
-    "save": "Guardar cambios",
-    "saved": "Perfil actualizado exitosamente",
-    "saveFailed": "Error al actualizar el perfil"
+    "loginToAccess": "Inicia sesión para acceder a todas las funciones"
   },
   "card": {
     "back": "Atrás",
@@ -664,9 +643,6 @@
       "maleDisplay": "Género: Masculino",
       "femaleDisplay": "Género: Femenino",
       "notSelectedDisplay": "Género: No especificado",
-      "gender": {
-        "preferNotToSay": "Prefiero no decir"
-      },
       "fullNamePlaceholder": "Nombre completo (requerido)",
       "passwordPlaceholder": "Crear contraseña (requerido)",
       "passwordHint": "La contraseña debe tener al menos 6 caracteres",

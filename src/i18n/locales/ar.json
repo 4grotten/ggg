@@ -339,28 +339,7 @@
     "apply": "تطبيق",
     "logout": "تسجيل الخروج",
     "guest": "ضيف",
-    "loginToAccess": "سجّل الدخول للوصول إلى جميع الميزات",
-    "accounts": "الحسابات",
-    "addAccount": "إضافة حساب",
-    "addAccountDesc": "تسجيل الدخول إلى حساب آخر",
-    "switchAccount": "تبديل الحساب",
-    "otherAccounts": "حسابات أخرى",
-    "otherAccountsMock": "أمثلة (لم يتم العثور على حسابات محفوظة)",
-    "editProfile": "تعديل الملف الشخصي"
-  },
-  "editProfile": {
-    "title": "تعديل الملف الشخصي",
-    "fullName": "الاسم الكامل",
-    "fullNamePlaceholder": "أدخل اسمك الكامل",
-    "email": "البريد الإلكتروني",
-    "emailPlaceholder": "أدخل بريدك الإلكتروني",
-    "dateOfBirth": "تاريخ الميلاد",
-    "selectDateOfBirth": "اختر تاريخ الميلاد",
-    "gender": "الجنس",
-    "selectGender": "اختر الجنس",
-    "save": "حفظ التغييرات",
-    "saved": "تم تحديث الملف الشخصي بنجاح",
-    "saveFailed": "فشل تحديث الملف الشخصي"
+    "loginToAccess": "سجّل الدخول للوصول إلى جميع الميزات"
   },
   "card": {
     "back": "رجوع",
@@ -664,9 +643,6 @@
       "maleDisplay": "الجنس: ذكر",
       "femaleDisplay": "الجنس: أنثى",
       "notSelectedDisplay": "الجنس: غير محدد",
-      "gender": {
-        "preferNotToSay": "أفضل عدم الإجابة"
-      },
       "fullNamePlaceholder": "الاسم الكامل (مطلوب)",
       "passwordPlaceholder": "إنشاء كلمة مرور (مطلوب)",
       "passwordHint": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",

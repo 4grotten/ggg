@@ -339,28 +339,7 @@
     "apply": "Anwenden",
     "logout": "Abmelden",
     "guest": "Gast",
-    "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen",
-    "accounts": "Konten",
-    "addAccount": "Konto hinzufügen",
-    "addAccountDesc": "Bei einem anderen Konto anmelden",
-    "switchAccount": "Konto wechseln",
-    "otherAccounts": "Andere Konten",
-    "otherAccountsMock": "Beispiele (keine gespeicherten Konten gefunden)",
-    "editProfile": "Profil bearbeiten"
-  },
-  "editProfile": {
-    "title": "Profil bearbeiten",
-    "fullName": "Vollständiger Name",
-    "fullNamePlaceholder": "Geben Sie Ihren vollständigen Namen ein",
-    "email": "E-Mail",
-    "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
-    "dateOfBirth": "Geburtsdatum",
-    "selectDateOfBirth": "Geburtsdatum auswählen",
-    "gender": "Geschlecht",
-    "selectGender": "Geschlecht auswählen",
-    "save": "Änderungen speichern",
-    "saved": "Profil erfolgreich aktualisiert",
-    "saveFailed": "Profil konnte nicht aktualisiert werden"
+    "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen"
   },
   "card": {
     "back": "Zurück",
@@ -664,9 +643,6 @@
       "maleDisplay": "Geschlecht: Männlich",
       "femaleDisplay": "Geschlecht: Weiblich",
       "notSelectedDisplay": "Geschlecht: Nicht angegeben",
-      "gender": {
-        "preferNotToSay": "Keine Angabe"
-      },
       "fullNamePlaceholder": "Vollständiger Name (erforderlich)",
       "passwordPlaceholder": "Passwort erstellen (erforderlich)",
       "passwordHint": "Passwort muss mindestens 6 Zeichen haben",
