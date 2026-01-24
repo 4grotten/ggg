@@ -15,7 +15,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { login as apiLogin, forgotPassword, registerAuth, getCurrentUser } from "@/services/api/authApi";
+import { login as apiLogin, forgotPassword, getCurrentUser, sendOtp, registerAuth } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { z } from "zod";
 
@@ -310,51 +310,56 @@ const PhoneEntry = () => {
       
       try {
         const fullPhone = getFullPhoneNumber();
-        const response = await registerAuth(fullPhone);
         
-        if (response.error) {
+        // First check if user already exists in database
+        const checkResponse = await registerAuth(fullPhone);
+        
+        if (checkResponse.error) {
           setShowError(true);
-          setErrorMessage(response.error.message || t("auth.phone.error"));
+          setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
           setTimeout(() => setShowError(false), 600);
           return;
         }
         
-        if (response.data) {
-          const { is_new_user, token, temporary_code_enabled } = response.data;
+        if (checkResponse.data) {
+          const { is_new_user, token } = checkResponse.data;
           
-          if (token) {
-            // Token received immediately (non-+996 countries) - skip OTP
-            setAuthToken(token);
-            if (is_new_user) {
-              // New user with token - go to profile setup
-              navigate("/auth/profile", { 
-                state: { phoneNumber: fullPhone }
-              });
-            } else {
-              // Existing user with token - fetch and save profile, then go to dashboard
-              await getCurrentUser();
-              toast.success(t("auth.login.success"));
-              navigate("/", { replace: true });
-            }
-          } else if (is_new_user && temporary_code_enabled) {
-            // Check if this is a +996 country (SMS) or other (WhatsApp)
+          if (is_new_user) {
+            // New user - send OTP (phone is NOT registered yet)
             const isKyrgyzstan = dialCode === '+996';
-            const authType: 'sms' | 'whatsapp' = isKyrgyzstan ? 'sms' : 'whatsapp';
+            const otpType: 'sms' | 'whatsapp' = isKyrgyzstan ? 'sms' : 'whatsapp';
             
-            const successMessage = isKyrgyzstan 
-              ? (t("auth.phone.codeSent") || "Verification code sent!")
-              : (t("auth.phone.codeSentWhatsApp") || "Code sent via WhatsApp!");
-            toast.success(successMessage);
+            const otpResponse = await sendOtp(fullPhone, otpType);
             
+            if (otpResponse.error) {
+              console.warn('OTP send failed:', otpResponse.error.message);
+              toast.error(otpResponse.error.message || t("auth.phone.error"));
+            } else {
+              const successMessage = isKyrgyzstan 
+                ? (t("auth.phone.codeSent") || "Verification code sent!")
+                : (t("auth.phone.codeSentWhatsApp") || "Code sent via WhatsApp!");
+              toast.success(successMessage);
+            }
+            
+            // Navigate to code entry page
             navigate("/auth/code", { 
               state: { 
                 phoneNumber: fullPhone,
-                authType: authType
+                authType: otpType
               }
             });
-          } else if (!is_new_user) {
-            // Existing user without token - needs password login
-            setIsLoginMode(true);
+          } else {
+            // Existing user - show password login (NO OTP)
+            if (token) {
+              // Token received - user logged in automatically
+              setAuthToken(token);
+              await getCurrentUser();
+              toast.success(t("auth.login.success"));
+              navigate("/", { replace: true });
+            } else {
+              // No token - needs password login
+              setIsLoginMode(true);
+            }
           }
         }
       } catch {

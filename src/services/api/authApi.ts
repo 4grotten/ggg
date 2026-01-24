@@ -95,6 +95,33 @@ export interface LogoutResponse {
 // ============ API Functions ============
 
 /**
+ * Отправка OTP на номер телефона (перед регистрацией)
+ * POST /otp/send/
+ */
+export async function sendOtp(phone_number: string, type: 'sms' | 'whatsapp' = 'whatsapp') {
+  return apiPost<{ message: string }>('/otp/send/', { 
+    phone_number, 
+    type 
+  });
+}
+
+/**
+ * Проверка OTP кода
+ * POST /otp/verify/
+ */
+export async function verifyOtp(phone_number: string, code: string) {
+  return apiPost<{ 
+    is_valid: boolean; 
+    error?: string; 
+    token?: string | null; 
+    is_new_user?: boolean | null;
+  }>('/otp/verify/', { 
+    phone_number, 
+    code 
+  });
+}
+
+/**
  * Регистрация / проверка номера телефона
  * POST /register_auth/
  */
