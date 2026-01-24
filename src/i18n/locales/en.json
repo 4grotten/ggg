@@ -345,7 +345,9 @@
     },
     "cropPhoto": "Crop Photo",
     "apply": "Apply",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "guest": "Guest",
+    "loginToAccess": "Sign in to access all features"
   },
   "card": {
     "back": "Back",

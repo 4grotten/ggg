@@ -337,7 +337,9 @@
     },
     "cropPhoto": "Foto zuschneiden",
     "apply": "Anwenden",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "guest": "Gast",
+    "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen"
   },
   "card": {
     "back": "Zurück",

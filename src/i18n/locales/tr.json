@@ -337,7 +337,9 @@
     },
     "cropPhoto": "Fotoğrafı kırp",
     "apply": "Uygula",
-    "logout": "Çıkış Yap"
+    "logout": "Çıkış Yap",
+    "guest": "Misafir",
+    "loginToAccess": "Tüm özelliklere erişmek için giriş yapın"
   },
   "card": {
     "back": "Geri",

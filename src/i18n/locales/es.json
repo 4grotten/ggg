@@ -337,7 +337,9 @@
     },
     "cropPhoto": "Recortar foto",
     "apply": "Aplicar",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "guest": "Invitado",
+    "loginToAccess": "Inicia sesión para acceder a todas las funciones"
   },
   "card": {
     "back": "Atrás",
