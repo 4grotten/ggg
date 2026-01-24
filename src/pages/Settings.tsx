@@ -332,41 +332,8 @@ const Settings = () => {
 
   const otherAccounts = accounts.filter((a) => a.user.id !== user?.id);
 
-  const mockAccounts: Array<Pick<SavedAccount, "id" | "user"> & { isMock: true }> = [
-    {
-      id: -1,
-      user: {
-        id: -1,
-        full_name: "Alex Johnson",
-        phone_number: "+971 50 123 4567",
-        email: null,
-        avatar: null,
-        username: null,
-        date_of_birth: null,
-        gender: null,
-        has_empty_fields: false,
-      },
-      isMock: true,
-    },
-    {
-      id: -2,
-      user: {
-        id: -2,
-        full_name: "Maria Petrova",
-        phone_number: "+996 555 111 222",
-        email: null,
-        avatar: null,
-        username: null,
-        date_of_birth: null,
-        gender: null,
-        has_empty_fields: false,
-      },
-      isMock: true,
-    },
-  ];
-
-  const accountsToRender: Array<SavedAccount | (Pick<SavedAccount, "id" | "user"> & { isMock: true })> =
-    otherAccounts.length > 0 ? otherAccounts : mockAccounts;
+  // Only show real accounts, no mocks
+  const accountsToRender = otherAccounts;
 
   return (
     <MobileLayout
@@ -531,51 +498,47 @@ const Settings = () => {
           />
         </div>
 
-        {/* Other Accounts (mockups if empty) */}
-        <div className="bg-card rounded-2xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <p className="text-sm font-semibold text-foreground">
-              {t("settings.otherAccounts") || "Other accounts"}
-            </p>
-            {otherAccounts.length === 0 && (
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t("settings.otherAccountsMock") || "Mockups (saved accounts not found)"}
+        {/* Other Accounts - only show if there are real accounts */}
+        {accountsToRender.length > 0 && (
+          <div className="bg-card rounded-2xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-border">
+              <p className="text-sm font-semibold text-foreground">
+                {t("settings.otherAccounts") || "Other accounts"}
               </p>
-            )}
-          </div>
+            </div>
 
-          <div className="divide-y divide-border">
-            {accountsToRender.map((account) => {
-              const isMock = (account as any).isMock === true;
-              const name = account.user.full_name;
-              const phone = account.user.phone_number;
-              const avatar = account.user.avatar?.medium || account.user.avatar?.file;
+            <div className="divide-y divide-border">
+              {accountsToRender.map((account) => {
+                const name = account.user.full_name;
+                const phone = account.user.phone_number;
+                const avatar = account.user.avatar?.medium || account.user.avatar?.file;
 
-              return (
-                <button
-                  key={`${isMock ? "mock" : "acc"}-${account.id}`}
-                  type="button"
-                  disabled
-                  className="w-full flex items-center gap-3 px-4 py-4 text-left opacity-80"
-                >
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={avatar || undefined} alt={name} />
-                    <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
-                      {getInitials(name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="text-base font-medium text-foreground">{name}</p>
-                    <p className="text-sm text-muted-foreground">{phone}</p>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                    <LogOut className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={`acc-${account.id}`}
+                    type="button"
+                    disabled
+                    className="w-full flex items-center gap-3 px-4 py-4 text-left opacity-80"
+                  >
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={avatar || undefined} alt={name} />
+                      <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
+                        {getInitials(name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="text-base font-medium text-foreground">{name}</p>
+                      <p className="text-sm text-muted-foreground">{phone}</p>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <LogOut className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Logout Button */}
         {isAuthenticated && (
