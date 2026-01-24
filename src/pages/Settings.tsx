@@ -459,6 +459,22 @@ const Settings = () => {
             label={t("settings.privacyPolicy")}
           />
         </div>
+
+        {/* Logout Button */}
+        {isAuthenticated && (
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full flex items-center justify-center gap-3 py-4 px-4 bg-destructive/10 hover:bg-destructive/20 rounded-2xl transition-colors disabled:opacity-50"
+          >
+            {isLoggingOut ? (
+              <Loader2 className="w-5 h-5 text-destructive animate-spin" />
+            ) : (
+              <LogOut className="w-5 h-5 text-destructive" />
+            )}
+            <span className="text-destructive font-medium">{t("settings.logout")}</span>
+          </button>
+        )}
       </div>
 
       {/* Language Selection Drawer */}
