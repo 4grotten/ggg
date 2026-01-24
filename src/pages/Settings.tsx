@@ -334,13 +334,13 @@ const Settings = () => {
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="flex items-center justify-center w-9 h-9 rounded-full bg-destructive/10 hover:bg-destructive/20 transition-colors disabled:opacity-50"
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-red-500/10 hover:bg-red-500/20 dark:bg-red-500/20 dark:hover:bg-red-500/30 transition-colors disabled:opacity-50"
               aria-label="Logout"
             >
               {isLoggingOut ? (
-                <Loader2 className="w-4 h-4 text-destructive animate-spin" />
+                <Loader2 className="w-4 h-4 text-red-500 animate-spin" />
               ) : (
-                <LogOut className="w-4 h-4 text-destructive" />
+                <LogOut className="w-4 h-4 text-red-500" />
               )}
             </button>
           )}
@@ -465,14 +465,14 @@ const Settings = () => {
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="w-full flex items-center justify-center gap-3 py-4 px-4 bg-destructive/10 hover:bg-destructive/20 rounded-2xl transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 py-4 px-4 bg-red-500/10 hover:bg-red-500/20 dark:bg-red-500/20 dark:hover:bg-red-500/30 rounded-2xl transition-colors disabled:opacity-50"
           >
             {isLoggingOut ? (
-              <Loader2 className="w-5 h-5 text-destructive animate-spin" />
+              <Loader2 className="w-5 h-5 text-red-500 animate-spin" />
             ) : (
-              <LogOut className="w-5 h-5 text-destructive" />
+              <LogOut className="w-5 h-5 text-red-500" />
             )}
-            <span className="text-destructive font-medium">{t("settings.logout")}</span>
+            <span className="text-red-500 font-medium">{t("settings.logout")}</span>
           </button>
         )}
       </div>
