@@ -21,11 +21,12 @@ interface SettingsItemProps {
   icon: React.ReactNode;
   label: string;
   value?: string;
+  valueIcon?: React.ReactNode;
   valueClassName?: string;
   onClick?: () => void;
 }
 
-const SettingsItem = ({ icon, label, value, valueClassName, onClick }: SettingsItemProps) => (
+const SettingsItem = ({ icon, label, value, valueIcon, valueClassName, onClick }: SettingsItemProps) => (
   <button
     onClick={onClick}
     className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
@@ -35,6 +36,7 @@ const SettingsItem = ({ icon, label, value, valueClassName, onClick }: SettingsI
       <span className="text-foreground font-medium">{label}</span>
     </div>
     <div className="flex items-center gap-2">
+      {valueIcon && <span className="flex items-center">{valueIcon}</span>}
       {value && <span className={valueClassName || "text-muted-foreground text-sm"}>{value}</span>}
       <ChevronRight className="w-5 h-5 text-muted-foreground" />
     </div>
@@ -621,12 +623,14 @@ const Settings = () => {
           <SettingsItem
             icon={<Globe className="w-5 h-5" />}
             label={t("settings.language")}
+            valueIcon={<span className="text-lg">{currentLanguage?.flag}</span>}
             value={currentLanguage?.name}
             onClick={() => setIsLanguageOpen(true)}
           />
           <SettingsItem
             icon={<Palette className="w-5 h-5" />}
             label={t("settings.appearance")}
+            valueIcon={currentTheme.icon && <currentTheme.icon className="w-4 h-4 text-muted-foreground" />}
             value={currentTheme.name}
             onClick={() => setIsAppearanceOpen(true)}
           />
