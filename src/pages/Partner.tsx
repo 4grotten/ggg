@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -37,6 +37,11 @@ const Partner = () => {
   const handleBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto">
