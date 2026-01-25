@@ -78,50 +78,87 @@ const AppContent = () => {
     location.pathname.startsWith(route)
   );
 
+  // Page transition variants
+  const pageVariants = {
+    initial: { 
+      opacity: 0, 
+      scale: 0.98,
+      y: 10
+    },
+    animate: { 
+      opacity: 1, 
+      scale: 1,
+      y: 0
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.98,
+      y: -10
+    }
+  };
+
+  const pageTransition = {
+    type: "tween" as const,
+    ease: [0.4, 0, 0.2, 1] as const,
+    duration: 0.25
+  };
+
   return (
     <>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/settings/edit-profile" element={<EditProfile />} />
-        <Route path="/fees-and-limits" element={<FeesAndLimits />} />
-        <Route path="/profile-verification" element={<ProfileVerification />} />
-        <Route path="/profile" element={<ProfileVerification />} />
-        <Route path="/info" element={<FeesAndLimits />} />
-        <Route path="/partner" element={<Partner />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/card/:type" element={<CardPage />} />
-        <Route path="/card/:type/history" element={<TransactionHistory />} />
-        <Route path="/send-to-card" element={<SendToCard />} />
-        <Route path="/top-up/crypto" element={<TopUpCrypto />} />
-        <Route path="/top-up/bank" element={<TopUpBank />} />
-        <Route path="/top-up/bank/details" element={<TopUpBankDetails />} />
-        <Route path="/send/crypto" element={<SendCrypto />} />
-        <Route path="/send/bank" element={<SendBank />} />
-        <Route path="/open-card" element={<OpenCardPayment />} />
-        <Route path="/open-card/pay-crypto" element={<OpenCardPayCrypto />} />
-        <Route path="/open-card/pay-bank" element={<OpenCardPayBank />} />
-        <Route path="/open-card/pay-balance" element={<OpenCardPayBalance />} />
-        <Route path="/transaction/:id" element={<TransactionDetails />} />
-        <Route path="/verify" element={<PrivacyProtection />} />
-        <Route path="/verify/terms" element={<AcceptTerms />} />
-        <Route path="/verify/steps" element={<VerificationSteps />} />
-        <Route path="/verify/personal-info" element={<PersonalInfo />} />
-        <Route path="/verify/monthly-volume" element={<MonthlyVolume />} />
-        <Route path="/verify/address" element={<AddressInfo />} />
-        <Route path="/verify/document-type" element={<DocumentType />} />
-        <Route path="/verify/document-upload" element={<DocumentUpload />} />
-        <Route path="/verify/document-capture-front" element={<DocumentCaptureFront />} />
-        <Route path="/verify/document-capture-back" element={<DocumentCaptureBack />} />
-        <Route path="/verify/liveness" element={<LivenessCheck />} />
-        <Route path="/verify/processing" element={<VerificationProcessing />} />
-        <Route path="/verify/complete" element={<VerificationComplete />} />
-        <Route path="/verify/success" element={<VerificationSuccess />} />
-        <Route path="/auth/phone" element={<PhoneEntry />} />
-        <Route path="/auth/code" element={<CodeEntry />} />
-        <Route path="/auth/profile" element={<ProfileSteps />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          variants={pageVariants}
+          transition={pageTransition}
+          className="min-h-screen"
+        >
+          <Routes location={location}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings/edit-profile" element={<EditProfile />} />
+            <Route path="/fees-and-limits" element={<FeesAndLimits />} />
+            <Route path="/profile-verification" element={<ProfileVerification />} />
+            <Route path="/profile" element={<ProfileVerification />} />
+            <Route path="/info" element={<FeesAndLimits />} />
+            <Route path="/partner" element={<Partner />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/card/:type" element={<CardPage />} />
+            <Route path="/card/:type/history" element={<TransactionHistory />} />
+            <Route path="/send-to-card" element={<SendToCard />} />
+            <Route path="/top-up/crypto" element={<TopUpCrypto />} />
+            <Route path="/top-up/bank" element={<TopUpBank />} />
+            <Route path="/top-up/bank/details" element={<TopUpBankDetails />} />
+            <Route path="/send/crypto" element={<SendCrypto />} />
+            <Route path="/send/bank" element={<SendBank />} />
+            <Route path="/open-card" element={<OpenCardPayment />} />
+            <Route path="/open-card/pay-crypto" element={<OpenCardPayCrypto />} />
+            <Route path="/open-card/pay-bank" element={<OpenCardPayBank />} />
+            <Route path="/open-card/pay-balance" element={<OpenCardPayBalance />} />
+            <Route path="/transaction/:id" element={<TransactionDetails />} />
+            <Route path="/verify" element={<PrivacyProtection />} />
+            <Route path="/verify/terms" element={<AcceptTerms />} />
+            <Route path="/verify/steps" element={<VerificationSteps />} />
+            <Route path="/verify/personal-info" element={<PersonalInfo />} />
+            <Route path="/verify/monthly-volume" element={<MonthlyVolume />} />
+            <Route path="/verify/address" element={<AddressInfo />} />
+            <Route path="/verify/document-type" element={<DocumentType />} />
+            <Route path="/verify/document-upload" element={<DocumentUpload />} />
+            <Route path="/verify/document-capture-front" element={<DocumentCaptureFront />} />
+            <Route path="/verify/document-capture-back" element={<DocumentCaptureBack />} />
+            <Route path="/verify/liveness" element={<LivenessCheck />} />
+            <Route path="/verify/processing" element={<VerificationProcessing />} />
+            <Route path="/verify/complete" element={<VerificationComplete />} />
+            <Route path="/verify/success" element={<VerificationSuccess />} />
+            <Route path="/auth/phone" element={<PhoneEntry />} />
+            <Route path="/auth/code" element={<CodeEntry />} />
+            <Route path="/auth/profile" element={<ProfileSteps />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
       <AnimatePresence>
         {shouldShowNav && (
           <motion.div
