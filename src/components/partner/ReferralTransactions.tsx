@@ -1,9 +1,9 @@
 import { memo, useMemo, useState } from "react";
-import { CreditCard, ArrowDownLeft, ArrowUpDown } from "lucide-react";
+import { CreditCard, ArrowDownLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CardType } from "@/types/card";
 
-type SortType = "date" | "amount" | "type";
+type FilterType = "all" | "cards" | "transactions";
 
 interface ReferralTransaction {
   id: string;
@@ -217,7 +217,7 @@ const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
 
 TransactionItem.displayName = "TransactionItem";
 
-const SortButton = memo(({ 
+const FilterButton = memo(({ 
   label, 
   active, 
   onClick 
@@ -238,49 +238,39 @@ const SortButton = memo(({
   </button>
 ));
 
-SortButton.displayName = "SortButton";
+FilterButton.displayName = "FilterButton";
 
 export const ReferralTransactions = memo(() => {
   const { t } = useTranslation();
-  const [sortType, setSortType] = useState<SortType>("date");
+  const [filterType, setFilterType] = useState<FilterType>("all");
   
-  // Sort and group transactions
-  const { groupedTransactions, sortedTransactions } = useMemo(() => {
-    let sorted = [...MOCK_TRANSACTIONS];
+  // Filter and group transactions
+  const { groupedTransactions, filteredTransactions } = useMemo(() => {
+    let filtered = [...MOCK_TRANSACTIONS];
     
-    switch (sortType) {
-      case "amount":
-        sorted.sort((a, b) => b.amount - a.amount);
-        break;
-      case "type":
-        sorted.sort((a, b) => {
-          if (a.type === b.type) return b.dateTimestamp - a.dateTimestamp;
-          return a.type === "card" ? -1 : 1;
-        });
-        break;
-      case "date":
-      default:
-        sorted.sort((a, b) => b.dateTimestamp - a.dateTimestamp);
-        break;
+    // Apply filter
+    if (filterType === "cards") {
+      filtered = filtered.filter(tx => tx.type === "card");
+    } else if (filterType === "transactions") {
+      filtered = filtered.filter(tx => tx.type === "transaction");
     }
     
-    // Only group by date when sorting by date
-    if (sortType === "date") {
-      const groups: { [key: string]: { transactions: ReferralTransaction[]; total: number } } = {};
-      
-      sorted.forEach((tx) => {
-        if (!groups[tx.dateGroup]) {
-          groups[tx.dateGroup] = { transactions: [], total: 0 };
-        }
-        groups[tx.dateGroup].transactions.push(tx);
-        groups[tx.dateGroup].total += tx.amount;
-      });
-      
-      return { groupedTransactions: groups, sortedTransactions: sorted };
-    }
+    // Sort by date
+    filtered.sort((a, b) => b.dateTimestamp - a.dateTimestamp);
     
-    return { groupedTransactions: null, sortedTransactions: sorted };
-  }, [sortType]);
+    // Group by date
+    const groups: { [key: string]: { transactions: ReferralTransaction[]; total: number } } = {};
+    
+    filtered.forEach((tx) => {
+      if (!groups[tx.dateGroup]) {
+        groups[tx.dateGroup] = { transactions: [], total: 0 };
+      }
+      groups[tx.dateGroup].transactions.push(tx);
+      groups[tx.dateGroup].total += tx.amount;
+    });
+    
+    return { groupedTransactions: groups, filteredTransactions: filtered };
+  }, [filterType]);
   
   const getDateLabel = (dateGroup: string) => {
     if (dateGroup === "today") return t('common.today', 'Сегодня');
@@ -289,8 +279,9 @@ export const ReferralTransactions = memo(() => {
   };
   
   const totalAmount = useMemo(() => 
-    MOCK_TRANSACTIONS.reduce((sum, tx) => sum + tx.amount, 0),
-  []);
+    filteredTransactions.reduce((sum, tx) => sum + tx.amount, 0),
+  [filteredTransactions]);
+  
   
   return (
     <div className="px-4 mb-6">
@@ -303,28 +294,27 @@ export const ReferralTransactions = memo(() => {
         </p>
       </div>
       
-      {/* Sort buttons */}
+      {/* Filter buttons */}
       <div className="flex items-center gap-2 mb-4">
-        <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
-        <SortButton 
-          label={t('partner.sortDate', 'По дате')} 
-          active={sortType === "date"} 
-          onClick={() => setSortType("date")} 
+        <FilterButton 
+          label={t('partner.filterAll', 'Все')} 
+          active={filterType === "all"} 
+          onClick={() => setFilterType("all")} 
         />
-        <SortButton 
-          label={t('partner.sortAmount', 'По сумме')} 
-          active={sortType === "amount"} 
-          onClick={() => setSortType("amount")} 
+        <FilterButton 
+          label={t('partner.filterCards', 'Карты')} 
+          active={filterType === "cards"} 
+          onClick={() => setFilterType("cards")} 
         />
-        <SortButton 
-          label={t('partner.sortType', 'По типу')} 
-          active={sortType === "type"} 
-          onClick={() => setSortType("type")} 
+        <FilterButton 
+          label={t('partner.filterTransactions', 'Транзакции')} 
+          active={filterType === "transactions"} 
+          onClick={() => setFilterType("transactions")} 
         />
       </div>
       
       {/* Grouped by date */}
-      {sortType === "date" && groupedTransactions && (
+      {Object.keys(groupedTransactions).length > 0 ? (
         <div className="space-y-4">
           {Object.entries(groupedTransactions).map(([dateGroup, { transactions, total }]) => (
             <div key={dateGroup}>
@@ -346,16 +336,11 @@ export const ReferralTransactions = memo(() => {
             </div>
           ))}
         </div>
-      )}
-      
-      {/* Flat list for other sorts */}
-      {sortType !== "date" && (
-        <div className="bg-card rounded-2xl overflow-hidden border border-border/50">
-          <div className="space-y-0">
-            {sortedTransactions.map((tx) => (
-              <TransactionItem key={tx.id} tx={tx} />
-            ))}
-          </div>
+      ) : (
+        <div className="bg-card rounded-2xl p-6 border border-border/50 text-center">
+          <p className="text-muted-foreground text-sm">
+            {t('partner.noTransactions', 'Нет транзакций')}
+          </p>
         </div>
       )}
     </div>
