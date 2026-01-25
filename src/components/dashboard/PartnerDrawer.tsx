@@ -467,10 +467,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
           </div>
         </div>
         
-        {/* Footer with buttons - pushed to bottom */}
-        <DrawerFooter className="px-6 pb-6">
+        {/* Floating button - no background */}
+        <div className="px-6 pb-6 pt-2 bg-transparent">
           {renderFooterButtons()}
-        </DrawerFooter>
+        </div>
       </DrawerContent>
     </Drawer>
   );
