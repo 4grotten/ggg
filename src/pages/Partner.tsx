@@ -233,8 +233,7 @@ const Partner = () => {
                           className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
                         >
                           <span 
-                            className="px-3 py-1 rounded-full text-xs font-bold text-black flex items-center gap-1"
-                            style={{ background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)" }}
+                            className="px-3 py-1 rounded-full text-xs font-bold text-white dark:text-black flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-[#BFFF00] dark:to-[#7FFF00]"
                           >
                             <Sparkles className="w-3 h-3" />
                             {t('partner.currentLevel', 'Текущий уровень')}
@@ -287,7 +286,7 @@ const Partner = () => {
                             <p className="text-xs text-muted-foreground mb-1">
                               {t('partner.cardIssuance', 'За выпуск карт')}
                             </p>
-                            <p className="text-2xl font-bold" style={{ color: "#BFFF00" }}>
+                            <p className="text-2xl font-bold text-emerald-600 dark:text-[#BFFF00]">
                               {level.cardPercent}%
                             </p>
                           </div>
@@ -295,7 +294,7 @@ const Partner = () => {
                             <p className="text-xs text-muted-foreground mb-1">
                               {t('partner.fromTransactions', 'С транзакций')}
                             </p>
-                            <p className="text-2xl font-bold" style={{ color: "#BFFF00" }}>
+                            <p className="text-2xl font-bold text-emerald-600 dark:text-[#BFFF00]">
                               {level.txPercent}%
                             </p>
                           </div>
@@ -316,7 +315,7 @@ const Partner = () => {
                   onClick={() => emblaApi?.scrollTo(idx)}
                   className={`h-2 rounded-full transition-all ${
                     idx === selectedLevelIndex 
-                      ? "w-6 bg-[#BFFF00]" 
+                      ? "w-6 bg-emerald-500 dark:bg-[#BFFF00]" 
                       : "w-2 bg-muted-foreground/30"
                   }`}
                 />
@@ -418,19 +417,15 @@ const Partner = () => {
             onClick={handleShare}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-4 font-bold rounded-2xl relative overflow-hidden flex items-center justify-center gap-2"
-            style={{
-              background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-              boxShadow: "0 8px 32px rgba(127, 255, 0, 0.4)",
-            }}
+            className="w-full py-4 font-bold rounded-2xl relative overflow-hidden flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-[#BFFF00] dark:to-[#7FFF00] shadow-lg shadow-emerald-500/30 dark:shadow-[#7FFF00]/40"
           >
             <motion.div 
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
               animate={{ x: ["-100%", "200%"] }}
               transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
             />
-            <Users className="w-5 h-5 text-black relative z-10" />
-            <span className="text-black relative z-10">
+            <Users className="w-5 h-5 text-white dark:text-black relative z-10" />
+            <span className="text-white dark:text-black relative z-10">
               {t('partner.inviteFriendsButton', 'Пригласить друзей')}
             </span>
           </motion.button>
