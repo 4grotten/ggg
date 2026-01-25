@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, ShoppingCart } from "lucide-react";
+import { Sparkles, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -81,29 +81,43 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
               className="flex-shrink-0 w-full pt-4 snap-center"
             >
               <div className="relative overflow-visible">
-                {/* Badge - Current level or Buy button */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
-                >
-                  {idx === currentLevelIndex ? (
+                {/* Badge - Current level (centered) */}
+                {idx === currentLevelIndex && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
+                  >
                     <span 
                       className="px-3 py-1 rounded-full text-xs font-bold text-white dark:text-black flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-[#BFFF00] dark:to-[#7FFF00]"
                     >
                       <Sparkles className="w-3 h-3" />
                       {t('partner.currentLevel', 'Текущий уровень')}
                     </span>
-                  ) : (
+                  </motion.div>
+                )}
+                
+                {/* Buy button (right side) for non-current levels */}
+                {idx !== currentLevelIndex && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute -top-3 right-4 z-20"
+                  >
                     <button
                       onClick={() => toast.info(t('partner.buyLevelSoon', 'Скоро будет доступно'))}
-                      className="px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/30 active:scale-95 transition-transform"
+                      className="relative px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 overflow-hidden active:scale-95 transition-transform"
+                      style={{
+                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f857a6 100%)",
+                        boxShadow: "0 4px 15px rgba(102, 126, 234, 0.5), 0 0 20px rgba(248, 87, 166, 0.3)",
+                      }}
                     >
-                      <ShoppingCart className="w-3 h-3" />
-                      {t('partner.buyLevel', 'Купить')}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+                      <CreditCard className="w-3.5 h-3.5 relative z-10" />
+                      <span className="relative z-10">{t('partner.buyLevel', 'Купить')}</span>
                     </button>
-                  )}
-                </motion.div>
+                  </motion.div>
+                )}
                 
                 <div className="relative rounded-3xl p-[1px]">
                   {/* Rotating gradient border for current level */}
