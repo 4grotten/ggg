@@ -283,7 +283,7 @@ const TransactionItem = memo(({ tx, onWithdrawalClick }: { tx: ReferralTransacti
       </div>
       <div className="text-right">
         <p className={`font-semibold text-sm ${isWithdrawal ? "text-blue-500" : "text-success"}`}>
-          {isWithdrawal ? "" : "+"}{tx.amount.toFixed(2)} AED
+          {isWithdrawal ? `${tx.amount.toFixed(2)}` : `+${tx.amount.toFixed(2)}`} AED
         </p>
         <p className="text-xs text-muted-foreground">{tx.date}</p>
       </div>
