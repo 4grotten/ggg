@@ -1,21 +1,12 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Users, Send, Copy, Share2, Sparkles } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Users, Send, Copy, Share2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import partnerGrowthImage from "@/assets/partner-growth-hero.png";
-
-// Partner levels configuration
-const LEVELS = [
-  { id: "R1", name: "R1", minFriends: 0, maxFriends: 10, cardPercent: 15, txPercent: 0.05, icon: "🌱" },
-  { id: "R2", name: "R2", minFriends: 10, maxFriends: 30, cardPercent: 20, txPercent: 0.1, icon: "🌿" },
-  { id: "R3", name: "R3", minFriends: 30, maxFriends: 50, cardPercent: 25, txPercent: 0.2, icon: "💎" },
-  { id: "R4", name: "R4", minFriends: 50, maxFriends: 100, cardPercent: 30, txPercent: 0.3, icon: "👑" },
-  { id: "Partner", name: "Партнёр", minFriends: 100, maxFriends: Infinity, cardPercent: 35, txPercent: 0.5, icon: "🚀" },
-];
+import { LevelCarousel, LEVELS } from "@/components/partner/LevelCarousel";
 
 const Partner = () => {
   const { t } = useTranslation();
@@ -27,26 +18,6 @@ const Partner = () => {
   const [totalInvited] = useState(0);
   const [totalWithdrawn] = useState(0);
   const [selectedLevelIndex, setSelectedLevelIndex] = useState(0);
-  
-  // Embla carousel for swipe
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: false,
-    align: "center",
-    containScroll: "trimSnaps"
-  });
-  
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedLevelIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-  
-  useEffect(() => {
-    if (!emblaApi) return;
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi, onSelect]);
   
   const appLink = "https://test.apofiz.com/EasyCard/";
   
@@ -61,15 +32,6 @@ const Partner = () => {
   };
   
   const currentLevelIndex = getCurrentLevelIndex();
-  const currentLevel = LEVELS[currentLevelIndex];
-  
-  // Progress calculation
-  const getProgressPercent = () => {
-    const level = LEVELS[currentLevelIndex];
-    if (level.maxFriends === Infinity) return 100;
-    const progress = ((currentFriends - level.minFriends) / (level.maxFriends - level.minFriends)) * 100;
-    return Math.min(Math.max(progress, 0), 100);
-  };
   
   const handleCopyLink = () => {
     navigator.clipboard.writeText(appLink);
@@ -98,8 +60,9 @@ const Partner = () => {
     }
   };
   
-  
-  const selectedLevel = LEVELS[selectedLevelIndex];
+  const handleLevelChange = (levelIndex: number) => {
+    setSelectedLevelIndex(levelIndex);
+  };
   
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto">
@@ -122,12 +85,46 @@ const Partner = () => {
         <div className="flex-1 overflow-y-auto pb-28">
           {/* Hero Section */}
           <div className="relative px-4 pt-4 pb-6">
-            {/* Wide format growth image */}
+            {/* Wide format growth image with pulsing glow */}
             <div className="relative w-full rounded-2xl overflow-visible mb-4">
+              {/* Pulsing glow effect */}
+              <motion.div 
+                className="absolute -inset-2 rounded-3xl z-0"
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.35) 0%, rgba(16, 185, 129, 0.15) 50%, transparent 70%)",
+                  filter: "blur(12px)"
+                }}
+                animate={{
+                  opacity: [0.5, 1, 0.5],
+                  scale: [0.98, 1.02, 0.98]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <motion.div 
+                className="absolute -inset-2 rounded-3xl z-0 dark:block hidden"
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.4) 0%, rgba(127, 255, 0, 0.2) 50%, transparent 70%)",
+                  filter: "blur(12px)"
+                }}
+                animate={{
+                  opacity: [0.5, 1, 0.5],
+                  scale: [0.98, 1.02, 0.98]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              
               <img 
                 src={partnerGrowthImage} 
                 alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-                className="w-full h-auto rounded-2xl"
+                className="relative z-10 w-full h-auto rounded-2xl"
                 loading="eager"
               />
             </div>
@@ -190,113 +187,11 @@ const Partner = () => {
             </div>
           </div>
           
-          {/* Level Cards Carousel with Swipe */}
-          <div className="px-4 mb-6 pt-4 touch-pan-y">
-            <div className="overflow-hidden touch-pan-x" ref={emblaRef}>
-              <div className="flex gap-4">
-                {LEVELS.map((level, idx) => (
-                  <div 
-                    key={level.id}
-                    className="flex-[0_0_100%] min-w-0 pt-4"
-                  >
-                    <div className="relative overflow-visible">
-                      {/* Current level badge - z-20 to be above everything */}
-                      {idx === currentLevelIndex && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
-                        >
-                          <span 
-                            className="px-3 py-1 rounded-full text-xs font-bold text-white dark:text-black flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-[#BFFF00] dark:to-[#7FFF00]"
-                          >
-                            <Sparkles className="w-3 h-3" />
-                            {t('partner.currentLevel', 'Текущий уровень')}
-                          </span>
-                        </motion.div>
-                      )}
-                      
-                      <div className="relative rounded-3xl p-[1px]">
-                        {/* Rotating gradient border for current level */}
-                        {idx === currentLevelIndex && (
-                          <div className="absolute inset-0 rounded-3xl overflow-hidden">
-                            <motion.div
-                              className="absolute inset-[-100%] w-[300%] h-[300%]"
-                              style={{
-                                background: "conic-gradient(from 0deg at 50% 50%, transparent 0deg, #BFFF00 60deg, #7FFF00 120deg, #00FF88 180deg, #7FFF00 240deg, #BFFF00 300deg, transparent 360deg)",
-                              }}
-                              animate={{ rotate: 360 }}
-                              transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-                            />
-                          </div>
-                        )}
-                        <div
-                          className={`relative bg-card backdrop-blur-xl rounded-3xl p-5 overflow-hidden ${
-                            idx !== currentLevelIndex ? "border border-border/50" : ""
-                          }`}
-                        >
-                        {/* Decorative gradient */}
-                        <div 
-                          className="absolute top-0 right-0 w-32 h-32 opacity-20"
-                          style={{
-                            background: "radial-gradient(circle at top right, rgba(191, 255, 0, 0.5) 0%, transparent 70%)"
-                          }}
-                        />
-                        
-                        {/* Level header */}
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl">{level.icon}</span>
-                            <span className="text-xl font-bold">{level.name}</span>
-                          </div>
-                          <span className="text-sm text-muted-foreground">
-                            <span className="text-foreground font-bold">{currentFriends}</span>
-                            /{level.maxFriends === Infinity ? 1000 : level.maxFriends}
-                          </span>
-                        </div>
-                        
-                        {/* Benefits */}
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-muted/50 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-muted-foreground mb-1">
-                              {t('partner.cardIssuance', 'За выпуск карт')}
-                            </p>
-                            <p className="text-2xl font-bold text-emerald-600 dark:text-[#BFFF00]">
-                              {level.cardPercent}%
-                            </p>
-                          </div>
-                          <div className="bg-muted/50 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-muted-foreground mb-1">
-                              {t('partner.fromTransactions', 'С транзакций')}
-                            </p>
-                            <p className="text-2xl font-bold text-emerald-600 dark:text-[#BFFF00]">
-                              {level.txPercent}%
-                            </p>
-                          </div>
-                        </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Carousel dots */}
-            <div className="flex justify-center gap-1.5 mt-3">
-              {LEVELS.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => emblaApi?.scrollTo(idx)}
-                  className={`h-2 rounded-full transition-all ${
-                    idx === selectedLevelIndex 
-                      ? "w-6 bg-emerald-500 dark:bg-[#BFFF00]" 
-                      : "w-2 bg-muted-foreground/30"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+          {/* Level Cards Carousel */}
+          <LevelCarousel 
+            currentFriends={currentFriends} 
+            onLevelChange={handleLevelChange}
+          />
           
           {/* Referral Balance */}
           <div className="px-4 mb-6">
