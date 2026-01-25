@@ -109,7 +109,8 @@ const SendCrypto = () => {
 
   const handleSubmit = () => {
     if (!isValid) return;
-    navigate("/");
+    // Redirect to partner page for referral withdrawals
+    navigate(isReferralWithdrawal ? "/partner" : "/");
   };
 
   return (
