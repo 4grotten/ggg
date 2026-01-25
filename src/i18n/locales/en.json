@@ -1,7 +1,8 @@
 {
   "partner": {
     "withdrawTitle": "Withdraw to",
-    "withdrawToCard": "Top up card"
+    "withdrawToCard": "Top up card",
+    "availableBalance": "Available balance"
   },
   "profileVerification": {
     "title": "Verify Your Identity",

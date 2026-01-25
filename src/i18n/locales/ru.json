@@ -1,7 +1,8 @@
 {
   "partner": {
     "withdrawTitle": "Вывести на",
-    "withdrawToCard": "Пополнение карты"
+    "withdrawToCard": "Пополнение карты",
+    "availableBalance": "Доступный баланс"
   },
   "profileVerification": {
     "title": "Подтвердите личность",

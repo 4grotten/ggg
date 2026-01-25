@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, QrCode, Landmark, CreditCard, X } from "lucide-react";
+import { ChevronRight, QrCode, Landmark, CreditCard, X, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Drawer,
@@ -36,7 +36,7 @@ export const WithdrawDrawer = ({ open, onOpenChange, balance }: WithdrawDrawerPr
       id: "card",
       icon: CreditCard,
       title: "Easy Card",
-      subtitle: t("partner.withdrawToCard", "Пополнение карты"),
+      subtitle: t("drawer.sendToCard", "Перевод на карту"),
       iconBg: "bg-primary",
     },
     {
@@ -87,12 +87,31 @@ export const WithdrawDrawer = ({ open, onOpenChange, balance }: WithdrawDrawerPr
         <DrawerContent className="bg-background/95 backdrop-blur-xl">
           <DrawerHeader className="relative flex items-center justify-center py-4">
             <DrawerTitle className="text-center text-base font-semibold">
-              {t("partner.withdrawTitle", "Вывести на")}
+              {t("drawer.sendMoneyWith", "Отправить через")}
             </DrawerTitle>
             <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
               <X className="w-3.5 h-3.5 text-primary" />
             </DrawerClose>
           </DrawerHeader>
+          
+          {/* Referral Balance Card */}
+          <div className="px-4 pb-4">
+            <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-4 border border-primary/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Wallet className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-muted-foreground">
+                    {t('partner.availableBalance', 'Доступный баланс')}
+                  </p>
+                  <p className="text-xl font-bold text-foreground">
+                    {balance.toFixed(2)} <span className="text-sm font-medium text-muted-foreground">AED</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
           
           <div className="px-4 pb-6">
             <AnimatedDrawerContainer className="bg-muted/50 rounded-xl overflow-hidden">
