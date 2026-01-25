@@ -640,13 +640,13 @@ const Settings = () => {
         {/* Support & Legal */}
         <div className="bg-card rounded-2xl overflow-hidden">
           <SettingsItem
+            icon={<Briefcase className="w-5 h-5" />}
+            label={t("settings.privacyPolicy")}
+          />
+          <SettingsItem
             icon={<MessageCircle className="w-5 h-5" />}
             label={t("settings.askQuestion")}
             onClick={() => navigate("/chat")}
-          />
-          <SettingsItem
-            icon={<Briefcase className="w-5 h-5" />}
-            label={t("settings.privacyPolicy")}
           />
         </div>
 
