@@ -306,7 +306,7 @@ const SendToCard = () => {
         
         // Navigate after short delay to show success
         setTimeout(() => {
-          navigate("/");
+          navigate(isReferralWithdrawal ? "/partner" : "/");
         }, 2000);
       } else {
         setTransferError(response.error || t('send.transferFailed'));
