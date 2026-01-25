@@ -438,6 +438,52 @@ const Settings = () => {
                   <AvatarFallback className="text-2xl bg-muted">{initials}</AvatarFallback>
                 </Avatar>
                 
+                {/* Verification status indicator */}
+                {(() => {
+                  const completedSteps = getCompletedSteps();
+                  const isVerified = completedSteps >= 3;
+                  return (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className={`absolute bottom-1 right-1 w-5 h-5 rounded-full border-2 border-background ${
+                        isVerified ? 'bg-green-500' : 'bg-red-500'
+                      }`}
+                    >
+                      {!isVerified && (
+                        <motion.div
+                          animate={{ 
+                            opacity: [1, 0.4, 1],
+                            scale: [1, 1.1, 1]
+                          }}
+                          transition={{ 
+                            duration: 1.5, 
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                          className="w-full h-full rounded-full bg-red-500"
+                        />
+                      )}
+                      {isVerified && (
+                        <motion.div
+                          animate={{ 
+                            boxShadow: [
+                              '0 0 0 0 rgba(34, 197, 94, 0.4)',
+                              '0 0 0 4px rgba(34, 197, 94, 0)',
+                            ]
+                          }}
+                          transition={{ 
+                            duration: 2, 
+                            repeat: Infinity,
+                            ease: "easeOut"
+                          }}
+                          className="w-full h-full rounded-full"
+                        />
+                      )}
+                    </motion.div>
+                  );
+                })()}
+                
                 {/* Flash effect - bright flash that expands */}
                 <AnimatePresence>
                   {showFlash && (
