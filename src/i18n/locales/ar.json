@@ -15,7 +15,8 @@
     "skip": "تخطي",
     "yes": "نعم",
     "aed": "AED",
-    "usdt": "USDT"
+    "usdt": "USDT",
+    "authorize": "تسجيل الدخول"
   },
   "dashboard": {
     "welcome": "مرحباً، {{name}}!",
@@ -527,7 +528,9 @@
     "perTx": "لكل معاملة",
     "dailyLimit": "الحد اليومي",
     "perTransaction": "لكل معاملة",
-    "save": "حفظ"
+    "save": "حفظ",
+    "authRequired": "مطلوب تسجيل الدخول",
+    "authRequiredMessage": "لتغيير الحدود، تحتاج إلى تسجيل الدخول"
   },
   "chat": {
     "aiAssistant": "مساعد الذكاء الاصطناعي",

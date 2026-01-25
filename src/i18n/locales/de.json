@@ -15,7 +15,8 @@
     "skip": "Überspringen",
     "yes": "Ja",
     "aed": "AED",
-    "usdt": "USDT"
+    "usdt": "USDT",
+    "authorize": "Anmelden"
   },
   "dashboard": {
     "welcome": "Willkommen, {{name}}!",
@@ -527,7 +528,9 @@
     "perTx": "Pro Tx",
     "dailyLimit": "Tageslimit",
     "perTransaction": "Pro Transaktion",
-    "save": "Speichern"
+    "save": "Speichern",
+    "authRequired": "Anmeldung erforderlich",
+    "authRequiredMessage": "Um Limits zu ändern, müssen Sie sich anmelden"
   },
   "chat": {
     "aiAssistant": "KI-Assistent",

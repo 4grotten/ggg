@@ -16,7 +16,8 @@
     "yes": "Да",
     "aed": "AED",
     "usdt": "USDT",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "authorize": "Авторизоваться"
   },
   "dashboard": {
     "greeting": "Привет, {{name}}!",
@@ -560,7 +561,9 @@
     "perTx": "За транзакцию",
     "dailyLimit": "Суточный лимит",
     "perTransaction": "За транзакцию",
-    "save": "Сохранить"
+    "save": "Сохранить",
+    "authRequired": "Требуется авторизация",
+    "authRequiredMessage": "Для смены лимитов вам надо авторизоваться"
   },
   "chat": {
     "aiAssistant": "AI Ассистент",
