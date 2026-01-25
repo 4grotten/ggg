@@ -147,7 +147,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                     </div>
                   )}
                   <div
-                    className={`relative bg-card backdrop-blur-xl rounded-3xl p-5 overflow-hidden ${
+                    className={`relative bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-3xl p-5 overflow-hidden ${
                       idx !== currentLevelIndex ? "border border-border/50" : ""
                     }`}
                   >

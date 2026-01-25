@@ -121,7 +121,7 @@ const handleClick = (transaction: Transaction) => {
           </div>
 
           {/* Transactions */}
-          <div className="bg-secondary rounded-2xl overflow-hidden">
+          <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
             {group.transactions.map((transaction, index) => {
               const { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isBankTransfer, isBankTransferIncoming } = formatAmount(transaction);
               const isTopup = transaction.type === "topup";

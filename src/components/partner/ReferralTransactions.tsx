@@ -458,7 +458,7 @@ export const ReferralTransactions = memo(() => {
                   )}
                 </div>
               </div>
-              <div className="bg-card rounded-2xl overflow-hidden border border-border/50">
+              <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
                 <div className="space-y-0">
                   {transactions.map((tx) => (
                     <TransactionItem key={tx.id} tx={tx} onWithdrawalClick={handleWithdrawalClick} />
@@ -469,7 +469,7 @@ export const ReferralTransactions = memo(() => {
           ))}
         </div>
       ) : (
-        <div className="bg-card rounded-2xl p-6 border border-border/50 text-center">
+        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl p-6 border border-border/50 text-center">
           <p className="text-muted-foreground text-sm">
             {t('partner.noTransactions', 'Нет транзакций')}
           </p>
