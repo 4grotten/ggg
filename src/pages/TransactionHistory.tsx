@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Check, X } from "lucide-react";
+import { ChevronLeft, ChevronDown, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -433,124 +433,111 @@ const TransactionHistory = () => {
         </div>
       </PullToRefresh>
 
-      {/* Date Options Drawer */}
+      {/* Period Selection Drawer */}
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
-        <DrawerContent className="max-h-[90vh] bg-background/95 backdrop-blur-xl">
-          <DrawerHeader className="relative flex items-center justify-center py-4 border-b border-border/50">
-            <DrawerTitle className="text-center text-base font-semibold">{t("history.dateOptions")}</DrawerTitle>
-            <button 
-              onClick={() => setIsDateDrawerOpen(false)}
-              className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-            >
-              <X className="w-3.5 h-3.5 text-primary" />
-            </button>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle>{t("history.selectPeriod", "Выберите период")}</DrawerTitle>
           </DrawerHeader>
           
-          <div className="px-4 py-2 overflow-y-auto max-h-[70vh]">
-            {/* Preset Options */}
-            <div className="space-y-0">
-              {presetOptions.map((option) => (
+          <div className="px-4 pb-8 overflow-y-auto">
+            {customDateField ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setCustomDateField(null)}
+                    className="text-sm text-muted-foreground"
+                  >
+                    {t("common.back", "Назад")}
+                  </button>
+                  <span className="text-sm font-medium">
+                    {customDateField === "from" 
+                      ? t("history.selectStartDate", "Выберите начальную дату")
+                      : t("history.selectEndDate", "Выберите конечную дату")
+                    }
+                  </span>
+                  <div className="w-12" />
+                </div>
+                
+                <DateWheelPicker
+                  value={customDateField === "from" ? tempCustomFrom : tempCustomTo}
+                  onChange={handleWheelDateChange}
+                  minYear={2020}
+                  maxYear={new Date().getFullYear() + 1}
+                />
+                
+                {customDateField === "from" && hasSelectedFrom && (
+                  <button
+                    onClick={() => setCustomDateField("to")}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
+                  >
+                    {t("common.next", "Далее")}
+                  </button>
+                )}
+                
+                {customDateField === "to" && tempCustomFrom && tempCustomTo && (
+                  <button
+                    onClick={handleCustomDateConfirm}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
+                  >
+                    {t("common.apply", "Применить")}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {presetOptions.map((preset) => (
+                  <button
+                    key={preset.key}
+                    onClick={() => handlePresetSelect(preset.key)}
+                    className={cn(
+                      "w-full flex items-center justify-between p-4 rounded-xl transition-colors",
+                      selectedPreset === preset.key
+                        ? "bg-primary/10 border border-primary/30"
+                        : "bg-secondary hover:bg-secondary/80"
+                    )}
+                  >
+                    <div className="text-left">
+                      <p className="font-medium">{preset.label}</p>
+                      {preset.dateRange && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{preset.dateRange}</p>
+                      )}
+                    </div>
+                    {selectedPreset === preset.key && (
+                      <Check className="w-5 h-5 text-primary" />
+                    )}
+                  </button>
+                ))}
+                
+                {/* Custom Period */}
                 <button
-                  key={option.key}
-                  onClick={() => handlePresetSelect(option.key)}
-                  className="w-full flex items-center justify-between py-4 border-b border-border/30"
+                  onClick={() => {
+                    setTempCustomFrom(dateFrom);
+                    setTempCustomTo(dateTo);
+                    setHasSelectedFrom(!!dateFrom);
+                    handleCustomDateSelect("from");
+                  }}
+                  className={cn(
+                    "w-full flex items-center justify-between p-4 rounded-xl transition-colors",
+                    selectedPreset === "custom"
+                      ? "bg-primary/10 border border-primary/30"
+                      : "bg-secondary hover:bg-secondary/80"
+                  )}
                 >
                   <div className="text-left">
-                    <p className="font-medium">{option.label}</p>
-                    {option.dateRange && (
-                      <p className="text-sm text-primary">{option.dateRange}</p>
+                    <p className="font-medium">{t("history.customPeriod", "Свой период")}</p>
+                    {selectedPreset === "custom" && dateFrom && dateTo && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatDateRange(dateFrom, dateTo)}
+                      </p>
                     )}
                   </div>
-                  {selectedPreset === option.key && (
+                  {selectedPreset === "custom" && (
                     <Check className="w-5 h-5 text-primary" />
                   )}
                 </button>
-              ))}
-            </div>
-
-            {/* Custom Date Section */}
-            <div className="mt-6">
-              <p className="font-semibold mb-4">{t("history.setUpYourTime")}</p>
-              
-              {/* Start Date */}
-              <button
-                onClick={() => handleCustomDateSelect("from")}
-                className="w-full flex items-center justify-between py-4 border-b border-border/30"
-              >
-                <span className={cn(
-                  "text-base",
-                  customDateField === "from" || tempCustomFrom ? "text-foreground" : "text-muted-foreground"
-                )}>
-                  {tempCustomFrom 
-                    ? format(tempCustomFrom, "dd.MM.yyyy")
-                    : t("history.startDate")
-                  }
-                </span>
-                <ChevronDown className={cn(
-                  "w-5 h-5 transition-transform",
-                  customDateField === "from" ? "rotate-180 text-primary" : "text-muted-foreground"
-                )} />
-              </button>
-
-              {/* End Date */}
-              <button
-                onClick={() => handleCustomDateSelect("to")}
-                className="w-full flex items-center justify-between py-4 border-b border-border/30"
-              >
-                <span className={cn(
-                  "text-base",
-                  customDateField === "to" || tempCustomTo ? "text-foreground" : "text-muted-foreground"
-                )}>
-                  {tempCustomTo 
-                    ? format(tempCustomTo, "dd.MM.yyyy")
-                    : t("history.endDate")
-                  }
-                </span>
-                <ChevronDown className={cn(
-                  "w-5 h-5 transition-transform",
-                  customDateField === "to" ? "rotate-180 text-primary" : "text-muted-foreground"
-                )} />
-              </button>
-
-              {/* Wheel Picker */}
-              {customDateField && (
-                <div className="mt-4 bg-muted/30 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-4 px-2">
-                    <button 
-                      onClick={() => setCustomDateField(null)}
-                      className="text-muted-foreground"
-                    >
-                      <ChevronDown className="w-5 h-5 rotate-180" />
-                    </button>
-                    <span className="text-sm text-muted-foreground">
-                      {customDateField === "from" ? t("history.startDate") : t("history.endDate")}
-                    </span>
-                    <button 
-                      onClick={() => setCustomDateField(null)}
-                      className="text-primary font-semibold"
-                    >
-                      {t("history.done")}
-                    </button>
-                  </div>
-                  <DateWheelPicker
-                    value={customDateField === "from" ? tempCustomFrom : tempCustomTo}
-                    onChange={handleWheelDateChange}
-                    minYear={2020}
-                    maxYear={new Date().getFullYear() + 1}
-                  />
-                </div>
-              )}
-
-              {/* Apply Button - shows when first date is selected */}
-              {hasSelectedFrom && tempCustomFrom && tempCustomTo && !customDateField && (
-                <button
-                  onClick={handleCustomDateConfirm}
-                  className="w-full mt-6 py-3 bg-primary text-primary-foreground font-semibold rounded-xl"
-                >
-                  {t("history.show")}
-                </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </DrawerContent>
       </Drawer>
