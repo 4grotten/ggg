@@ -284,12 +284,11 @@ const Dashboard = () => {
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 py-6 space-y-6 pb-28">
           {/* Balance - only for authenticated users */}
-          {isAuthenticated && (
-            balanceLoading ? (
-              <Skeleton className="h-32 w-full rounded-2xl" />
-            ) : (
-              <BalanceCard balance={totalBalance} />
-            )
+          {isAuthenticated && !balanceLoading && (
+            <BalanceCard balance={totalBalance} />
+          )}
+          {isAuthenticated && balanceLoading && (
+            <Skeleton className="h-32 w-full rounded-2xl" />
           )}
 
           {/* Action Buttons */}
@@ -302,15 +301,14 @@ const Dashboard = () => {
           <OpenCardButton onClick={() => setOpenCardOpen(true)} />
 
           {/* Cards - only for authenticated users */}
-          {isAuthenticated && (
-            cardsLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-24 w-full rounded-2xl" />
-                <Skeleton className="h-24 w-full rounded-2xl" />
-              </div>
-            ) : (
-              <CardsList cards={cards} />
-            )
+          {isAuthenticated && cardsLoading && (
+            <div className="space-y-3">
+              <Skeleton className="h-24 w-full rounded-2xl" />
+              <Skeleton className="h-24 w-full rounded-2xl" />
+            </div>
+          )}
+          {isAuthenticated && !cardsLoading && (
+            <CardsList cards={cards} />
           )}
 
           {/* Send to Card */}
