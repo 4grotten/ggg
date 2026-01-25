@@ -59,7 +59,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     })
   };
 
-  const renderStep = () => {
+  const renderStepContent = () => {
     switch (step) {
       case 0:
         return (
@@ -71,7 +71,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.3 }}
-            className="flex flex-col items-center px-6 pb-8"
+            className="flex flex-col items-center px-6"
           >
             {/* Easy Card illustration - same as splash screen */}
             <div className="relative w-72 h-48 flex items-center justify-center mb-6">
@@ -130,16 +130,9 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             <p className="text-xl font-semibold text-center mb-4">
               {t('partner.step1.subtitle')}
             </p>
-            <p className="text-muted-foreground text-center mb-8">
+            <p className="text-muted-foreground text-center">
               {t('partner.step1.description')}
             </p>
-
-            <button
-              onClick={handleContinue}
-              className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl active:scale-[0.98] transition-transform"
-            >
-              {t('common.continue')}
-            </button>
           </motion.div>
         );
 
@@ -153,16 +146,8 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.3 }}
-            className="flex flex-col items-center px-6 pb-8"
+            className="flex flex-col items-center px-6"
           >
-            {/* Back button */}
-            <button
-              onClick={handleBack}
-              className="absolute top-4 left-4 w-10 h-10 rounded-full bg-muted flex items-center justify-center"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-
             {/* Magnet + coins illustration */}
             <div className="relative w-48 h-48 flex items-center justify-center mb-6">
               <div 
@@ -203,16 +188,9 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             <p className="text-muted-foreground text-center mb-2">
               {t('partner.step2.description1')}
             </p>
-            <p className="text-muted-foreground text-center mb-8">
+            <p className="text-muted-foreground text-center">
               {t('partner.step2.description2')}
             </p>
-
-            <button
-              onClick={handleContinue}
-              className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl active:scale-[0.98] transition-transform"
-            >
-              {t('common.continue')}
-            </button>
           </motion.div>
         );
 
@@ -226,16 +204,8 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.3 }}
-            className="flex flex-col items-center px-6 pb-8"
+            className="flex flex-col items-center px-6"
           >
-            {/* Back button */}
-            <button
-              onClick={handleBack}
-              className="absolute top-4 left-4 w-10 h-10 rounded-full bg-muted flex items-center justify-center"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-
             {/* Box illustration */}
             <div className="relative w-48 h-48 flex items-center justify-center mb-6">
               <div 
@@ -270,7 +240,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             </p>
 
             {/* 3 earning methods */}
-            <div className="flex justify-center gap-6 mb-8">
+            <div className="flex justify-center gap-6">
               <div className="flex flex-col items-center">
                 <div 
                   className="w-14 h-14 rounded-full flex items-center justify-center mb-2"
@@ -302,13 +272,6 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 <p className="text-sm font-medium text-center opacity-60">{t('partner.completeTasks')}</p>
               </div>
             </div>
-
-            <button
-              onClick={handleContinue}
-              className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl active:scale-[0.98] transition-transform"
-            >
-              {t('common.continue')}
-            </button>
           </motion.div>
         );
 
@@ -322,16 +285,8 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.3 }}
-            className="flex flex-col items-center px-6 pb-8"
+            className="flex flex-col items-center px-6"
           >
-            {/* Back button */}
-            <button
-              onClick={handleBack}
-              className="absolute top-4 left-4 w-10 h-10 rounded-full bg-muted flex items-center justify-center"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-
             {/* Piggy bank illustration */}
             <div className="relative w-56 h-48 flex items-center justify-center mb-6">
               <div 
@@ -371,33 +326,9 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step4.title')}
             </h2>
-            <p className="text-muted-foreground text-center mb-8">
+            <p className="text-muted-foreground text-center">
               {t('partner.step4.description')}
             </p>
-
-            {/* Share buttons */}
-            <button
-              onClick={handleShareTelegram}
-              className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl mb-3 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-            >
-              <Send className="w-5 h-5" />
-              {t('partner.shareInTelegram')}
-            </button>
-
-            <button
-              onClick={handleCopyLink}
-              className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl mb-4 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-            >
-              <Copy className="w-5 h-5" />
-              {t('partner.copyInviteLink')}
-            </button>
-
-            <button
-              onClick={handleClose}
-              className="w-full py-3 text-muted-foreground font-medium"
-            >
-              {t('common.cancel')}
-            </button>
           </motion.div>
         );
 
@@ -406,16 +337,72 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     }
   };
 
+  const renderFooterButtons = () => {
+    if (step === 3) {
+      return (
+        <>
+          <button
+            onClick={handleShareTelegram}
+            className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl mb-3 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          >
+            <Send className="w-5 h-5" />
+            {t('partner.shareInTelegram')}
+          </button>
+
+          <button
+            onClick={handleCopyLink}
+            className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl mb-3 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          >
+            <Copy className="w-5 h-5" />
+            {t('partner.copyInviteLink')}
+          </button>
+
+          <button
+            onClick={handleClose}
+            className="w-full py-3 text-muted-foreground font-medium"
+          >
+            {t('common.cancel')}
+          </button>
+        </>
+      );
+    }
+
+    return (
+      <button
+        onClick={handleContinue}
+        className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl active:scale-[0.98] transition-transform"
+      >
+        {t('common.continue')}
+      </button>
+    );
+  };
+
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh] overflow-hidden">
-        <ScrollArea className="max-h-[85vh]">
-          <div className="relative pt-8">
+      <DrawerContent className="max-h-[90vh] flex flex-col">
+        {/* Back button - fixed position */}
+        {step > 0 && (
+          <button
+            onClick={handleBack}
+            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-muted flex items-center justify-center z-10"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+        )}
+        
+        {/* Scrollable content */}
+        <ScrollArea className="flex-1 max-h-[60vh]">
+          <div className="relative pt-8 pb-4">
             <AnimatePresence mode="wait" custom={step}>
-              {renderStep()}
+              {renderStepContent()}
             </AnimatePresence>
           </div>
         </ScrollArea>
+        
+        {/* Fixed footer with buttons */}
+        <div className="px-6 pb-8 pt-4 bg-background">
+          {renderFooterButtons()}
+        </div>
       </DrawerContent>
     </Drawer>
   );
