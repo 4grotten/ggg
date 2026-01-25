@@ -106,7 +106,7 @@
 
 @layer components {
   .karta-card {
-    @apply bg-card rounded-2xl border border-border p-4 shadow-sm;
+    @apply bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl border border-border/50 p-4;
   }
 
   .karta-card-accent {
