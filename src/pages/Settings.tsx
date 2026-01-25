@@ -623,6 +623,8 @@ const Settings = () => {
           />
         </div>
 
+        <div className="h-px bg-border" />
+
         {/* Limits and Fees */}
         <div className="bg-card rounded-2xl overflow-hidden">
           <SettingsItem
