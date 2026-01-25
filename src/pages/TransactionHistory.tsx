@@ -330,6 +330,7 @@ const TransactionHistory = () => {
       }
       rightAction={
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
           <div className="flex bg-secondary rounded-lg p-1">
             <button
               onClick={() => navigate("/card/virtual/history", { replace: true })}
@@ -354,7 +355,6 @@ const TransactionHistory = () => {
               Metal
             </button>
           </div>
-          <LanguageSwitcher />
         </div>
       }
     >
