@@ -300,15 +300,16 @@ const Dashboard = () => {
           {/* Open New Card Button */}
           <OpenCardButton onClick={() => setOpenCardOpen(true)} />
 
-          {/* Cards - only for authenticated users */}
-          {isAuthenticated && cardsLoading && (
+          {/* Cards */}
+          {cardsLoading ? (
             <div className="space-y-3">
               <Skeleton className="h-24 w-full rounded-2xl" />
               <Skeleton className="h-24 w-full rounded-2xl" />
             </div>
-          )}
-          {isAuthenticated && !cardsLoading && (
-            <CardsList cards={cards} />
+          ) : (
+            <CardsList 
+              cards={isAuthenticated ? cards : cards.map(c => ({ ...c, balance: undefined }))} 
+            />
           )}
 
           {/* Send to Card */}
