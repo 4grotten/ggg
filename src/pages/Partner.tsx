@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -13,7 +13,6 @@ import { LevelCarousel } from "@/components/partner/LevelCarousel";
 const Partner = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Mock data - will be replaced with real data from API
   const [currentFriends] = useState(0);
@@ -47,7 +46,7 @@ const Partner = () => {
       </header>
       
       {/* Scrollable Content */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 overflow-y-auto pb-28">
         {/* Hero Section */}
         <div className="relative px-4 pt-4 pb-6">
           <HeroBanner />
@@ -74,8 +73,8 @@ const Partner = () => {
         <ShareButtons />
       </div>
       
-      {/* Floating Invite Button with scroll animation */}
-      <InviteButton scrollContainerRef={scrollContainerRef} />
+      {/* Floating Invite Button */}
+      <InviteButton />
     </div>
   );
 };
