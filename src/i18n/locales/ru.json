@@ -325,7 +325,7 @@
     "verified": "Верифицирован",
     "language": "Язык",
     "appearance": "Оформление",
-    "limitsAndFees": "Лимиты и комиссии",
+    "limitsAndFees": "Комиссии и проценты",
     "referralPartner": "Реферальный партнёр",
     "limitsSettings": "Настройки лимитов",
     "askQuestion": "Задать вопрос",
@@ -546,7 +546,7 @@
     }
   },
   "feesAndLimits": {
-    "title": "Комиссии и лимиты",
+    "title": "Комиссии и проценты",
     "oneTimeFees": "Разовые комиссии",
     "virtualCardAnnual": "Виртуальная карта (годовая)",
     "virtualCardReplacement": "Замена виртуальной карты",
