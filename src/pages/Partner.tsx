@@ -85,48 +85,141 @@ const Partner = () => {
         <div className="flex-1 overflow-y-auto pb-28">
           {/* Hero Section */}
           <div className="relative px-4 pt-4 pb-6">
-            {/* Wide format growth image with pulsing glow */}
+            {/* Fantastic Hero Banner with Multi-layer Glow */}
             <div className="relative w-full rounded-2xl overflow-visible mb-4">
-              {/* Pulsing glow effect - Light theme */}
+              {/* Outer glow layer - large soft pulse */}
               <motion.div 
-                className="absolute -inset-4 rounded-3xl z-0 dark:hidden"
+                className="absolute -inset-8 rounded-[2rem] z-0"
                 style={{ 
-                  background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.5) 0%, rgba(16, 185, 129, 0.25) 40%, transparent 70%)",
-                  filter: "blur(20px)"
+                  background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.6) 0%, rgba(16, 185, 129, 0.2) 50%, transparent 80%)",
+                  filter: "blur(30px)"
                 }}
                 animate={{
-                  opacity: [0.4, 1, 0.4],
-                  scale: [0.97, 1.03, 0.97]
+                  opacity: [0.3, 0.8, 0.3],
+                  scale: [0.95, 1.08, 0.95]
                 }}
                 transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-              {/* Pulsing glow effect - Dark theme */}
-              <motion.div 
-                className="absolute -inset-4 rounded-3xl z-0 hidden dark:block"
-                style={{ 
-                  background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.6) 0%, rgba(127, 255, 0, 0.3) 40%, transparent 70%)",
-                  filter: "blur(20px)"
-                }}
-                animate={{
-                  opacity: [0.4, 1, 0.4],
-                  scale: [0.97, 1.03, 0.97]
-                }}
-                transition={{
-                  duration: 2.5,
+                  duration: 3,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
               />
               
-              <img 
+              {/* Middle glow layer - intense core */}
+              <motion.div 
+                className="absolute -inset-4 rounded-3xl z-0"
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.4) 40%, transparent 70%)",
+                  filter: "blur(16px)"
+                }}
+                animate={{
+                  opacity: [0.5, 1, 0.5],
+                  scale: [0.98, 1.04, 0.98]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5
+                }}
+              />
+              
+              {/* Inner glow layer - sharp accent */}
+              <motion.div 
+                className="absolute -inset-2 rounded-2xl z-0"
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(74, 222, 128, 0.9) 0%, rgba(34, 197, 94, 0.5) 30%, transparent 60%)",
+                  filter: "blur(8px)"
+                }}
+                animate={{
+                  opacity: [0.6, 1, 0.6],
+                  scale: [1, 1.02, 1]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.25
+                }}
+              />
+              
+              {/* Dark theme - Lime neon outer glow */}
+              <motion.div 
+                className="absolute -inset-8 rounded-[2rem] z-0 hidden dark:block"
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.7) 0%, rgba(127, 255, 0, 0.3) 50%, transparent 80%)",
+                  filter: "blur(30px)"
+                }}
+                animate={{
+                  opacity: [0.3, 0.9, 0.3],
+                  scale: [0.95, 1.08, 0.95]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              
+              {/* Dark theme - Lime neon middle glow */}
+              <motion.div 
+                className="absolute -inset-4 rounded-3xl z-0 hidden dark:block"
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.9) 0%, rgba(127, 255, 0, 0.5) 40%, transparent 70%)",
+                  filter: "blur(16px)"
+                }}
+                animate={{
+                  opacity: [0.5, 1, 0.5],
+                  scale: [0.98, 1.04, 0.98]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5
+                }}
+              />
+              
+              {/* Dark theme - Lime neon inner glow */}
+              <motion.div 
+                className="absolute -inset-2 rounded-2xl z-0 hidden dark:block"
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(212, 255, 31, 1) 0%, rgba(191, 255, 0, 0.6) 30%, transparent 60%)",
+                  filter: "blur(8px)"
+                }}
+                animate={{
+                  opacity: [0.6, 1, 0.6],
+                  scale: [1, 1.02, 1]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.25
+                }}
+              />
+              
+              {/* Image with enhanced shadow */}
+              <motion.img 
                 src={partnerGrowthImage} 
                 alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-                className="relative z-10 w-full h-auto rounded-2xl"
+                className="relative z-10 w-full h-auto rounded-2xl shadow-2xl"
+                style={{
+                  boxShadow: "0 0 40px rgba(16, 185, 129, 0.4), 0 0 80px rgba(16, 185, 129, 0.2)"
+                }}
                 loading="eager"
+                animate={{
+                  boxShadow: [
+                    "0 0 30px rgba(16, 185, 129, 0.3), 0 0 60px rgba(16, 185, 129, 0.15)",
+                    "0 0 50px rgba(16, 185, 129, 0.5), 0 0 100px rgba(16, 185, 129, 0.25)",
+                    "0 0 30px rgba(16, 185, 129, 0.3), 0 0 60px rgba(16, 185, 129, 0.15)"
+                  ]
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
               />
             </div>
             <h2 className="text-xl font-bold text-center">
