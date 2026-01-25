@@ -206,36 +206,52 @@ const EditProfile = () => {
               disabled={isUploadingAvatar}
               className="relative group"
             >
-              {/* Flash effect overlay */}
-              <AnimatePresence>
-                {showFlash && (
-                  <motion.div
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="absolute inset-0 bg-white rounded-full z-20 pointer-events-none"
+              {/* Avatar container - no animation on the avatar itself */}
+              <div className="relative">
+                <Avatar className="w-28 h-28 ring-4 ring-background shadow-xl overflow-hidden">
+                  <AvatarImage 
+                    src={displayAvatar} 
+                    alt={user?.full_name || "User"} 
+                    className="object-cover"
                   />
-                )}
-              </AnimatePresence>
-              
-              {/* Avatar with scale animation on change */}
-              <motion.div
-                key={avatarKey}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 300, 
-                  damping: 20,
-                  duration: 0.4 
-                }}
-              >
-                <Avatar className="w-28 h-28 ring-4 ring-background shadow-xl">
-                  <AvatarImage src={displayAvatar} alt={user?.full_name || "User"} />
-                  <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
+                  <AvatarFallback className="text-2xl bg-muted">{initials}</AvatarFallback>
                 </Avatar>
-              </motion.div>
+                
+                {/* Flash effect - bright flash that expands */}
+                <AnimatePresence>
+                  {showFlash && (
+                    <>
+                      {/* White flash burst */}
+                      <motion.div
+                        initial={{ opacity: 1, scale: 1 }}
+                        animate={{ opacity: 0, scale: 1.5 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="absolute inset-0 bg-white rounded-full z-30 pointer-events-none"
+                      />
+                      {/* Glow ring effect */}
+                      <motion.div
+                        initial={{ opacity: 0.8, scale: 1 }}
+                        animate={{ opacity: 0, scale: 2 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="absolute inset-0 rounded-full border-4 border-primary z-30 pointer-events-none"
+                      />
+                      {/* Success checkmark */}
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{ delay: 0.2, duration: 0.3, type: "spring" }}
+                        className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"
+                      >
+                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-7 h-7 text-white" strokeWidth={3} />
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
               
               {/* Loading overlay */}
               <AnimatePresence>
@@ -244,14 +260,25 @@ const EditProfile = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-10"
+                    className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-full z-10 backdrop-blur-sm"
                   >
-                    <div className="relative">
-                      <Loader2 className="w-10 h-10 text-white animate-spin" />
+                    <div className="relative flex flex-col items-center gap-2">
                       <motion.div
-                        className="absolute inset-0 rounded-full border-2 border-white/30"
-                        animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "easeOut" }}
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Loader2 className="w-10 h-10 text-white" />
+                      </motion.div>
+                      {/* Pulsing rings */}
+                      <motion.div
+                        className="absolute inset-0 m-auto w-16 h-16 rounded-full border-2 border-white/40"
+                        animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut" }}
+                      />
+                      <motion.div
+                        className="absolute inset-0 m-auto w-16 h-16 rounded-full border-2 border-white/40"
+                        animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut", delay: 0.4 }}
                       />
                     </div>
                   </motion.div>
@@ -267,7 +294,7 @@ const EditProfile = () => {
               
               {/* Camera badge */}
               <motion.div 
-                className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg"
+                className="absolute bottom-0 right-0 w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
