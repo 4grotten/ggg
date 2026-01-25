@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,8 @@ const EditProfile = () => {
   const [isGenderOpen, setIsGenderOpen] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [tempDate, setTempDate] = useState<Date | undefined>(undefined);
+  const [showFlash, setShowFlash] = useState(false);
+  const [avatarKey, setAvatarKey] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormData>({
@@ -113,6 +116,12 @@ const EditProfile = () => {
         
         await updateAvatar(croppedFile);
         await refreshUser(); // Refresh to get updated avatar URL
+        
+        // Trigger flash effect and avatar animation
+        setShowFlash(true);
+        setAvatarKey(prev => prev + 1);
+        setTimeout(() => setShowFlash(false), 400);
+        
         toast.success(t("toast.avatarUpdated"));
       } catch (error) {
         console.error('Failed to upload avatar:', error);
@@ -122,6 +131,11 @@ const EditProfile = () => {
         setPendingFile(null);
       }
     } else {
+      // Trigger flash for local preview
+      setShowFlash(true);
+      setAvatarKey(prev => prev + 1);
+      setTimeout(() => setShowFlash(false), 400);
+      
       toast.success(t("toast.avatarUpdated"));
       setPendingFile(null);
     }
@@ -192,20 +206,77 @@ const EditProfile = () => {
               disabled={isUploadingAvatar}
               className="relative group"
             >
-              <Avatar className="w-28 h-28">
-                <AvatarImage src={displayAvatar} alt={user?.full_name || "User"} />
-                <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
-              </Avatar>
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                {isUploadingAvatar ? (
-                  <Loader2 className="w-6 h-6 text-white animate-spin" />
-                ) : (
-                  <Camera className="w-6 h-6 text-white" />
+              {/* Flash effect overlay */}
+              <AnimatePresence>
+                {showFlash && (
+                  <motion.div
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="absolute inset-0 bg-white rounded-full z-20 pointer-events-none"
+                  />
                 )}
-              </div>
-              <div className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                <Camera className="w-4 h-4 text-primary-foreground" />
-              </div>
+              </AnimatePresence>
+              
+              {/* Avatar with scale animation on change */}
+              <motion.div
+                key={avatarKey}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 20,
+                  duration: 0.4 
+                }}
+              >
+                <Avatar className="w-28 h-28 ring-4 ring-background shadow-xl">
+                  <AvatarImage src={displayAvatar} alt={user?.full_name || "User"} />
+                  <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
+                </Avatar>
+              </motion.div>
+              
+              {/* Loading overlay */}
+              <AnimatePresence>
+                {isUploadingAvatar && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-10"
+                  >
+                    <div className="relative">
+                      <Loader2 className="w-10 h-10 text-white animate-spin" />
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-white/30"
+                        animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "easeOut" }}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {/* Hover overlay (only when not uploading) */}
+              {!isUploadingAvatar && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+              )}
+              
+              {/* Camera badge */}
+              <motion.div 
+                className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isUploadingAvatar ? (
+                  <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4 text-primary-foreground" />
+                )}
+              </motion.div>
             </button>
           </div>
 
