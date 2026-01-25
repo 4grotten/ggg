@@ -114,8 +114,7 @@ const Partner = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="text-center">
-              <h1 className="text-lg font-bold">Easy Card</h1>
-              <p className="text-xs text-muted-foreground">{t('partner.program', 'Партнёрская программа')}</p>
+              <h1 className="text-lg font-bold">{t('partner.program', 'Партнёрская программа')}</h1>
             </div>
             <LanguageSwitcher />
           </div>
