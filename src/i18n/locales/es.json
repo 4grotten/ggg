@@ -306,6 +306,7 @@
     "installInstructions": "Toca Compartir → Añadir a pantalla de inicio para instalar"
   },
   "settings": {
+    "profile": "Perfil",
     "personalDetails": "Datos personales",
     "notVerified": "No verificado",
     "verified": "Verificado",

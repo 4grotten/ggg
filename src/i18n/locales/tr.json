@@ -306,6 +306,7 @@
     "installInstructions": "Yüklemek için Paylaş → Ana Ekrana Ekle'ye dokunun"
   },
   "settings": {
+    "profile": "Profil",
     "personalDetails": "Kişisel Bilgiler",
     "notVerified": "Doğrulanmadı",
     "verified": "Doğrulandı",

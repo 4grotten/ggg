@@ -306,6 +306,7 @@
     "installInstructions": "Tippen Sie auf Teilen → Zum Home-Bildschirm zur Installation"
   },
   "settings": {
+    "profile": "Profil",
     "personalDetails": "Persönliche Daten",
     "notVerified": "Nicht verifiziert",
     "verified": "Verifiziert",

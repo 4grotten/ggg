@@ -320,6 +320,7 @@
     "installInstructions": "Нажмите «Поделиться» → «На экран Домой» для установки"
   },
   "settings": {
+    "profile": "Профиль",
     "personalDetails": "Личные данные",
     "notVerified": "Не верифицирован",
     "verified": "Верифицирован",
