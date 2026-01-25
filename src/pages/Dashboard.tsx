@@ -312,67 +312,69 @@ const Dashboard = () => {
           {/* Send to Card */}
           <SendToCardButton />
 
-          {/* Transactions */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xl font-bold">{t('dashboard.transactions')}</h2>
-              <button
-                onClick={() => navigate("/card/virtual/history")}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
-              >
-                <Clock className="w-4 h-4" />
-                {t('card.transactionHistory')}
-              </button>
-            </div>
+          {/* Transactions - only for authenticated users */}
+          {isAuthenticated && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xl font-bold">{t('dashboard.transactions')}</h2>
+                <button
+                  onClick={() => navigate("/card/virtual/history")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+                >
+                  <Clock className="w-4 h-4" />
+                  {t('card.transactionHistory')}
+                </button>
+              </div>
 
-            {/* Filter Tabs - Telegram Style */}
-            <div className="relative mb-4">
-              <div 
-                ref={tabsContainerRef}
-                className="flex gap-0 overflow-x-auto scrollbar-hide relative"
-              >
-                {/* Sliding indicator */}
-                <motion.div
-                  className="absolute bottom-0 h-[3px] bg-primary rounded-full"
-                  animate={{
-                    left: indicatorStyle.left,
-                    width: indicatorStyle.width,
-                  }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-                
-                {filterOptions.map((option) => (
-                  <button
-                    key={option.key}
-                    ref={(el) => {
-                      if (el) tabRefs.current.set(option.key, el);
+              {/* Filter Tabs - Telegram Style */}
+              <div className="relative mb-4">
+                <div 
+                  ref={tabsContainerRef}
+                  className="flex gap-0 overflow-x-auto scrollbar-hide relative"
+                >
+                  {/* Sliding indicator */}
+                  <motion.div
+                    className="absolute bottom-0 h-[3px] bg-primary rounded-full"
+                    animate={{
+                      left: indicatorStyle.left,
+                      width: indicatorStyle.width,
                     }}
-                    onClick={() => setActiveFilter(option.key)}
-                    className={cn(
-                      "px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative",
-                      activeFilter === option.key
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                  
+                  {filterOptions.map((option) => (
+                    <button
+                      key={option.key}
+                      ref={(el) => {
+                        if (el) tabRefs.current.set(option.key, el);
+                      }}
+                      onClick={() => setActiveFilter(option.key)}
+                      className={cn(
+                        "px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative",
+                        activeFilter === option.key
+                          ? "text-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                {/* Bottom border */}
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-border/50" />
               </div>
-              {/* Bottom border */}
-              <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-border/50" />
-            </div>
 
-            {transactionsLoading ? (
-              <div className="space-y-4">
-                <Skeleton className="h-16 w-full rounded-xl" />
-                <Skeleton className="h-32 w-full rounded-xl" />
-                <Skeleton className="h-24 w-full rounded-xl" />
-              </div>
-            ) : (
-              <CardTransactionsList groups={filteredGroups} />
-            )}
-          </div>
+              {transactionsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-16 w-full rounded-xl" />
+                  <Skeleton className="h-32 w-full rounded-xl" />
+                  <Skeleton className="h-24 w-full rounded-xl" />
+                </div>
+              ) : (
+                <CardTransactionsList groups={filteredGroups} />
+              )}
+            </div>
+          )}
 
         </div>
       </PullToRefresh>
