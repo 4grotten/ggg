@@ -605,6 +605,8 @@ const Settings = () => {
           />
         </div>
 
+        <div className="h-px bg-border" />
+
         {/* Language & Appearance */}
         <div className="bg-card rounded-2xl overflow-hidden">
           <SettingsItem
