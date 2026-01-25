@@ -23,7 +23,9 @@
     "aed": "AED",
     "usdt": "USDT",
     "loading": "Loading...",
-    "authorize": "Sign In"
+    "authorize": "Sign In",
+    "next": "Next",
+    "apply": "Apply"
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",
@@ -419,8 +421,8 @@
     "period": "Period",
     "noTransactions": "No transactions found",
     "dateOptions": "Date options",
-    "allTime": "During all this time",
-    "today": "For today",
+    "allTime": "All time",
+    "today": "Today",
     "thisWeek": "This week",
     "lastWeek": "Last week",
     "thisMonth": "This month",
@@ -429,7 +431,11 @@
     "startDate": "Start date",
     "endDate": "End date",
     "done": "Done",
-    "show": "Show"
+    "show": "Show",
+    "selectPeriod": "Select period",
+    "selectStartDate": "Select start date",
+    "selectEndDate": "Select end date",
+    "customPeriod": "Custom period"
   },
   "transaction": {
     "back": "Back",
