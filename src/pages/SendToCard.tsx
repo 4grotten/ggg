@@ -277,16 +277,25 @@ const SendToCard = () => {
   };
 
   const handleConfirm = async () => {
-    if (!selectedCard || !recipientName) return;
+    // For referral withdrawal, check destination card; for regular transfer, check source card and recipient
+    if (isReferralWithdrawal) {
+      if (!selectedDestinationCard) return;
+    } else {
+      if (!selectedCard || !recipientName) return;
+    }
     
     setIsSubmitting(true);
     setTransferError(null);
     
     try {
       const request: TransferRequest = {
-        fromCardId: selectedCardId,
-        toCardNumber: cardNumber.replace(/\s/g, ""),
-        recipientName: recipientName,
+        fromCardId: isReferralWithdrawal ? "referral" : selectedCardId,
+        toCardNumber: isReferralWithdrawal 
+          ? `****${selectedDestinationCard?.lastFour}` 
+          : cardNumber.replace(/\s/g, ""),
+        recipientName: isReferralWithdrawal 
+          ? (selectedDestinationCard?.name || "") 
+          : (recipientName || ""),
         amount: numericAmount,
         fee: fee,
         totalAmount: totalAmount
