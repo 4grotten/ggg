@@ -16,7 +16,9 @@
     "yes": "是",
     "aed": "AED",
     "usdt": "USDT",
-    "authorize": "登录"
+    "authorize": "登录",
+    "next": "下一步",
+    "apply": "应用"
   },
   "dashboard": {
     "welcome": "欢迎，{{name}}！",
@@ -391,7 +393,11 @@
     "startDate": "开始日期",
     "endDate": "结束日期",
     "done": "完成",
-    "show": "显示"
+    "show": "显示",
+    "selectPeriod": "选择时间段",
+    "selectStartDate": "选择开始日期",
+    "selectEndDate": "选择结束日期",
+    "customPeriod": "自定义时间段"
   },
   "transaction": {
     "back": "返回",
@@ -768,6 +774,7 @@
     "shareVia": "分享方式",
     "inviteFriendsButton": "邀请朋友",
     "inviteFriendsTitle": "邀请朋友",
-    "friends": "朋友"
+    "friends": "朋友",
+    "referralHistory": "推荐历史"
   }
 }

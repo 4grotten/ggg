@@ -23,7 +23,9 @@
     "aed": "AED",
     "usdt": "USDT",
     "loading": "Загрузка...",
-    "authorize": "Авторизоваться"
+    "authorize": "Авторизоваться",
+    "next": "Далее",
+    "apply": "Применить"
   },
   "dashboard": {
     "greeting": "Привет, {{name}}!",
@@ -429,7 +431,11 @@
     "startDate": "Начальная дата",
     "endDate": "Конечная дата",
     "done": "Готово",
-    "show": "Показать"
+    "show": "Показать",
+    "selectPeriod": "Выберите период",
+    "selectStartDate": "Выберите начальную дату",
+    "selectEndDate": "Выберите конечную дату",
+    "customPeriod": "Свой период"
   },
   "transaction": {
     "back": "Назад",
