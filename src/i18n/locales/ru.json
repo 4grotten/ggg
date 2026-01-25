@@ -362,6 +362,8 @@
     "title": "Редактирование профиля",
     "fullName": "Полное имя",
     "fullNamePlaceholder": "Введите ваше полное имя",
+    "username": "Никнейм",
+    "usernamePlaceholder": "Введите ваш никнейм",
     "email": "Email",
     "emailPlaceholder": "Введите ваш email",
     "dateOfBirth": "Дата рождения",

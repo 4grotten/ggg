@@ -21,6 +21,7 @@ import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 
 const profileSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters").max(100),
+  username: z.string().min(3, "Username must be at least 3 characters").max(30).regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers and underscores").optional().or(z.literal("")),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
   date_of_birth: z.string().optional(),
   gender: z.enum(["male", "female", ""]).optional(),
@@ -48,6 +49,7 @@ const EditProfile = () => {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       full_name: user?.full_name || "",
+      username: user?.username || "",
       email: user?.email || "",
       date_of_birth: user?.date_of_birth || "",
       gender: (user?.gender as "male" | "female" | "") || "",
@@ -59,6 +61,7 @@ const EditProfile = () => {
     if (user) {
       form.reset({
         full_name: user.full_name || "",
+        username: user.username || "",
         email: user.email || "",
         date_of_birth: user.date_of_birth || "",
         gender: (user.gender as "male" | "female" | "") || "",
@@ -129,6 +132,7 @@ const EditProfile = () => {
     try {
       await updateUserProfile({
         full_name: data.full_name,
+        username: data.username || undefined,
         email: data.email || undefined,
         date_of_birth: data.date_of_birth || undefined,
         gender: data.gender || undefined,
@@ -219,6 +223,25 @@ const EditProfile = () => {
                       <Input
                         {...field}
                         placeholder={t("editProfile.fullNamePlaceholder")}
+                        className="h-14 rounded-2xl border-border bg-card px-4 text-base"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Username / Nickname */}
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("editProfile.username")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder={t("editProfile.usernamePlaceholder")}
                         className="h-14 rounded-2xl border-border bg-card px-4 text-base"
                       />
                     </FormControl>

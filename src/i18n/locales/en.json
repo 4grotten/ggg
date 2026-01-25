@@ -362,6 +362,8 @@
     "title": "Edit Profile",
     "fullName": "Full Name",
     "fullNamePlaceholder": "Enter your full name",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
     "email": "Email",
     "emailPlaceholder": "Enter your email",
     "dateOfBirth": "Date of Birth",
