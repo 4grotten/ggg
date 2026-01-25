@@ -49,7 +49,7 @@ const FeeSection = ({ title, icon, children }: FeeSectionProps) => (
         {title}
       </h3>
     </div>
-    <div className="bg-card rounded-2xl px-4 border border-border/50 shadow-sm">
+    <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl px-4 border border-border/50">
       {children}
     </div>
   </div>
