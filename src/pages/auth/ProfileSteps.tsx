@@ -412,10 +412,20 @@ const ProfileSteps = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleCropComplete = (croppedUrl: string) => {
+  const handleCropComplete = async (croppedUrl: string) => {
     setPhotoPreview(croppedUrl);
     setAvatarUrl(croppedUrl);
     setCropDialogOpen(false);
+    
+    // Convert base64 cropped image to File for upload
+    try {
+      const response = await fetch(croppedUrl);
+      const blob = await response.blob();
+      const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+      setPhotoFile(croppedFile);
+    } catch (error) {
+      console.error('Failed to convert cropped image:', error);
+    }
   };
 
   const handleComplete = async () => {
