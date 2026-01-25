@@ -160,4 +160,14 @@
   .karta-shadow-lg {
     box-shadow: 0 8px 30px -6px rgba(0, 0, 0, 0.15);
   }
+
+  /* Shimmer animation for buttons */
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2.5s ease-in-out infinite;
+  }
 }
