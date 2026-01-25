@@ -438,52 +438,6 @@ const Settings = () => {
                   <AvatarFallback className="text-2xl bg-muted">{initials}</AvatarFallback>
                 </Avatar>
                 
-                {/* Verification status indicator */}
-                {(() => {
-                  const completedSteps = getCompletedSteps();
-                  const isVerified = completedSteps >= 3;
-                  return (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className={`absolute bottom-1 right-1 w-5 h-5 rounded-full border-2 border-background ${
-                        isVerified ? 'bg-green-500' : 'bg-red-500'
-                      }`}
-                    >
-                      {!isVerified && (
-                        <motion.div
-                          animate={{ 
-                            opacity: [1, 0.4, 1],
-                            scale: [1, 1.1, 1]
-                          }}
-                          transition={{ 
-                            duration: 1.5, 
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                          }}
-                          className="w-full h-full rounded-full bg-red-500"
-                        />
-                      )}
-                      {isVerified && (
-                        <motion.div
-                          animate={{ 
-                            boxShadow: [
-                              '0 0 0 0 rgba(34, 197, 94, 0.4)',
-                              '0 0 0 4px rgba(34, 197, 94, 0)',
-                            ]
-                          }}
-                          transition={{ 
-                            duration: 2, 
-                            repeat: Infinity,
-                            ease: "easeOut"
-                          }}
-                          className="w-full h-full rounded-full"
-                        />
-                      )}
-                    </motion.div>
-                  );
-                })()}
-                
                 {/* Flash effect - bright flash that expands */}
                 <AnimatePresence>
                   {showFlash && (
@@ -604,13 +558,42 @@ const Settings = () => {
           const isVerified = completedSteps >= 3;
           return (
             <div className="bg-card rounded-2xl overflow-hidden">
-              <SettingsItem
-                icon={<Briefcase className="w-5 h-5" />}
-                label={t("settings.personalDetails")}
-                value={isVerified ? t("settings.verified") : t("settings.notVerified")}
-                valueClassName={isVerified ? "text-sm font-medium text-green-500" : "text-sm font-medium text-red-500"}
+              <button
                 onClick={() => navigate("/profile-verification")}
-              />
+                className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-foreground"><Briefcase className="w-5 h-5" /></span>
+                  <span className="text-foreground font-medium">{t("settings.personalDetails")}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Verification status indicator */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className={`w-2.5 h-2.5 rounded-full ${isVerified ? 'bg-green-500' : 'bg-red-500'}`}
+                  >
+                    {!isVerified && (
+                      <motion.div
+                        animate={{ 
+                          opacity: [1, 0.4, 1],
+                          scale: [1, 1.1, 1]
+                        }}
+                        transition={{ 
+                          duration: 1.5, 
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                        className="w-full h-full rounded-full bg-red-500"
+                      />
+                    )}
+                  </motion.div>
+                  <span className={isVerified ? "text-sm font-medium text-green-500" : "text-sm font-medium text-red-500"}>
+                    {isVerified ? t("settings.verified") : t("settings.notVerified")}
+                  </span>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </button>
             </div>
           );
         })()}
