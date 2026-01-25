@@ -140,23 +140,31 @@ const SendToCard = () => {
   // Cards state
   const [userCards, setUserCards] = useState<UserCard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string>("");
+  const [selectedDestinationCardId, setSelectedDestinationCardId] = useState<string>("");
   const [isLoadingCards, setIsLoadingCards] = useState(false);
   const [cardsError, setCardsError] = useState<string | null>(null);
 
   const selectedCard = userCards.find((c) => c.id === selectedCardId);
+  const selectedDestinationCard = userCards.find((c) => c.id === selectedDestinationCardId);
   
   // Use referral balance or card balance
   const availableBalance = isReferralWithdrawal ? referralBalance : (selectedCard?.balance || 0);
-  // Fetch cards when entering amount step (skip for referral withdrawal)
+  
+  // Fetch cards when entering amount step (for both referral and regular transfers)
   useEffect(() => {
-    if (step === "amount" && userCards.length === 0 && !isReferralWithdrawal) {
+    if (step === "amount" && userCards.length === 0) {
       setIsLoadingCards(true);
       setCardsError(null);
       
       fetchUserCards().then((result) => {
         if (result.success && result.cards.length > 0) {
           setUserCards(result.cards);
-          setSelectedCardId(result.cards[0].id);
+          // For referral withdrawal, set destination card
+          if (isReferralWithdrawal) {
+            setSelectedDestinationCardId(result.cards[0].id);
+          } else {
+            setSelectedCardId(result.cards[0].id);
+          }
         } else {
           setCardsError(result.error || t('send.failedToLoadCards'));
         }
@@ -166,7 +174,7 @@ const SendToCard = () => {
         setIsLoadingCards(false);
       });
     }
-  }, [step, userCards.length, t]);
+  }, [step, userCards.length, t, isReferralWithdrawal]);
   const cleanCardNumber = cardNumber.replace(/\s/g, "");
   const isCardValid = cleanCardNumber.length === 16;
   
@@ -447,21 +455,87 @@ const SendToCard = () => {
 
             {/* Select Source - Referral Balance or Cards */}
             {isReferralWithdrawal ? (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('partner.referralBalance', 'Реферальный счёт')}</label>
-                <div className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Wallet className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold">{t('partner.referralBalance', 'Реферальный счёт')}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {referralBalance.toFixed(2)} AED
-                      </p>
+              <div className="space-y-4">
+                {/* Referral Balance Source */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('send.fromAccount', 'С счёта')}</label>
+                  <div className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Wallet className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-semibold">{t('partner.referralBalance', 'Реферальный счёт')}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {referralBalance.toFixed(2)} AED
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Loading Cards State */}
+                {isLoadingCards && (
+                  <div className="bg-secondary rounded-xl p-6 flex items-center justify-center gap-3 animate-pulse">
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                    <span className="text-muted-foreground">{t('send.loadingCards')}</span>
+                  </div>
+                )}
+
+                {/* Cards Error State */}
+                {cardsError && !isLoadingCards && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                      <X className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-red-500">{t('send.failedToLoadCards')}</p>
+                      <button 
+                        onClick={() => {
+                          setCardsError(null);
+                          setIsLoadingCards(true);
+                          fetchUserCards().then((result) => {
+                            if (result.success && result.cards.length > 0) {
+                              setUserCards(result.cards);
+                              setSelectedDestinationCardId(result.cards[0].id);
+                            } else {
+                              setCardsError(result.error || t('send.failedToLoadCards'));
+                            }
+                            setIsLoadingCards(false);
+                          }).catch(() => {
+                            setCardsError(t('send.failedToLoadCards'));
+                            setIsLoadingCards(false);
+                          });
+                        }}
+                        className="text-sm text-primary hover:underline mt-1"
+                      >
+                        {t('send.tryAgain')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Select Destination Card */}
+                {!isLoadingCards && !cardsError && userCards.length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('send.toCard', 'На карту')}</label>
+                    <Select value={selectedDestinationCardId} onValueChange={setSelectedDestinationCardId}>
+                      <SelectTrigger className="h-14 rounded-xl">
+                        <SelectValue placeholder={t('send.selectCard')} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover">
+                        {userCards.map((card) => (
+                          <SelectItem key={card.id} value={card.id} className="data-[state=checked]:text-white">
+                            <div className="flex items-center justify-between w-full gap-4">
+                              <span>{card.name} •••• {card.lastFour}</span>
+                              <span className="text-muted-foreground group-data-[state=checked]:text-white/90">{card.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             ) : (
               <>

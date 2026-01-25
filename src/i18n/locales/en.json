@@ -625,6 +625,8 @@
     "redirecting": "Redirecting to home...",
     "insufficientBalanceWarning": "Insufficient balance. The total amount exceeds your available balance.",
     "selectCard": "Select Card",
+    "fromAccount": "From Account",
+    "toCard": "To Card",
     "coin": "Coin",
     "network": "Network",
     "walletAddress": "Wallet Address",
