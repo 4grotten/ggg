@@ -22,11 +22,13 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
   const { t } = useTranslation();
   const [selectedLevelIndex, setSelectedLevelIndex] = useState(0);
   
-  // Embla carousel for swipe
+  // Embla carousel for swipe - axis: "x" allows vertical scroll passthrough
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: false,
     align: "center",
-    containScroll: "trimSnaps"
+    containScroll: "trimSnaps",
+    axis: "x",
+    dragThreshold: 10
   });
   
   // Calculate current level
@@ -57,9 +59,9 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
   }, [emblaApi, onSelect]);
 
   return (
-    <div className="px-4 mb-6 pt-4 touch-pan-y">
-      <div className="overflow-hidden touch-pan-x" ref={emblaRef}>
-        <div className="flex gap-4">
+    <div className="px-4 mb-6 pt-4">
+      <div className="overflow-hidden" ref={emblaRef} style={{ touchAction: "pan-y pinch-zoom" }}>
+        <div className="flex gap-4" style={{ touchAction: "pan-x" }}>
           {LEVELS.map((level, idx) => (
             <div 
               key={level.id}
