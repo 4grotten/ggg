@@ -410,8 +410,8 @@ export const ReferralTransactions = memo(() => {
                 <p className="text-sm font-medium">
                   {getDateLabel(dateGroup)}
                 </p>
-                <p className="text-sm font-medium text-success">
-                  +{total.toFixed(2)} AED
+                <p className={`text-sm font-medium ${total >= 0 ? "text-success" : "text-blue-500"}`}>
+                  {total >= 0 ? "+" : ""}{total.toFixed(2)} AED
                 </p>
               </div>
               <div className="bg-card rounded-2xl overflow-hidden border border-border/50">
