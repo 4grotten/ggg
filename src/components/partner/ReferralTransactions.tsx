@@ -19,7 +19,7 @@ interface ReferralTransaction {
   level: string;
 }
 
-const MOCK_TRANSACTIONS: ReferralTransaction[] = [
+export const MOCK_TRANSACTIONS: ReferralTransaction[] = [
   {
     id: "1",
     userName: "Александр К.",
