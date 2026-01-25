@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { CreditCard, ArrowRightLeft } from "lucide-react";
+import { CreditCard, ArrowDownLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface ReferralTransaction {
@@ -131,7 +131,7 @@ const TransactionIcon = memo(({ type }: { type: "card" | "transaction" }) => {
   if (type === "card") {
     return <CreditCard className="w-5 h-5 text-emerald-600 dark:text-[#BFFF00]" />;
   }
-  return <ArrowRightLeft className="w-5 h-5 text-primary" />;
+  return <ArrowDownLeft className="w-5 h-5 text-success" />;
 });
 
 TransactionIcon.displayName = "TransactionIcon";
