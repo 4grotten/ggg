@@ -616,19 +616,19 @@ const Settings = () => {
           </div>
         )}
 
-        {/* Language & Appearance */}
+        {/* Appearance & Language */}
         <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
-          <SettingsItem
-            icon={<Globe className="w-5 h-5" />}
-            label={t("settings.language")}
-            value={currentLanguage?.name}
-            onClick={() => setIsLanguageOpen(true)}
-          />
           <SettingsItem
             icon={<Palette className="w-5 h-5" />}
             label={t("settings.appearance")}
             value={currentTheme.name}
             onClick={() => setIsAppearanceOpen(true)}
+          />
+          <SettingsItem
+            icon={<Globe className="w-5 h-5" />}
+            label={t("settings.language")}
+            value={currentLanguage?.name}
+            onClick={() => setIsLanguageOpen(true)}
           />
         </div>
 
