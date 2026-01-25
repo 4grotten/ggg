@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Diamond, Users, Percent, ClipboardCheck, Send, Copy, X } from "lucide-react";
+import { ArrowLeft, Diamond, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -336,31 +336,56 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     }
   };
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Easy Card',
+          text: t('partner.shareText'),
+          url: 'https://karta.app/invite/YOUR_CODE',
+        });
+      } catch (error) {
+        // User cancelled or error
+      }
+    }
+  };
+
   const renderFooterButtons = () => {
     if (step === 3) {
       return (
         <>
-          <button
-            onClick={handleShareTelegram}
-            className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl mb-3 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-          >
-            <Send className="w-5 h-5" />
-            {t('partner.shareInTelegram')}
-          </button>
-
-          <button
-            onClick={handleCopyLink}
-            className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl mb-3 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-          >
-            <Copy className="w-5 h-5" />
-            {t('partner.copyInviteLink')}
-          </button>
+          {/* 3 icons in a row */}
+          <div className="flex justify-center gap-6 mb-6">
+            <button
+              onClick={handleShareTelegram}
+              className="w-14 h-14 rounded-full bg-foreground flex items-center justify-center active:scale-95 transition-transform"
+              aria-label={t('partner.shareInTelegram')}
+            >
+              <Send className="w-6 h-6 text-background" />
+            </button>
+            
+            <button
+              onClick={handleCopyLink}
+              className="w-14 h-14 rounded-full bg-foreground flex items-center justify-center active:scale-95 transition-transform"
+              aria-label={t('partner.copyInviteLink')}
+            >
+              <Copy className="w-6 h-6 text-background" />
+            </button>
+            
+            <button
+              onClick={handleShare}
+              className="w-14 h-14 rounded-full bg-foreground flex items-center justify-center active:scale-95 transition-transform"
+              aria-label={t('common.share')}
+            >
+              <Share2 className="w-6 h-6 text-background" />
+            </button>
+          </div>
 
           <button
             onClick={handleClose}
-            className="w-full py-3 text-muted-foreground font-medium"
+            className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl active:scale-[0.98] transition-transform"
           >
-            {t('common.cancel')}
+            {t('common.continue')}
           </button>
         </>
       );
