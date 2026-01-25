@@ -106,6 +106,11 @@ const FeesAndLimits = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <MobileLayout
       showBackButton
