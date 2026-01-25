@@ -46,7 +46,7 @@ const Partner = () => {
       </header>
       
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 overflow-y-auto pb-8">
         {/* Hero Section */}
         <div className="relative px-4 pt-4 pb-6">
           <HeroBanner />
@@ -62,6 +62,9 @@ const Partner = () => {
           onLevelChange={handleLevelChange}
         />
         
+        {/* Invite Button - below carousel */}
+        <InviteButton />
+        
         {/* Referral Balance */}
         <ReferralBalance 
           balance={referralBalance}
@@ -72,9 +75,6 @@ const Partner = () => {
         {/* Share Buttons */}
         <ShareButtons />
       </div>
-      
-      {/* Floating Invite Button */}
-      <InviteButton />
     </div>
   );
 };

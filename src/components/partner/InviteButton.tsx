@@ -26,10 +26,10 @@ export const InviteButton = memo(() => {
   }, [t]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background/80 to-transparent pb-6 pointer-events-none">
+    <div className="px-4 py-2">
       <button
         onClick={handleShare}
-        className="w-full py-4 font-bold rounded-2xl relative overflow-hidden flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-[#BFFF00] dark:to-[#7FFF00] shadow-lg shadow-emerald-500/30 dark:shadow-[#7FFF00]/40 active:scale-[0.98] transition-transform duration-150 pointer-events-auto"
+        className="w-full py-4 font-bold rounded-2xl relative overflow-hidden flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-[#BFFF00] dark:to-[#7FFF00] shadow-lg shadow-emerald-500/30 dark:shadow-[#7FFF00]/40 active:scale-[0.98] transition-transform duration-150"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
         <Users className="w-5 h-5 text-white dark:text-black relative z-10" />
