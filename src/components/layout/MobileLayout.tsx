@@ -20,13 +20,15 @@ export const MobileLayout = ({
 }: MobileLayoutProps) => {
   const { t } = useTranslation();
   
+  const hasHeader = header || showBackButton || rightAction;
+  
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="w-full max-w-[800px] mx-auto flex flex-col min-h-screen">
-        {/* Header */}
-        {(header || showBackButton || rightAction) && (
-          <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-            <div className="flex items-center justify-between h-14 px-4">
+        {/* Fixed Header */}
+        {hasHeader && (
+          <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+            <div className="max-w-[800px] mx-auto flex items-center justify-between h-14 px-4">
               <div className="flex-1 flex items-center">
                 {showBackButton && (
                   <button
@@ -56,8 +58,8 @@ export const MobileLayout = ({
           </header>
         )}
 
-        {/* Main content */}
-        <main className={`flex-1 ${className}`}>{children}</main>
+        {/* Main content with top padding for fixed header */}
+        <main className={`flex-1 ${hasHeader ? 'pt-14' : ''} ${className}`}>{children}</main>
       </div>
     </div>
   );
