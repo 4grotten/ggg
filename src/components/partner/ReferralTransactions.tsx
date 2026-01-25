@@ -305,15 +305,13 @@ const FilterTabs = memo(({
   onFilterChange: (filter: FilterType) => void;
   labels: Record<FilterType, string>;
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   
   useEffect(() => {
-    if (!containerRef.current) return;
     const activeIndex = FILTER_OPTIONS.indexOf(activeFilter);
-    const buttons = containerRef.current.querySelectorAll('button');
-    if (buttons[activeIndex]) {
-      const button = buttons[activeIndex] as HTMLButtonElement;
+    const button = buttonRefs.current[activeIndex];
+    if (button) {
       setIndicatorStyle({
         left: button.offsetLeft,
         width: button.offsetWidth
@@ -322,28 +320,27 @@ const FilterTabs = memo(({
   }, [activeFilter]);
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative flex items-center gap-1 p-1 bg-muted rounded-full overflow-x-auto scrollbar-hide"
-    >
+    <div className="relative flex items-center gap-1">
       {/* Animated indicator */}
       <motion.div
-        className="absolute h-[calc(100%-8px)] bg-primary rounded-full"
+        className="absolute h-full bg-primary rounded-full"
         initial={false}
         animate={{
-          left: indicatorStyle.left,
+          x: indicatorStyle.left,
           width: indicatorStyle.width
         }}
         transition={{
           type: "spring",
-          stiffness: 400,
-          damping: 30
+          stiffness: 500,
+          damping: 35
         }}
+        style={{ left: 0 }}
       />
       
-      {FILTER_OPTIONS.map((filter) => (
+      {FILTER_OPTIONS.map((filter, index) => (
         <button
           key={filter}
+          ref={(el) => { buttonRefs.current[index] = el; }}
           onClick={() => onFilterChange(filter)}
           className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
             activeFilter === filter 
