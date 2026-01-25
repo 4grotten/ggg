@@ -1,7 +1,8 @@
 import { useCallback, useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ShoppingCart } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 // Partner levels configuration
 export const LEVELS = [
@@ -80,21 +81,29 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
               className="flex-shrink-0 w-full pt-4 snap-center"
             >
               <div className="relative overflow-visible">
-                {/* Current level badge - z-20 to be above everything */}
-                {idx === currentLevelIndex && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
-                  >
+                {/* Badge - Current level or Buy button */}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
+                >
+                  {idx === currentLevelIndex ? (
                     <span 
                       className="px-3 py-1 rounded-full text-xs font-bold text-white dark:text-black flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-[#BFFF00] dark:to-[#7FFF00]"
                     >
                       <Sparkles className="w-3 h-3" />
                       {t('partner.currentLevel', 'Текущий уровень')}
                     </span>
-                  </motion.div>
-                )}
+                  ) : (
+                    <button
+                      onClick={() => toast.info(t('partner.buyLevelSoon', 'Скоро будет доступно'))}
+                      className="px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/30 active:scale-95 transition-transform"
+                    >
+                      <ShoppingCart className="w-3 h-3" />
+                      {t('partner.buyLevel', 'Купить')}
+                    </button>
+                  )}
+                </motion.div>
                 
                 <div className="relative rounded-3xl p-[1px]">
                   {/* Rotating gradient border for current level */}
