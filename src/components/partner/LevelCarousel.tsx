@@ -102,7 +102,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="absolute -top-3 right-5 z-20"
+                    className="absolute -top-3 right-6 z-20"
                   >
                     <button
                       onClick={() => toast.info(t('partner.buyLevelSoon', 'Скоро будет доступно'))}
