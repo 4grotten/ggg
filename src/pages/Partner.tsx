@@ -5,7 +5,7 @@ import { ArrowLeft, Users, Send, Copy, Share2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import partnerGrowthImage from "@/assets/partner-growth-hero.png";
+import partnerGrowthImage from "@/assets/partner-growth-hero-v2.png";
 import { LevelCarousel, LEVELS } from "@/components/partner/LevelCarousel";
 
 const Partner = () => {
