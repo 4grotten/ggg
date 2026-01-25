@@ -13,6 +13,7 @@ import { BalanceCard } from "@/components/dashboard/BalanceCard";
 import { ActionButtons } from "@/components/dashboard/ActionButtons";
 import { VerifyIdentityCard } from "@/components/dashboard/VerifyIdentityCard";
 import { PartnerCard } from "@/components/dashboard/PartnerCard";
+import { PartnerDrawer } from "@/components/dashboard/PartnerDrawer";
 import { CardsList } from "@/components/dashboard/CardsList";
 import { SendToCardButton } from "@/components/dashboard/SendToCardButton";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -55,6 +56,7 @@ const Dashboard = () => {
   const [sendOpen, setSendOpen] = useState(false);
   const [openCardOpen, setOpenCardOpen] = useState(false);
   const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
+  const [partnerDrawerOpen, setPartnerDrawerOpen] = useState(false);
   const [authAlertOpen, setAuthAlertOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   
@@ -306,7 +308,7 @@ const Dashboard = () => {
           <VerifyIdentityCard />
 
           {/* Partner Program Card */}
-          <PartnerCard onClick={() => {/* TODO: Navigate to partner page */}} />
+          <PartnerCard onClick={() => setPartnerDrawerOpen(true)} />
 
           {/* Open New Card Button */}
           <OpenCardButton onClick={() => setOpenCardOpen(true)} />
@@ -399,6 +401,7 @@ const Dashboard = () => {
     <SendDrawer open={sendOpen} onOpenChange={setSendOpen} />
     <OpenCardDrawer open={openCardOpen} onOpenChange={setOpenCardOpen} />
     <AccountSwitcher open={accountSwitcherOpen} onOpenChange={setAccountSwitcherOpen} />
+    <PartnerDrawer open={partnerDrawerOpen} onOpenChange={setPartnerDrawerOpen} />
     
     {/* iOS-style Auth Alert */}
     <AlertDialog open={authAlertOpen} onOpenChange={setAuthAlertOpen}>

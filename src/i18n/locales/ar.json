@@ -693,5 +693,33 @@
         "ready": "تم إنشاء الملف الشخصي بنجاح"
       }
     }
+  },
+  "partner": {
+    "step1": {
+      "title": "تعرف على",
+      "subtitle": "طريقك للربح مع Karta.",
+      "description": "ادعُ أصدقاءك واكسب Karat في كل مرة يستخدم فيها أصدقاؤك Karta."
+    },
+    "step2": {
+      "title": "اطلب",
+      "subtitle": "حوّل المكافآت إلى USDT.",
+      "description1": "حوّل Karat إلى USDT أو احتفظ به.",
+      "description2": "$KARAT قادم والمكافآت قد تنمو."
+    },
+    "step3": {
+      "title": "اربح",
+      "subtitle": "اكسب يومياً من خلال:"
+    },
+    "step4": {
+      "title": "أصدقاؤك = أموالك",
+      "description": "كلما دعوت أكثر، كلما ربحت أكثر."
+    },
+    "inviteFriends": "دعوة الأصدقاء",
+    "friendsSpending": "إنفاق الأصدقاء",
+    "completeTasks": "إكمال المهام",
+    "shareInTelegram": "مشاركة في تيليجرام",
+    "copyInviteLink": "نسخ رابط الدعوة",
+    "linkCopied": "تم نسخ رابط الدعوة!",
+    "shareText": "انضم إلى Karta واحصل على بطاقة كريبتو مجانية! استخدم رابط الإحالة الخاص بي:"
   }
 }

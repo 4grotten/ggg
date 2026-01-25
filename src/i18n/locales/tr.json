@@ -693,5 +693,33 @@
         "ready": "Profil başarıyla oluşturuldu"
       }
     }
+  },
+  "partner": {
+    "step1": {
+      "title": "Tanışın",
+      "subtitle": "Karta ile kazanma yolunuz.",
+      "description": "Arkadaşlarınızı davet edin ve arkadaşlarınız Karta kullandığında Karat kazanın."
+    },
+    "step2": {
+      "title": "Talep Et",
+      "subtitle": "Ödülleri USDT'ye çevirin.",
+      "description1": "Karat'ı USDT'ye çevirin veya tutun.",
+      "description2": "$KARAT geliyor ve ödüller artabilir."
+    },
+    "step3": {
+      "title": "Kazan",
+      "subtitle": "Günlük para kazanın:"
+    },
+    "step4": {
+      "title": "Arkadaşlarınız = Paranız",
+      "description": "Ne kadar çok davet ederseniz, o kadar çok kazanırsınız."
+    },
+    "inviteFriends": "Arkadaşları Davet Et",
+    "friendsSpending": "Arkadaş Harcamaları",
+    "completeTasks": "Görevleri Tamamla",
+    "shareInTelegram": "Telegram'da Paylaş",
+    "copyInviteLink": "Davet Linkini Kopyala",
+    "linkCopied": "Davet linki kopyalandı!",
+    "shareText": "Karta'ya katıl ve ücretsiz kripto kartı al! Referans linkimi kullan:"
   }
 }
