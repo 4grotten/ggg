@@ -278,12 +278,10 @@ const Partner = () => {
                             <span className="text-2xl">{level.icon}</span>
                             <span className="text-xl font-bold">{level.name}</span>
                           </div>
-                          {level.maxFriends !== Infinity && (
-                            <span className="text-sm text-muted-foreground">
-                              <span className="text-foreground font-bold">{currentFriends}</span>
-                              /{level.maxFriends}
-                            </span>
-                          )}
+                          <span className="text-sm text-muted-foreground">
+                            <span className="text-foreground font-bold">{currentFriends}</span>
+                            /{level.maxFriends === Infinity ? 1000 : level.maxFriends}
+                          </span>
                         </div>
                         
                         {/* Benefits */}
