@@ -150,7 +150,7 @@ const Partner = () => {
               <img 
                 src={partnerGrowthImage} 
                 alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-                className="relative z-10 w-full h-auto rounded-2xl"
+                className="relative z-10 w-full h-auto"
                 style={{ 
                   boxShadow: "0 0 30px rgba(191, 255, 0, 0.3)"
                 }}
