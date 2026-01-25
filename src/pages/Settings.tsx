@@ -11,6 +11,7 @@ import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
@@ -20,10 +21,11 @@ interface SettingsItemProps {
   icon: React.ReactNode;
   label: string;
   value?: string;
+  valueClassName?: string;
   onClick?: () => void;
 }
 
-const SettingsItem = ({ icon, label, value, onClick }: SettingsItemProps) => (
+const SettingsItem = ({ icon, label, value, valueClassName, onClick }: SettingsItemProps) => (
   <button
     onClick={onClick}
     className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
@@ -33,7 +35,7 @@ const SettingsItem = ({ icon, label, value, onClick }: SettingsItemProps) => (
       <span className="text-foreground font-medium">{label}</span>
     </div>
     <div className="flex items-center gap-2">
-      {value && <span className="text-muted-foreground text-sm">{value}</span>}
+      {value && <span className={valueClassName || "text-muted-foreground text-sm"}>{value}</span>}
       <ChevronRight className="w-5 h-5 text-muted-foreground" />
     </div>
   </button>
@@ -194,6 +196,7 @@ const Settings = () => {
   const { user, isAuthenticated, logout, updateAvatar, refreshUser } = useAuth();
   const { accounts } = useMultiAccount();
   const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
+  const { getCompletedSteps } = useVerificationProgress();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isAppearanceOpen, setIsAppearanceOpen] = useState(false);
   const [isInstallOpen, setIsInstallOpen] = useState(false);
@@ -550,14 +553,21 @@ const Settings = () => {
         )}
 
         {/* Personal Details / Verification */}
-        <div className="bg-card rounded-2xl overflow-hidden">
-          <SettingsItem
-            icon={<Briefcase className="w-5 h-5" />}
-            label={t("settings.personalDetails")}
-            value={t("settings.notVerified")}
-            onClick={() => navigate("/profile-verification")}
-          />
-        </div>
+        {(() => {
+          const completedSteps = getCompletedSteps();
+          const isVerified = completedSteps >= 3;
+          return (
+            <div className="bg-card rounded-2xl overflow-hidden">
+              <SettingsItem
+                icon={<Briefcase className="w-5 h-5" />}
+                label={t("settings.personalDetails")}
+                value={isVerified ? t("settings.verified") : t("settings.notVerified")}
+                valueClassName={isVerified ? "text-sm font-medium text-green-500" : "text-sm font-medium text-red-500"}
+                onClick={() => navigate("/profile-verification")}
+              />
+            </div>
+          );
+        })()}
 
         {/* Install App */}
         {!isInstalled && (
