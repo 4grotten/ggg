@@ -105,20 +105,18 @@ const Partner = () => {
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto">
       <div className="min-h-screen bg-background flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50">
-          <div className="flex items-center justify-between px-4 py-3">
+        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+          <div className="flex items-center justify-between h-14 px-4">
             <button
               onClick={() => navigate(-1)}
               className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="text-center">
-              <h1 className="text-lg font-bold">{t('partner.program', 'Партнёрская программа')}</h1>
-            </div>
+            <h1 className="text-lg font-bold">{t('partner.program', 'Партнёрская программа')}</h1>
             <LanguageSwitcher />
           </div>
-        </div>
+        </header>
         
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto pb-28">
