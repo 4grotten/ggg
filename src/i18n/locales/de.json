@@ -693,5 +693,33 @@
         "ready": "Profil erfolgreich erstellt"
       }
     }
+  },
+  "partner": {
+    "step1": {
+      "title": "Entdecke",
+      "subtitle": "Dein Weg zum Verdienen mit Karta.",
+      "description": "Lade Freunde ein und verdiene Karat jedes Mal, wenn deine Freunde Karta nutzen."
+    },
+    "step2": {
+      "title": "Fordere",
+      "subtitle": "Wandle Belohnungen in USDT um.",
+      "description1": "Tausche Karat in USDT um oder halte es.",
+      "description2": "$KARAT kommt und Belohnungen können wachsen."
+    },
+    "step3": {
+      "title": "Verdiene",
+      "subtitle": "Verdiene täglich durch:"
+    },
+    "step4": {
+      "title": "Deine Freunde = Dein Geld",
+      "description": "Je mehr du einlädst, desto mehr verdienst du."
+    },
+    "inviteFriends": "Freunde einladen",
+    "friendsSpending": "Ausgaben der Freunde",
+    "completeTasks": "Aufgaben erledigen",
+    "shareInTelegram": "In Telegram teilen",
+    "copyInviteLink": "Einladungslink kopieren",
+    "linkCopied": "Einladungslink kopiert!",
+    "shareText": "Tritt Karta bei und erhalte eine kostenlose Krypto-Karte! Nutze meinen Empfehlungslink:"
   }
 }

@@ -693,5 +693,33 @@
         "ready": "个人资料创建成功"
       }
     }
+  },
+  "partner": {
+    "step1": {
+      "title": "认识",
+      "subtitle": "您通过Karta赚钱的方式。",
+      "description": "邀请朋友，每当朋友使用Karta时即可赚取Karat。"
+    },
+    "step2": {
+      "title": "领取",
+      "subtitle": "将奖励转换为USDT。",
+      "description1": "将Karat兑换为USDT或持有。",
+      "description2": "$KARAT即将到来，奖励可能增长。"
+    },
+    "step3": {
+      "title": "赚取",
+      "subtitle": "每日赚钱方式："
+    },
+    "step4": {
+      "title": "您的朋友 = 您的金钱",
+      "description": "邀请越多，赚得越多。"
+    },
+    "inviteFriends": "邀请朋友",
+    "friendsSpending": "朋友消费",
+    "completeTasks": "完成任务",
+    "shareInTelegram": "分享到Telegram",
+    "copyInviteLink": "复制邀请链接",
+    "linkCopied": "邀请链接已复制！",
+    "shareText": "加入Karta获取免费加密卡！使用我的推荐链接："
   }
 }

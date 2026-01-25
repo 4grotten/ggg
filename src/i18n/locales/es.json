@@ -693,5 +693,33 @@
         "ready": "Perfil creado exitosamente"
       }
     }
+  },
+  "partner": {
+    "step1": {
+      "title": "Conoce",
+      "subtitle": "Tu forma de ganar con Karta.",
+      "description": "Invita amigos y gana Karat cada vez que tus amigos usen Karta."
+    },
+    "step2": {
+      "title": "Reclama",
+      "subtitle": "Convierte recompensas en USDT.",
+      "description1": "Cambia Karat a USDT o guárdalo.",
+      "description2": "$KARAT viene pronto y las recompensas pueden crecer."
+    },
+    "step3": {
+      "title": "Gana",
+      "subtitle": "Gana dinero diariamente:"
+    },
+    "step4": {
+      "title": "Tus Amigos = Tu Dinero",
+      "description": "Cuanto más invites, más ganarás."
+    },
+    "inviteFriends": "Invitar Amigos",
+    "friendsSpending": "Gastos de Amigos",
+    "completeTasks": "Completar Tareas",
+    "shareInTelegram": "Compartir en Telegram",
+    "copyInviteLink": "Copiar Enlace de Invitación",
+    "linkCopied": "¡Enlace de invitación copiado!",
+    "shareText": "¡Únete a Karta y obtén una tarjeta cripto gratis! Usa mi enlace de referido:"
   }
 }

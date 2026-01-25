@@ -734,5 +734,33 @@
         "ready": "Profile created successfully"
       }
     }
+  },
+  "partner": {
+    "step1": {
+      "title": "Meet",
+      "subtitle": "Your way to earn with Karta.",
+      "description": "Invite friends and earn Karat every time your friends use Karta."
+    },
+    "step2": {
+      "title": "Claim",
+      "subtitle": "Turn rewards into USDT.",
+      "description1": "Claim Karat to USDT or hold it.",
+      "description2": "$KARAT is coming and rewards may grow."
+    },
+    "step3": {
+      "title": "Earn",
+      "subtitle": "Make money daily by:"
+    },
+    "step4": {
+      "title": "Your Friends = Your Money",
+      "description": "The more you invite, the more you earn."
+    },
+    "inviteFriends": "Invite Friends",
+    "friendsSpending": "Friends Spending",
+    "completeTasks": "Complete Tasks",
+    "shareInTelegram": "Share in Telegram",
+    "copyInviteLink": "Copy Invite Link",
+    "linkCopied": "Invite link copied!",
+    "shareText": "Join Karta and get a free crypto card! Use my referral link:"
   }
 }
