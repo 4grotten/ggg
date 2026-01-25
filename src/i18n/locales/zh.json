@@ -15,7 +15,8 @@
     "skip": "跳过",
     "yes": "是",
     "aed": "AED",
-    "usdt": "USDT"
+    "usdt": "USDT",
+    "authorize": "登录"
   },
   "dashboard": {
     "welcome": "欢迎，{{name}}！",
@@ -527,7 +528,9 @@
     "perTx": "每笔",
     "dailyLimit": "每日限额",
     "perTransaction": "每笔交易",
-    "save": "保存"
+    "save": "保存",
+    "authRequired": "需要登录",
+    "authRequiredMessage": "更改限额需要登录"
   },
   "chat": {
     "aiAssistant": "AI 助手",

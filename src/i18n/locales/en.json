@@ -16,7 +16,8 @@
     "yes": "Yes",
     "aed": "AED",
     "usdt": "USDT",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "authorize": "Sign In"
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",
@@ -560,7 +561,9 @@
     "perTx": "Per tx",
     "dailyLimit": "Daily Limit",
     "perTransaction": "Per Transaction",
-    "save": "Save"
+    "save": "Save",
+    "authRequired": "Authorization Required",
+    "authRequiredMessage": "To change limits, you need to sign in"
   },
   "chat": {
     "aiAssistant": "AI Assistant",

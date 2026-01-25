@@ -15,7 +15,8 @@
     "skip": "Atla",
     "yes": "Evet",
     "aed": "AED",
-    "usdt": "USDT"
+    "usdt": "USDT",
+    "authorize": "Giriş Yap"
   },
   "dashboard": {
     "welcome": "Hoş geldiniz, {{name}}!",
@@ -527,7 +528,9 @@
     "perTx": "İşlem başına",
     "dailyLimit": "Günlük Limit",
     "perTransaction": "İşlem Başına",
-    "save": "Kaydet"
+    "save": "Kaydet",
+    "authRequired": "Giriş Gerekli",
+    "authRequiredMessage": "Limitleri değiştirmek için giriş yapmanız gerekiyor"
   },
   "chat": {
     "aiAssistant": "Yapay Zeka Asistanı",
