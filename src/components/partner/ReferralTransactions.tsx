@@ -1,4 +1,5 @@
 import { memo, useMemo, useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { CreditCard, ArrowDownLeft, ArrowUpRight, Wallet, ExternalLink, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CardType } from "@/types/card";
@@ -359,6 +360,7 @@ FilterTabs.displayName = "FilterTabs";
 
 export const ReferralTransactions = memo(() => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [filterType, setFilterType] = useState<FilterType>("all");
   const [selectedWithdrawal, setSelectedWithdrawal] = useState<ReferralTransaction | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -439,6 +441,7 @@ export const ReferralTransactions = memo(() => {
         
         {/* Referral History Button */}
         <button
+          onClick={() => navigate('/partner/history')}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
         >
           <Clock className="w-4 h-4" />
