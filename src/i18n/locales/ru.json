@@ -625,6 +625,8 @@
     "redirecting": "Переход на главную...",
     "insufficientBalanceWarning": "Недостаточно средств. Общая сумма превышает ваш доступный баланс.",
     "selectCard": "Выберите карту",
+    "fromAccount": "С счёта",
+    "toCard": "На карту",
     "coin": "Монета",
     "network": "Сеть",
     "walletAddress": "Адрес кошелька",
