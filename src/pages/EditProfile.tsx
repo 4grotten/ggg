@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Pencil, Loader2, ChevronDown, Check } from "lucide-react";
+import { Camera, Loader2, Check, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -44,6 +44,8 @@ const EditProfile = () => {
   const [isGenderOpen, setIsGenderOpen] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [tempDate, setTempDate] = useState<Date | undefined>(undefined);
+  const [showFlash, setShowFlash] = useState(false);
+  const [avatarKey, setAvatarKey] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormData>({
@@ -115,6 +117,10 @@ const EditProfile = () => {
         await updateAvatar(croppedFile);
         await refreshUser(); // Refresh to get updated avatar URL
         
+        // Trigger flash effect and avatar animation
+        setShowFlash(true);
+        setAvatarKey(prev => prev + 1);
+        setTimeout(() => setShowFlash(false), 400);
         
         toast.success(t("toast.avatarUpdated"));
       } catch (error) {
@@ -125,6 +131,10 @@ const EditProfile = () => {
         setPendingFile(null);
       }
     } else {
+      // Trigger flash for local preview
+      setShowFlash(true);
+      setAvatarKey(prev => prev + 1);
+      setTimeout(() => setShowFlash(false), 400);
       
       toast.success(t("toast.avatarUpdated"));
       setPendingFile(null);
@@ -207,40 +217,82 @@ const EditProfile = () => {
                   <AvatarFallback className="text-2xl bg-muted">{initials}</AvatarFallback>
                 </Avatar>
                 
+                {/* Flash effect - bright flash that expands */}
+                <AnimatePresence>
+                  {showFlash && (
+                    <>
+                      {/* White flash burst */}
+                      <motion.div
+                        initial={{ opacity: 1, scale: 1 }}
+                        animate={{ opacity: 0, scale: 1.5 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="absolute inset-0 bg-white rounded-full z-30 pointer-events-none"
+                      />
+                      {/* Glow ring effect */}
+                      <motion.div
+                        initial={{ opacity: 0.8, scale: 1 }}
+                        animate={{ opacity: 0, scale: 2 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="absolute inset-0 rounded-full border-4 border-primary z-30 pointer-events-none"
+                      />
+                      {/* Success checkmark */}
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{ delay: 0.2, duration: 0.3, type: "spring" }}
+                        className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"
+                      >
+                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-7 h-7 text-white" strokeWidth={3} />
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
               
-              {/* Loading overlay with beautiful loader */}
+              {/* Loading overlay */}
               <AnimatePresence>
                 {isUploadingAvatar && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-10 backdrop-blur-sm"
+                    className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-full z-10 backdrop-blur-sm"
                   >
-                    <div className="relative">
-                      {/* Spinning gradient ring */}
+                    <div className="relative flex flex-col items-center gap-2">
                       <motion.div
-                        className="w-12 h-12 rounded-full border-[3px] border-transparent"
-                        style={{
-                          borderTopColor: "hsl(var(--primary))",
-                          borderRightColor: "hsl(var(--primary) / 0.4)",
-                        }}
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      />
-                      {/* Inner dot */}
+                      >
+                        <Loader2 className="w-10 h-10 text-white" />
+                      </motion.div>
+                      {/* Pulsing rings */}
                       <motion.div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white"
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 0.8, repeat: Infinity }}
+                        className="absolute inset-0 m-auto w-16 h-16 rounded-full border-2 border-white/40"
+                        animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut" }}
+                      />
+                      <motion.div
+                        className="absolute inset-0 m-auto w-16 h-16 rounded-full border-2 border-white/40"
+                        animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut", delay: 0.4 }}
                       />
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
               
-              {/* Edit photo badge */}
+              {/* Hover overlay (only when not uploading) */}
+              {!isUploadingAvatar && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+              )}
+              
+              {/* Camera badge */}
               <motion.div 
                 className="absolute bottom-0 right-0 w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background"
                 whileHover={{ scale: 1.1 }}
@@ -249,7 +301,7 @@ const EditProfile = () => {
                 {isUploadingAvatar ? (
                   <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
                 ) : (
-                  <Pencil className="w-4 h-4 text-primary-foreground" />
+                  <Camera className="w-4 h-4 text-primary-foreground" />
                 )}
               </motion.div>
             </button>
