@@ -165,8 +165,8 @@ const Partner = () => {
             {/* Progress milestones */}
             <div className="flex justify-between text-sm text-muted-foreground mb-2 px-2">
               <span>10 {t('partner.friends', 'друзей')}</span>
-              <span>30 {t('partner.friends', 'друзей')}</span>
               <span>50 {t('partner.friends', 'друзей')}</span>
+              <span>100 {t('partner.friends', 'друзей')}</span>
             </div>
             
             {/* Progress bar */}
