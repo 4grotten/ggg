@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Diamond, Users, Percent, ClipboardCheck, Send, Copy, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -408,11 +409,13 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh] overflow-hidden">
-        <div className="relative pt-8">
-          <AnimatePresence mode="wait" custom={step}>
-            {renderStep()}
-          </AnimatePresence>
-        </div>
+        <ScrollArea className="max-h-[85vh]">
+          <div className="relative pt-8">
+            <AnimatePresence mode="wait" custom={step}>
+              {renderStep()}
+            </AnimatePresence>
+          </div>
+        </ScrollArea>
       </DrawerContent>
     </Drawer>
   );
