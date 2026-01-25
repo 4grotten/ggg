@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Check } from "lucide-react";
+import { ChevronLeft, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -485,26 +485,16 @@ const TransactionHistory = () => {
                 )}
               </div>
             ) : (
-              <div className="space-y-2">
+            <div className="space-y-2">
                 {presetOptions.map((preset) => (
                   <button
                     key={preset.key}
                     onClick={() => handlePresetSelect(preset.key)}
-                    className={cn(
-                      "w-full flex items-center justify-between p-4 rounded-xl transition-colors",
-                      selectedPreset === preset.key
-                        ? "bg-primary/10 border border-primary/30"
-                        : "bg-secondary hover:bg-secondary/80"
-                    )}
+                    className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors"
                   >
-                    <div className="text-left">
-                      <p className="font-medium">{preset.label}</p>
-                      {preset.dateRange && (
-                        <p className="text-xs text-muted-foreground mt-0.5">{preset.dateRange}</p>
-                      )}
-                    </div>
-                    {selectedPreset === preset.key && (
-                      <Check className="w-5 h-5 text-primary" />
+                    <p className="font-medium">{preset.label}</p>
+                    {preset.dateRange && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{preset.dateRange}</p>
                     )}
                   </button>
                 ))}
@@ -517,23 +507,13 @@ const TransactionHistory = () => {
                     setHasSelectedFrom(!!dateFrom);
                     handleCustomDateSelect("from");
                   }}
-                  className={cn(
-                    "w-full flex items-center justify-between p-4 rounded-xl transition-colors",
-                    selectedPreset === "custom"
-                      ? "bg-primary/10 border border-primary/30"
-                      : "bg-secondary hover:bg-secondary/80"
-                  )}
+                  className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors"
                 >
-                  <div className="text-left">
-                    <p className="font-medium">{t("history.customPeriod", "Свой период")}</p>
-                    {selectedPreset === "custom" && dateFrom && dateTo && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {formatDateRange(dateFrom, dateTo)}
-                      </p>
-                    )}
-                  </div>
-                  {selectedPreset === "custom" && (
-                    <Check className="w-5 h-5 text-primary" />
+                  <p className="font-medium">{t("history.customPeriod", "Свой период")}</p>
+                  {selectedPreset === "custom" && dateFrom && dateTo && (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {formatDateRange(dateFrom, dateTo)}
+                    </p>
                   )}
                 </button>
               </div>
