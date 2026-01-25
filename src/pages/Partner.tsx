@@ -209,15 +209,15 @@ const Partner = () => {
           </div>
           
           {/* Level Cards Carousel with Swipe */}
-          <div className="px-4 mb-6">
-            <div className="overflow-hidden" ref={emblaRef}>
+          <div className="px-4 mb-6 pt-4">
+            <div className="overflow-visible" ref={emblaRef}>
               <div className="flex gap-4">
                 {LEVELS.map((level, idx) => (
                   <div 
                     key={level.id}
-                    className="flex-[0_0_100%] min-w-0"
+                    className="flex-[0_0_100%] min-w-0 pt-4"
                   >
-                    <div className="relative">
+                    <div className="relative overflow-visible">
                       {/* Current level badge */}
                       {idx === currentLevelIndex && (
                         <motion.div
