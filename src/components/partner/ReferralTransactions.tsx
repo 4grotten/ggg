@@ -160,7 +160,7 @@ const TransactionIcon = memo(({ type, cardType }: { type: "card" | "transaction"
   if (type === "card") {
     return <CardIcon cardType={cardType} />;
   }
-  return <ArrowDownLeft className="w-5 h-5 text-success" />;
+  return <ArrowDownLeft className="w-5 h-5 text-blue-500" />;
 });
 
 TransactionIcon.displayName = "TransactionIcon";
