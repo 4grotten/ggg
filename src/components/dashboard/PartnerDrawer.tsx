@@ -16,21 +16,27 @@ interface PartnerDrawerProps {
 export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(1);
 
   const handleClose = () => {
     onOpenChange(false);
     // Reset step after close animation
-    setTimeout(() => setStep(0), 300);
+    setTimeout(() => {
+      setStep(0);
+      setDirection(1);
+    }, 300);
   };
 
   const handleBack = () => {
     if (step > 0) {
+      setDirection(-1);
       setStep(step - 1);
     }
   };
 
   const handleContinue = () => {
     if (step < 3) {
+      setDirection(1);
       setStep(step + 1);
     }
   };
@@ -69,7 +75,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
         return (
           <motion.div
             key="step0"
-            custom={1}
+            custom={direction}
             variants={stepVariants}
             initial="enter"
             animate="center"
@@ -173,7 +179,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
         return (
           <motion.div
             key="step1"
-            custom={1}
+            custom={direction}
             variants={stepVariants}
             initial="enter"
             animate="center"
@@ -214,7 +220,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
         return (
           <motion.div
             key="step2"
-            custom={1}
+            custom={direction}
             variants={stepVariants}
             initial="enter"
             animate="center"
@@ -283,7 +289,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
         return (
           <motion.div
             key="step3"
-            custom={1}
+            custom={direction}
             variants={stepVariants}
             initial="enter"
             animate="center"
@@ -428,7 +434,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto">
           <div className="relative pt-8 pb-4">
-            <AnimatePresence mode="wait" custom={step}>
+            <AnimatePresence mode="wait" custom={direction}>
               {renderStepContent()}
             </AnimatePresence>
           </div>
