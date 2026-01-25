@@ -308,7 +308,7 @@ const Dashboard = () => {
           <VerifyIdentityCard />
 
           {/* Partner Program Card */}
-          <PartnerCard onClick={() => navigate("/partner")} />
+          <PartnerCard onClick={() => setPartnerDrawerOpen(true)} />
 
           {/* Open New Card Button */}
           <OpenCardButton onClick={() => setOpenCardOpen(true)} />
