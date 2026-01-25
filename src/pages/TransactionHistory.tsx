@@ -6,6 +6,7 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 import {
   Drawer,
@@ -328,29 +329,32 @@ const TransactionHistory = () => {
         </button>
       }
       rightAction={
-        <div className="flex bg-secondary rounded-lg p-1">
-          <button
-            onClick={() => navigate("/card/virtual/history", { replace: true })}
-            className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-              cardType === "virtual" 
-                ? "bg-primary text-primary-foreground" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Virtual
-          </button>
-          <button
-            onClick={() => navigate("/card/metal/history", { replace: true })}
-            className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-              cardType === "metal" 
-                ? "bg-primary text-primary-foreground" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Metal
-          </button>
+        <div className="flex items-center gap-2">
+          <div className="flex bg-secondary rounded-lg p-1">
+            <button
+              onClick={() => navigate("/card/virtual/history", { replace: true })}
+              className={cn(
+                "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                cardType === "virtual" 
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Virtual
+            </button>
+            <button
+              onClick={() => navigate("/card/metal/history", { replace: true })}
+              className={cn(
+                "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+                cardType === "metal" 
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Metal
+            </button>
+          </div>
+          <LanguageSwitcher />
         </div>
       }
     >
