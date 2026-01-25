@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Diamond, Users, Percent, ClipboardCheck, Send, Copy, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -391,16 +390,16 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
         )}
         
         {/* Scrollable content */}
-        <ScrollArea className="flex-1 max-h-[60vh]">
+        <div className="flex-1 overflow-y-auto">
           <div className="relative pt-8 pb-4">
             <AnimatePresence mode="wait" custom={step}>
               {renderStepContent()}
             </AnimatePresence>
           </div>
-        </ScrollArea>
+        </div>
         
-        {/* Fixed footer with buttons */}
-        <div className="px-6 pb-8 pt-4 bg-background">
+        {/* Fixed footer with buttons - transparent */}
+        <div className="px-6 pb-8 pt-4">
           {renderFooterButtons()}
         </div>
       </DrawerContent>
