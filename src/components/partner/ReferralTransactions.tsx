@@ -256,11 +256,7 @@ const TransactionItem = memo(({ tx, onWithdrawalClick }: { tx: ReferralTransacti
   return (
     <button 
       onClick={handleClick}
-      className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
-        tx.isClickable 
-          ? "hover:bg-blue-500/10 active:bg-blue-500/20 ring-1 ring-blue-500/30 bg-blue-500/5" 
-          : "hover:bg-secondary/50 active:bg-secondary/70"
-      }`}
+      className="w-full flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-secondary/50 active:bg-secondary/70"
     >
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
