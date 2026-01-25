@@ -122,40 +122,31 @@ const Partner = () => {
         <div className="flex-1 overflow-y-auto pb-28">
           {/* Hero Section */}
           <div className="relative px-4 pt-4 pb-6">
-            {/* Wide format growth image with pulsating green glow */}
-            <motion.div 
-              className="relative w-full rounded-2xl overflow-visible mb-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Pulsating green glow effect */}
-              <motion.div 
-                className="absolute -inset-3 rounded-3xl z-0"
-                animate={{ 
-                  opacity: [0.4, 0.7, 0.4],
-                  scale: [0.98, 1.02, 0.98]
+            {/* Wide format growth image with optimized CSS glow */}
+            <div className="relative w-full rounded-2xl overflow-visible mb-4">
+              {/* Optimized CSS-based glow effect */}
+              <div 
+                className="absolute -inset-3 rounded-3xl z-0 animate-pulse will-change-transform"
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0.2) 40%, transparent 70%)",
+                  filter: "blur(16px)"
                 }}
-                transition={{ 
-                  duration: 2, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
+              />
+              <div 
+                className="absolute -inset-3 rounded-3xl z-0 animate-pulse will-change-transform dark:block hidden"
                 style={{ 
                   background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.5) 0%, rgba(127, 255, 0, 0.3) 40%, transparent 70%)",
-                  filter: "blur(20px)"
+                  filter: "blur(16px)"
                 }}
               />
               
               <img 
                 src={partnerGrowthImage} 
                 alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-                className="relative z-10 w-full h-auto rounded-2xl"
-                style={{ 
-                  boxShadow: "0 0 30px rgba(191, 255, 0, 0.3)"
-                }}
+                className="relative z-10 w-full h-auto rounded-2xl shadow-lg shadow-emerald-500/20 dark:shadow-[#BFFF00]/30"
+                loading="eager"
               />
-            </motion.div>
+            </div>
             <h2 className="text-xl font-bold text-center">
               {t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
             </h2>
