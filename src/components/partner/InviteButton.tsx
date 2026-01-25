@@ -1,4 +1,4 @@
-import { memo, useCallback, useState, useEffect } from "react";
+import { memo, useCallback, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -13,25 +13,23 @@ interface InviteButtonProps {
 export const InviteButton = memo(({ scrollContainerRef }: InviteButtonProps) => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
-  const [lastScrollTop, setLastScrollTop] = useState(0);
+  const lastScrollTopRef = useRef(0);
 
   useEffect(() => {
     const container = scrollContainerRef?.current;
-   if (!container) return;
+    if (!container) return;
 
     const handleScroll = () => {
       const scrollTop = container.scrollTop;
-      const scrollingDown = scrollTop > lastScrollTop;
+      const scrollingDown = scrollTop > lastScrollTopRef.current;
       
-     if (scrollingDown && scrollTop > 100) {
-       // Scrolling down and past 100px - show button
-       setIsVisible(true);
-     } else if (!scrollingDown) {
-       // Scrolling up - hide button
+      if (scrollingDown && scrollTop > 100) {
+        setIsVisible(true);
+      } else if (!scrollingDown) {
         setIsVisible(false);
       }
       
-      setLastScrollTop(scrollTop);
+      lastScrollTopRef.current = scrollTop;
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
@@ -39,7 +37,7 @@ export const InviteButton = memo(({ scrollContainerRef }: InviteButtonProps) => 
     return () => {
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [scrollContainerRef, lastScrollTop]);
+  }, [scrollContainerRef]);
 
   const handleShare = useCallback(async () => {
     if (navigator.share) {
