@@ -306,6 +306,7 @@
     "installInstructions": "اضغط على مشاركة → إضافة إلى الشاشة الرئيسية للتثبيت"
   },
   "settings": {
+    "profile": "الملف الشخصي",
     "personalDetails": "البيانات الشخصية",
     "notVerified": "غير موثق",
     "verified": "موثق",

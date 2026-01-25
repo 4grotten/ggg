@@ -320,6 +320,7 @@
     "installInstructions": "Tap Share → Add to Home Screen to install"
   },
   "settings": {
+    "profile": "Profile",
     "personalDetails": "Personal Details",
     "notVerified": "Not verified",
     "verified": "Verified",

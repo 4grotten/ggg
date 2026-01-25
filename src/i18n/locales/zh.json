@@ -306,6 +306,7 @@
     "installInstructions": "点击分享 → 添加到主屏幕进行安装"
   },
   "settings": {
+    "profile": "个人资料",
     "personalDetails": "个人信息",
     "notVerified": "未验证",
     "verified": "已验证",
