@@ -10,7 +10,7 @@ export const PartnerCard = ({ onClick }: PartnerCardProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className="relative rounded-2xl p-[1.5px] overflow-hidden">
+    <div className="relative rounded-2xl p-[2px] overflow-hidden">
       {/* Animated rainbow border with glow */}
       <div 
         className="absolute inset-0 rounded-2xl blur-[1px]"
