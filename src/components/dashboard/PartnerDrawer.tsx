@@ -164,9 +164,9 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             </button>
 
             {/* Magnet + coins illustration */}
-            <div className="relative w-64 h-64 flex items-center justify-center mb-6">
+            <div className="relative w-48 h-48 flex items-center justify-center mb-6">
               <div 
-                className="w-32 h-40 rounded-t-full"
+                className="w-24 h-32 rounded-t-full"
                 style={{
                   background: "linear-gradient(180deg, #7FFF00 0%, #BFFF00 100%)",
                 }}
@@ -175,23 +175,23 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               {[...Array(4)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute w-8 h-8 rounded-full flex items-center justify-center"
+                  className="absolute w-6 h-6 rounded-full flex items-center justify-center"
                   style={{
                     background: "linear-gradient(135deg, #DFFF00 0%, #BFFF00 100%)",
                     border: "2px solid #7FFF00",
-                    top: `${30 + i * 15}%`,
-                    left: `${20 + (i % 2) * 40}%`,
+                    top: `${25 + i * 15}%`,
+                    left: `${15 + (i % 2) * 50}%`,
                   }}
                   animate={{ y: [0, -5, 0] }}
                   transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }}
                 >
-                  <Diamond className="w-4 h-4 text-black" />
+                  <Diamond className="w-3 h-3 text-black" />
                 </motion.div>
               ))}
               {/* Sparkles */}
-              <span className="absolute top-8 left-8 text-2xl">✦</span>
-              <span className="absolute top-12 right-12 text-xl">✦</span>
-              <span className="absolute bottom-16 left-16 text-lg">✦</span>
+              <span className="absolute top-4 left-4 text-xl">✦</span>
+              <span className="absolute top-8 right-8 text-lg">✦</span>
+              <span className="absolute bottom-12 left-12 text-sm">✦</span>
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
