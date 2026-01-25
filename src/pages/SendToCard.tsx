@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ChevronLeft, CreditCard, Check, ClipboardPaste, X, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ChevronLeft, CreditCard, Check, ClipboardPaste, X, Loader2, CheckCircle2, AlertCircle, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -119,8 +119,14 @@ type Step = "card" | "amount" | "confirm";
 
 const SendToCard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const { toast } = useToast();
+  
+  // Check if this is a referral withdrawal
+  const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
+  const referralBalance = location.state?.referralBalance || 0;
+  
   const [step, setStep] = useState<Step>("card");
   const [cardNumber, setCardNumber] = useState("");
   const [recipientName, setRecipientName] = useState<string | null>(null);
@@ -138,10 +144,12 @@ const SendToCard = () => {
   const [cardsError, setCardsError] = useState<string | null>(null);
 
   const selectedCard = userCards.find((c) => c.id === selectedCardId);
-
-  // Fetch cards when entering amount step
+  
+  // Use referral balance or card balance
+  const availableBalance = isReferralWithdrawal ? referralBalance : (selectedCard?.balance || 0);
+  // Fetch cards when entering amount step (skip for referral withdrawal)
   useEffect(() => {
-    if (step === "amount" && userCards.length === 0) {
+    if (step === "amount" && userCards.length === 0 && !isReferralWithdrawal) {
       setIsLoadingCards(true);
       setCardsError(null);
       
@@ -168,7 +176,7 @@ const SendToCard = () => {
   };
   
   const numericAmount = parseAmount(amount);
-  const isAmountValid = numericAmount > 0 && numericAmount <= (selectedCard?.balance || 0);
+  const isAmountValid = numericAmount > 0 && numericAmount <= availableBalance;
 
   // Check recipient name when card number is complete
   useEffect(() => {
@@ -436,70 +444,93 @@ const SendToCard = () => {
               </div>
             </div>
 
-            {/* Loading Cards State */}
-            {isLoadingCards && (
-              <div className="bg-secondary rounded-xl p-6 flex items-center justify-center gap-3 animate-pulse">
-                <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                <span className="text-muted-foreground">{t('send.loadingCards')}</span>
-              </div>
-            )}
 
-            {/* Cards Error State */}
-            {cardsError && !isLoadingCards && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
-                  <X className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-red-500">{t('send.failedToLoadCards')}</p>
-                  <button 
-                    onClick={() => {
-                      setCardsError(null);
-                      setIsLoadingCards(true);
-                      fetchUserCards().then((result) => {
-                        if (result.success && result.cards.length > 0) {
-                          setUserCards(result.cards);
-                          setSelectedCardId(result.cards[0].id);
-                        } else {
-                          setCardsError(result.error || t('send.failedToLoadCards'));
-                        }
-                        setIsLoadingCards(false);
-                      }).catch(() => {
-                        setCardsError(t('send.failedToLoadCards'));
-                        setIsLoadingCards(false);
-                      });
-                    }}
-                    className="text-sm text-primary hover:underline mt-1"
-                  >
-                    {t('send.tryAgain')}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Select Source Card - Only show when cards loaded */}
-            {!isLoadingCards && !cardsError && userCards.length > 0 && (
+            {/* Select Source - Referral Balance or Cards */}
+            {isReferralWithdrawal ? (
               <div className="space-y-2">
-                <label className="text-sm font-medium">{t('send.fromCard')}</label>
-                <Select value={selectedCardId} onValueChange={setSelectedCardId}>
-                  <SelectTrigger className="h-14 rounded-xl">
-                    <SelectValue placeholder={t('send.selectCard')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {userCards.map((card) => (
-                      <SelectItem key={card.id} value={card.id} className="data-[state=checked]:text-white">
-                        <div className="flex items-center justify-between w-full gap-4">
-                          <span>{card.name} •••• {card.lastFour}</span>
-                          <span className="text-muted-foreground group-data-[state=checked]:text-white/90">{card.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  {t('send.available')}: <span className="font-medium text-foreground">{selectedCard?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
-                </p>
+                <label className="text-sm font-medium">{t('partner.referralBalance', 'Реферальный счёт')}</label>
+                <div className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Wallet className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold">{t('partner.referralBalance', 'Реферальный счёт')}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {referralBalance.toFixed(2)} AED
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
+            ) : (
+              <>
+                {/* Loading Cards State */}
+                {isLoadingCards && (
+                  <div className="bg-secondary rounded-xl p-6 flex items-center justify-center gap-3 animate-pulse">
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                    <span className="text-muted-foreground">{t('send.loadingCards')}</span>
+                  </div>
+                )}
+
+                {/* Cards Error State */}
+                {cardsError && !isLoadingCards && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                      <X className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-red-500">{t('send.failedToLoadCards')}</p>
+                      <button 
+                        onClick={() => {
+                          setCardsError(null);
+                          setIsLoadingCards(true);
+                          fetchUserCards().then((result) => {
+                            if (result.success && result.cards.length > 0) {
+                              setUserCards(result.cards);
+                              setSelectedCardId(result.cards[0].id);
+                            } else {
+                              setCardsError(result.error || t('send.failedToLoadCards'));
+                            }
+                            setIsLoadingCards(false);
+                          }).catch(() => {
+                            setCardsError(t('send.failedToLoadCards'));
+                            setIsLoadingCards(false);
+                          });
+                        }}
+                        className="text-sm text-primary hover:underline mt-1"
+                      >
+                        {t('send.tryAgain')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Select Source Card - Only show when cards loaded */}
+                {!isLoadingCards && !cardsError && userCards.length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('send.fromCard')}</label>
+                    <Select value={selectedCardId} onValueChange={setSelectedCardId}>
+                      <SelectTrigger className="h-14 rounded-xl">
+                        <SelectValue placeholder={t('send.selectCard')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {userCards.map((card) => (
+                          <SelectItem key={card.id} value={card.id} className="data-[state=checked]:text-white">
+                            <div className="flex items-center justify-between w-full gap-4">
+                              <span>{card.name} •••• {card.lastFour}</span>
+                              <span className="text-muted-foreground group-data-[state=checked]:text-white/90">{card.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">
+                      {t('send.available')}: <span className="font-medium text-foreground">{selectedCard?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                    </p>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Amount Input */}
@@ -519,7 +550,7 @@ const SendToCard = () => {
                     type="button"
                     onClick={() => {
                       // Max amount considering fee: balance = amount * (1 + fee/100)
-                      const maxAmount = (selectedCard?.balance || 0) / (1 + CARD_TO_CARD_FEE_PERCENT / 100);
+                      const maxAmount = availableBalance / (1 + CARD_TO_CARD_FEE_PERCENT / 100);
                       const formatted = maxAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                       setAmount(formatted);
                     }}
@@ -530,10 +561,10 @@ const SendToCard = () => {
                   <span className="text-muted-foreground font-medium">AED</span>
                 </div>
               </div>
-              {numericAmount > (selectedCard?.balance || 0) && (
+              {numericAmount > availableBalance && (
                 <p className="text-sm text-red-500">{t('send.insufficientBalance')}</p>
               )}
-              {numericAmount > 0 && numericAmount <= (selectedCard?.balance || 0) && (
+              {numericAmount > 0 && numericAmount <= availableBalance && (
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{t('send.fee')} ({CARD_TO_CARD_FEE_PERCENT}%): {fee.toFixed(2)} AED</span>
                   <span>{t('send.total')}: {totalAmount.toFixed(2)} AED</span>

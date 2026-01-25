@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -30,10 +30,19 @@ const cards: Card[] = [
 
 const SendBank = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
+  
+  // Check if this is a referral withdrawal
+  const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
+  const referralBalance = location.state?.referralBalance || 0;
+  
   const [step, setStep] = useState(1);
   const [selectedCard, setSelectedCard] = useState<Card>(cards[0]);
   const [cardDrawerOpen, setCardDrawerOpen] = useState(false);
+  
+  // Use referral balance or card balance
+  const availableBalance = isReferralWithdrawal ? referralBalance : selectedCard.balance;
   
   // Scroll to top on mount
   useEffect(() => {
@@ -90,7 +99,7 @@ const SendBank = () => {
 
   const isStep1Valid = iban.replace(/\s/g, "").length >= 15;
   const isStep2Valid = recipientName.trim().length >= 2 && bankName.trim().length >= 2;
-  const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= selectedCard.balance;
+  const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= availableBalance;
 
   const handleNext = () => {
     if (step < 3) {
@@ -222,32 +231,48 @@ const SendBank = () => {
           {/* Step 3: Amount */}
           {step === 3 && (
             <div className="space-y-6">
-              {/* Card Selection */}
+              {/* Source Selection - Card or Referral Balance */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">
-                  {t("send.fromCard")}
+                  {isReferralWithdrawal ? t("partner.referralBalance", "Реферальный счёт") : t("send.fromCard")}
                 </label>
-                <button
-                  onClick={() => setCardDrawerOpen(true)}
-                  className="w-full flex items-center justify-between p-4 bg-secondary rounded-2xl hover:bg-muted/80 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      selectedCard.type === "metal" 
-                        ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                        : "bg-primary"
-                    }`}>
-                      <CreditCard className="w-5 h-5 text-primary-foreground" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold">{selectedCard.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        •••• {selectedCard.lastFour}
-                      </p>
+                {isReferralWithdrawal ? (
+                  <div className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Wallet className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-semibold">{t("partner.referralBalance", "Реферальный счёт")}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {referralBalance.toFixed(2)} AED
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                </button>
+                ) : (
+                  <button
+                    onClick={() => setCardDrawerOpen(true)}
+                    className="w-full flex items-center justify-between p-4 bg-secondary rounded-2xl hover:bg-muted/80 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        selectedCard.type === "metal" 
+                          ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                          : "bg-primary"
+                      }`}>
+                        <CreditCard className="w-5 h-5 text-primary-foreground" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-semibold">{selectedCard.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          •••• {selectedCard.lastFour}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  </button>
+                )}
               </div>
 
               {/* Transfer Details Summary */}
@@ -273,7 +298,7 @@ const SendBank = () => {
                     {t("send.amount")}
                   </label>
                   <span className="text-sm text-muted-foreground">
-                    {t("send.available")}: <span className="font-medium text-foreground">{selectedCard.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
+                    {t("send.available")}: <span className="font-medium text-foreground">{availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
                   </span>
                 </div>
                 <div className="relative">
@@ -287,7 +312,7 @@ const SendBank = () => {
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <button
                       onClick={() => {
-                      const maxAmount = selectedCard.balance / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
+                      const maxAmount = availableBalance / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
                       setAmountAED(maxAmount.toFixed(2));
                       }}
                       className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
@@ -317,7 +342,7 @@ const SendBank = () => {
                 </div>
               </div>
 
-              {parseFloat(totalAmount) > selectedCard.balance && (
+              {parseFloat(totalAmount) > availableBalance && (
                 <div className="bg-red-500/10 rounded-2xl p-4">
                   <p className="text-sm text-red-500">
                     ⚠️ {t("send.insufficientBalanceWarning")}
