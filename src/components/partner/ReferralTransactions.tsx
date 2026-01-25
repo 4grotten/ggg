@@ -442,7 +442,7 @@ export const ReferralTransactions = memo(() => {
         {/* Referral History Button */}
         <button
           onClick={() => navigate('/partner/history')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+          className="relative z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 active:scale-95 transition-all"
         >
           <Clock className="w-4 h-4" />
           {t('partner.referralHistory', 'Реферальная история')}
