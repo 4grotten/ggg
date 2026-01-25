@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -8,18 +8,27 @@ import { ProgressSection } from "@/components/partner/ProgressSection";
 import { ReferralBalance } from "@/components/partner/ReferralBalance";
 import { InviteButton } from "@/components/partner/InviteButton";
 import { LevelCarousel } from "@/components/partner/LevelCarousel";
-import { ReferralTransactions } from "@/components/partner/ReferralTransactions";
+import { ReferralTransactions, MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 
 const Partner = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
-  // Mock data - will be replaced with real data from API
-  const [currentFriends] = useState(0);
-  const [referralBalance] = useState(0);
-  const [totalInvited] = useState(0);
-  const [totalWithdrawn] = useState(0);
   const [selectedLevelIndex, setSelectedLevelIndex] = useState(0);
+  const [totalWithdrawn] = useState(150); // Mock withdrawn amount
+  
+  // Calculate stats from transactions
+  const stats = useMemo(() => {
+    const totalBalance = MOCK_TRANSACTIONS.reduce((sum, tx) => sum + tx.amount, 0);
+    const uniqueUsers = new Set(MOCK_TRANSACTIONS.map(tx => tx.userName)).size;
+    const cardPurchases = MOCK_TRANSACTIONS.filter(tx => tx.type === "card").length;
+    
+    return {
+      balance: totalBalance,
+      invited: uniqueUsers,
+      cardPurchases
+    };
+  }, []);
   
   const handleLevelChange = useCallback((levelIndex: number) => {
     setSelectedLevelIndex(levelIndex);
@@ -58,7 +67,7 @@ const Partner = () => {
         
         {/* Level Cards Carousel */}
         <LevelCarousel 
-          currentFriends={currentFriends} 
+          currentFriends={stats.invited} 
           onLevelChange={handleLevelChange}
         />
         
@@ -67,8 +76,8 @@ const Partner = () => {
         
         {/* Referral Balance */}
         <ReferralBalance 
-          balance={referralBalance}
-          invited={totalInvited}
+          balance={stats.balance}
+          invited={stats.invited}
           withdrawn={totalWithdrawn}
         />
         
