@@ -2,7 +2,7 @@ import { memo, useMemo, useState } from "react";
 import { CreditCard, ArrowDownLeft, ArrowUpRight, Wallet, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CardType } from "@/types/card";
-import { toast } from "sonner";
+import { WithdrawalDetailsDrawer } from "./WithdrawalDetailsDrawer";
 
 type FilterType = "all" | "cards" | "transactions" | "withdrawals";
 
@@ -195,9 +195,9 @@ CardIcon.displayName = "CardIcon";
 const TransactionIcon = memo(({ type, cardType, withdrawalMethod }: { type: "card" | "transaction" | "withdrawal"; cardType?: CardType; withdrawalMethod?: "crypto" | "card" }) => {
   if (type === "withdrawal") {
     if (withdrawalMethod === "crypto") {
-      return <Wallet className="w-5 h-5 text-orange-500" />;
+      return <Wallet className="w-5 h-5 text-blue-500" />;
     }
-    return <ArrowUpRight className="w-5 h-5 text-purple-500" />;
+    return <ArrowUpRight className="w-5 h-5 text-blue-500" />;
   }
   if (type === "card") {
     return <CardIcon cardType={cardType} />;
@@ -226,17 +226,14 @@ const getCardTypeName = (cardType?: CardType, t?: (key: string, fallback: string
   return t?.('partner.virtualCard', 'Virtual карта') ?? 'Virtual карта';
 };
 
-const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
+const TransactionItem = memo(({ tx, onWithdrawalClick }: { tx: ReferralTransaction; onWithdrawalClick?: (tx: ReferralTransaction) => void }) => {
   const { t } = useTranslation();
   const isCard = tx.type === "card";
   const isWithdrawal = tx.type === "withdrawal";
   
   const handleClick = () => {
-    if (tx.isClickable) {
-      toast.info(
-        `Вывод ${Math.abs(tx.amount)} AED на ${tx.cryptoNetwork} кошелёк\nКомиссия сети: ${tx.networkFee} USDT`,
-        { duration: 4000 }
-      );
+    if (isWithdrawal && tx.isClickable && onWithdrawalClick) {
+      onWithdrawalClick(tx);
     }
   };
   
@@ -258,13 +255,13 @@ const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
       onClick={handleClick}
       className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
         tx.isClickable 
-          ? "hover:bg-primary/10 active:bg-primary/20 ring-1 ring-primary/30 bg-primary/5" 
+          ? "hover:bg-blue-500/10 active:bg-blue-500/20 ring-1 ring-blue-500/30 bg-blue-500/5" 
           : "hover:bg-secondary/50 active:bg-secondary/70"
       }`}
     >
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          isWithdrawal ? "bg-orange-100 dark:bg-orange-900/30" : "bg-secondary"
+          isWithdrawal ? "bg-blue-100 dark:bg-blue-900/30" : "bg-secondary"
         }`}>
           <TransactionIcon type={tx.type} cardType={tx.cardType} withdrawalMethod={tx.withdrawalMethod} />
         </div>
@@ -274,7 +271,7 @@ const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
               {isWithdrawal ? t('partner.withdrawal', 'Вывод средств') : maskName(tx.userName)}
             </p>
             {tx.isClickable && (
-              <ExternalLink className="w-3.5 h-3.5 text-primary" />
+              <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
             )}
           </div>
           <p className="text-xs text-muted-foreground">
@@ -283,7 +280,7 @@ const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
         </div>
       </div>
       <div className="text-right">
-        <p className={`font-semibold text-sm ${isWithdrawal ? "text-orange-500" : "text-success"}`}>
+        <p className={`font-semibold text-sm ${isWithdrawal ? "text-blue-500" : "text-success"}`}>
           {isWithdrawal ? "" : "+"}{tx.amount.toFixed(2)} AED
         </p>
         <p className="text-xs text-muted-foreground">{tx.date}</p>
@@ -320,6 +317,13 @@ FilterButton.displayName = "FilterButton";
 export const ReferralTransactions = memo(() => {
   const { t } = useTranslation();
   const [filterType, setFilterType] = useState<FilterType>("all");
+  const [selectedWithdrawal, setSelectedWithdrawal] = useState<ReferralTransaction | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  
+  const handleWithdrawalClick = (tx: ReferralTransaction) => {
+    setSelectedWithdrawal(tx);
+    setDrawerOpen(true);
+  };
   
   // Filter and group transactions
   const { groupedTransactions, filteredTransactions } = useMemo(() => {
@@ -411,7 +415,7 @@ export const ReferralTransactions = memo(() => {
               <div className="bg-card rounded-2xl overflow-hidden border border-border/50">
                 <div className="space-y-0">
                   {transactions.map((tx) => (
-                    <TransactionItem key={tx.id} tx={tx} />
+                    <TransactionItem key={tx.id} tx={tx} onWithdrawalClick={handleWithdrawalClick} />
                   ))}
                 </div>
               </div>
@@ -425,6 +429,25 @@ export const ReferralTransactions = memo(() => {
           </p>
         </div>
       )}
+      
+      {/* Withdrawal Details Drawer */}
+      <WithdrawalDetailsDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        withdrawal={selectedWithdrawal ? {
+          id: selectedWithdrawal.id,
+          amount: selectedWithdrawal.amount,
+          date: selectedWithdrawal.dateGroup,
+          time: selectedWithdrawal.date,
+          withdrawalMethod: selectedWithdrawal.withdrawalMethod || "crypto",
+          cryptoNetwork: selectedWithdrawal.cryptoNetwork,
+          networkFee: selectedWithdrawal.networkFee,
+          cardType: selectedWithdrawal.cardType,
+          walletAddress: "TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7",
+          cardLast4: "7617",
+          status: "completed"
+        } : null}
+      />
     </div>
   );
 });
