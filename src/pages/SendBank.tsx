@@ -105,8 +105,8 @@ const SendBank = () => {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Submit transfer
-      navigate("/");
+      // Submit transfer - redirect to partner page for referral withdrawals
+      navigate(isReferralWithdrawal ? "/partner" : "/");
     }
   };
 
