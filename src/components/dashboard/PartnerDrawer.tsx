@@ -274,7 +274,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                   <ClipboardCheck className="w-6 h-6 text-black" />
                 </div>
                 <span className="absolute -top-1 -right-2 text-[10px] font-bold bg-foreground text-background px-1.5 py-0.5 rounded-full">
-                  SOON
+                  {t('partner.soon')}
                 </span>
                 <p className="text-sm font-medium text-center opacity-60">{t('partner.completeTasks')}</p>
               </div>
@@ -416,9 +416,9 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
           </button>
         )}
         
-        {/* Scrollable content with fixed min-height to prevent drawer collapse */}
+        {/* Scrollable content with fixed height to prevent drawer jumping */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden">
-          <div className="relative pt-8 pb-4 min-h-[420px]">
+          <div className="relative pt-8 pb-4 h-[420px] flex flex-col">
             <AnimatePresence mode="wait" custom={direction} initial={false}>
               {renderStepContent()}
             </AnimatePresence>
