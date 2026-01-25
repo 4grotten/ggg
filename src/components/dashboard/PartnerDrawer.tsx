@@ -242,12 +242,9 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               />
             </motion.div>
 
-            <h2 className="text-2xl font-bold text-center mb-2">
+            <h2 className="text-2xl font-bold text-center mb-6">
               {t('partner.step3.title')} Easy Card
             </h2>
-            <p className="text-xl font-semibold text-center mb-6">
-              {t('partner.step3.subtitle')}
-            </p>
 
             {/* 3 earning methods */}
             <div className="flex justify-center gap-6">
