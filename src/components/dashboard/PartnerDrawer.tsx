@@ -316,50 +316,92 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             </p>
 
             {/* 3 fantastic share icons in content area */}
-            <div className="flex justify-center gap-5">
+            <div className="flex justify-center gap-4">
               <motion.button
                 onClick={handleShareTelegram}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
+                whileHover={{ scale: 1.15, rotate: 5 }}
+                whileTap={{ scale: 0.9 }}
+                animate={{ 
+                  boxShadow: [
+                    "0 4px 20px rgba(0, 136, 204, 0.4)",
+                    "0 8px 30px rgba(0, 136, 204, 0.6)",
+                    "0 4px 20px rgba(0, 136, 204, 0.4)"
+                  ]
+                }}
+                transition={{ 
+                  boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                }}
+                className="relative w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #0088cc 0%, #00c6ff 100%)",
-                  boxShadow: "0 8px 24px rgba(0, 136, 204, 0.4)",
+                  background: "linear-gradient(135deg, #0088cc 0%, #00c6ff 50%, #0088cc 100%)",
+                  backgroundSize: "200% 200%",
                 }}
                 aria-label={t('partner.shareInTelegram')}
               >
-                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Send className="w-7 h-7 text-white relative z-10" />
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                />
+                <Send className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
               </motion.button>
               
               <motion.button
                 onClick={handleCopyLink}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
+                whileHover={{ scale: 1.15, rotate: -5 }}
+                whileTap={{ scale: 0.9 }}
+                animate={{ 
+                  boxShadow: [
+                    "0 4px 20px rgba(124, 58, 237, 0.4)",
+                    "0 8px 30px rgba(168, 85, 247, 0.6)",
+                    "0 4px 20px rgba(124, 58, 237, 0.4)"
+                  ]
+                }}
+                transition={{ 
+                  boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }
+                }}
+                className="relative w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-                  boxShadow: "0 8px 24px rgba(124, 58, 237, 0.4)",
+                  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%)",
+                  backgroundSize: "200% 200%",
                 }}
                 aria-label={t('partner.copyInviteLink')}
               >
-                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Copy className="w-7 h-7 text-white relative z-10" />
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.3 }}
+                />
+                <Copy className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
               </motion.button>
               
               <motion.button
                 onClick={handleShare}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
+                whileHover={{ scale: 1.15, rotate: 5 }}
+                whileTap={{ scale: 0.9 }}
+                animate={{ 
+                  boxShadow: [
+                    "0 4px 20px rgba(16, 185, 129, 0.4)",
+                    "0 8px 30px rgba(52, 211, 153, 0.6)",
+                    "0 4px 20px rgba(16, 185, 129, 0.4)"
+                  ]
+                }}
+                transition={{ 
+                  boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }
+                }}
+                className="relative w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
-                  boxShadow: "0 8px 24px rgba(16, 185, 129, 0.4)",
+                  background: "linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%)",
+                  backgroundSize: "200% 200%",
                 }}
                 aria-label={t('common.share')}
               >
-                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Share2 className="w-7 h-7 text-white relative z-10" />
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.6 }}
+                />
+                <Share2 className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
               </motion.button>
             </div>
           </motion.div>
