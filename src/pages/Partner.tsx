@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { HeroBanner } from "@/components/partner/HeroBanner";
 import { ProgressSection } from "@/components/partner/ProgressSection";
 import { ReferralBalance } from "@/components/partner/ReferralBalance";
-import { ShareButtons } from "@/components/partner/ShareButtons";
 import { InviteButton } from "@/components/partner/InviteButton";
 import { LevelCarousel } from "@/components/partner/LevelCarousel";
 
@@ -71,9 +70,6 @@ const Partner = () => {
           invited={totalInvited}
           withdrawn={totalWithdrawn}
         />
-        
-        {/* Share Buttons */}
-        <ShareButtons />
       </div>
     </div>
   );
