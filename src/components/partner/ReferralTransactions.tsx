@@ -1,8 +1,8 @@
 import { memo, useMemo, useState } from "react";
-import { CreditCard, ArrowDownLeft, Smartphone, Crown, ArrowUpDown } from "lucide-react";
+import { CreditCard, ArrowDownLeft, ArrowUpDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-type CardType = "virtual" | "metal" | "premium";
+type CardType = "black" | "green";
 type SortType = "date" | "amount" | "type";
 
 interface ReferralTransaction {
@@ -24,7 +24,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "1",
     userName: "Александр К.",
     type: "card",
-    cardType: "virtual",
+    cardType: "green",
     amount: 27.45,
     originalAmount: 183,
     percent: 15,
@@ -49,7 +49,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "3",
     userName: "Дмитрий В.",
     type: "card",
-    cardType: "metal",
+    cardType: "black",
     amount: 45.75,
     originalAmount: 305,
     percent: 15,
@@ -74,7 +74,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "5",
     userName: "Артём Н.",
     type: "card",
-    cardType: "premium",
+    cardType: "black",
     amount: 75.00,
     originalAmount: 500,
     percent: 15,
@@ -99,7 +99,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "7",
     userName: "Иван Т.",
     type: "card",
-    cardType: "virtual",
+    cardType: "green",
     amount: 27.45,
     originalAmount: 183,
     percent: 15,
@@ -124,7 +124,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "9",
     userName: "Сергей Л.",
     type: "card",
-    cardType: "metal",
+    cardType: "black",
     amount: 45.75,
     originalAmount: 305,
     percent: 15,
@@ -148,28 +148,21 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
 ];
 
 const CardIcon = memo(({ cardType }: { cardType?: CardType }) => {
-  switch (cardType) {
-    case "metal":
-      return (
-        <div className="w-5 h-5 rounded bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
-          <CreditCard className="w-3 h-3 text-white" />
-        </div>
-      );
-    case "premium":
-      return (
-        <div className="w-5 h-5 rounded bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-          <Crown className="w-3 h-3 text-white" />
-        </div>
-      );
-    case "virtual":
-    default:
-      return (
-        <div className="w-5 h-5 rounded bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-          <Smartphone className="w-3 h-3 text-white" />
-        </div>
-      );
+  if (cardType === "black") {
+    return (
+      <div className="w-5 h-5 rounded bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center">
+        <CreditCard className="w-3 h-3 text-white" />
+      </div>
+    );
   }
+  return (
+    <div className="w-5 h-5 rounded bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-[#BFFF00] dark:to-[#7FFF00] flex items-center justify-center">
+      <CreditCard className="w-3 h-3 text-white dark:text-black" />
+    </div>
+  );
 });
+
+CardIcon.displayName = "CardIcon";
 
 CardIcon.displayName = "CardIcon";
 
@@ -194,15 +187,10 @@ const maskName = (name: string): string => {
 };
 
 const getCardTypeName = (cardType?: CardType, t?: (key: string, fallback: string) => string): string => {
-  switch (cardType) {
-    case "metal":
-      return t?.('partner.metalCard', 'Metal карта') ?? 'Metal карта';
-    case "premium":
-      return t?.('partner.premiumCard', 'Premium карта') ?? 'Premium карта';
-    case "virtual":
-    default:
-      return t?.('partner.virtualCard', 'Virtual карта') ?? 'Virtual карта';
+  if (cardType === "black") {
+    return t?.('partner.blackCard', 'Black карта') ?? 'Black карта';
   }
+  return t?.('partner.greenCard', 'Green карта') ?? 'Green карта';
 };
 
 const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
