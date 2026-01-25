@@ -136,6 +136,18 @@ const TransactionIcon = memo(({ type }: { type: "card" | "transaction" }) => {
 
 TransactionIcon.displayName = "TransactionIcon";
 
+const maskName = (name: string): string => {
+  const parts = name.split(' ');
+  if (parts.length >= 2) {
+    const firstName = parts[0];
+    const lastName = parts[1];
+    // Show first 2 chars, then stars, then last initial
+    const maskedFirst = firstName.slice(0, 2) + '***';
+    return `${maskedFirst} ${lastName}`;
+  }
+  return name.slice(0, 2) + '***';
+};
+
 const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
   const { t } = useTranslation();
   const isCard = tx.type === "card";
@@ -147,7 +159,7 @@ const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
           <TransactionIcon type={tx.type} />
         </div>
         <div className="text-left">
-          <p className="font-medium text-sm">{tx.userName}</p>
+          <p className="font-medium text-sm">{maskName(tx.userName)}</p>
           <p className="text-xs text-muted-foreground">
             {isCard 
               ? t('partner.cardPurchase', 'Покупка карты')
@@ -173,15 +185,16 @@ TransactionItem.displayName = "TransactionItem";
 export const ReferralTransactions = memo(() => {
   const { t } = useTranslation();
   
-  // Group transactions by date
+  // Group transactions by date with totals
   const groupedTransactions = useMemo(() => {
-    const groups: { [key: string]: ReferralTransaction[] } = {};
+    const groups: { [key: string]: { transactions: ReferralTransaction[]; total: number } } = {};
     
     MOCK_TRANSACTIONS.forEach((tx) => {
       if (!groups[tx.dateGroup]) {
-        groups[tx.dateGroup] = [];
+        groups[tx.dateGroup] = { transactions: [], total: 0 };
       }
-      groups[tx.dateGroup].push(tx);
+      groups[tx.dateGroup].transactions.push(tx);
+      groups[tx.dateGroup].total += tx.amount;
     });
     
     return groups;
@@ -202,11 +215,16 @@ export const ReferralTransactions = memo(() => {
       </div>
       
       <div className="space-y-4">
-        {Object.entries(groupedTransactions).map(([dateGroup, transactions]) => (
+        {Object.entries(groupedTransactions).map(([dateGroup, { transactions, total }]) => (
           <div key={dateGroup}>
-            <p className="text-xs text-muted-foreground mb-2 px-1">
-              {getDateLabel(dateGroup)}
-            </p>
+            <div className="flex items-center justify-between mb-2 px-1">
+              <p className="text-xs text-muted-foreground">
+                {getDateLabel(dateGroup)}
+              </p>
+              <p className="text-xs font-medium text-success">
+                +{total.toFixed(2)} AED
+              </p>
+            </div>
             <div className="bg-card rounded-2xl overflow-hidden border border-border/50">
               <div className="space-y-0">
                 {transactions.map((tx) => (
