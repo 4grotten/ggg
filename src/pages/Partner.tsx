@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Users, Send, Copy, Share2, Sparkles } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import partnerGrowthImage from "@/assets/partner-growth-hero.png";
@@ -116,7 +117,7 @@ const Partner = () => {
               <h1 className="text-lg font-bold">Easy Card</h1>
               <p className="text-xs text-muted-foreground">{t('partner.program', 'Партнёрская программа')}</p>
             </div>
-            <div className="w-10" />
+            <LanguageSwitcher />
           </div>
         </div>
         
