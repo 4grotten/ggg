@@ -44,7 +44,9 @@
     "passportUpdateTitle": "Daten aktualisieren",
     "passportUpdateDescription": "Möchten Sie Ihre Passdaten aktualisieren? Der gesamte Verifizierungsfortschritt wird zurückgesetzt.",
     "openCard": "Neue Karte eröffnen",
-    "payButton": "Bezahlen"
+    "payButton": "Bezahlen",
+    "startEarning": "Verdienen starten",
+    "becomePartner": "Werden Sie Easy Card Partner"
   },
   "openCard": {
     "title": "Neue Karte eröffnen",

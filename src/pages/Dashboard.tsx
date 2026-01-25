@@ -12,6 +12,7 @@ import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { BalanceCard } from "@/components/dashboard/BalanceCard";
 import { ActionButtons } from "@/components/dashboard/ActionButtons";
 import { VerifyIdentityCard } from "@/components/dashboard/VerifyIdentityCard";
+import { PartnerCard } from "@/components/dashboard/PartnerCard";
 import { CardsList } from "@/components/dashboard/CardsList";
 import { SendToCardButton } from "@/components/dashboard/SendToCardButton";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -303,6 +304,9 @@ const Dashboard = () => {
 
           {/* Verify Identity Card */}
           <VerifyIdentityCard />
+
+          {/* Partner Program Card */}
+          <PartnerCard onClick={() => {/* TODO: Navigate to partner page */}} />
 
           {/* Open New Card Button */}
           <OpenCardButton onClick={() => setOpenCardOpen(true)} />

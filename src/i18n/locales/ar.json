@@ -44,7 +44,9 @@
     "passportUpdateTitle": "تحديث البيانات",
     "passportUpdateDescription": "هل تريد تحديث بيانات جواز السفر؟ سيتم إعادة تعيين جميع تقدم التحقق.",
     "openCard": "فتح بطاقة جديدة",
-    "payButton": "ادفع"
+    "payButton": "ادفع",
+    "startEarning": "ابدأ الربح",
+    "becomePartner": "كن شريكاً لـ Easy Card"
   },
   "openCard": {
     "title": "فتح بطاقة جديدة",

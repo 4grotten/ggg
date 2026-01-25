@@ -44,7 +44,9 @@
     "passportUpdateTitle": "Verileri Güncelle",
     "passportUpdateDescription": "Pasaport verilerinizi güncellemek istiyor musunuz? Tüm doğrulama ilerlemesi sıfırlanacaktır.",
     "openCard": "Yeni Kart Aç",
-    "payButton": "Öde"
+    "payButton": "Öde",
+    "startEarning": "Kazanmaya Başla",
+    "becomePartner": "Easy Card ortağı olun"
   },
   "openCard": {
     "title": "Yeni Kart Aç",
