@@ -210,8 +210,8 @@ const Partner = () => {
           </div>
           
           {/* Level Cards Carousel with Swipe */}
-          <div className="px-4 mb-6 pt-4">
-            <div className="overflow-visible" ref={emblaRef}>
+          <div className="px-4 mb-6 pt-4 touch-pan-y">
+            <div className="overflow-hidden touch-pan-x" ref={emblaRef}>
               <div className="flex gap-4">
                 {LEVELS.map((level, idx) => (
                   <div 
