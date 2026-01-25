@@ -150,7 +150,7 @@ export const WithdrawalDetailsDrawer = memo(({
                 />
                 <DetailRow 
                   label={t('partner.receivedAmount', 'Получено')} 
-                  value={`${(Math.abs(withdrawal.amount) / 3.65 - (withdrawal.networkFee || 5.90)).toFixed(2)} USDT`} 
+                  value={`${(Math.abs(withdrawal.amount) / 3.69 - (withdrawal.networkFee || 5.90)).toFixed(2)} USDT`} 
                 />
               </>
             ) : (
