@@ -542,54 +542,72 @@ const PhoneEntry = () => {
               </p>
             </motion.div>
 
-            {/* Password Input */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              className="space-y-6"
+            {/* Password Input - wrapped in form for browser autofill */}
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleLogin();
+              }}
+              autoComplete="on"
             >
-              <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
-                passwordError ? 'border-destructive' : 'border-border'
-              }`}>
-                <Lock className={`w-5 h-5 ${passwordError ? 'text-destructive' : 'text-muted-foreground'}`} />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={t('auth.login.passwordPlaceholder')}
-                  className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
-                  autoFocus
-                />
+              {/* Hidden username field for browser password manager */}
+              <input 
+                type="hidden" 
+                name="username" 
+                value={getFullPhoneNumber()}
+                autoComplete="username"
+              />
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="space-y-6"
+              >
+                <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
+                  passwordError ? 'border-destructive' : 'border-border'
+                }`}>
+                  <Lock className={`w-5 h-5 ${passwordError ? 'text-destructive' : 'text-muted-foreground'}`} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t('auth.login.passwordPlaceholder')}
+                    className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                
+                {(passwordError || errorMessage) && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-destructive text-sm"
+                  >
+                    {errorMessage || t('auth.login.wrongPassword')}
+                  </motion.p>
+                )}
+                
+                {/* Forgot Password Link */}
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={handleForgotPassword}
+                  disabled={isLoading}
+                  className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {t('auth.login.forgotPassword') || 'Forgot password?'}
                 </button>
-              </div>
-              
-              {(passwordError || errorMessage) && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-destructive text-sm"
-                >
-                  {errorMessage || t('auth.login.wrongPassword')}
-                </motion.p>
-              )}
-              
-              {/* Forgot Password Link */}
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                disabled={isLoading}
-                className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
-              >
-                {t('auth.login.forgotPassword') || 'Forgot password?'}
-              </button>
-            </motion.div>
+              </motion.div>
+            </form>
 
             {/* Support Link */}
             <motion.div
@@ -749,6 +767,8 @@ const PhoneEntry = () => {
               <input
                 type="tel"
                 inputMode="tel"
+                name="phone"
+                autoComplete="tel"
                 value={`${dialCode}${phoneNumber ? ' ' + phoneNumber : ''}`}
                 onChange={(e) => {
                   let value = e.target.value;
