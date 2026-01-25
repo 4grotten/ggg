@@ -654,6 +654,8 @@ const Settings = () => {
           )}
         </div>
 
+        <div className="h-px bg-border" />
+
         {/* Add Account Button */}
         <div className="bg-card rounded-2xl overflow-hidden">
           <SettingsItem
