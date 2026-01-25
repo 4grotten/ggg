@@ -571,22 +571,20 @@ const Settings = () => {
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className={`w-2.5 h-2.5 rounded-full ${isVerified ? 'bg-green-500' : 'bg-red-500'}`}
+                    className="w-2.5 h-2.5 rounded-full"
                   >
-                    {!isVerified && (
-                      <motion.div
-                        animate={{ 
-                          opacity: [1, 0.4, 1],
-                          scale: [1, 1.1, 1]
-                        }}
-                        transition={{ 
-                          duration: 1.5, 
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }}
-                        className="w-full h-full rounded-full bg-red-500"
-                      />
-                    )}
+                    <motion.div
+                      animate={{ 
+                        opacity: [1, 0.4, 1],
+                        scale: [1, 1.05, 1]
+                      }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className={`w-full h-full rounded-full ${isVerified ? 'bg-green-500' : 'bg-red-500'}`}
+                    />
                   </motion.div>
                   <span className={isVerified ? "text-sm font-medium text-green-500" : "text-sm font-medium text-red-500"}>
                     {isVerified ? t("settings.verified") : t("settings.notVerified")}
