@@ -328,7 +328,7 @@ const LimitsSettings = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-card rounded-2xl px-4 border border-border/50 shadow-sm mb-4"
+          className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl px-4 border border-border/50 mb-4"
         >
           <LimitItem 
             label={t("feesAndLimits.transferLimits")}
