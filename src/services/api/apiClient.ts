@@ -71,6 +71,77 @@ export async function apiRequest<T = unknown>(
   if (token) {
     (headers as Record<string, string>)['Authorization'] = `Token ${token}`;
   }
+
+  // --- Internal helpers (debug + safer 401 handling) ---
+  const saveAuthDebug = (payload: Record<string, unknown>) => {
+    try {
+      sessionStorage.setItem(
+        'auth_last_401',
+        JSON.stringify({
+          at: new Date().toISOString(),
+          endpoint,
+          ...payload,
+        })
+      );
+    } catch {
+      // ignore
+    }
+  };
+
+  const scheduleVerifyToken = () => {
+    // Prevent spamming verification calls.
+    try {
+      const existing = sessionStorage.getItem('auth_401_verify_pending');
+      if (existing === '1') return;
+      sessionStorage.setItem('auth_401_verify_pending', '1');
+    } catch {
+      // If sessionStorage is blocked, just fall back to old behavior.
+      removeAuthToken();
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
+        window.location.href = '/auth/phone';
+      }
+      return;
+    }
+
+    // Defer: avoid doing more work in the same tick as the failing request.
+    setTimeout(async () => {
+      const currentToken = getAuthToken();
+      if (!currentToken) {
+        try {
+          sessionStorage.removeItem('auth_401_verify_pending');
+        } catch {
+          // ignore
+        }
+        return;
+      }
+
+      try {
+        const verifyRes = await fetch(`${API_BASE_URL}/users/me/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${currentToken}`,
+          },
+        });
+
+        if (verifyRes.status === 401) {
+          // Token is definitely invalid -> clear and redirect
+          removeAuthToken();
+          if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
+            window.location.href = '/auth/phone';
+          }
+        }
+      } catch {
+        // Network error while verifying -> do NOT log out.
+      } finally {
+        try {
+          sessionStorage.removeItem('auth_401_verify_pending');
+        } catch {
+          // ignore
+        }
+      }
+    }, 0);
+  };
   
   try {
     const response = await fetch(url, {
@@ -80,11 +151,24 @@ export async function apiRequest<T = unknown>(
     
     // Обработка 401 - невалидный токен
     if (response.status === 401) {
-      removeAuthToken();
-      // Редирект на страницу входа
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
-        window.location.href = '/auth/phone';
+      // Safer behavior: a random 401 from any endpoint shouldn't instantly kick the user.
+      // 1) If we don't have a token -> just return 401.
+      // 2) If it's /users/me/ -> token is definitively invalid -> log out immediately.
+      // 3) Otherwise -> schedule a background verification via /users/me/.
+      saveAuthDebug({ reason: 'api_401', url, method: options.method ?? 'GET' });
+
+      if (token) {
+        if (endpoint === '/users/me/' || endpoint === '/users/me') {
+          removeAuthToken();
+          // Редирект на страницу входа
+          if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
+            window.location.href = '/auth/phone';
+          }
+        } else {
+          scheduleVerifyToken();
+        }
       }
+
       return {
         data: null,
         error: { detail: 'Invalid token.' },
