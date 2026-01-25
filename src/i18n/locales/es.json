@@ -44,7 +44,9 @@
     "passportUpdateTitle": "Actualizar datos",
     "passportUpdateDescription": "¿Desea actualizar los datos de su pasaporte? Se restablecerá todo el progreso de verificación.",
     "openCard": "Abrir nueva tarjeta",
-    "payButton": "Pagar"
+    "payButton": "Pagar",
+    "startEarning": "Empieza a ganar",
+    "becomePartner": "Conviértete en socio de Easy Card"
   },
   "openCard": {
     "title": "Abrir nueva tarjeta",

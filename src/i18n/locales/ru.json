@@ -46,7 +46,9 @@
     "passportUpdateTitle": "Обновить данные",
     "passportUpdateDescription": "Вы хотите обновить данные паспорта? Весь прогресс верификации будет сброшен.",
     "openCard": "Открыть новую карту",
-    "payButton": "Оплатить"
+    "payButton": "Оплатить",
+    "startEarning": "Начать зарабатывать",
+    "becomePartner": "Стань партнёром Easy Card"
   },
   "openCard": {
     "title": "Открыть новую карту",

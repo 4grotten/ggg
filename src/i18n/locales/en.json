@@ -46,7 +46,9 @@
     "passportUpdateTitle": "Update Data",
     "passportUpdateDescription": "Do you want to update your passport data? All verification progress will be reset.",
     "openCard": "Open New Card",
-    "payButton": "Pay"
+    "payButton": "Pay",
+    "startEarning": "Start Earning",
+    "becomePartner": "Become an Easy Card partner"
   },
   "openCard": {
     "title": "Open New Card",
