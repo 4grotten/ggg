@@ -97,8 +97,21 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                   </motion.div>
                 )}
                 
-                {/* Buy button (right side) for non-current levels */}
-                {idx !== currentLevelIndex && (
+                {/* Passed badge for levels below current */}
+                {idx < currentLevelIndex && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute -top-3 right-12 z-20"
+                  >
+                    <span className="px-4 py-1.5 rounded-full text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 flex items-center gap-1.5">
+                      ✓ {t('partner.levelPassed', 'Пройдено')}
+                    </span>
+                  </motion.div>
+                )}
+                
+                {/* Buy button (right side) for levels above current */}
+                {idx > currentLevelIndex && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
