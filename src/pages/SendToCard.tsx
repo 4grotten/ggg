@@ -150,9 +150,13 @@ const SendToCard = () => {
   // Use referral balance or card balance
   const availableBalance = isReferralWithdrawal ? referralBalance : (selectedCard?.balance || 0);
   
-  // Fetch cards when entering amount step (for both referral and regular transfers)
+  // Fetch cards on mount for referral withdrawal, or on amount step for regular transfers
   useEffect(() => {
-    if (step === "amount" && userCards.length === 0) {
+    const shouldFetchCards = isReferralWithdrawal 
+      ? (step === "card" && userCards.length === 0)
+      : (step === "amount" && userCards.length === 0);
+      
+    if (shouldFetchCards) {
       setIsLoadingCards(true);
       setCardsError(null);
       
@@ -250,8 +254,13 @@ const SendToCard = () => {
   };
 
   const handleNext = () => {
-    if (step === "card" && isCardValid && recipientName) {
-      setStep("amount");
+    if (step === "card") {
+      // For referral withdrawal, check if destination card is selected
+      if (isReferralWithdrawal && selectedDestinationCardId) {
+        setStep("amount");
+      } else if (!isReferralWithdrawal && isCardValid && recipientName) {
+        setStep("amount");
+      }
     } else if (step === "amount" && isAmountValid) {
       setStep("confirm");
     }
@@ -379,83 +388,11 @@ const SendToCard = () => {
           ))}
         </div>
 
-        {/* Step 1: Card Number */}
+        {/* Step 1: Card Selection (Referral) or Card Number Input (Regular) */}
         {step === "card" && (
           <div className="space-y-4 animate-fade-in">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{t('send.cardNumber')}</label>
-              <div className="relative">
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  placeholder="0000 0000 0000 0000"
-                  value={cardNumber}
-                  onChange={handleCardNumberChange}
-                  className="text-lg font-mono tracking-wider h-14 pr-12 no-underline decoration-transparent"
-                  maxLength={19}
-                />
-                <button
-                  type="button"
-                  onClick={handlePasteFromClipboard}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-secondary transition-colors"
-                  aria-label="Paste from clipboard"
-                >
-                  <ClipboardPaste className="w-5 h-5 text-muted-foreground" />
-                </button>
-              </div>
-            </div>
-
-            {isLoading && (
-              <div className="bg-secondary rounded-xl p-4 animate-pulse">
-                <div className="h-4 bg-muted rounded w-1/2" />
-              </div>
-            )}
-
-            {recipientName && !isLoading && (
-              <div className="bg-secondary rounded-xl p-4 flex items-center gap-3 animate-fade-in">
-                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-                  <Check className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{t('send.recipient')}</p>
-                  <p className="font-semibold">{recipientName}</p>
-                </div>
-              </div>
-            )}
-
-            {recipientNotFound && !isLoading && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3 animate-fade-in">
-                <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
-                  <X className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-red-500">{t('send.recipientNotFound')}</p>
-                  <p className="text-sm text-muted-foreground">{t('send.checkCardNumber')}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Step 2: Amount */}
-        {step === "amount" && (
-          <div className="space-y-4 animate-fade-in">
-            {/* Recipient Preview */}
-            <div className="bg-secondary rounded-xl p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#007AFF] flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium">{recipientName}</p>
-                <p className="text-sm text-muted-foreground no-underline decoration-transparent">{cardNumber}</p>
-              </div>
-            </div>
-
-
-            {/* Select Source - Referral Balance or Cards */}
             {isReferralWithdrawal ? (
-              <div className="space-y-4">
+              <>
                 {/* Referral Balance Source */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t('send.fromAccount', 'С счёта')}</label>
@@ -536,6 +473,110 @@ const SendToCard = () => {
                     </Select>
                   </div>
                 )}
+              </>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('send.cardNumber')}</label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      placeholder="0000 0000 0000 0000"
+                      value={cardNumber}
+                      onChange={handleCardNumberChange}
+                      className="text-lg font-mono tracking-wider h-14 pr-12 no-underline decoration-transparent"
+                      maxLength={19}
+                    />
+                    <button
+                      type="button"
+                      onClick={handlePasteFromClipboard}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-secondary transition-colors"
+                      aria-label="Paste from clipboard"
+                    >
+                      <ClipboardPaste className="w-5 h-5 text-muted-foreground" />
+                    </button>
+                  </div>
+                </div>
+
+                {isLoading && (
+                  <div className="bg-secondary rounded-xl p-4 animate-pulse">
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                  </div>
+                )}
+
+                {recipientName && !isLoading && (
+                  <div className="bg-secondary rounded-xl p-4 flex items-center gap-3 animate-fade-in">
+                    <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                      <Check className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t('send.recipient')}</p>
+                      <p className="font-semibold">{recipientName}</p>
+                    </div>
+                  </div>
+                )}
+
+                {recipientNotFound && !isLoading && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3 animate-fade-in">
+                    <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                      <X className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-red-500">{t('send.recipientNotFound')}</p>
+                      <p className="text-sm text-muted-foreground">{t('send.checkCardNumber')}</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Step 2: Amount */}
+        {step === "amount" && (
+          <div className="space-y-4 animate-fade-in">
+            {/* Destination Preview - for referral withdrawal show selected card */}
+            {isReferralWithdrawal ? (
+              <div className="bg-secondary rounded-xl p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#007AFF] flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-medium">{selectedDestinationCard?.name}</p>
+                  <p className="text-sm text-muted-foreground">•••• {selectedDestinationCard?.lastFour}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-secondary rounded-xl p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#007AFF] flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-medium">{recipientName}</p>
+                  <p className="text-sm text-muted-foreground no-underline decoration-transparent">{cardNumber}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Select Source - Referral Balance or Cards */}
+            {isReferralWithdrawal ? (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('send.fromAccount', 'С счёта')}</label>
+                <div className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Wallet className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold">{t('partner.referralBalance', 'Реферальный счёт')}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {referralBalance.toFixed(2)} AED
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               <>
@@ -703,15 +744,27 @@ const SendToCard = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('send.to')}</span>
-                    <span className="font-medium">{recipientName}</span>
+                    <span className="font-medium">
+                      {isReferralWithdrawal 
+                        ? `${selectedDestinationCard?.name} •••• ${selectedDestinationCard?.lastFour}`
+                        : recipientName
+                      }
+                    </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('send.card')}</span>
-                    <span className="font-mono no-underline decoration-transparent">{cardNumber}</span>
-                  </div>
+                  {!isReferralWithdrawal && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('send.card')}</span>
+                      <span className="font-mono no-underline decoration-transparent">{cardNumber}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('send.from')}</span>
-                    <span className="font-medium">{selectedCard?.name} •••• {selectedCard?.lastFour}</span>
+                    <span className="font-medium">
+                      {isReferralWithdrawal 
+                        ? t('partner.referralBalance', 'Реферальный счёт')
+                        : `${selectedCard?.name} •••• ${selectedCard?.lastFour}`
+                      }
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('send.fee')} ({CARD_TO_CARD_FEE_PERCENT}%)</span>
@@ -748,7 +801,10 @@ const SendToCard = () => {
         {step === "card" && (
           <Button
             className="w-full h-14 text-base font-semibold bg-primary/90 hover:bg-primary text-white rounded-xl active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
-            disabled={!isCardValid || !recipientName || isLoading}
+            disabled={isReferralWithdrawal 
+              ? (!selectedDestinationCardId || isLoadingCards) 
+              : (!isCardValid || !recipientName || isLoading)
+            }
             onClick={handleNext}
           >
             {t('send.continue')}
