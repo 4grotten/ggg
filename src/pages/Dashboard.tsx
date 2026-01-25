@@ -25,6 +25,12 @@ import { TopUpDrawer } from "@/components/dashboard/TopUpDrawer";
 import { SendDrawer } from "@/components/dashboard/SendDrawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // API hooks
 import { useCards, useTotalBalance } from "@/hooks/useCards";
@@ -48,6 +54,7 @@ const Dashboard = () => {
   const [sendOpen, setSendOpen] = useState(false);
   const [openCardOpen, setOpenCardOpen] = useState(false);
   const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
+  const [authAlertOpen, setAuthAlertOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   
   // Long press handling for avatar
@@ -309,6 +316,7 @@ const Dashboard = () => {
           ) : (
             <CardsList 
               cards={isAuthenticated ? cards : cards.map(c => ({ ...c, balance: undefined }))} 
+              onCardClick={!isAuthenticated ? () => setAuthAlertOpen(true) : undefined}
             />
           )}
 
@@ -387,6 +395,37 @@ const Dashboard = () => {
     <SendDrawer open={sendOpen} onOpenChange={setSendOpen} />
     <OpenCardDrawer open={openCardOpen} onOpenChange={setOpenCardOpen} />
     <AccountSwitcher open={accountSwitcherOpen} onOpenChange={setAccountSwitcherOpen} />
+    
+    {/* iOS-style Auth Alert */}
+    <AlertDialog open={authAlertOpen} onOpenChange={setAuthAlertOpen}>
+      <AlertDialogContent className="w-[270px] rounded-2xl p-0 gap-0 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-0 shadow-2xl">
+        <div className="pt-5 pb-4 px-4 text-center">
+          <AlertDialogTitle className="text-[17px] font-semibold text-foreground mb-1">
+            {t('feesAndLimits.authRequired')}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-[13px] text-muted-foreground leading-tight">
+            {t('feesAndLimits.authRequiredMessage')}
+          </AlertDialogDescription>
+        </div>
+        <div className="border-t border-[#C6C6C8] dark:border-[#38383A]">
+          <button
+            onClick={() => setAuthAlertOpen(false)}
+            className="w-full py-[11px] text-[17px] text-[#007AFF] font-normal border-b border-[#C6C6C8] dark:border-[#38383A] active:bg-black/5 dark:active:bg-white/5 transition-colors"
+          >
+            {t('common.cancel')}
+          </button>
+          <button
+            onClick={() => {
+              setAuthAlertOpen(false);
+              navigate("/auth/phone");
+            }}
+            className="w-full py-[11px] text-[17px] text-[#007AFF] font-semibold active:bg-black/5 dark:active:bg-white/5 transition-colors"
+          >
+            {t('common.authorize')}
+          </button>
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
   </>
 );
 };
