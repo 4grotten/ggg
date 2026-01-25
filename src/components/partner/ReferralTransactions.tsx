@@ -1,5 +1,5 @@
 import { memo, useMemo, useState, useRef, useEffect } from "react";
-import { CreditCard, ArrowDownLeft, ArrowUpRight, Wallet, ExternalLink } from "lucide-react";
+import { CreditCard, ArrowDownLeft, ArrowUpRight, Wallet, ExternalLink, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CardType } from "@/types/card";
 import { WithdrawalDetailsDrawer } from "./WithdrawalDetailsDrawer";
@@ -424,16 +424,26 @@ export const ReferralTransactions = memo(() => {
     <div className="px-4 mb-6">
       {/* Filter tabs with animated indicator */}
       <div className="mb-4">
-        <FilterTabs
-          activeFilter={filterType}
-          onFilterChange={setFilterType}
-          labels={{
-            all: t('partner.filterAll', 'Все'),
-            cards: t('partner.filterCards', 'Карты'),
-            transactions: t('partner.filterTransactions', 'Транзакции'),
-            withdrawals: t('partner.filterWithdrawals', 'Выводы')
-          }}
-        />
+        <div className="flex items-center justify-between mb-3">
+          <FilterTabs
+            activeFilter={filterType}
+            onFilterChange={setFilterType}
+            labels={{
+              all: t('partner.filterAll', 'Все'),
+              cards: t('partner.filterCards', 'Карты'),
+              transactions: t('partner.filterTransactions', 'Транзакции'),
+              withdrawals: t('partner.filterWithdrawals', 'Выводы')
+            }}
+          />
+        </div>
+        
+        {/* Referral History Button */}
+        <button
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+        >
+          <Clock className="w-4 h-4" />
+          {t('partner.referralHistory', 'Реферальная история')}
+        </button>
       </div>
       
       {/* Grouped by date */}
