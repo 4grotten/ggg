@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -190,7 +191,7 @@ const Settings = () => {
   const { theme, setTheme } = useTheme();
   const { i18n, t } = useTranslation();
   const { avatarUrl, setAvatarUrl } = useAvatar();
-  const { user, isAuthenticated, logout, updateAvatar } = useAuth();
+  const { user, isAuthenticated, logout, updateAvatar, refreshUser } = useAuth();
   const { accounts } = useMultiAccount();
   const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
@@ -202,6 +203,7 @@ const Settings = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [showFlash, setShowFlash] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
@@ -258,16 +260,25 @@ const Settings = () => {
   };
 
   const handleCropComplete = async (croppedImage: string) => {
-    // Update local preview immediately
     setAvatarUrl(croppedImage);
     setCropImageSrc(null);
     setIsCropDialogOpen(false);
     
-    // If authenticated and have file, upload to API
-    if (isAuthenticated && pendingFile) {
+    if (isAuthenticated) {
       setIsUploadingAvatar(true);
       try {
-        await updateAvatar(pendingFile);
+        // Convert base64 cropped image to File
+        const response = await fetch(croppedImage);
+        const blob = await response.blob();
+        const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+        
+        await updateAvatar(croppedFile);
+        await refreshUser(); // Refresh to get updated avatar URL
+        
+        // Trigger flash effect
+        setShowFlash(true);
+        setTimeout(() => setShowFlash(false), 400);
+        
         toast.success(t("toast.avatarUpdated"));
       } catch (error) {
         console.error('Failed to upload avatar:', error);
@@ -277,6 +288,10 @@ const Settings = () => {
         setPendingFile(null);
       }
     } else {
+      // Trigger flash for local preview
+      setShowFlash(true);
+      setTimeout(() => setShowFlash(false), 400);
+      
       toast.success(t("toast.avatarUpdated"));
       setPendingFile(null);
     }
@@ -409,20 +424,96 @@ const Settings = () => {
               disabled={isUploadingAvatar}
               className="relative group mb-4"
             >
-              <Avatar className="w-24 h-24">
-                <AvatarImage 
-                  src={displayAvatar} 
-                  alt={displayName} 
-                />
-                <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
-              </Avatar>
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                {isUploadingAvatar ? (
-                  <Loader2 className="w-6 h-6 text-white animate-spin" />
-                ) : (
-                  <Camera className="w-6 h-6 text-white" />
-                )}
+              {/* Avatar container */}
+              <div className="relative">
+                <Avatar className="w-28 h-28 ring-4 ring-background shadow-xl overflow-hidden">
+                  <AvatarImage 
+                    src={displayAvatar} 
+                    alt={displayName}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="text-2xl bg-muted">{initials}</AvatarFallback>
+                </Avatar>
+                
+                {/* Flash effect - bright flash that expands */}
+                <AnimatePresence>
+                  {showFlash && (
+                    <>
+                      {/* White flash burst */}
+                      <motion.div
+                        initial={{ opacity: 1, scale: 1 }}
+                        animate={{ opacity: 0, scale: 1.5 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="absolute inset-0 bg-white rounded-full z-30 pointer-events-none"
+                      />
+                      {/* Glow ring effect */}
+                      <motion.div
+                        initial={{ opacity: 0.8, scale: 1 }}
+                        animate={{ opacity: 0, scale: 2 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="absolute inset-0 rounded-full border-4 border-primary z-30 pointer-events-none"
+                      />
+                      {/* Success checkmark */}
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{ delay: 0.2, duration: 0.3, type: "spring" }}
+                        className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"
+                      >
+                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-7 h-7 text-white" strokeWidth={3} />
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
+              
+              {/* Loading overlay - simple dots */}
+              <AnimatePresence>
+                {isUploadingAvatar && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-10"
+                  >
+                    <div className="flex gap-1.5">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-2.5 h-2.5 bg-white rounded-full"
+                          animate={{ y: [0, -8, 0] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: i * 0.15,
+                            ease: "easeInOut"
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {/* Hover overlay (only when not uploading) */}
+              {!isUploadingAvatar && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+              )}
+              
+              {/* Edit badge */}
+              <motion.div 
+                className="absolute bottom-0 right-0 w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Camera className="w-4 h-4 text-primary-foreground" />
+              </motion.div>
             </button>
             <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
             {displayPhone && (
