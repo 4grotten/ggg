@@ -419,8 +419,8 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   };
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh] flex flex-col">
+    <Drawer open={open} onOpenChange={onOpenChange} modal>
+      <DrawerContent className="max-h-[90vh] flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
         {/* Back button - fixed position */}
         {step > 0 && (
           <button
@@ -431,10 +431,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
           </button>
         )}
         
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="relative pt-8 pb-4">
-            <AnimatePresence mode="wait" custom={direction}>
+        {/* Scrollable content with fixed min-height to prevent drawer collapse */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="relative pt-8 pb-4 min-h-[420px]">
+            <AnimatePresence mode="wait" custom={direction} initial={false}>
               {renderStepContent()}
             </AnimatePresence>
           </div>
