@@ -762,6 +762,17 @@
     "shareInTelegram": "Поделиться в Telegram",
     "copyInviteLink": "Скопировать ссылку",
     "linkCopied": "Ссылка скопирована!",
-    "shareText": "Присоединяйся к Easy Card и получи бесплатную крипто-карту! Используй мою реферальную ссылку:"
+    "shareText": "Присоединяйся к Easy Card и получи бесплатную крипто-карту! Используй мою реферальную ссылку:",
+    "program": "Партнёрская программа",
+    "inviteFriendsTitle": "Приглашайте друзей",
+    "friends": "друзей",
+    "currentLevel": "Текущий уровень",
+    "cardIssuance": "За выпуск карт",
+    "fromTransactions": "С транзакций",
+    "referralBalance": "Реферальный счёт",
+    "invited": "Приглашено",
+    "withdrawn": "Выведено",
+    "shareVia": "Поделиться через",
+    "inviteFriendsButton": "Пригласить друзей"
   }
 }
