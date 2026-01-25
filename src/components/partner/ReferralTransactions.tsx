@@ -286,15 +286,6 @@ export const ReferralTransactions = memo(() => {
   
   return (
     <div className="px-4 mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-semibold">
-          {t('partner.recentEarnings', 'Последние начисления')}
-        </h3>
-        <p className="text-sm font-medium text-success">
-          +{totalAmount.toFixed(2)} AED
-        </p>
-      </div>
-      
       {/* Filter buttons */}
       <div className="flex items-center gap-2 mb-4">
         <FilterButton 
