@@ -9,41 +9,57 @@ export const PartnerCard = ({ onClick }: PartnerCardProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className="relative rounded-2xl p-[3px] overflow-hidden">
-      {/* Animated rainbow border */}
+    <div className="relative rounded-2xl p-[1.5px] overflow-hidden">
+      {/* Animated rainbow border with glow */}
       <div 
-        className="absolute inset-0 rounded-2xl"
+        className="absolute inset-0 rounded-2xl blur-[1px]"
         style={{
-          background: "linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000)",
-          backgroundSize: "400% 100%",
-          animation: "rainbow-border 3s linear infinite",
+          background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
+          animation: "spin-slow 8s linear infinite",
+        }}
+      />
+      
+      {/* Glow effect layer */}
+      <div 
+        className="absolute inset-[-2px] rounded-2xl opacity-40 blur-md"
+        style={{
+          background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
+          animation: "spin-slow 8s linear infinite",
         }}
       />
       
       {/* Inner button */}
       <button
         onClick={onClick}
-        className="relative w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-[13px] p-4 flex items-center justify-between group"
+        className="relative w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[14px] p-4 flex items-center justify-between group"
       >
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+          <div 
+            className="w-12 h-12 rounded-full flex items-center justify-center"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,107,107,0.3), rgba(84,160,255,0.3))",
+              backdropFilter: "blur(8px)",
+            }}
+          >
             <Handshake className="w-6 h-6 text-white" />
           </div>
           <div className="text-left">
-            <p className="font-bold text-lg">{t('dashboard.startEarning')}</p>
-            <p className="text-sm text-white/80">{t('dashboard.becomePartner')}</p>
+            <p className="font-bold text-lg bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+              {t('dashboard.startEarning')}
+            </p>
+            <p className="text-sm text-white/70">{t('dashboard.becomePartner')}</p>
           </div>
         </div>
-        <div className="w-10 h-10 min-w-10 min-h-10 shrink-0 rounded-full border-2 border-white/50 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-          <ArrowRight className="w-5 h-5 text-white" />
+        <div className="w-10 h-10 min-w-10 min-h-10 shrink-0 rounded-full border border-white/30 flex items-center justify-center group-hover:bg-white/10 group-hover:border-white/50 transition-all duration-300">
+          <ArrowRight className="w-5 h-5 text-white/80 group-hover:text-white transition-colors" />
         </div>
       </button>
       
       {/* CSS Animation */}
       <style>{`
-        @keyframes rainbow-border {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 400% 50%; }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>
