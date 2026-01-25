@@ -114,8 +114,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Проверяем токен через API
     const response = await getCurrentUser();
     
-    if (response.error || !response.data) {
-      // Токен невалидный
+    // ВАЖНО: Удаляем токен ТОЛЬКО при 401 (невалидный токен)
+    // При других ошибках (сеть, 500) оставляем пользователя залогиненным
+    if (response.status === 401) {
+      // Токен точно невалидный — сервер это подтвердил
       removeAuthToken();
       setUser(null);
       
@@ -124,9 +126,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
         navigate('/auth/phone', { replace: true });
       }
-    } else {
+    } else if (response.data) {
+      // Успешный ответ — обновляем данные пользователя
       setUser(response.data);
     }
+    // При других ошибках (сеть, 500) — оставляем кэшированного пользователя
     
     setIsLoading(false);
   }, [navigate]);
