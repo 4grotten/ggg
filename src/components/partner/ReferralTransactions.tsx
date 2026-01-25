@@ -274,8 +274,15 @@ export const ReferralTransactions = memo(() => {
   }, [filterType]);
   
   const getDateLabel = (dateGroup: string) => {
-    if (dateGroup === "today") return t('common.today', 'Сегодня');
-    if (dateGroup === "yesterday") return t('common.yesterday', 'Вчера');
+    if (dateGroup === "today") {
+      const today = new Date();
+      return today.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    }
+    if (dateGroup === "yesterday") {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      return yesterday.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    }
     return dateGroup;
   };
   
@@ -307,7 +314,7 @@ export const ReferralTransactions = memo(() => {
       
       {/* Grouped by date */}
       {Object.keys(groupedTransactions).length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {Object.entries(groupedTransactions).map(([dateGroup, { transactions, total }]) => (
             <div key={dateGroup}>
               <div className="flex items-center justify-between mb-2 px-1">
