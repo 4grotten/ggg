@@ -320,10 +320,10 @@ export const ReferralTransactions = memo(() => {
           {Object.entries(groupedTransactions).map(([dateGroup, { transactions, total }]) => (
             <div key={dateGroup}>
               <div className="flex items-center justify-between mb-2 px-1">
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm font-medium">
                   {getDateLabel(dateGroup)}
                 </p>
-                <p className="text-xs font-medium text-success">
+                <p className="text-sm font-medium text-success">
                   +{total.toFixed(2)} AED
                 </p>
               </div>
