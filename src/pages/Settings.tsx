@@ -605,15 +605,8 @@ const Settings = () => {
           />
         </div>
 
-        {/* Install App, Language & Appearance */}
+        {/* Language & Appearance */}
         <div className="bg-card rounded-2xl overflow-hidden">
-          {!isInstalled && (
-            <SettingsItem
-              icon={<Smartphone className="w-5 h-5" />}
-              label={t("settings.installApp")}
-              onClick={handleInstallClick}
-            />
-          )}
           <SettingsItem
             icon={<Globe className="w-5 h-5" />}
             label={t("settings.language")}
@@ -648,6 +641,13 @@ const Settings = () => {
             label={t("settings.askQuestion")}
             onClick={() => navigate("/chat")}
           />
+          {!isInstalled && (
+            <SettingsItem
+              icon={<Smartphone className="w-5 h-5" />}
+              label={t("settings.installApp")}
+              onClick={handleInstallClick}
+            />
+          )}
         </div>
 
         {/* Add Account Button */}
