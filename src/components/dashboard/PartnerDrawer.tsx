@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Diamond, Users, Percent, ClipboardCheck, Send, Copy, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -398,10 +398,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
           </div>
         </div>
         
-        {/* Fixed footer with buttons - transparent */}
-        <div className="px-6 pb-8 pt-4">
+        {/* Footer with buttons - pushed to bottom */}
+        <DrawerFooter className="px-6 pb-6">
           {renderFooterButtons()}
-        </div>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
