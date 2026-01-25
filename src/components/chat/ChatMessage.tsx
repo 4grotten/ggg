@@ -16,13 +16,14 @@ interface ChatMessageProps {
 export const ChatMessage = ({ role, content }: ChatMessageProps) => {
   const isUser = role === 'user';
   const { avatarUrl } = useAvatar();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   
-  // Priority: API avatar > local avatar
-  const displayAvatar = user?.avatar?.medium || user?.avatar?.small || user?.avatar?.file || avatarUrl;
+  // Priority: API avatar > local avatar (only for authenticated users)
+  const displayAvatar = isAuthenticated ? (user?.avatar?.medium || user?.avatar?.small || user?.avatar?.file || avatarUrl) : null;
+  const isGuest = !isAuthenticated;
   
   const handleSpeak = async () => {
     // If already playing, stop
@@ -113,12 +114,18 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
         isUser ? "bg-primary" : "bg-secondary"
       )}>
         {isUser ? (
-          <Avatar className="w-8 h-8">
-            <AvatarImage src={displayAvatar} alt="User" className="object-cover" />
-            <AvatarFallback className="bg-primary">
-              <User className="w-4 h-4 text-primary-foreground" />
-            </AvatarFallback>
-          </Avatar>
+          isGuest ? (
+            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+              <User className="w-4 h-4 text-white" />
+            </div>
+          ) : (
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={displayAvatar} alt="User" className="object-cover" />
+              <AvatarFallback className="bg-primary">
+                <User className="w-4 h-4 text-primary-foreground" />
+              </AvatarFallback>
+            </Avatar>
+          )
         ) : (
           <AnimatedBotHead />
         )}
