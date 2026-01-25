@@ -147,7 +147,7 @@ const EditProfile = () => {
   const genderOptions = [
     { value: "male", label: t("auth.profile.male") },
     { value: "female", label: t("auth.profile.female") },
-    { value: "", label: t("auth.profile.gender.preferNotToSay") },
+    { value: "", label: t("auth.profile.notSelected") || "Не выбран" },
   ];
 
   const selectedGenderLabel = genderOptions.find(g => g.value === form.watch("gender"))?.label || t("editProfile.selectGender");
@@ -219,7 +219,7 @@ const EditProfile = () => {
                       <Input
                         {...field}
                         placeholder={t("editProfile.fullNamePlaceholder")}
-                        className="h-12"
+                        className="h-14 rounded-2xl border-border bg-card px-4 text-base"
                       />
                     </FormControl>
                     <FormMessage />
@@ -239,7 +239,7 @@ const EditProfile = () => {
                         {...field}
                         type="email"
                         placeholder={t("editProfile.emailPlaceholder")}
-                        className="h-12"
+                        className="h-14 rounded-2xl border-border bg-card px-4 text-base"
                       />
                     </FormControl>
                     <FormMessage />
@@ -267,11 +267,12 @@ const EditProfile = () => {
                             setTempDate(dateValue || new Date(2000, 0, 1));
                             setIsDateOpen(true);
                           }}
-                          className="w-full h-12 px-3 text-left border border-input rounded-md bg-background hover:bg-muted/50 transition-colors flex items-center justify-between"
+                          className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base"
                         >
                           <span className={displayValue ? "text-foreground" : "text-muted-foreground"}>
                             {displayValue || t("editProfile.selectDateOfBirth")}
                           </span>
+                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
                         </button>
                       </FormControl>
                       <FormMessage />
@@ -291,11 +292,12 @@ const EditProfile = () => {
                       <button
                         type="button"
                         onClick={() => setIsGenderOpen(true)}
-                        className="w-full h-12 px-3 text-left border border-input rounded-md bg-background hover:bg-muted/50 transition-colors flex items-center justify-between"
+                        className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base"
                       >
                         <span className={field.value ? "text-foreground" : "text-muted-foreground"}>
                           {selectedGenderLabel}
                         </span>
+                        <ChevronDown className="w-5 h-5 text-muted-foreground" />
                       </button>
                     </FormControl>
                     <FormMessage />
