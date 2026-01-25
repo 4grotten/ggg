@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Users, Send, Copy, Share2, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import partnerCamelImage from "@/assets/partner-step3-camel.png";
+import partnerGrowthImage from "@/assets/partner-growth-hero.png";
 
 // Partner levels configuration
 const LEVELS = [
@@ -109,35 +109,29 @@ const Partner = () => {
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto pb-28">
           {/* Hero Section */}
-          <div className="relative px-6 pt-6 pb-8 text-center">
-            {/* Glowing background */}
-            <motion.div
-              animate={{ 
-                opacity: [0.3, 0.6, 0.3],
-                scale: [0.95, 1.05, 0.95]
-              }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-0 mx-auto w-48 h-48 top-8"
-              style={{ 
-                background: "radial-gradient(circle, rgba(191, 255, 0, 0.3) 0%, transparent 70%)",
-                filter: "blur(40px)"
-              }}
-            />
-            
-            <h2 className="text-2xl font-bold mb-4 relative z-10">
-              {t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-            </h2>
-            
+          <div className="relative px-4 pt-4 pb-6">
+            {/* Wide format growth image */}
             <motion.div 
-              className="relative w-32 h-32 mx-auto mb-6"
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="relative w-full rounded-2xl overflow-hidden mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
+              {/* Glowing border effect */}
+              <div 
+                className="absolute -inset-0.5 rounded-2xl opacity-60"
+                style={{ 
+                  background: "linear-gradient(135deg, rgba(191, 255, 0, 0.5) 0%, rgba(127, 255, 0, 0.3) 50%, rgba(191, 255, 0, 0.5) 100%)",
+                  filter: "blur(8px)"
+                }}
+              />
               <img 
-                src={partnerCamelImage} 
-                alt="Partner" 
-                className="w-full h-full object-contain rounded-2xl"
-                style={{ filter: "drop-shadow(0 8px 24px rgba(191, 255, 0, 0.4))" }}
+                src={partnerGrowthImage} 
+                alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
+                className="relative w-full h-auto aspect-video object-cover rounded-2xl"
+                style={{ 
+                  boxShadow: "0 12px 40px rgba(191, 255, 0, 0.25)"
+                }}
               />
             </motion.div>
             
