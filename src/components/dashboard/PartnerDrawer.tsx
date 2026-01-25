@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import partnerStep1Image from "@/assets/partner-step1-magnet.png";
 import partnerStep2Image from "@/assets/partner-step2-gift.png";
-import partnerStep3Image from "@/assets/partner-step3-piggy.png";
+import partnerStep3Image from "@/assets/partner-step3-camel.png";
 
 interface PartnerDrawerProps {
   open: boolean;
