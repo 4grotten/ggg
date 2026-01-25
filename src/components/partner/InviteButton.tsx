@@ -7,33 +7,46 @@ import { toast } from "sonner";
 const APP_LINK = "https://test.apofiz.com/EasyCard/";
 
 interface InviteButtonProps {
-  scrollContainerRef?: React.RefObject<HTMLDivElement>;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export const InviteButton = memo(({ scrollContainerRef }: InviteButtonProps) => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
+  const [lastScrollTop, setLastScrollTop] = useState(0);
 
   useEffect(() => {
+    // Show button after initial render with animation
+    const showTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, 500);
+
     const container = scrollContainerRef?.current;
     if (!container) {
-      // If no container ref, show button after a small delay
-      const timer = setTimeout(() => setIsVisible(true), 300);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(showTimer);
     }
 
     const handleScroll = () => {
       const scrollTop = container.scrollTop;
-      // Show button after scrolling 100px
-      setIsVisible(scrollTop > 100);
+      const scrollingDown = scrollTop > lastScrollTop;
+      
+      // Hide when scrolling up near the top, show otherwise
+      if (scrollTop < 50) {
+        setIsVisible(false);
+      } else if (scrollingDown || scrollTop > 100) {
+        setIsVisible(true);
+      }
+      
+      setLastScrollTop(scrollTop);
     };
 
-    // Initial check
-    handleScroll();
-
     container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [scrollContainerRef]);
+    
+    return () => {
+      clearTimeout(showTimer);
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrollContainerRef, lastScrollTop]);
 
   const handleShare = useCallback(async () => {
     if (navigator.share) {
@@ -56,7 +69,7 @@ export const InviteButton = memo(({ scrollContainerRef }: InviteButtonProps) => 
     <AnimatePresence>
       {isVisible && (
         <motion.div 
-          className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background/80 to-transparent pb-6 pointer-events-none"
+          className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background/80 to-transparent pb-6 pointer-events-none max-w-[800px] mx-auto"
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
