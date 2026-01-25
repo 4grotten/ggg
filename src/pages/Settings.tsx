@@ -610,7 +610,7 @@ const Settings = () => {
           <SettingsItem
             icon={<SlidersHorizontal className="w-5 h-5" />}
             label={t("settings.limitsSettings") || "Limits Settings"}
-            onClick={() => navigate("/fees-and-limits")}
+            onClick={() => navigate("/limits-settings")}
           />
         </div>
 

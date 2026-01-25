@@ -28,6 +28,7 @@ import VerificationComplete from "./pages/verification/VerificationComplete";
 import VerificationSuccess from "./pages/verification/VerificationSuccess";
 import Settings from "./pages/Settings";
 import FeesAndLimits from "./pages/FeesAndLimits";
+import LimitsSettings from "./pages/LimitsSettings";
 import ProfileVerification from "./pages/ProfileVerification";
 import TopUpCrypto from "./pages/TopUpCrypto";
 import TopUpBank from "./pages/TopUpBank";
@@ -120,6 +121,7 @@ const AppContent = () => {
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/edit-profile" element={<EditProfile />} />
             <Route path="/fees-and-limits" element={<FeesAndLimits />} />
+            <Route path="/limits-settings" element={<LimitsSettings />} />
             <Route path="/profile-verification" element={<ProfileVerification />} />
             <Route path="/profile" element={<ProfileVerification />} />
             <Route path="/info" element={<FeesAndLimits />} />
