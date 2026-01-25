@@ -14,8 +14,15 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { AnimatedDrawerContainer, AnimatedDrawerItem } from "@/components/ui/animated-drawer-item";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   VIRTUAL_CARD_ANNUAL_FEE,
   VIRTUAL_CARD_REPLACEMENT_FEE,
@@ -172,14 +179,24 @@ const AnimatedFeeIcon = () => {
 const FeesAndLimits = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   
   const [transferDrawerOpen, setTransferDrawerOpen] = useState(false);
   const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
+  const [authAlertOpen, setAuthAlertOpen] = useState(false);
   
   const [transferDailyLimit, setTransferDailyLimit] = useState(500000);
   const [transferPerTransaction, setTransferPerTransaction] = useState(50000);
   const [withdrawalDailyLimit, setWithdrawalDailyLimit] = useState(500000);
   const [withdrawalPerTransaction, setWithdrawalPerTransaction] = useState(50000);
+
+  const handleLimitClick = (openDrawer: () => void) => {
+    if (!isAuthenticated) {
+      setAuthAlertOpen(true);
+    } else {
+      openDrawer();
+    }
+  };
 
   return (
     <MobileLayout
@@ -228,7 +245,7 @@ const FeesAndLimits = () => {
             label={t("feesAndLimits.transferLimits")}
             dailyValue={transferDailyLimit}
             perTransactionValue={transferPerTransaction}
-            onClick={() => setTransferDrawerOpen(true)}
+            onClick={() => handleLimitClick(() => setTransferDrawerOpen(true))}
             dailyLabel={t("feesAndLimits.daily")}
             perTxLabel={t("feesAndLimits.perTx")}
           />
@@ -236,7 +253,7 @@ const FeesAndLimits = () => {
             label={t("feesAndLimits.withdrawalLimits")}
             dailyValue={withdrawalDailyLimit}
             perTransactionValue={withdrawalPerTransaction}
-            onClick={() => setWithdrawalDrawerOpen(true)}
+            onClick={() => handleLimitClick(() => setWithdrawalDrawerOpen(true))}
             dailyLabel={t("feesAndLimits.daily")}
             perTxLabel={t("feesAndLimits.perTx")}
             isLast
@@ -331,6 +348,38 @@ const FeesAndLimits = () => {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {/* iOS-style Auth Alert for Guests */}
+      <AlertDialog open={authAlertOpen} onOpenChange={setAuthAlertOpen}>
+        <AlertDialogContent className="w-[270px] rounded-2xl p-0 gap-0 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-0 shadow-2xl">
+          <div className="pt-5 pb-4 px-4 text-center">
+            <AlertDialogTitle className="text-[17px] font-semibold text-foreground mb-1">
+              {t("feesAndLimits.authRequired", "Требуется авторизация")}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] text-muted-foreground leading-tight">
+              {t("feesAndLimits.authRequiredMessage", "Для смены лимитов вам надо авторизоваться")}
+            </AlertDialogDescription>
+          </div>
+          
+          <div className="border-t border-[#C6C6C8] dark:border-[#38383A]">
+            <button
+              onClick={() => setAuthAlertOpen(false)}
+              className="w-full py-[11px] text-[17px] text-[#007AFF] font-normal border-b border-[#C6C6C8] dark:border-[#38383A] active:bg-black/5 dark:active:bg-white/5 transition-colors"
+            >
+              {t("common.cancel", "Отмена")}
+            </button>
+            <button
+              onClick={() => {
+                setAuthAlertOpen(false);
+                navigate("/auth/phone");
+              }}
+              className="w-full py-[11px] text-[17px] text-[#007AFF] font-semibold active:bg-black/5 dark:active:bg-white/5 transition-colors"
+            >
+              {t("common.authorize", "Авторизоваться")}
+            </button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </MobileLayout>
   );
 };
