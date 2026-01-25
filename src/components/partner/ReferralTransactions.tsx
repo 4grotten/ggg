@@ -173,13 +173,15 @@ export const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     type: "withdrawal",
     amount: -50,
     originalAmount: 50,
-    percent: 0,
+    percent: 0.5,
     date: "11:20",
     dateGroup: "26 января",
     dateTimestamp: Date.now() + 86400000,
     level: "R1",
     withdrawalMethod: "card",
-    cardType: "virtual"
+    cardType: "virtual",
+    networkFee: 0.25,
+    isClickable: true
   },
 ];
 
@@ -242,7 +244,7 @@ const TransactionItem = memo(({ tx, onWithdrawalClick }: { tx: ReferralTransacti
       if (tx.withdrawalMethod === "crypto") {
         return `${tx.cryptoNetwork} • Комиссия ${tx.networkFee} USDT`;
       }
-      return t('partner.virtualCard', 'Virtual карта');
+      return `${t('partner.virtualCard', 'Virtual карта')} • Комиссия ${tx.percent}%`;
     }
     if (isCard) {
       return `${getCardTypeName(tx.cardType, t)} • ${tx.percent}%`;
@@ -445,6 +447,7 @@ export const ReferralTransactions = memo(() => {
           cardType: selectedWithdrawal.cardType,
           walletAddress: "TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7",
           cardLast4: "7617",
+          cardFeePercent: selectedWithdrawal.percent,
           status: "completed"
         } : null}
       />

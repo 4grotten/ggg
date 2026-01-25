@@ -16,6 +16,7 @@ interface WithdrawalDetails {
   cardType?: string;
   walletAddress?: string;
   cardLast4?: string;
+  cardFeePercent?: number;
   status: "completed" | "pending" | "failed";
 }
 
@@ -160,6 +161,10 @@ export const WithdrawalDetailsDrawer = memo(({
                     value={`•••• ${withdrawal.cardLast4}`} 
                   />
                 )}
+                <DetailRow 
+                  label={t('partner.fee', 'Комиссия')} 
+                  value={`${withdrawal.cardFeePercent || 0.5}%`} 
+                />
               </>
             )}
             
