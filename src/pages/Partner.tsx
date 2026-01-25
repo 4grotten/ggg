@@ -87,35 +87,36 @@ const Partner = () => {
           <div className="relative px-4 pt-4 pb-6">
             {/* Wide format growth image with pulsing glow */}
             <div className="relative w-full rounded-2xl overflow-visible mb-4">
-              {/* Pulsing glow effect */}
+              {/* Pulsing glow effect - Light theme */}
               <motion.div 
-                className="absolute -inset-2 rounded-3xl z-0"
+                className="absolute -inset-4 rounded-3xl z-0 dark:hidden"
                 style={{ 
-                  background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.35) 0%, rgba(16, 185, 129, 0.15) 50%, transparent 70%)",
-                  filter: "blur(12px)"
+                  background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.5) 0%, rgba(16, 185, 129, 0.25) 40%, transparent 70%)",
+                  filter: "blur(20px)"
                 }}
                 animate={{
-                  opacity: [0.5, 1, 0.5],
-                  scale: [0.98, 1.02, 0.98]
+                  opacity: [0.4, 1, 0.4],
+                  scale: [0.97, 1.03, 0.97]
                 }}
                 transition={{
-                  duration: 3,
+                  duration: 2.5,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
               />
+              {/* Pulsing glow effect - Dark theme */}
               <motion.div 
-                className="absolute -inset-2 rounded-3xl z-0 dark:block hidden"
+                className="absolute -inset-4 rounded-3xl z-0 hidden dark:block"
                 style={{ 
-                  background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.4) 0%, rgba(127, 255, 0, 0.2) 50%, transparent 70%)",
-                  filter: "blur(12px)"
+                  background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.6) 0%, rgba(127, 255, 0, 0.3) 40%, transparent 70%)",
+                  filter: "blur(20px)"
                 }}
                 animate={{
-                  opacity: [0.5, 1, 0.5],
-                  scale: [0.98, 1.02, 0.98]
+                  opacity: [0.4, 1, 0.4],
+                  scale: [0.97, 1.03, 0.97]
                 }}
                 transition={{
-                  duration: 3,
+                  duration: 2.5,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
