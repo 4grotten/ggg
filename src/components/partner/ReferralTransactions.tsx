@@ -404,15 +404,15 @@ export const ReferralTransactions = memo(() => {
     return { groupedTransactions: groups, filteredTransactions: filtered };
   }, [filterType]);
   
-  const getDateLabel = (dateGroup: string) => {
-    if (dateGroup === "today") {
-      const today = new Date();
-      return today.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-    }
-    if (dateGroup === "yesterday") {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      return yesterday.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  const getDateLabel = (dateGroup: string, transactions: ReferralTransaction[]) => {
+    // Get the actual date from the first transaction in the group
+    const firstTx = transactions[0];
+    if (firstTx) {
+      const date = new Date(firstTx.dateTimestamp);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}.${month}.${year}`;
     }
     return dateGroup;
   };
@@ -456,7 +456,7 @@ export const ReferralTransactions = memo(() => {
             <div key={dateGroup}>
               <div className="flex items-center justify-between mb-2 px-1">
                 <p className="text-sm font-medium">
-                  {getDateLabel(dateGroup)}
+                  {getDateLabel(dateGroup, transactions)}
                 </p>
                 <div className="flex items-center gap-3">
                   {income > 0 && (
