@@ -536,6 +536,10 @@
     "authRequired": "مطلوب تسجيل الدخول",
     "authRequiredMessage": "لتغيير الحدود، تحتاج إلى تسجيل الدخول"
   },
+  "limitsSettings": {
+    "limitsFor": "حدود",
+    "accountWithdrawal": "السحب إلى الحساب"
+  },
   "chat": {
     "aiAssistant": "مساعد الذكاء الاصطناعي",
     "description": "اطرح سؤالاً حول البطاقات أو التحويلات أو الحدود أو أي ميزة أخرى في التطبيق",

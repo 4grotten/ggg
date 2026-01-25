@@ -536,6 +536,10 @@
     "authRequired": "需要登录",
     "authRequiredMessage": "更改限额需要登录"
   },
+  "limitsSettings": {
+    "limitsFor": "限额",
+    "accountWithdrawal": "提款到账户"
+  },
   "chat": {
     "aiAssistant": "AI 助手",
     "description": "询问有关卡片、转账、限额或其他应用功能的问题",

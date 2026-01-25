@@ -574,6 +574,10 @@
     "authRequired": "Authorization Required",
     "authRequiredMessage": "To change limits, you need to sign in"
   },
+  "limitsSettings": {
+    "limitsFor": "Limits for",
+    "accountWithdrawal": "Account Withdrawal"
+  },
   "chat": {
     "aiAssistant": "AI Assistant",
     "description": "Ask a question about cards, transfers, limits, or any other app feature",

@@ -574,6 +574,10 @@
     "authRequired": "Требуется авторизация",
     "authRequiredMessage": "Для смены лимитов вам надо авторизоваться"
   },
+  "limitsSettings": {
+    "limitsFor": "Лимиты для",
+    "accountWithdrawal": "Вывод на счёт"
+  },
   "chat": {
     "aiAssistant": "AI Ассистент",
     "description": "Задайте вопрос о картах, переводах, лимитах или любой другой функции приложения",

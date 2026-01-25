@@ -536,6 +536,10 @@
     "authRequired": "Giriş Gerekli",
     "authRequiredMessage": "Limitleri değiştirmek için giriş yapmanız gerekiyor"
   },
+  "limitsSettings": {
+    "limitsFor": "Limitler",
+    "accountWithdrawal": "Hesaba Çekim"
+  },
   "chat": {
     "aiAssistant": "Yapay Zeka Asistanı",
     "description": "Kartlar, transferler, limitler veya diğer uygulama özellikleri hakkında soru sorun",
