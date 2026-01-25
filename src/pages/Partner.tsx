@@ -113,7 +113,7 @@ const Partner = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-lg font-bold">{t('partner.program', 'Партнёрская программа')}</h1>
+            <h1 className="text-base font-semibold">{t('partner.program', 'Партнёрская программа')}</h1>
             <LanguageSwitcher />
           </div>
         </header>
