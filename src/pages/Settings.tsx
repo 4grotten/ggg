@@ -546,7 +546,7 @@ const Settings = () => {
       <div className="space-y-3 px-4 pb-28">
         {/* Edit Profile - only for authenticated users */}
         {isAuthenticated && (
-          <div className="bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+          <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
             <SettingsItem
               icon={<User className="w-5 h-5" />}
               label={t("settings.editProfile") || "Edit Profile"}
@@ -560,7 +560,7 @@ const Settings = () => {
           const completedSteps = getCompletedSteps();
           const isVerified = completedSteps >= 3;
           return (
-            <div className="bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+            <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
               <button
                 onClick={() => navigate("/profile-verification")}
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
@@ -600,7 +600,7 @@ const Settings = () => {
         })()}
 
         {/* Referral Partner */}
-        <div className="bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
             icon={<Users className="w-5 h-5" />}
             label={t("settings.referralPartner") || "Referral Partner"}
@@ -609,7 +609,7 @@ const Settings = () => {
         </div>
 
         {/* Limits Settings */}
-        <div className="bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
             icon={<SlidersHorizontal className="w-5 h-5" />}
             label={t("settings.limitsSettings") || "Limits Settings"}
@@ -620,7 +620,7 @@ const Settings = () => {
         <div className="h-px bg-border" />
 
         {/* Language & Appearance */}
-        <div className="bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
             icon={<Globe className="w-5 h-5" />}
             label={t("settings.language")}
@@ -640,7 +640,7 @@ const Settings = () => {
         <div className="h-px bg-border" />
 
         {/* Limits and Fees */}
-        <div className="bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
             icon={<Receipt className="w-5 h-5" />}
             label={t("settings.limitsAndFees")}
@@ -649,7 +649,7 @@ const Settings = () => {
         </div>
 
         {/* Support & Legal */}
-        <div className="bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
             icon={<Briefcase className="w-5 h-5" />}
             label={t("settings.privacyPolicy")}
@@ -671,7 +671,7 @@ const Settings = () => {
         <div className="h-px bg-border" />
 
         {/* Add Account Button */}
-        <div className="bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
             icon={<UserPlus className="w-5 h-5" />}
             label={t("settings.addAccount") || "Add Account"}
