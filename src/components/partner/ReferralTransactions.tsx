@@ -1,8 +1,9 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useState, useRef, useEffect } from "react";
 import { CreditCard, ArrowDownLeft, ArrowUpRight, Wallet, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CardType } from "@/types/card";
 import { WithdrawalDetailsDrawer } from "./WithdrawalDetailsDrawer";
+import { motion } from "framer-motion";
 
 type FilterType = "all" | "cards" | "transactions" | "withdrawals";
 
@@ -293,28 +294,71 @@ const TransactionItem = memo(({ tx, onWithdrawalClick }: { tx: ReferralTransacti
 
 TransactionItem.displayName = "TransactionItem";
 
-const FilterButton = memo(({ 
-  label, 
-  active, 
-  onClick 
-}: { 
-  label: string; 
-  active: boolean; 
-  onClick: () => void;
-}) => (
-  <button
-    onClick={onClick}
-    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-      active 
-        ? "bg-primary text-primary-foreground" 
-        : "bg-muted text-muted-foreground hover:bg-muted/80"
-    }`}
-  >
-    {label}
-  </button>
-));
+const FILTER_OPTIONS: FilterType[] = ["all", "cards", "transactions", "withdrawals"];
 
-FilterButton.displayName = "FilterButton";
+const FilterTabs = memo(({ 
+  activeFilter, 
+  onFilterChange,
+  labels
+}: { 
+  activeFilter: FilterType;
+  onFilterChange: (filter: FilterType) => void;
+  labels: Record<FilterType, string>;
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+  
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const activeIndex = FILTER_OPTIONS.indexOf(activeFilter);
+    const buttons = containerRef.current.querySelectorAll('button');
+    if (buttons[activeIndex]) {
+      const button = buttons[activeIndex] as HTMLButtonElement;
+      setIndicatorStyle({
+        left: button.offsetLeft,
+        width: button.offsetWidth
+      });
+    }
+  }, [activeFilter]);
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative flex items-center gap-1 p-1 bg-muted rounded-full overflow-x-auto scrollbar-hide"
+    >
+      {/* Animated indicator */}
+      <motion.div
+        className="absolute h-[calc(100%-8px)] bg-primary rounded-full"
+        initial={false}
+        animate={{
+          left: indicatorStyle.left,
+          width: indicatorStyle.width
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 400,
+          damping: 30
+        }}
+      />
+      
+      {FILTER_OPTIONS.map((filter) => (
+        <button
+          key={filter}
+          onClick={() => onFilterChange(filter)}
+          className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+            activeFilter === filter 
+              ? "text-primary-foreground" 
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {labels[filter]}
+        </button>
+      ))}
+    </div>
+  );
+});
+
+FilterTabs.displayName = "FilterTabs";
 
 export const ReferralTransactions = memo(() => {
   const { t } = useTranslation();
@@ -381,27 +425,17 @@ export const ReferralTransactions = memo(() => {
   
   return (
     <div className="px-4 mb-6">
-      {/* Filter buttons */}
-      <div className="flex items-center gap-2 mb-4 overflow-x-auto scrollbar-hide">
-        <FilterButton 
-          label={t('partner.filterAll', 'Все')} 
-          active={filterType === "all"} 
-          onClick={() => setFilterType("all")} 
-        />
-        <FilterButton 
-          label={t('partner.filterCards', 'Карты')} 
-          active={filterType === "cards"} 
-          onClick={() => setFilterType("cards")} 
-        />
-        <FilterButton 
-          label={t('partner.filterTransactions', 'Транзакции')} 
-          active={filterType === "transactions"} 
-          onClick={() => setFilterType("transactions")} 
-        />
-        <FilterButton 
-          label={t('partner.filterWithdrawals', 'Выводы')} 
-          active={filterType === "withdrawals"} 
-          onClick={() => setFilterType("withdrawals")} 
+      {/* Filter tabs with animated indicator */}
+      <div className="mb-4">
+        <FilterTabs
+          activeFilter={filterType}
+          onFilterChange={setFilterType}
+          labels={{
+            all: t('partner.filterAll', 'Все'),
+            cards: t('partner.filterCards', 'Карты'),
+            transactions: t('partner.filterTransactions', 'Транзакции'),
+            withdrawals: t('partner.filterWithdrawals', 'Выводы')
+          }}
         />
       </div>
       
