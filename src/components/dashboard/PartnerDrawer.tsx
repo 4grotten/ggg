@@ -77,61 +77,90 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center px-6"
           >
-            {/* Easy Card illustration - same as splash screen */}
-            <div className="relative w-72 h-48 flex items-center justify-center mb-6">
-              {/* Animated Shadow */}
+            {/* Network/Partnership illustration */}
+            <div className="relative w-56 h-56 flex items-center justify-center mb-6">
+              {/* Pulsing background glow */}
               <motion.div
                 animate={{ 
-                  opacity: [0.3, 0.6, 0.3],
-                  scale: [0.95, 1.05, 0.95],
+                  opacity: [0.2, 0.5, 0.2],
+                  scale: [0.9, 1.1, 0.9],
                 }}
                 transition={{ 
                   duration: 3, 
                   repeat: Infinity, 
                   ease: "easeInOut" 
                 }}
-                className="absolute inset-0 bg-primary/40 blur-[40px] rounded-3xl"
+                className="absolute inset-0 rounded-full"
+                style={{ background: "radial-gradient(circle, rgba(191, 255, 0, 0.4) 0%, transparent 70%)" }}
               />
               
-              {/* Card Image */}
-              <motion.img
-                src="/og-image.png"
-                alt="Easy Card"
-                className="relative w-full h-auto rounded-2xl"
+              {/* Orbiting circles representing network */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0"
+              >
+                {[0, 72, 144, 216, 288].map((angle, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{
+                      background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
+                      boxShadow: "0 4px 16px rgba(127, 255, 0, 0.4)",
+                      left: `calc(50% + ${Math.cos(angle * Math.PI / 180) * 80}px - 20px)`,
+                      top: `calc(50% + ${Math.sin(angle * Math.PI / 180) * 80}px - 20px)`,
+                    }}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
+                  >
+                    <Users className="w-5 h-5 text-black" />
+                  </motion.div>
+                ))}
+              </motion.div>
+              
+              {/* Center card icon */}
+              <motion.div
                 animate={{ 
-                  y: [0, -8, 0],
-                  rotateY: [0, 3, 0],
+                  y: [0, -6, 0],
+                  scale: [1, 1.05, 1],
                 }}
                 transition={{ 
-                  duration: 3, 
+                  duration: 2.5, 
                   repeat: Infinity, 
                   ease: "easeInOut" 
                 }}
-                style={{ 
-                  filter: "drop-shadow(0 20px 40px rgba(59, 130, 246, 0.3))"
+                className="relative z-10 w-20 h-20 rounded-2xl flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(191, 255, 0, 0.2)",
+                  border: "2px solid rgba(191, 255, 0, 0.5)"
                 }}
-              />
+              >
+                <span className="text-2xl font-bold" style={{ color: "#BFFF00" }}>EC</span>
+              </motion.div>
               
-              {/* Light Reflection */}
-              <motion.div
-                animate={{ 
-                  x: ["-150%", "250%"],
-                  opacity: [0, 0.5, 0]
-                }}
-                transition={{ 
-                  duration: 2.5,
-                  repeat: Infinity,
-                  repeatDelay: 2,
-                  ease: "easeInOut"
-                }}
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 rounded-2xl pointer-events-none"
-              />
+              {/* Connecting lines effect */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.3 }}>
+                {[0, 72, 144, 216, 288].map((angle, i) => (
+                  <motion.line
+                    key={i}
+                    x1="50%"
+                    y1="50%"
+                    x2={`${50 + Math.cos(angle * Math.PI / 180) * 35}%`}
+                    y2={`${50 + Math.sin(angle * Math.PI / 180) * 35}%`}
+                    stroke="#BFFF00"
+                    strokeWidth="1"
+                    animate={{ opacity: [0.3, 0.8, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
+                  />
+                ))}
+              </svg>
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step1.title')} Easy Card
             </h2>
-            <p className="text-xl font-semibold text-center mb-4">
+            <p className="text-lg text-center mb-3 text-foreground">
               {t('partner.step1.subtitle')}
             </p>
             <p className="text-muted-foreground text-center">
