@@ -236,14 +236,23 @@ const Partner = () => {
                         </motion.div>
                       )}
                       
-                      <div
-                        className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-5 border border-border/50 overflow-hidden"
-                        style={{
-                          boxShadow: idx === currentLevelIndex 
-                            ? "0 0 30px rgba(191, 255, 0, 0.2)" 
-                            : "none"
-                        }}
-                      >
+                      <div className="relative">
+                        {/* Rotating gradient border for current level */}
+                        {idx === currentLevelIndex && (
+                          <motion.div
+                            className="absolute -inset-[1px] rounded-3xl z-0"
+                            style={{
+                              background: "conic-gradient(from 0deg, #BFFF00, #7FFF00, #00FF00, #7FFF00, #BFFF00)",
+                            }}
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                          />
+                        )}
+                        <div
+                          className={`relative bg-card/50 backdrop-blur-xl rounded-3xl p-5 overflow-hidden z-10 ${
+                            idx === currentLevelIndex ? "" : "border border-border/50"
+                          }`}
+                        >
                         {/* Decorative gradient */}
                         <div 
                           className="absolute top-0 right-0 w-32 h-32 opacity-20"
@@ -284,6 +293,7 @@ const Partner = () => {
                               {level.txPercent}%
                             </p>
                           </div>
+                        </div>
                         </div>
                       </div>
                     </div>
