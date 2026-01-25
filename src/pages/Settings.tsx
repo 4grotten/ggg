@@ -605,7 +605,18 @@ const Settings = () => {
           />
         </div>
 
-        {/* Appearance, Language & Install App */}
+        {/* Install App */}
+        {!isInstalled && (
+          <div className="bg-card rounded-2xl overflow-hidden">
+            <SettingsItem
+              icon={<Smartphone className="w-5 h-5" />}
+              label={t("settings.installApp")}
+              onClick={handleInstallClick}
+            />
+          </div>
+        )}
+
+        {/* Appearance & Language */}
         <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
           <SettingsItem
             icon={<Palette className="w-5 h-5" />}
@@ -619,13 +630,6 @@ const Settings = () => {
             value={currentLanguage?.name}
             onClick={() => setIsLanguageOpen(true)}
           />
-          {!isInstalled && (
-            <SettingsItem
-              icon={<Smartphone className="w-5 h-5" />}
-              label={t("settings.installApp")}
-              onClick={handleInstallClick}
-            />
-          )}
         </div>
 
         {/* Limits and Fees */}
