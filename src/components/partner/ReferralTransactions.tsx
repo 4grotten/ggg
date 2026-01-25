@@ -1,14 +1,15 @@
 import { memo, useMemo, useState } from "react";
-import { CreditCard, ArrowDownLeft } from "lucide-react";
+import { CreditCard, ArrowDownLeft, ArrowUpRight, Wallet, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CardType } from "@/types/card";
+import { toast } from "sonner";
 
-type FilterType = "all" | "cards" | "transactions";
+type FilterType = "all" | "cards" | "transactions" | "withdrawals";
 
 interface ReferralTransaction {
   id: string;
   userName: string;
-  type: "card" | "transaction";
+  type: "card" | "transaction" | "withdrawal";
   cardType?: CardType;
   amount: number;
   originalAmount: number;
@@ -17,6 +18,11 @@ interface ReferralTransaction {
   dateGroup: string;
   dateTimestamp: number;
   level: string;
+  // Withdrawal specific fields
+  withdrawalMethod?: "crypto" | "card";
+  cryptoNetwork?: string;
+  networkFee?: number;
+  isClickable?: boolean;
 }
 
 export const MOCK_TRANSACTIONS: ReferralTransaction[] = [
@@ -145,6 +151,36 @@ export const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     dateTimestamp: Date.now() - 345600000,
     level: "R1"
   },
+  {
+    id: "11",
+    userName: "Вывод средств",
+    type: "withdrawal",
+    amount: -100,
+    originalAmount: 100,
+    percent: 0,
+    date: "16:45",
+    dateGroup: "23 января",
+    dateTimestamp: Date.now() - 172800000 + 3600000,
+    level: "R1",
+    withdrawalMethod: "crypto",
+    cryptoNetwork: "TRC20",
+    networkFee: 5.90,
+    isClickable: true
+  },
+  {
+    id: "12",
+    userName: "Вывод средств",
+    type: "withdrawal",
+    amount: -50,
+    originalAmount: 50,
+    percent: 0,
+    date: "11:20",
+    dateGroup: "26 января",
+    dateTimestamp: Date.now() + 86400000,
+    level: "R1",
+    withdrawalMethod: "card",
+    cardType: "virtual"
+  },
 ];
 
 const CardIcon = memo(({ cardType }: { cardType?: CardType }) => {
@@ -156,7 +192,13 @@ const CardIcon = memo(({ cardType }: { cardType?: CardType }) => {
 
 CardIcon.displayName = "CardIcon";
 
-const TransactionIcon = memo(({ type, cardType }: { type: "card" | "transaction"; cardType?: CardType }) => {
+const TransactionIcon = memo(({ type, cardType, withdrawalMethod }: { type: "card" | "transaction" | "withdrawal"; cardType?: CardType; withdrawalMethod?: "crypto" | "card" }) => {
+  if (type === "withdrawal") {
+    if (withdrawalMethod === "crypto") {
+      return <Wallet className="w-5 h-5 text-orange-500" />;
+    }
+    return <ArrowUpRight className="w-5 h-5 text-purple-500" />;
+  }
   if (type === "card") {
     return <CardIcon cardType={cardType} />;
   }
@@ -187,28 +229,62 @@ const getCardTypeName = (cardType?: CardType, t?: (key: string, fallback: string
 const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
   const { t } = useTranslation();
   const isCard = tx.type === "card";
+  const isWithdrawal = tx.type === "withdrawal";
+  
+  const handleClick = () => {
+    if (tx.isClickable) {
+      toast.info(
+        `Вывод ${Math.abs(tx.amount)} AED на ${tx.cryptoNetwork} кошелёк\nКомиссия сети: ${tx.networkFee} USDT`,
+        { duration: 4000 }
+      );
+    }
+  };
+  
+  const getDescription = () => {
+    if (isWithdrawal) {
+      if (tx.withdrawalMethod === "crypto") {
+        return `${tx.cryptoNetwork} • Комиссия ${tx.networkFee} USDT`;
+      }
+      return t('partner.virtualCard', 'Virtual карта');
+    }
+    if (isCard) {
+      return `${getCardTypeName(tx.cardType, t)} • ${tx.percent}%`;
+    }
+    return `${t('partner.transactionFee', 'Комиссия с транзакции')} • ${tx.percent}%`;
+  };
   
   return (
-    <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-secondary/50 active:bg-secondary/70 transition-colors">
+    <button 
+      onClick={handleClick}
+      className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors ${
+        tx.isClickable 
+          ? "hover:bg-primary/10 active:bg-primary/20 ring-1 ring-primary/30 bg-primary/5" 
+          : "hover:bg-secondary/50 active:bg-secondary/70"
+      }`}
+    >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-          <TransactionIcon type={tx.type} cardType={tx.cardType} />
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+          isWithdrawal ? "bg-orange-100 dark:bg-orange-900/30" : "bg-secondary"
+        }`}>
+          <TransactionIcon type={tx.type} cardType={tx.cardType} withdrawalMethod={tx.withdrawalMethod} />
         </div>
         <div className="text-left">
-          <p className="font-medium text-sm">{maskName(tx.userName)}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="font-medium text-sm">
+              {isWithdrawal ? t('partner.withdrawal', 'Вывод средств') : maskName(tx.userName)}
+            </p>
+            {tx.isClickable && (
+              <ExternalLink className="w-3.5 h-3.5 text-primary" />
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
-            {isCard 
-              ? getCardTypeName(tx.cardType, t)
-              : t('partner.transactionFee', 'Комиссия с транзакции')
-            }
-            <span className="mx-1">•</span>
-            {tx.percent}%
+            {getDescription()}
           </p>
         </div>
       </div>
       <div className="text-right">
-        <p className="font-semibold text-sm text-success">
-          +{tx.amount.toFixed(2)} AED
+        <p className={`font-semibold text-sm ${isWithdrawal ? "text-orange-500" : "text-success"}`}>
+          {isWithdrawal ? "" : "+"}{tx.amount.toFixed(2)} AED
         </p>
         <p className="text-xs text-muted-foreground">{tx.date}</p>
       </div>
@@ -254,6 +330,8 @@ export const ReferralTransactions = memo(() => {
       filtered = filtered.filter(tx => tx.type === "card");
     } else if (filterType === "transactions") {
       filtered = filtered.filter(tx => tx.type === "transaction");
+    } else if (filterType === "withdrawals") {
+      filtered = filtered.filter(tx => tx.type === "withdrawal");
     }
     
     // Sort by date
@@ -294,7 +372,7 @@ export const ReferralTransactions = memo(() => {
   return (
     <div className="px-4 mb-6">
       {/* Filter buttons */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-4 overflow-x-auto scrollbar-hide">
         <FilterButton 
           label={t('partner.filterAll', 'Все')} 
           active={filterType === "all"} 
@@ -309,6 +387,11 @@ export const ReferralTransactions = memo(() => {
           label={t('partner.filterTransactions', 'Транзакции')} 
           active={filterType === "transactions"} 
           onClick={() => setFilterType("transactions")} 
+        />
+        <FilterButton 
+          label={t('partner.filterWithdrawals', 'Выводы')} 
+          active={filterType === "withdrawals"} 
+          onClick={() => setFilterType("withdrawals")} 
         />
       </div>
       
