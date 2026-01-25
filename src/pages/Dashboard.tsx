@@ -34,6 +34,7 @@ import { TransactionGroup, Transaction } from "@/types/transaction";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useMultiAccount } from "@/hooks/useMultiAccount";
+import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 
 type FilterType = "all" | "income" | "expenses" | "transfers";
 
@@ -52,6 +53,8 @@ const Dashboard = () => {
   // Long press handling for avatar
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const { addCurrentAccount } = useMultiAccount();
+  const { getCompletedSteps } = useVerificationProgress();
+  const isVerified = getCompletedSteps() >= 3;
 
   // Refs for sliding indicator
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -231,16 +234,30 @@ const Dashboard = () => {
                   </Avatar>
                 </motion.div>
                 <motion.div 
-                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center border-2 border-background"
+                  className={cn(
+                    "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center border-2 border-background",
+                    isVerified ? "bg-green-500" : "bg-red-500"
+                  )}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.6 }}
                 >
-                  <motion.div
-                    className="w-1.5 h-1.5 rounded-full bg-white"
-                    animate={{ opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
+                  {isVerified ? (
+                    <motion.div
+                      className="w-1.5 h-1.5 rounded-full bg-white"
+                      animate={{ opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  ) : (
+                    <motion.div
+                      className="w-1.5 h-1.5 rounded-full bg-white"
+                      animate={{ 
+                        opacity: [1, 0.3, 1],
+                        scale: [1, 0.8, 1]
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  )}
                 </motion.div>
               </motion.button>
             ) : (
