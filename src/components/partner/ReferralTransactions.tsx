@@ -344,14 +344,18 @@ export const ReferralTransactions = memo(() => {
     filtered.sort((a, b) => b.dateTimestamp - a.dateTimestamp);
     
     // Group by date
-    const groups: { [key: string]: { transactions: ReferralTransaction[]; total: number } } = {};
+    const groups: { [key: string]: { transactions: ReferralTransaction[]; income: number; withdrawals: number } } = {};
     
     filtered.forEach((tx) => {
       if (!groups[tx.dateGroup]) {
-        groups[tx.dateGroup] = { transactions: [], total: 0 };
+        groups[tx.dateGroup] = { transactions: [], income: 0, withdrawals: 0 };
       }
       groups[tx.dateGroup].transactions.push(tx);
-      groups[tx.dateGroup].total += tx.amount;
+      if (tx.type === "withdrawal") {
+        groups[tx.dateGroup].withdrawals += Math.abs(tx.amount);
+      } else {
+        groups[tx.dateGroup].income += tx.amount;
+      }
     });
     
     return { groupedTransactions: groups, filteredTransactions: filtered };
@@ -404,15 +408,24 @@ export const ReferralTransactions = memo(() => {
       {/* Grouped by date */}
       {Object.keys(groupedTransactions).length > 0 ? (
         <div className="space-y-6">
-          {Object.entries(groupedTransactions).map(([dateGroup, { transactions, total }]) => (
+          {Object.entries(groupedTransactions).map(([dateGroup, { transactions, income, withdrawals }]) => (
             <div key={dateGroup}>
               <div className="flex items-center justify-between mb-2 px-1">
                 <p className="text-sm font-medium">
                   {getDateLabel(dateGroup)}
                 </p>
-                <p className={`text-sm font-medium ${total >= 0 ? "text-success" : "text-blue-500"}`}>
-                  {total >= 0 ? "+" : ""}{total.toFixed(2)} AED
-                </p>
+                <div className="flex items-center gap-3">
+                  {income > 0 && (
+                    <p className="text-sm font-medium text-success">
+                      +{income.toFixed(2)} AED
+                    </p>
+                  )}
+                  {withdrawals > 0 && (
+                    <p className="text-sm font-medium text-blue-500">
+                      -{withdrawals.toFixed(2)} AED
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="bg-card rounded-2xl overflow-hidden border border-border/50">
                 <div className="space-y-0">
