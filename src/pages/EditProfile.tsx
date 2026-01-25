@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Pencil, Check, ChevronDown } from "lucide-react";
+import { Camera, Check, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -284,7 +284,7 @@ const EditProfile = () => {
               {/* Hover overlay (only when not uploading) */}
               {!isUploadingAvatar && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Pencil className="w-6 h-6 text-white" />
+                  <Camera className="w-6 h-6 text-white" />
                 </div>
               )}
               
@@ -294,7 +294,7 @@ const EditProfile = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Pencil className="w-4 h-4 text-primary-foreground" />
+                <Camera className="w-4 h-4 text-primary-foreground" />
               </motion.div>
             </button>
           </div>
