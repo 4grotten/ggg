@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Wallet } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface ReferralBalanceProps {
@@ -56,9 +56,9 @@ export const ReferralBalance = memo(({ balance, invited, withdrawn }: ReferralBa
         
         <Button 
           onClick={handleWithdraw}
-          className="w-full mt-4 bg-success hover:bg-success/90 text-success-foreground"
+          className="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white"
         >
-          <Wallet className="w-4 h-4 mr-2" />
+          <ArrowUpRight className="w-4 h-4 mr-2" />
           {t('partner.withdraw', 'Вывести')}
         </Button>
       </div>
