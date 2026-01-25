@@ -171,7 +171,8 @@ const maskName = (name: string): string => {
     const firstName = parts[0];
     const lastName = parts[1];
     const maskedFirst = firstName.slice(0, 2) + '***';
-    return `${maskedFirst} ${lastName}`;
+    const maskedLast = lastName.slice(0, 1) + '***';
+    return `${maskedFirst} ${maskedLast}`;
   }
   return name.slice(0, 2) + '***';
 };
