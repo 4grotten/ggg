@@ -115,12 +115,10 @@ const FeesAndLimits = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
+      title={t("feesAndLimits.title")}
       rightAction={<LanguageSwitcher />}
     >
       <AnimatedFeeIcon />
-      <div className="flex flex-col items-center pb-6">
-        <h1 className="text-2xl font-bold text-foreground">{t("feesAndLimits.title")}</h1>
-      </div>
 
       <div className="px-4 pb-28">
         {/* One-Time Fees */}
