@@ -179,8 +179,8 @@ const Partner = () => {
                   boxShadow: "0 0 10px rgba(191, 255, 0, 0.5)"
                 }}
                 initial={{ width: "0%" }}
-                animate={{ width: `${(currentLevelIndex / (LEVELS.length - 1)) * 100}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
+                animate={{ width: `${(selectedLevelIndex / (LEVELS.length - 1)) * 100}%` }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               />
               
               {/* Progress indicator dot */}
@@ -189,22 +189,31 @@ const Partner = () => {
                 style={{
                   background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
                   boxShadow: "0 0 12px rgba(191, 255, 0, 0.8)",
-                  left: `calc(${(currentLevelIndex / (LEVELS.length - 1)) * 100}% - 8px)`
                 }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                animate={{ 
+                  left: `calc(${(selectedLevelIndex / (LEVELS.length - 1)) * 100}% - 8px)`,
+                  scale: [1, 1.15, 1]
+                }}
+                transition={{ 
+                  left: { duration: 0.4, ease: "easeOut" },
+                  scale: { duration: 2, repeat: Infinity }
+                }}
               />
             </div>
             
             {/* Level labels */}
             <div className="flex justify-between text-xs text-muted-foreground px-1">
               {LEVELS.map((level, idx) => (
-                <span 
+                <motion.span 
                   key={level.id}
-                  className={idx <= currentLevelIndex ? "text-foreground font-medium" : ""}
+                  animate={{
+                    color: idx <= selectedLevelIndex ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))",
+                    fontWeight: idx === selectedLevelIndex ? 600 : 400
+                  }}
+                  transition={{ duration: 0.3 }}
                 >
                   {level.name}
-                </span>
+                </motion.span>
               ))}
             </div>
           </div>
