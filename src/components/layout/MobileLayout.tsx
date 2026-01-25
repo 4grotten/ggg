@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 interface MobileLayoutProps {
   children: ReactNode;
   header?: ReactNode;
+  title?: string;
   showBackButton?: boolean;
   onBack?: () => void;
   rightAction?: ReactNode;
@@ -13,6 +14,7 @@ interface MobileLayoutProps {
 export const MobileLayout = ({
   children,
   header,
+  title,
   showBackButton = false,
   onBack,
   rightAction,
@@ -20,7 +22,7 @@ export const MobileLayout = ({
 }: MobileLayoutProps) => {
   const { t } = useTranslation();
   
-  const hasHeader = header || showBackButton || rightAction;
+  const hasHeader = header || title || showBackButton || rightAction;
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -53,6 +55,11 @@ export const MobileLayout = ({
                 )}
                 {header && !showBackButton && <div>{header}</div>}
               </div>
+              {title && (
+                <h1 className="absolute left-1/2 -translate-x-1/2 text-base font-semibold text-foreground">
+                  {title}
+                </h1>
+              )}
               <div className="flex justify-end">{rightAction}</div>
             </div>
           </header>
