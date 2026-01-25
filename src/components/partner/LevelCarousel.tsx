@@ -109,7 +109,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                       className="relative px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 overflow-hidden active:scale-95 transition-transform"
                       style={{
                         background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f857a6 100%)",
-                        boxShadow: "0 4px 15px rgba(102, 126, 234, 0.5), 0 0 20px rgba(248, 87, 166, 0.3)",
+                        boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
                       }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
