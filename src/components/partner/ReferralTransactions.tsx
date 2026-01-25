@@ -149,17 +149,9 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
 
 const CardIcon = memo(({ cardType }: { cardType?: CardType }) => {
   if (cardType === "black") {
-    return (
-      <div className="w-5 h-5 rounded bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center">
-        <CreditCard className="w-3 h-3 text-white" />
-      </div>
-    );
+    return <CreditCard className="w-5 h-5 text-zinc-800 dark:text-zinc-300" />;
   }
-  return (
-    <div className="w-5 h-5 rounded bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-[#BFFF00] dark:to-[#7FFF00] flex items-center justify-center">
-      <CreditCard className="w-3 h-3 text-white dark:text-black" />
-    </div>
-  );
+  return <CreditCard className="w-5 h-5 text-emerald-500 dark:text-[#BFFF00]" />;
 });
 
 CardIcon.displayName = "CardIcon";
