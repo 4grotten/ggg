@@ -697,14 +697,14 @@
   "partner": {
     "step1": {
       "title": "Conoce",
-      "subtitle": "Tu forma de ganar con Karta.",
-      "description": "Invita amigos y gana Karat cada vez que tus amigos usen Karta."
+      "subtitle": "Tu forma de ganar con Easy Card.",
+      "description": "Invita amigos y gana recompensas cada vez que tus amigos usen Easy Card."
     },
     "step2": {
       "title": "Reclama",
       "subtitle": "Convierte recompensas en USDT.",
-      "description1": "Cambia Karat a USDT o guárdalo.",
-      "description2": "$KARAT viene pronto y las recompensas pueden crecer."
+      "description1": "Cambia recompensas a USDT o guárdalas.",
+      "description2": "¡El programa de recompensas está creciendo!"
     },
     "step3": {
       "title": "Gana",
@@ -720,6 +720,6 @@
     "shareInTelegram": "Compartir en Telegram",
     "copyInviteLink": "Copiar Enlace de Invitación",
     "linkCopied": "¡Enlace de invitación copiado!",
-    "shareText": "¡Únete a Karta y obtén una tarjeta cripto gratis! Usa mi enlace de referido:"
+    "shareText": "¡Únete a Easy Card y obtén una tarjeta cripto gratis! Usa mi enlace de referido:"
   }
 }

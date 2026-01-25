@@ -100,7 +100,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
-              {t('partner.step1.title')} <Diamond className="inline w-5 h-5" /> Karat
+              {t('partner.step1.title')} Easy Card
             </h2>
             <p className="text-xl font-semibold text-center mb-4">
               {t('partner.step1.subtitle')}
@@ -170,7 +170,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
-              {t('partner.step2.title')} <Diamond className="inline w-5 h-5" /> Karat
+              {t('partner.step2.title')} Easy Card
             </h2>
             <p className="text-xl font-semibold text-center mb-4">
               {t('partner.step2.subtitle')}
@@ -238,7 +238,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
-              {t('partner.step3.title')} <Diamond className="inline w-5 h-5" /> Karat
+              {t('partner.step3.title')} Easy Card
             </h2>
             <p className="text-xl font-semibold text-center mb-6">
               {t('partner.step3.subtitle')}
