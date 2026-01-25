@@ -1,5 +1,6 @@
 import { ArrowRight, Handshake } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
 interface PartnerCardProps {
   onClick?: () => void;
@@ -34,15 +35,35 @@ export const PartnerCard = ({ onClick }: PartnerCardProps) => {
         className="relative w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[14px] p-4 flex items-center justify-between group"
       >
         <div className="flex items-center gap-3">
-          <div 
+          <motion.div 
             className="w-12 h-12 rounded-full flex items-center justify-center"
             style={{
               background: "linear-gradient(135deg, rgba(255,107,107,0.3), rgba(84,160,255,0.3))",
               backdropFilter: "blur(8px)",
             }}
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 200, 
+              damping: 15,
+              delay: 0.3 
+            }}
           >
-            <Handshake className="w-6 h-6 text-white" />
-          </div>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ 
+                scale: [0, 1.3, 1],
+                rotate: [0, -15, 15, -10, 10, 0]
+              }}
+              transition={{ 
+                scale: { delay: 0.5, duration: 0.4, ease: "easeOut" },
+                rotate: { delay: 0.9, duration: 0.6, ease: "easeInOut" }
+              }}
+            >
+              <Handshake className="w-6 h-6 text-white" />
+            </motion.div>
+          </motion.div>
           <div className="text-left">
             <p className="font-bold text-lg bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
               {t('dashboard.startEarning')}
