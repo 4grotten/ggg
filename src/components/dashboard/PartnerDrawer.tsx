@@ -72,31 +72,55 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center px-6 pb-8"
           >
-            {/* Diamond + Card illustration */}
-            <div className="relative w-64 h-64 flex items-center justify-center mb-6">
-              {/* Diamond background */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div 
-                  className="w-48 h-48"
-                  style={{
-                    background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 50%, #00FF7F 100%)",
-                    clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
-                    opacity: 0.9,
-                  }}
-                />
-              </div>
-              {/* Card in center */}
-              <div 
-                className="relative w-36 h-24 rounded-xl flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #DFFF00 0%, #BFFF00 100%)",
-                  boxShadow: "0 8px 32px rgba(191, 255, 0, 0.3)",
+            {/* Easy Card illustration - same as splash screen */}
+            <div className="relative w-72 h-48 flex items-center justify-center mb-6">
+              {/* Animated Shadow */}
+              <motion.div
+                animate={{ 
+                  opacity: [0.3, 0.6, 0.3],
+                  scale: [0.95, 1.05, 0.95],
                 }}
-              >
-                <Diamond className="w-8 h-8 text-black" />
-                <span className="absolute bottom-2 left-3 text-xs font-mono text-black/70">•••• 5273</span>
-                <span className="absolute bottom-2 right-3 text-xs font-bold text-black/80">VISA</span>
-              </div>
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+                className="absolute inset-0 bg-primary/40 blur-[40px] rounded-3xl"
+              />
+              
+              {/* Card Image */}
+              <motion.img
+                src="/og-image.png"
+                alt="Easy Card"
+                className="relative w-full h-auto rounded-2xl"
+                animate={{ 
+                  y: [0, -8, 0],
+                  rotateY: [0, 3, 0],
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+                style={{ 
+                  filter: "drop-shadow(0 20px 40px rgba(59, 130, 246, 0.3))"
+                }}
+              />
+              
+              {/* Light Reflection */}
+              <motion.div
+                animate={{ 
+                  x: ["-150%", "250%"],
+                  opacity: [0, 0.5, 0]
+                }}
+                transition={{ 
+                  duration: 2.5,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                  ease: "easeInOut"
+                }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 rounded-2xl pointer-events-none"
+              />
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
