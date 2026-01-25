@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Users, Send, Copy, Share2, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { ArrowLeft, Users, Send, Copy, Share2, Sparkles } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import partnerGrowthImage from "@/assets/partner-growth-hero.png";
@@ -25,6 +26,26 @@ const Partner = () => {
   const [totalInvited] = useState(0);
   const [totalWithdrawn] = useState(0);
   const [selectedLevelIndex, setSelectedLevelIndex] = useState(0);
+  
+  // Embla carousel for swipe
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: false,
+    align: "center",
+    containScroll: "trimSnaps"
+  });
+  
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedLevelIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+  
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
   
   const appLink = "https://test.apofiz.com/EasyCard/";
   
@@ -76,13 +97,6 @@ const Partner = () => {
     }
   };
   
-  const handlePrevLevel = () => {
-    setSelectedLevelIndex(prev => Math.max(0, prev - 1));
-  };
-  
-  const handleNextLevel = () => {
-    setSelectedLevelIndex(prev => Math.min(LEVELS.length - 1, prev + 1));
-  };
   
   const selectedLevel = LEVELS[selectedLevelIndex];
   
@@ -175,107 +189,102 @@ const Partner = () => {
             </div>
           </div>
           
-          {/* Level Cards Carousel */}
+          {/* Level Cards Carousel with Swipe */}
           <div className="px-4 mb-6">
-            <div className="relative">
-              {/* Current level badge */}
-              {selectedLevelIndex === currentLevelIndex && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 z-10"
-                >
-                  <span 
-                    className="px-3 py-1 rounded-full text-xs font-bold text-black flex items-center gap-1"
-                    style={{ background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)" }}
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex gap-4">
+                {LEVELS.map((level, idx) => (
+                  <div 
+                    key={level.id}
+                    className="flex-[0_0_100%] min-w-0"
                   >
-                    <Sparkles className="w-3 h-3" />
-                    {t('partner.currentLevel', 'Текущий уровень')}
-                  </span>
-                </motion.div>
-              )}
-              
-              <motion.div
-                className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-5 border border-border/50 overflow-hidden"
-                style={{
-                  boxShadow: selectedLevelIndex === currentLevelIndex 
-                    ? "0 0 30px rgba(191, 255, 0, 0.2)" 
-                    : "none"
-                }}
-              >
-                {/* Decorative gradient */}
-                <div 
-                  className="absolute top-0 right-0 w-32 h-32 opacity-20"
-                  style={{
-                    background: "radial-gradient(circle at top right, rgba(191, 255, 0, 0.5) 0%, transparent 70%)"
-                  }}
-                />
-                
-                {/* Level header */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{selectedLevel.icon}</span>
-                    <span className="text-xl font-bold">{selectedLevel.name}</span>
+                    <div className="relative">
+                      {/* Current level badge */}
+                      {idx === currentLevelIndex && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="absolute -top-3 left-1/2 -translate-x-1/2 z-10"
+                        >
+                          <span 
+                            className="px-3 py-1 rounded-full text-xs font-bold text-black flex items-center gap-1"
+                            style={{ background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)" }}
+                          >
+                            <Sparkles className="w-3 h-3" />
+                            {t('partner.currentLevel', 'Текущий уровень')}
+                          </span>
+                        </motion.div>
+                      )}
+                      
+                      <div
+                        className="relative bg-card/50 backdrop-blur-xl rounded-3xl p-5 border border-border/50 overflow-hidden"
+                        style={{
+                          boxShadow: idx === currentLevelIndex 
+                            ? "0 0 30px rgba(191, 255, 0, 0.2)" 
+                            : "none"
+                        }}
+                      >
+                        {/* Decorative gradient */}
+                        <div 
+                          className="absolute top-0 right-0 w-32 h-32 opacity-20"
+                          style={{
+                            background: "radial-gradient(circle at top right, rgba(191, 255, 0, 0.5) 0%, transparent 70%)"
+                          }}
+                        />
+                        
+                        {/* Level header */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{level.icon}</span>
+                            <span className="text-xl font-bold">{level.name}</span>
+                          </div>
+                          {level.maxFriends !== Infinity && (
+                            <span className="text-sm text-muted-foreground">
+                              <span className="text-foreground font-bold">{currentFriends}</span>
+                              /{level.maxFriends}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Benefits */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-muted/50 rounded-2xl p-4 text-center">
+                            <p className="text-xs text-muted-foreground mb-1">
+                              {t('partner.cardIssuance', 'За выпуск карт')}
+                            </p>
+                            <p className="text-2xl font-bold" style={{ color: "#BFFF00" }}>
+                              {level.cardPercent}%
+                            </p>
+                          </div>
+                          <div className="bg-muted/50 rounded-2xl p-4 text-center">
+                            <p className="text-xs text-muted-foreground mb-1">
+                              {t('partner.fromTransactions', 'С транзакций')}
+                            </p>
+                            <p className="text-2xl font-bold" style={{ color: "#BFFF00" }}>
+                              {level.txPercent}%
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  {selectedLevel.maxFriends !== Infinity && (
-                    <span className="text-sm text-muted-foreground">
-                      <span className="text-foreground font-bold">{currentFriends}</span>
-                      /{selectedLevel.maxFriends}
-                    </span>
-                  )}
-                </div>
-                
-                {/* Benefits */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-muted/50 rounded-2xl p-4 text-center">
-                    <p className="text-xs text-muted-foreground mb-1">
-                      {t('partner.cardIssuance', 'За выпуск карт')}
-                    </p>
-                    <p className="text-2xl font-bold" style={{ color: "#BFFF00" }}>
-                      {selectedLevel.cardPercent}%
-                    </p>
-                  </div>
-                  <div className="bg-muted/50 rounded-2xl p-4 text-center">
-                    <p className="text-xs text-muted-foreground mb-1">
-                      {t('partner.fromTransactions', 'С транзакций')}
-                    </p>
-                    <p className="text-2xl font-bold" style={{ color: "#BFFF00" }}>
-                      {selectedLevel.txPercent}%
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Navigation arrows */}
-                <button
-                  onClick={handlePrevLevel}
-                  disabled={selectedLevelIndex === 0}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center disabled:opacity-30"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={handleNextLevel}
-                  disabled={selectedLevelIndex === LEVELS.length - 1}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center disabled:opacity-30"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </motion.div>
-              
-              {/* Carousel dots */}
-              <div className="flex justify-center gap-1.5 mt-3">
-                {LEVELS.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedLevelIndex(idx)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      idx === selectedLevelIndex 
-                        ? "w-6 bg-[#BFFF00]" 
-                        : "bg-muted-foreground/30"
-                    }`}
-                  />
                 ))}
               </div>
+            </div>
+            
+            {/* Carousel dots */}
+            <div className="flex justify-center gap-1.5 mt-3">
+              {LEVELS.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => emblaApi?.scrollTo(idx)}
+                  className={`h-2 rounded-full transition-all ${
+                    idx === selectedLevelIndex 
+                      ? "w-6 bg-[#BFFF00]" 
+                      : "w-2 bg-muted-foreground/30"
+                  }`}
+                />
+              ))}
             </div>
           </div>
           
