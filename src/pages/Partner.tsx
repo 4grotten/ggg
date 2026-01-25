@@ -124,21 +124,40 @@ const Partner = () => {
         <div className="flex-1 overflow-y-auto pb-28">
           {/* Hero Section */}
           <div className="relative px-4 pt-4 pb-6">
-            {/* Wide format growth image with fantastic green border */}
+            {/* Wide format growth image with pulsating green glow */}
             <motion.div 
-              className="relative w-full rounded-2xl overflow-hidden mb-4"
+              className="relative w-full rounded-2xl overflow-visible mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
+              {/* Pulsating green glow effect */}
+              <motion.div 
+                className="absolute -inset-3 rounded-3xl z-0"
+                animate={{ 
+                  opacity: [0.4, 0.7, 0.4],
+                  scale: [0.98, 1.02, 0.98]
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+                style={{ 
+                  background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.5) 0%, rgba(127, 255, 0, 0.3) 40%, transparent 70%)",
+                  filter: "blur(20px)"
+                }}
+              />
+              
               <img 
                 src={partnerGrowthImage} 
                 alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-                className="w-full h-auto aspect-video object-cover rounded-2xl"
+                className="relative z-10 w-full h-auto aspect-video object-cover rounded-2xl"
+                style={{ 
+                  boxShadow: "0 0 30px rgba(191, 255, 0, 0.3)"
+                }}
               />
             </motion.div>
-            
-            {/* Title under the image */}
             <h2 className="text-xl font-bold text-center">
               {t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
             </h2>
