@@ -44,6 +44,7 @@ import PhoneEntry from "./pages/auth/PhoneEntry";
 import ProfileSteps from "./pages/auth/ProfileSteps";
 import CodeEntry from "./pages/auth/CodeEntry";
 import EditProfile from "./pages/EditProfile";
+import Partner from "./pages/Partner";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
@@ -64,6 +65,7 @@ const hiddenNavRoutes = [
   "/auth/",
   "/open-card",
   "/settings/edit-profile",
+  "/partner",
 ];
 
 const AppContent = () => {
@@ -86,6 +88,7 @@ const AppContent = () => {
         <Route path="/profile-verification" element={<ProfileVerification />} />
         <Route path="/profile" element={<ProfileVerification />} />
         <Route path="/info" element={<FeesAndLimits />} />
+        <Route path="/partner" element={<Partner />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/card/:type" element={<CardPage />} />
         <Route path="/card/:type/history" element={<TransactionHistory />} />
