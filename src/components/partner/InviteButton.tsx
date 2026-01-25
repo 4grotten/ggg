@@ -16,25 +16,19 @@ export const InviteButton = memo(({ scrollContainerRef }: InviteButtonProps) => 
   const [lastScrollTop, setLastScrollTop] = useState(0);
 
   useEffect(() => {
-    // Show button after initial render with animation
-    const showTimer = setTimeout(() => {
-      setIsVisible(true);
-    }, 500);
-
     const container = scrollContainerRef?.current;
-    if (!container) {
-      return () => clearTimeout(showTimer);
-    }
+   if (!container) return;
 
     const handleScroll = () => {
       const scrollTop = container.scrollTop;
       const scrollingDown = scrollTop > lastScrollTop;
       
-      // Hide when scrolling up near the top, show otherwise
-      if (scrollTop < 50) {
+     if (scrollingDown && scrollTop > 100) {
+       // Scrolling down and past 100px - show button
+       setIsVisible(true);
+     } else if (!scrollingDown) {
+       // Scrolling up - hide button
         setIsVisible(false);
-      } else if (scrollingDown || scrollTop > 100) {
-        setIsVisible(true);
       }
       
       setLastScrollTop(scrollTop);
@@ -43,7 +37,6 @@ export const InviteButton = memo(({ scrollContainerRef }: InviteButtonProps) => 
     container.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
-      clearTimeout(showTimer);
       container.removeEventListener('scroll', handleScroll);
     };
   }, [scrollContainerRef, lastScrollTop]);
