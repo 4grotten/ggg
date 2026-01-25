@@ -605,19 +605,15 @@ const Settings = () => {
           />
         </div>
 
-        {/* Install App */}
-        {!isInstalled && (
-          <div className="bg-card rounded-2xl overflow-hidden">
+        {/* Install App, Language & Appearance */}
+        <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
+          {!isInstalled && (
             <SettingsItem
               icon={<Smartphone className="w-5 h-5" />}
               label={t("settings.installApp")}
               onClick={handleInstallClick}
             />
-          </div>
-        )}
-
-        {/* Appearance & Language */}
-        <div className="bg-card rounded-2xl overflow-hidden divide-y divide-border">
+          )}
           <SettingsItem
             icon={<Globe className="w-5 h-5" />}
             label={t("settings.language")}
