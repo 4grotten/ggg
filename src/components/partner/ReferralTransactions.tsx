@@ -151,7 +151,7 @@ const CardIcon = memo(({ cardType }: { cardType?: CardType }) => {
   if (cardType === "metal") {
     return <CreditCard className="w-5 h-5 text-zinc-800 dark:text-zinc-300" />;
   }
-  return <CreditCard className="w-5 h-5 text-emerald-500 dark:text-[#BFFF00]" />;
+  return <CreditCard className="w-5 h-5 text-[#00FF00] dark:text-[#00FF00]" />;
 });
 
 CardIcon.displayName = "CardIcon";
