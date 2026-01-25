@@ -536,6 +536,10 @@
     "authRequired": "Anmeldung erforderlich",
     "authRequiredMessage": "Um Limits zu ändern, müssen Sie sich anmelden"
   },
+  "limitsSettings": {
+    "limitsFor": "Limits für",
+    "accountWithdrawal": "Auszahlung auf Konto"
+  },
   "chat": {
     "aiAssistant": "KI-Assistent",
     "description": "Stellen Sie eine Frage zu Karten, Überweisungen, Limits oder anderen App-Funktionen",

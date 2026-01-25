@@ -536,6 +536,10 @@
     "authRequired": "Autorización requerida",
     "authRequiredMessage": "Para cambiar los límites, debes iniciar sesión"
   },
+  "limitsSettings": {
+    "limitsFor": "Límites para",
+    "accountWithdrawal": "Retiro a cuenta"
+  },
   "chat": {
     "aiAssistant": "Asistente IA",
     "description": "Haz una pregunta sobre tarjetas, transferencias, límites o cualquier otra función de la app",
