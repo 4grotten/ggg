@@ -596,6 +596,15 @@ const Settings = () => {
           );
         })()}
 
+        {/* Referral Partner */}
+        <div className="bg-card rounded-2xl overflow-hidden">
+          <SettingsItem
+            icon={<Users className="w-5 h-5" />}
+            label={t("settings.referralPartner") || "Referral Partner"}
+            onClick={() => navigate("/partner")}
+          />
+        </div>
+
         {/* Install App */}
         {!isInstalled && (
           <div className="bg-card rounded-2xl overflow-hidden">
@@ -629,15 +638,6 @@ const Settings = () => {
             icon={<Receipt className="w-5 h-5" />}
             label={t("settings.limitsAndFees")}
             onClick={() => navigate("/fees-and-limits")}
-          />
-        </div>
-
-        {/* Referral Partner */}
-        <div className="bg-card rounded-2xl overflow-hidden">
-          <SettingsItem
-            icon={<Users className="w-5 h-5" />}
-            label={t("settings.referralPartner") || "Referral Partner"}
-            onClick={() => navigate("/partner")}
           />
         </div>
 
