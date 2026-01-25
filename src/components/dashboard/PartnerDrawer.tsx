@@ -340,81 +340,96 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   };
 
   const renderFooterButtons = () => {
-    if (step === 3) {
-      return (
-        <>
-          {/* 3 fantastic icons in a row */}
-          <div className="flex justify-center gap-5 mb-6">
-            <motion.button
-              onClick={handleShareTelegram}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
-              style={{
-                background: "linear-gradient(135deg, #0088cc 0%, #00c6ff 100%)",
-                boxShadow: "0 8px 24px rgba(0, 136, 204, 0.4)",
-              }}
-              aria-label={t('partner.shareInTelegram')}
-            >
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Send className="w-7 h-7 text-white relative z-10" />
-            </motion.button>
-            
-            <motion.button
-              onClick={handleCopyLink}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
-              style={{
-                background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-                boxShadow: "0 8px 24px rgba(124, 58, 237, 0.4)",
-              }}
-              aria-label={t('partner.copyInviteLink')}
-            >
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Copy className="w-7 h-7 text-white relative z-10" />
-            </motion.button>
-            
-            <motion.button
-              onClick={handleShare}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
-              style={{
-                background: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
-                boxShadow: "0 8px 24px rgba(16, 185, 129, 0.4)",
-              }}
-              aria-label={t('common.share')}
-            >
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Share2 className="w-7 h-7 text-white relative z-10" />
-            </motion.button>
-          </div>
-
-          <motion.button
-            onClick={handleClose}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-4 font-semibold rounded-2xl relative overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-              boxShadow: "0 8px 24px rgba(127, 255, 0, 0.3)",
-            }}
-          >
-            <span className="text-black font-bold">{t('common.continue')}</span>
-          </motion.button>
-        </>
-      );
-    }
     return (
-      <motion.button
-        onClick={handleContinue}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl"
-      >
-        {t('common.continue')}
-      </motion.button>
+      <AnimatePresence mode="wait" initial={false}>
+        {step === 3 ? (
+          <motion.div
+            key="footer-step3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* 3 fantastic icons in a row */}
+            <div className="flex justify-center gap-5 mb-6">
+              <motion.button
+                onClick={handleShareTelegram}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
+                style={{
+                  background: "linear-gradient(135deg, #0088cc 0%, #00c6ff 100%)",
+                  boxShadow: "0 8px 24px rgba(0, 136, 204, 0.4)",
+                }}
+                aria-label={t('partner.shareInTelegram')}
+              >
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Send className="w-7 h-7 text-white relative z-10" />
+              </motion.button>
+              
+              <motion.button
+                onClick={handleCopyLink}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
+                style={{
+                  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+                  boxShadow: "0 8px 24px rgba(124, 58, 237, 0.4)",
+                }}
+                aria-label={t('partner.copyInviteLink')}
+              >
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Copy className="w-7 h-7 text-white relative z-10" />
+              </motion.button>
+              
+              <motion.button
+                onClick={handleShare}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden group"
+                style={{
+                  background: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
+                  boxShadow: "0 8px 24px rgba(16, 185, 129, 0.4)",
+                }}
+                aria-label={t('common.share')}
+              >
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Share2 className="w-7 h-7 text-white relative z-10" />
+              </motion.button>
+            </div>
+
+            <motion.button
+              onClick={handleClose}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full py-4 font-semibold rounded-2xl relative overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
+                boxShadow: "0 8px 24px rgba(127, 255, 0, 0.3)",
+              }}
+            >
+              <span className="text-black font-bold">{t('common.continue')}</span>
+            </motion.button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="footer-default"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.button
+              onClick={handleContinue}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full py-4 bg-foreground text-background font-semibold rounded-2xl"
+            >
+              {t('common.continue')}
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   };
 
