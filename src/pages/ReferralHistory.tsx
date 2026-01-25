@@ -200,13 +200,13 @@ const ReferralHistory = () => {
           <span className="text-sm">{t("common.back", "Назад")}</span>
         </button>
       }
+      title={t("partner.referralHistory", "Реферальная история")}
       rightAction={<LanguageSwitcher />}
     >
       <PullToRefresh onRefresh={handleRefresh} className="h-full">
         <div className="px-4 py-6 space-y-4 pb-28">
-          {/* Title with Period Selector */}
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold">{t("partner.referralHistory", "Реферальная история")}</h1>
+          {/* Period Selector */}
+          <div className="flex items-center justify-end">
             <button
               onClick={() => setIsDateDrawerOpen(true)}
               className="flex items-center gap-1.5 text-primary"
