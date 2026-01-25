@@ -8,6 +8,7 @@ import { ProgressSection } from "@/components/partner/ProgressSection";
 import { ReferralBalance } from "@/components/partner/ReferralBalance";
 import { InviteButton } from "@/components/partner/InviteButton";
 import { LevelCarousel } from "@/components/partner/LevelCarousel";
+import { ReferralTransactions } from "@/components/partner/ReferralTransactions";
 
 const Partner = () => {
   const { t } = useTranslation();
@@ -70,6 +71,9 @@ const Partner = () => {
           invited={totalInvited}
           withdrawn={totalWithdrawn}
         />
+        
+        {/* Referral Transactions */}
+        <ReferralTransactions />
       </div>
     </div>
   );
