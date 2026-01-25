@@ -267,10 +267,11 @@ const LimitsSettings = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
+      title={t("settings.limitsSettings")}
       rightAction={<LanguageSwitcher />}
     >
       <div className="px-4 pt-4 pb-6">
-        <h1 className="text-xl font-bold text-foreground text-center mb-4">{t("settings.limitsSettings")}</h1>
+        
         
         {/* Card Carousel */}
         <div className="relative overflow-hidden mb-6">
