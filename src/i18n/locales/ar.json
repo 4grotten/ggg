@@ -697,14 +697,14 @@
   "partner": {
     "step1": {
       "title": "تعرف على",
-      "subtitle": "طريقك للربح مع Karta.",
-      "description": "ادعُ أصدقاءك واكسب Karat في كل مرة يستخدم فيها أصدقاؤك Karta."
+      "subtitle": "طريقك للربح مع Easy Card.",
+      "description": "ادعُ أصدقاءك واكسب مكافآت في كل مرة يستخدم فيها أصدقاؤك Easy Card."
     },
     "step2": {
       "title": "اطلب",
       "subtitle": "حوّل المكافآت إلى USDT.",
-      "description1": "حوّل Karat إلى USDT أو احتفظ به.",
-      "description2": "$KARAT قادم والمكافآت قد تنمو."
+      "description1": "حوّل المكافآت إلى USDT أو احتفظ بها.",
+      "description2": "برنامج المكافآت ينمو!"
     },
     "step3": {
       "title": "اربح",
@@ -720,6 +720,6 @@
     "shareInTelegram": "مشاركة في تيليجرام",
     "copyInviteLink": "نسخ رابط الدعوة",
     "linkCopied": "تم نسخ رابط الدعوة!",
-    "shareText": "انضم إلى Karta واحصل على بطاقة كريبتو مجانية! استخدم رابط الإحالة الخاص بي:"
+    "shareText": "انضم إلى Easy Card واحصل على بطاقة كريبتو مجانية! استخدم رابط الإحالة الخاص بي:"
   }
 }

@@ -697,14 +697,14 @@
   "partner": {
     "step1": {
       "title": "Tanışın",
-      "subtitle": "Karta ile kazanma yolunuz.",
-      "description": "Arkadaşlarınızı davet edin ve arkadaşlarınız Karta kullandığında Karat kazanın."
+      "subtitle": "Easy Card ile kazanma yolunuz.",
+      "description": "Arkadaşlarınızı davet edin ve arkadaşlarınız Easy Card kullandığında ödül kazanın."
     },
     "step2": {
       "title": "Talep Et",
       "subtitle": "Ödülleri USDT'ye çevirin.",
-      "description1": "Karat'ı USDT'ye çevirin veya tutun.",
-      "description2": "$KARAT geliyor ve ödüller artabilir."
+      "description1": "Ödülleri USDT'ye çevirin veya tutun.",
+      "description2": "Ödül programı büyüyor!"
     },
     "step3": {
       "title": "Kazan",
@@ -720,6 +720,6 @@
     "shareInTelegram": "Telegram'da Paylaş",
     "copyInviteLink": "Davet Linkini Kopyala",
     "linkCopied": "Davet linki kopyalandı!",
-    "shareText": "Karta'ya katıl ve ücretsiz kripto kartı al! Referans linkimi kullan:"
+    "shareText": "Easy Card'a katıl ve ücretsiz kripto kartı al! Referans linkimi kullan:"
   }
 }

@@ -738,14 +738,14 @@
   "partner": {
     "step1": {
       "title": "Meet",
-      "subtitle": "Your way to earn with Karta.",
-      "description": "Invite friends and earn Karat every time your friends use Karta."
+      "subtitle": "Your way to earn with Easy Card.",
+      "description": "Invite friends and earn rewards every time your friends use Easy Card."
     },
     "step2": {
       "title": "Claim",
       "subtitle": "Turn rewards into USDT.",
-      "description1": "Claim Karat to USDT or hold it.",
-      "description2": "$KARAT is coming and rewards may grow."
+      "description1": "Claim rewards to USDT or hold them.",
+      "description2": "Rewards program is growing!"
     },
     "step3": {
       "title": "Earn",
@@ -761,6 +761,6 @@
     "shareInTelegram": "Share in Telegram",
     "copyInviteLink": "Copy Invite Link",
     "linkCopied": "Invite link copied!",
-    "shareText": "Join Karta and get a free crypto card! Use my referral link:"
+    "shareText": "Join Easy Card and get a free crypto card! Use my referral link:"
   }
 }

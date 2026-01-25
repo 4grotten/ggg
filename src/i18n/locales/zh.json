@@ -697,14 +697,14 @@
   "partner": {
     "step1": {
       "title": "认识",
-      "subtitle": "您通过Karta赚钱的方式。",
-      "description": "邀请朋友，每当朋友使用Karta时即可赚取Karat。"
+      "subtitle": "您通过Easy Card赚钱的方式。",
+      "description": "邀请朋友，每当朋友使用Easy Card时即可获得奖励。"
     },
     "step2": {
       "title": "领取",
       "subtitle": "将奖励转换为USDT。",
-      "description1": "将Karat兑换为USDT或持有。",
-      "description2": "$KARAT即将到来，奖励可能增长。"
+      "description1": "将奖励兑换为USDT或持有。",
+      "description2": "奖励计划正在增长！"
     },
     "step3": {
       "title": "赚取",
@@ -720,6 +720,6 @@
     "shareInTelegram": "分享到Telegram",
     "copyInviteLink": "复制邀请链接",
     "linkCopied": "邀请链接已复制！",
-    "shareText": "加入Karta获取免费加密卡！使用我的推荐链接："
+    "shareText": "加入Easy Card获取免费加密卡！使用我的推荐链接："
   }
 }
