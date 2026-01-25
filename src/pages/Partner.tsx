@@ -117,13 +117,11 @@ const Partner = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Animated rotating green border */}
-              <motion.div 
+              {/* Static green border */}
+              <div 
                 className="absolute -inset-[3px] rounded-2xl z-0"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                 style={{ 
-                  background: "conic-gradient(from 0deg, #BFFF00, #7FFF00, #00FF88, #7FFF00, #BFFF00)",
+                  background: "linear-gradient(135deg, #BFFF00, #7FFF00, #00FF88, #7FFF00, #BFFF00)",
                 }}
               />
               
