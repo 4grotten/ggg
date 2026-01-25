@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Diamond, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
+import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import partnerStep1Image from "@/assets/partner-step1-magnet.png";
+import partnerStep2Image from "@/assets/partner-step2-gift.png";
+import partnerStep3Image from "@/assets/partner-step3-piggy.png";
 
 interface PartnerDrawerProps {
   open: boolean;
@@ -149,36 +152,19 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center px-6"
           >
-            {/* Magnet + coins illustration */}
-            <div className="relative w-48 h-48 flex items-center justify-center mb-6">
-              <div 
-                className="w-24 h-32 rounded-t-full"
-                style={{
-                  background: "linear-gradient(180deg, #7FFF00 0%, #BFFF00 100%)",
-                }}
+            {/* Coins illustration */}
+            <motion.div 
+              className="relative w-48 h-48 flex items-center justify-center mb-6"
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <img 
+                src={partnerStep1Image} 
+                alt="Earn rewards" 
+                className="w-full h-full object-contain rounded-2xl"
+                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
               />
-              {/* Coins */}
-              {[...Array(4)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-6 h-6 rounded-full flex items-center justify-center"
-                  style={{
-                    background: "linear-gradient(135deg, #DFFF00 0%, #BFFF00 100%)",
-                    border: "2px solid #7FFF00",
-                    top: `${25 + i * 15}%`,
-                    left: `${15 + (i % 2) * 50}%`,
-                  }}
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }}
-                >
-                  <Diamond className="w-3 h-3 text-black" />
-                </motion.div>
-              ))}
-              {/* Sparkles */}
-              <span className="absolute top-4 left-4 text-xl">✦</span>
-              <span className="absolute top-8 right-8 text-lg">✦</span>
-              <span className="absolute bottom-12 left-12 text-sm">✦</span>
-            </div>
+            </motion.div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step2.title')} Easy Card
@@ -207,31 +193,19 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center px-6"
           >
-            {/* Box illustration */}
-            <div className="relative w-48 h-48 flex items-center justify-center mb-6">
-              <div 
-                className="w-32 h-32 rounded-2xl flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-                  boxShadow: "0 8px 32px rgba(127, 255, 0, 0.3)",
-                }}
-              >
-                <Diamond className="w-12 h-12 text-black" />
-              </div>
-              {/* Ribbon */}
-              <div 
-                className="absolute -right-4 top-1/2 w-16 h-24 -translate-y-1/2"
-                style={{
-                  background: "linear-gradient(180deg, #7FFF00 0%, #00FF7F 100%)",
-                  borderRadius: "0 12px 12px 0",
-                }}
+            {/* Gift box illustration */}
+            <motion.div 
+              className="relative w-48 h-48 flex items-center justify-center mb-6"
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <img 
+                src={partnerStep2Image} 
+                alt="Rewards" 
+                className="w-full h-full object-contain rounded-2xl"
+                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
               />
-              {/* Sparkles */}
-              <span className="absolute -top-2 right-0 text-2xl text-[#BFFF00]">✦</span>
-              <span className="absolute top-4 -right-2 text-lg text-[#BFFF00]">✦</span>
-              <span className="absolute -bottom-4 -left-2 text-xl text-[#BFFF00]">✦</span>
-              <span className="absolute bottom-0 left-4 text-sm text-[#BFFF00]">✦</span>
-            </div>
+            </motion.div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step3.title')} Easy Card
@@ -289,40 +263,18 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className="flex flex-col items-center px-6"
           >
             {/* Piggy bank illustration */}
-            <div className="relative w-56 h-48 flex items-center justify-center mb-6">
-              <div 
-                className="w-40 h-32 rounded-[40px] relative"
-                style={{
-                  background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-                }}
-              >
-                {/* Legs */}
-                <div className="absolute -bottom-4 left-6 w-4 h-6 rounded-b-lg" style={{ background: "#7FFF00" }} />
-                <div className="absolute -bottom-4 left-14 w-4 h-6 rounded-b-lg" style={{ background: "#7FFF00" }} />
-                <div className="absolute -bottom-4 right-14 w-4 h-6 rounded-b-lg" style={{ background: "#7FFF00" }} />
-                <div className="absolute -bottom-4 right-6 w-4 h-6 rounded-b-lg" style={{ background: "#7FFF00" }} />
-                {/* Tail */}
-                <div className="absolute top-1/2 -left-6 w-8 h-4 rounded-l-full border-4 border-[#7FFF00] border-r-0" />
-                {/* Coin slot */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-2 bg-black/20 rounded-full" />
-              </div>
-              {/* Coin */}
-              <motion.div
-                className="absolute -top-4 right-12 w-10 h-10 rounded-full flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #DFFF00 0%, #BFFF00 100%)",
-                  border: "2px solid #7FFF00",
-                }}
-                animate={{ y: [0, 8, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-              >
-                <Diamond className="w-5 h-5 text-black" />
-              </motion.div>
-              {/* Sparkles */}
-              <span className="absolute top-0 left-8 text-xl text-[#BFFF00]">✦</span>
-              <span className="absolute top-4 right-4 text-lg text-[#BFFF00]">✦</span>
-              <span className="absolute bottom-8 right-0 text-sm text-[#BFFF00]">✦</span>
-            </div>
+            <motion.div 
+              className="relative w-48 h-48 flex items-center justify-center mb-6"
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <img 
+                src={partnerStep3Image} 
+                alt="Save rewards" 
+                className="w-full h-full object-contain rounded-2xl"
+                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
+              />
+            </motion.div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step4.title')}
