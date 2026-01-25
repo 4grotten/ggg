@@ -104,6 +104,11 @@ const LimitsSettings = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   
   const [activeIndex, setActiveIndex] = useState(0);
   const [transferDrawerOpen, setTransferDrawerOpen] = useState(false);
