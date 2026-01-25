@@ -61,14 +61,14 @@ export const WithdrawalDetailsDrawer = memo(({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader className="text-center pb-0">
+      <DrawerContent className="max-h-[85vh] flex flex-col">
+        <DrawerHeader className="text-center pb-0 flex-shrink-0">
           <DrawerTitle className="sr-only">
             {t('partner.withdrawalDetails', 'Детали вывода')}
           </DrawerTitle>
         </DrawerHeader>
         
-        <div className="px-4 pb-8 pt-2 space-y-6">
+        <div className="px-4 pb-8 pt-2 space-y-6 overflow-y-auto flex-1">
           {/* Icon and Amount */}
           <div className="flex flex-col items-center text-center space-y-3">
             <motion.div 
