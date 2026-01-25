@@ -1,5 +1,6 @@
 {
   "partner": {
+    "referralHistory": "Referral History",
     "withdrawTitle": "Withdraw to",
     "withdrawToCard": "Top up card",
     "availableBalance": "Available balance"

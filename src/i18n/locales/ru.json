@@ -1,5 +1,6 @@
 {
   "partner": {
+    "referralHistory": "Реферальная история",
     "withdrawTitle": "Вывести на",
     "withdrawToCard": "Пополнение карты",
     "availableBalance": "Доступный баланс"
