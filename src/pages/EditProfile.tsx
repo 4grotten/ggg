@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Loader2, Check, ChevronDown } from "lucide-react";
+import { Pencil, Check, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -253,33 +253,29 @@ const EditProfile = () => {
                 </AnimatePresence>
               </div>
               
-              {/* Loading overlay */}
+              {/* Loading overlay - simple dots */}
               <AnimatePresence>
                 {isUploadingAvatar && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-full z-10 backdrop-blur-sm"
+                    className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-10"
                   >
-                    <div className="relative flex flex-col items-center gap-2">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      >
-                        <Loader2 className="w-10 h-10 text-white" />
-                      </motion.div>
-                      {/* Pulsing rings */}
-                      <motion.div
-                        className="absolute inset-0 m-auto w-16 h-16 rounded-full border-2 border-white/40"
-                        animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
-                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut" }}
-                      />
-                      <motion.div
-                        className="absolute inset-0 m-auto w-16 h-16 rounded-full border-2 border-white/40"
-                        animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
-                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut", delay: 0.4 }}
-                      />
+                    <div className="flex gap-1.5">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-2.5 h-2.5 bg-white rounded-full"
+                          animate={{ y: [0, -8, 0] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: i * 0.15,
+                            ease: "easeInOut"
+                          }}
+                        />
+                      ))}
                     </div>
                   </motion.div>
                 )}
@@ -288,21 +284,17 @@ const EditProfile = () => {
               {/* Hover overlay (only when not uploading) */}
               {!isUploadingAvatar && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-6 h-6 text-white" />
+                  <Pencil className="w-6 h-6 text-white" />
                 </div>
               )}
               
-              {/* Camera badge */}
+              {/* Edit badge */}
               <motion.div 
                 className="absolute bottom-0 right-0 w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {isUploadingAvatar ? (
-                  <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
-                ) : (
-                  <Camera className="w-4 h-4 text-primary-foreground" />
-                )}
+                <Pencil className="w-4 h-4 text-primary-foreground" />
               </motion.div>
             </button>
           </div>
@@ -438,7 +430,16 @@ const EditProfile = () => {
           className="w-full h-14 text-lg font-semibold"
         >
           {isSaving ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <div className="flex gap-1">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-2 h-2 bg-primary-foreground rounded-full"
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                />
+              ))}
+            </div>
           ) : (
             t("editProfile.save")
           )}
