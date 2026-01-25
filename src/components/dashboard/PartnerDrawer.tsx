@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
@@ -15,6 +16,7 @@ interface PartnerDrawerProps {
 
 export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
 
@@ -426,12 +428,21 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     }
   };
 
+  const handleGoToPartnerPage = () => {
+    onOpenChange(false);
+    setTimeout(() => {
+      setStep(0);
+      setDirection(1);
+      navigate("/partner");
+    }, 300);
+  };
+
   const renderFooterButtons = () => {
     const isLastStep = step === 3;
     
     return (
       <motion.button
-        onClick={isLastStep ? handleClose : handleContinue}
+        onClick={isLastStep ? handleGoToPartnerPage : handleContinue}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className="w-full py-4 font-semibold rounded-2xl relative overflow-hidden"
