@@ -112,36 +112,16 @@ const Partner = () => {
           <div className="relative px-4 pt-4 pb-6">
             {/* Wide format growth image with fantastic green border */}
             <motion.div 
-              className="relative w-full rounded-2xl overflow-visible mb-4"
+              className="relative w-full rounded-2xl overflow-hidden mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Static green border */}
-              <div 
-                className="absolute -inset-[3px] rounded-2xl z-0"
-                style={{ 
-                  background: "linear-gradient(135deg, #BFFF00, #7FFF00, #00FF88, #7FFF00, #BFFF00)",
-                }}
+              <img 
+                src={partnerGrowthImage} 
+                alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
+                className="w-full h-auto aspect-video object-cover rounded-2xl"
               />
-              
-              {/* Outer glow effect */}
-              <div 
-                className="absolute -inset-[6px] rounded-2xl z-0"
-                style={{ 
-                  background: "conic-gradient(from 0deg, rgba(191, 255, 0, 0.4), rgba(127, 255, 0, 0.2), rgba(0, 255, 136, 0.4), rgba(127, 255, 0, 0.2), rgba(191, 255, 0, 0.4))",
-                  filter: "blur(12px)"
-                }}
-              />
-              
-              {/* Image container with inner background to mask border */}
-              <div className="relative rounded-2xl overflow-hidden z-10 bg-background">
-                <img 
-                  src={partnerGrowthImage} 
-                  alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-                  className="w-full h-auto aspect-video object-cover"
-                />
-              </div>
             </motion.div>
             
             {/* Title under the image */}
