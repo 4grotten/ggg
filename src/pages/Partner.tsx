@@ -236,20 +236,22 @@ const Partner = () => {
                         </motion.div>
                       )}
                       
-                      <div className="relative rounded-3xl p-[1px] overflow-hidden">
+                      <div className="relative rounded-3xl p-[1px]">
                         {/* Rotating gradient border for current level */}
                         {idx === currentLevelIndex && (
-                          <motion.div
-                            className="absolute inset-[-50%] z-0"
-                            style={{
-                              background: "conic-gradient(from 0deg, #BFFF00, #7FFF00, #00FF00, #7FFF00, #BFFF00)",
-                            }}
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                          />
+                          <div className="absolute inset-0 rounded-3xl overflow-hidden">
+                            <motion.div
+                              className="absolute inset-[-100%] w-[300%] h-[300%]"
+                              style={{
+                                background: "conic-gradient(from 0deg at 50% 50%, transparent 0deg, #BFFF00 60deg, #7FFF00 120deg, #00FF88 180deg, #7FFF00 240deg, #BFFF00 300deg, transparent 360deg)",
+                              }}
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                            />
+                          </div>
                         )}
                         <div
-                          className={`relative bg-card backdrop-blur-xl rounded-3xl p-5 overflow-hidden z-10 ${
+                          className={`relative bg-card backdrop-blur-xl rounded-3xl p-5 overflow-hidden ${
                             idx !== currentLevelIndex ? "border border-border/50" : ""
                           }`}
                         >
