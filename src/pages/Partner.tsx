@@ -219,12 +219,12 @@ const Partner = () => {
                     className="flex-[0_0_100%] min-w-0 pt-4"
                   >
                     <div className="relative overflow-visible">
-                      {/* Current level badge */}
+                      {/* Current level badge - z-20 to be above everything */}
                       {idx === currentLevelIndex && (
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="absolute -top-3 left-1/2 -translate-x-1/2 z-10"
+                          className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
                         >
                           <span 
                             className="px-3 py-1 rounded-full text-xs font-bold text-black flex items-center gap-1"
@@ -236,11 +236,11 @@ const Partner = () => {
                         </motion.div>
                       )}
                       
-                      <div className="relative">
+                      <div className="relative rounded-3xl p-[1px] overflow-hidden">
                         {/* Rotating gradient border for current level */}
                         {idx === currentLevelIndex && (
                           <motion.div
-                            className="absolute -inset-[1px] rounded-3xl z-0"
+                            className="absolute inset-[-50%] z-0"
                             style={{
                               background: "conic-gradient(from 0deg, #BFFF00, #7FFF00, #00FF00, #7FFF00, #BFFF00)",
                             }}
@@ -249,8 +249,8 @@ const Partner = () => {
                           />
                         )}
                         <div
-                          className={`relative bg-card/50 backdrop-blur-xl rounded-3xl p-5 overflow-hidden z-10 ${
-                            idx === currentLevelIndex ? "" : "border border-border/50"
+                          className={`relative bg-card backdrop-blur-xl rounded-3xl p-5 overflow-hidden z-10 ${
+                            idx !== currentLevelIndex ? "border border-border/50" : ""
                           }`}
                         >
                         {/* Decorative gradient */}
