@@ -291,7 +291,7 @@ const Partner = () => {
           <div className="px-4 mb-6">
             <div className="bg-card/50 backdrop-blur-xl rounded-2xl p-5 border border-border/50">
               <p className="text-sm text-muted-foreground mb-1">
-                {t('partner.referralBalance', 'Реферальный счёт')} (USDT)
+                {t('partner.referralBalance', 'Реферальный счёт')}
               </p>
               <p className="text-4xl font-bold mb-4">{referralBalance}</p>
               
