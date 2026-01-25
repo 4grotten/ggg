@@ -110,30 +110,46 @@ const Partner = () => {
         <div className="flex-1 overflow-y-auto pb-28">
           {/* Hero Section */}
           <div className="relative px-4 pt-4 pb-6">
-            {/* Wide format growth image */}
+            {/* Wide format growth image with fantastic green border */}
             <motion.div 
-              className="relative w-full rounded-2xl overflow-hidden mb-4"
+              className="relative w-full rounded-2xl overflow-visible mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Glowing border effect */}
+              {/* Animated rotating green border */}
+              <motion.div 
+                className="absolute -inset-[3px] rounded-2xl z-0"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                style={{ 
+                  background: "conic-gradient(from 0deg, #BFFF00, #7FFF00, #00FF88, #7FFF00, #BFFF00)",
+                }}
+              />
+              
+              {/* Outer glow effect */}
               <div 
-                className="absolute -inset-0.5 rounded-2xl opacity-60"
+                className="absolute -inset-[6px] rounded-2xl z-0"
                 style={{ 
-                  background: "linear-gradient(135deg, rgba(191, 255, 0, 0.5) 0%, rgba(127, 255, 0, 0.3) 50%, rgba(191, 255, 0, 0.5) 100%)",
-                  filter: "blur(8px)"
+                  background: "conic-gradient(from 0deg, rgba(191, 255, 0, 0.4), rgba(127, 255, 0, 0.2), rgba(0, 255, 136, 0.4), rgba(127, 255, 0, 0.2), rgba(191, 255, 0, 0.4))",
+                  filter: "blur(12px)"
                 }}
               />
-              <img 
-                src={partnerGrowthImage} 
-                alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-                className="relative w-full h-auto aspect-video object-cover rounded-2xl"
-                style={{ 
-                  boxShadow: "0 12px 40px rgba(191, 255, 0, 0.25)"
-                }}
-              />
+              
+              {/* Image container with inner background to mask border */}
+              <div className="relative rounded-2xl overflow-hidden z-10 bg-background">
+                <img 
+                  src={partnerGrowthImage} 
+                  alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
+                  className="w-full h-auto aspect-video object-cover"
+                />
+              </div>
             </motion.div>
+            
+            {/* Title under the image */}
+            <h2 className="text-xl font-bold text-center">
+              {t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
+            </h2>
             
             {/* Progress milestones */}
             <div className="flex justify-between text-sm text-muted-foreground mb-2 px-2">
