@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
 import { useTranslation } from "react-i18next";
 
 // Partner levels configuration
@@ -21,15 +20,7 @@ interface LevelCarouselProps {
 export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselProps) => {
   const { t } = useTranslation();
   const [selectedLevelIndex, setSelectedLevelIndex] = useState(0);
-  
-  // Embla carousel for swipe - axis: "x" allows vertical scroll passthrough
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: false,
-    align: "center",
-    containScroll: "trimSnaps",
-    axis: "x",
-    dragThreshold: 10
-  });
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Calculate current level
   const getCurrentLevelIndex = () => {
@@ -43,29 +34,50 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
   
   const currentLevelIndex = getCurrentLevelIndex();
   
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    const newIndex = emblaApi.selectedScrollSnap();
-    setSelectedLevelIndex(newIndex);
-    onLevelChange?.(newIndex);
-  }, [emblaApi, onLevelChange]);
+  const handleScroll = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const scrollLeft = container.scrollLeft;
+    const cardWidth = container.offsetWidth;
+    const newIndex = Math.round(scrollLeft / cardWidth);
+    if (newIndex !== selectedLevelIndex) {
+      setSelectedLevelIndex(newIndex);
+      onLevelChange?.(newIndex);
+    }
+  }, [selectedLevelIndex, onLevelChange]);
   
   useEffect(() => {
-    if (!emblaApi) return;
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi, onSelect]);
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  const scrollToIndex = useCallback((index: number) => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const cardWidth = container.offsetWidth;
+    container.scrollTo({
+      left: cardWidth * index,
+      behavior: "smooth"
+    });
+  }, []);
 
   return (
     <div className="px-4 mb-6 pt-4">
-      <div className="overflow-hidden" ref={emblaRef} style={{ touchAction: "pan-y pinch-zoom" }}>
-        <div className="flex gap-4" style={{ touchAction: "pan-x" }}>
+      <div 
+        ref={scrollContainerRef}
+        className="overflow-x-auto overflow-y-visible scrollbar-hide snap-x snap-mandatory"
+        style={{ 
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        <div className="flex gap-4 pb-2">
           {LEVELS.map((level, idx) => (
             <div 
               key={level.id}
-              className="flex-[0_0_100%] min-w-0 pt-4"
+              className="flex-shrink-0 w-full pt-4 snap-center"
             >
               <div className="relative overflow-visible">
                 {/* Current level badge - z-20 to be above everything */}
@@ -155,7 +167,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
         {LEVELS.map((_, idx) => (
           <button
             key={idx}
-            onClick={() => emblaApi?.scrollTo(idx)}
+            onClick={() => scrollToIndex(idx)}
             className={`h-2 rounded-full transition-all ${
               idx === selectedLevelIndex 
                 ? "w-6 bg-emerald-500 dark:bg-[#BFFF00]" 
