@@ -1,8 +1,8 @@
 import { memo, useMemo, useState } from "react";
 import { CreditCard, ArrowDownLeft, ArrowUpDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { CardType } from "@/types/card";
 
-type CardType = "black" | "green";
 type SortType = "date" | "amount" | "type";
 
 interface ReferralTransaction {
@@ -24,7 +24,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "1",
     userName: "Александр К.",
     type: "card",
-    cardType: "green",
+    cardType: "virtual",
     amount: 27.45,
     originalAmount: 183,
     percent: 15,
@@ -49,7 +49,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "3",
     userName: "Дмитрий В.",
     type: "card",
-    cardType: "black",
+    cardType: "metal",
     amount: 45.75,
     originalAmount: 305,
     percent: 15,
@@ -74,7 +74,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "5",
     userName: "Артём Н.",
     type: "card",
-    cardType: "black",
+    cardType: "metal",
     amount: 75.00,
     originalAmount: 500,
     percent: 15,
@@ -99,7 +99,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "7",
     userName: "Иван Т.",
     type: "card",
-    cardType: "green",
+    cardType: "virtual",
     amount: 27.45,
     originalAmount: 183,
     percent: 15,
@@ -124,7 +124,7 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
     id: "9",
     userName: "Сергей Л.",
     type: "card",
-    cardType: "black",
+    cardType: "metal",
     amount: 45.75,
     originalAmount: 305,
     percent: 15,
@@ -148,13 +148,11 @@ const MOCK_TRANSACTIONS: ReferralTransaction[] = [
 ];
 
 const CardIcon = memo(({ cardType }: { cardType?: CardType }) => {
-  if (cardType === "black") {
+  if (cardType === "metal") {
     return <CreditCard className="w-5 h-5 text-zinc-800 dark:text-zinc-300" />;
   }
   return <CreditCard className="w-5 h-5 text-emerald-500 dark:text-[#BFFF00]" />;
 });
-
-CardIcon.displayName = "CardIcon";
 
 CardIcon.displayName = "CardIcon";
 
@@ -179,10 +177,10 @@ const maskName = (name: string): string => {
 };
 
 const getCardTypeName = (cardType?: CardType, t?: (key: string, fallback: string) => string): string => {
-  if (cardType === "black") {
-    return t?.('partner.blackCard', 'Black карта') ?? 'Black карта';
+  if (cardType === "metal") {
+    return t?.('partner.metalCard', 'Metal карта') ?? 'Metal карта';
   }
-  return t?.('partner.greenCard', 'Green карта') ?? 'Green карта';
+  return t?.('partner.virtualCard', 'Virtual карта') ?? 'Virtual карта';
 };
 
 const TransactionItem = memo(({ tx }: { tx: ReferralTransaction }) => {
