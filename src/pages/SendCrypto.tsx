@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -51,7 +51,13 @@ const networksByCoin: Record<string, { id: string; name: string }[]> = {
 
 const SendCrypto = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
+  
+  // Check if this is a referral withdrawal
+  const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
+  const referralBalance = location.state?.referralBalance || 0;
+  
   const [selectedCard, setSelectedCard] = useState<Card>(cards[0]);
   const [selectedCoin, setSelectedCoin] = useState(coins[0]);
   const [selectedNetwork, setSelectedNetwork] = useState(networksByCoin[coins[0].id][0]);
@@ -61,10 +67,13 @@ const SendCrypto = () => {
   const [walletAddress, setWalletAddress] = useState("");
   const [amountAED, setAmountAED] = useState("");
 
+  // Use referral balance or card balance
+  const availableBalance = isReferralWithdrawal ? referralBalance : selectedCard.balance;
+
   const amountCrypto = amountAED ? (parseFloat(amountAED) * AED_TO_USDT_RATE).toFixed(2) : "0.00";
   const networkFee = amountAED ? (parseFloat(amountCrypto) * NETWORK_FEE_PERCENT / 100).toFixed(2) : "0.00";
   const amountAfterFee = amountAED ? (parseFloat(amountCrypto) - parseFloat(networkFee)).toFixed(2) : "0.00";
-  const isValid = walletAddress.length >= 20 && parseFloat(amountAED) > 0 && parseFloat(amountAED) <= selectedCard.balance;
+  const isValid = walletAddress.length >= 20 && parseFloat(amountAED) > 0 && parseFloat(amountAED) <= availableBalance;
 
   const formatAmountInput = (value: string) => {
     const cleaned = value.replace(/[^\d.]/g, "");
@@ -124,32 +133,48 @@ const SendCrypto = () => {
             </p>
           </div>
 
-          {/* Card Selection */}
+          {/* Source Selection - Card or Referral Balance */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground">
-              {t("send.fromCard")}
+              {isReferralWithdrawal ? t("partner.referralBalance", "Реферальный счёт") : t("send.fromCard")}
             </label>
-            <button
-              onClick={() => setCardDrawerOpen(true)}
-              className="w-full flex items-center justify-between p-4 bg-secondary rounded-2xl hover:bg-muted/80 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  selectedCard.type === "metal" 
-                    ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                    : "bg-primary"
-                }`}>
-                  <CreditCard className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <div className="text-left">
-                  <p className="font-semibold">{selectedCard.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    •••• {selectedCard.lastFour}
-                  </p>
+            {isReferralWithdrawal ? (
+              <div className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Wallet className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold">{t("partner.referralBalance", "Реферальный счёт")}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {referralBalance.toFixed(2)} AED
+                    </p>
+                  </div>
                 </div>
               </div>
-              <ChevronDown className="w-5 h-5 text-muted-foreground" />
-            </button>
+            ) : (
+              <button
+                onClick={() => setCardDrawerOpen(true)}
+                className="w-full flex items-center justify-between p-4 bg-secondary rounded-2xl hover:bg-muted/80 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    selectedCard.type === "metal" 
+                      ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                      : "bg-primary"
+                  }`}>
+                    <CreditCard className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold">{selectedCard.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      •••• {selectedCard.lastFour}
+                    </p>
+                  </div>
+                </div>
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              </button>
+            )}
           </div>
 
           {/* Coin Selection */}
@@ -234,7 +259,7 @@ const SendCrypto = () => {
                 {t("send.amount")}
               </label>
               <span className="text-sm text-muted-foreground">
-                {t("send.available")}: <span className="font-medium text-foreground">{selectedCard.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
+                {t("send.available")}: <span className="font-medium text-foreground">{availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
               </span>
             </div>
             <div className="relative">
@@ -247,7 +272,7 @@ const SendCrypto = () => {
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 <button
-                  onClick={() => setAmountAED(selectedCard.balance.toFixed(2))}
+                  onClick={() => setAmountAED(availableBalance.toFixed(2))}
                   className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
                 >
                   MAX

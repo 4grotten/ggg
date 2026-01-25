@@ -38,6 +38,7 @@ export const WithdrawDrawer = ({ open, onOpenChange, balance }: WithdrawDrawerPr
       title: "Easy Card",
       subtitle: t("drawer.sendToCard", "Перевод на карту"),
       iconBg: "bg-primary",
+      route: "/send-to-card",
     },
     {
       id: "stablecoins",
@@ -45,6 +46,7 @@ export const WithdrawDrawer = ({ open, onOpenChange, balance }: WithdrawDrawerPr
       title: t("drawer.stablecoins"),
       subtitle: "USDT, USDC",
       iconBg: "bg-green-500",
+      route: "/send/crypto",
     },
     {
       id: "bank",
@@ -52,10 +54,11 @@ export const WithdrawDrawer = ({ open, onOpenChange, balance }: WithdrawDrawerPr
       title: t("drawer.bankTransfer"),
       subtitle: "AED Wire",
       iconBg: "bg-purple-500",
+      route: "/send/bank",
     },
   ];
 
-  const handleOptionClick = (optionId: string) => {
+  const handleOptionClick = (option: typeof options[0]) => {
     if (balance < 50) {
       onOpenChange(false);
       toast({
@@ -74,10 +77,12 @@ export const WithdrawDrawer = ({ open, onOpenChange, balance }: WithdrawDrawerPr
     
     onOpenChange(false);
     
-    // Show success toast for now (would navigate to actual withdrawal flow)
-    toast({
-      title: t('partner.withdrawRequested', 'Заявка отправлена'),
-      description: t('partner.withdrawRequestedDesc', 'Средства поступят на вашу карту в течение 24 часов'),
+    // Navigate to the selected route with referral balance in state
+    navigate(option.route, { 
+      state: { 
+        referralBalance: balance,
+        isReferralWithdrawal: true 
+      } 
     });
   };
 
@@ -118,7 +123,7 @@ export const WithdrawDrawer = ({ open, onOpenChange, balance }: WithdrawDrawerPr
               {options.map((option, index) => (
                 <AnimatedDrawerItem key={option.id} index={index}>
                   <button
-                    onClick={() => handleOptionClick(option.id)}
+                    onClick={() => handleOptionClick(option)}
                     className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
                       index < options.length - 1 ? 'border-b border-border/50' : ''
                     }`}
