@@ -122,28 +122,12 @@ const Partner = () => {
         <div className="flex-1 overflow-y-auto pb-28">
           {/* Hero Section */}
           <div className="relative px-4 pt-4 pb-6">
-            {/* Wide format growth image with optimized CSS glow */}
+            {/* Wide format growth image */}
             <div className="relative w-full rounded-2xl overflow-visible mb-4">
-              {/* Optimized CSS-based glow effect */}
-              <div 
-                className="absolute -inset-3 rounded-3xl z-0 animate-pulse will-change-transform"
-                style={{ 
-                  background: "radial-gradient(ellipse at center, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0.2) 40%, transparent 70%)",
-                  filter: "blur(16px)"
-                }}
-              />
-              <div 
-                className="absolute -inset-3 rounded-3xl z-0 animate-pulse will-change-transform dark:block hidden"
-                style={{ 
-                  background: "radial-gradient(ellipse at center, rgba(191, 255, 0, 0.5) 0%, rgba(127, 255, 0, 0.3) 40%, transparent 70%)",
-                  filter: "blur(16px)"
-                }}
-              />
-              
               <img 
                 src={partnerGrowthImage} 
                 alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-                className="relative z-10 w-full h-auto rounded-2xl shadow-lg shadow-emerald-500/20 dark:shadow-[#BFFF00]/30"
+                className="w-full h-auto rounded-2xl"
                 loading="eager"
               />
             </div>
