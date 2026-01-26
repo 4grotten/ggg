@@ -184,10 +184,40 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
         return (
           <div
             key={`step1-${animationKey}`}
-            className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
+            className={`flex flex-col items-center px-6 relative overflow-hidden ${stepAnimationClass}`}
           >
+            {/* Matrix falling users background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {[...Array(12)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute partner-matrix-fall"
+                  style={{
+                    left: `${(i * 8.5) + 2}%`,
+                    animationDelay: `${i * 0.3}s`,
+                    animationDuration: `${2.5 + (i % 3) * 0.5}s`,
+                  }}
+                >
+                  <Users className="w-5 h-5 text-emerald-500/40" />
+                </div>
+              ))}
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={`second-${i}`}
+                  className="absolute partner-matrix-fall"
+                  style={{
+                    left: `${(i * 12) + 6}%`,
+                    animationDelay: `${1.5 + i * 0.4}s`,
+                    animationDuration: `${3 + (i % 2) * 0.7}s`,
+                  }}
+                >
+                  <Users className="w-4 h-4 text-emerald-400/30" />
+                </div>
+              ))}
+            </div>
+
             {/* TGS Lottie animation with green glow */}
-            <div className="relative w-56 h-56 flex items-center justify-center mb-6">
+            <div className="relative w-56 h-56 flex items-center justify-center mb-6 z-10">
               {/* Pulsing green background glow */}
               <div
                 className="absolute -inset-4 rounded-full partner-pulse-glow"
@@ -201,16 +231,16 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               />
             </div>
 
-            <h2 className="text-2xl font-bold text-center mb-2">
+            <h2 className="text-2xl font-bold text-center mb-2 relative z-10">
               {t('partner.step2.title')} Easy Card
             </h2>
-            <p className="text-xl font-semibold text-center mb-4">
+            <p className="text-xl font-semibold text-center mb-4 relative z-10">
               {t('partner.step2.subtitle')}
             </p>
-            <p className="text-muted-foreground text-center mb-2">
+            <p className="text-muted-foreground text-center mb-2 relative z-10">
               {t('partner.step2.description1')}
             </p>
-            <p className="text-muted-foreground text-center">
+            <p className="text-muted-foreground text-center relative z-10">
               {t('partner.step2.description2')}
             </p>
           </div>
