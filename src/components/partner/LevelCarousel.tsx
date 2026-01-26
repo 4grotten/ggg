@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 // Partner levels configuration
 export const LEVELS = [
@@ -20,6 +20,7 @@ interface LevelCarouselProps {
 
 export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [selectedLevelIndex, setSelectedLevelIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
@@ -134,7 +135,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                     className="absolute -top-3 right-12 z-20"
                   >
                     <button
-                      onClick={() => toast.info(t('partner.buyLevelSoon', 'Скоро будет доступно'))}
+                      onClick={() => navigate('/partner/bonuses')}
                       className="relative px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 overflow-hidden active:scale-95 transition-transform"
                       style={{
                         background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f857a6 100%)",
