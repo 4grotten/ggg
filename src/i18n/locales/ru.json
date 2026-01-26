@@ -865,7 +865,8 @@
       "closedEvents": "Все закрытые мероприятия компании",
       "dedicatedSupport": "Выделенная линия поддержки",
       "cardIncomeLabel": "Доход с продаж карт",
-      "referralLevelsLabel": "Уровней реферальной программы"
+      "referralLevelsLabel": "Уровней реферальной программы",
+      "padawan": "Падаван"
     }
   }
 }

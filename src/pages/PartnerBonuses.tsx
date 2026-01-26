@@ -29,8 +29,8 @@ const TARIFFS = [
     name: "Agent",
     price: 215,
     icon: Sparkles,
-    badge: null,
-    badgeType: null,
+    badge: "partner.bonuses.padawan",
+    badgeType: "padawan" as const,
     description: "partner.bonuses.agentDesc",
     includes: [
       "partner.bonuses.virtualCard",
@@ -150,6 +150,8 @@ const PartnerBonuses = () => {
                       className={`absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full ${
                         tariff.badgeType === "recommended" 
                           ? "bg-primary text-primary-foreground" 
+                          : tariff.badgeType === "padawan"
+                          ? "bg-amber-500 text-white"
                           : "bg-violet-500 text-white"
                       }`}
                     >

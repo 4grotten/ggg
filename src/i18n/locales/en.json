@@ -864,7 +864,8 @@
       "closedEvents": "All private company events",
       "dedicatedSupport": "Dedicated support line",
       "cardIncomeLabel": "Income from card sales",
-      "referralLevelsLabel": "Referral program levels"
+      "referralLevelsLabel": "Referral program levels",
+      "padawan": "Padawan"
     }
   }
 }
