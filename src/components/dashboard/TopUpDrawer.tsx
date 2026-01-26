@@ -74,7 +74,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
             </DrawerClose>
           </DrawerHeader>
           
-          <div className="flex-1 overflow-y-auto px-4">
+          <div className="px-4 pb-6">
             <AnimatedDrawerContainer className="bg-muted/50 rounded-xl overflow-hidden">
               {options.map((option, index) => (
                 <AnimatedDrawerItem key={option.id} index={index}>

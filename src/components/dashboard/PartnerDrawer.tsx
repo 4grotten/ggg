@@ -371,7 +371,7 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
   return (
     <>
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="bg-background/95 backdrop-blur-xl">
+        <DrawerContent className="max-h-[90vh] bg-background/95 backdrop-blur-xl">
           {/* Header with back button and step indicator */}
           <div className="flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
             {step > 0 ? (
