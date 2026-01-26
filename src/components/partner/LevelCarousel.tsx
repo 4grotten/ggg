@@ -188,7 +188,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                     </div>
                     
                     {/* Benefits */}
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3 relative z-10">
                       <div className="bg-muted backdrop-blur-md rounded-2xl p-4 text-center">
                         <p className="text-xs text-muted-foreground mb-1">
                           {t('partner.cardIssuance', 'За выпуск карт')}
