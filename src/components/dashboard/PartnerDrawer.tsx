@@ -37,6 +37,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   useEffect(() => {
     if (open) {
       preloadTgs("/animations/GlassDuck.tgs");
+      preloadTgs("/animations/money-coins.tgs");
       preloadTgs("/animations/wowduck.tgs");
     }
   }, [open]);
@@ -132,59 +133,19 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             key={`step0-${animationKey}`}
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
-            {/* Network/Partnership illustration */}
+            {/* GlassDuck TGS animation with green glow */}
             <div className="relative w-56 h-56 flex items-center justify-center mb-6">
-              {/* Pulsing background glow */}
+              {/* Pulsing green background glow */}
               <div
-                className="absolute inset-0 rounded-full partner-pulse-glow"
-                style={{ background: "radial-gradient(circle, rgba(191, 255, 0, 0.4) 0%, transparent 70%)" }}
-              />
-              
-              {/* Orbiting circles representing network */}
-              <div className="absolute inset-0 partner-orbit">
-                {[0, 72, 144, 216, 288].map((angle, i) => (
-                  <div
-                    key={i}
-                    className={`absolute w-10 h-10 rounded-full flex items-center justify-center partner-node-pulse partner-node-pulse-${i + 1}`}
-                    style={{
-                      background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-                      boxShadow: "0 4px 16px rgba(127, 255, 0, 0.4)",
-                      left: `calc(50% + ${Math.cos(angle * Math.PI / 180) * 80}px - 20px)`,
-                      top: `calc(50% + ${Math.sin(angle * Math.PI / 180) * 80}px - 20px)`,
-                    }}
-                  >
-                    <Users className="w-5 h-5 text-black" />
-                  </div>
-                ))}
-              </div>
-              
-              {/* Center card icon */}
-              <div
-                className="relative z-10 w-20 h-20 rounded-2xl flex items-center justify-center partner-center-float"
-                style={{
-                  background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
-                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(191, 255, 0, 0.2)",
-                  border: "2px solid rgba(191, 255, 0, 0.5)"
+                className="absolute -inset-4 rounded-full partner-pulse-glow"
+                style={{ 
+                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
-              >
-                <span className="text-2xl font-bold" style={{ color: "#BFFF00" }}>EC</span>
-              </div>
-              
-              {/* Connecting lines effect */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.3 }}>
-                {[0, 72, 144, 216, 288].map((angle, i) => (
-                  <line
-                    key={i}
-                    x1="50%"
-                    y1="50%"
-                    x2={`${50 + Math.cos(angle * Math.PI / 180) * 35}%`}
-                    y2={`${50 + Math.sin(angle * Math.PI / 180) * 35}%`}
-                    stroke="#BFFF00"
-                    strokeWidth="1"
-                    className={`partner-line-pulse partner-line-pulse-${i + 1}`}
-                  />
-                ))}
-              </svg>
+              />
+              <TgsPlayer 
+                src="/animations/GlassDuck.tgs" 
+                className="w-full h-full relative z-10"
+              />
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
@@ -215,7 +176,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 }}
               />
               <TgsPlayer 
-                src="/animations/GlassDuck.tgs" 
+                src="/animations/money-coins.tgs" 
                 className="w-full h-full relative z-10"
               />
             </div>
