@@ -115,6 +115,7 @@ const PartnerBonuses = () => {
   const navigate = useNavigate();
   const [selectedTariffIndex, setSelectedTariffIndex] = useState(2); // PRO by default
   const [currentTariffId] = useState("smart"); // Mock current tariff
+  const [hoveredColumnIndex, setHoveredColumnIndex] = useState<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   
   // Scroll carousel to selected tariff
@@ -379,11 +380,42 @@ const PartnerBonuses = () => {
         <div className="px-4 mt-6">
           <h3 className="text-center font-bold mb-4">{t('partner.bonuses.compare', 'Сравните возможности')}</h3>
           
-          <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-3xl border border-border/50 overflow-hidden">
+          <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-3xl border border-border/50 overflow-hidden relative">
+            {/* Column highlight overlays */}
+            <div className="absolute inset-0 grid grid-cols-5 pointer-events-none">
+              {TARIFFS.map((tariff, idx) => {
+                const isHighlighted = idx === selectedTariffIndex || idx === hoveredColumnIndex;
+                const highlightColor = tariff.id === "smart" ? "rgba(16, 185, 129, 0.15)" :
+                  tariff.id === "agent" ? "rgba(245, 158, 11, 0.15)" :
+                  tariff.id === "pro" ? "rgba(139, 92, 246, 0.15)" :
+                  tariff.id === "vip" ? "rgba(139, 92, 246, 0.15)" :
+                  "rgba(212, 175, 55, 0.15)";
+                
+                return (
+                  <motion.div
+                    key={tariff.id}
+                    className="h-full transition-all duration-300"
+                    initial={false}
+                    animate={{
+                      backgroundColor: isHighlighted ? highlightColor : "transparent",
+                      boxShadow: isHighlighted 
+                        ? `inset 0 0 20px ${highlightColor}, 0 0 10px ${highlightColor}` 
+                        : "none"
+                    }}
+                  />
+                );
+              })}
+            </div>
+            
             {/* Table header */}
-            <div className="grid grid-cols-5 gap-1 p-3 border-b border-border/50">
-              {TARIFFS.map((tariff) => (
-                <div key={tariff.id} className="text-center">
+            <div className="grid grid-cols-5 gap-1 p-3 border-b border-border/50 relative z-10">
+              {TARIFFS.map((tariff, idx) => (
+                <div 
+                  key={tariff.id} 
+                  className="text-center cursor-pointer md:hover:scale-105 transition-transform"
+                  onMouseEnter={() => setHoveredColumnIndex(idx)}
+                  onMouseLeave={() => setHoveredColumnIndex(null)}
+                >
                   {tariff.id === "partner" ? (
                     <p 
                       className="font-bold text-xs"
@@ -414,13 +446,18 @@ const PartnerBonuses = () => {
             </div>
             
             {/* Virtual card row */}
-            <div className="p-3 border-b border-border/30">
+            <div className="p-3 border-b border-border/30 relative z-10">
               <p className="text-xs text-muted-foreground text-center mb-2">
                 {t('partner.bonuses.virtualCard', 'Выпуск виртуальной карты')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                {TARIFFS.map((tariff) => (
-                  <div key={tariff.id} className="flex justify-center">
+                {TARIFFS.map((tariff, idx) => (
+                  <div 
+                    key={tariff.id} 
+                    className="flex justify-center"
+                    onMouseEnter={() => setHoveredColumnIndex(idx)}
+                    onMouseLeave={() => setHoveredColumnIndex(null)}
+                  >
                     {tariff.id === "partner" ? (
                       <span className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</span>
                     ) : (
@@ -432,44 +469,65 @@ const PartnerBonuses = () => {
             </div>
             
             {/* Metal card row */}
-            <div className="p-3 border-b border-border/30">
+            <div className="p-3 border-b border-border/30 relative z-10">
               <p className="text-xs text-muted-foreground text-center mb-2">
                 {t('partner.bonuses.metalCardLabel', 'Выпуск металлической карты')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                <div className="text-center text-xs font-medium text-muted-foreground/50">—</div>
-                <div className="text-center text-xs font-medium text-muted-foreground/50">—</div>
-                <div className="flex justify-center"><Check className="w-4 h-4 text-muted-foreground" /></div>
-                <div className="flex justify-center"><Check className="w-4 h-4 text-muted-foreground" /></div>
-                <div className="flex justify-center"><span className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</span></div>
+                {[false, false, true, true, "∞"].map((value, idx) => (
+                  <div 
+                    key={idx} 
+                    className="flex justify-center"
+                    onMouseEnter={() => setHoveredColumnIndex(idx)}
+                    onMouseLeave={() => setHoveredColumnIndex(null)}
+                  >
+                    {value === "∞" ? (
+                      <span className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</span>
+                    ) : value ? (
+                      <Check className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <span className="text-xs font-medium text-muted-foreground/50">—</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
             
             {/* Card income row */}
-            <div className="p-3 border-b border-border/30">
+            <div className="p-3 border-b border-border/30 relative z-10">
               <p className="text-xs text-muted-foreground text-center mb-2">
                 {t('partner.bonuses.cardIncomeLabel', 'Доход с продаж карт')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                <div className="text-center text-xs font-medium">15%</div>
-                <div className="text-center text-xs font-medium">25%</div>
-                <div className="text-center text-xs font-medium">30%</div>
-                <div className="text-center text-xs font-medium">30%</div>
-                <div className="text-center text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">MAX</div>
+                {["15%", "25%", "30%", "30%", "MAX"].map((value, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`text-center text-xs font-medium ${value === "MAX" ? "text-emerald-500 dark:text-[#BFFF00]" : ""}`}
+                    onMouseEnter={() => setHoveredColumnIndex(idx)}
+                    onMouseLeave={() => setHoveredColumnIndex(null)}
+                  >
+                    {value}
+                  </div>
+                ))}
               </div>
             </div>
             
             {/* Referral levels row */}
-            <div className="p-3">
+            <div className="p-3 relative z-10">
               <p className="text-xs text-muted-foreground text-center mb-2">
                 {t('partner.bonuses.referralLevelsLabel', 'Уровней реферальной программы')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                <div className="text-center text-xs font-medium">1</div>
-                <div className="text-center text-xs font-medium">5</div>
-                <div className="text-center text-xs font-medium">9</div>
-                <div className="text-center text-xs font-medium">9</div>
-                <div className="text-center text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</div>
+                {["1", "5", "9", "9", "∞"].map((value, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`text-center text-xs font-medium ${value === "∞" ? "text-emerald-500 dark:text-[#BFFF00]" : ""}`}
+                    onMouseEnter={() => setHoveredColumnIndex(idx)}
+                    onMouseLeave={() => setHoveredColumnIndex(null)}
+                  >
+                    {value}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
