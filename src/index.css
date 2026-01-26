@@ -536,4 +536,18 @@
       opacity: 0;
     }
   }
+
+  /* Floating users animation - smooth up and down */
+  .partner-float-user {
+    animation: partner-float-user 3s ease-in-out infinite;
+  }
+
+  @keyframes partner-float-user {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
 }
