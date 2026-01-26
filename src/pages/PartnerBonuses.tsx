@@ -305,15 +305,41 @@ const PartnerBonuses = () => {
       
       {/* Fixed Bottom Button */}
       {!isCurrentTariff && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border max-w-[800px] mx-auto">
-          <Button 
-            className="w-full h-14 text-base font-bold rounded-2xl"
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f857a6 100%)",
+        <div className="fixed bottom-6 left-4 right-4 max-w-[800px] mx-auto">
+          <motion.div
+            className="relative rounded-2xl overflow-hidden"
+            animate={{
+              boxShadow: [
+                "0 0 20px rgba(102, 126, 234, 0.4), 0 0 40px rgba(118, 75, 162, 0.3)",
+                "0 0 30px rgba(248, 87, 166, 0.4), 0 0 60px rgba(102, 126, 234, 0.3)",
+                "0 0 20px rgba(102, 126, 234, 0.4), 0 0 40px rgba(118, 75, 162, 0.3)",
+              ]
             }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
-            {t('partner.bonuses.purchase', 'Приобрести')} — ${selectedTariff.price}
-          </Button>
+            {/* Animated gradient border */}
+            <motion.div
+              className="absolute inset-0 rounded-2xl"
+              style={{
+                background: "linear-gradient(90deg, #667eea, #764ba2, #f857a6, #667eea)",
+                backgroundSize: "300% 100%",
+              }}
+              animate={{
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            />
+            
+            {/* Glass inner button */}
+            <Button 
+              className="relative w-full h-14 text-base font-bold rounded-2xl m-[2px] bg-background/80 dark:bg-card/80 backdrop-blur-xl text-foreground hover:bg-background/90 dark:hover:bg-card/90 border-0"
+              style={{ width: "calc(100% - 4px)" }}
+            >
+              <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent font-bold">
+                {t('partner.bonuses.purchase', 'Приобрести')} — ${selectedTariff.price}
+              </span>
+            </Button>
+          </motion.div>
         </div>
       )}
     </div>
