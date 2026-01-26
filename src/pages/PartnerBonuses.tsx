@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, Sparkles, Crown, Zap, Rocket, Gem } from "lucide-react";
+import { ArrowLeft, Check, Sparkles, Crown, Zap, Rocket, Gem, Phone, PhoneOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
+import { useVoiceCall } from "@/contexts/VoiceCallContext";
 
 // Tariff plans configuration
 const TARIFFS = [
@@ -113,6 +114,7 @@ const TARIFFS = [
 const PartnerBonuses = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isConnecting, isConnected, isSpeaking, startCall, endCall } = useVoiceCall();
   const [selectedTariffIndex, setSelectedTariffIndex] = useState(2); // PRO by default
   const [currentTariffId] = useState("smart"); // Mock current tariff
   const [hoveredColumnIndex, setHoveredColumnIndex] = useState<number | null>(null);
@@ -680,21 +682,80 @@ const PartnerBonuses = () => {
             <Button 
               className="relative w-full h-14 text-base font-bold rounded-2xl m-[2px] bg-background/80 dark:bg-card/80 backdrop-blur-xl text-foreground hover:bg-background/90 dark:hover:bg-card/90 border-0 overflow-hidden"
               style={{ width: "calc(100% - 4px)" }}
+              onClick={selectedTariff.id === "partner" ? (isConnected ? endCall : startCall) : undefined}
+              disabled={selectedTariff.id === "partner" && isConnecting}
             >
               {selectedTariff.id === "partner" ? (
-                <span 
-                  className="font-bold text-amber-900 dark:text-amber-100"
-                  style={{
-                    background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
-                    backgroundSize: "200% 100%",
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    animation: "goldShimmer 4s ease-in-out infinite"
-                  }}
-                >
-                  {t('partner.bonuses.contactUs', 'Связаться с нами')}
-                </span>
+                <div className="flex items-center gap-2">
+                  {isConnected ? (
+                    <>
+                      <motion.div
+                        animate={isSpeaking ? { scale: [1, 1.3, 1], opacity: [1, 0.7, 1] } : {}}
+                        transition={{ repeat: Infinity, duration: 0.8 }}
+                        className={`w-2.5 h-2.5 rounded-full ${isSpeaking ? "bg-green-500" : "bg-yellow-500"}`}
+                      />
+                      <PhoneOff className="w-5 h-5 text-red-500" />
+                      <span 
+                        className="font-bold"
+                        style={{
+                          background: "linear-gradient(90deg, #ef4444, #f87171, #ef4444)",
+                          backgroundSize: "200% 100%",
+                          backgroundClip: "text",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                        }}
+                      >
+                        {t('partner.bonuses.endCall', 'Завершить звонок')}
+                      </span>
+                    </>
+                  ) : isConnecting ? (
+                    <>
+                      <motion.div
+                        animate={{ 
+                          rotate: [-10, 10, -10, 10, 0],
+                          x: [-1, 1, -1, 1, 0]
+                        }}
+                        transition={{ 
+                          repeat: Infinity, 
+                          duration: 0.5,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        <Phone className="w-5 h-5 text-amber-500" />
+                      </motion.div>
+                      <span 
+                        className="font-bold"
+                        style={{
+                          background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
+                          backgroundSize: "200% 100%",
+                          backgroundClip: "text",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          animation: "goldShimmer 4s ease-in-out infinite"
+                        }}
+                      >
+                        {t('partner.bonuses.connecting', 'Соединяем...')}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Phone className="w-5 h-5 text-amber-500" />
+                      <span 
+                        className="font-bold"
+                        style={{
+                          background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
+                          backgroundSize: "200% 100%",
+                          backgroundClip: "text",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          animation: "goldShimmer 4s ease-in-out infinite"
+                        }}
+                      >
+                        {t('partner.bonuses.contactUs', 'Связаться с нами')}
+                      </span>
+                    </>
+                  )}
+                </div>
               ) : (
                 <span className="font-bold bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                   {`${t('partner.bonuses.purchase', 'Приобрести')} — $${selectedTariff.price}`}
