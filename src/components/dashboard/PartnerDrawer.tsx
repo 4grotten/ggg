@@ -39,6 +39,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
       preloadTgs("/animations/GlassDuck.tgs");
       preloadTgs("/animations/money-coins.tgs");
       preloadTgs("/animations/wowduck.tgs");
+      preloadTgs("/animations/WonDuck.tgs");
     }
   }, [open]);
 
@@ -326,12 +327,18 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             key={`step3-${animationKey}`}
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
-            {/* Piggy bank illustration */}
+            {/* WonDuck animation with glow */}
             <div className="relative w-48 h-48 flex items-center justify-center mb-6">
-              <img 
-                src={partnerStep3Image} 
-                alt="Save rewards" 
-                className="w-full h-full object-contain rounded-2xl opacity-80"
+              {/* Pulsing green background glow */}
+              <div
+                className="absolute -inset-4 rounded-full partner-pulse-glow"
+                style={{ 
+                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+                }}
+              />
+              <TgsPlayer 
+                src="/animations/WonDuck.tgs" 
+                className="w-full h-full relative z-10"
               />
             </div>
 
