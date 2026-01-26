@@ -201,9 +201,9 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             <div className="relative w-56 h-56 flex items-center justify-center mb-6">
               {/* Pulsing green background glow */}
               <div
-                className="absolute inset-0 rounded-full partner-pulse-glow"
+                className="absolute -inset-4 rounded-full partner-pulse-glow"
                 style={{ 
-                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.5) 0%, rgba(16, 185, 129, 0.3) 40%, transparent 70%)",
+                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
               />
               <TgsPlayer 
