@@ -217,11 +217,22 @@ const PartnerBonuses = () => {
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedTariff.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="px-4"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="px-4 touch-pan-y"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(_, info) => {
+              const threshold = 50;
+              if (info.offset.x < -threshold && selectedTariffIndex < TARIFFS.length - 1) {
+                setSelectedTariffIndex(selectedTariffIndex + 1);
+              } else if (info.offset.x > threshold && selectedTariffIndex > 0) {
+                setSelectedTariffIndex(selectedTariffIndex - 1);
+              }
+            }}
           >
             <div className="relative bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-3xl p-5 border border-border/50 overflow-hidden">
               {/* Decorative glow */}
