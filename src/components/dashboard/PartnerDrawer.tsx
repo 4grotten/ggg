@@ -197,11 +197,18 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             key={`step1-${animationKey}`}
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
-            {/* TGS Lottie animation */}
+            {/* TGS Lottie animation with green glow */}
             <div className="relative w-56 h-56 flex items-center justify-center mb-6">
+              {/* Pulsing green background glow */}
+              <div
+                className="absolute inset-0 rounded-full partner-pulse-glow"
+                style={{ 
+                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.5) 0%, rgba(16, 185, 129, 0.3) 40%, transparent 70%)",
+                }}
+              />
               <TgsPlayer 
                 src="/animations/money-coins.tgs" 
-                className="w-full h-full"
+                className="w-full h-full relative z-10"
               />
             </div>
 
