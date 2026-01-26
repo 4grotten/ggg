@@ -1,4 +1,8 @@
 {
+  "partner": {
+    "earnWithEasyCard": "Gana con Easy Card",
+    "passiveIncomeDaily": "Ingresos pasivos todos los días."
+  },
   "profileVerification": {
     "title": "Verifica tu identidad",
     "description": "Completa el proceso de verificación para desbloquear todas las funciones y aumentar los límites de tu cuenta.",
