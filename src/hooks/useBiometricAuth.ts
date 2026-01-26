@@ -2,11 +2,30 @@ import { useState, useEffect, useCallback } from 'react';
 
 const BIOMETRIC_CREDENTIAL_KEY = 'biometric_credential';
 const BIOMETRIC_PHONE_KEY = 'biometric_phone';
+const BIOMETRIC_PASSWORD_KEY = 'biometric_password';
 
 interface StoredCredential {
   credentialId: string;
   phoneNumber: string;
 }
+
+// Simple XOR encryption for password storage (obfuscation layer)
+const encryptPassword = (password: string, key: string): string => {
+  let result = '';
+  for (let i = 0; i < password.length; i++) {
+    result += String.fromCharCode(password.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+  }
+  return btoa(result);
+};
+
+const decryptPassword = (encrypted: string, key: string): string => {
+  const decoded = atob(encrypted);
+  let result = '';
+  for (let i = 0; i < decoded.length; i++) {
+    result += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+  }
+  return result;
+};
 
 // Check if WebAuthn is available
 const isWebAuthnAvailable = (): boolean => {
@@ -78,8 +97,8 @@ export const useBiometricAuth = () => {
     checkAvailability();
   }, []);
 
-  // Register biometric credential
-  const registerBiometric = useCallback(async (phoneNumber: string): Promise<boolean> => {
+  // Register biometric credential with password
+  const registerBiometric = useCallback(async (phoneNumber: string, password?: string): Promise<boolean> => {
     if (!isAvailable) return false;
     
     setIsLoading(true);
@@ -127,6 +146,13 @@ export const useBiometricAuth = () => {
         localStorage.setItem(BIOMETRIC_CREDENTIAL_KEY, JSON.stringify(storedCredential));
         localStorage.setItem(BIOMETRIC_PHONE_KEY, phoneNumber);
         
+        // Store encrypted password if provided
+        if (password) {
+          const encryptionKey = bufferToBase64(credential.rawId);
+          const encryptedPassword = encryptPassword(password, encryptionKey);
+          localStorage.setItem(BIOMETRIC_PASSWORD_KEY, encryptedPassword);
+        }
+        
         setIsEnabled(true);
         setStoredPhone(phoneNumber);
         
@@ -143,7 +169,7 @@ export const useBiometricAuth = () => {
   }, [isAvailable]);
 
   // Authenticate with biometric
-  const authenticateWithBiometric = useCallback(async (): Promise<{ success: boolean; phoneNumber?: string }> => {
+  const authenticateWithBiometric = useCallback(async (): Promise<{ success: boolean; phoneNumber?: string; password?: string }> => {
     if (!isEnabled) return { success: false };
     
     setIsLoading(true);
@@ -175,7 +201,16 @@ export const useBiometricAuth = () => {
       }) as PublicKeyCredential;
 
       if (assertion) {
-        return { success: true, phoneNumber };
+        // Decrypt stored password if available
+        const encryptedPassword = localStorage.getItem(BIOMETRIC_PASSWORD_KEY);
+        let password: string | undefined;
+        
+        if (encryptedPassword) {
+          const encryptionKey = credentialId;
+          password = decryptPassword(encryptedPassword, encryptionKey);
+        }
+        
+        return { success: true, phoneNumber, password };
       }
       
       return { success: false };
@@ -191,6 +226,7 @@ export const useBiometricAuth = () => {
   const removeBiometric = useCallback(() => {
     localStorage.removeItem(BIOMETRIC_CREDENTIAL_KEY);
     localStorage.removeItem(BIOMETRIC_PHONE_KEY);
+    localStorage.removeItem(BIOMETRIC_PASSWORD_KEY);
     setIsEnabled(false);
     setStoredPhone(null);
   }, []);

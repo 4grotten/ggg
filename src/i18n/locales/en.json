@@ -710,6 +710,8 @@
       "enabled": "Biometric login enabled",
       "useButton": "Use {{type}}",
       "loginSuccess": "Logged in with biometric",
+      "loginFailed": "Login failed. Please enter password manually.",
+      "enterPassword": "Please enter your password",
       "failed": "Biometric authentication failed"
     },
     "profile": {

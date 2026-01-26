@@ -281,6 +281,7 @@ const PhoneEntry = () => {
   } = useBiometricAuth();
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
   const [pendingLoginPhone, setPendingLoginPhone] = useState<string | null>(null);
+  const [pendingLoginPassword, setPendingLoginPassword] = useState<string | null>(null);
 
   // Check for autofilled password periodically
   useEffect(() => {
@@ -504,6 +505,7 @@ const PhoneEntry = () => {
         const loginPhone = getFullPhoneNumber();
         if (isBiometricAvailable && !isBiometricEnabled) {
           setPendingLoginPhone(loginPhone);
+          setPendingLoginPassword(password);
           setShowBiometricPrompt(true);
         } else {
           navigate("/", { replace: true });
@@ -547,8 +549,8 @@ const PhoneEntry = () => {
   // Handle biometric login
   const handleBiometricLogin = async () => {
     const result = await authenticateWithBiometric();
-    if (result.success && result.phoneNumber) {
-      // Auto-fill phone and trigger login mode
+    if (result.success && result.phoneNumber && result.password) {
+      // Auto-fill phone and trigger login
       const phone = result.phoneNumber;
       // Parse phone to get dial code and number
       const matchedCountry = countries.find(c => phone.startsWith(c.dialCode));
@@ -559,12 +561,57 @@ const PhoneEntry = () => {
         setPhoneNumber(formatPhoneNumber(localNumber));
       }
       
-      // Biometric verified = immediate login without password
-      toast.success(t('auth.biometric.loginSuccess') || 'Logged in with biometric');
-      
-      // We need stored credentials - for now navigate to home
-      // In production, you'd store encrypted password or use server-side biometric token
-      navigate("/", { replace: true });
+      // Use stored password to login automatically
+      setIsLoading(true);
+      try {
+        const getDeviceInfo = (): string => {
+          const ua = navigator.userAgent;
+          if (/iPhone/.test(ua)) return `iPhone ${ua.match(/iPhone OS (\d+)/)?.[1] || ''}`.trim();
+          if (/iPad/.test(ua)) return 'iPad';
+          if (/Android/.test(ua)) return `Android ${ua.match(/Android (\d+)/)?.[1] || ''}`.trim();
+          if (/Windows/.test(ua)) return 'Windows PC';
+          if (/Mac/.test(ua)) return 'Mac';
+          return 'Unknown Device';
+        };
+        
+        const storedLocation = sessionStorage.getItem('user_geo_location');
+        
+        const response = await apiLogin(phone, result.password, {
+          device: getDeviceInfo(),
+          ...(storedLocation && { location: storedLocation }),
+        });
+        
+        if (response.error) {
+          toast.error(t('auth.biometric.loginFailed') || 'Login failed. Please enter password manually.');
+          setIsLoginMode(true);
+          setPassword('');
+        } else if (response.data) {
+          const userName = response.data.user?.full_name || response.data.user?.username;
+          if (userName) {
+            toast.success(`${t('auth.login.welcomeBack') || 'Welcome back'}, ${userName}!`);
+          } else {
+            toast.success(t('auth.biometric.loginSuccess') || 'Logged in with biometric');
+          }
+          navigate("/", { replace: true });
+        }
+      } catch {
+        toast.error(t('auth.biometric.loginFailed') || 'Login failed');
+        setIsLoginMode(true);
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (result.success && result.phoneNumber) {
+      // Biometric success but no stored password - need manual entry
+      const phone = result.phoneNumber;
+      const matchedCountry = countries.find(c => phone.startsWith(c.dialCode));
+      if (matchedCountry) {
+        setSelectedCountry(matchedCountry);
+        setDialCode(matchedCountry.dialCode);
+        const localNumber = phone.substring(matchedCountry.dialCode.length);
+        setPhoneNumber(formatPhoneNumber(localNumber));
+      }
+      setIsLoginMode(true);
+      toast.info(t('auth.biometric.enterPassword') || 'Please enter your password');
     } else {
       toast.error(t('auth.biometric.failed') || 'Biometric authentication failed');
     }
@@ -572,20 +619,22 @@ const PhoneEntry = () => {
 
   // Handle biometric setup after login
   const handleEnableBiometric = async () => {
-    if (pendingLoginPhone) {
-      const success = await registerBiometric(pendingLoginPhone);
+    if (pendingLoginPhone && pendingLoginPassword) {
+      const success = await registerBiometric(pendingLoginPhone, pendingLoginPassword);
       if (success) {
         toast.success(t('auth.biometric.enabled') || 'Biometric login enabled');
       }
     }
     setShowBiometricPrompt(false);
     setPendingLoginPhone(null);
+    setPendingLoginPassword(null);
     navigate("/", { replace: true });
   };
 
   const handleSkipBiometric = () => {
     setShowBiometricPrompt(false);
     setPendingLoginPhone(null);
+    setPendingLoginPassword(null);
     navigate("/", { replace: true });
   };
 
