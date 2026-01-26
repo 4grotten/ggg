@@ -152,13 +152,11 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                   {/* Rotating gradient border for current level */}
                   {idx === currentLevelIndex && (
                     <div className="absolute inset-0 rounded-3xl overflow-hidden">
-                      <motion.div
+                      <div
                         className="absolute inset-[-100%] w-[300%] h-[300%]"
                         style={{
                           background: "conic-gradient(from 0deg at 50% 50%, transparent 0deg, #BFFF00 60deg, #7FFF00 120deg, #00FF88 180deg, #7FFF00 240deg, #BFFF00 300deg, transparent 360deg)",
                         }}
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
                       />
                     </div>
                   )}
