@@ -551,19 +551,19 @@
     }
   }
 
-  /* Blinking users animation */
+  /* Blinking users animation - constant appear/disappear cycle */
   .partner-blink-user {
-    animation: partner-blink-user 1.5s ease-in-out infinite;
+    animation: partner-blink-user 1.2s ease-in-out infinite;
   }
 
   @keyframes partner-blink-user {
     0%, 100% {
-      opacity: 0.2;
-      transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateX(70px) rotate(calc(-1 * var(--angle, 0deg))) scale(0.8);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.5);
     }
     50% {
       opacity: 1;
-      transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateX(70px) rotate(calc(-1 * var(--angle, 0deg))) scale(1.1);
+      transform: translate(-50%, -50%) scale(1);
     }
   }
 }
