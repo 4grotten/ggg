@@ -207,17 +207,21 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               {/* Flying coins around the edges */}
               {[
                 { startAngle: 0, delay: 0 },
-                { startAngle: 45, delay: 0.5 },
-                { startAngle: 90, delay: 1 },
-                { startAngle: 135, delay: 1.5 },
-                { startAngle: 180, delay: 2 },
-                { startAngle: 225, delay: 2.5 },
-                { startAngle: 270, delay: 3 },
-                { startAngle: 315, delay: 3.5 },
+                { startAngle: 30, delay: 0.3 },
+                { startAngle: 60, delay: 0.6 },
+                { startAngle: 90, delay: 0.9 },
+                { startAngle: 120, delay: 1.2 },
+                { startAngle: 150, delay: 1.5 },
+                { startAngle: 180, delay: 1.8 },
+                { startAngle: 210, delay: 2.1 },
+                { startAngle: 240, delay: 2.4 },
+                { startAngle: 270, delay: 2.7 },
+                { startAngle: 300, delay: 3 },
+                { startAngle: 330, delay: 3.3 },
               ].map((coin, i) => (
                 <div
                   key={i}
-                  className="absolute w-8 h-8 partner-flying-coin"
+                  className="absolute w-7 h-7 partner-flying-coin"
                   style={{
                     animationDelay: `${coin.delay}s`,
                     '--start-angle': `${coin.startAngle}deg`,
@@ -230,21 +234,14 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                       boxShadow: "0 4px 12px rgba(255, 165, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4)",
                     }}
                   >
-                    <span className="text-yellow-900 font-bold text-sm">$</span>
+                    <span className="text-yellow-900 font-bold text-xs">$</span>
                   </div>
                 </div>
               ))}
               
               {/* Center money bag emoji */}
               <div className="relative z-10 partner-center-float">
-                <span 
-                  className="text-8xl drop-shadow-2xl"
-                  style={{
-                    filter: "drop-shadow(0 8px 24px rgba(255, 215, 0, 0.5))",
-                  }}
-                >
-                  💰
-                </span>
+                <span className="text-8xl">💰</span>
               </div>
               
               {/* Sparkle particles */}
