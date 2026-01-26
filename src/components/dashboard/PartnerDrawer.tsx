@@ -36,7 +36,6 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   // Preload TGS animations when drawer opens
   useEffect(() => {
     if (open) {
-      preloadTgs("/animations/glass-duck.tgs");
       preloadTgs("/animations/money-coins.tgs");
       preloadTgs("/animations/wowduck.tgs");
     }
@@ -159,12 +158,16 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 ))}
               </div>
               
-              {/* Center duck animation (clip to remove TGS square background) */}
-              <div className="relative z-10 w-48 h-48 rounded-full overflow-hidden flex items-center justify-center partner-center-float">
-                <TgsPlayer
-                  src="/animations/glass-duck.tgs"
-                  className="w-full h-full"
-                />
+              {/* Center card icon */}
+              <div
+                className="relative z-10 w-20 h-20 rounded-2xl flex items-center justify-center partner-center-float"
+                style={{
+                  background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(191, 255, 0, 0.2)",
+                  border: "2px solid rgba(191, 255, 0, 0.5)"
+                }}
+              >
+                <span className="text-2xl font-bold" style={{ color: "#BFFF00" }}>EC</span>
               </div>
               
               {/* Connecting lines effect */}
