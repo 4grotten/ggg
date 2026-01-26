@@ -173,7 +173,7 @@ const PartnerBonuses = () => {
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40 pt-14">
         {/* Tariff Selector Carousel */}
         <div className="px-4 pt-6">
-          <div ref={carouselRef} className="relative flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4">
+          <div ref={carouselRef} className="relative flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4 md:mx-0 md:px-0 md:overflow-x-visible md:justify-between">
             {TARIFFS.map((tariff, idx) => {
               const isSelected = idx === selectedTariffIndex;
               const isCurrent = tariff.id === currentTariffId;
@@ -183,7 +183,7 @@ const PartnerBonuses = () => {
                   key={tariff.id}
                   data-tariff-item
                   onClick={() => handleTariffChange(idx)}
-                  className={`relative flex-shrink-0 min-w-[120px] rounded-2xl p-4 text-left transition-colors duration-200 ${
+                  className={`relative flex-shrink-0 min-w-[120px] md:min-w-0 md:flex-1 rounded-2xl p-4 text-left transition-colors duration-200 ${
                     isSelected 
                       ? "bg-muted/70 dark:bg-card/70" 
                       : "border border-transparent bg-muted/30 dark:bg-card/30"
