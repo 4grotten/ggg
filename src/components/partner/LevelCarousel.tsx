@@ -81,7 +81,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
   }, []);
 
   return (
-    <div className="px-4 mb-6 pt-4">
+    <div className="px-4">
       <div 
         ref={scrollContainerRef}
         className="overflow-x-auto overflow-y-visible scrollbar-hide snap-x snap-mandatory"

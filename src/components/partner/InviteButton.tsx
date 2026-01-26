@@ -13,7 +13,7 @@ export const InviteButton = memo(() => {
 
   return (
     <>
-      <div className="px-4 py-2">
+      <div className="px-4">
         <button
           onClick={handleClick}
           className="w-full py-4 font-bold rounded-2xl relative overflow-hidden flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-[#BFFF00] dark:to-[#7FFF00] shadow-[0_0_20px_rgba(16,185,129,0.4)] dark:shadow-[0_0_20px_rgba(127,255,0,0.5)] active:scale-[0.98] transition-transform duration-150"

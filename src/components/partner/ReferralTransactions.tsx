@@ -423,9 +423,9 @@ export const ReferralTransactions = memo(() => {
   
   
   return (
-    <div className="px-4 mb-6">
+    <div className="px-4 space-y-6">
       {/* Filter tabs with animated indicator */}
-      <div className="mb-4">
+      <div>
         <div className="flex items-center justify-between mb-3">
           <FilterTabs
             activeFilter={filterType}
