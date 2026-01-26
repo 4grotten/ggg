@@ -362,48 +362,9 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     );
   };
 
-  // Matrix effect component for step 1
-  const renderMatrixEffect = () => {
-    if (step !== 1) return null;
-    
-    return (
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {[...Array(14)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute partner-matrix-fall"
-            style={{
-              left: `${(i * 7) + 2}%`,
-              animationDelay: `${i * 0.25}s`,
-              animationDuration: `${2.5 + (i % 3) * 0.5}s`,
-            }}
-          >
-            <Users className="w-5 h-5 text-emerald-500/40" />
-          </div>
-        ))}
-        {[...Array(10)].map((_, i) => (
-          <div
-            key={`second-${i}`}
-            className="absolute partner-matrix-fall"
-            style={{
-              left: `${(i * 10) + 5}%`,
-              animationDelay: `${1.2 + i * 0.35}s`,
-              animationDuration: `${3 + (i % 2) * 0.7}s`,
-            }}
-          >
-            <Users className="w-4 h-4 text-emerald-400/30" />
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <Drawer open={open} onOpenChange={onOpenChange} modal>
-      <DrawerContent className="max-h-[90vh] flex flex-col overflow-hidden" onPointerDownOutside={(e) => e.preventDefault()}>
-        {/* Matrix falling users - full drawer background */}
-        {renderMatrixEffect()}
-        
+      <DrawerContent className="max-h-[90vh] flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
         {/* Back button - fixed position */}
         {step > 0 && (
           <button
@@ -415,7 +376,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
         )}
         
         {/* Scrollable content with fixed height to prevent drawer jumping */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden relative z-[1]">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
           <div className="relative pt-8 pb-4 h-[420px] flex flex-col">
             {renderStepContent()}
           </div>
