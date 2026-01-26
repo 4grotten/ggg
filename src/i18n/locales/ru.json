@@ -836,6 +836,11 @@
     "inviteFriendsTitle": "Приглашайте друзей",
     "friends": "друзей",
     "bonuses": {
+      "tariffSmart": "Smart",
+      "tariffAgent": "Agent",
+      "tariffPro": "PRO",
+      "tariffVip": "VIP",
+      "tariffPartner": "Партнёр",
       "title": "Выберите тариф",
       "yourTariff": "Ваш тариф",
       "currentTariff": "Текущий тариф",

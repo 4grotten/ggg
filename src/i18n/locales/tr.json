@@ -772,6 +772,11 @@
     "inviteFriendsTitle": "Arkadaşları Davet Et",
     "friends": "arkadaş",
     "bonuses": {
+      "tariffSmart": "Smart",
+      "tariffAgent": "Ajan",
+      "tariffPro": "PRO",
+      "tariffVip": "VIP",
+      "tariffPartner": "Ortak",
       "title": "Planınızı Seçin",
       "yourTariff": "Planınız",
       "currentTariff": "Mevcut plan",

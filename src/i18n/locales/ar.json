@@ -772,6 +772,11 @@
     "inviteFriendsTitle": "دعوة الأصدقاء",
     "friends": "أصدقاء",
     "bonuses": {
+      "tariffSmart": "سمارت",
+      "tariffAgent": "وكيل",
+      "tariffPro": "برو",
+      "tariffVip": "VIP",
+      "tariffPartner": "شريك",
       "title": "اختر خطتك",
       "yourTariff": "خطتك",
       "currentTariff": "الخطة الحالية",

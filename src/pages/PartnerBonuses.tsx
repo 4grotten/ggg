@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 const TARIFFS = [
   {
     id: "smart",
-    name: "Smart",
+    nameKey: "partner.bonuses.tariffSmart",
     price: 35,
     icon: Zap,
     badge: null,
@@ -27,7 +27,7 @@ const TARIFFS = [
   },
   {
     id: "agent",
-    name: "Agent",
+    nameKey: "partner.bonuses.tariffAgent",
     price: 215,
     icon: Sparkles,
     badge: "partner.bonuses.padawan",
@@ -44,7 +44,7 @@ const TARIFFS = [
   },
   {
     id: "pro",
-    name: "PRO",
+    nameKey: "partner.bonuses.tariffPro",
     price: 1215,
     icon: Crown,
     badge: "partner.bonuses.bestStart",
@@ -63,7 +63,7 @@ const TARIFFS = [
   },
   {
     id: "vip",
-    name: "VIP",
+    nameKey: "partner.bonuses.tariffVip",
     price: 2465,
     icon: Rocket,
     badge: "partner.bonuses.bigSales",
@@ -86,7 +86,7 @@ const TARIFFS = [
   },
   {
     id: "partner",
-    name: "Партнёр",
+    nameKey: "partner.bonuses.tariffPartner",
     price: -1, // -1 means priceless
     icon: Gem,
     badge: "partner.bonuses.contract",
@@ -202,7 +202,7 @@ const PartnerBonuses = () => {
                   )}
                   
                   <p className={`font-bold text-lg ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
-                    {tariff.name}
+                    {t(tariff.nameKey)}
                   </p>
                   <p className={`text-sm ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
                     {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
@@ -248,7 +248,7 @@ const PartnerBonuses = () => {
                 <div>
                   <div className="flex items-center gap-3 mb-1">
                     <selectedTariff.icon className="w-6 h-6 text-primary" />
-                    <h2 className="text-2xl font-bold">{selectedTariff.name}</h2>
+                    <h2 className="text-2xl font-bold">{t(selectedTariff.nameKey)}</h2>
                   </div>
                   <p className="text-3xl font-bold">
                     {selectedTariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${selectedTariff.price}`}
@@ -325,7 +325,7 @@ const PartnerBonuses = () => {
                         animation: "goldShimmer 4s ease-in-out infinite"
                       }}
                     >
-                      {tariff.name}
+                      {t(tariff.nameKey)}
                     </p>
                   ) : (
                     <p className={`font-bold text-xs ${
@@ -333,7 +333,7 @@ const PartnerBonuses = () => {
                       tariff.id === "agent" ? "text-amber-500" :
                       tariff.id === "pro" ? "text-primary" :
                       "text-violet-500"
-                    }`}>{tariff.name}</p>
+                    }`}>{t(tariff.nameKey)}</p>
                   )}
                   <p className="text-xs text-muted-foreground font-medium">
                     {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}

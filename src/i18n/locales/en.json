@@ -835,6 +835,11 @@
     "inviteFriendsButton": "Invite Friends",
     "inviteFriendsTitle": "Invite Friends",
     "bonuses": {
+      "tariffSmart": "Smart",
+      "tariffAgent": "Agent",
+      "tariffPro": "PRO",
+      "tariffVip": "VIP",
+      "tariffPartner": "Partner",
       "title": "Choose Your Plan",
       "yourTariff": "Your plan",
       "currentTariff": "Current plan",

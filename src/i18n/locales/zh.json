@@ -779,6 +779,11 @@
     "friends": "朋友",
     "referralHistory": "推荐历史",
     "bonuses": {
+      "tariffSmart": "智能版",
+      "tariffAgent": "代理版",
+      "tariffPro": "专业版",
+      "tariffVip": "VIP版",
+      "tariffPartner": "合作伙伴",
       "title": "选择您的计划",
       "yourTariff": "您的计划",
       "currentTariff": "当前计划",
