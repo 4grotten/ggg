@@ -174,19 +174,31 @@ const PartnerBonuses = () => {
                     </span>
                   )}
                   {tariff.badge && !isCurrent && (
-                    <span 
-                      className={`absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full ${
-                        tariff.badgeType === "recommended" 
-                          ? "bg-primary text-primary-foreground" 
-                          : tariff.badgeType === "padawan"
-                          ? "bg-amber-500 text-white"
-                        : tariff.badgeType === "contract"
-                        ? "bg-emerald-600 text-white"
-                          : "bg-violet-500 text-white"
-                      }`}
-                    >
-                      {t(tariff.badge)}
-                    </span>
+                    tariff.badgeType === "contract" ? (
+                      <span 
+                        className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full text-amber-900 overflow-hidden"
+                        style={{
+                          background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
+                          backgroundSize: "200% 100%",
+                          animation: "goldShimmer 2s linear infinite",
+                          boxShadow: "0 0 8px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255,255,255,0.4)"
+                        }}
+                      >
+                        {t(tariff.badge)}
+                      </span>
+                    ) : (
+                      <span 
+                        className={`absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                          tariff.badgeType === "recommended" 
+                            ? "bg-primary text-primary-foreground" 
+                            : tariff.badgeType === "padawan"
+                            ? "bg-amber-500 text-white"
+                            : "bg-violet-500 text-white"
+                        }`}
+                      >
+                        {t(tariff.badge)}
+                      </span>
+                    )
                   )}
                   
                   <p className={`font-bold text-lg ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
@@ -404,19 +416,29 @@ const PartnerBonuses = () => {
             
             {/* Glass inner button */}
             <Button 
-              className="relative w-full h-14 text-base font-bold rounded-2xl m-[2px] bg-background/80 dark:bg-card/80 backdrop-blur-xl text-foreground hover:bg-background/90 dark:hover:bg-card/90 border-0"
+              className="relative w-full h-14 text-base font-bold rounded-2xl m-[2px] bg-background/80 dark:bg-card/80 backdrop-blur-xl text-foreground hover:bg-background/90 dark:hover:bg-card/90 border-0 overflow-hidden"
               style={{ width: "calc(100% - 4px)" }}
             >
-              <span className={`font-bold ${
-                selectedTariff.id === "partner" 
-                  ? "bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-clip-text text-transparent"
-                  : "bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent"
-              }`}>
-                {selectedTariff.id === "partner" 
-                  ? t('partner.bonuses.contactUs', 'Связаться с нами')
-                  : `${t('partner.bonuses.purchase', 'Приобрести')} — $${selectedTariff.price}`
-                }
-              </span>
+              {selectedTariff.id === "partner" ? (
+                <span 
+                  className="font-bold text-amber-900 dark:text-amber-100"
+                  style={{
+                    background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
+                    backgroundSize: "200% 100%",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    animation: "goldShimmer 2s linear infinite",
+                    textShadow: "0 0 20px rgba(212, 175, 55, 0.3)"
+                  }}
+                >
+                  {t('partner.bonuses.contactUs', 'Связаться с нами')}
+                </span>
+              ) : (
+                <span className="font-bold bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                  {`${t('partner.bonuses.purchase', 'Приобрести')} — $${selectedTariff.price}`}
+                </span>
+              )}
             </Button>
           </motion.div>
         </div>
