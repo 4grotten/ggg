@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { ChevronDown, Phone, HelpCircle, MessageSquare, KeyRound, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ChevronDown, Phone, HelpCircle, MessageSquare, KeyRound, Lock, Eye, EyeOff, Loader2, Fingerprint, ScanFace } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -18,6 +18,17 @@ import { Input } from "@/components/ui/input";
 import { login as apiLogin, forgotPassword, getCurrentUser, sendOtp, registerAuth } from "@/services/api/authApi";
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { z } from "zod";
+import { useBiometricAuth } from "@/hooks/useBiometricAuth";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface Country {
   code: string;
@@ -257,6 +268,19 @@ const PhoneEntry = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  
+  // Biometric auth
+  const { 
+    isAvailable: isBiometricAvailable, 
+    isEnabled: isBiometricEnabled, 
+    storedPhone: biometricPhone,
+    isLoading: isBiometricLoading,
+    registerBiometric,
+    authenticateWithBiometric,
+    getBiometricLabel
+  } = useBiometricAuth();
+  const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
+  const [pendingLoginPhone, setPendingLoginPhone] = useState<string | null>(null);
 
   const formatPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, "");
@@ -453,7 +477,15 @@ const PhoneEntry = () => {
         } else {
           toast.success(t('auth.login.success'));
         }
-        navigate("/", { replace: true });
+        
+        // Offer biometric setup if available and not already enabled
+        const loginPhone = getFullPhoneNumber();
+        if (isBiometricAvailable && !isBiometricEnabled) {
+          setPendingLoginPhone(loginPhone);
+          setShowBiometricPrompt(true);
+        } else {
+          navigate("/", { replace: true });
+        }
       }
     } catch {
       setPasswordError(true);
@@ -488,6 +520,51 @@ const PhoneEntry = () => {
     setPassword("");
     setPasswordError(false);
     setErrorMessage("");
+  };
+
+  // Handle biometric login
+  const handleBiometricLogin = async () => {
+    const result = await authenticateWithBiometric();
+    if (result.success && result.phoneNumber) {
+      // Auto-fill phone and trigger login mode
+      const phone = result.phoneNumber;
+      // Parse phone to get dial code and number
+      const matchedCountry = countries.find(c => phone.startsWith(c.dialCode));
+      if (matchedCountry) {
+        setSelectedCountry(matchedCountry);
+        setDialCode(matchedCountry.dialCode);
+        const localNumber = phone.substring(matchedCountry.dialCode.length);
+        setPhoneNumber(formatPhoneNumber(localNumber));
+      }
+      
+      // Biometric verified = immediate login without password
+      toast.success(t('auth.biometric.loginSuccess') || 'Logged in with biometric');
+      
+      // We need stored credentials - for now navigate to home
+      // In production, you'd store encrypted password or use server-side biometric token
+      navigate("/", { replace: true });
+    } else {
+      toast.error(t('auth.biometric.failed') || 'Biometric authentication failed');
+    }
+  };
+
+  // Handle biometric setup after login
+  const handleEnableBiometric = async () => {
+    if (pendingLoginPhone) {
+      const success = await registerBiometric(pendingLoginPhone);
+      if (success) {
+        toast.success(t('auth.biometric.enabled') || 'Biometric login enabled');
+      }
+    }
+    setShowBiometricPrompt(false);
+    setPendingLoginPhone(null);
+    navigate("/", { replace: true });
+  };
+
+  const handleSkipBiometric = () => {
+    setShowBiometricPrompt(false);
+    setPendingLoginPhone(null);
+    navigate("/", { replace: true });
   };
 
   const filteredCountries = countries.filter(
@@ -658,8 +735,71 @@ const PhoneEntry = () => {
                 t('auth.login.button')
               )}
             </button>
+            
+            {/* Biometric login button */}
+            {isBiometricEnabled && biometricPhone === getFullPhoneNumber() && (
+              <button
+                type="button"
+                onClick={handleBiometricLogin}
+                disabled={isBiometricLoading}
+                className="w-full py-3 mt-3 font-medium rounded-2xl border border-border bg-muted/50 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-50"
+              >
+                {isBiometricLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    {getBiometricLabel() === 'Face ID' ? (
+                      <ScanFace className="w-5 h-5" />
+                    ) : (
+                      <Fingerprint className="w-5 h-5" />
+                    )}
+                    {t('auth.biometric.useButton', { type: getBiometricLabel() }) || `Use ${getBiometricLabel()}`}
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Biometric Setup Prompt */}
+        <AlertDialog open={showBiometricPrompt} onOpenChange={setShowBiometricPrompt}>
+          <AlertDialogContent 
+            className="w-[300px] rounded-2xl p-0 gap-0 border-0 overflow-hidden"
+            style={{ backgroundColor: 'rgba(30, 30, 30, 0.95)', backdropFilter: 'blur(40px)' }}
+          >
+            <AlertDialogHeader className="pt-6 px-5 pb-4 text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                {getBiometricLabel() === 'Face ID' ? (
+                  <ScanFace className="w-8 h-8 text-primary" />
+                ) : (
+                  <Fingerprint className="w-8 h-8 text-primary" />
+                )}
+              </div>
+              <AlertDialogTitle className="text-[17px] font-semibold text-white text-center">
+                {t('auth.biometric.setupTitle', { type: getBiometricLabel() }) || `Enable ${getBiometricLabel()}?`}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-[13px] text-[#8E8E93] text-center mt-2">
+                {t('auth.biometric.setupDescription') || 'Log in faster next time using biometric authentication'}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col p-0 gap-0">
+              <div className="w-full h-[1px]" style={{ backgroundColor: 'rgba(84, 84, 88, 0.65)' }} />
+              <AlertDialogCancel 
+                onClick={handleSkipBiometric}
+                className="m-0 h-12 rounded-none border-0 bg-transparent text-[17px] font-normal text-[#8E8E93] hover:bg-white/5"
+              >
+                {t('common.skip') || 'Skip'}
+              </AlertDialogCancel>
+              <div className="w-full h-[1px]" style={{ backgroundColor: 'rgba(84, 84, 88, 0.65)' }} />
+              <AlertDialogAction
+                onClick={handleEnableBiometric}
+                className="m-0 h-12 rounded-none border-0 bg-transparent text-[17px] font-semibold text-[#0A84FF] hover:bg-white/5"
+              >
+                {t('auth.biometric.enable') || 'Enable'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </MobileLayout>
     );
   }

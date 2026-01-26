@@ -703,6 +703,15 @@
       "tooManyAttempts": "Too many attempts. Please try again later.",
       "error": "Login failed. Please try again."
     },
+    "biometric": {
+      "setupTitle": "Enable {{type}}?",
+      "setupDescription": "Log in faster next time using biometric authentication",
+      "enable": "Enable",
+      "enabled": "Biometric login enabled",
+      "useButton": "Use {{type}}",
+      "loginSuccess": "Logged in with biometric",
+      "failed": "Biometric authentication failed"
+    },
     "profile": {
       "header": "Profile",
       "moreInfo": "More info",
