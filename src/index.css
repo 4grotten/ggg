@@ -205,4 +205,166 @@
       box-shadow: 0 0 18px rgba(59, 130, 246, 0.45);
     }
   }
+
+  /* Partner Drawer Animations */
+  @keyframes partner-pulse-glow {
+    0%, 100% { opacity: 0.2; transform: scale(0.9); }
+    50% { opacity: 0.5; transform: scale(1.1); }
+  }
+
+  @keyframes partner-orbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes partner-node-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  @keyframes partner-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes partner-float-scale {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  @keyframes partner-center-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.05); }
+  }
+
+  @keyframes partner-line-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  @keyframes partner-step-enter-right {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes partner-step-enter-left {
+    from { opacity: 0; transform: translateX(-100px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes partner-btn-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+
+  @keyframes partner-shadow-pulse-telegram {
+    0%, 100% { box-shadow: 0 4px 20px rgba(0, 136, 204, 0.4); }
+    50% { box-shadow: 0 8px 30px rgba(0, 136, 204, 0.6); }
+  }
+
+  @keyframes partner-shadow-pulse-copy {
+    0%, 100% { box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4); }
+    50% { box-shadow: 0 8px 30px rgba(168, 85, 247, 0.6); }
+  }
+
+  @keyframes partner-shadow-pulse-share {
+    0%, 100% { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4); }
+    50% { box-shadow: 0 8px 30px rgba(52, 211, 153, 0.6); }
+  }
+
+  .partner-pulse-glow {
+    animation: partner-pulse-glow 3s ease-in-out infinite;
+  }
+
+  .partner-orbit {
+    animation: partner-orbit 12s linear infinite;
+  }
+
+  .partner-node-pulse {
+    animation: partner-node-pulse 2s ease-in-out infinite;
+  }
+
+  .partner-node-pulse-1 { animation-delay: 0s; }
+  .partner-node-pulse-2 { animation-delay: 0.3s; }
+  .partner-node-pulse-3 { animation-delay: 0.6s; }
+  .partner-node-pulse-4 { animation-delay: 0.9s; }
+  .partner-node-pulse-5 { animation-delay: 1.2s; }
+
+  .partner-float {
+    animation: partner-float 3s ease-in-out infinite;
+  }
+
+  .partner-float-scale {
+    animation: partner-float-scale 2.5s ease-in-out infinite;
+  }
+
+  .partner-center-float {
+    animation: partner-center-float 2.5s ease-in-out infinite;
+  }
+
+  .partner-line-pulse {
+    animation: partner-line-pulse 2s ease-in-out infinite;
+  }
+
+  .partner-line-pulse-1 { animation-delay: 0s; }
+  .partner-line-pulse-2 { animation-delay: 0.2s; }
+  .partner-line-pulse-3 { animation-delay: 0.4s; }
+  .partner-line-pulse-4 { animation-delay: 0.6s; }
+  .partner-line-pulse-5 { animation-delay: 0.8s; }
+
+  .partner-step-enter-right {
+    animation: partner-step-enter-right 0.3s ease-out forwards;
+  }
+
+  .partner-step-enter-left {
+    animation: partner-step-enter-left 0.3s ease-out forwards;
+  }
+
+  .partner-share-btn {
+    transition: transform 0.2s ease;
+  }
+
+  .partner-share-btn:hover {
+    transform: scale(1.15) rotate(5deg);
+  }
+
+  .partner-share-btn:active {
+    transform: scale(0.9);
+  }
+
+  .partner-share-btn-telegram {
+    animation: partner-shadow-pulse-telegram 2s ease-in-out infinite;
+  }
+
+  .partner-share-btn-copy {
+    animation: partner-shadow-pulse-copy 2s ease-in-out infinite 0.3s;
+  }
+
+  .partner-share-btn-share {
+    animation: partner-shadow-pulse-share 2s ease-in-out infinite 0.6s;
+  }
+
+  .partner-share-btn-copy:hover {
+    transform: scale(1.15) rotate(-5deg);
+  }
+
+  .partner-btn-shimmer-overlay {
+    animation: partner-btn-shimmer 2s ease-in-out infinite;
+  }
+
+  .partner-btn-shimmer-overlay-1 { animation-delay: 0s; }
+  .partner-btn-shimmer-overlay-2 { animation-delay: 1.3s; }
+  .partner-btn-shimmer-overlay-3 { animation-delay: 1.6s; }
+
+  .partner-continue-btn {
+    transition: transform 0.2s ease;
+  }
+
+  .partner-continue-btn:hover {
+    transform: scale(1.02);
+  }
+
+  .partner-continue-btn:active {
+    transform: scale(0.98);
+  }
 }
