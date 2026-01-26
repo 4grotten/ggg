@@ -197,7 +197,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 }}
               />
               
-              {/* Blinking users around the animation */}
+              {/* Blinking users around the animation - sequential wave */}
               <div className="absolute -inset-6 z-0">
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
                   <div
@@ -209,7 +209,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                       left: "50%",
                       top: "50%",
                       transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(70px) rotate(-${angle}deg)`,
-                      animationDelay: `${i * 0.15}s`,
+                      animationDelay: `${i * 0.3}s`,
                     }}
                   >
                     <Users className="w-3 h-3 text-white" />
