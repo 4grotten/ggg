@@ -632,7 +632,7 @@ const Settings = () => {
             icon={<Palette className="w-5 h-5" />}
             label={t("settings.appearance")}
             valueIcon={currentTheme.icon && (
-              <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center">
+              <div className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-secondary flex items-center justify-center">
                 <currentTheme.icon className="w-4 h-4 text-muted-foreground" />
               </div>
             )}
