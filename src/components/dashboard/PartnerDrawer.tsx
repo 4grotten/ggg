@@ -372,20 +372,8 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
     <>
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent className="max-h-[90vh] bg-background/95 backdrop-blur-xl">
-          {/* Header with back button and step indicator */}
-          <div className="flex items-center justify-between px-4 pt-2 pb-2 flex-shrink-0">
-            {step > 0 ? (
-              <button
-                onClick={handleBack}
-                className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-            ) : (
-              <div className="w-10" />
-            )}
-            
-            {/* Step indicators */}
+          {/* Step indicators only */}
+          <div className="flex justify-center py-4">
             <div className="flex gap-1.5">
               {[0, 1, 2, 3].map((i) => (
                 <div
@@ -396,13 +384,6 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
                 />
               ))}
             </div>
-            
-            <button
-              onClick={handleClose}
-              className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform"
-            >
-              <span className="text-lg">×</span>
-            </button>
           </div>
 
           {/* Content */}
