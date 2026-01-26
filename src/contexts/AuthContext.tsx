@@ -14,7 +14,8 @@ import {
   type AvatarData
 } from '@/services/api/authApi';
 import { 
-  getAuthToken, 
+  getAuthToken,
+  setAuthToken,
   removeAuthToken, 
   isAuthenticated as checkIsAuthenticated,
   AUTH_USER_KEY 
@@ -93,6 +94,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (hasCheckedRef.current) return;
     hasCheckedRef.current = true;
 
+    // 1. Попробовать прочитать токен из куки state (от Apofiz)
+    // Это обеспечивает синхронизацию Apofiz → EasyCard
+    const stateCookie = Cookies.get('state');
+    if (stateCookie && !getAuthToken()) {
+      try {
+        const parsed = JSON.parse(stateCookie);
+        const cookieToken = parsed?.userStore?.token;
+        const cookieUser = parsed?.userStore?.user;
+        
+        if (cookieToken) {
+          // Сохранить токен в localStorage EasyCard
+          setAuthToken(cookieToken);
+          
+          // Если есть user в куке — сразу установить (будет перезаписан после валидации)
+          if (cookieUser) {
+            setUser(cookieUser);
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(cookieUser));
+          }
+        }
+      } catch {
+        // Невалидный JSON в куке — игнорируем
+      }
+    }
+
+    // 2. Теперь проверяем токен (может быть из localStorage или только что из куки)
     const token = getAuthToken();
     
     if (!token) {
