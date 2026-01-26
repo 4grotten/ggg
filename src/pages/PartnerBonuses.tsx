@@ -173,75 +173,81 @@ const PartnerBonuses = () => {
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40 pt-14">
         {/* Tariff Selector Carousel */}
         <div className="px-4 pt-6">
-          <div ref={carouselRef} className="relative flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4 md:mx-0 md:px-0 md:overflow-x-visible md:justify-between">
-            {TARIFFS.map((tariff, idx) => {
-              const isSelected = idx === selectedTariffIndex;
-              const isCurrent = tariff.id === currentTariffId;
-              
-              return (
-                <motion.button
-                  key={tariff.id}
-                  data-tariff-item
-                  onClick={() => handleTariffChange(idx)}
-                  className={`relative flex-shrink-0 min-w-[120px] md:min-w-0 md:flex-1 rounded-2xl p-4 text-left transition-colors duration-200 ${
-                    isSelected 
-                      ? "bg-muted/70 dark:bg-card/70" 
-                      : "border border-transparent bg-muted/30 dark:bg-card/30"
-                  }`}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  {/* Animated border for selected state */}
-                  {isSelected && (
-                    <motion.div
-                      layoutId="tariff-selector-border"
-                      className="absolute inset-0 rounded-2xl border-2 border-primary"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                  
-                  {/* Badge above card */}
-                  {isCurrent && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-emerald-500 dark:bg-[#BFFF00] text-white dark:text-black text-[10px] font-bold rounded-full z-10">
-                      {t('partner.bonuses.yourTariff', 'Ваш тариф')}
-                    </span>
-                  )}
-                  {tariff.badge && !isCurrent && (
-                    tariff.badgeType === "contract" ? (
-                      <span 
-                        className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full text-amber-900 overflow-hidden z-10"
+          {/* Glass container */}
+          <div className="bg-muted/50 dark:bg-card/50 backdrop-blur-xl rounded-3xl p-3 border border-border/30">
+            <div ref={carouselRef} className="relative flex gap-2 overflow-x-auto scrollbar-hide py-1 -mx-1 px-1 md:mx-0 md:px-0 md:overflow-x-visible md:justify-between">
+              {TARIFFS.map((tariff, idx) => {
+                const isSelected = idx === selectedTariffIndex;
+                const isCurrent = tariff.id === currentTariffId;
+                
+                return (
+                  <motion.button
+                    key={tariff.id}
+                    data-tariff-item
+                    onClick={() => handleTariffChange(idx)}
+                    className={`relative flex-shrink-0 min-w-[110px] md:min-w-0 md:flex-1 rounded-2xl p-3 text-left transition-colors duration-200 ${
+                      isSelected 
+                        ? "bg-background/80 dark:bg-background/30" 
+                        : "bg-transparent"
+                    }`}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    {/* Animated border + glow for selected state */}
+                    {isSelected && (
+                      <motion.div
+                        layoutId="tariff-selector-border"
+                        className="absolute inset-0 rounded-2xl border-2 border-primary"
                         style={{
-                          background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
-                          backgroundSize: "200% 100%",
-                          animation: "goldShimmer 4s ease-in-out infinite",
-                          boxShadow: "0 0 6px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)"
+                          boxShadow: "0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.15), inset 0 0 20px rgba(139, 92, 246, 0.05)"
                         }}
-                      >
-                        {t(tariff.badge)}
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      />
+                    )}
+                    
+                    {/* Badge above card */}
+                    {isCurrent && (
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-emerald-500 dark:bg-[#BFFF00] text-white dark:text-black text-[10px] font-bold rounded-full z-10">
+                        {t('partner.bonuses.yourTariff', 'Ваш тариф')}
                       </span>
-                    ) : (
-                      <span 
-                        className={`absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full z-10 ${
-                          tariff.badgeType === "recommended" 
-                            ? "bg-primary text-primary-foreground" 
-                            : tariff.badgeType === "padawan"
-                            ? "bg-amber-500 text-white"
-                            : "bg-violet-500 text-white"
-                        }`}
-                      >
-                        {t(tariff.badge)}
-                      </span>
-                    )
-                  )}
-                  
-                  <p className={`font-bold text-lg relative z-10 ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
-                    {t(tariff.nameKey)}
-                  </p>
-                  <p className={`text-sm relative z-10 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
-                    {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
-                  </p>
-                </motion.button>
-              );
-            })}
+                    )}
+                    {tariff.badge && !isCurrent && (
+                      tariff.badgeType === "contract" ? (
+                        <span 
+                          className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full text-amber-900 overflow-hidden z-10"
+                          style={{
+                            background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
+                            backgroundSize: "200% 100%",
+                            animation: "goldShimmer 4s ease-in-out infinite",
+                            boxShadow: "0 0 6px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)"
+                          }}
+                        >
+                          {t(tariff.badge)}
+                        </span>
+                      ) : (
+                        <span 
+                          className={`absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full z-10 ${
+                            tariff.badgeType === "recommended" 
+                              ? "bg-primary text-primary-foreground" 
+                              : tariff.badgeType === "padawan"
+                              ? "bg-amber-500 text-white"
+                              : "bg-violet-500 text-white"
+                          }`}
+                        >
+                          {t(tariff.badge)}
+                        </span>
+                      )
+                    )}
+                    
+                    <p className={`font-bold text-base relative z-10 ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
+                      {t(tariff.nameKey)}
+                    </p>
+                    <p className={`text-sm relative z-10 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
+                      {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
+                    </p>
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
         </div>
         
