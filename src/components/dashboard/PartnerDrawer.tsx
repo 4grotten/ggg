@@ -202,7 +202,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               <img 
                 src={partnerStep1Image} 
                 alt="Earn rewards" 
-                className="w-full h-full object-contain rounded-2xl opacity-80"
+                className="w-full h-full object-contain rounded-2xl opacity-60"
                 style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
               />
             </div>
@@ -233,7 +233,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               <img 
                 src={partnerStep2Image} 
                 alt="Rewards" 
-                className="w-full h-full object-contain rounded-2xl opacity-80"
+                className="w-full h-full object-contain rounded-2xl opacity-60"
                 style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
               />
             </div>
@@ -289,7 +289,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               <img 
                 src={partnerStep3Image} 
                 alt="Save rewards" 
-                className="w-full h-full object-contain rounded-2xl opacity-80"
+                className="w-full h-full object-contain rounded-2xl opacity-60"
                 style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
               />
             </div>
