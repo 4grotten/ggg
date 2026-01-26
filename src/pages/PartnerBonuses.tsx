@@ -148,7 +148,7 @@ const PartnerBonuses = () => {
       </header>
       
       {/* Content */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-32 pt-14">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40 pt-14">
         {/* Tariff Selector Carousel */}
         <div className="px-4 pt-6">
           <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4">
