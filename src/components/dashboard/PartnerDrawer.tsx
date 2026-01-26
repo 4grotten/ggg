@@ -373,7 +373,7 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
   return (
     <>
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="bg-background/95 backdrop-blur-xl">
+        <DrawerContent className="max-h-[90vh] bg-background/95 backdrop-blur-xl">
           {/* Compact header */}
           <div className="relative pt-2 pb-1">
             <div className="flex justify-center gap-1.5">
