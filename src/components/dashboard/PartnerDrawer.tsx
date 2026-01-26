@@ -8,6 +8,17 @@ import { toast } from "sonner";
 import partnerStep1Image from "@/assets/partner-step1-magnet.png";
 import partnerStep2Image from "@/assets/partner-step2-gift.png";
 import partnerStep3Image from "@/assets/partner-step3-camel.png";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface PartnerDrawerProps {
   open: boolean;
@@ -17,8 +28,10 @@ interface PartnerDrawerProps {
 export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
 
   const handleClose = () => {
     onOpenChange(false);
@@ -37,23 +50,44 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   };
 
   const handleContinue = () => {
+    // На последнем шаге (step 3) гость должен увидеть алерт
+    if (step === 2 && !isAuthenticated) {
+      setShowAuthAlert(true);
+      return;
+    }
     if (step < 3) {
       setDirection(1);
       setStep(step + 1);
     }
   };
 
+  const handleGuestShareAction = () => {
+    if (!isAuthenticated) {
+      setShowAuthAlert(true);
+      return true;
+    }
+    return false;
+  };
+
   const appLink = "https://test.apofiz.com/EasyCard/";
 
   const handleCopyLink = () => {
+    if (handleGuestShareAction()) return;
     navigator.clipboard.writeText(appLink);
     toast.success(t('partner.linkCopied'));
   };
 
   const handleShareTelegram = () => {
+    if (handleGuestShareAction()) return;
     const text = encodeURIComponent(t('partner.shareText'));
     const url = encodeURIComponent(appLink);
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+  };
+
+  const handleAuthRedirect = () => {
+    setShowAuthAlert(false);
+    onOpenChange(false);
+    navigate("/auth/phone");
   };
 
   const stepVariants = {
@@ -415,6 +449,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   };
 
   const handleShare = async () => {
+    if (handleGuestShareAction()) return;
     if (navigator.share) {
       try {
         await navigator.share({
@@ -483,6 +518,40 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
           {renderFooterButtons()}
         </div>
       </DrawerContent>
+
+      {/* iOS-style Auth Alert */}
+      <AlertDialog open={showAuthAlert} onOpenChange={setShowAuthAlert}>
+        <AlertDialogContent 
+          className="w-[270px] rounded-2xl p-0 gap-0 border-0 overflow-hidden"
+          style={{ backgroundColor: 'rgba(30, 30, 30, 0.95)', backdropFilter: 'blur(40px)' }}
+          onOverlayClick={() => setShowAuthAlert(false)}
+        >
+          <AlertDialogHeader className="pt-5 px-4 pb-4 text-center">
+            <AlertDialogTitle className="text-[17px] font-semibold text-white text-center">
+              {t('common.authorize', 'Авторизация')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] text-[#8E8E93] text-center mt-1">
+              {t('feesAndLimits.authRequiredMessage', 'Для доступа к этой функции необходимо войти в аккаунт')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col p-0 gap-0">
+            <div className="w-full h-[1px]" style={{ backgroundColor: 'rgba(84, 84, 88, 0.65)' }} />
+            <AlertDialogCancel 
+              onClick={() => setShowAuthAlert(false)}
+              className="m-0 h-11 rounded-none border-0 bg-transparent text-[17px] font-normal text-[#0A84FF] hover:bg-white/5"
+            >
+              {t('common.cancel', 'Отмена')}
+            </AlertDialogCancel>
+            <div className="w-full h-[1px]" style={{ backgroundColor: 'rgba(84, 84, 88, 0.65)' }} />
+            <AlertDialogAction
+              onClick={handleAuthRedirect}
+              className="m-0 h-11 rounded-none border-0 bg-transparent text-[17px] font-semibold text-[#0A84FF] hover:bg-white/5"
+            >
+              {t('common.authorize', 'Авторизация')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Drawer>
   );
 };
