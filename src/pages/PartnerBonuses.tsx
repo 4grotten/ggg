@@ -165,7 +165,48 @@ const PartnerBonuses = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-base font-semibold">{t('partner.bonuses.title', 'Выберите тариф')}</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* Call Angie button */}
+            <button
+              onClick={isConnected ? endCall : () => startCall("ANGIE")}
+              disabled={isConnecting}
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                isConnected 
+                  ? "bg-red-500 text-white" 
+                  : isConnecting 
+                    ? "bg-primary/80 text-primary-foreground" 
+                    : "bg-muted/50 hover:bg-muted"
+              }`}
+            >
+              {isConnected ? (
+                <div className="relative">
+                  <PhoneOff className="w-4 h-4" />
+                  <motion.div
+                    animate={isSpeaking ? { scale: [1, 1.4, 1], opacity: [1, 0.5, 1] } : {}}
+                    transition={{ repeat: Infinity, duration: 0.8 }}
+                    className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${
+                      isSpeaking ? "bg-green-400" : "bg-yellow-400"
+                    }`}
+                  />
+                </div>
+              ) : isConnecting ? (
+                <motion.div
+                  animate={{ 
+                    rotate: [-10, 10, -10, 10, 0],
+                    x: [-1, 1, -1, 1, 0]
+                  }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 0.5,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <Phone className="w-4 h-4" />
+                </motion.div>
+              ) : (
+                <Phone className="w-4 h-4" />
+              )}
+            </button>
             <ThemeSwitcher />
             <LanguageSwitcher />
           </div>
