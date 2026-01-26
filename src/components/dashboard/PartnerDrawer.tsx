@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, useCallback, useRef } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
@@ -26,9 +26,6 @@ preloadImages.forEach((src) => {
   img.src = src;
 });
 
-// Fixed content height for consistent drawer size
-const CONTENT_HEIGHT = "420px";
-
 interface PartnerDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -38,49 +35,54 @@ interface PartnerDrawerProps {
 const OrbitIcon = memo(({ index }: { index: number }) => {
   const angles = [0, 72, 144, 216, 288];
   const angle = angles[index];
-  const x = Math.cos(angle * Math.PI / 180) * 70;
-  const y = Math.sin(angle * Math.PI / 180) * 70;
+  const x = Math.cos(angle * Math.PI / 180) * 80;
+  const y = Math.sin(angle * Math.PI / 180) * 80;
   
   return (
     <div
-      className="absolute w-9 h-9 rounded-full flex items-center justify-center animate-pulse"
+      className="absolute w-10 h-10 rounded-full flex items-center justify-center animate-pulse"
       style={{
         background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
         boxShadow: "0 4px 16px rgba(127, 255, 0, 0.4)",
-        left: `calc(50% + ${x}px - 18px)`,
-        top: `calc(50% + ${y}px - 18px)`,
+        left: `calc(50% + ${x}px - 20px)`,
+        top: `calc(50% + ${y}px - 20px)`,
         animationDelay: `${index * 0.2}s`,
       }}
     >
-      <Users className="w-4 h-4 text-black" />
+      <Users className="w-5 h-5 text-black" />
     </div>
   );
 });
 OrbitIcon.displayName = "OrbitIcon";
 
-// Memoized network illustration (Step 0)
+// Memoized network illustration (Step 0) - uses CSS animations instead of Framer Motion
 const NetworkIllustration = memo(() => (
-  <div className="relative w-48 h-48 flex items-center justify-center">
+  <div className="relative w-56 h-56 flex items-center justify-center mb-6">
+    {/* Pulsing background glow - CSS animation */}
     <div
       className="absolute inset-0 rounded-full animate-pulse"
       style={{ 
         background: "radial-gradient(circle, rgba(191, 255, 0, 0.3) 0%, transparent 70%)",
       }}
     />
+    
+    {/* Orbiting circles - static positions with pulse */}
     <div className="absolute inset-0">
       {[0, 1, 2, 3, 4].map((i) => (
         <OrbitIcon key={i} index={i} />
       ))}
     </div>
+    
+    {/* Center card icon - simple float animation */}
     <div
-      className="relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center animate-float"
+      className="relative z-10 w-20 h-20 rounded-2xl flex items-center justify-center animate-float"
       style={{
         background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(191, 255, 0, 0.2)",
         border: "2px solid rgba(191, 255, 0, 0.5)"
       }}
     >
-      <span className="text-xl font-bold" style={{ color: "#BFFF00" }}>EC</span>
+      <span className="text-2xl font-bold" style={{ color: "#BFFF00" }}>EC</span>
     </div>
   </div>
 ));
@@ -88,7 +90,7 @@ NetworkIllustration.displayName = "NetworkIllustration";
 
 // Memoized image step component
 const StepImage = memo(({ src, alt }: { src: string; alt: string }) => (
-  <div className="relative w-40 h-40 flex items-center justify-center">
+  <div className="relative w-48 h-48 flex items-center justify-center mb-6">
     <img 
       src={src} 
       alt={alt} 
@@ -101,7 +103,7 @@ const StepImage = memo(({ src, alt }: { src: string; alt: string }) => (
 ));
 StepImage.displayName = "StepImage";
 
-// Share button component
+// Share button component with CSS-only animations
 const ShareActionButton = memo(({ 
   onClick, 
   gradient, 
@@ -136,11 +138,6 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
   const { isAuthenticated } = useAuth();
   const [step, setStep] = useState(0);
   const [showAuthAlert, setShowAuthAlert] = useState(false);
-  
-  // Swipe handling
-  const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
-  const minSwipeDistance = 50;
 
   // Reset step when drawer closes
   useEffect(() => {
@@ -158,45 +155,12 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
     if (step > 0) setStep(step - 1);
   }, [step]);
 
-  const handleNext = useCallback(() => {
+  const handleContinue = useCallback(() => {
     if (step === 2 && !isAuthenticated) {
       setShowAuthAlert(true);
       return;
     }
     if (step < 3) setStep(step + 1);
-  }, [step, isAuthenticated]);
-
-  // Swipe handlers
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    touchEndX.current = null;
-    touchStartX.current = e.targetTouches[0].clientX;
-  }, []);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (!touchStartX.current || !touchEndX.current) return;
-    
-    const distance = touchStartX.current - touchEndX.current;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-    
-    if (isLeftSwipe && step < 3) {
-      // Swipe left = next step
-      if (step === 2 && !isAuthenticated) {
-        setShowAuthAlert(true);
-      } else {
-        setStep(step + 1);
-      }
-    } else if (isRightSwipe && step > 0) {
-      // Swipe right = previous step
-      setStep(step - 1);
-    }
-    
-    touchStartX.current = null;
-    touchEndX.current = null;
   }, [step, isAuthenticated]);
 
   const handleGuestShareAction = useCallback(() => {
@@ -249,20 +213,18 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
   }, [navigate, onOpenChange]);
 
   const renderStepContent = () => {
-    const contentClass = "flex flex-col items-center justify-center px-6 h-full";
-    
     switch (step) {
       case 0:
         return (
-          <div className={contentClass}>
+          <div className="flex flex-col items-center px-6 animate-fade-in">
             <NetworkIllustration />
-            <h2 className="text-xl font-bold text-center mt-4 mb-2">
+            <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step1.title')} Easy Card
             </h2>
-            <p className="text-base text-center mb-2 text-foreground">
+            <p className="text-lg text-center mb-3 text-foreground">
               {t('partner.step1.subtitle')}
             </p>
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-muted-foreground text-center">
               {t('partner.step1.description')}
             </p>
           </div>
@@ -270,18 +232,18 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
 
       case 1:
         return (
-          <div className={contentClass}>
+          <div className="flex flex-col items-center px-6 animate-fade-in">
             <StepImage src={partnerStep1Image} alt="Earn rewards" />
-            <h2 className="text-xl font-bold text-center mt-4 mb-2">
+            <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step2.title')} Easy Card
             </h2>
-            <p className="text-lg font-semibold text-center mb-2">
+            <p className="text-xl font-semibold text-center mb-4">
               {t('partner.step2.subtitle')}
             </p>
-            <p className="text-sm text-muted-foreground text-center mb-1">
+            <p className="text-muted-foreground text-center mb-2">
               {t('partner.step2.description1')}
             </p>
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-muted-foreground text-center">
               {t('partner.step2.description2')}
             </p>
           </div>
@@ -289,41 +251,42 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
 
       case 2:
         return (
-          <div className={contentClass}>
+          <div className="flex flex-col items-center px-6 animate-fade-in">
             <StepImage src={partnerStep2Image} alt="Rewards" />
-            <h2 className="text-xl font-bold text-center mt-4 mb-4">
+            <h2 className="text-2xl font-bold text-center mb-6">
               {t('partner.step3.title')} Easy Card
             </h2>
-            <div className="flex justify-center gap-5">
+            {/* 3 earning methods */}
+            <div className="flex justify-center gap-6">
               <div className="flex flex-col items-center">
                 <div 
-                  className="w-12 h-12 rounded-full flex items-center justify-center mb-1.5"
+                  className="w-14 h-14 rounded-full flex items-center justify-center mb-2"
                   style={{ background: "#BFFF00" }}
                 >
-                  <Users className="w-5 h-5 text-black" />
+                  <Users className="w-6 h-6 text-black" />
                 </div>
-                <p className="text-xs font-medium text-center max-w-[70px]">{t('partner.inviteFriends')}</p>
+                <p className="text-sm font-medium text-center">{t('partner.inviteFriends')}</p>
               </div>
               <div className="flex flex-col items-center">
                 <div 
-                  className="w-12 h-12 rounded-full flex items-center justify-center mb-1.5"
+                  className="w-14 h-14 rounded-full flex items-center justify-center mb-2"
                   style={{ background: "#BFFF00" }}
                 >
-                  <Percent className="w-5 h-5 text-black" />
+                  <Percent className="w-6 h-6 text-black" />
                 </div>
-                <p className="text-xs font-medium text-center max-w-[70px]">{t('partner.friendsSpending')}</p>
+                <p className="text-sm font-medium text-center">{t('partner.friendsSpending')}</p>
               </div>
               <div className="flex flex-col items-center relative">
                 <div 
-                  className="w-12 h-12 rounded-full flex items-center justify-center mb-1.5 opacity-60"
+                  className="w-14 h-14 rounded-full flex items-center justify-center mb-2 opacity-60"
                   style={{ background: "#BFFF00" }}
                 >
-                  <ClipboardCheck className="w-5 h-5 text-black" />
+                  <ClipboardCheck className="w-6 h-6 text-black" />
                 </div>
-                <span className="absolute -top-1 -right-1 text-[9px] font-bold bg-foreground text-background px-1 py-0.5 rounded-full">
+                <span className="absolute -top-1 -right-2 text-[10px] font-bold bg-foreground text-background px-1.5 py-0.5 rounded-full">
                   {t('partner.soon')}
                 </span>
-                <p className="text-xs font-medium text-center opacity-60 max-w-[70px]">{t('partner.completeTasks')}</p>
+                <p className="text-sm font-medium text-center opacity-60">{t('partner.completeTasks')}</p>
               </div>
             </div>
           </div>
@@ -331,14 +294,15 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
 
       case 3:
         return (
-          <div className={contentClass}>
+          <div className="flex flex-col items-center px-6 animate-fade-in">
             <StepImage src={partnerStep3Image} alt="Save rewards" />
-            <h2 className="text-xl font-bold text-center mt-4 mb-2">
+            <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step4.title')}
             </h2>
-            <p className="text-sm text-muted-foreground text-center mb-4">
+            <p className="text-muted-foreground text-center mb-6">
               {t('partner.step4.description')}
             </p>
+            {/* Share buttons with CSS animations */}
             <div className="flex justify-center gap-4">
               <ShareActionButton
                 onClick={handleShareTelegram}
@@ -370,13 +334,59 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
     }
   };
 
+  const renderFooterButtons = () => {
+    const isLastStep = step === 3;
+    
+    return (
+      <DrawerFooter className="px-4 pb-6 pt-2">
+        {isLastStep ? (
+          <button
+            onClick={handleGoToPartnerPage}
+            className="w-full py-4 px-6 font-bold rounded-2xl relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
+              boxShadow: "0 0 20px rgba(127, 255, 0, 0.5)"
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            <span className="relative z-10 text-black">{t('partner.goToPartnerPage', 'Перейти в партнёрский кабинет')}</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleContinue}
+            className="w-full py-4 px-6 font-bold rounded-2xl relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
+              boxShadow: "0 0 20px rgba(127, 255, 0, 0.5)"
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            <span className="relative z-10 text-black">{t('common.continue', 'Продолжить')}</span>
+          </button>
+        )}
+      </DrawerFooter>
+    );
+  };
+
   return (
     <>
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent className="max-h-[90vh] bg-background/95 backdrop-blur-xl">
-          {/* Compact header */}
-          <div className="relative pt-2 pb-1">
-            <div className="flex justify-center gap-1.5">
+          {/* Header with back button and step indicator */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-2">
+            {step > 0 ? (
+              <button
+                onClick={handleBack}
+                className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            ) : (
+              <div className="w-10" />
+            )}
+            
+            {/* Step indicators */}
+            <div className="flex gap-1.5">
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
@@ -389,60 +399,19 @@ export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) =
             
             <button
               onClick={handleClose}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform"
+              className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform"
             >
-              <span className="text-xl leading-none">×</span>
+              <span className="text-lg">×</span>
             </button>
-            
-            {step > 0 && (
-              <button
-                onClick={handleBack}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-            )}
           </div>
 
-          {/* Swipeable content with fixed height */}
-          <div 
-            className="overflow-hidden touch-pan-y"
-            style={{ height: CONTENT_HEIGHT }}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-          >
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto py-4">
             {renderStepContent()}
           </div>
 
           {/* Footer */}
-          <DrawerFooter className="px-4 pb-6 pt-2">
-            {step === 3 ? (
-              <button
-                onClick={handleGoToPartnerPage}
-                className="w-full py-4 px-6 font-bold rounded-2xl relative overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-                  boxShadow: "0 0 20px rgba(127, 255, 0, 0.5)"
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-                <span className="relative z-10 text-black">{t('partner.goToPartnerPage', 'Перейти в партнёрский кабинет')}</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleNext}
-                className="w-full py-4 px-6 font-bold rounded-2xl relative overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-                  boxShadow: "0 0 20px rgba(127, 255, 0, 0.5)"
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-                <span className="relative z-10 text-black">{t('common.continue', 'Продолжить')}</span>
-              </button>
-            )}
-          </DrawerFooter>
+          {renderFooterButtons()}
         </DrawerContent>
       </Drawer>
 
