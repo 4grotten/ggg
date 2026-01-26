@@ -236,8 +236,8 @@ const PartnerBonuses = () => {
                 <Phone className="w-4 h-4" />
               )}
             </motion.button>
-            <ThemeSwitcher />
             <LanguageSwitcher />
+            <ThemeSwitcher />
           </div>
         </div>
       </header>
