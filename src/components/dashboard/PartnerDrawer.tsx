@@ -257,9 +257,12 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               />
             </div>
 
-            <h2 className="text-2xl font-bold text-center mb-6">
+            <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step3.title')} Easy Card
             </h2>
+            <p className="text-lg text-muted-foreground text-center mb-6">
+              Зарабатывайте с Easy Card
+            </p>
 
             {/* 3 earning methods */}
             <div className="flex justify-center gap-6">
