@@ -198,12 +198,11 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* Coins illustration */}
-            <div className="relative w-48 h-48 flex items-center justify-center mb-6 partner-float">
+            <div className="relative w-48 h-48 flex items-center justify-center mb-6">
               <img 
                 src={partnerStep1Image} 
                 alt="Earn rewards" 
                 className="w-full h-full object-contain rounded-2xl opacity-80"
-                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
               />
             </div>
 
@@ -229,12 +228,11 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* Gift box illustration */}
-            <div className="relative w-48 h-48 flex items-center justify-center mb-6 partner-float-scale">
+            <div className="relative w-48 h-48 flex items-center justify-center mb-6">
               <img 
                 src={partnerStep2Image} 
                 alt="Rewards" 
                 className="w-full h-full object-contain rounded-2xl opacity-80"
-                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
               />
             </div>
 
@@ -285,12 +283,11 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* Piggy bank illustration */}
-            <div className="relative w-48 h-48 flex items-center justify-center mb-6 partner-float">
+            <div className="relative w-48 h-48 flex items-center justify-center mb-6">
               <img 
                 src={partnerStep3Image} 
                 alt="Save rewards" 
                 className="w-full h-full object-contain rounded-2xl opacity-80"
-                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
               />
             </div>
 
