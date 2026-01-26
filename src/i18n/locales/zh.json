@@ -1,4 +1,8 @@
 {
+  "partner": {
+    "earnWithEasyCard": "使用Easy Card赚钱",
+    "passiveIncomeDaily": "每天被动收入。"
+  },
   "profileVerification": {
     "title": "验证您的身份",
     "description": "完成验证流程以解锁所有功能并提高账户限额。",

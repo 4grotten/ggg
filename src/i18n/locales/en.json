@@ -3,7 +3,9 @@
     "referralHistory": "Referral History",
     "withdrawTitle": "Withdraw to",
     "withdrawToCard": "Top up card",
-    "availableBalance": "Available balance"
+    "availableBalance": "Available balance",
+    "earnWithEasyCard": "Earn with Easy Card",
+    "passiveIncomeDaily": "Passive income every day."
   },
   "profileVerification": {
     "title": "Verify Your Identity",

@@ -1,4 +1,8 @@
 {
+  "partner": {
+    "earnWithEasyCard": "Verdienen Sie mit Easy Card",
+    "passiveIncomeDaily": "Passives Einkommen jeden Tag."
+  },
   "profileVerification": {
     "title": "Identität verifizieren",
     "description": "Schließen Sie den Verifizierungsprozess ab, um alle Funktionen freizuschalten und Ihre Kontolimits zu erhöhen.",

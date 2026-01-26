@@ -1,4 +1,8 @@
 {
+  "partner": {
+    "earnWithEasyCard": "اكسب مع Easy Card",
+    "passiveIncomeDaily": "دخل سلبي كل يوم."
+  },
   "profileVerification": {
     "title": "تحقق من هويتك",
     "description": "أكمل عملية التحقق لفتح جميع الميزات وزيادة حدود حسابك.",

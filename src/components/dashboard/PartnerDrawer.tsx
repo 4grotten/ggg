@@ -287,10 +287,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
-              Зарабатывайте с Easy Card
+              {t('partner.earnWithEasyCard')}
             </h2>
             <p className="text-muted-foreground text-center mb-6">
-              Пассивный доход каждый день.
+              {t('partner.passiveIncomeDaily')}
             </p>
 
             {/* 3 earning methods */}
