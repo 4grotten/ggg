@@ -12,7 +12,7 @@ const TARIFFS = [
   {
     id: "smart",
     nameKey: "partner.bonuses.tariffSmart",
-    price: 35,
+    price: 50,
     icon: Zap,
     badge: null,
     badgeType: "current" as const,
@@ -28,7 +28,7 @@ const TARIFFS = [
   {
     id: "agent",
     nameKey: "partner.bonuses.tariffAgent",
-    price: 215,
+    price: 250,
     icon: Sparkles,
     badge: "partner.bonuses.padawan",
     badgeType: "padawan" as const,
@@ -45,7 +45,7 @@ const TARIFFS = [
   {
     id: "pro",
     nameKey: "partner.bonuses.tariffPro",
-    price: 1215,
+    price: 1270,
     icon: Crown,
     badge: "partner.bonuses.bestStart",
     badgeType: "recommended" as const,
@@ -64,7 +64,7 @@ const TARIFFS = [
   {
     id: "vip",
     nameKey: "partner.bonuses.tariffVip",
-    price: 2465,
+    price: 2540,
     icon: Rocket,
     badge: "partner.bonuses.bigSales",
     badgeType: "premium" as const,
