@@ -274,7 +274,7 @@ const PartnerBonuses = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="px-4 touch-pan-y"
+            className="px-4 touch-pan-y mt-4"
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
