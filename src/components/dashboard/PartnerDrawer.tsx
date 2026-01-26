@@ -133,7 +133,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             key={`step0-${animationKey}`}
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
-            {/* GlassDuck TGS animation with green glow */}
+            {/* GlassDuck TGS animation with green glow and orbiting users */}
             <div className="relative w-56 h-56 flex items-center justify-center mb-6">
               {/* Pulsing green background glow */}
               <div
@@ -142,6 +142,26 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                   background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
               />
+              
+              {/* Orbiting users container */}
+              <div className="absolute inset-0 partner-orbit-container">
+                {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-8 h-8 rounded-full flex items-center justify-center partner-orbit-item"
+                    style={{
+                      background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
+                      boxShadow: "0 0 12px rgba(34, 197, 94, 0.6), 0 0 24px rgba(16, 185, 129, 0.3)",
+                      left: `calc(50% + ${Math.cos((angle - 90) * Math.PI / 180) * 100}px - 16px)`,
+                      top: `calc(50% + ${Math.sin((angle - 90) * Math.PI / 180) * 100}px - 16px)`,
+                      animationDelay: `${i * 0.15}s`,
+                    }}
+                  >
+                    <Users className="w-4 h-4 text-white" />
+                  </div>
+                ))}
+              </div>
+              
               <TgsPlayer 
                 src="/animations/GlassDuck.tgs" 
                 className="w-full h-full relative z-10"
