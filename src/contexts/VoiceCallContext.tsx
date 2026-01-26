@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useRef, ReactNode } from "react";
 import { useConversation } from "@elevenlabs/react";
 import { toast } from "sonner";
+import { useDialTone } from "@/hooks/useDialTone";
 
 // Agent IDs
 export const AGENTS = {
@@ -24,35 +25,51 @@ const VoiceCallContext = createContext<VoiceCallContextType | undefined>(undefin
 export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [currentAgent, setCurrentAgent] = useState<AgentType | null>(null);
+  const { playRingTone, stopRingTone } = useDialTone();
+  const connectionSuccessRef = useRef(false);
 
   const conversation = useConversation({
     onConnect: () => {
       console.log("Connected to ElevenLabs agent");
+      connectionSuccessRef.current = true;
+      stopRingTone();
       toast.success("Звонок начат! 📞");
     },
     onDisconnect: () => {
       console.log("Disconnected from ElevenLabs agent");
       setCurrentAgent(null);
+      stopRingTone();
       toast.info("Звонок завершён");
     },
     onError: (error) => {
       console.error("ElevenLabs error:", error);
+      stopRingTone();
       toast.error("Ошибка соединения. Попробуйте позже.");
     },
   });
 
   const startCall = useCallback(async (agent: AgentType = "EVA") => {
     setIsConnecting(true);
+    connectionSuccessRef.current = false;
+    
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       setCurrentAgent(agent);
+      
+      // Start ringing sound (async, don't await)
+      playRingTone();
+      
+      // Connect to agent
       await conversation.startSession({
         agentId: AGENTS[agent],
         connectionType: "websocket",
       } as any);
+      
     } catch (error) {
       console.error("Failed to start call:", error);
       setCurrentAgent(null);
+      stopRingTone();
+      
       if (error instanceof Error && error.name === "NotAllowedError") {
         toast.error("Разрешите доступ к микрофону для звонка");
       } else {
@@ -61,12 +78,13 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsConnecting(false);
     }
-  }, [conversation]);
+  }, [conversation, playRingTone, stopRingTone]);
 
   const endCall = useCallback(async () => {
+    stopRingTone();
     await conversation.endSession();
     setCurrentAgent(null);
-  }, [conversation]);
+  }, [conversation, stopRingTone]);
 
   const isConnected = conversation.status === "connected";
   const isSpeaking = conversation.isSpeaking;
