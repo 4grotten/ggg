@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import partnerStep2Image from "@/assets/partner-step2-gift.png";
 import partnerStep3Image from "@/assets/partner-step3-camel.png";
+import TgsPlayer from "@/components/ui/TgsPlayer";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog,
@@ -196,67 +197,12 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             key={`step1-${animationKey}`}
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
-            {/* Money bag emoji with flying coins */}
+            {/* TGS Lottie animation */}
             <div className="relative w-56 h-56 flex items-center justify-center mb-6">
-              {/* Pulsing golden background glow */}
-              <div
-                className="absolute inset-0 rounded-full partner-pulse-glow"
-                style={{ background: "radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 165, 0, 0.2) 50%, transparent 70%)" }}
+              <TgsPlayer 
+                src="/animations/money-coins.tgs" 
+                className="w-full h-full"
               />
-              
-              {/* Flying coins around the edges */}
-              {[
-                { startAngle: 0, delay: 0 },
-                { startAngle: 30, delay: 0.3 },
-                { startAngle: 60, delay: 0.6 },
-                { startAngle: 90, delay: 0.9 },
-                { startAngle: 120, delay: 1.2 },
-                { startAngle: 150, delay: 1.5 },
-                { startAngle: 180, delay: 1.8 },
-                { startAngle: 210, delay: 2.1 },
-                { startAngle: 240, delay: 2.4 },
-                { startAngle: 270, delay: 2.7 },
-                { startAngle: 300, delay: 3 },
-                { startAngle: 330, delay: 3.3 },
-              ].map((coin, i) => (
-                <div
-                  key={i}
-                  className="absolute w-7 h-7 partner-flying-coin"
-                  style={{
-                    animationDelay: `${coin.delay}s`,
-                    '--start-angle': `${coin.startAngle}deg`,
-                  } as React.CSSProperties}
-                >
-                  <div 
-                    className="w-full h-full rounded-full flex items-center justify-center partner-coin-spin"
-                    style={{
-                      background: "linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)",
-                      boxShadow: "0 4px 12px rgba(255, 165, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4)",
-                    }}
-                  >
-                    <span className="text-yellow-900 font-bold text-xs">$</span>
-                  </div>
-                </div>
-              ))}
-              
-              {/* Center money bag emoji */}
-              <div className="relative z-10 partner-center-float">
-                <span className="text-8xl">💰</span>
-              </div>
-              
-              {/* Sparkle particles */}
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={`sparkle-${i}`}
-                  className="absolute w-2 h-2 rounded-full partner-sparkle"
-                  style={{
-                    background: "radial-gradient(circle, #FFFFFF 0%, #FFD700 100%)",
-                    left: `${15 + i * 14}%`,
-                    top: `${10 + (i % 3) * 30}%`,
-                    animationDelay: `${i * 0.3}s`,
-                  }}
-                />
-              ))}
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
