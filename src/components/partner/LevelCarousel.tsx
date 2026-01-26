@@ -97,31 +97,6 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
 
   return (
     <div className="px-4 relative">
-      {/* Desktop Navigation Arrows */}
-      <button
-        onClick={handlePrev}
-        disabled={selectedLevelIndex === 0}
-        className={`hidden md:flex absolute -left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-muted/80 dark:bg-card/80 backdrop-blur-sm border border-border/50 items-center justify-center transition-all ${
-          selectedLevelIndex === 0 
-            ? "opacity-30 cursor-not-allowed" 
-            : "hover:bg-muted dark:hover:bg-card hover:scale-110 active:scale-95"
-        }`}
-      >
-        <ChevronLeft className="w-5 h-5" />
-      </button>
-      
-      <button
-        onClick={handleNext}
-        disabled={selectedLevelIndex === LEVELS.length - 1}
-        className={`hidden md:flex absolute -right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-muted/80 dark:bg-card/80 backdrop-blur-sm border border-border/50 items-center justify-center transition-all ${
-          selectedLevelIndex === LEVELS.length - 1 
-            ? "opacity-30 cursor-not-allowed" 
-            : "hover:bg-muted dark:hover:bg-card hover:scale-110 active:scale-95"
-        }`}
-      >
-        <ChevronRight className="w-5 h-5" />
-      </button>
-
       <div 
         ref={scrollContainerRef}
         className="overflow-x-auto overflow-y-visible scrollbar-hide snap-x snap-mandatory"
@@ -254,19 +229,48 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
         </div>
       </div>
       
-      {/* Carousel dots */}
-      <div className="flex justify-center gap-1.5 mt-3">
-        {LEVELS.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => scrollToIndex(idx)}
-            className={`h-2 rounded-full transition-all ${
-              idx === selectedLevelIndex 
-                ? "w-6 bg-emerald-500 dark:bg-[#BFFF00]" 
-                : "w-2 bg-muted-foreground/30"
-            }`}
-          />
-        ))}
+      {/* Carousel dots with arrows */}
+      <div className="flex justify-center items-center gap-3 mt-3">
+        {/* Left Arrow */}
+        <button
+          onClick={handlePrev}
+          disabled={selectedLevelIndex === 0}
+          className={`hidden md:flex w-8 h-8 rounded-full bg-muted/80 dark:bg-card/80 backdrop-blur-sm border border-border/50 items-center justify-center transition-all ${
+            selectedLevelIndex === 0 
+              ? "opacity-30 cursor-not-allowed" 
+              : "hover:bg-muted dark:hover:bg-card hover:scale-110 active:scale-95"
+          }`}
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        
+        {/* Dots */}
+        <div className="flex gap-1.5">
+          {LEVELS.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => scrollToIndex(idx)}
+              className={`h-2 rounded-full transition-all ${
+                idx === selectedLevelIndex 
+                  ? "w-6 bg-emerald-500 dark:bg-[#BFFF00]" 
+                  : "w-2 bg-muted-foreground/30"
+              }`}
+            />
+          ))}
+        </div>
+        
+        {/* Right Arrow */}
+        <button
+          onClick={handleNext}
+          disabled={selectedLevelIndex === LEVELS.length - 1}
+          className={`hidden md:flex w-8 h-8 rounded-full bg-muted/80 dark:bg-card/80 backdrop-blur-sm border border-border/50 items-center justify-center transition-all ${
+            selectedLevelIndex === LEVELS.length - 1 
+              ? "opacity-30 cursor-not-allowed" 
+              : "hover:bg-muted dark:hover:bg-card hover:scale-110 active:scale-95"
+          }`}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
