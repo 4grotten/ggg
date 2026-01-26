@@ -209,7 +209,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                       left: "50%",
                       top: "50%",
                       transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(70px) rotate(-${angle}deg)`,
-                      animationDelay: `${i * 0.25}s`,
+                      animationDelay: `${i * 0.5}s`,
                     }}
                   >
                     <Users className="w-3 h-3 text-white" />
