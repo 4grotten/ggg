@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, CreditCard } from "lucide-react";
+import { Sparkles, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Partner levels configuration
@@ -79,10 +79,24 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
       left: cardWidth * index,
       behavior: "smooth"
     });
-  }, []);
+    setSelectedLevelIndex(index);
+    onLevelChange?.(index);
+  }, [onLevelChange]);
+
+  const handlePrev = useCallback(() => {
+    if (selectedLevelIndex > 0) {
+      scrollToIndex(selectedLevelIndex - 1);
+    }
+  }, [selectedLevelIndex, scrollToIndex]);
+
+  const handleNext = useCallback(() => {
+    if (selectedLevelIndex < LEVELS.length - 1) {
+      scrollToIndex(selectedLevelIndex + 1);
+    }
+  }, [selectedLevelIndex, scrollToIndex]);
 
   return (
-    <div className="px-4">
+    <div className="px-4 relative">
       <div 
         ref={scrollContainerRef}
         className="overflow-x-auto overflow-y-visible scrollbar-hide snap-x snap-mandatory"
@@ -214,6 +228,31 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
           ))}
         </div>
       </div>
+      
+      {/* Desktop Navigation Arrows */}
+      <button
+        onClick={handlePrev}
+        disabled={selectedLevelIndex === 0}
+        className={`hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-muted/80 dark:bg-card/80 backdrop-blur-sm border border-border/50 items-center justify-center transition-all ${
+          selectedLevelIndex === 0 
+            ? "opacity-30 cursor-not-allowed" 
+            : "hover:bg-muted dark:hover:bg-card hover:scale-110 active:scale-95"
+        }`}
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      
+      <button
+        onClick={handleNext}
+        disabled={selectedLevelIndex === LEVELS.length - 1}
+        className={`hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-muted/80 dark:bg-card/80 backdrop-blur-sm border border-border/50 items-center justify-center transition-all ${
+          selectedLevelIndex === LEVELS.length - 1 
+            ? "opacity-30 cursor-not-allowed" 
+            : "hover:bg-muted dark:hover:bg-card hover:scale-110 active:scale-95"
+        }`}
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
       
       {/* Carousel dots */}
       <div className="flex justify-center gap-1.5 mt-3">
