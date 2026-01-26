@@ -457,4 +457,33 @@
   .partner-continue-btn:active {
     transform: scale(0.98);
   }
+
+  /* Orbiting users animation */
+  .partner-orbit-container {
+    animation: partner-orbit-rotate 12s linear infinite;
+  }
+
+  @keyframes partner-orbit-rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .partner-orbit-item {
+    animation: partner-orbit-item-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes partner-orbit-item-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.6), 0 0 24px rgba(16, 185, 129, 0.3);
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.8), 0 0 40px rgba(16, 185, 129, 0.5);
+    }
+  }
 }
