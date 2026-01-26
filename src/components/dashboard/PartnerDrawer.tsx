@@ -337,22 +337,28 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 }}
               />
               
-              {/* Floating users animation - behind */}
-              <div className="absolute inset-0 z-0">
-                {[15, 40, 65, 85, 25, 55].map((leftPos, i) => (
+              {/* Floating users animation - around the animation */}
+              <div className="absolute -inset-8 z-0">
+                {[
+                  { left: -5, top: 20 },
+                  { left: 95, top: 30 },
+                  { left: 0, top: 70 },
+                  { left: 100, top: 65 },
+                  { left: 50, top: -10 },
+                  { left: 45, top: 105 },
+                ].map((pos, i) => (
                   <div
                     key={i}
-                    className="absolute w-5 h-5 rounded-full flex items-center justify-center partner-float-user"
+                    className="absolute w-6 h-6 rounded-full flex items-center justify-center partner-float-user"
                     style={{
                       background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
-                      boxShadow: "0 0 8px rgba(34, 197, 94, 0.5)",
-                      left: `${leftPos}%`,
-                      top: `${20 + (i * 10) % 60}%`,
-                      animationDelay: `${i * 0.5}s`,
-                      opacity: 0.7,
+                      boxShadow: "0 0 10px rgba(34, 197, 94, 0.6)",
+                      left: `${pos.left}%`,
+                      top: `${pos.top}%`,
+                      animationDelay: `${i * 0.4}s`,
                     }}
                   >
-                    <Users className="w-2.5 h-2.5 text-white" />
+                    <Users className="w-3 h-3 text-white" />
                   </div>
                 ))}
               </div>
