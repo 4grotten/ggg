@@ -384,24 +384,21 @@ const PartnerBonuses = () => {
             {/* Column highlight overlays */}
             <div className="absolute inset-0 grid grid-cols-5 pointer-events-none">
               {TARIFFS.map((tariff, idx) => {
-                const isHighlighted = idx === selectedTariffIndex || idx === hoveredColumnIndex;
-                const highlightColor = tariff.id === "smart" ? "rgba(16, 185, 129, 0.15)" :
-                  tariff.id === "agent" ? "rgba(245, 158, 11, 0.15)" :
-                  tariff.id === "pro" ? "rgba(139, 92, 246, 0.15)" :
-                  tariff.id === "vip" ? "rgba(139, 92, 246, 0.15)" :
-                  "rgba(212, 175, 55, 0.15)";
+                const isHighlighted = idx === hoveredColumnIndex;
                 
                 return (
                   <motion.div
                     key={tariff.id}
-                    className="h-full transition-all duration-300"
+                    className="h-full"
                     initial={false}
                     animate={{
-                      backgroundColor: isHighlighted ? highlightColor : "transparent",
+                      backgroundColor: isHighlighted ? "rgba(255, 255, 255, 0.08)" : "transparent",
                       boxShadow: isHighlighted 
-                        ? `inset 0 0 20px ${highlightColor}, 0 0 10px ${highlightColor}` 
-                        : "none"
+                        ? "inset 0 0 30px rgba(255, 255, 255, 0.1), 0 0 15px rgba(255, 255, 255, 0.05)" 
+                        : "none",
+                      backdropFilter: isHighlighted ? "blur(8px)" : "blur(0px)"
                     }}
+                    transition={{ duration: 0.2 }}
                   />
                 );
               })}
