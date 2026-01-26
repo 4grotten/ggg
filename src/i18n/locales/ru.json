@@ -868,7 +868,22 @@
       "dedicatedSupport": "Выделенная линия поддержки",
       "cardIncomeLabel": "Доход с продаж карт",
       "referralLevelsLabel": "Уровней реферальной программы",
-      "padawan": "Падаван"
+      "padawan": "Падаван",
+      "contract": "Контракт",
+      "priceless": "Бесценно",
+      "partnerDesc": "Полная бизнес-модель без ограничений. Станьте частью экосистемы Easy Card",
+      "unlimitedCards": "Безлимитный выпуск карт",
+      "maxCardIncome": "Максимальный % с продаж карт",
+      "maxTariffIncome": "Максимальный % с продажи тарифов",
+      "unlimitedReferral": "Безлимитные уровни реферальной программы",
+      "personalManager": "Персональный менеджер 24/7",
+      "ownCourses": "Собственные обучающие курсы",
+      "unlimitedVolumes": "Объёмы продаж без ограничений",
+      "regionalFranchise": "Франшиза в вашем регионе",
+      "internationalExpansion": "Расширение за пределы региона",
+      "whiteLabel": "White-label решение под ваш бренд",
+      "prioritySupport": "Приоритетная техническая поддержка",
+      "contactUs": "Связаться с нами"
     }
   }
 }
