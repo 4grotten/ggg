@@ -4,6 +4,7 @@ import { ArrowLeft, Check, Sparkles, Crown, Zap, Rocket, Gem } from "lucide-reac
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 
 // Tariff plans configuration
@@ -139,7 +140,10 @@ const PartnerBonuses = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-base font-semibold">{t('partner.bonuses.title', 'Выберите тариф')}</h1>
-          <LanguageSwitcher />
+          <div className="flex items-center gap-2">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
       
