@@ -551,19 +551,28 @@
     }
   }
 
-  /* Blinking users animation - sequential wave around circle */
+  /* Blinking users animation - continuous circle cycle */
   .partner-blink-user {
-    animation: partner-blink-user 2.4s ease-in-out infinite;
+    animation: partner-blink-user 2s linear infinite;
+    opacity: 0;
   }
 
   @keyframes partner-blink-user {
-    0%, 15%, 100% {
+    0% {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.5);
+      transform: translate(-50%, -50%) scale(0.6);
     }
-    7.5% {
+    5% {
       opacity: 1;
       transform: translate(-50%, -50%) scale(1.1);
+    }
+    12.5% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
     }
   }
 }
