@@ -254,6 +254,47 @@
     100% { opacity: 1; transform: translateX(0); }
   }
 
+  @keyframes partner-coin-float {
+    0%, 100% { 
+      transform: translateY(0) rotate(0deg);
+      opacity: 0.9;
+    }
+    25% { 
+      transform: translateY(-8px) rotate(10deg);
+      opacity: 1;
+    }
+    50% { 
+      transform: translateY(-4px) rotate(-5deg);
+      opacity: 0.95;
+    }
+    75% { 
+      transform: translateY(-10px) rotate(5deg);
+      opacity: 1;
+    }
+  }
+
+  @keyframes partner-gem-float {
+    0%, 100% { 
+      transform: translateY(0) rotate(0deg) scale(1);
+      filter: drop-shadow(0 0 8px rgba(80, 200, 120, 0.6));
+    }
+    50% { 
+      transform: translateY(-12px) rotate(15deg) scale(1.1);
+      filter: drop-shadow(0 0 16px rgba(80, 200, 120, 0.8));
+    }
+  }
+
+  @keyframes partner-sparkle {
+    0%, 100% { 
+      opacity: 0;
+      transform: scale(0);
+    }
+    50% { 
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
   @keyframes partner-btn-shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(200%); }
@@ -302,6 +343,18 @@
 
   .partner-center-float {
     animation: partner-center-float 2.5s ease-in-out infinite;
+  }
+
+  .partner-coin-float {
+    animation: partner-coin-float 3s ease-in-out infinite;
+  }
+
+  .partner-gem-float {
+    animation: partner-gem-float 2.5s ease-in-out infinite;
+  }
+
+  .partner-sparkle {
+    animation: partner-sparkle 1.5s ease-in-out infinite;
   }
 
   .partner-line-pulse {

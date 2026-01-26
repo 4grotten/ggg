@@ -4,7 +4,6 @@ import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import partnerStep1Image from "@/assets/partner-step1-magnet.png";
 import partnerStep2Image from "@/assets/partner-step2-gift.png";
 import partnerStep3Image from "@/assets/partner-step3-camel.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -197,13 +196,112 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             key={`step1-${animationKey}`}
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
-            {/* Coins illustration */}
-            <div className="relative w-48 h-48 flex items-center justify-center mb-6">
-              <img 
-                src={partnerStep1Image} 
-                alt="Earn rewards" 
-                className="w-full h-full object-contain rounded-2xl opacity-80"
+            {/* Animated Coins & Gem illustration */}
+            <div className="relative w-56 h-56 flex items-center justify-center mb-6">
+              {/* Pulsing golden background glow */}
+              <div
+                className="absolute inset-0 rounded-full partner-pulse-glow"
+                style={{ background: "radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 165, 0, 0.2) 50%, transparent 70%)" }}
               />
+              
+              {/* Floating coins around */}
+              {[
+                { angle: 30, delay: 0, size: 'w-8 h-8' },
+                { angle: 75, delay: 0.3, size: 'w-6 h-6' },
+                { angle: 130, delay: 0.6, size: 'w-7 h-7' },
+                { angle: 200, delay: 0.2, size: 'w-5 h-5' },
+                { angle: 250, delay: 0.5, size: 'w-8 h-8' },
+                { angle: 310, delay: 0.4, size: 'w-6 h-6' },
+              ].map((coin, i) => (
+                <div
+                  key={i}
+                  className={`absolute ${coin.size} rounded-full flex items-center justify-center partner-coin-float`}
+                  style={{
+                    background: "linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)",
+                    boxShadow: "0 4px 12px rgba(255, 165, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3)",
+                    left: `calc(50% + ${Math.cos(coin.angle * Math.PI / 180) * 85}px - 16px)`,
+                    top: `calc(50% + ${Math.sin(coin.angle * Math.PI / 180) * 85}px - 16px)`,
+                    animationDelay: `${coin.delay}s`,
+                  }}
+                >
+                  <span className="text-yellow-900 font-bold text-xs">$</span>
+                </div>
+              ))}
+              
+              {/* Floating gem */}
+              <div
+                className="absolute w-10 h-10 partner-gem-float"
+                style={{
+                  left: `calc(50% + 60px)`,
+                  top: `calc(50% - 70px)`,
+                }}
+              >
+                <div 
+                  className="w-full h-full"
+                  style={{
+                    background: "linear-gradient(135deg, #50C878 0%, #00FF7F 50%, #98FB98 100%)",
+                    clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
+                    boxShadow: "0 0 20px rgba(80, 200, 120, 0.6)",
+                  }}
+                />
+              </div>
+              
+              {/* Center coin stack */}
+              <div className="relative z-10 partner-center-float">
+                {/* Bottom coins */}
+                <div className="flex justify-center mb-[-8px]">
+                  <div 
+                    className="w-14 h-14 rounded-full"
+                    style={{
+                      background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
+                      boxShadow: "0 4px 16px rgba(218, 165, 32, 0.4)",
+                    }}
+                  />
+                </div>
+                {/* Middle coins */}
+                <div className="flex justify-center gap-[-4px] mb-[-6px]">
+                  <div 
+                    className="w-12 h-12 rounded-full -mr-2"
+                    style={{
+                      background: "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)",
+                      boxShadow: "0 4px 16px rgba(255, 165, 0, 0.4)",
+                    }}
+                  />
+                  <div 
+                    className="w-12 h-12 rounded-full"
+                    style={{
+                      background: "linear-gradient(135deg, #FFD700 0%, #DAA520 100%)",
+                      boxShadow: "0 4px 16px rgba(255, 215, 0, 0.4)",
+                    }}
+                  />
+                </div>
+                {/* Top big coin */}
+                <div className="flex justify-center">
+                  <div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center"
+                    style={{
+                      background: "linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%)",
+                      boxShadow: "0 8px 32px rgba(255, 165, 0, 0.5), inset 0 4px 8px rgba(255, 255, 255, 0.3)",
+                    }}
+                  >
+                    <span className="text-yellow-900 font-bold text-xl">$</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Sparkle particles */}
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div
+                  key={`sparkle-${i}`}
+                  className="absolute w-2 h-2 rounded-full partner-sparkle"
+                  style={{
+                    background: "radial-gradient(circle, #FFFFFF 0%, #FFD700 100%)",
+                    left: `${20 + i * 15}%`,
+                    top: `${15 + (i % 3) * 25}%`,
+                    animationDelay: `${i * 0.4}s`,
+                  }}
+                />
+              ))}
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
