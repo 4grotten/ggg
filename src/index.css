@@ -223,18 +223,18 @@
   }
 
   @keyframes partner-float {
-    0%, 100% { filter: drop-shadow(0 4px 12px rgba(127, 255, 0, 0.2)); }
-    50% { filter: drop-shadow(0 6px 16px rgba(127, 255, 0, 0.35)); }
+    0%, 100% { filter: drop-shadow(0 6px 20px rgba(127, 255, 0, 0.4)); }
+    50% { filter: drop-shadow(0 10px 28px rgba(127, 255, 0, 0.7)); }
   }
 
   @keyframes partner-float-scale {
-    0%, 100% { filter: drop-shadow(0 4px 12px rgba(127, 255, 0, 0.2)); }
-    50% { filter: drop-shadow(0 6px 16px rgba(127, 255, 0, 0.35)); }
+    0%, 100% { filter: drop-shadow(0 6px 20px rgba(127, 255, 0, 0.4)); }
+    50% { filter: drop-shadow(0 10px 28px rgba(127, 255, 0, 0.7)); }
   }
 
   @keyframes partner-center-float {
-    0%, 100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 20px rgba(191, 255, 0, 0.15); }
-    50% { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 28px rgba(191, 255, 0, 0.25); }
+    0%, 100% { box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 0 30px rgba(191, 255, 0, 0.3); }
+    50% { box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 50px rgba(191, 255, 0, 0.5); }
   }
 
   @keyframes partner-line-pulse {
