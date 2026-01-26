@@ -176,8 +176,8 @@ const PartnerBonuses = () => {
                           ? "bg-primary text-primary-foreground" 
                           : tariff.badgeType === "padawan"
                           ? "bg-amber-500 text-white"
-                          : tariff.badgeType === "contract"
-                          ? "bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-black"
+                        : tariff.badgeType === "contract"
+                        ? "bg-emerald-600 text-white"
                           : "bg-violet-500 text-white"
                       }`}
                     >
