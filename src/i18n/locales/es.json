@@ -772,6 +772,11 @@
     "inviteFriendsTitle": "Invitar Amigos",
     "friends": "amigos",
     "bonuses": {
+      "tariffSmart": "Smart",
+      "tariffAgent": "Agente",
+      "tariffPro": "PRO",
+      "tariffVip": "VIP",
+      "tariffPartner": "Socio",
       "title": "Elige tu Plan",
       "yourTariff": "Tu plan",
       "currentTariff": "Plan actual",

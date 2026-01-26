@@ -772,6 +772,11 @@
     "inviteFriendsTitle": "Freunde einladen",
     "friends": "Freunde",
     "bonuses": {
+      "tariffSmart": "Smart",
+      "tariffAgent": "Agent",
+      "tariffPro": "PRO",
+      "tariffVip": "VIP",
+      "tariffPartner": "Partner",
       "title": "Wählen Sie Ihren Plan",
       "yourTariff": "Ihr Plan",
       "currentTariff": "Aktueller Plan",
