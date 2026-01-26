@@ -36,7 +36,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   // Preload TGS animations when drawer opens
   useEffect(() => {
     if (open) {
-      preloadTgs("/animations/money-coins.tgs");
+      preloadTgs("/animations/GlassDuck.tgs");
       preloadTgs("/animations/wowduck.tgs");
     }
   }, [open]);
@@ -215,7 +215,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 }}
               />
               <TgsPlayer 
-                src="/animations/money-coins.tgs" 
+                src="/animations/GlassDuck.tgs" 
                 className="w-full h-full relative z-10"
               />
             </div>
