@@ -199,7 +199,7 @@ const App = () => {
           {isLoading ? (
             <SplashScreen key="splash" />
           ) : (
-            <BrowserRouter basename="/EasyCard">
+            <BrowserRouter basename={window.location.pathname.startsWith('/EasyCard') ? '/EasyCard' : ''}>
               <AuthProvider>
                 <AvatarProvider>
                   <AvatarSync />
