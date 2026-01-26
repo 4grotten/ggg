@@ -80,7 +80,7 @@ export const LanguageSwitcher = () => {
             </button>
           </DrawerHeader>
           
-          <div className="px-4 pb-6">
+          <div className="flex-1 overflow-y-auto px-4">
             <AnimatedDrawerContainer className="bg-muted/50 rounded-xl overflow-hidden">
               {languages.map((language, index) => (
                 <AnimatedDrawerItem key={language.code} index={index}>
