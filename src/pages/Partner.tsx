@@ -46,7 +46,7 @@ const Partner = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto overflow-x-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border max-w-[800px] mx-auto">
         <div className="flex items-center justify-between h-14 px-4">
           <button
             onClick={handleBack}
@@ -60,7 +60,7 @@ const Partner = () => {
       </header>
       
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-8 space-y-6">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-8 space-y-6 pt-14">
         {/* Hero Section */}
         <div className="relative px-4 pt-4">
           <HeroBanner />
