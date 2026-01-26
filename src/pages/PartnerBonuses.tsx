@@ -282,8 +282,8 @@ const PartnerBonuses = () => {
                 {t('partner.bonuses.cardIncomeLabel', 'Доход с продаж карт')}
               </p>
               <div className="grid grid-cols-4 gap-2">
-                <div className="text-center text-sm font-medium">15-30%</div>
-                <div className="text-center text-sm font-medium">30%</div>
+                <div className="text-center text-sm font-medium">15%</div>
+                <div className="text-center text-sm font-medium">25%</div>
                 <div className="text-center text-sm font-medium">30%</div>
                 <div className="text-center text-sm font-medium">30%</div>
               </div>
