@@ -1,12 +1,4 @@
 {
-  "partner": {
-    "referralHistory": "Реферальная история",
-    "withdrawTitle": "Вывести на",
-    "withdrawToCard": "Пополнение карты",
-    "availableBalance": "Доступный баланс",
-    "earnWithEasyCard": "Зарабатывайте с Easy Card",
-    "passiveIncomeDaily": "Пассивный доход каждый день."
-  },
   "profileVerification": {
     "title": "Подтвердите личность",
     "description": "Пройдите верификацию, чтобы разблокировать все функции и увеличить лимиты аккаунта.",
@@ -770,6 +762,12 @@
     }
   },
   "partner": {
+    "referralHistory": "Реферальная история",
+    "withdrawTitle": "Вывести на",
+    "withdrawToCard": "Пополнение карты",
+    "availableBalance": "Доступный баланс",
+    "earnWithEasyCard": "Зарабатывайте с Easy Card",
+    "passiveIncomeDaily": "Пассивный доход каждый день.",
     "step1": {
       "title": "Станьте партнёром",
       "subtitle": "Приглашайте друзей — получайте пассивный доход каждый раз.",
