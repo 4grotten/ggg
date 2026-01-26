@@ -95,14 +95,21 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
   return (
     <Drawer open={open} onOpenChange={handleClose}>
       <DrawerContent className="bg-background/95 backdrop-blur-xl border-t border-border/50 max-w-[800px] mx-auto">
-        {/* Centered title only */}
-        <div className="py-4 text-center border-b border-border/50">
-          <h2 className="text-lg font-semibold">
-            {step === "selectCard" ? t('openCard.title') : 
-             step === "selectPayment" ? t('openCard.paymentTitle') :
-             t('openCard.payFromBalance')}
-          </h2>
-        </div>
+        <DrawerHeader className="border-b border-border/50 pb-4">
+          <div className="flex items-center justify-between">
+            <DrawerTitle className="text-lg font-semibold">
+              {step === "selectCard" ? t('openCard.title') : 
+               step === "selectPayment" ? t('openCard.paymentTitle') :
+               t('openCard.payFromBalance')}
+            </DrawerTitle>
+            <button
+              onClick={handleClose}
+              className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </DrawerHeader>
 
         <div className="p-4 pb-8">
           <AnimatePresence mode="wait">
@@ -272,6 +279,21 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
                     </motion.div>
                   </AnimatePresence>
                   
+                  {/* Pagination dots */}
+                  <div className="flex justify-center gap-2 mt-3">
+                    <button
+                      onClick={() => setSelectedCard("virtual")}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        selectedCard === "virtual" ? "bg-primary w-6" : "bg-muted-foreground/30"
+                      }`}
+                    />
+                    <button
+                      onClick={() => setSelectedCard("metal")}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        selectedCard === "metal" ? "bg-primary w-6" : "bg-muted-foreground/30"
+                      }`}
+                    />
+                  </div>
                 </div>
 
                 {/* Pay from Balance */}
