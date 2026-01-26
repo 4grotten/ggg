@@ -44,7 +44,7 @@ const Partner = () => {
   }, []);
   
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto">
+    <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="flex items-center justify-between h-14 px-4">
