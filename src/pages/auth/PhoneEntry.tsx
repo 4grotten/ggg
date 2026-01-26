@@ -549,20 +549,33 @@ const PhoneEntry = () => {
                 handleLogin();
               }}
               autoComplete="on"
+              className="space-y-6"
             >
-              {/* Hidden username field for browser password manager */}
-              <input 
-                type="hidden" 
-                name="username" 
-                value={getFullPhoneNumber()}
-                autoComplete="username"
-              />
+              {/* Visible readonly phone field for iOS/Android password autofill */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.05 }}
+              >
+                <div className="flex items-center gap-2 border-b pb-4 border-border opacity-60">
+                  <Phone className="w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="tel"
+                    name="username"
+                    id="username"
+                    autoComplete="username"
+                    value={getFullPhoneNumber()}
+                    readOnly
+                    tabIndex={-1}
+                    className="flex-1 text-lg bg-transparent border-none outline-none text-muted-foreground cursor-default"
+                  />
+                </div>
+              </motion.div>
               
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="space-y-6"
               >
                 <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
                   passwordError ? 'border-destructive' : 'border-border'
@@ -571,6 +584,7 @@ const PhoneEntry = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
+                    id="password"
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -586,27 +600,27 @@ const PhoneEntry = () => {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                
-                {(passwordError || errorMessage) && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-destructive text-sm"
-                  >
-                    {errorMessage || t('auth.login.wrongPassword')}
-                  </motion.p>
-                )}
-                
-                {/* Forgot Password Link */}
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  disabled={isLoading}
-                  className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
-                >
-                  {t('auth.login.forgotPassword') || 'Forgot password?'}
-                </button>
               </motion.div>
+                
+              {(passwordError || errorMessage) && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-destructive text-sm"
+                >
+                  {errorMessage || t('auth.login.wrongPassword')}
+                </motion.p>
+              )}
+              
+              {/* Forgot Password Link */}
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={isLoading}
+                className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
+              >
+                {t('auth.login.forgotPassword') || 'Forgot password?'}
+              </button>
             </form>
 
             {/* Support Link */}
