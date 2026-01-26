@@ -88,24 +88,12 @@ const Dashboard = () => {
   const firstName = displayName.split(' ')[0];
   
 
-  // Show welcome toast once per session for authenticated users
-  // Also save current account to multi-account storage
+  // Save current account to multi-account storage (welcome toast is now shown only at login)
   useEffect(() => {
-    if (isAuthenticated && user?.full_name) {
-      const welcomeKey = `welcome_shown_${user.id || user.phone_number}`;
-      const alreadyShown = sessionStorage.getItem(welcomeKey);
-      
-      if (!alreadyShown) {
-        sessionStorage.setItem(welcomeKey, 'true');
-        toast.success(t('dashboard.welcome', { name: firstName }), {
-          duration: 3000,
-        });
-      }
-      
-      // Save current account to multi-account storage
+    if (isAuthenticated && user) {
       addCurrentAccount(user);
     }
-  }, [isAuthenticated, user?.full_name, user?.id, user?.phone_number, firstName, t, user, addCurrentAccount]);
+  }, [isAuthenticated, user, addCurrentAccount]);
 
   // Filter options
   const filterOptions: { key: FilterType; label: string }[] = [
