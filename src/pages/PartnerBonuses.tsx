@@ -141,7 +141,7 @@ const PartnerBonuses = () => {
                 >
                   {/* Badge above card */}
                   {isCurrent && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-muted text-muted-foreground text-[10px] font-medium rounded-full">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-emerald-500 dark:bg-[#BFFF00] text-white dark:text-black text-[10px] font-bold rounded-full">
                       {t('partner.bonuses.yourTariff', 'Ваш тариф')}
                     </span>
                   )}
