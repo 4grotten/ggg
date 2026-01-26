@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
-import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -20,185 +19,205 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
+// Preload images on module load
+const preloadImages = [partnerStep1Image, partnerStep2Image, partnerStep3Image];
+preloadImages.forEach((src) => {
+  const img = new Image();
+  img.src = src;
+});
+
 interface PartnerDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
+// Memoized orbit icon component with CSS animations
+const OrbitIcon = memo(({ index }: { index: number }) => {
+  const angles = [0, 72, 144, 216, 288];
+  const angle = angles[index];
+  const x = Math.cos(angle * Math.PI / 180) * 80;
+  const y = Math.sin(angle * Math.PI / 180) * 80;
+  
+  return (
+    <div
+      className="absolute w-10 h-10 rounded-full flex items-center justify-center animate-pulse"
+      style={{
+        background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
+        boxShadow: "0 4px 16px rgba(127, 255, 0, 0.4)",
+        left: `calc(50% + ${x}px - 20px)`,
+        top: `calc(50% + ${y}px - 20px)`,
+        animationDelay: `${index * 0.2}s`,
+      }}
+    >
+      <Users className="w-5 h-5 text-black" />
+    </div>
+  );
+});
+OrbitIcon.displayName = "OrbitIcon";
+
+// Memoized network illustration (Step 0) - uses CSS animations instead of Framer Motion
+const NetworkIllustration = memo(() => (
+  <div className="relative w-56 h-56 flex items-center justify-center mb-6">
+    {/* Pulsing background glow - CSS animation */}
+    <div
+      className="absolute inset-0 rounded-full animate-pulse"
+      style={{ 
+        background: "radial-gradient(circle, rgba(191, 255, 0, 0.3) 0%, transparent 70%)",
+      }}
+    />
+    
+    {/* Orbiting circles - static positions with pulse */}
+    <div className="absolute inset-0">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <OrbitIcon key={i} index={i} />
+      ))}
+    </div>
+    
+    {/* Center card icon - simple float animation */}
+    <div
+      className="relative z-10 w-20 h-20 rounded-2xl flex items-center justify-center animate-float"
+      style={{
+        background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(191, 255, 0, 0.2)",
+        border: "2px solid rgba(191, 255, 0, 0.5)"
+      }}
+    >
+      <span className="text-2xl font-bold" style={{ color: "#BFFF00" }}>EC</span>
+    </div>
+  </div>
+));
+NetworkIllustration.displayName = "NetworkIllustration";
+
+// Memoized image step component
+const StepImage = memo(({ src, alt }: { src: string; alt: string }) => (
+  <div className="relative w-48 h-48 flex items-center justify-center mb-6">
+    <img 
+      src={src} 
+      alt={alt} 
+      className="w-full h-full object-contain rounded-2xl animate-float"
+      style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
+      loading="eager"
+      decoding="async"
+    />
+  </div>
+));
+StepImage.displayName = "StepImage";
+
+// Share button component with CSS-only animations
+const ShareActionButton = memo(({ 
+  onClick, 
+  gradient, 
+  shadowColor, 
+  icon: Icon,
+  label 
+}: { 
+  onClick: () => void; 
+  gradient: string; 
+  shadowColor: string;
+  icon: typeof Send;
+  label: string;
+}) => (
+  <button
+    onClick={onClick}
+    className="relative w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden active:scale-90 transition-transform"
+    style={{
+      background: gradient,
+      boxShadow: `0 6px 20px ${shadowColor}`,
+    }}
+    aria-label={label}
+  >
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+    <Icon className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
+  </button>
+));
+ShareActionButton.displayName = "ShareActionButton";
+
+export const PartnerDrawer = memo(({ open, onOpenChange }: PartnerDrawerProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [step, setStep] = useState(0);
-  const [direction, setDirection] = useState(1);
   const [showAuthAlert, setShowAuthAlert] = useState(false);
 
-  const handleClose = () => {
-    onOpenChange(false);
-    // Reset step after close animation
-    setTimeout(() => {
-      setStep(0);
-      setDirection(1);
-    }, 300);
-  };
-
-  const handleBack = () => {
-    if (step > 0) {
-      setDirection(-1);
-      setStep(step - 1);
+  // Reset step when drawer closes
+  useEffect(() => {
+    if (!open) {
+      const timer = setTimeout(() => setStep(0), 300);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [open]);
 
-  const handleContinue = () => {
-    // На последнем шаге (step 3) гость должен увидеть алерт
+  const handleClose = useCallback(() => {
+    onOpenChange(false);
+  }, [onOpenChange]);
+
+  const handleBack = useCallback(() => {
+    if (step > 0) setStep(step - 1);
+  }, [step]);
+
+  const handleContinue = useCallback(() => {
     if (step === 2 && !isAuthenticated) {
       setShowAuthAlert(true);
       return;
     }
-    if (step < 3) {
-      setDirection(1);
-      setStep(step + 1);
-    }
-  };
+    if (step < 3) setStep(step + 1);
+  }, [step, isAuthenticated]);
 
-  const handleGuestShareAction = () => {
+  const handleGuestShareAction = useCallback(() => {
     if (!isAuthenticated) {
       setShowAuthAlert(true);
       return true;
     }
     return false;
-  };
+  }, [isAuthenticated]);
 
   const appLink = "https://test.apofiz.com/EasyCard/";
 
-  const handleCopyLink = () => {
+  const handleCopyLink = useCallback(() => {
     if (handleGuestShareAction()) return;
     navigator.clipboard.writeText(appLink);
     toast.success(t('partner.linkCopied'));
-  };
+  }, [handleGuestShareAction, t]);
 
-  const handleShareTelegram = () => {
+  const handleShareTelegram = useCallback(() => {
     if (handleGuestShareAction()) return;
     const text = encodeURIComponent(t('partner.shareText'));
     const url = encodeURIComponent(appLink);
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
-  };
+  }, [handleGuestShareAction, t]);
 
-  const handleAuthRedirect = () => {
+  const handleShare = useCallback(async () => {
+    if (handleGuestShareAction()) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Easy Card',
+          text: t('partner.shareText'),
+          url: appLink,
+        });
+      } catch {
+        // User cancelled
+      }
+    }
+  }, [handleGuestShareAction, t]);
+
+  const handleAuthRedirect = useCallback(() => {
     setShowAuthAlert(false);
     onOpenChange(false);
     navigate("/auth/phone");
-  };
+  }, [navigate, onOpenChange]);
 
-  const stepVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 100 : -100,
-      opacity: 0
-    }),
-    center: {
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction: number) => ({
-      x: direction < 0 ? 100 : -100,
-      opacity: 0
-    })
-  };
+  const handleGoToPartnerPage = useCallback(() => {
+    onOpenChange(false);
+    setTimeout(() => navigate("/partner"), 300);
+  }, [navigate, onOpenChange]);
 
   const renderStepContent = () => {
     switch (step) {
       case 0:
         return (
-          <motion.div
-            key="step0"
-            custom={direction}
-            variants={stepVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center px-6"
-          >
-            {/* Network/Partnership illustration */}
-            <div className="relative w-56 h-56 flex items-center justify-center mb-6">
-              {/* Pulsing background glow */}
-              <motion.div
-                animate={{ 
-                  opacity: [0.2, 0.5, 0.2],
-                  scale: [0.9, 1.1, 0.9],
-                }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-                className="absolute inset-0 rounded-full"
-                style={{ background: "radial-gradient(circle, rgba(191, 255, 0, 0.4) 0%, transparent 70%)" }}
-              />
-              
-              {/* Orbiting circles representing network */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0"
-              >
-                {[0, 72, 144, 216, 288].map((angle, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{
-                      background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-                      boxShadow: "0 4px 16px rgba(127, 255, 0, 0.4)",
-                      left: `calc(50% + ${Math.cos(angle * Math.PI / 180) * 80}px - 20px)`,
-                      top: `calc(50% + ${Math.sin(angle * Math.PI / 180) * 80}px - 20px)`,
-                    }}
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
-                  >
-                    <Users className="w-5 h-5 text-black" />
-                  </motion.div>
-                ))}
-              </motion.div>
-              
-              {/* Center card icon */}
-              <motion.div
-                animate={{ 
-                  y: [0, -6, 0],
-                  scale: [1, 1.05, 1],
-                }}
-                transition={{ 
-                  duration: 2.5, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-                className="relative z-10 w-20 h-20 rounded-2xl flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
-                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(191, 255, 0, 0.2)",
-                  border: "2px solid rgba(191, 255, 0, 0.5)"
-                }}
-              >
-                <span className="text-2xl font-bold" style={{ color: "#BFFF00" }}>EC</span>
-              </motion.div>
-              
-              {/* Connecting lines effect */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.3 }}>
-                {[0, 72, 144, 216, 288].map((angle, i) => (
-                  <motion.line
-                    key={i}
-                    x1="50%"
-                    y1="50%"
-                    x2={`${50 + Math.cos(angle * Math.PI / 180) * 35}%`}
-                    y2={`${50 + Math.sin(angle * Math.PI / 180) * 35}%`}
-                    stroke="#BFFF00"
-                    strokeWidth="1"
-                    animate={{ opacity: [0.3, 0.8, 0.3] }}
-                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
-                  />
-                ))}
-              </svg>
-            </div>
-
+          <div className="flex flex-col items-center px-6 animate-fade-in">
+            <NetworkIllustration />
             <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step1.title')} Easy Card
             </h2>
@@ -208,35 +227,13 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             <p className="text-muted-foreground text-center">
               {t('partner.step1.description')}
             </p>
-          </motion.div>
+          </div>
         );
 
       case 1:
         return (
-          <motion.div
-            key="step1"
-            custom={direction}
-            variants={stepVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center px-6"
-          >
-            {/* Coins illustration */}
-            <motion.div 
-              className="relative w-48 h-48 flex items-center justify-center mb-6"
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <img 
-                src={partnerStep1Image} 
-                alt="Earn rewards" 
-                className="w-full h-full object-contain rounded-2xl"
-                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
-              />
-            </motion.div>
-
+          <div className="flex flex-col items-center px-6 animate-fade-in">
+            <StepImage src={partnerStep1Image} alt="Earn rewards" />
             <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step2.title')} Easy Card
             </h2>
@@ -249,39 +246,16 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             <p className="text-muted-foreground text-center">
               {t('partner.step2.description2')}
             </p>
-          </motion.div>
+          </div>
         );
 
       case 2:
         return (
-          <motion.div
-            key="step2"
-            custom={direction}
-            variants={stepVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center px-6"
-          >
-            {/* Gift box illustration */}
-            <motion.div 
-              className="relative w-48 h-48 flex items-center justify-center mb-6"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <img 
-                src={partnerStep2Image} 
-                alt="Rewards" 
-                className="w-full h-full object-contain rounded-2xl"
-                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
-              />
-            </motion.div>
-
+          <div className="flex flex-col items-center px-6 animate-fade-in">
+            <StepImage src={partnerStep2Image} alt="Rewards" />
             <h2 className="text-2xl font-bold text-center mb-6">
               {t('partner.step3.title')} Easy Card
             </h2>
-
             {/* 3 earning methods */}
             <div className="flex justify-center gap-6">
               <div className="flex flex-col items-center">
@@ -315,132 +289,44 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 <p className="text-sm font-medium text-center opacity-60">{t('partner.completeTasks')}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
         );
 
       case 3:
         return (
-          <motion.div
-            key="step3"
-            custom={direction}
-            variants={stepVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center px-6"
-          >
-            {/* Piggy bank illustration */}
-            <motion.div 
-              className="relative w-48 h-48 flex items-center justify-center mb-6"
-              animate={{ y: [0, -6, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <img 
-                src={partnerStep3Image} 
-                alt="Save rewards" 
-                className="w-full h-full object-contain rounded-2xl"
-                style={{ filter: "drop-shadow(0 8px 24px rgba(127, 255, 0, 0.3))" }}
-              />
-            </motion.div>
-
+          <div className="flex flex-col items-center px-6 animate-fade-in">
+            <StepImage src={partnerStep3Image} alt="Save rewards" />
             <h2 className="text-2xl font-bold text-center mb-2">
               {t('partner.step4.title')}
             </h2>
             <p className="text-muted-foreground text-center mb-6">
               {t('partner.step4.description')}
             </p>
-
-            {/* 3 fantastic share icons in content area */}
+            {/* Share buttons with CSS animations */}
             <div className="flex justify-center gap-4">
-              <motion.button
+              <ShareActionButton
                 onClick={handleShareTelegram}
-                whileHover={{ scale: 1.15, rotate: 5 }}
-                whileTap={{ scale: 0.9 }}
-                animate={{ 
-                  boxShadow: [
-                    "0 4px 20px rgba(0, 136, 204, 0.4)",
-                    "0 8px 30px rgba(0, 136, 204, 0.6)",
-                    "0 4px 20px rgba(0, 136, 204, 0.4)"
-                  ]
-                }}
-                transition={{ 
-                  boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                }}
-                className="relative w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, #0088cc 0%, #00c6ff 50%, #0088cc 100%)",
-                  backgroundSize: "200% 200%",
-                }}
-                aria-label={t('partner.shareInTelegram')}
-              >
-                <motion.div 
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                  animate={{ x: ["-100%", "200%"] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                />
-                <Send className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
-              </motion.button>
-              
-              <motion.button
+                gradient="linear-gradient(135deg, #0088cc 0%, #00c6ff 100%)"
+                shadowColor="rgba(0, 136, 204, 0.4)"
+                icon={Send}
+                label={t('partner.shareInTelegram')}
+              />
+              <ShareActionButton
                 onClick={handleCopyLink}
-                whileHover={{ scale: 1.15, rotate: -5 }}
-                whileTap={{ scale: 0.9 }}
-                animate={{ 
-                  boxShadow: [
-                    "0 4px 20px rgba(124, 58, 237, 0.4)",
-                    "0 8px 30px rgba(168, 85, 247, 0.6)",
-                    "0 4px 20px rgba(124, 58, 237, 0.4)"
-                  ]
-                }}
-                transition={{ 
-                  boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }
-                }}
-                className="relative w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%)",
-                  backgroundSize: "200% 200%",
-                }}
-                aria-label={t('partner.copyInviteLink')}
-              >
-                <motion.div 
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                  animate={{ x: ["-100%", "200%"] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.3 }}
-                />
-                <Copy className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
-              </motion.button>
-              
-              <motion.button
+                gradient="linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)"
+                shadowColor="rgba(124, 58, 237, 0.4)"
+                icon={Copy}
+                label={t('partner.copyInviteLink')}
+              />
+              <ShareActionButton
                 onClick={handleShare}
-                whileHover={{ scale: 1.15, rotate: 5 }}
-                whileTap={{ scale: 0.9 }}
-                animate={{ 
-                  boxShadow: [
-                    "0 4px 20px rgba(16, 185, 129, 0.4)",
-                    "0 8px 30px rgba(52, 211, 153, 0.6)",
-                    "0 4px 20px rgba(16, 185, 129, 0.4)"
-                  ]
-                }}
-                transition={{ 
-                  boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }
-                }}
-                className="relative w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%)",
-                  backgroundSize: "200% 200%",
-                }}
-                aria-label={t('common.share')}
-              >
-                <motion.div 
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                  animate={{ x: ["-100%", "200%"] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.6 }}
-                />
-                <Share2 className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
-              </motion.button>
+                gradient="linear-gradient(135deg, #10b981 0%, #34d399 100%)"
+                shadowColor="rgba(16, 185, 129, 0.4)"
+                icon={Share2}
+                label={t('common.share')}
+              />
             </div>
-          </motion.div>
+          </div>
         );
 
       default:
@@ -448,110 +334,116 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     }
   };
 
-  const handleShare = async () => {
-    if (handleGuestShareAction()) return;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Easy Card',
-          text: t('partner.shareText'),
-          url: appLink,
-        });
-      } catch (error) {
-        // User cancelled or error
-      }
-    }
-  };
-
-  const handleGoToPartnerPage = () => {
-    onOpenChange(false);
-    setTimeout(() => {
-      setStep(0);
-      setDirection(1);
-      navigate("/partner");
-    }, 300);
-  };
-
   const renderFooterButtons = () => {
     const isLastStep = step === 3;
     
     return (
-      <motion.button
-        onClick={isLastStep ? handleGoToPartnerPage : handleContinue}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="w-full py-4 font-semibold rounded-2xl relative overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-          boxShadow: "0 8px 24px rgba(127, 255, 0, 0.3)",
-        }}
-      >
-        <span className="text-black font-bold">{t('common.continue')}</span>
-      </motion.button>
+      <DrawerFooter className="px-4 pb-6 pt-2">
+        {isLastStep ? (
+          <button
+            onClick={handleGoToPartnerPage}
+            className="w-full py-4 px-6 font-bold rounded-2xl relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
+              boxShadow: "0 0 20px rgba(127, 255, 0, 0.5)"
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            <span className="relative z-10 text-black">{t('partner.goToPartnerPage', 'Перейти в партнёрский кабинет')}</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleContinue}
+            className="w-full py-4 px-6 font-bold rounded-2xl relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
+              boxShadow: "0 0 20px rgba(127, 255, 0, 0.5)"
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            <span className="relative z-10 text-black">{t('common.continue', 'Продолжить')}</span>
+          </button>
+        )}
+      </DrawerFooter>
     );
   };
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange} modal>
-      <DrawerContent className="max-h-[90vh] flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
-        {/* Back button - fixed position */}
-        {step > 0 && (
-          <button
-            onClick={handleBack}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-muted flex items-center justify-center z-10"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        )}
-        
-        {/* Scrollable content with fixed height to prevent drawer jumping */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden">
-          <div className="relative pt-8 pb-4 h-[420px] flex flex-col">
-            <AnimatePresence mode="wait" custom={direction} initial={false}>
-              {renderStepContent()}
-            </AnimatePresence>
+    <>
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent className="max-h-[90vh] bg-background/95 backdrop-blur-xl">
+          {/* Header with back button and step indicator */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-2">
+            {step > 0 ? (
+              <button
+                onClick={handleBack}
+                className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            ) : (
+              <div className="w-10" />
+            )}
+            
+            {/* Step indicators */}
+            <div className="flex gap-1.5">
+              {[0, 1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === step ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'
+                  }`}
+                />
+              ))}
+            </div>
+            
+            <button
+              onClick={handleClose}
+              className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <span className="text-lg">×</span>
+            </button>
           </div>
-        </div>
-        
-        {/* Floating button - no background */}
-        <div className="px-6 pb-6 pt-2 bg-transparent">
-          {renderFooterButtons()}
-        </div>
-      </DrawerContent>
 
-      {/* iOS-style Auth Alert */}
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto py-4">
+            {renderStepContent()}
+          </div>
+
+          {/* Footer */}
+          {renderFooterButtons()}
+        </DrawerContent>
+      </Drawer>
+
+      {/* Auth Alert */}
       <AlertDialog open={showAuthAlert} onOpenChange={setShowAuthAlert}>
-        <AlertDialogContent 
-          className="w-[270px] rounded-2xl p-0 gap-0 border-0 overflow-hidden"
-          style={{ backgroundColor: 'rgba(30, 30, 30, 0.95)', backdropFilter: 'blur(40px)' }}
-          onOverlayClick={() => setShowAuthAlert(false)}
-        >
-          <AlertDialogHeader className="pt-5 px-4 pb-4 text-center">
-            <AlertDialogTitle className="text-[17px] font-semibold text-white text-center">
-              {t('common.authorize', 'Авторизация')}
+        <AlertDialogContent className="w-[270px] rounded-2xl p-0 gap-0 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-0 shadow-2xl">
+          <AlertDialogHeader className="pt-5 pb-4 px-4 text-center">
+            <AlertDialogTitle className="text-[17px] font-semibold text-foreground">
+              {t('feesAndLimits.authRequired', 'Требуется авторизация')}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] text-[#8E8E93] text-center mt-1">
-              {t('feesAndLimits.authRequiredMessage', 'Для доступа к этой функции необходимо войти в аккаунт')}
+            <AlertDialogDescription className="text-[13px] text-muted-foreground leading-tight">
+              {t('partner.authRequiredDesc', 'Для участия в партнёрской программе необходимо авторизоваться')}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col p-0 gap-0">
-            <div className="w-full h-[1px]" style={{ backgroundColor: 'rgba(84, 84, 88, 0.65)' }} />
+          <AlertDialogFooter className="flex-col p-0 border-t border-[#C6C6C8] dark:border-[#38383A]">
             <AlertDialogCancel 
               onClick={() => setShowAuthAlert(false)}
-              className="m-0 h-11 rounded-none border-0 bg-transparent text-[17px] font-normal text-[#0A84FF] hover:bg-white/5"
+              className="w-full py-[11px] text-[17px] text-[#007AFF] font-normal border-0 border-b border-[#C6C6C8] dark:border-[#38383A] bg-transparent hover:bg-black/5 dark:hover:bg-white/5 rounded-none"
             >
               {t('common.cancel', 'Отмена')}
             </AlertDialogCancel>
-            <div className="w-full h-[1px]" style={{ backgroundColor: 'rgba(84, 84, 88, 0.65)' }} />
-            <AlertDialogAction
+            <AlertDialogAction 
               onClick={handleAuthRedirect}
-              className="m-0 h-11 rounded-none border-0 bg-transparent text-[17px] font-semibold text-[#0A84FF] hover:bg-white/5"
+              className="w-full py-[11px] text-[17px] text-[#007AFF] font-semibold border-0 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 rounded-none"
             >
-              {t('common.authorize', 'Авторизация')}
+              {t('common.authorize', 'Авторизоваться')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Drawer>
+    </>
   );
-};
+});
+
+PartnerDrawer.displayName = "PartnerDrawer";
