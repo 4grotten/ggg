@@ -310,7 +310,11 @@ const PartnerBonuses = () => {
               <div className="grid grid-cols-5 gap-1">
                 {TARIFFS.map((tariff) => (
                   <div key={tariff.id} className="flex justify-center">
-                    <Check className="w-4 h-4 text-muted-foreground" />
+                    {tariff.id === "partner" ? (
+                      <span className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</span>
+                    ) : (
+                      <Check className="w-4 h-4 text-muted-foreground" />
+                    )}
                   </div>
                 ))}
               </div>
@@ -326,7 +330,7 @@ const PartnerBonuses = () => {
                 <div className="text-center text-xs font-medium text-muted-foreground/50">—</div>
                 <div className="flex justify-center"><Check className="w-4 h-4 text-muted-foreground" /></div>
                 <div className="flex justify-center"><Check className="w-4 h-4 text-muted-foreground" /></div>
-                <div className="flex justify-center"><Check className="w-4 h-4 text-emerald-500 dark:text-[#BFFF00]" /></div>
+                <div className="flex justify-center"><span className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</span></div>
               </div>
             </div>
             
