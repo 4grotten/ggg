@@ -1,12 +1,4 @@
 {
-  "partner": {
-    "referralHistory": "Referral History",
-    "withdrawTitle": "Withdraw to",
-    "withdrawToCard": "Top up card",
-    "availableBalance": "Available balance",
-    "earnWithEasyCard": "Earn with Easy Card",
-    "passiveIncomeDaily": "Passive income every day."
-  },
   "profileVerification": {
     "title": "Verify Your Identity",
     "description": "Complete the verification process to unlock all features and increase your account limits.",
@@ -770,6 +762,12 @@
     }
   },
   "partner": {
+    "referralHistory": "Referral History",
+    "withdrawTitle": "Withdraw to",
+    "withdrawToCard": "Top up card",
+    "availableBalance": "Available balance",
+    "earnWithEasyCard": "Earn with Easy Card",
+    "passiveIncomeDaily": "Passive income every day.",
     "step1": {
       "title": "Meet",
       "subtitle": "Your way to earn with Easy Card.",
