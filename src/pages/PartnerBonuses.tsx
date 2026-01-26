@@ -92,7 +92,7 @@ const PartnerBonuses = () => {
   const [currentTariffId] = useState("smart"); // Mock current tariff
   
   const handleBack = useCallback(() => {
-    navigate(-1);
+    navigate('/partner');
   }, [navigate]);
 
   // Scroll to top on mount
