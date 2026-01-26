@@ -46,17 +46,17 @@ export const HeroBanner = memo(() => {
 
   return (
     <div className="relative w-full rounded-2xl overflow-visible mb-4">
-      {/* Light theme glow layers */}
+      {/* Light theme glow layers - more saturated for visibility */}
       <GlowLayer
-        inset="-inset-6"
-        blur={24}
-        gradient="radial-gradient(ellipse at center, rgba(16, 185, 129, 0.5) 0%, rgba(16, 185, 129, 0.2) 50%, transparent 75%)"
+        inset="-inset-8"
+        blur={30}
+        gradient="radial-gradient(ellipse at center, rgba(16, 185, 129, 0.85) 0%, rgba(34, 197, 94, 0.5) 40%, rgba(16, 185, 129, 0.15) 70%, transparent 90%)"
         duration={3}
       />
       <GlowLayer
-        inset="-inset-3"
-        blur={12}
-        gradient="radial-gradient(ellipse at center, rgba(34, 197, 94, 0.7) 0%, rgba(16, 185, 129, 0.3) 40%, transparent 65%)"
+        inset="-inset-4"
+        blur={16}
+        gradient="radial-gradient(ellipse at center, rgba(34, 197, 94, 0.9) 0%, rgba(16, 185, 129, 0.6) 35%, transparent 70%)"
         duration={2}
         delay={0.4}
       />
