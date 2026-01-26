@@ -346,14 +346,14 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               />
               
               {/* Floating users animation - around the animation */}
-              <div className="absolute -inset-4 z-0 overflow-hidden rounded-full">
+              <div className="absolute -inset-4 z-0">
                 {[
                   { left: 5, top: 25 },
                   { left: 85, top: 30 },
                   { left: 8, top: 65 },
                   { left: 88, top: 60 },
-                  { left: 30, top: 10 },
-                  { left: 70, top: 12 },
+                  { left: 30, top: 0 },
+                  { left: 70, top: 5 },
                 ].map((pos, i) => (
                   <div
                     key={i}
