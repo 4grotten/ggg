@@ -122,8 +122,8 @@ const PartnerBonuses = () => {
       {/* Content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-32 pt-14">
         {/* Tariff Selector Carousel */}
-        <div className="px-4 pt-4">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4">
+        <div className="px-4 pt-6">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4">
             {TARIFFS.map((tariff, idx) => {
               const isSelected = idx === selectedTariffIndex;
               const isCurrent = tariff.id === currentTariffId;
@@ -141,13 +141,13 @@ const PartnerBonuses = () => {
                 >
                   {/* Badge above card */}
                   {isCurrent && (
-                    <span className="absolute -top-2.5 left-3 px-2 py-0.5 bg-muted text-muted-foreground text-[10px] font-medium rounded-full">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-muted text-muted-foreground text-[10px] font-medium rounded-full">
                       {t('partner.bonuses.yourTariff', 'Ваш тариф')}
                     </span>
                   )}
                   {tariff.badge && !isCurrent && (
                     <span 
-                      className={`absolute -top-2.5 left-3 px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                      className={`absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full ${
                         tariff.badgeType === "recommended" 
                           ? "bg-primary text-primary-foreground" 
                           : "bg-violet-500 text-white"
