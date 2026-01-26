@@ -195,4 +195,14 @@
   input:-webkit-autofill {
     animation-name: onAutoFillStart;
   }
+
+  /* Biometric button glow animation */
+  @keyframes biometric-glow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+    }
+    50% {
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.45);
+    }
+  }
 }
