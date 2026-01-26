@@ -18,7 +18,7 @@ const TARIFFS = [
     description: "partner.bonuses.smartDesc",
     includes: [
       "partner.bonuses.virtualCard",
-      "partner.bonuses.cardIncome30",
+      "partner.bonuses.cardIncome15",
       "partner.bonuses.tariffIncome15",
       "partner.bonuses.referralLevel1",
     ],
@@ -34,7 +34,7 @@ const TARIFFS = [
     description: "partner.bonuses.agentDesc",
     includes: [
       "partner.bonuses.virtualCard",
-      "partner.bonuses.cardIncome30",
+      "partner.bonuses.cardIncome25",
       "partner.bonuses.tariffIncome15",
     ],
     alsoIncludes: [
