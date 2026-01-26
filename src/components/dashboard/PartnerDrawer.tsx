@@ -197,6 +197,26 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 }}
               />
               
+              {/* Blinking users around the animation */}
+              <div className="absolute -inset-6 z-0">
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-6 h-6 rounded-full flex items-center justify-center partner-blink-user"
+                    style={{
+                      background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
+                      boxShadow: "0 0 10px rgba(34, 197, 94, 0.6)",
+                      left: "50%",
+                      top: "50%",
+                      transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(70px) rotate(-${angle}deg)`,
+                      animationDelay: `${i * 0.2}s`,
+                    }}
+                  >
+                    <Users className="w-3 h-3 text-white" />
+                  </div>
+                ))}
+              </div>
+              
               <TgsPlayer 
                 src="/animations/money-coins.tgs" 
                 className="w-full h-full relative z-10"

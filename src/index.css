@@ -550,4 +550,20 @@
       transform: translateY(-20px);
     }
   }
+
+  /* Blinking users animation */
+  .partner-blink-user {
+    animation: partner-blink-user 1.5s ease-in-out infinite;
+  }
+
+  @keyframes partner-blink-user {
+    0%, 100% {
+      opacity: 0.2;
+      transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateX(70px) rotate(calc(-1 * var(--angle, 0deg))) scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateX(70px) rotate(calc(-1 * var(--angle, 0deg))) scale(1.1);
+    }
+  }
 }
