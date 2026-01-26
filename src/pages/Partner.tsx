@@ -64,10 +64,10 @@ const Partner = () => {
         {/* Hero Section */}
         <div className="relative px-4 pt-4">
           <HeroBanner />
-          <h2 className="text-xl font-bold text-center mb-4">
-            {t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-          </h2>
-          <ProgressSection selectedLevelIndex={selectedLevelIndex} />
+          <InviteButton />
+          <div className="mt-4">
+            <ProgressSection selectedLevelIndex={selectedLevelIndex} />
+          </div>
         </div>
         
         {/* Level Cards Carousel */}
@@ -75,9 +75,6 @@ const Partner = () => {
           currentFriends={stats.invited} 
           onLevelChange={handleLevelChange}
         />
-        
-        {/* Invite Button - below carousel */}
-        <InviteButton />
         
         {/* Referral Balance */}
         <ReferralBalance 
