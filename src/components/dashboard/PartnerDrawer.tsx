@@ -187,25 +187,18 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             key={`step1-${animationKey}`}
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
-            {/* TGS Lottie animation with green glow */}
-            <div className="relative w-[162px] h-[162px] flex items-center justify-center mb-6">
-              {/* Pulsing green background glow */}
-              <div
-                className="absolute -inset-4 rounded-full partner-pulse-glow"
-                style={{ 
-                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
-                }}
-              />
-              
-              {/* Falling users - wider spread */}
-              <div className="absolute -inset-12 z-0">
+            {/* Wrapper for animation with falling users */}
+            <div className="relative mb-6">
+              {/* Falling users - outside the glow, much wider spread */}
+              <div className="absolute -left-16 -right-16 -top-8 -bottom-8 z-0">
                 {[
-                  { left: -10, delay: 0 },
-                  { left: 15, delay: 0.3 },
-                  { left: 40, delay: 0.6 },
-                  { left: 60, delay: 0.9 },
-                  { left: 85, delay: 0.2 },
-                  { left: 110, delay: 0.5 },
+                  { left: 0, delay: 0 },
+                  { left: 18, delay: 0.3 },
+                  { left: 36, delay: 0.6 },
+                  { left: 54, delay: 0.9 },
+                  { left: 72, delay: 0.2 },
+                  { left: 90, delay: 0.5 },
+                  { left: 100, delay: 0.8 },
                 ].map((item, i) => (
                   <div
                     key={i}
@@ -222,10 +215,21 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 ))}
               </div>
               
-              <TgsPlayer 
-                src="/animations/money-coins.tgs" 
-                className="w-full h-full relative z-10"
-              />
+              {/* TGS Lottie animation with green glow */}
+              <div className="relative w-[162px] h-[162px] flex items-center justify-center">
+                {/* Pulsing green background glow */}
+                <div
+                  className="absolute -inset-4 rounded-full partner-pulse-glow"
+                  style={{ 
+                    background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+                  }}
+                />
+                
+                <TgsPlayer 
+                  src="/animations/money-coins.tgs" 
+                  className="w-full h-full relative z-10"
+                />
+              </div>
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
