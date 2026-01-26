@@ -94,7 +94,7 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
 
   return (
     <Drawer open={open} onOpenChange={handleClose}>
-      <DrawerContent className="bg-background/95 backdrop-blur-xl border-t border-border/50">
+      <DrawerContent className="bg-background/95 backdrop-blur-xl border-t border-border/50 max-w-[800px] mx-auto">
         <DrawerHeader className="border-b border-border/50 pb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <DrawerTitle className="text-lg font-semibold">
@@ -111,7 +111,7 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
           </div>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="p-4 pb-8">
           <AnimatePresence mode="wait">
             {step === "selectCard" ? (
               <motion.div
