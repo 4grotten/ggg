@@ -1131,7 +1131,7 @@ const PhoneEntry = () => {
         </div>
 
         {/* Continue Button and Biometric */}
-        <div className="karta-footer-actions">
+        <div className="karta-footer-actions pb-6">
           <button
             onClick={handleContinue}
             className="karta-btn-primary"
@@ -1145,7 +1145,7 @@ const PhoneEntry = () => {
               type="button"
               onClick={handleBiometricLogin}
               disabled={isBiometricLoading || isLoading}
-              className="w-full py-3 mt-3 font-medium rounded-2xl border border-border bg-muted/50 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-50"
+              className="w-full py-3.5 mt-4 font-medium rounded-2xl border border-primary/30 bg-primary/10 text-primary flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]"
             >
               {isBiometricLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
