@@ -282,8 +282,19 @@ const PhoneEntry = () => {
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
   const [pendingLoginPhone, setPendingLoginPhone] = useState<string | null>(null);
   const [pendingLoginPassword, setPendingLoginPassword] = useState<string | null>(null);
+  const [biometricTriggered, setBiometricTriggered] = useState(false);
 
-  // Check for autofilled password periodically
+  // Auto-trigger biometric auth on page load if available
+  useEffect(() => {
+    if (isBiometricEnabled && biometricPhone && !biometricTriggered && !isLoading && !isLoginMode) {
+      setBiometricTriggered(true);
+      // Small delay to let the page render first
+      const timer = setTimeout(() => {
+        handleBiometricLogin();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isBiometricEnabled, biometricPhone, biometricTriggered, isLoading, isLoginMode]);
   useEffect(() => {
     if (!isLoginMode) return;
     
@@ -1145,7 +1156,10 @@ const PhoneEntry = () => {
               type="button"
               onClick={handleBiometricLogin}
               disabled={isBiometricLoading || isLoading}
-              className="w-full py-3.5 mt-4 font-medium rounded-2xl border border-primary/30 bg-primary/10 text-primary flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]"
+              className="w-full py-3.5 mt-4 font-medium rounded-2xl border border-primary/30 bg-primary/10 text-primary flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 animate-[biometric-glow_2s_ease-in-out_infinite]"
+              style={{
+                boxShadow: '0 0 12px rgba(59,130,246,0.3)',
+              }}
             >
               {isBiometricLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
