@@ -1,8 +1,4 @@
 {
-  "partner": {
-    "earnWithEasyCard": "Easy Card ile Kazan",
-    "passiveIncomeDaily": "Her gün pasif gelir."
-  },
   "profileVerification": {
     "title": "Kimliğinizi Doğrulayın",
     "description": "Tüm özelliklerin kilidini açmak ve hesap limitlerini artırmak için doğrulama işlemini tamamlayın.",
@@ -706,6 +702,8 @@
     }
   },
   "partner": {
+    "earnWithEasyCard": "Easy Card ile Kazan",
+    "passiveIncomeDaily": "Her gün pasif gelir.",
     "step1": {
       "title": "Tanışın",
       "subtitle": "Easy Card ile kazanma yolunuz.",
