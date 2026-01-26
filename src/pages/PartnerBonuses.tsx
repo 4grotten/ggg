@@ -236,8 +236,8 @@ const PartnerBonuses = () => {
           </div>
         </div>
         
-        {/* Dot Indicator */}
-        <div className="flex justify-center gap-2 py-2">
+        {/* Dot Indicator - Mobile only */}
+        <div className="flex md:hidden justify-center gap-2 py-2">
           {TARIFFS.map((_, idx) => (
             <button
               key={idx}
