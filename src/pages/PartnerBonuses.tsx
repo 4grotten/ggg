@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, Sparkles, Crown, Zap, Rocket } from "lucide-react";
+import { ArrowLeft, Check, Sparkles, Crown, Zap, Rocket, Gem } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -83,6 +83,30 @@ const TARIFFS = [
       "partner.bonuses.dedicatedSupport",
     ],
   },
+  {
+    id: "partner",
+    name: "Партнёр",
+    price: -1, // -1 means priceless
+    icon: Gem,
+    badge: "partner.bonuses.contract",
+    badgeType: "contract" as const,
+    description: "partner.bonuses.partnerDesc",
+    includes: [
+      "partner.bonuses.unlimitedCards",
+      "partner.bonuses.maxCardIncome",
+      "partner.bonuses.maxTariffIncome",
+      "partner.bonuses.unlimitedReferral",
+      "partner.bonuses.personalManager",
+    ],
+    alsoIncludes: [
+      "partner.bonuses.ownCourses",
+      "partner.bonuses.unlimitedVolumes",
+      "partner.bonuses.regionalFranchise",
+      "partner.bonuses.internationalExpansion",
+      "partner.bonuses.whiteLabel",
+      "partner.bonuses.prioritySupport",
+    ],
+  },
 ];
 
 const PartnerBonuses = () => {
@@ -152,6 +176,8 @@ const PartnerBonuses = () => {
                           ? "bg-primary text-primary-foreground" 
                           : tariff.badgeType === "padawan"
                           ? "bg-amber-500 text-white"
+                          : tariff.badgeType === "contract"
+                          ? "bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-black"
                           : "bg-violet-500 text-white"
                       }`}
                     >
@@ -163,7 +189,7 @@ const PartnerBonuses = () => {
                     {tariff.name}
                   </p>
                   <p className={`text-sm ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
-                    ${tariff.price}
+                    {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
                   </p>
                 </motion.button>
               );
@@ -197,7 +223,9 @@ const PartnerBonuses = () => {
                     <selectedTariff.icon className="w-6 h-6 text-primary" />
                     <h2 className="text-2xl font-bold">{selectedTariff.name}</h2>
                   </div>
-                  <p className="text-3xl font-bold">${selectedTariff.price}</p>
+                  <p className="text-3xl font-bold">
+                    {selectedTariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${selectedTariff.price}`}
+                  </p>
                 </div>
                 <span className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium text-muted-foreground">
                   {isCurrentTariff 
@@ -253,52 +281,56 @@ const PartnerBonuses = () => {
           
           <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-3xl border border-border/50 overflow-hidden">
             {/* Table header */}
-            <div className="grid grid-cols-4 gap-2 p-4 border-b border-border/50">
+            <div className="grid grid-cols-5 gap-1 p-3 border-b border-border/50">
               {TARIFFS.map((tariff) => (
                 <div key={tariff.id} className="text-center">
-                  <p className="font-bold text-sm">{tariff.name}</p>
-                  <p className="text-xs text-muted-foreground">${tariff.price}</p>
+                  <p className="font-bold text-xs">{tariff.name}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
+                  </p>
                 </div>
               ))}
             </div>
             
             {/* Virtual card row */}
-            <div className="p-4 border-b border-border/30">
-              <p className="text-xs text-muted-foreground text-center mb-3">
+            <div className="p-3 border-b border-border/30">
+              <p className="text-xs text-muted-foreground text-center mb-2">
                 {t('partner.bonuses.virtualCard', 'Выпуск виртуальной карты')}
               </p>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-5 gap-1">
                 {TARIFFS.map((tariff) => (
                   <div key={tariff.id} className="flex justify-center">
-                    <Check className="w-5 h-5 text-muted-foreground" />
+                    <Check className="w-4 h-4 text-muted-foreground" />
                   </div>
                 ))}
               </div>
             </div>
             
             {/* Card income row */}
-            <div className="p-4 border-b border-border/30">
-              <p className="text-xs text-muted-foreground text-center mb-3">
+            <div className="p-3 border-b border-border/30">
+              <p className="text-xs text-muted-foreground text-center mb-2">
                 {t('partner.bonuses.cardIncomeLabel', 'Доход с продаж карт')}
               </p>
-              <div className="grid grid-cols-4 gap-2">
-                <div className="text-center text-sm font-medium">15%</div>
-                <div className="text-center text-sm font-medium">25%</div>
-                <div className="text-center text-sm font-medium">30%</div>
-                <div className="text-center text-sm font-medium">30%</div>
+              <div className="grid grid-cols-5 gap-1">
+                <div className="text-center text-xs font-medium">15%</div>
+                <div className="text-center text-xs font-medium">25%</div>
+                <div className="text-center text-xs font-medium">30%</div>
+                <div className="text-center text-xs font-medium">30%</div>
+                <div className="text-center text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">MAX</div>
               </div>
             </div>
             
             {/* Referral levels row */}
-            <div className="p-4">
-              <p className="text-xs text-muted-foreground text-center mb-3">
+            <div className="p-3">
+              <p className="text-xs text-muted-foreground text-center mb-2">
                 {t('partner.bonuses.referralLevelsLabel', 'Уровней реферальной программы')}
               </p>
-              <div className="grid grid-cols-4 gap-2">
-                <div className="text-center text-sm font-medium">1</div>
-                <div className="text-center text-sm font-medium">5</div>
-                <div className="text-center text-sm font-medium">9</div>
-                <div className="text-center text-sm font-medium">9</div>
+              <div className="grid grid-cols-5 gap-1">
+                <div className="text-center text-xs font-medium">1</div>
+                <div className="text-center text-xs font-medium">5</div>
+                <div className="text-center text-xs font-medium">9</div>
+                <div className="text-center text-xs font-medium">9</div>
+                <div className="text-center text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</div>
               </div>
             </div>
           </div>
@@ -311,11 +343,17 @@ const PartnerBonuses = () => {
           <motion.div
             className="relative rounded-2xl overflow-hidden"
             animate={{
-              boxShadow: [
-                "0 0 20px rgba(102, 126, 234, 0.4), 0 0 40px rgba(118, 75, 162, 0.3)",
-                "0 0 30px rgba(248, 87, 166, 0.4), 0 0 60px rgba(102, 126, 234, 0.3)",
-                "0 0 20px rgba(102, 126, 234, 0.4), 0 0 40px rgba(118, 75, 162, 0.3)",
-              ]
+              boxShadow: selectedTariff.id === "partner" 
+                ? [
+                    "0 0 20px rgba(251, 191, 36, 0.4), 0 0 40px rgba(245, 158, 11, 0.3)",
+                    "0 0 30px rgba(234, 179, 8, 0.5), 0 0 60px rgba(251, 191, 36, 0.3)",
+                    "0 0 20px rgba(251, 191, 36, 0.4), 0 0 40px rgba(245, 158, 11, 0.3)",
+                  ]
+                : [
+                    "0 0 20px rgba(102, 126, 234, 0.4), 0 0 40px rgba(118, 75, 162, 0.3)",
+                    "0 0 30px rgba(248, 87, 166, 0.4), 0 0 60px rgba(102, 126, 234, 0.3)",
+                    "0 0 20px rgba(102, 126, 234, 0.4), 0 0 40px rgba(118, 75, 162, 0.3)",
+                  ]
             }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
@@ -323,7 +361,9 @@ const PartnerBonuses = () => {
             <motion.div
               className="absolute inset-0 rounded-2xl"
               style={{
-                background: "linear-gradient(90deg, #667eea, #764ba2, #f857a6, #667eea)",
+                background: selectedTariff.id === "partner"
+                  ? "linear-gradient(90deg, #fbbf24, #f59e0b, #eab308, #fbbf24)"
+                  : "linear-gradient(90deg, #667eea, #764ba2, #f857a6, #667eea)",
                 backgroundSize: "300% 100%",
               }}
               animate={{
@@ -337,8 +377,15 @@ const PartnerBonuses = () => {
               className="relative w-full h-14 text-base font-bold rounded-2xl m-[2px] bg-background/80 dark:bg-card/80 backdrop-blur-xl text-foreground hover:bg-background/90 dark:hover:bg-card/90 border-0"
               style={{ width: "calc(100% - 4px)" }}
             >
-              <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent font-bold">
-                {t('partner.bonuses.purchase', 'Приобрести')} — ${selectedTariff.price}
+              <span className={`font-bold ${
+                selectedTariff.id === "partner" 
+                  ? "bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-clip-text text-transparent"
+                  : "bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+              }`}>
+                {selectedTariff.id === "partner" 
+                  ? t('partner.bonuses.contactUs', 'Связаться с нами')
+                  : `${t('partner.bonuses.purchase', 'Приобрести')} — $${selectedTariff.price}`
+                }
               </span>
             </Button>
           </motion.div>

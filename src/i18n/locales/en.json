@@ -867,7 +867,22 @@
       "dedicatedSupport": "Dedicated support line",
       "cardIncomeLabel": "Income from card sales",
       "referralLevelsLabel": "Referral program levels",
-      "padawan": "Padawan"
+      "padawan": "Padawan",
+      "contract": "Contract",
+      "priceless": "Priceless",
+      "partnerDesc": "Complete business model without limits. Become part of the Easy Card ecosystem",
+      "unlimitedCards": "Unlimited card issuance",
+      "maxCardIncome": "Maximum % from card sales",
+      "maxTariffIncome": "Maximum % from tariff sales",
+      "unlimitedReferral": "Unlimited referral program levels",
+      "personalManager": "Personal manager 24/7",
+      "ownCourses": "Your own training courses",
+      "unlimitedVolumes": "Unlimited sales volumes",
+      "regionalFranchise": "Franchise in your region",
+      "internationalExpansion": "International expansion",
+      "whiteLabel": "White-label solution for your brand",
+      "prioritySupport": "Priority technical support",
+      "contactUs": "Contact Us"
     }
   }
 }
