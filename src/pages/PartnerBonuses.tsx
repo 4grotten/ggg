@@ -174,7 +174,7 @@ const PartnerBonuses = () => {
         {/* Tariff Selector Carousel */}
         <div className="px-4 pt-6">
           {/* Glass container */}
-          <div className="bg-muted/50 dark:bg-card/50 backdrop-blur-xl rounded-3xl p-3 border border-border/30">
+          <div className="bg-muted/50 dark:bg-card/50 backdrop-blur-xl rounded-3xl pt-5 pb-3 px-3 border border-border/30">
             <div ref={carouselRef} className="relative flex gap-2 overflow-x-auto scrollbar-hide py-1 -mx-1 px-1 md:mx-0 md:px-0 md:overflow-x-visible md:justify-between">
               {TARIFFS.map((tariff, idx) => {
                 const isSelected = idx === selectedTariffIndex;
