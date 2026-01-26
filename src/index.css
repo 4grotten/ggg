@@ -551,19 +551,32 @@
     }
   }
 
-  /* Blinking users animation - continuous circle cycle */
+  /* Blinking users animation - one by one around circle */
   .partner-blink-user {
-    animation: partner-blink-user 8s linear infinite;
+    animation: partner-blink-user 8s ease-in-out infinite;
+    opacity: 0;
   }
 
   @keyframes partner-blink-user {
-    0%, 12.5%, 100% {
+    0% {
       opacity: 0;
-      scale: 0.6;
+      scale: 0.5;
     }
-    6.25% {
+    4% {
       opacity: 1;
-      scale: 1.1;
+      scale: 1.15;
+    }
+    8% {
+      opacity: 1;
+      scale: 1;
+    }
+    12% {
+      opacity: 0;
+      scale: 0.5;
+    }
+    100% {
+      opacity: 0;
+      scale: 0.5;
     }
   }
 }
