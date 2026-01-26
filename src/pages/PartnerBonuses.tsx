@@ -204,34 +204,52 @@ const PartnerBonuses = () => {
                       />
                     )}
                     
-                    {/* Badge above card - elevated z-index */}
+                    {/* Badge above card - elevated z-index with glow when selected */}
                     {isCurrent && (
-                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-emerald-500 dark:bg-[#BFFF00] text-white dark:text-black text-[10px] font-bold rounded-full z-20">
+                      <span 
+                        className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-emerald-500 dark:bg-[#BFFF00] text-white dark:text-black text-[10px] font-bold rounded-full z-20 transition-shadow duration-300"
+                        style={{
+                          boxShadow: isSelected 
+                            ? "0 0 12px rgba(16, 185, 129, 0.6), 0 0 24px rgba(16, 185, 129, 0.3)" 
+                            : "none"
+                        }}
+                      >
                         {t('partner.bonuses.yourTariff', 'Ваш тариф')}
                       </span>
                     )}
                     {tariff.badge && !isCurrent && (
                       tariff.badgeType === "contract" ? (
                         <span 
-                          className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full text-amber-900 overflow-hidden z-20"
+                          className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full text-amber-900 overflow-hidden z-20 transition-shadow duration-300"
                           style={{
                             background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
                             backgroundSize: "200% 100%",
                             animation: "goldShimmer 4s ease-in-out infinite",
-                            boxShadow: "0 0 6px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)"
+                            boxShadow: isSelected 
+                              ? "0 0 12px rgba(212, 175, 55, 0.7), 0 0 24px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)" 
+                              : "0 0 6px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)"
                           }}
                         >
                           {t(tariff.badge)}
                         </span>
                       ) : (
                         <span 
-                          className={`absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full z-20 ${
+                          className={`absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full z-20 transition-shadow duration-300 ${
                             tariff.badgeType === "recommended" 
                               ? "bg-primary text-primary-foreground" 
                               : tariff.badgeType === "padawan"
                               ? "bg-amber-500 text-white"
                               : "bg-violet-500 text-white"
                           }`}
+                          style={{
+                            boxShadow: isSelected 
+                              ? tariff.badgeType === "recommended"
+                                ? "0 0 12px rgba(139, 92, 246, 0.6), 0 0 24px rgba(139, 92, 246, 0.3)"
+                                : tariff.badgeType === "padawan"
+                                ? "0 0 12px rgba(245, 158, 11, 0.6), 0 0 24px rgba(245, 158, 11, 0.3)"
+                                : "0 0 12px rgba(139, 92, 246, 0.6), 0 0 24px rgba(139, 92, 246, 0.3)"
+                              : "none"
+                          }}
                         >
                           {t(tariff.badge)}
                         </span>
