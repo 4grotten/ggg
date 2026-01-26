@@ -16,7 +16,7 @@ export const ReferralBalance = memo(({ balance, invited, withdrawn }: ReferralBa
 
   return (
     <>
-      <div className="px-4 mb-6">
+      <div className="px-4">
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl p-5 border border-border/50">
           <p className="text-sm text-muted-foreground mb-1">
             {t('partner.referralBalance', 'Реферальный счёт')}

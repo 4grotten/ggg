@@ -60,9 +60,9 @@ const Partner = () => {
       </header>
       
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto pb-8">
+      <div className="flex-1 overflow-y-auto pb-8 space-y-6">
         {/* Hero Section */}
-        <div className="relative px-4 pt-4 pb-6">
+        <div className="relative px-4 pt-4">
           <HeroBanner />
           <h2 className="text-xl font-bold text-center mb-4">
             {t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
