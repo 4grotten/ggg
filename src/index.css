@@ -273,6 +273,28 @@
     }
   }
 
+  @keyframes partner-flying-coin {
+    0% {
+      transform: rotate(var(--start-angle)) translateX(95px) rotate(calc(-1 * var(--start-angle)));
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(calc(var(--start-angle) + 360deg)) translateX(95px) rotate(calc(-1 * (var(--start-angle) + 360deg)));
+      opacity: 0;
+    }
+  }
+
+  @keyframes partner-coin-spin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+  }
+
   @keyframes partner-gem-float {
     0%, 100% { 
       transform: translateY(0) rotate(0deg) scale(1);
@@ -347,6 +369,17 @@
 
   .partner-coin-float {
     animation: partner-coin-float 3s ease-in-out infinite;
+  }
+
+  .partner-flying-coin {
+    position: absolute;
+    left: calc(50% - 16px);
+    top: calc(50% - 16px);
+    animation: partner-flying-coin 4s linear infinite;
+  }
+
+  .partner-coin-spin {
+    animation: partner-coin-spin 1s linear infinite;
   }
 
   .partner-gem-float {
