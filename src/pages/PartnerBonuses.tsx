@@ -175,7 +175,7 @@ const PartnerBonuses = () => {
         <div className="px-4 pt-6">
           {/* Glass container */}
           <div className="bg-muted/50 dark:bg-card/50 backdrop-blur-xl rounded-3xl py-3 px-2 border border-border/30">
-            <div ref={carouselRef} className="relative flex gap-2 overflow-x-auto scrollbar-hide py-3 -mx-1 px-1 md:mx-0 md:px-0 md:overflow-x-visible md:justify-between">
+            <div ref={carouselRef} className="relative flex gap-2 overflow-x-auto scrollbar-hide pt-5 pb-2 -mx-1 px-1 md:mx-0 md:px-0 md:overflow-x-visible md:justify-between">
               {TARIFFS.map((tariff, idx) => {
                 const isSelected = idx === selectedTariffIndex;
                 const isCurrent = tariff.id === currentTariffId;
