@@ -234,6 +234,8 @@ const PartnerBonuses = () => {
                 <span className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium text-muted-foreground">
                   {isCurrentTariff 
                     ? t('partner.bonuses.currentTariff', 'Текущий тариф')
+                    : selectedTariff.id === "partner"
+                    ? t('partner.bonuses.contractSigning', 'Подписание контракта')
                     : t('partner.bonuses.oneTimePayment', 'Единоразовый платёж')
                   }
                 </span>
