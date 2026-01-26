@@ -198,15 +198,16 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               
               {/* Falling users container - behind the main animation */}
               <div className="absolute inset-0 overflow-hidden rounded-full z-0">
-                {[...Array(8)].map((_, i) => (
+                {[10, 35, 55, 75, 25, 65].map((leftPos, i) => (
                   <div
                     key={i}
                     className="absolute w-6 h-6 rounded-full flex items-center justify-center partner-falling-user"
                     style={{
                       background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
                       boxShadow: "0 0 8px rgba(34, 197, 94, 0.5)",
-                      left: `${15 + (i * 10) % 70}%`,
-                      animationDelay: `${i * 0.4}s`,
+                      left: `${leftPos}%`,
+                      animationDelay: `${i * 0.7}s`,
+                      animationDuration: `${2.5 + (i % 3) * 0.5}s`,
                       opacity: 0.7,
                     }}
                   >
