@@ -82,7 +82,7 @@ export const HeroBanner = memo(() => {
       <img 
         src={partnerGrowthImage} 
         alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
-        className="relative z-10 w-full h-auto rounded-2xl opacity-90"
+        className="relative z-10 w-full h-auto rounded-2xl opacity-80"
         loading="eager"
       />
     </div>
