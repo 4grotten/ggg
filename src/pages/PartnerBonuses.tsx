@@ -302,13 +302,28 @@ const PartnerBonuses = () => {
             <div className="grid grid-cols-5 gap-1 p-3 border-b border-border/50">
               {TARIFFS.map((tariff) => (
                 <div key={tariff.id} className="text-center">
-                  <p className={`font-bold text-xs ${
-                    tariff.id === "smart" ? "text-emerald-500" :
-                    tariff.id === "agent" ? "text-amber-500" :
-                    tariff.id === "pro" ? "text-primary" :
-                    tariff.id === "vip" ? "text-violet-500" :
-                    "text-emerald-600"
-                  }`}>{tariff.name}</p>
+                  {tariff.id === "partner" ? (
+                    <p 
+                      className="font-bold text-xs"
+                      style={{
+                        background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
+                        backgroundSize: "200% 100%",
+                        backgroundClip: "text",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        animation: "goldShimmer 2s linear infinite"
+                      }}
+                    >
+                      {tariff.name}
+                    </p>
+                  ) : (
+                    <p className={`font-bold text-xs ${
+                      tariff.id === "smart" ? "text-emerald-500" :
+                      tariff.id === "agent" ? "text-amber-500" :
+                      tariff.id === "pro" ? "text-primary" :
+                      "text-violet-500"
+                    }`}>{tariff.name}</p>
+                  )}
                   <p className="text-xs text-muted-foreground font-medium">
                     {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
                   </p>
