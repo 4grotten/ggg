@@ -1130,7 +1130,7 @@ const PhoneEntry = () => {
           <PoweredByFooter />
         </div>
 
-        {/* Continue Button */}
+        {/* Continue Button and Biometric */}
         <div className="karta-footer-actions">
           <button
             onClick={handleContinue}
@@ -1138,6 +1138,29 @@ const PhoneEntry = () => {
           >
             {t('common.continue')}
           </button>
+          
+          {/* Show biometric login if enabled */}
+          {isBiometricEnabled && biometricPhone && (
+            <button
+              type="button"
+              onClick={handleBiometricLogin}
+              disabled={isBiometricLoading || isLoading}
+              className="w-full py-3 mt-3 font-medium rounded-2xl border border-border bg-muted/50 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-50"
+            >
+              {isBiometricLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  {getBiometricLabel() === 'Face ID' ? (
+                    <ScanFace className="w-5 h-5" />
+                  ) : (
+                    <Fingerprint className="w-5 h-5" />
+                  )}
+                  {t('auth.biometric.useButton', { type: getBiometricLabel() }) || `Use ${getBiometricLabel()}`}
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </MobileLayout>
