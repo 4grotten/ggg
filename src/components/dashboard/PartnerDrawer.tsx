@@ -159,10 +159,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 ))}
               </div>
               
-              {/* Center duck animation */}
-              <div className="relative z-10 w-48 h-48 flex items-center justify-center partner-center-float">
-                <TgsPlayer 
-                  src="/animations/glass-duck.tgs" 
+              {/* Center duck animation (clip to remove TGS square background) */}
+              <div className="relative z-10 w-48 h-48 rounded-full overflow-hidden flex items-center justify-center partner-center-float">
+                <TgsPlayer
+                  src="/animations/glass-duck.tgs"
                   className="w-full h-full"
                 />
               </div>
