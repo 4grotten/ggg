@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import partnerStep2Image from "@/assets/partner-step2-gift.png";
 import partnerStep3Image from "@/assets/partner-step3-camel.png";
-import TgsPlayer from "@/components/ui/TgsPlayer";
+import TgsPlayer, { preloadTgs } from "@/components/ui/TgsPlayer";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog,
@@ -32,6 +32,13 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   const [direction, setDirection] = useState(1);
   const [showAuthAlert, setShowAuthAlert] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
+
+  // Preload TGS animation when drawer opens
+  useEffect(() => {
+    if (open) {
+      preloadTgs("/animations/money-coins.tgs");
+    }
+  }, [open]);
 
   const handleClose = () => {
     onOpenChange(false);
