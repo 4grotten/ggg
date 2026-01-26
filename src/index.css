@@ -579,4 +579,13 @@
       scale: 0.5;
     }
   }
+
+  @keyframes goldShimmer {
+    0% {
+      background-position: 200% 50%;
+    }
+    100% {
+      background-position: -200% 50%;
+    }
+  }
 }
