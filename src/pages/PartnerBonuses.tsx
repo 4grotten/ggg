@@ -448,20 +448,37 @@ const PartnerBonuses = () => {
                 {t('partner.bonuses.virtualCard', 'Выпуск виртуальной карты')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                {TARIFFS.map((tariff, idx) => (
-                  <div 
-                    key={tariff.id} 
-                    className="flex justify-center"
-                    onMouseEnter={() => setHoveredColumnIndex(idx)}
-                    onMouseLeave={() => setHoveredColumnIndex(null)}
-                  >
-                    {tariff.id === "partner" ? (
-                      <span className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</span>
-                    ) : (
-                      <Check className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </div>
-                ))}
+                {TARIFFS.map((tariff, idx) => {
+                  const isHovered = hoveredColumnIndex === idx;
+                  const isPartner = tariff.id === "partner";
+                  
+                  return (
+                    <div 
+                      key={tariff.id} 
+                      className="flex justify-center transition-all duration-200"
+                      onMouseEnter={() => setHoveredColumnIndex(idx)}
+                      onMouseLeave={() => setHoveredColumnIndex(null)}
+                    >
+                      {isPartner ? (
+                        <span 
+                          className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00] transition-all duration-200"
+                          style={{
+                            textShadow: isHovered ? "0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.5)" : "none"
+                          }}
+                        >
+                          ∞
+                        </span>
+                      ) : (
+                        <Check 
+                          className={`w-4 h-4 transition-all duration-200 ${isHovered ? "text-primary" : "text-muted-foreground"}`}
+                          style={{
+                            filter: isHovered ? "drop-shadow(0 0 6px rgba(59, 130, 246, 0.6))" : "none"
+                          }}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
             
@@ -471,22 +488,39 @@ const PartnerBonuses = () => {
                 {t('partner.bonuses.metalCardLabel', 'Выпуск металлической карты')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                {[false, false, true, true, "∞"].map((value, idx) => (
-                  <div 
-                    key={idx} 
-                    className="flex justify-center"
-                    onMouseEnter={() => setHoveredColumnIndex(idx)}
-                    onMouseLeave={() => setHoveredColumnIndex(null)}
-                  >
-                    {value === "∞" ? (
-                      <span className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00]">∞</span>
-                    ) : value ? (
-                      <Check className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <span className="text-xs font-medium text-muted-foreground/50">—</span>
-                    )}
-                  </div>
-                ))}
+                {[false, false, true, true, "∞"].map((value, idx) => {
+                  const isHovered = hoveredColumnIndex === idx;
+                  const isPartner = idx === 4;
+                  
+                  return (
+                    <div 
+                      key={idx} 
+                      className="flex justify-center transition-all duration-200"
+                      onMouseEnter={() => setHoveredColumnIndex(idx)}
+                      onMouseLeave={() => setHoveredColumnIndex(null)}
+                    >
+                      {value === "∞" ? (
+                        <span 
+                          className="text-xs font-medium text-emerald-500 dark:text-[#BFFF00] transition-all duration-200"
+                          style={{
+                            textShadow: isHovered ? "0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.5)" : "none"
+                          }}
+                        >
+                          ∞
+                        </span>
+                      ) : value ? (
+                        <Check 
+                          className={`w-4 h-4 transition-all duration-200 ${isHovered ? "text-primary" : "text-muted-foreground"}`}
+                          style={{
+                            filter: isHovered ? "drop-shadow(0 0 6px rgba(59, 130, 246, 0.6))" : "none"
+                          }}
+                        />
+                      ) : (
+                        <span className="text-xs font-medium text-muted-foreground/50">—</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
             
@@ -496,16 +530,34 @@ const PartnerBonuses = () => {
                 {t('partner.bonuses.cardIncomeLabel', 'Доход с продаж карт')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                {["15%", "25%", "30%", "30%", "MAX"].map((value, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`text-center text-xs font-medium ${value === "MAX" ? "text-emerald-500 dark:text-[#BFFF00]" : ""}`}
-                    onMouseEnter={() => setHoveredColumnIndex(idx)}
-                    onMouseLeave={() => setHoveredColumnIndex(null)}
-                  >
-                    {value}
-                  </div>
-                ))}
+                {["15%", "25%", "30%", "30%", "MAX"].map((value, idx) => {
+                  const isHovered = hoveredColumnIndex === idx;
+                  const isPartner = idx === 4;
+                  
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`text-center text-xs font-medium transition-all duration-200 ${
+                        isPartner 
+                          ? "text-emerald-500 dark:text-[#BFFF00]" 
+                          : isHovered 
+                            ? "text-primary" 
+                            : ""
+                      }`}
+                      style={{
+                        textShadow: isHovered 
+                          ? isPartner 
+                            ? "0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.5)" 
+                            : "0 0 8px rgba(59, 130, 246, 0.6)"
+                          : "none"
+                      }}
+                      onMouseEnter={() => setHoveredColumnIndex(idx)}
+                      onMouseLeave={() => setHoveredColumnIndex(null)}
+                    >
+                      {value}
+                    </div>
+                  );
+                })}
               </div>
             </div>
             
@@ -515,16 +567,34 @@ const PartnerBonuses = () => {
                 {t('partner.bonuses.referralLevelsLabel', 'Уровней реферальной программы')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                {["1", "5", "9", "9", "∞"].map((value, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`text-center text-xs font-medium ${value === "∞" ? "text-emerald-500 dark:text-[#BFFF00]" : ""}`}
-                    onMouseEnter={() => setHoveredColumnIndex(idx)}
-                    onMouseLeave={() => setHoveredColumnIndex(null)}
-                  >
-                    {value}
-                  </div>
-                ))}
+                {["1", "5", "9", "9", "∞"].map((value, idx) => {
+                  const isHovered = hoveredColumnIndex === idx;
+                  const isPartner = idx === 4;
+                  
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`text-center text-xs font-medium transition-all duration-200 ${
+                        isPartner 
+                          ? "text-emerald-500 dark:text-[#BFFF00]" 
+                          : isHovered 
+                            ? "text-primary" 
+                            : ""
+                      }`}
+                      style={{
+                        textShadow: isHovered 
+                          ? isPartner 
+                            ? "0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.5)" 
+                            : "0 0 8px rgba(59, 130, 246, 0.6)"
+                          : "none"
+                      }}
+                      onMouseEnter={() => setHoveredColumnIndex(idx)}
+                      onMouseLeave={() => setHoveredColumnIndex(null)}
+                    >
+                      {value}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
