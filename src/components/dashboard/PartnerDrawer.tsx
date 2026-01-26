@@ -135,10 +135,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* GlassDuck TGS animation with green glow and orbiting users */}
-            <div className="relative w-[135px] h-[135px] flex items-center justify-center mb-6">
+            <div className="relative w-[162px] h-[162px] flex items-center justify-center mb-6">
               {/* Pulsing green background glow */}
               <div
-                className="absolute -inset-3 rounded-full partner-pulse-glow"
+                className="absolute -inset-4 rounded-full partner-pulse-glow"
                 style={{ 
                   background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
@@ -149,16 +149,16 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 {[0, 60, 120, 180, 240, 300].map((angle, i) => (
                   <div
                     key={i}
-                    className="absolute w-6 h-6 rounded-full flex items-center justify-center partner-orbit-item"
+                    className="absolute w-7 h-7 rounded-full flex items-center justify-center partner-orbit-item"
                     style={{
                       background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
-                      boxShadow: "0 0 8px rgba(34, 197, 94, 0.6), 0 0 16px rgba(16, 185, 129, 0.3)",
-                      left: `calc(50% + ${Math.cos((angle - 90) * Math.PI / 180) * 60}px - 12px)`,
-                      top: `calc(50% + ${Math.sin((angle - 90) * Math.PI / 180) * 60}px - 12px)`,
+                      boxShadow: "0 0 10px rgba(34, 197, 94, 0.6), 0 0 20px rgba(16, 185, 129, 0.3)",
+                      left: `calc(50% + ${Math.cos((angle - 90) * Math.PI / 180) * 72}px - 14px)`,
+                      top: `calc(50% + ${Math.sin((angle - 90) * Math.PI / 180) * 72}px - 14px)`,
                       animationDelay: `${i * 0.15}s`,
                     }}
                   >
-                    <Users className="w-3 h-3 text-white" />
+                    <Users className="w-3.5 h-3.5 text-white" />
                   </div>
                 ))}
               </div>
@@ -188,10 +188,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* TGS Lottie animation with green glow */}
-            <div className="relative w-[135px] h-[135px] flex items-center justify-center mb-6">
+            <div className="relative w-[162px] h-[162px] flex items-center justify-center mb-6">
               {/* Pulsing green background glow */}
               <div
-                className="absolute -inset-3 rounded-full partner-pulse-glow"
+                className="absolute -inset-4 rounded-full partner-pulse-glow"
                 style={{ 
                   background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
@@ -202,17 +202,17 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 {[10, 35, 55, 75, 25, 65].map((leftPos, i) => (
                   <div
                     key={i}
-                    className="absolute w-5 h-5 rounded-full flex items-center justify-center partner-falling-user"
+                    className="absolute w-6 h-6 rounded-full flex items-center justify-center partner-falling-user"
                     style={{
                       background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
-                      boxShadow: "0 0 6px rgba(34, 197, 94, 0.5)",
+                      boxShadow: "0 0 8px rgba(34, 197, 94, 0.5)",
                       left: `${leftPos}%`,
                       animationDelay: `${i * 0.7}s`,
                       animationDuration: `${2.5 + (i % 3) * 0.5}s`,
                       opacity: 0.7,
                     }}
                   >
-                    <Users className="w-2.5 h-2.5 text-white" />
+                    <Users className="w-3 h-3 text-white" />
                   </div>
                 ))}
               </div>
@@ -245,10 +245,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* Duck animation with glow */}
-            <div className="relative w-[115px] h-[115px] flex items-center justify-center mb-6">
+            <div className="relative w-[138px] h-[138px] flex items-center justify-center mb-6">
               {/* Pulsing green background glow */}
               <div
-                className="absolute -inset-3 rounded-full partner-pulse-glow"
+                className="absolute -inset-4 rounded-full partner-pulse-glow"
                 style={{ 
                   background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
@@ -259,10 +259,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
                   <div
                     key={i}
-                    className="absolute w-5 h-5 rounded-full flex items-center justify-center partner-explode-user"
+                    className="absolute w-6 h-6 rounded-full flex items-center justify-center partner-explode-user"
                     style={{
                       background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
-                      boxShadow: "0 0 6px rgba(34, 197, 94, 0.6)",
+                      boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)",
                       left: "50%",
                       top: "50%",
                       transform: "translate(-50%, -50%)",
@@ -270,7 +270,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                       animationDelay: `${i * 0.15}s`,
                     } as React.CSSProperties}
                   >
-                    <Users className="w-2.5 h-2.5 text-white" />
+                    <Users className="w-3 h-3 text-white" />
                   </div>
                 ))}
               </div>
@@ -328,10 +328,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* WonDuck animation with glow */}
-            <div className="relative w-[115px] h-[115px] flex items-center justify-center mb-6">
+            <div className="relative w-[138px] h-[138px] flex items-center justify-center mb-6">
               {/* Pulsing green background glow */}
               <div
-                className="absolute -inset-3 rounded-full partner-pulse-glow"
+                className="absolute -inset-4 rounded-full partner-pulse-glow"
                 style={{ 
                   background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
