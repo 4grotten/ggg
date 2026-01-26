@@ -197,14 +197,15 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 }}
               />
               
-              {/* Falling users - outside the animation */}
-              <div className="absolute -inset-6 z-0 overflow-hidden rounded-full">
+              {/* Falling users - wider spread */}
+              <div className="absolute -inset-12 z-0">
                 {[
-                  { left: 0, delay: 0 },
-                  { left: 25, delay: 0.8 },
-                  { left: 50, delay: 1.6 },
-                  { left: 75, delay: 2.4 },
-                  { left: 100, delay: 0.4 },
+                  { left: -10, delay: 0 },
+                  { left: 15, delay: 0.3 },
+                  { left: 40, delay: 0.6 },
+                  { left: 60, delay: 0.9 },
+                  { left: 85, delay: 0.2 },
+                  { left: 110, delay: 0.5 },
                 ].map((item, i) => (
                   <div
                     key={i}
@@ -214,7 +215,6 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                       boxShadow: "0 0 8px rgba(34, 197, 94, 0.5)",
                       left: `${item.left}%`,
                       animationDelay: `${item.delay}s`,
-                      animationDuration: "3s",
                     }}
                   >
                     <Users className="w-3 h-3 text-white" />
