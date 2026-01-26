@@ -38,11 +38,7 @@ const TgsPlayer = ({ src, className = '', loop = true, autoplay = true }: TgsPla
   }
 
   if (!animationData) {
-    return (
-      <div className={`${className} flex items-center justify-center`}>
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 animate-pulse" />
-      </div>
-    );
+    return <div className={className} />;
   }
 
   return (
