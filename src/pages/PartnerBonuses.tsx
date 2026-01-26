@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, Sparkles, Crown, Zap, Rocket, Gem } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -115,6 +115,28 @@ const PartnerBonuses = () => {
   const navigate = useNavigate();
   const [selectedTariffIndex, setSelectedTariffIndex] = useState(2); // PRO by default
   const [currentTariffId] = useState("smart"); // Mock current tariff
+  const carouselRef = useRef<HTMLDivElement>(null);
+  
+  // Scroll carousel to selected tariff
+  const scrollToTariff = useCallback((index: number) => {
+    if (carouselRef.current) {
+      const container = carouselRef.current;
+      const items = container.querySelectorAll('[data-tariff-item]');
+      const targetItem = items[index] as HTMLElement;
+      if (targetItem) {
+        const containerRect = container.getBoundingClientRect();
+        const itemRect = targetItem.getBoundingClientRect();
+        const scrollLeft = targetItem.offsetLeft - (containerRect.width / 2) + (itemRect.width / 2);
+        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      }
+    }
+  }, []);
+  
+  // Handle tariff change with scroll sync
+  const handleTariffChange = useCallback((index: number) => {
+    setSelectedTariffIndex(index);
+    scrollToTariff(index);
+  }, [scrollToTariff]);
   
   const handleBack = useCallback(() => {
     navigate('/partner');
@@ -151,7 +173,7 @@ const PartnerBonuses = () => {
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40 pt-14">
         {/* Tariff Selector Carousel */}
         <div className="px-4 pt-6">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4">
+          <div ref={carouselRef} className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4">
             {TARIFFS.map((tariff, idx) => {
               const isSelected = idx === selectedTariffIndex;
               const isCurrent = tariff.id === currentTariffId;
@@ -159,7 +181,8 @@ const PartnerBonuses = () => {
               return (
                 <motion.button
                   key={tariff.id}
-                  onClick={() => setSelectedTariffIndex(idx)}
+                  data-tariff-item
+                  onClick={() => handleTariffChange(idx)}
                   className={`relative flex-shrink-0 min-w-[120px] rounded-2xl p-4 text-left transition-all ${
                     isSelected 
                       ? "border-2 border-primary bg-muted/70 dark:bg-card/70" 
@@ -213,6 +236,21 @@ const PartnerBonuses = () => {
           </div>
         </div>
         
+        {/* Dot Indicator */}
+        <div className="flex justify-center gap-2 py-2">
+          {TARIFFS.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleTariffChange(idx)}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                idx === selectedTariffIndex 
+                  ? "w-6 bg-primary" 
+                  : "bg-muted-foreground/30"
+              }`}
+            />
+          ))}
+        </div>
+        
         {/* Selected Tariff Details */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -228,9 +266,9 @@ const PartnerBonuses = () => {
             onDragEnd={(_, info) => {
               const threshold = 50;
               if (info.offset.x < -threshold && selectedTariffIndex < TARIFFS.length - 1) {
-                setSelectedTariffIndex(selectedTariffIndex + 1);
+                handleTariffChange(selectedTariffIndex + 1);
               } else if (info.offset.x > threshold && selectedTariffIndex > 0) {
-                setSelectedTariffIndex(selectedTariffIndex - 1);
+                handleTariffChange(selectedTariffIndex - 1);
               }
             }}
           >
