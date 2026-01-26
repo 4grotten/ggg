@@ -336,6 +336,27 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                   background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
               />
+              
+              {/* Floating users animation - behind */}
+              <div className="absolute inset-0 z-0">
+                {[15, 40, 65, 85, 25, 55].map((leftPos, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-5 h-5 rounded-full flex items-center justify-center partner-float-user"
+                    style={{
+                      background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
+                      boxShadow: "0 0 8px rgba(34, 197, 94, 0.5)",
+                      left: `${leftPos}%`,
+                      top: `${20 + (i * 10) % 60}%`,
+                      animationDelay: `${i * 0.5}s`,
+                      opacity: 0.7,
+                    }}
+                  >
+                    <Users className="w-2.5 h-2.5 text-white" />
+                  </div>
+                ))}
+              </div>
+              
               <TgsPlayer 
                 src="/animations/WonDuck.tgs" 
                 className="w-full h-full relative z-10"
