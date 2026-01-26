@@ -554,25 +554,16 @@
   /* Blinking users animation - continuous circle cycle */
   .partner-blink-user {
     animation: partner-blink-user 2s linear infinite;
-    opacity: 0;
   }
 
   @keyframes partner-blink-user {
-    0% {
+    0%, 12.5%, 100% {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.6);
+      scale: 0.6;
     }
-    5% {
+    6.25% {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1.1);
-    }
-    12.5% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.6);
-    }
-    100% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.6);
+      scale: 1.1;
     }
   }
 }
