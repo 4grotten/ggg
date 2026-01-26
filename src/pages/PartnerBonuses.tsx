@@ -297,7 +297,7 @@ const PartnerBonuses = () => {
                     tariff.id === "vip" ? "text-violet-500" :
                     "text-emerald-600"
                   }`}>{tariff.name}</p>
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground font-medium">
                     {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
                   </p>
                 </div>
