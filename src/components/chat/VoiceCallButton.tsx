@@ -60,7 +60,7 @@ export const VoiceCallButton = () => {
               <Button
                 type="button"
                 size="icon"
-                onClick={startCall}
+                onClick={() => startCall()}
                 disabled={isConnecting}
                 className={cn(
                   "shrink-0 w-9 h-9 rounded-full",

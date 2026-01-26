@@ -2,13 +2,20 @@ import { createContext, useContext, useState, useCallback, ReactNode } from "rea
 import { useConversation } from "@elevenlabs/react";
 import { toast } from "sonner";
 
-const ELEVENLABS_AGENT_ID = "agent_5801kfp8shb2fv48yefns7hvkh5a";
+// Agent IDs
+export const AGENTS = {
+  EVA: "agent_5801kfp8shb2fv48yefns7hvkh5a",      // Main chat assistant
+  ANGIE: "agent_9701kfya7rw9fxhs981fh1wvky6x",   // Partner support & sales
+} as const;
+
+export type AgentType = keyof typeof AGENTS;
 
 interface VoiceCallContextType {
   isConnecting: boolean;
   isConnected: boolean;
   isSpeaking: boolean;
-  startCall: () => Promise<void>;
+  currentAgent: AgentType | null;
+  startCall: (agent?: AgentType) => Promise<void>;
   endCall: () => Promise<void>;
 }
 
@@ -16,6 +23,7 @@ const VoiceCallContext = createContext<VoiceCallContextType | undefined>(undefin
 
 export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
   const [isConnecting, setIsConnecting] = useState(false);
+  const [currentAgent, setCurrentAgent] = useState<AgentType | null>(null);
 
   const conversation = useConversation({
     onConnect: () => {
@@ -24,6 +32,7 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
     },
     onDisconnect: () => {
       console.log("Disconnected from ElevenLabs agent");
+      setCurrentAgent(null);
       toast.info("Звонок завершён");
     },
     onError: (error) => {
@@ -32,16 +41,18 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
     },
   });
 
-  const startCall = useCallback(async () => {
+  const startCall = useCallback(async (agent: AgentType = "EVA") => {
     setIsConnecting(true);
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
+      setCurrentAgent(agent);
       await conversation.startSession({
-        agentId: ELEVENLABS_AGENT_ID,
+        agentId: AGENTS[agent],
         connectionType: "websocket",
       } as any);
     } catch (error) {
       console.error("Failed to start call:", error);
+      setCurrentAgent(null);
       if (error instanceof Error && error.name === "NotAllowedError") {
         toast.error("Разрешите доступ к микрофону для звонка");
       } else {
@@ -54,6 +65,7 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
 
   const endCall = useCallback(async () => {
     await conversation.endSession();
+    setCurrentAgent(null);
   }, [conversation]);
 
   const isConnected = conversation.status === "connected";
@@ -65,6 +77,7 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
         isConnecting,
         isConnected,
         isSpeaking,
+        currentAgent,
         startCall,
         endCall,
       }}

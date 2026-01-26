@@ -682,7 +682,7 @@ const PartnerBonuses = () => {
             <Button 
               className="relative w-full h-14 text-base font-bold rounded-2xl m-[2px] bg-background/80 dark:bg-card/80 backdrop-blur-xl text-foreground hover:bg-background/90 dark:hover:bg-card/90 border-0 overflow-hidden"
               style={{ width: "calc(100% - 4px)" }}
-              onClick={selectedTariff.id === "partner" ? (isConnected ? endCall : startCall) : undefined}
+              onClick={selectedTariff.id === "partner" ? (isConnected ? endCall : () => startCall("ANGIE")) : undefined}
               disabled={selectedTariff.id === "partner" && isConnecting}
             >
               {selectedTariff.id === "partner" ? (
