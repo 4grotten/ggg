@@ -553,7 +553,7 @@
 
   /* Blinking users animation - continuous circle cycle */
   .partner-blink-user {
-    animation: partner-blink-user 2s linear infinite;
+    animation: partner-blink-user 4s linear infinite;
   }
 
   @keyframes partner-blink-user {
