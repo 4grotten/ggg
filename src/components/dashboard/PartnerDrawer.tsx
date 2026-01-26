@@ -33,10 +33,11 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   const [showAuthAlert, setShowAuthAlert] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // Preload TGS animation when drawer opens
+  // Preload TGS animations when drawer opens
   useEffect(() => {
     if (open) {
       preloadTgs("/animations/money-coins.tgs");
+      preloadTgs("/animations/wowduck.tgs");
     }
   }, [open]);
 
@@ -240,12 +241,18 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             key={`step2-${animationKey}`}
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
-            {/* Gift box illustration */}
+            {/* Duck animation with glow */}
             <div className="relative w-48 h-48 flex items-center justify-center mb-6">
-              <img 
-                src={partnerStep2Image} 
-                alt="Rewards" 
-                className="w-full h-full object-contain rounded-2xl opacity-80"
+              {/* Pulsing green background glow */}
+              <div
+                className="absolute -inset-4 rounded-full partner-pulse-glow"
+                style={{ 
+                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+                }}
+              />
+              <TgsPlayer 
+                src="/animations/wowduck.tgs" 
+                className="w-full h-full relative z-10"
               />
             </div>
 
