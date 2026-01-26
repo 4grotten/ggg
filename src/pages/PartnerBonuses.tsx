@@ -180,8 +180,8 @@ const PartnerBonuses = () => {
                         style={{
                           background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
                           backgroundSize: "200% 100%",
-                          animation: "goldShimmer 2s linear infinite",
-                          boxShadow: "0 0 8px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255,255,255,0.4)"
+                          animation: "goldShimmer 4s ease-in-out infinite",
+                          boxShadow: "0 0 6px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)"
                         }}
                       >
                         {t(tariff.badge)}
@@ -311,7 +311,7 @@ const PartnerBonuses = () => {
                         backgroundClip: "text",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
-                        animation: "goldShimmer 2s linear infinite"
+                        animation: "goldShimmer 4s ease-in-out infinite"
                       }}
                     >
                       {tariff.name}
@@ -443,8 +443,7 @@ const PartnerBonuses = () => {
                     backgroundClip: "text",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
-                    animation: "goldShimmer 2s linear infinite",
-                    textShadow: "0 0 20px rgba(212, 175, 55, 0.3)"
+                    animation: "goldShimmer 4s ease-in-out infinite"
                   }}
                 >
                   {t('partner.bonuses.contactUs', 'Связаться с нами')}
