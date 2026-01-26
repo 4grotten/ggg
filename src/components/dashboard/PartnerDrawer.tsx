@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2 } from "lucide-react";
+import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import partnerStep2Image from "@/assets/partner-step2-gift.png";
@@ -408,13 +408,21 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   return (
     <Drawer open={open} onOpenChange={onOpenChange} modal>
       <DrawerContent className="max-h-[90vh] flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
+        {/* Close button - right side */}
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted flex items-center justify-center z-10 hover:bg-muted/80 transition-colors"
+        >
+          <X className="w-4 h-4 text-muted-foreground" />
+        </button>
+        
         {/* Back button - fixed position */}
         {step > 0 && (
           <button
             onClick={handleBack}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-muted flex items-center justify-center z-10"
+            className="absolute top-4 left-4 w-8 h-8 rounded-full bg-muted flex items-center justify-center z-10 hover:bg-muted/80 transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 text-muted-foreground" />
           </button>
         )}
         
