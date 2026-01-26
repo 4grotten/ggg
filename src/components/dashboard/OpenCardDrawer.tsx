@@ -95,21 +95,14 @@ export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
   return (
     <Drawer open={open} onOpenChange={handleClose}>
       <DrawerContent className="bg-background/95 backdrop-blur-xl border-t border-border/50 max-w-[800px] mx-auto">
-        <DrawerHeader className="border-b border-border/50 pb-4 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <DrawerTitle className="text-lg font-semibold">
-              {step === "selectCard" ? t('openCard.title') : 
-               step === "selectPayment" ? t('openCard.paymentTitle') :
-               t('openCard.payFromBalance')}
-            </DrawerTitle>
-            <button
-              onClick={handleClose}
-              className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </DrawerHeader>
+        {/* Centered title only */}
+        <div className="py-4 text-center border-b border-border/50">
+          <h2 className="text-lg font-semibold">
+            {step === "selectCard" ? t('openCard.title') : 
+             step === "selectPayment" ? t('openCard.paymentTitle') :
+             t('openCard.payFromBalance')}
+          </h2>
+        </div>
 
         <div className="p-4 pb-8">
           <AnimatePresence mode="wait">
