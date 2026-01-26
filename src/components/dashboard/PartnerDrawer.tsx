@@ -345,7 +345,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                   { left: 8, top: 65 },
                   { left: 88, top: 60 },
                   { left: 45, top: 0 },
-                  { left: 50, top: 92 },
+                  { left: 55, top: 5 },
                 ].map((pos, i) => (
                   <div
                     key={i}
