@@ -173,7 +173,7 @@ const PartnerBonuses = () => {
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-40 pt-14">
         {/* Tariff Selector Carousel */}
         <div className="px-4 pt-6">
-          <div ref={carouselRef} className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4">
+          <div ref={carouselRef} className="relative flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 pt-4">
             {TARIFFS.map((tariff, idx) => {
               const isSelected = idx === selectedTariffIndex;
               const isCurrent = tariff.id === currentTariffId;
@@ -183,23 +183,32 @@ const PartnerBonuses = () => {
                   key={tariff.id}
                   data-tariff-item
                   onClick={() => handleTariffChange(idx)}
-                  className={`relative flex-shrink-0 min-w-[120px] rounded-2xl p-4 text-left transition-all ${
+                  className={`relative flex-shrink-0 min-w-[120px] rounded-2xl p-4 text-left transition-colors duration-200 ${
                     isSelected 
-                      ? "border-2 border-primary bg-muted/70 dark:bg-card/70" 
-                      : "border border-border/50 bg-muted/30 dark:bg-card/30"
+                      ? "bg-muted/70 dark:bg-card/70" 
+                      : "border border-transparent bg-muted/30 dark:bg-card/30"
                   }`}
                   whileTap={{ scale: 0.97 }}
                 >
+                  {/* Animated border for selected state */}
+                  {isSelected && (
+                    <motion.div
+                      layoutId="tariff-selector-border"
+                      className="absolute inset-0 rounded-2xl border-2 border-primary"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  
                   {/* Badge above card */}
                   {isCurrent && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-emerald-500 dark:bg-[#BFFF00] text-white dark:text-black text-[10px] font-bold rounded-full">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 bg-emerald-500 dark:bg-[#BFFF00] text-white dark:text-black text-[10px] font-bold rounded-full z-10">
                       {t('partner.bonuses.yourTariff', 'Ваш тариф')}
                     </span>
                   )}
                   {tariff.badge && !isCurrent && (
                     tariff.badgeType === "contract" ? (
                       <span 
-                        className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full text-amber-900 overflow-hidden"
+                        className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full text-amber-900 overflow-hidden z-10"
                         style={{
                           background: "linear-gradient(90deg, #D4AF37, #F5E6A3, #C5A028, #F5E6A3, #D4AF37)",
                           backgroundSize: "200% 100%",
@@ -211,7 +220,7 @@ const PartnerBonuses = () => {
                       </span>
                     ) : (
                       <span 
-                        className={`absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                        className={`absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 text-[10px] font-bold rounded-full z-10 ${
                           tariff.badgeType === "recommended" 
                             ? "bg-primary text-primary-foreground" 
                             : tariff.badgeType === "padawan"
@@ -224,10 +233,10 @@ const PartnerBonuses = () => {
                     )
                   )}
                   
-                  <p className={`font-bold text-lg ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
+                  <p className={`font-bold text-lg relative z-10 ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
                     {t(tariff.nameKey)}
                   </p>
-                  <p className={`text-sm ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
+                  <p className={`text-sm relative z-10 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
                     {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
                   </p>
                 </motion.button>
