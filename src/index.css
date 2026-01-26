@@ -508,4 +508,32 @@
       opacity: 0;
     }
   }
+
+  /* Exploding users animation - from center outward and back */
+  .partner-explode-user {
+    animation: partner-explode-user 2.5s ease-in-out infinite;
+  }
+
+  @keyframes partner-explode-user {
+    0% {
+      transform: translate(-50%, -50%) rotate(var(--explode-angle)) translateX(0) scale(0.5);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(var(--explode-angle)) translateX(0) scale(1);
+    }
+    50% {
+      transform: translate(-50%, -50%) rotate(var(--explode-angle)) translateX(85px) scale(1);
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(var(--explode-angle)) translateX(0) scale(1);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(var(--explode-angle)) translateX(0) scale(0.5);
+      opacity: 0;
+    }
+  }
 }

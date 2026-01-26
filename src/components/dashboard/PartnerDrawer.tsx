@@ -252,6 +252,28 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                   background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
                 }}
               />
+              
+              {/* Exploding users animation */}
+              <div className="absolute inset-0">
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-7 h-7 rounded-full flex items-center justify-center partner-explode-user"
+                    style={{
+                      background: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
+                      boxShadow: "0 0 10px rgba(34, 197, 94, 0.6)",
+                      left: "50%",
+                      top: "50%",
+                      transform: "translate(-50%, -50%)",
+                      "--explode-angle": `${angle}deg`,
+                      animationDelay: `${i * 0.15}s`,
+                    } as React.CSSProperties}
+                  >
+                    <Users className="w-3.5 h-3.5 text-white" />
+                  </div>
+                ))}
+              </div>
+              
               <TgsPlayer 
                 src="/animations/wowduck.tgs" 
                 className="w-full h-full relative z-10"
