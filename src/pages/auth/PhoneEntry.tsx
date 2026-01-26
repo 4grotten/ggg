@@ -282,6 +282,28 @@ const PhoneEntry = () => {
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
   const [pendingLoginPhone, setPendingLoginPhone] = useState<string | null>(null);
 
+  // Check for autofilled password periodically
+  useEffect(() => {
+    if (!isLoginMode) return;
+    
+    const checkAutofill = () => {
+      const passwordInput = document.getElementById('password') as HTMLInputElement;
+      if (passwordInput && passwordInput.value && passwordInput.value !== password) {
+        setPassword(passwordInput.value);
+      }
+    };
+    
+    // Check after a short delay to allow browser autofill
+    const timer = setTimeout(checkAutofill, 100);
+    const timer2 = setTimeout(checkAutofill, 500);
+    const timer3 = setTimeout(checkAutofill, 1000);
+    
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [isLoginMode, password]);
   const formatPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, "");
     if (digits.length <= 2) return digits;
@@ -665,8 +687,19 @@ const PhoneEntry = () => {
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onAnimationStart={(e) => {
+                      // Detect browser autofill and sync state
+                      if (e.animationName === 'onAutoFillStart' || (e.target as HTMLInputElement).matches(':-webkit-autofill')) {
+                        const input = e.target as HTMLInputElement;
+                        if (input.value && input.value !== password) {
+                          setPassword(input.value);
+                        }
+                      }
+                    }}
+                    onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
                     placeholder={t('auth.login.passwordPlaceholder')}
-                    className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
+                    className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground autofill:bg-transparent autofill:text-foreground"
+                    style={{ WebkitTextFillColor: 'inherit' }}
                     autoFocus
                   />
                   <button

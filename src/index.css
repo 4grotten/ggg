@@ -175,4 +175,24 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Fix autofill styling for iOS/Safari */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: hsl(var(--foreground)) !important;
+    background-color: transparent !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  @keyframes onAutoFillStart {
+    from { /* empty */ }
+    to { /* empty */ }
+  }
+
+  input:-webkit-autofill {
+    animation-name: onAutoFillStart;
+  }
 }
