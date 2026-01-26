@@ -316,6 +316,20 @@ const PartnerBonuses = () => {
               </div>
             </div>
             
+            {/* Metal card row */}
+            <div className="p-3 border-b border-border/30">
+              <p className="text-xs text-muted-foreground text-center mb-2">
+                {t('partner.bonuses.metalCardLabel', 'Выпуск металлической карты')}
+              </p>
+              <div className="grid grid-cols-5 gap-1">
+                <div className="text-center text-xs font-medium text-muted-foreground/50">—</div>
+                <div className="text-center text-xs font-medium text-muted-foreground/50">—</div>
+                <div className="flex justify-center"><Check className="w-4 h-4 text-muted-foreground" /></div>
+                <div className="flex justify-center"><Check className="w-4 h-4 text-muted-foreground" /></div>
+                <div className="flex justify-center"><Check className="w-4 h-4 text-emerald-500 dark:text-[#BFFF00]" /></div>
+              </div>
+            </div>
+            
             {/* Card income row */}
             <div className="p-3 border-b border-border/30">
               <p className="text-xs text-muted-foreground text-center mb-2">
