@@ -347,7 +347,17 @@
     "logoutSuccess": "Başarıyla çıkış yapıldı",
     "apofizNetwork": "Apofiz Ticaret ve Sosyal Ağ",
     "guest": "Misafir",
-    "loginToAccess": "Tüm özelliklere erişmek için giriş yapın"
+    "loginToAccess": "Tüm özelliklere erişmek için giriş yapın",
+    "accounts": "Hesaplar",
+    "addAccount": "Hesap Ekle",
+    "addAccountDesc": "Başka bir hesaba giriş yap",
+    "switchAccount": "Hesap Değiştir",
+    "otherAccounts": "Diğer hesaplar",
+    "editProfile": "Profili Düzenle",
+    "personalData": "Profil",
+    "verification": "Doğrulama",
+    "savedAccounts": "Kayıtlı Hesaplar",
+    "switchedTo": "{{name}} hesabına geçildi"
   },
   "card": {
     "back": "Geri",

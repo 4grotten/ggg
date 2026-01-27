@@ -347,7 +347,17 @@
     "logoutSuccess": "Sesión cerrada correctamente",
     "apofizNetwork": "Red Comercial y Social Apofiz",
     "guest": "Invitado",
-    "loginToAccess": "Inicia sesión para acceder a todas las funciones"
+    "loginToAccess": "Inicia sesión para acceder a todas las funciones",
+    "accounts": "Cuentas",
+    "addAccount": "Añadir cuenta",
+    "addAccountDesc": "Iniciar sesión en otra cuenta",
+    "switchAccount": "Cambiar cuenta",
+    "otherAccounts": "Otras cuentas",
+    "editProfile": "Editar perfil",
+    "personalData": "Perfil",
+    "verification": "Verificación",
+    "savedAccounts": "Cuentas guardadas",
+    "switchedTo": "Cambiado a {{name}}"
   },
   "card": {
     "back": "Atrás",

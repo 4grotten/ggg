@@ -347,7 +347,17 @@
     "logoutSuccess": "تم تسجيل الخروج بنجاح",
     "apofizNetwork": "شبكة Apofiz التجارية والاجتماعية",
     "guest": "ضيف",
-    "loginToAccess": "سجّل الدخول للوصول إلى جميع الميزات"
+    "loginToAccess": "سجّل الدخول للوصول إلى جميع الميزات",
+    "accounts": "الحسابات",
+    "addAccount": "إضافة حساب",
+    "addAccountDesc": "تسجيل الدخول إلى حساب آخر",
+    "switchAccount": "تبديل الحساب",
+    "otherAccounts": "حسابات أخرى",
+    "editProfile": "تعديل الملف الشخصي",
+    "personalData": "الملف الشخصي",
+    "verification": "التحقق",
+    "savedAccounts": "الحسابات المحفوظة",
+    "switchedTo": "تم التبديل إلى {{name}}"
   },
   "card": {
     "back": "رجوع",
