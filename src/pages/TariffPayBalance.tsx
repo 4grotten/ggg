@@ -195,13 +195,13 @@ const TariffPayBalance = () => {
             >
               {selectedPaymentCard ? (
                 <>
-                  <div className="w-10 shrink-0">
+                  <div className="w-14 h-9 shrink-0 rounded-lg overflow-hidden shadow-lg ring-1 ring-white/10">
                     <CardMiniature type={selectedPaymentCard.type} />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-medium text-sm">{selectedPaymentCard.name}</p>
+                    <p className="font-semibold text-sm">{selectedPaymentCard.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {t('card.cardBalance')}: {formatBalance(selectedPaymentCard.balance || 0)} AED
+                      {t('card.cardBalance')}: <span className="font-medium text-foreground">{formatBalance(selectedPaymentCard.balance || 0)} AED</span>
                     </p>
                   </div>
                 </>
@@ -228,19 +228,25 @@ const TariffPayBalance = () => {
                         setSelectedPaymentCardId(card.id);
                         setShowCardSelector(false);
                       }}
-                      className="w-full p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors"
+                      className={`w-full p-3 flex items-center gap-3 transition-colors rounded-xl ${
+                        selectedPaymentCardId === card.id 
+                          ? 'bg-primary/10' 
+                          : 'hover:bg-muted/50'
+                      }`}
                     >
-                      <div className="w-10 shrink-0">
+                      <div className="w-14 h-9 shrink-0 rounded-lg overflow-hidden shadow-md ring-1 ring-white/10">
                         <CardMiniature type={card.type} />
                       </div>
                       <div className="flex-1 text-left">
-                        <p className="font-medium text-sm">{card.name}</p>
+                        <p className="font-semibold text-sm">{card.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {formatBalance(card.balance || 0)} AED
+                          <span className="font-medium text-foreground">{formatBalance(card.balance || 0)} AED</span>
                         </p>
                       </div>
                       {selectedPaymentCardId === card.id && (
-                        <Check className="w-4 h-4 text-primary" />
+                        <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                          <Check className="w-3 h-3 text-primary-foreground" />
+                        </div>
                       )}
                     </button>
                   ))}
