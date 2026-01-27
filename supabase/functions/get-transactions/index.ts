@@ -23,13 +23,40 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    // Check for Authorization header (for authenticated users)
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+    
+    if (authHeader?.startsWith('Bearer ')) {
+      // Use anon key client with user's token for auth verification
+      const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
+      
+      const token = authHeader.replace('Bearer ', '');
+      const { data: claimsData, error: claimsError } = await userClient.auth.getUser(token);
+      
+      if (!claimsError && claimsData?.user) {
+        userId = claimsData.user.id;
+        console.log(`Authenticated user: ${userId}`);
+      }
+    }
+    
+    // Fallback to demo user for unauthenticated requests (ElevenLabs agent testing)
+    if (!userId) {
+      userId = '00000000-0000-0000-0000-000000000001';
+      console.log('Using demo user ID');
+    }
+    
+    // Use service role for actual query
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Parse query parameters
     const url = new URL(req.url);
     const body = req.method === 'POST' ? await req.json() : {};
     
-    const userId = body.user_id || url.searchParams.get('user_id') || '00000000-0000-0000-0000-000000000001';
     const type = body.type || url.searchParams.get('type');
     const limit = parseInt(body.limit || url.searchParams.get('limit') || '10');
     const days = parseInt(body.days || url.searchParams.get('days') || '30');
