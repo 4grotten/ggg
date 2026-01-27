@@ -166,6 +166,8 @@ const PartnerBonuses = () => {
           </button>
           <h1 className="text-base font-semibold">{t('partner.bonuses.title', 'Выберите тариф')}</h1>
           <div className="flex items-center gap-1">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
             {/* Call Angie button */}
             <motion.button
               onClick={isConnected ? endCall : () => startCall("ANGIE")}
@@ -187,7 +189,7 @@ const PartnerBonuses = () => {
                   ? "bg-red-500 text-white" 
                   : isConnecting 
                     ? "bg-primary text-primary-foreground" 
-                    : "bg-muted/50 hover:bg-muted"
+                    : "bg-primary text-primary-foreground hover:bg-primary/90"
               }`}
             >
               {/* Pulsing ring during connecting */}
@@ -236,8 +238,6 @@ const PartnerBonuses = () => {
                 <Phone className="w-4 h-4" />
               )}
             </motion.button>
-            <LanguageSwitcher />
-            <ThemeSwitcher />
           </div>
         </div>
       </header>
