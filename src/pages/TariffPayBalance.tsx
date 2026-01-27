@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import useEmblaCarousel from "embla-carousel-react";
+import confetti from "canvas-confetti";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -145,6 +146,44 @@ const TariffPayBalance = () => {
     return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
+  const fireConfetti = () => {
+    const duration = 3000;
+    const end = Date.now() + duration;
+
+    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+    (function frame() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.7 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.7 },
+        colors: colors
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+
+    // Big burst in the center
+    setTimeout(() => {
+      confetti({
+        particleCount: 100,
+        spread: 100,
+        origin: { x: 0.5, y: 0.5 },
+        colors: colors
+      });
+    }, 200);
+  };
+
   const handleConfirmPayment = async () => {
     if (!hasEnoughBalance) {
       toast.error(t('openCard.insufficientBalance'));
@@ -153,8 +192,16 @@ const TariffPayBalance = () => {
     setIsProcessing(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsProcessing(false);
+    
+    // Fire confetti celebration
+    fireConfetti();
+    
     toast.success(t('partner.bonuses.purchaseSuccess', 'Тариф успешно приобретён!'));
-    navigate('/partner/bonuses');
+    
+    // Delay navigation to let user enjoy the confetti
+    setTimeout(() => {
+      navigate('/partner/bonuses');
+    }, 1500);
   };
 
   const scrollToTariff = (index: number) => {
