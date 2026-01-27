@@ -113,11 +113,13 @@ const handleClick = (transaction: Transaction) => {
           className="space-y-2"
         >
           {/* Date Header */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between">
             <span className="font-semibold text-base">{translateDate(group.date, t)}</span>
-            <span className="text-muted-foreground text-sm">
-              {t("transactions.spend")} {group.totalSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
-            </span>
+            {group.totalSpend > 0 && (
+              <span className="text-[#007AFF] text-sm font-medium">
+                -{group.totalSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+              </span>
+            )}
           </div>
 
           {/* Transactions */}
