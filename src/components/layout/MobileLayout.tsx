@@ -60,7 +60,7 @@ export const MobileLayout = ({
                   {title}
                 </h1>
               )}
-              <div className="flex justify-end">{rightAction}</div>
+              <div className="flex-1 flex justify-end">{rightAction}</div>
             </div>
           </header>
         )}
