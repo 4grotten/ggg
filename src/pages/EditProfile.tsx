@@ -183,7 +183,7 @@ const EditProfile = () => {
         avatar_id: user?.avatar?.id,
       });
       toast.success(t("editProfile.saved") || "Profile updated successfully");
-      navigate(-1);
+      navigate("/settings");
     } catch (error) {
       console.error('Failed to update profile:', error);
       toast.error(t("editProfile.saveFailed") || "Failed to update profile");
