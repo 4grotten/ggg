@@ -151,19 +151,27 @@ const clientTools = {
   get_transactions: async (params: { type?: string; limit?: number; days?: number; summary?: boolean }) => {
     // Check authorization first
     const token = getAuthToken();
-    if (!token) {
+    const user = getCurrentUserProfile();
+    if (!token || !user) {
       return "Для просмотра транзакций необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
     }
     
     try {
       console.log("Agent calling get_transactions:", params);
+      
+      // Use demo user for now - maps external user to demo transactions
+      // In production, this should map user.id to the Supabase user_id
+      const demoUserId = "00000000-0000-0000-0000-000000000001";
+      
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      };
+      
       const response = await fetch(getTransactionsUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify(params),
+        headers,
+        body: JSON.stringify({ ...params, user_id: demoUserId }),
       });
       
       if (!response.ok) {
@@ -196,19 +204,26 @@ const clientTools = {
   get_balance_summary: async () => {
     // Check authorization first
     const token = getAuthToken();
-    if (!token) {
+    const user = getCurrentUserProfile();
+    if (!token || !user) {
       return "Для просмотра баланса необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
     }
     
     try {
       console.log("Agent calling get_balance_summary");
+      
+      // Use demo user for now - maps external user to demo transactions
+      const demoUserId = "00000000-0000-0000-0000-000000000001";
+      
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      };
+      
       const response = await fetch(getTransactionsUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify({ summary: true, days: 30 }),
+        headers,
+        body: JSON.stringify({ summary: true, days: 30, user_id: demoUserId }),
       });
       
       const data = await response.json();
@@ -231,19 +246,26 @@ const clientTools = {
   get_spending_by_category: async (params: { days?: number }) => {
     // Check authorization first
     const token = getAuthToken();
-    if (!token) {
+    const user = getCurrentUserProfile();
+    if (!token || !user) {
       return "Для просмотра расходов по категориям необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
     }
     
     try {
       console.log("Agent calling get_spending_by_category:", params);
+      
+      // Use demo user for now - maps external user to demo transactions
+      const demoUserId = "00000000-0000-0000-0000-000000000001";
+      
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      };
+      
       const response = await fetch(getTransactionsUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify({ summary: true, days: params.days || 30 }),
+        headers,
+        body: JSON.stringify({ summary: true, days: params.days || 30, user_id: demoUserId }),
       });
       
       const data = await response.json();
