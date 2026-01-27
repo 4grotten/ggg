@@ -702,6 +702,13 @@
     }
   },
   "partner": {
+    "levels": {
+      "r1": "R1",
+      "r2": "R2",
+      "r3": "R3",
+      "r4": "R4",
+      "partner": "Partner"
+    },
     "earnWithEasyCard": "Verdienen Sie mit Easy Card",
     "passiveIncomeDaily": "Passives Einkommen jeden Tag.",
     "step1": {

@@ -762,6 +762,13 @@
     }
   },
   "partner": {
+    "levels": {
+      "r1": "R1",
+      "r2": "R2",
+      "r3": "R3",
+      "r4": "R4",
+      "partner": "Партнёр"
+    },
     "referralHistory": "Реферальная история",
     "withdrawTitle": "Вывести на",
     "withdrawToCard": "Пополнение карты",

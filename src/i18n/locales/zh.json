@@ -708,6 +708,13 @@
     }
   },
   "partner": {
+    "levels": {
+      "r1": "R1",
+      "r2": "R2",
+      "r3": "R3",
+      "r4": "R4",
+      "partner": "合伙人"
+    },
     "earnWithEasyCard": "使用Easy Card赚钱",
     "passiveIncomeDaily": "每天被动收入。",
     "step1": {
