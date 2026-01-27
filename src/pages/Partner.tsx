@@ -68,15 +68,15 @@ const Partner = () => {
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto overflow-x-hidden">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border max-w-[800px] mx-auto">
-        <div className="relative flex items-center justify-between h-14 px-4">
+        <div className="flex items-center h-14 px-4 gap-3">
           <button
             onClick={handleBack}
-            className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform z-10"
+            className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center active:scale-95 transition-transform shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="absolute left-1/2 -translate-x-1/2 text-base font-semibold text-center max-w-[180px] leading-tight">{t('partner.program', 'Партнёрская программа')}</h1>
-          <div className="flex items-center gap-1">
+          <h1 className="text-base font-semibold leading-tight flex-1">{t('partner.program', 'Партнёрская программа')}</h1>
+          <div className="flex items-center gap-1 shrink-0">
             <ThemeSwitcher />
             <LanguageSwitcher />
             <PartnerCallButton />
