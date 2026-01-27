@@ -10,7 +10,8 @@ export const useDialTone = () => {
   const isPlayingRef = useRef(false);
   const shouldStopRef = useRef(false);
 
-  const playRingTone = useCallback(async (ringCount?: number): Promise<void> => {
+  // Returns true if it finished all rings; false if stopped early.
+  const playRingTone = useCallback(async (ringCount?: number): Promise<boolean> => {
     // Random ring count: 2, 3, or 5
     const rings = ringCount ?? [2, 3, 5][Math.floor(Math.random() * 3)];
     
@@ -58,6 +59,7 @@ export const useDialTone = () => {
     }
     
     isPlayingRef.current = false;
+    return !shouldStopRef.current;
   }, []);
 
   const stopRingTone = useCallback(() => {
