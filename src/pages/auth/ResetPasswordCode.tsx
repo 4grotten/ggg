@@ -24,7 +24,12 @@ const RESEND_COOLDOWN = 60; // seconds
 const ResetPasswordCode = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  // Debug: check translation
+  console.log('[ResetPasswordCode] Language:', i18n.language);
+  console.log('[ResetPasswordCode] sendToEmail key:', t("auth.resetPassword.sendToEmail"));
+  console.log('[ResetPasswordCode] emailSent key:', t("auth.resetPassword.emailSent"));
   
   // Get phone number and email status from navigation state
   const locationState = location.state as { phoneNumber?: string; hasEmail?: boolean } | null;
