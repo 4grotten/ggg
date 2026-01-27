@@ -702,6 +702,22 @@ const EditProfile = () => {
                 maxYear={new Date().getFullYear()}
               />
             </div>
+            {/* Clear date button */}
+            {form.watch("date_of_birth") && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                type="button"
+                onClick={() => {
+                  form.setValue("date_of_birth", "");
+                  setTempDate(undefined);
+                  setIsDateOpen(false);
+                }}
+                className="w-full mt-4 py-3 text-destructive font-medium text-center hover:bg-destructive/10 rounded-xl transition-colors"
+              >
+                {t("editProfile.clearDate")}
+              </motion.button>
+            )}
           </div>
         </DrawerContent>
       </Drawer>

@@ -384,6 +384,7 @@
     "gender": "Gender",
     "selectGender": "Select gender",
     "genderDescription": "Optional. Used for personalizing in-app communications.",
+    "clearDate": "Clear date",
     "save": "Save Changes",
     "saved": "Profile updated successfully",
     "saveFailed": "Failed to update profile",
