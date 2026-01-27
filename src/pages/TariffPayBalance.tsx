@@ -160,6 +160,71 @@ const TariffPayBalance = () => {
       rightAction={<LanguageSwitcher />}
     >
       <div className="py-6 space-y-4 pb-32">
+        {/* Card Selector - moved to top */}
+        <div className="px-4 space-y-2">
+          <label className="text-sm text-muted-foreground">{t('openCard.payFromCard', 'Оплатить с карты')}</label>
+          <div className="relative">
+            <button
+              onClick={() => setShowCardSelector(!showCardSelector)}
+              className="w-full p-4 rounded-2xl border border-border/50 bg-muted/30 hover:bg-muted/50 transition-all flex items-center gap-3"
+            >
+              {selectedPaymentCard ? (
+                <>
+                  <div className="w-10 shrink-0">
+                    <CardMiniature type={selectedPaymentCard.type} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="font-medium text-sm">{selectedPaymentCard.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('card.cardBalance')}: {formatBalance(selectedPaymentCard.balance || 0)} AED
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <span className="text-muted-foreground">{t('openCard.selectCard')}</span>
+              )}
+              <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${showCardSelector ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Card Dropdown */}
+            <AnimatePresence>
+              {showCardSelector && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/50 rounded-2xl overflow-hidden shadow-lg z-50"
+                >
+                  {userCards.map((card) => (
+                    <button
+                      key={card.id}
+                      onClick={() => {
+                        setSelectedPaymentCardId(card.id);
+                        setShowCardSelector(false);
+                      }}
+                      className="w-full p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="w-10 shrink-0">
+                        <CardMiniature type={card.type} />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="font-medium text-sm">{card.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatBalance(card.balance || 0)} AED
+                        </p>
+                      </div>
+                      {selectedPaymentCardId === card.id && (
+                        <Check className="w-4 h-4 text-primary" />
+                      )}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
         {/* Tariff Card Carousel */}
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
@@ -248,71 +313,6 @@ const TariffPayBalance = () => {
               {tariffId === 'vip' && t('partner.bonuses.vipDesc', 'Для лидеров с максимальными привилегиями')}
             </p>
           </motion.div>
-        </div>
-
-        {/* Card Selector */}
-        <div className="px-4 space-y-2">
-          <label className="text-sm text-muted-foreground">{t('openCard.payFromCard', 'Оплатить с карты')}</label>
-          <div className="relative">
-            <button
-              onClick={() => setShowCardSelector(!showCardSelector)}
-              className="w-full p-4 rounded-2xl border border-border/50 bg-muted/30 hover:bg-muted/50 transition-all flex items-center gap-3"
-            >
-              {selectedPaymentCard ? (
-                <>
-                  <div className="w-10 shrink-0">
-                    <CardMiniature type={selectedPaymentCard.type} />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-medium text-sm">{selectedPaymentCard.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t('card.cardBalance')}: {formatBalance(selectedPaymentCard.balance || 0)} AED
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <span className="text-muted-foreground">{t('openCard.selectCard')}</span>
-              )}
-              <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${showCardSelector ? 'rotate-180' : ''}`} />
-            </button>
-
-            {/* Card Dropdown */}
-            <AnimatePresence>
-              {showCardSelector && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/50 rounded-2xl overflow-hidden shadow-lg z-50"
-                >
-                  {userCards.map((card) => (
-                    <button
-                      key={card.id}
-                      onClick={() => {
-                        setSelectedPaymentCardId(card.id);
-                        setShowCardSelector(false);
-                      }}
-                      className="w-full p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="w-10 shrink-0">
-                        <CardMiniature type={card.type} />
-                      </div>
-                      <div className="flex-1 text-left">
-                        <p className="font-medium text-sm">{card.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatBalance(card.balance || 0)} AED
-                        </p>
-                      </div>
-                      {selectedPaymentCardId === card.id && (
-                        <Check className="w-4 h-4 text-primary" />
-                      )}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </div>
 
         {/* Insufficient Balance Warning */}
