@@ -11,7 +11,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { KeyRound, HelpCircle, Loader2, RefreshCw, MessageCircle, Mail, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyResetCode, forgotPassword, forgotPasswordEmail } from "@/services/api/authApi";
+import { verifyResetCode, forgotPassword, resendCode } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -189,23 +189,23 @@ const ResetPasswordCode = () => {
     }
   };
   
-  // Send reset link to email
+  // Send reset code to email
   const handleSendToEmail = async () => {
     if (isSendingEmail || emailSent) return;
     
     setIsSendingEmail(true);
     
     try {
-      const response = await forgotPasswordEmail();
+      const response = await resendCode(phoneNumber, 'email_auth_type');
       
       if (response.error) {
-        toast.error(response.error.message || t("editProfile.changePassword.emailError") || "Failed to send email");
+        toast.error(response.error.message || t("auth.resetPassword.emailError") || "Failed to send email");
       } else {
         setEmailSent(true);
-        toast.success(t("editProfile.changePassword.emailSent") || "Reset link sent to email!");
+        toast.success(t("auth.resetPassword.emailSent") || "Code sent to email!");
       }
     } catch {
-      toast.error(t("editProfile.changePassword.emailError") || "Failed to send email");
+      toast.error(t("auth.resetPassword.emailError") || "Failed to send email");
     } finally {
       setIsSendingEmail(false);
     }
@@ -335,8 +335,8 @@ const ResetPasswordCode = () => {
                     <Mail className="w-4 h-4" />
                   )}
                   {emailSent 
-                    ? t("editProfile.changePassword.emailSent") || "Email sent!"
-                    : t("auth.resetPassword.sendToEmail") || "Send reset link to email"
+                    ? t("auth.resetPassword.emailSent") || "Code sent!"
+                    : t("auth.resetPassword.sendToEmail") || "Send code to email"
                   }
                 </motion.button>
               )}

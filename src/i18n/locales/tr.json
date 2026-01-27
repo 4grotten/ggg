@@ -1,7 +1,9 @@
 {
   "auth": {
     "resetPassword": {
-      "sendToEmail": "E-posta ile gönder"
+      "sendToEmail": "Kodu e-posta ile gönder",
+      "emailSent": "Kod e-posta ile gönderildi!",
+      "emailError": "E-posta gönderilemedi"
     }
   },
   "profileVerification": {

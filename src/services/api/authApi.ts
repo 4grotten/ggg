@@ -32,7 +32,7 @@ export interface VerifyCodeResponse {
 
 export interface ResendCodeRequest {
   phone_number: string;
-  type: 'register_auth_type' | 'whatsapp_auth_type';
+  type: 'register_auth_type' | 'whatsapp_auth_type' | 'email_auth_type';
 }
 
 export interface ResendCodeResponse {
@@ -172,7 +172,7 @@ export async function verifyCode(phone_number: string, code: number) {
  */
 export async function resendCode(
   phone_number: string, 
-  type: 'register_auth_type' | 'whatsapp_auth_type' = 'register_auth_type'
+  type: 'register_auth_type' | 'whatsapp_auth_type' | 'email_auth_type' = 'register_auth_type'
 ) {
   return apiPost<ResendCodeResponse>('/resend_code/', { phone_number, type });
 }
