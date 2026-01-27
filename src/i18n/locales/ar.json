@@ -1,7 +1,9 @@
 {
   "auth": {
     "resetPassword": {
-      "sendToEmail": "إرسال الرابط إلى البريد"
+      "sendToEmail": "إرسال الرمز إلى البريد",
+      "emailSent": "تم إرسال الرمز إلى البريد!",
+      "emailError": "فشل إرسال البريد"
     }
   },
   "profileVerification": {
