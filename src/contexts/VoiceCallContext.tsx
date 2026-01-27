@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useDialTone } from "@/hooks/useDialTone";
 import { getAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import type { UserProfile } from "@/services/api/authApi";
+import { fetchCards } from "@/services/api/cards";
 
 // Agent IDs
 export const AGENTS = {
@@ -29,7 +30,9 @@ const getCurrentUserProfile = (): UserProfile | null => {
   try {
     const cached = localStorage.getItem(AUTH_USER_KEY);
     if (cached) {
-      return JSON.parse(cached);
+      const profile = JSON.parse(cached);
+      console.log("getCurrentUserProfile:", profile);
+      return profile;
     }
   } catch {
     // ignore
@@ -38,35 +41,22 @@ const getCurrentUserProfile = (): UserProfile | null => {
 };
 
 // Helper to calculate age from date of birth
-const calculateAge = (dateOfBirth: string | null): number | null => {
+const calculateAge = (dateOfBirth: string | null | undefined): number | null => {
   if (!dateOfBirth) return null;
-  const today = new Date();
-  const birthDate = new Date(dateOfBirth);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
+  try {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    if (isNaN(birthDate.getTime())) return null;
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  } catch {
+    return null;
   }
-  return age;
 };
-
-// Mock cards data for balance (same as in cards.ts)
-const mockCardsData = [
-  { 
-    id: "1", 
-    type: "virtual", 
-    name: "Visa Virtual", 
-    balance: 213757.49,
-    lastFourDigits: "4521",
-  },
-  { 
-    id: "2", 
-    type: "metal", 
-    name: "Visa Metal", 
-    balance: 256508.98,
-    lastFourDigits: "8834",
-  },
-];
 
 // Client tools for ElevenLabs agent
 const getTransactionsUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-transactions`;
@@ -117,24 +107,44 @@ const clientTools = {
       });
     }
     
-    // Calculate total balance
-    const totalBalance = mockCardsData.reduce((sum, card) => sum + card.balance, 0);
-    
-    // Format cards info
-    const cardsInfo = mockCardsData.map(card => ({
-      type: card.type === "virtual" ? "Виртуальная карта" : "Металлическая карта",
-      name: card.name,
-      last_digits: card.lastFourDigits,
-      balance: card.balance,
-      balance_formatted: `${card.balance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`
-    }));
-    
-    return JSON.stringify({
-      total_balance: totalBalance,
-      total_balance_formatted: `${totalBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`,
-      cards: cardsInfo,
-      message: `Общий баланс: ${totalBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} дирхам. ${cardsInfo.map(c => `${c.type} *${c.last_digits}: ${c.balance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} дирхам`).join('. ')}.`
-    });
+    try {
+      // Fetch real cards data from API
+      const cardsResponse = await fetchCards();
+      
+      if (!cardsResponse.success || !cardsResponse.data.length) {
+        return JSON.stringify({
+          error: true,
+          message: "Не удалось загрузить информацию о картах."
+        });
+      }
+      
+      const cards = cardsResponse.data;
+      
+      // Calculate total balance
+      const totalBalance = cards.reduce((sum, card) => sum + card.balance, 0);
+      
+      // Format cards info
+      const cardsInfo = cards.map(card => ({
+        type: card.type === "virtual" ? "Виртуальная карта" : "Металлическая карта",
+        name: card.name,
+        last_digits: card.lastFourDigits,
+        balance: card.balance,
+        balance_formatted: `${card.balance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`
+      }));
+      
+      return JSON.stringify({
+        total_balance: totalBalance,
+        total_balance_formatted: `${totalBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`,
+        cards: cardsInfo,
+        message: `Общий баланс: ${totalBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} дирхам. ${cardsInfo.map(c => `${c.type} *${c.last_digits}: ${c.balance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} дирхам`).join('. ')}.`
+      });
+    } catch (error) {
+      console.error("Error fetching card balance:", error);
+      return JSON.stringify({
+        error: true,
+        message: "Произошла ошибка при загрузке баланса карт."
+      });
+    }
   },
   
   // Get user transactions - REQUIRES authenticated user
