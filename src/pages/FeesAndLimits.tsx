@@ -5,8 +5,8 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
-import { Receipt, CreditCard, ArrowDownToLine, Send, ArrowLeftRight, Percent, Banknote, CircleDollarSign, Headphones, Users, MessageCircle, Phone } from "lucide-react";
-import { useVoiceCall } from "@/contexts/VoiceCallContext";
+import { Receipt, CreditCard, ArrowDownToLine, Send, ArrowLeftRight, Percent, Banknote, CircleDollarSign, Headphones, Users, MessageCircle, Phone, PhoneOff } from "lucide-react";
+import { useVoiceCall, AGENTS, AgentType } from "@/contexts/VoiceCallContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   VIRTUAL_CARD_ANNUAL_FEE,
@@ -161,18 +161,111 @@ const FeesAndLimits = () => {
   );
 };
 
+const SupportCallButton = ({ 
+  agent, 
+  icon: Icon, 
+  label 
+}: { 
+  agent: AgentType; 
+  icon: React.ElementType; 
+  label: string;
+}) => {
+  const { isConnecting, isConnected, isSpeaking, currentAgent, startCall, endCall } = useVoiceCall();
+  
+  const isThisAgentActive = currentAgent === agent;
+  const isOtherAgentActive = isConnected && currentAgent !== agent;
+
+  const handleClick = () => {
+    if (isThisAgentActive) {
+      endCall();
+    } else if (!isConnected) {
+      startCall(agent);
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      className="w-full h-14 justify-between gap-3 rounded-2xl bg-muted/70 dark:bg-card/70 backdrop-blur-xl border-border/50 hover:bg-muted px-3"
+      onClick={handleClick}
+      disabled={isOtherAgentActive}
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-primary" />
+        </div>
+        <span className="text-foreground font-medium">{label}</span>
+      </div>
+      
+      <div className="rounded-full border border-border/50 p-1">
+        <AnimatePresence mode="wait">
+          {isThisAgentActive ? (
+            <motion.div
+              key="connected"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="flex items-center gap-1.5 pl-2"
+            >
+              <motion.div
+                animate={isSpeaking ? { scale: [1, 1.3, 1], opacity: [1, 0.7, 1] } : {}}
+                transition={{ repeat: Infinity, duration: 0.8 }}
+                className={`w-2 h-2 rounded-full ${isSpeaking ? "bg-green-500" : "bg-yellow-500"}`}
+              />
+              <div className="shrink-0 w-9 h-9 rounded-full bg-destructive flex items-center justify-center">
+                <PhoneOff className="w-4 h-4 text-destructive-foreground" />
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="disconnected"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+            >
+              <motion.div
+                animate={isConnecting && currentAgent === agent ? { 
+                  scale: [1, 1.1, 1],
+                  boxShadow: [
+                    "0 0 0 0 hsl(var(--primary) / 0.4)",
+                    "0 0 0 8px hsl(var(--primary) / 0)",
+                    "0 0 0 0 hsl(var(--primary) / 0)"
+                  ]
+                } : {}}
+                transition={{ repeat: Infinity, duration: 1.2 }}
+                className="rounded-full"
+              >
+                <div className="shrink-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                  {isConnecting && currentAgent === agent ? (
+                    <motion.div
+                      animate={{ 
+                        rotate: [-10, 10, -10, 10, 0],
+                        x: [-1, 1, -1, 1, 0]
+                      }}
+                      transition={{ 
+                        repeat: Infinity, 
+                        duration: 0.5,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      <Phone className="w-4 h-4 text-primary-foreground" />
+                    </motion.div>
+                  ) : (
+                    <Phone className="w-4 h-4 text-primary-foreground" />
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </Button>
+  );
+};
+
 const SupportButtons = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { startCall } = useVoiceCall();
-
-  const handleCardSupport = () => {
-    startCall("EVA");
-  };
-
-  const handleReferralSupport = () => {
-    startCall("ANGIE");
-  };
 
   const handleAIChat = () => {
     navigate("/chat");
@@ -180,37 +273,17 @@ const SupportButtons = () => {
 
   return (
     <div className="flex flex-col gap-3 mb-6">
-      <Button
-        variant="outline"
-        className="w-full h-14 justify-between gap-3 rounded-2xl bg-muted/70 dark:bg-card/70 backdrop-blur-xl border-border/50 hover:bg-muted px-3"
-        onClick={handleCardSupport}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Headphones className="w-5 h-5 text-primary" />
-          </div>
-          <span className="text-foreground font-medium">{t("feesAndLimits.cardSupport", "Поддержка по картам")}</span>
-        </div>
-        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-          <Phone className="w-4 h-4 text-primary-foreground" />
-        </div>
-      </Button>
-
-      <Button
-        variant="outline"
-        className="w-full h-14 justify-between gap-3 rounded-2xl bg-muted/70 dark:bg-card/70 backdrop-blur-xl border-border/50 hover:bg-muted px-3"
-        onClick={handleReferralSupport}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-primary" />
-          </div>
-          <span className="text-foreground font-medium">{t("feesAndLimits.referralSupport", "Поддержка по рефералам")}</span>
-        </div>
-        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-          <Phone className="w-4 h-4 text-primary-foreground" />
-        </div>
-      </Button>
+      <SupportCallButton 
+        agent="EVA" 
+        icon={Headphones} 
+        label={t("feesAndLimits.cardSupport", "Поддержка по картам")} 
+      />
+      
+      <SupportCallButton 
+        agent="ANGIE" 
+        icon={Users} 
+        label={t("feesAndLimits.referralSupport", "Поддержка по рефералам")} 
+      />
 
       <Button
         variant="outline"
