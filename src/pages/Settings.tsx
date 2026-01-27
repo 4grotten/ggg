@@ -399,7 +399,7 @@ const Settings = () => {
       title={t("settings.profile")}
       rightAction={
         <div className="flex items-center gap-2">
-          <ThemeSwitcher />
+          <ThemeSwitcher className="mr-1" />
           <LanguageSwitcher />
           {isAuthenticated && (
             <button

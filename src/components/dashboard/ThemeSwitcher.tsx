@@ -1,7 +1,12 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
-export const ThemeSwitcher = () => {
+interface ThemeSwitcherProps {
+  className?: string;
+}
+
+export const ThemeSwitcher = ({ className }: ThemeSwitcherProps) => {
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
@@ -11,7 +16,7 @@ export const ThemeSwitcher = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center justify-center w-9 h-9 rounded-full bg-secondary hover:bg-muted transition-colors"
+      className={cn("flex items-center justify-center w-9 h-9 rounded-full bg-secondary hover:bg-muted transition-colors", className)}
       aria-label="Toggle theme"
     >
       {theme === "dark" ? (
