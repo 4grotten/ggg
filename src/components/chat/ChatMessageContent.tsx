@@ -1,6 +1,5 @@
-import { ArrowDownLeft, ArrowUpRight, Wallet, Clock } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Wallet, CheckCircle2, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
 
 interface ChatMessageContentProps {
   content: string;
@@ -25,50 +24,59 @@ interface ParsedBalance {
   isExpense: boolean;
 }
 
+// Get icon based on transaction type
+const getTransactionIcon = (type: string) => {
+  const lowerType = type.toLowerCase();
+  if (lowerType.includes('перевод') || lowerType.includes('transfer') || lowerType.includes('банк') || lowerType.includes('bank')) {
+    return Building2;
+  }
+  return null;
+};
+
 const TransactionCard = ({ date, type, amount, description }: ParsedTransaction) => {
   const isPositive = amount > 0;
+  const IconComponent = getTransactionIcon(type);
 
   return (
-    <Card className="p-0 overflow-hidden my-2 border-border/60 shadow-md">
+    <div className="flex items-center gap-3 py-3 my-1">
+      {/* Icon */}
       <div className={cn(
-        "h-1.5 w-full",
-        isPositive ? "bg-success" : "bg-destructive"
-      )} />
-      <div className="p-3.5">
-        <div className="flex items-start gap-3">
-          <div className={cn(
-            "w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm",
-            isPositive 
-              ? "bg-gradient-to-br from-success to-success/80" 
-              : "bg-gradient-to-br from-destructive to-destructive/80"
-          )}>
-            {isPositive 
-              ? <ArrowDownLeft className="w-5 h-5 text-white" />
-              : <ArrowUpRight className="w-5 h-5 text-white" />
-            }
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground leading-tight">{type}</p>
-            {description && (
-              <p className="text-xs text-muted-foreground mt-0.5 truncate">{description.trim()}</p>
-            )}
-            <div className="flex items-center gap-1.5 mt-1.5">
-              <Clock className="w-3 h-3 text-muted-foreground/70" />
-              <span className="text-[11px] text-muted-foreground">{date}</span>
-            </div>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <p className={cn(
-              "text-base font-bold",
-              isPositive ? "text-success" : "text-destructive"
-            )}>
-              {isPositive ? '+' : ''}{amount.toFixed(2)}
-            </p>
-            <p className="text-[10px] text-muted-foreground font-medium">AED</p>
+        "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
+        isPositive 
+          ? "bg-success" 
+          : "bg-primary"
+      )}>
+        {IconComponent ? (
+          <IconComponent className="w-5 h-5 text-white" />
+        ) : isPositive ? (
+          <ArrowDownLeft className="w-5 h-5 text-white" />
+        ) : (
+          <ArrowUpRight className="w-5 h-5 text-white" />
+        )}
+      </div>
+      
+      {/* Title and time */}
+      <div className="flex-1 min-w-0">
+        <p className="text-[15px] font-medium text-foreground leading-tight">{type}</p>
+        <div className="flex items-center gap-2 mt-1">
+          <span className="text-sm text-muted-foreground">{date}</span>
+          <div className="flex items-center gap-1 text-success">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span className="text-xs">Завершено</span>
           </div>
         </div>
       </div>
-    </Card>
+      
+      {/* Amount */}
+      <div className="text-right flex-shrink-0">
+        <p className={cn(
+          "text-base font-semibold",
+          isPositive ? "text-success" : "text-primary"
+        )}>
+          {isPositive ? '+' : '-'}{Math.abs(amount).toFixed(2)} AED
+        </p>
+      </div>
+    </div>
   );
 };
 
@@ -80,29 +88,27 @@ const BalanceCard = ({ label, amount, isIncome, isExpense }: ParsedBalance) => {
   };
 
   return (
-    <Card className="p-4 my-2 border-border/60 shadow-md">
-      <div className="flex items-center gap-3">
-        <div className={cn(
-          "w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm",
-          isIncome 
-            ? "bg-gradient-to-br from-success to-success/80" 
-            : isExpense 
-              ? "bg-gradient-to-br from-destructive to-destructive/80" 
-              : "bg-gradient-to-br from-primary to-primary/80"
-        )}>
-          {getIcon()}
-        </div>
-        <div className="flex-1">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
-          <p className={cn(
-            "text-lg font-bold mt-0.5",
-            isIncome ? "text-success" : isExpense ? "text-destructive" : "text-foreground"
-          )}>
-            {amount} <span className="text-sm font-medium text-muted-foreground">AED</span>
-          </p>
-        </div>
+    <div className="flex items-center gap-3 py-3 my-1 px-3 rounded-xl bg-secondary/50">
+      <div className={cn(
+        "w-12 h-12 rounded-full flex items-center justify-center",
+        isIncome 
+          ? "bg-success" 
+          : isExpense 
+            ? "bg-destructive" 
+            : "bg-primary"
+      )}>
+        {getIcon()}
       </div>
-    </Card>
+      <div className="flex-1">
+        <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
+        <p className={cn(
+          "text-lg font-bold mt-0.5",
+          isIncome ? "text-success" : isExpense ? "text-destructive" : "text-foreground"
+        )}>
+          {amount} <span className="text-sm font-medium text-muted-foreground">AED</span>
+        </p>
+      </div>
+    </div>
   );
 };
 
