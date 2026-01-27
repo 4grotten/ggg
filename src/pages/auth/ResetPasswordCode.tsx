@@ -11,7 +11,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { KeyRound, HelpCircle, Loader2, RefreshCw, MessageCircle, Mail, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyResetCode, forgotPassword, getUserEmail, forgotPasswordEmail } from "@/services/api/authApi";
+import { verifyResetCode, forgotPassword, forgotPasswordEmail } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -26,9 +26,10 @@ const ResetPasswordCode = () => {
   const location = useLocation();
   const { t } = useTranslation();
   
-  // Get phone number from navigation state
-  const locationState = location.state as { phoneNumber?: string } | null;
+  // Get phone number and email status from navigation state
+  const locationState = location.state as { phoneNumber?: string; hasEmail?: boolean } | null;
   const phoneNumber = locationState?.phoneNumber || "";
+  const hasEmail = locationState?.hasEmail || false;
   
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +38,6 @@ const ResetPasswordCode = () => {
   const [resendCooldown, setResendCooldown] = useState(RESEND_COOLDOWN);
   
   // Email recovery state
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   
@@ -50,21 +50,6 @@ const ResetPasswordCode = () => {
       navigate("/auth/phone", { replace: true });
     }
   }, [phoneNumber, navigate]);
-  
-  // Fetch user email on mount
-  useEffect(() => {
-    const fetchEmail = async () => {
-      try {
-        const response = await getUserEmail();
-        if (response.data?.email) {
-          setUserEmail(response.data.email);
-        }
-      } catch {
-        // Email not available, ignore
-      }
-    };
-    fetchEmail();
-  }, []);
   
   // Resend cooldown timer
   useEffect(() => {
@@ -334,7 +319,7 @@ const ResetPasswordCode = () => {
               </button>
               
               {/* Send to email option */}
-              {userEmail && (
+              {hasEmail && (
                 <motion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -351,7 +336,7 @@ const ResetPasswordCode = () => {
                   )}
                   {emailSent 
                     ? t("editProfile.changePassword.emailSent") || "Email sent!"
-                    : `${t("editProfile.changePassword.sendToEmail") || "Send to"} ${userEmail.replace(/(.{2})(.*)(@.*)/, '$1***$3')}`
+                    : t("auth.resetPassword.sendToEmail") || "Send reset link to email"
                   }
                 </motion.button>
               )}

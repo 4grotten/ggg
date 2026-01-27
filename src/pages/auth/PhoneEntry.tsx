@@ -269,6 +269,7 @@ const PhoneEntry = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [hasEmail, setHasEmail] = useState(false);
   
   // Biometric auth
   const { 
@@ -398,7 +399,10 @@ const PhoneEntry = () => {
         }
         
         if (checkResponse.data) {
-          const { is_new_user, token } = checkResponse.data;
+          const { is_new_user, token, email } = checkResponse.data;
+          
+          // Store email availability for password reset flow
+          setHasEmail(!!email);
           
           if (is_new_user) {
             // New user - send OTP (phone is NOT registered yet)
@@ -561,7 +565,7 @@ const PhoneEntry = () => {
         toast.success(t('auth.login.forgotPasswordSent') || 'Password reset code sent via WhatsApp');
         // Navigate to reset code entry page
         navigate("/auth/reset-code", { 
-          state: { phoneNumber: fullPhone }
+          state: { phoneNumber: fullPhone, hasEmail }
         });
       }
     } catch {
