@@ -1,11 +1,4 @@
 {
-  "auth": {
-    "resetPassword": {
-      "sendToEmail": "Отправить код на email",
-      "emailSent": "Код отправлен на email!",
-      "emailError": "Не удалось отправить email"
-    }
-  },
   "profileVerification": {
     "title": "Подтвердите личность",
     "description": "Пройдите верификацию, чтобы разблокировать все функции и увеличить лимиты аккаунта.",
@@ -685,6 +678,31 @@
     "sendToCard": "Перевод на карту"
   },
   "auth": {
+    "resetPassword": {
+      "title": "Забыли пароль?",
+      "description": "Введите номер телефона для восстановления",
+      "codeTitle": "Введите код восстановления",
+      "codeSentTo": "Код отправлен через WhatsApp на",
+      "verify": "Подтвердить",
+      "invalidCode": "Введите корректный 6-значный код",
+      "wrongCode": "Неверный код. Попробуйте снова.",
+      "codeVerified": "Код подтверждён!",
+      "error": "Ошибка проверки",
+      "resendError": "Не удалось отправить код",
+      "resendSuccess": "Код отправлен через WhatsApp!",
+      "newPasswordTitle": "Новый пароль",
+      "newPasswordDescription": "Придумайте надёжный пароль",
+      "newPassword": "Новый пароль",
+      "confirmPassword": "Повторите пароль",
+      "passwordMismatch": "Пароли не совпадают",
+      "passwordTooShort": "Минимум 6 символов",
+      "setPassword": "Установить пароль",
+      "success": "Пароль успешно изменён!",
+      "setError": "Не удалось установить пароль",
+      "sendToEmail": "Отправить код на email",
+      "emailSent": "Код отправлен на email!",
+      "emailError": "Не удалось отправить email"
+    },
     "phone": {
       "title": "Введите номер телефона",
       "description": "Мы отправим вам код подтверждения",
