@@ -413,7 +413,9 @@
       "sendToEmail": "Send reset link to {{email}}",
       "emailSent": "Reset link sent to email",
       "emailSentSuccess": "Password reset link sent to {{email}}",
-      "emailSendError": "Failed to send reset link"
+      "emailSendError": "Failed to send reset link",
+      "passwordsMatch": "Passwords match",
+      "passwordsNotMatch": "Passwords do not match"
     }
   },
   "card": {
