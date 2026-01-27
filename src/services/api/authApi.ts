@@ -232,6 +232,17 @@ export async function setPassword(password: string) {
 }
 
 /**
+ * Смена пароля (для авторизованного пользователя)
+ * POST /users/change_password/
+ */
+export async function changePassword(current_password: string, new_password: string) {
+  return apiPost<{ message: string }>('/users/change_password/', { 
+    current_password, 
+    new_password 
+  });
+}
+
+/**
  * Получение профиля текущего пользователя
  * GET /users/me/
  */

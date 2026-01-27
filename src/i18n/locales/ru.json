@@ -381,7 +381,21 @@
     "selectGender": "Выберите пол",
     "save": "Сохранить изменения",
     "saved": "Профиль успешно обновлён",
-    "saveFailed": "Не удалось обновить профиль"
+    "saveFailed": "Не удалось обновить профиль",
+    "changePassword": {
+      "title": "Сменить пароль",
+      "currentPassword": "Текущий пароль",
+      "currentPlaceholder": "Введите текущий пароль",
+      "currentRequired": "Введите текущий пароль",
+      "newPassword": "Новый пароль",
+      "newPlaceholder": "Введите новый пароль",
+      "confirmPassword": "Подтвердите пароль",
+      "confirmPlaceholder": "Повторите новый пароль",
+      "submit": "Изменить пароль",
+      "success": "Пароль успешно изменён!",
+      "error": "Не удалось изменить пароль",
+      "wrongPassword": "Неверный текущий пароль"
+    }
   },
   "card": {
     "back": "Назад",
