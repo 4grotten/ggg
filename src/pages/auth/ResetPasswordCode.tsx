@@ -11,7 +11,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { KeyRound, HelpCircle, Loader2, RefreshCw, MessageCircle, Mail, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyResetCode, forgotPassword, resendCode } from "@/services/api/authApi";
+import { verifyCode, forgotPassword, resendCode } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -130,7 +130,8 @@ const ResetPasswordCode = () => {
     setError("");
     
     try {
-      const response = await verifyResetCode(phoneNumber, fullCode);
+      // Use verifyCode() - it saves the token automatically
+      const response = await verifyCode(phoneNumber, parseInt(fullCode, 10));
       
       if (response.error) {
         setError(response.error.message || t("auth.resetPassword.wrongCode") || "Wrong code");
@@ -139,21 +140,16 @@ const ResetPasswordCode = () => {
         return;
       }
       
-      if (response.data?.is_valid) {
+      if (response.data?.token) {
         toast.success(t("auth.resetPassword.codeVerified") || "Code verified!");
         
-        // Navigate to set new password
+        // Navigate to set new password - token is already saved in apiClient
         navigate("/auth/reset-password", { 
           replace: true,
-          state: { 
-            phoneNumber, 
-            resetCode: fullCode,
-            resetToken: response.data.token
-          }
+          state: { phoneNumber }
         });
       } else {
-        const errorMessage = response.data?.error || t("auth.resetPassword.wrongCode") || "Wrong code";
-        setError(errorMessage);
+        setError(t("auth.resetPassword.wrongCode") || "Wrong code");
         setCode(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
       }

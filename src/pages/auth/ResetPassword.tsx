@@ -1,5 +1,6 @@
 /**
  * ResetPassword — экран установки нового пароля
+ * Использует setPassword() с токеном, полученным после verifyCode()
  */
 
 import { useState, useEffect } from "react";
@@ -11,7 +12,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Lock, Eye, EyeOff, HelpCircle, Loader2, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { resetPassword } from "@/services/api/authApi";
+import { setPassword, getCurrentUser } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -23,30 +24,23 @@ const ResetPassword = () => {
   const location = useLocation();
   const { t } = useTranslation();
   
-  // Get data from navigation state
-  const locationState = location.state as { 
-    phoneNumber?: string; 
-    resetCode?: string;
-    resetToken?: string;
-  } | null;
-  
+  // Get phone number from navigation state (token is already saved in apiClient)
+  const locationState = location.state as { phoneNumber?: string } | null;
   const phoneNumber = locationState?.phoneNumber || "";
-  const resetCode = locationState?.resetCode || "";
-  const resetToken = locationState?.resetToken || "";
   
-  const [password, setPassword] = useState("");
+  const [password, setPasswordValue] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   
-  // Redirect if no phone number or code
+  // Redirect if no phone number (means user didn't go through the flow)
   useEffect(() => {
-    if (!phoneNumber || !resetCode) {
+    if (!phoneNumber) {
       navigate("/auth/phone", { replace: true });
     }
-  }, [phoneNumber, resetCode, navigate]);
+  }, [phoneNumber, navigate]);
   
   const passwordsMatch = password === confirmPassword && password.length > 0;
   const isPasswordValid = password.length >= 6;
@@ -60,7 +54,7 @@ const ResetPassword = () => {
     }
     
     if (!passwordsMatch) {
-      setError(t("auth.resetPassword.passwordsNotMatch") || "Passwords do not match");
+      setError(t("auth.resetPassword.passwordMismatch") || "Passwords do not match");
       return;
     }
     
@@ -68,19 +62,23 @@ const ResetPassword = () => {
     setError("");
     
     try {
-      const response = await resetPassword(phoneNumber, resetCode, password, resetToken);
+      // Use setPassword() - token is already saved from verifyCode()
+      const response = await setPassword(password);
       
       if (response.error) {
-        setError(response.error.message || t("auth.resetPassword.error") || "Failed to reset password");
+        setError(response.error.message || t("auth.resetPassword.setError") || "Failed to set password");
         return;
       }
       
       toast.success(t("auth.resetPassword.success") || "Password changed successfully!");
       
-      // Navigate back to login
-      navigate("/auth/phone", { replace: true });
+      // Fetch user profile since we're now authorized
+      await getCurrentUser();
+      
+      // Navigate to dashboard - user is already authorized
+      navigate("/", { replace: true });
     } catch {
-      setError(t("auth.resetPassword.error") || "Failed to reset password");
+      setError(t("auth.resetPassword.setError") || "Failed to set password");
     } finally {
       setIsLoading(false);
     }
@@ -110,10 +108,10 @@ const ResetPassword = () => {
               <Lock className="w-12 h-12 text-primary" />
             </motion.div>
             <h1 className="text-2xl font-bold">
-              {t("auth.resetPassword.title") || "Set new password"}
+              {t("auth.resetPassword.newPasswordTitle") || "Set new password"}
             </h1>
             <p className="text-muted-foreground mt-2">
-              {t("auth.resetPassword.subtitle") || "Create a new password for your account"}
+              {t("auth.resetPassword.newPasswordDescription") || "Create a new password for your account"}
             </p>
           </motion.div>
 
@@ -137,10 +135,10 @@ const ResetPassword = () => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => {
-                    setPassword(e.target.value);
+                    setPasswordValue(e.target.value);
                     setError("");
                   }}
-                  placeholder={t("auth.resetPassword.passwordPlaceholder") || "Enter new password"}
+                  placeholder={t("auth.resetPassword.newPassword") || "Enter new password"}
                   className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
                   autoFocus
                 />
@@ -153,8 +151,8 @@ const ResetPassword = () => {
                 </button>
               </div>
               {password.length > 0 && (
-                <p className={`text-xs mt-2 ${isPasswordValid ? 'text-success' : 'text-muted-foreground'}`}>
-                  {isPasswordValid ? '✓' : '○'} {t("auth.resetPassword.minChars") || "Minimum 6 characters"}
+                <p className={`text-xs mt-2 ${isPasswordValid ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                  {isPasswordValid ? '✓' : '○'} {t("auth.resetPassword.passwordTooShort") || "Minimum 6 characters"}
                 </p>
               )}
             </div>
@@ -175,7 +173,7 @@ const ResetPassword = () => {
                     setConfirmPassword(e.target.value);
                     setError("");
                   }}
-                  placeholder={t("auth.resetPassword.confirmPlaceholder") || "Confirm new password"}
+                  placeholder={t("auth.resetPassword.confirmPassword") || "Confirm new password"}
                   className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
                 />
                 <button
@@ -186,12 +184,12 @@ const ResetPassword = () => {
                   {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
                 {passwordsMatch && (
-                  <Check className="w-5 h-5 text-success" />
+                  <Check className="w-5 h-5 text-emerald-500" />
                 )}
               </div>
               {confirmPassword.length > 0 && !passwordsMatch && (
                 <p className="text-xs mt-2 text-destructive">
-                  {t("auth.resetPassword.passwordsNotMatch") || "Passwords do not match"}
+                  {t("auth.resetPassword.passwordMismatch") || "Passwords do not match"}
                 </p>
               )}
             </div>
@@ -239,7 +237,7 @@ const ResetPassword = () => {
                 {t("common.loading") || "Loading..."}
               </>
             ) : (
-              t("auth.resetPassword.submit") || "Set new password"
+              t("auth.resetPassword.setPassword") || "Set new password"
             )}
           </button>
         </div>
