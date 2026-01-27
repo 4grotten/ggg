@@ -98,7 +98,20 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
                   <p className="text-base font-medium text-foreground">{user.full_name}</p>
                   <p className="text-sm text-muted-foreground">{user.phone_number}</p>
                 </div>
-                <Check className="w-5 h-5 text-primary" />
+                <div className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-primary" />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenChange(false);
+                      navigate('/auth/phone');
+                      localStorage.removeItem('auth_token');
+                    }}
+                    className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center hover:bg-red-500/20 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 text-red-500" />
+                  </button>
+                </div>
               </div>
             </div>
           )}
