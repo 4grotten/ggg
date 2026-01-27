@@ -86,8 +86,17 @@ export interface SetPasswordRequest {
   password: string;
 }
 
+export type ForgotPasswordMethod = 'sms' | 'whatsapp' | 'email';
+
 export interface ForgotPasswordRequest {
   phone_number: string;
+  method?: ForgotPasswordMethod;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+  method: ForgotPasswordMethod;
+  available_methods: ForgotPasswordMethod[];
 }
 
 export interface LogoutResponse {
@@ -286,9 +295,14 @@ export async function forgotPasswordEmail() {
 /**
  * Сброс пароля — запрос кода
  * POST /users/forgot_password/
+ * @param phone_number - номер телефона
+ * @param method - способ отправки: 'sms' | 'whatsapp' | 'email'
  */
-export async function forgotPassword(phone_number: string) {
-  return apiPost<{ message: string }>('/users/forgot_password/', { phone_number });
+export async function forgotPassword(phone_number: string, method?: ForgotPasswordMethod) {
+  return apiPost<ForgotPasswordResponse>('/users/forgot_password/', { 
+    phone_number,
+    ...(method && { method })
+  });
 }
 
 /**
