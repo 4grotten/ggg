@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, Copy, Check, Crown, Zap, Sparkles, Rocket, Gem, MessageSquare, ChevronRight } from "lucide-react";
+import { ArrowLeft, Copy, Check, Crown, Zap, Sparkles, Rocket, Gem, MessageSquare, ChevronRight, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -92,6 +92,10 @@ const TariffPayCrypto = () => {
   const [copied, setCopied] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(networks[0]);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
+  
+  // Timer for crypto payment (30 minutes = 1800 seconds)
+  const [timeLeft, setTimeLeft] = useState(1800);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Current selected tariff
   const currentTariff = ALL_TARIFFS[selectedTariffIndex];
@@ -133,6 +137,29 @@ const TariffPayCrypto = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Start timer
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Get wallet address based on selected network
   const walletAddress = selectedNetwork.address;
@@ -366,28 +393,18 @@ const TariffPayCrypto = () => {
         </div>
       </div>
 
-      {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 max-w-[800px] mx-auto bg-gradient-to-t from-background via-background to-transparent pt-8">
-        <motion.button
-          onClick={handleCopy}
-          className={`w-full py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all ${
-            copied 
-              ? "bg-green-500 text-white" 
-              : "bg-primary text-primary-foreground"
-          }`}
+      {/* Fixed Bottom Button - Waiting for Payment */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 max-w-[800px] mx-auto">
+        <button
+          disabled
+          className="w-full py-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 text-amber-600 font-semibold flex items-center justify-center gap-3 backdrop-blur-2xl"
         >
-          {copied ? (
-            <>
-              <Check className="w-5 h-5" />
-              {t("topUp.copied", "Скопировано")}
-            </>
-          ) : (
-            <>
-              <Copy className="w-5 h-5" />
-              {t("topUp.copyAddress", "Скопировать адрес")}
-            </>
-          )}
-        </motion.button>
+          <Clock className="w-5 h-5" />
+          <span>{t('openCard.waitingPayment', 'Ожидание оплаты')}</span>
+          <span className="font-mono bg-amber-500/20 px-3 py-1 rounded-lg text-sm">
+            {formatTime(timeLeft)}
+          </span>
+        </button>
       </div>
 
       {/* Network Selection Drawer */}
