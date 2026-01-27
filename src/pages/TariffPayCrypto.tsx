@@ -288,50 +288,57 @@ const TariffPayCrypto = () => {
           </button>
         </div>
 
-        {/* Wallet Address with QR */}
-        <div className="px-4">
+        {/* QR Code and Address - matching OpenCardPayCrypto design */}
+        <div className="px-4 space-y-4">
+          {/* QR Code Section */}
           <motion.div 
-            key={selectedNetwork.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-4"
+            key={`qr-container-${selectedNetwork.id}`}
+            initial={{ opacity: 0, rotateY: 90, scale: 0.9 }}
+            animate={{ opacity: 1, rotateY: 0, scale: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex flex-col items-center p-4 rounded-2xl bg-white"
           >
-            <p className="text-sm text-muted-foreground text-center">
-              {t('topUp.sendExactAmount', 'Отправьте точную сумму на адрес')}
-            </p>
-            
-            {/* QR Code */}
-            <div className="flex justify-center">
-              <motion.div 
-                key={`qr-${selectedNetwork.id}`}
-                initial={{ opacity: 0, rotateY: 90 }}
-                animate={{ opacity: 1, rotateY: 0 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="bg-white p-4 rounded-xl shadow-lg"
-              >
-                <QRCodeSVG 
-                  value={walletAddress} 
-                  size={140}
-                  level="H"
-                  includeMargin={false}
-                />
-              </motion.div>
-            </div>
-
-            {/* Address */}
-            <motion.button
-              key={`addr-${selectedNetwork.id}`}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.15 }}
-              onClick={handleCopy}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-background/50 border border-border/30 hover:bg-background/80 transition-colors"
+            <QRCodeSVG
+              value={walletAddress}
+              size={180}
+              level="M"
+              className="mb-3"
+            />
+            <p className="text-xs text-muted-foreground mb-2">{t('openCard.sendExactAmount', 'Отправьте точную сумму')}</p>
+            <motion.p 
+              key={`amount-${tariffId}`}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-xl font-bold text-foreground"
             >
-              <span className="text-xs font-mono text-foreground truncate pr-2">
-                {walletAddress}
-              </span>
-              <div className="shrink-0">
+              {formatBalance(calculateTotal(tariffPrice).total)} USDT
+            </motion.p>
+            <motion.p 
+              key={`network-label-${selectedNetwork.id}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="text-xs text-muted-foreground mt-2"
+            >
+              {t('openCard.network', 'Сеть')}: {selectedNetwork.name}
+            </motion.p>
+          </motion.div>
+
+          {/* Wallet Address */}
+          <motion.div 
+            key={`address-container-${selectedNetwork.id}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.15 }}
+            className="p-4 rounded-2xl bg-muted/50 border border-border/50"
+          >
+            <p className="text-xs text-muted-foreground mb-2">{t('openCard.walletAddress', 'Адрес кошелька')}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-mono flex-1 break-all">{walletAddress}</p>
+              <button
+                onClick={handleCopy}
+                className="p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0"
+              >
                 {copied ? (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -341,10 +348,10 @@ const TariffPayCrypto = () => {
                     <Check className="w-5 h-5 text-green-500" />
                   </motion.div>
                 ) : (
-                  <Copy className="w-5 h-5 text-muted-foreground" />
+                  <Copy className="w-5 h-5" />
                 )}
-              </div>
-            </motion.button>
+              </button>
+            </div>
           </motion.div>
         </div>
 
