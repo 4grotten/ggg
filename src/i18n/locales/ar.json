@@ -1,4 +1,9 @@
 {
+  "auth": {
+    "resetPassword": {
+      "sendToEmail": "إرسال الرابط إلى البريد"
+    }
+  },
   "profileVerification": {
     "title": "تحقق من هويتك",
     "description": "أكمل عملية التحقق لفتح جميع الميزات وزيادة حدود حسابك.",

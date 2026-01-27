@@ -1,4 +1,9 @@
 {
+  "auth": {
+    "resetPassword": {
+      "sendToEmail": "Enviar enlace por email"
+    }
+  },
   "profileVerification": {
     "title": "Verifica tu identidad",
     "description": "Completa el proceso de verificación para desbloquear todas las funciones y aumentar los límites de tu cuenta.",
