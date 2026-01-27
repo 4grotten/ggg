@@ -57,7 +57,7 @@ export const ProgressSection = memo(({ selectedLevelIndex }: ProgressSectionProp
                 : "text-muted-foreground"
             } ${idx === selectedLevelIndex ? "font-semibold" : "font-normal"}`}
           >
-            {level.name}
+            {t(level.nameKey, level.id)}
           </span>
         ))}
       </div>

@@ -6,11 +6,11 @@ import { useTranslation } from "react-i18next";
 
 // Partner levels configuration
 export const LEVELS = [
-  { id: "R1", name: "R1", minFriends: 0, maxFriends: 10, cardPercent: 15, txPercent: 0.05, icon: "🌱" },
-  { id: "R2", name: "R2", minFriends: 10, maxFriends: 30, cardPercent: 20, txPercent: 0.1, icon: "🌿" },
-  { id: "R3", name: "R3", minFriends: 30, maxFriends: 50, cardPercent: 25, txPercent: 0.2, icon: "💎" },
-  { id: "R4", name: "R4", minFriends: 50, maxFriends: 100, cardPercent: 30, txPercent: 0.3, icon: "👑" },
-  { id: "Partner", name: "Партнёр", minFriends: 100, maxFriends: Infinity, cardPercent: 35, txPercent: 0.5, icon: "🚀" },
+  { id: "R1", nameKey: "partner.levels.r1", minFriends: 0, maxFriends: 10, cardPercent: 15, txPercent: 0.05, icon: "🌱" },
+  { id: "R2", nameKey: "partner.levels.r2", minFriends: 10, maxFriends: 30, cardPercent: 20, txPercent: 0.1, icon: "🌿" },
+  { id: "R3", nameKey: "partner.levels.r3", minFriends: 30, maxFriends: 50, cardPercent: 25, txPercent: 0.2, icon: "💎" },
+  { id: "R4", nameKey: "partner.levels.r4", minFriends: 50, maxFriends: 100, cardPercent: 30, txPercent: 0.3, icon: "👑" },
+  { id: "Partner", nameKey: "partner.levels.partner", minFriends: 100, maxFriends: Infinity, cardPercent: 35, txPercent: 0.5, icon: "🚀" },
 ];
 
 interface LevelCarouselProps {
@@ -227,7 +227,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">{level.icon}</span>
-                        <span className="text-xl font-bold">{level.name}</span>
+                        <span className="text-xl font-bold">{t(level.nameKey, level.id)}</span>
                       </div>
                       <span className="text-sm text-muted-foreground">
                         <span className="text-foreground font-bold">{currentFriends}</span>

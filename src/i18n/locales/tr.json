@@ -702,6 +702,13 @@
     }
   },
   "partner": {
+    "levels": {
+      "r1": "R1",
+      "r2": "R2",
+      "r3": "R3",
+      "r4": "R4",
+      "partner": "Ortak"
+    },
     "earnWithEasyCard": "Easy Card ile Kazan",
     "passiveIncomeDaily": "Her gün pasif gelir.",
     "step1": {
