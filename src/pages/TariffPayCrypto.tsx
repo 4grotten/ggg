@@ -309,35 +309,15 @@ const TariffPayCrypto = () => {
                 animate={{ opacity: 1, rotateY: 0 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className="bg-white p-4 rounded-xl shadow-lg"
-                style={{ 
-                  boxShadow: `0 4px 20px ${selectedNetwork.color}30`
-                }}
               >
                 <QRCodeSVG 
                   value={walletAddress} 
                   size={140}
                   level="H"
                   includeMargin={false}
-                  fgColor={selectedNetwork.color}
                 />
               </motion.div>
             </div>
-
-            {/* Network Badge */}
-            <motion.div 
-              key={`badge-${selectedNetwork.id}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className="flex justify-center"
-            >
-              <span 
-                className="px-3 py-1 rounded-full text-xs font-semibold text-white"
-                style={{ backgroundColor: selectedNetwork.color }}
-              >
-                {selectedNetwork.shortName}
-              </span>
-            </motion.div>
 
             {/* Address */}
             <motion.button
