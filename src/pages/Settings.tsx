@@ -12,7 +12,9 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Store } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, ExternalLink, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal } from "lucide-react";
+import apofizLogo from "@/assets/apofiz-logo.svg";
+import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/useMultiAccount";
@@ -675,9 +677,9 @@ const Settings = () => {
         {/* Apofiz Social Network */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
-            icon={<Store className="w-5 h-5" />}
-            label={t("settings.apofizNetwork") || "Торгово-Социальная сеть Apofiz"}
-            onClick={() => window.open("https://apofiz.com", "_blank")}
+            icon={<img src={apofizLogo} alt="Apofiz" className="w-5 h-5" />}
+            label={t("settings.apofizNetwork")}
+            onClick={openApofizWithAuth}
           />
         </div>
 
