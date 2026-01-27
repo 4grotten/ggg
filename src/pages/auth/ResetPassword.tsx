@@ -138,7 +138,7 @@ const ResetPassword = () => {
                     setPasswordValue(e.target.value);
                     setError("");
                   }}
-                  placeholder={t("auth.resetPassword.newPassword") || "Enter new password"}
+                  placeholder={t("auth.resetPassword.newPasswordPlaceholder") || "Enter new password"}
                   className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
                   autoFocus
                 />
@@ -173,7 +173,7 @@ const ResetPassword = () => {
                     setConfirmPassword(e.target.value);
                     setError("");
                   }}
-                  placeholder={t("auth.resetPassword.confirmPassword") || "Confirm new password"}
+                  placeholder={t("auth.resetPassword.confirmPasswordPlaceholder") || "Repeat password"}
                   className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
                 />
                 <button
