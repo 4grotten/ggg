@@ -532,6 +532,35 @@ const Settings = () => {
             {displayEmail && (
               <p className="text-sm text-muted-foreground">{displayEmail}</p>
             )}
+            
+            {/* Status indicators */}
+            <div className="flex items-center gap-3 mt-3">
+              {/* Personal data status */}
+              <button
+                onClick={() => navigate("/edit-profile")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  user?.has_empty_fields
+                    ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                    : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
+                }`}
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>{t("settings.personalData") || "Личные данные"}</span>
+              </button>
+              
+              {/* Verification status */}
+              <button
+                onClick={() => navigate("/profile-verification")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  getCompletedSteps() < 10
+                    ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                    : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
+                }`}
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>{t("settings.verification") || "Верификация"}</span>
+              </button>
+            </div>
           </>
         ) : (
           <>
