@@ -13,12 +13,13 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Check, ChevronDown } from "lucide-react";
+import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
+import { changePassword } from "@/services/api/authApi";
 
 const profileSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -47,6 +48,17 @@ const EditProfile = () => {
   const [showFlash, setShowFlash] = useState(false);
   const [avatarKey, setAvatarKey] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Password change state
+  const [isPasswordDrawerOpen, setIsPasswordDrawerOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -169,6 +181,53 @@ const EditProfile = () => {
   ];
 
   const selectedGenderLabel = genderOptions.find(g => g.value === form.watch("gender"))?.label || t("editProfile.selectGender");
+
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    
+    if (!currentPassword) {
+      setPasswordError(t("editProfile.changePassword.currentRequired"));
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      setPasswordError(t("auth.resetPassword.passwordTooShort"));
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setPasswordError(t("auth.resetPassword.passwordsNotMatch"));
+      return;
+    }
+    
+    setIsChangingPassword(true);
+    try {
+      const response = await changePassword(currentPassword, newPassword);
+      if (response.error) {
+        setPasswordError(typeof response.error === 'string' ? response.error : t("editProfile.changePassword.error"));
+      } else {
+        toast.success(t("editProfile.changePassword.success"));
+        setIsPasswordDrawerOpen(false);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+    } catch (error: any) {
+      setPasswordError(error.message || t("editProfile.changePassword.error"));
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
+  const resetPasswordForm = () => {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setPasswordError("");
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
@@ -417,6 +476,26 @@ const EditProfile = () => {
                   </FormItem>
                 )}
               />
+
+              {/* Change Password Button */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetPasswordForm();
+                    setIsPasswordDrawerOpen(true);
+                  }}
+                  className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Lock className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="text-foreground font-medium">{t("editProfile.changePassword.title")}</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
+              </div>
             </form>
           </Form>
         </div>
@@ -512,6 +591,116 @@ const EditProfile = () => {
                 maxYear={new Date().getFullYear()}
               />
             </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Change Password Drawer */}
+      <Drawer open={isPasswordDrawerOpen} onOpenChange={(open) => {
+        setIsPasswordDrawerOpen(open);
+        if (!open) resetPasswordForm();
+      }}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t("editProfile.changePassword.title")}</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-8 space-y-4">
+            {/* Current Password */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                {t("editProfile.changePassword.currentPassword")}
+              </label>
+              <div className="relative">
+                <Input
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder={t("editProfile.changePassword.currentPlaceholder")}
+                  className="h-14 rounded-2xl border-border bg-card px-4 pr-12 text-base"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* New Password */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                {t("editProfile.changePassword.newPassword")}
+              </label>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder={t("editProfile.changePassword.newPlaceholder")}
+                  className="h-14 rounded-2xl border-border bg-card px-4 pr-12 text-base"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">{t("auth.resetPassword.minChars")}</p>
+            </div>
+
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                {t("editProfile.changePassword.confirmPassword")}
+              </label>
+              <div className="relative">
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={t("editProfile.changePassword.confirmPlaceholder")}
+                  className="h-14 rounded-2xl border-border bg-card px-4 pr-12 text-base"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Error message */}
+            <AnimatePresence>
+              {passwordError && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-sm text-destructive"
+                >
+                  {passwordError}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            {/* Submit Button */}
+            <Button
+              onClick={handleChangePassword}
+              disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+              className="w-full h-14 text-lg font-semibold mt-4"
+            >
+              {isChangingPassword ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                t("editProfile.changePassword.submit")
+              )}
+            </Button>
           </div>
         </DrawerContent>
       </Drawer>

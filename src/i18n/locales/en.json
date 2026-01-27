@@ -381,7 +381,21 @@
     "selectGender": "Select gender",
     "save": "Save Changes",
     "saved": "Profile updated successfully",
-    "saveFailed": "Failed to update profile"
+    "saveFailed": "Failed to update profile",
+    "changePassword": {
+      "title": "Change Password",
+      "currentPassword": "Current Password",
+      "currentPlaceholder": "Enter current password",
+      "currentRequired": "Please enter current password",
+      "newPassword": "New Password",
+      "newPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm Password",
+      "confirmPlaceholder": "Confirm new password",
+      "submit": "Change Password",
+      "success": "Password changed successfully!",
+      "error": "Failed to change password",
+      "wrongPassword": "Wrong current password"
+    }
   },
   "card": {
     "back": "Back",
