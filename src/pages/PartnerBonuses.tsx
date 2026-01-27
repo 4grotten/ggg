@@ -811,8 +811,10 @@ const PartnerBonuses = () => {
       <PurchaseTariffDrawer
         open={purchaseDrawerOpen}
         onOpenChange={setPurchaseDrawerOpen}
+        tariffId={selectedTariff.id}
         tariffName={t(selectedTariff.nameKey)}
         tariffPrice={selectedTariff.price}
+        tariffDescription={t(selectedTariff.description)}
       />
     </div>
   );

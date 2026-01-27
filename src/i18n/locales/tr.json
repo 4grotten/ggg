@@ -842,7 +842,13 @@
       "purchaseTariff": "Plan Satın Al",
       "payWithCard": "Kartla Öde",
       "payWithCrypto": "Kripto ile Öde",
-      "fromBalance": "Kart bakiyesinden"
+      "fromBalance": "Kart bakiyesinden",
+      "payForTariff": "Plan Ödemesi",
+      "tariffPurchase": "Plan Satın Alma",
+      "tariffCost": "Plan maliyeti",
+      "exchangeRate": "Döviz kuru",
+      "paymentType": "Ödeme tipi",
+      "purchaseSuccess": "Plan başarıyla satın alındı!"
     }
   }
 }
