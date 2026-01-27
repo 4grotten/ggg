@@ -113,7 +113,7 @@ const handleClick = (transaction: Transaction) => {
           className="space-y-2"
         >
           {/* Date Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between px-4">
             <span className="font-semibold text-base">{translateDate(group.date, t)}</span>
             {group.totalSpend > 0 && (
               <span className="text-[#007AFF] text-sm font-medium">
