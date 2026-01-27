@@ -37,6 +37,10 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    debug: true, // Enable debug to see what's happening
   });
+
+// Debug: log loaded translations for resetPassword
+console.log('[i18n] Loaded ru.auth.resetPassword:', (ru as Record<string, unknown>).auth);
 
 export default i18n;
