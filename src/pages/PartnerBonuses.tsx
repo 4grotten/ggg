@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
+import { PartnerCallButton } from "@/components/partner/PartnerCallButton";
 import { useVoiceCall } from "@/contexts/VoiceCallContext";
 
 // Tariff plans configuration
@@ -168,76 +169,7 @@ const PartnerBonuses = () => {
           <div className="flex items-center gap-1">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            {/* Call Angie button */}
-            <motion.button
-              onClick={isConnected ? endCall : () => startCall("ANGIE")}
-              disabled={isConnecting}
-              animate={isConnecting ? {
-                boxShadow: [
-                  "0 0 0 0 rgba(59, 130, 246, 0)",
-                  "0 0 0 8px rgba(59, 130, 246, 0.4)",
-                  "0 0 0 16px rgba(59, 130, 246, 0)",
-                ]
-              } : {}}
-              transition={isConnecting ? {
-                repeat: Infinity,
-                duration: 1.5,
-                ease: "easeOut"
-              } : {}}
-              className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                isConnected 
-                  ? "bg-red-500 text-white" 
-                  : isConnecting 
-                    ? "bg-primary text-primary-foreground" 
-                    : "bg-primary text-primary-foreground hover:bg-primary/90"
-              }`}
-            >
-              {/* Pulsing ring during connecting */}
-              {isConnecting && (
-                <>
-                  <motion.div
-                    className="absolute inset-0 rounded-full bg-primary/30"
-                    animate={{ scale: [1, 1.8, 2], opacity: [0.6, 0.3, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeOut" }}
-                  />
-                  <motion.div
-                    className="absolute inset-0 rounded-full bg-primary/20"
-                    animate={{ scale: [1, 1.5, 1.8], opacity: [0.4, 0.2, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeOut", delay: 0.3 }}
-                  />
-                </>
-              )}
-              
-              {isConnected ? (
-                <div className="relative z-10">
-                  <PhoneOff className="w-4 h-4" />
-                  <motion.div
-                    animate={isSpeaking ? { scale: [1, 1.4, 1], opacity: [1, 0.5, 1] } : {}}
-                    transition={{ repeat: Infinity, duration: 0.8 }}
-                    className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${
-                      isSpeaking ? "bg-green-400" : "bg-yellow-400"
-                    }`}
-                  />
-                </div>
-              ) : isConnecting ? (
-                <motion.div
-                  className="relative z-10"
-                  animate={{ 
-                    rotate: [-10, 10, -10, 10, 0],
-                    x: [-1, 1, -1, 1, 0]
-                  }}
-                  transition={{ 
-                    repeat: Infinity, 
-                    duration: 0.5,
-                    ease: "easeInOut"
-                  }}
-                >
-                  <Phone className="w-4 h-4" />
-                </motion.div>
-              ) : (
-                <Phone className="w-4 h-4" />
-              )}
-            </motion.button>
+            <PartnerCallButton />
           </div>
         </div>
       </header>
