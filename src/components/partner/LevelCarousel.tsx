@@ -179,6 +179,34 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                   </motion.div>
                 )}
                 
+                {/* Tariff availability badge for R4 and Partner levels */}
+                {(level.id === "R4" || level.id === "Partner") && idx > currentLevelIndex && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="absolute -top-3 left-4 z-20"
+                  >
+                    <span 
+                      className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 ${
+                        level.id === "Partner" 
+                          ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-white" 
+                          : "bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
+                      }`}
+                      style={{
+                        boxShadow: level.id === "Partner" 
+                          ? "0 2px 10px rgba(245, 158, 11, 0.4)" 
+                          : "0 2px 10px rgba(59, 130, 246, 0.4)"
+                      }}
+                    >
+                      {level.id === "R4" 
+                        ? t('partner.availableWithPro', 'Доступен с PRO')
+                        : t('partner.availableWithPartner', 'Доступен с Партнёр')
+                      }
+                    </span>
+                  </motion.div>
+                )}
+                
                 <div className="relative rounded-3xl p-[1px]">
                   {/* Static gradient border for current level */}
                   {idx === currentLevelIndex && (

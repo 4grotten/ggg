@@ -739,6 +739,8 @@
     "cardIssuance": "Por emisión de tarjetas",
     "fromTransactions": "De transacciones",
     "subscribe": "Suscribirse",
+    "availableWithPro": "Disponible con PRO",
+    "availableWithPartner": "Disponible con Partner",
     "referralBalance": "Saldo de Referidos",
     "invited": "Invitados",
     "withdrawn": "Retirado",
