@@ -41,6 +41,7 @@ const EditProfile = () => {
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isGenderOpen, setIsGenderOpen] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
@@ -182,12 +183,19 @@ const EditProfile = () => {
         gender: data.gender || undefined,
         avatar_id: user?.avatar?.id,
       });
-      toast.success(t("editProfile.saved") || "Profile updated successfully");
-      navigate("/settings");
+      
+      // Show success animation before navigating
+      setIsSaving(false);
+      setShowSuccessAnimation(true);
+      
+      // Wait for animation, then navigate
+      setTimeout(() => {
+        navigate("/settings");
+      }, 1200);
+      
     } catch (error) {
       console.error('Failed to update profile:', error);
       toast.error(t("editProfile.saveFailed") || "Failed to update profile");
-    } finally {
       setIsSaving(false);
     }
   };
@@ -291,6 +299,93 @@ const EditProfile = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
+      {/* Success Animation Overlay */}
+      <AnimatePresence>
+        {showSuccessAnimation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ 
+                type: "spring",
+                stiffness: 300,
+                damping: 20,
+                delay: 0.1
+              }}
+              className="relative"
+            >
+              {/* Outer glow ring */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1.5, opacity: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="absolute inset-0 w-24 h-24 rounded-full bg-green-500/30"
+              />
+              
+              {/* Success circle */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 15,
+                  delay: 0.1
+                }}
+                className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center shadow-2xl"
+              >
+                {/* Checkmark with draw animation */}
+                <motion.svg
+                  viewBox="0 0 24 24"
+                  className="w-12 h-12 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <motion.path
+                    d="M5 13l4 4L19 7"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ 
+                      duration: 0.4, 
+                      delay: 0.3,
+                      ease: "easeOut"
+                    }}
+                  />
+                </motion.svg>
+              </motion.div>
+              
+              {/* Sparkle particles */}
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ scale: 0, opacity: 1 }}
+                  animate={{ 
+                    scale: [0, 1, 0],
+                    opacity: [1, 1, 0],
+                    x: Math.cos((i / 6) * Math.PI * 2) * 60,
+                    y: Math.sin((i / 6) * Math.PI * 2) * 60,
+                  }}
+                  transition={{ 
+                    duration: 0.6, 
+                    delay: 0.4 + i * 0.05,
+                    ease: "easeOut"
+                  }}
+                  className="absolute top-1/2 left-1/2 w-2 h-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-400"
+                />
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Fixed Header - glassmorphism style */}
       <div className="fixed top-0 left-0 right-0 z-20 bg-white/50 dark:bg-card/70 backdrop-blur-2xl border-b border-border/50">
         <div className="flex items-center justify-between h-14 px-4">
