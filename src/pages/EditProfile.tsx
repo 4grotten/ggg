@@ -622,7 +622,7 @@ const EditProfile = () => {
       </div>
 
       {/* Fixed Bottom Button - transparent glassmorphism */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-safe max-w-[800px] mx-auto">
         <Button
           onClick={form.handleSubmit(onSubmit)}
           disabled={isSaving}
