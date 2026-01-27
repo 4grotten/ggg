@@ -701,7 +701,10 @@
       "setError": "Не удалось установить пароль",
       "sendToEmail": "Отправить код на email",
       "emailSent": "Код отправлен на email!",
-      "emailError": "Не удалось отправить email"
+      "emailError": "Не удалось отправить email",
+      "codeSentViaSms": "Код отправлен по SMS на",
+      "codeSentViaWhatsApp": "Код отправлен через WhatsApp на",
+      "codeSentViaEmail": "Код отправлен на email"
     },
     "phone": {
       "title": "Введите номер телефона",
