@@ -849,14 +849,7 @@
       "purchaseTariff": "购买套餐",
       "payWithCard": "银行卡支付",
       "payWithCrypto": "加密货币支付",
-      "fromBalance": "从卡余额",
-      "payForTariff": "支付套餐",
-      "tariffPurchase": "购买套餐",
-      "tariffCost": "套餐费用",
-      "exchangeRate": "汇率",
-      "paymentType": "付款类型",
-      "purchaseSuccess": "套餐购买成功！",
-      "selectTariff": "选择套餐"
+      "fromBalance": "从卡余额"
     }
   }
 }

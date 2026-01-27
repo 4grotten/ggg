@@ -21,19 +21,15 @@ import { useAuth } from "@/contexts/AuthContext";
 interface PurchaseTariffDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  tariffId: string;
   tariffName: string;
   tariffPrice: number;
-  tariffDescription?: string;
 }
 
 export const PurchaseTariffDrawer = ({ 
   open, 
   onOpenChange, 
-  tariffId,
   tariffName, 
-  tariffPrice,
-  tariffDescription
+  tariffPrice 
 }: PurchaseTariffDrawerProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -68,19 +64,18 @@ export const PurchaseTariffDrawer = ({
     
     // Navigate with pre-filled amount
     if (optionId === "card") {
-      navigate("/partner/pay-balance", { 
+      navigate("/open-card/pay-balance", { 
         state: { 
-          tariffId,
+          isTariffPurchase: true,
           tariffName,
           tariffPrice,
-          tariffDescription
+          amount: tariffPrice
         } 
       });
     } else if (optionId === "crypto") {
       navigate("/top-up/crypto", { 
         state: { 
           isTariffPurchase: true,
-          tariffId,
           tariffName,
           tariffPrice,
           prefilledAmount: tariffPrice

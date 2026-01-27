@@ -905,14 +905,7 @@
       "purchaseTariff": "Purchase Plan",
       "payWithCard": "Pay with Card",
       "payWithCrypto": "Pay with Crypto",
-      "fromBalance": "From card balance",
-      "payForTariff": "Pay for Plan",
-      "tariffPurchase": "Plan Purchase",
-      "tariffCost": "Plan cost",
-      "exchangeRate": "Exchange rate",
-      "paymentType": "Payment type",
-      "purchaseSuccess": "Plan purchased successfully!",
-      "selectTariff": "Select Plan"
+      "fromBalance": "From card balance"
     }
   }
 }

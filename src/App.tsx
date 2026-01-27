@@ -39,7 +39,6 @@ import OpenCardPayCrypto from "./pages/OpenCardPayCrypto";
 import OpenCardPayBank from "./pages/OpenCardPayBank";
 import OpenCardPayment from "./pages/OpenCardPayment";
 import OpenCardPayBalance from "./pages/OpenCardPayBalance";
-import TariffPayBalance from "./pages/TariffPayBalance";
 import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
 import PhoneEntry from "./pages/auth/PhoneEntry";
@@ -144,7 +143,6 @@ const AppContent = () => {
             <Route path="/open-card/pay-crypto" element={<OpenCardPayCrypto />} />
             <Route path="/open-card/pay-bank" element={<OpenCardPayBank />} />
             <Route path="/open-card/pay-balance" element={<OpenCardPayBalance />} />
-            <Route path="/partner/pay-balance" element={<TariffPayBalance />} />
             <Route path="/transaction/:id" element={<TransactionDetails />} />
             <Route path="/verify" element={<PrivacyProtection />} />
             <Route path="/verify/terms" element={<AcceptTerms />} />
