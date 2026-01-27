@@ -7,8 +7,9 @@ interface ChatMessageContentProps {
 
 // Regex patterns for detecting financial data
 const AMOUNT_PATTERN = /([+-]?\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*(AED|дирхам|USDT|USD)/gi;
-const TRANSACTION_LINE_PATTERN = /^[-•]\s*(\d{2}\.\d{2}\.\d{4}):\s*(.*?)\s*([+-]?\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*AED(.*)$/gm;
-const BALANCE_PATTERN = /(Общий баланс|Баланс|Total balance|Balance|Доходы|Income|Расходы|Expenses):\s*([+-]?\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*(AED|дирхам)?/gi;
+// Updated pattern to match: "- 12.01.2026 — Вывод – 1,890 AED (description)"
+const TRANSACTION_LINE_PATTERN = /^[-•]\s*(\d{2}\.\d{2}\.\d{4})\s*[—–:]\s*(.*?)\s*[—–]\s*(\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*AED\s*(.*)$/gm;
+const BALANCE_PATTERN = /(Общий баланс|Баланс|Total balance|Balance|Доходы|Income|Расходы|Expenses|Ваши расходы|расходы за|Your expenses).*?([+-]?\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*(AED|дирхам)?/gi;
 
 interface ParsedTransaction {
   date: string;
@@ -192,7 +193,8 @@ export const ChatMessageContent = ({ content }: ChatMessageContentProps) => {
     let currentTextBlock: string[] = [];
     
     lines.forEach((line, idx) => {
-      const isTxLine = /^[-•]\s*\d{2}\.\d{2}\.\d{4}:/.test(line);
+      // Match transaction line with either : or — or – after date
+      const isTxLine = /^[-•]\s*\d{2}\.\d{2}\.\d{4}\s*[—–:]/.test(line);
       
       if (isTxLine) {
         // Flush text block
