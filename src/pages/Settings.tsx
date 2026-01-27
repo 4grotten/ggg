@@ -201,7 +201,12 @@ const Settings = () => {
   const { i18n, t } = useTranslation();
   const { avatarUrl, setAvatarUrl } = useAvatar();
   const { user, isAuthenticated, logout, updateAvatar, refreshUser } = useAuth();
-  const { accounts } = useMultiAccount();
+  const { accounts, refreshAccounts } = useMultiAccount();
+  
+  // Refresh accounts list when component mounts
+  useEffect(() => {
+    refreshAccounts();
+  }, [refreshAccounts]);
   const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
   const { getCompletedSteps } = useVerificationProgress();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
@@ -817,7 +822,45 @@ const Settings = () => {
           />
         </div>
 
-        {/* Other Accounts section hidden for now */}
+        {/* Saved Accounts List */}
+        {accounts.length > 0 && (
+          <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+            <div className="px-4 py-3 border-b border-border/50">
+              <p className="text-sm text-muted-foreground font-medium">
+                {t("settings.savedAccounts") || "Saved Accounts"} ({accounts.length})
+              </p>
+            </div>
+            {accounts.map((account, index) => (
+              <div
+                key={account.id}
+                className={`flex items-center gap-3 px-4 py-3 ${
+                  index < accounts.length - 1 ? 'border-b border-border/30' : ''
+                } ${account.user.id === user?.id ? 'bg-primary/5' : ''}`}
+              >
+                <Avatar className="w-10 h-10">
+                  <AvatarImage 
+                    src={account.user.avatar?.medium || account.user.avatar?.file} 
+                    alt={account.user.full_name} 
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                    {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {account.user.full_name}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {account.user.phone_number}
+                  </p>
+                </div>
+                {account.user.id === user?.id && (
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Logout Button */}
         {isAuthenticated && (
