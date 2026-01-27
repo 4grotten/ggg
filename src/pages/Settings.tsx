@@ -838,7 +838,7 @@ const Settings = () => {
                   onClick={() => {
                     if (!isCurrentUser) {
                       switchUser(account.user, account.token);
-                      toast.success(t("settings.switchedTo") || `Switched to ${account.user.full_name}`);
+                      toast.success(t("settings.switchedTo", { name: account.user.full_name }));
                       navigate('/');
                     }
                   }}

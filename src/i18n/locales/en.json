@@ -367,7 +367,9 @@
     "otherAccountsMock": "Mockups (no saved accounts found)",
     "editProfile": "Edit Profile",
     "personalData": "Profile",
-    "verification": "Verification"
+    "verification": "Verification",
+    "savedAccounts": "Saved Accounts",
+    "switchedTo": "Switched to {{name}}"
   },
   "editProfile": {
     "title": "Edit Profile",
