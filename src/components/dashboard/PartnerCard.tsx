@@ -13,19 +13,17 @@ export const PartnerCard = ({ onClick }: PartnerCardProps) => {
     <div className="relative rounded-2xl p-[2px] overflow-hidden">
       {/* Animated rainbow border with glow */}
       <div 
-        className="absolute inset-0 rounded-2xl blur-[1px]"
+        className="absolute inset-0 rounded-2xl blur-[1px] animate-spin-slow"
         style={{
           background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
-          animation: "spin-slow 8s linear infinite",
         }}
       />
       
       {/* Glow effect layer */}
       <div 
-        className="absolute inset-[-2px] rounded-2xl opacity-40 blur-md"
+        className="absolute inset-[-2px] rounded-2xl opacity-40 blur-md animate-spin-slow"
         style={{
           background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
-          animation: "spin-slow 8s linear infinite",
         }}
       />
       
@@ -63,14 +61,6 @@ export const PartnerCard = ({ onClick }: PartnerCardProps) => {
           <ArrowRight className="w-5 h-5 text-white/80 group-hover:text-white transition-colors" />
         </div>
       </button>
-      
-      {/* CSS Animation */}
-      <style>{`
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };
