@@ -353,22 +353,15 @@ const CardPage = () => {
         <div className="px-4 py-6 space-y-5">
           {/* Card Carousel */}
           <div className="relative overflow-hidden">
-            <AnimatePresence initial={false} mode="popLayout">
-              <motion.div
-                key={activeIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.1}
-                onDragEnd={handleDragEnd}
-                className="cursor-grab active:cursor-grabbing"
-              >
-                {renderCardVisual()}
-              </motion.div>
-            </AnimatePresence>
+            <motion.div
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.1}
+              onDragEnd={handleDragEnd}
+              className="cursor-grab active:cursor-grabbing"
+            >
+              {renderCardVisual()}
+            </motion.div>
             
             {/* Pagination dots */}
             <div className="flex justify-center gap-2 mt-4">
