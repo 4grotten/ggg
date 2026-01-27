@@ -164,9 +164,9 @@ const TariffPayBalance = () => {
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground px-4">{t('partner.bonuses.selectTariff', 'Выберите тариф')}</p>
           
-          <div className="overflow-visible px-4">
-            <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
-              <div className="flex touch-pan-y">
+          <div className="w-full">
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex">
                 {ALL_TARIFFS.map((tariff, index) => {
                   const Icon = TARIFF_ICONS[tariff.id] || Crown;
                   const color = TARIFF_COLORS[tariff.id] || "text-primary";
@@ -177,15 +177,16 @@ const TariffPayBalance = () => {
                   return (
                     <div 
                       key={tariff.id}
-                      className="flex-[0_0_100%] min-w-0"
+                      className="flex-[0_0_85%] min-w-0 pl-4 first:pl-4"
                     >
                       <motion.div
                         animate={{ 
-                          scale: isSelected ? 1 : 0.95,
-                          opacity: isSelected ? 1 : 0.7
+                          scale: isSelected ? 1 : 0.92,
+                          opacity: isSelected ? 1 : 0.6
                         }}
                         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                        className={`mx-1 p-4 rounded-2xl border-2 transition-all ${
+                        onClick={() => scrollToTariff(index)}
+                        className={`p-4 rounded-2xl border-2 transition-all cursor-pointer ${
                           isSelected 
                             ? `${borderColor} ${bgColor}` 
                             : 'border-border/30 bg-muted/30'
@@ -213,6 +214,7 @@ const TariffPayBalance = () => {
                     </div>
                   );
                 })}
+                <div className="flex-[0_0_15%] min-w-0" />
               </div>
             </div>
           </div>
