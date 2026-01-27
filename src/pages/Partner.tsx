@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
@@ -10,10 +10,14 @@ import { ReferralBalance } from "@/components/partner/ReferralBalance";
 import { InviteButton } from "@/components/partner/InviteButton";
 import { LevelCarousel } from "@/components/partner/LevelCarousel";
 import { ReferralTransactions, MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
+import { PartnerCallButton } from "@/components/partner/PartnerCallButton";
+import { useVoiceCall } from "@/contexts/VoiceCallContext";
 
 const Partner = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isConnected, endCall } = useVoiceCall();
   
   const [selectedLevelIndex, setSelectedLevelIndex] = useState(0);
   const [totalWithdrawn] = useState(150); // Mock withdrawn amount
@@ -36,13 +40,28 @@ const Partner = () => {
   }, []);
   
   const handleBack = useCallback(() => {
+    // Disconnect call when leaving partner section
+    if (isConnected) {
+      endCall();
+    }
     navigate(-1);
-  }, [navigate]);
+  }, [navigate, isConnected, endCall]);
 
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Disconnect call when navigating away from partner section
+  useEffect(() => {
+    return () => {
+      // Only disconnect if navigating outside partner section
+      const isLeavingPartnerSection = !location.pathname.startsWith('/partner');
+      if (isConnected && isLeavingPartnerSection) {
+        endCall();
+      }
+    };
+  }, [location.pathname, isConnected, endCall]);
   
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-[800px] mx-auto overflow-x-hidden">
@@ -56,9 +75,10 @@ const Partner = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-base font-semibold">{t('partner.program', 'Партнёрская программа')}</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <ThemeSwitcher />
             <LanguageSwitcher />
+            <PartnerCallButton />
           </div>
         </div>
       </header>
