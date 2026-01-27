@@ -159,73 +159,74 @@ const TariffPayBalance = () => {
       }
       rightAction={<LanguageSwitcher />}
     >
-      <div className="py-6 space-y-4 pb-32">
-        {/* Tariff Carousel */}
+      <div className="py-4 space-y-4 pb-32">
+        {/* Tariff Carousel - Full Width */}
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground px-4">{t('partner.bonuses.selectTariff', 'Выберите тариф')}</p>
           
-          <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex">
-              {ALL_TARIFFS.map((tariff, index) => {
-                const Icon = TARIFF_ICONS[tariff.id] || Crown;
-                const color = TARIFF_COLORS[tariff.id] || "text-primary";
-                const borderColor = TARIFF_BORDER_COLORS[tariff.id] || "border-primary/50";
-                const bgColor = TARIFF_BG_COLORS[tariff.id] || "bg-primary/10";
-                const isSelected = index === selectedTariffIndex;
-                
-                return (
-                  <div 
-                    key={tariff.id}
-                    className="flex-none w-[75%] min-w-0 pl-4 first:pl-4 last:pr-4"
-                  >
-                    <motion.button
-                      onClick={() => scrollToTariff(index)}
-                      animate={{ 
-                        scale: isSelected ? 1 : 0.92,
-                        opacity: isSelected ? 1 : 0.6
-                      }}
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      className={`w-full p-4 rounded-2xl border-2 transition-all ${
-                        isSelected 
-                          ? `${borderColor} ${bgColor}` 
-                          : 'border-border/30 bg-muted/30'
-                      }`}
+          <div className="overflow-visible px-4">
+            <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
+              <div className="flex touch-pan-y">
+                {ALL_TARIFFS.map((tariff, index) => {
+                  const Icon = TARIFF_ICONS[tariff.id] || Crown;
+                  const color = TARIFF_COLORS[tariff.id] || "text-primary";
+                  const borderColor = TARIFF_BORDER_COLORS[tariff.id] || "border-primary/50";
+                  const bgColor = TARIFF_BG_COLORS[tariff.id] || "bg-primary/10";
+                  const isSelected = index === selectedTariffIndex;
+                  
+                  return (
+                    <div 
+                      key={tariff.id}
+                      className="flex-[0_0_100%] min-w-0"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 rounded-2xl ${bgColor} flex items-center justify-center ${color}`}>
-                          <Icon className="w-6 h-6" />
+                      <motion.div
+                        animate={{ 
+                          scale: isSelected ? 1 : 0.95,
+                          opacity: isSelected ? 1 : 0.7
+                        }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        className={`mx-1 p-4 rounded-2xl border-2 transition-all ${
+                          isSelected 
+                            ? `${borderColor} ${bgColor}` 
+                            : 'border-border/30 bg-muted/30'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`w-14 h-14 rounded-2xl ${bgColor} flex items-center justify-center ${color}`}>
+                            <Icon className="w-7 h-7" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-bold text-xl">{tariff.name}</p>
+                            <p className="text-2xl font-bold text-primary">${tariff.price}</p>
+                          </div>
+                          {isSelected && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-8 h-8 rounded-full bg-primary flex items-center justify-center"
+                            >
+                              <Check className="w-5 h-5 text-primary-foreground" />
+                            </motion.div>
+                          )}
                         </div>
-                        <div className="flex-1 text-left">
-                          <p className="font-bold text-lg">{tariff.name}</p>
-                          <p className="text-2xl font-bold text-primary">${tariff.price}</p>
-                        </div>
-                        {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-6 h-6 rounded-full bg-primary flex items-center justify-center"
-                          >
-                            <Check className="w-4 h-4 text-primary-foreground" />
-                          </motion.div>
-                        )}
-                      </div>
-                    </motion.button>
-                  </div>
-                );
-              })}
+                      </motion.div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
           {/* Carousel Dots */}
-          <div className="flex justify-center gap-1.5 pt-2">
-            {ALL_TARIFFS.map((_, index) => (
+          <div className="flex justify-center gap-2 pt-1">
+            {ALL_TARIFFS.map((tariff, index) => (
               <button
-                key={index}
+                key={tariff.id}
                 onClick={() => scrollToTariff(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
+                className={`h-2 rounded-full transition-all duration-300 ${
                   index === selectedTariffIndex 
-                    ? 'w-6 bg-primary' 
-                    : 'w-1.5 bg-muted-foreground/30'
+                    ? 'w-8 bg-primary' 
+                    : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
                 }`}
               />
             ))}
@@ -240,19 +241,7 @@ const TariffPayBalance = () => {
             animate={{ opacity: 1, y: 0 }}
             className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-3"
           >
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center ${tariffColor}`}>
-                <TariffIcon className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold">{tariffName}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('partner.bonuses.tariffPurchase', 'Приобретение тарифа')}
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-3 border-t border-border/50">
+            <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('partner.bonuses.tariffCost', 'Стоимость тарифа')}</span>
                 <span className="font-medium">${tariffPrice}</span>
