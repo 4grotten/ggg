@@ -5,7 +5,7 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
-import { Receipt, CreditCard, ArrowDownToLine, Send, ArrowLeftRight, Percent, Banknote, CircleDollarSign, Headphones, Users, MessageCircle } from "lucide-react";
+import { Receipt, CreditCard, ArrowDownToLine, Send, ArrowLeftRight, Percent, Banknote, CircleDollarSign, Headphones, Users, MessageCircle, Phone } from "lucide-react";
 import { useVoiceCall } from "@/contexts/VoiceCallContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -182,24 +182,34 @@ const SupportButtons = () => {
     <div className="flex flex-col gap-3 mb-6">
       <Button
         variant="outline"
-        className="w-full h-14 justify-start gap-3 rounded-2xl bg-muted/70 dark:bg-card/70 backdrop-blur-xl border-border/50 hover:bg-muted"
+        className="w-full h-14 justify-between gap-3 rounded-2xl bg-muted/70 dark:bg-card/70 backdrop-blur-xl border-border/50 hover:bg-muted px-3"
         onClick={handleCardSupport}
       >
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-          <Headphones className="w-5 h-5 text-primary" />
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <Headphones className="w-5 h-5 text-primary" />
+          </div>
+          <span className="text-foreground font-medium">{t("feesAndLimits.cardSupport", "Поддержка по картам")}</span>
         </div>
-        <span className="text-foreground font-medium">{t("feesAndLimits.cardSupport", "Поддержка по картам")}</span>
+        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+          <Phone className="w-4 h-4 text-primary-foreground" />
+        </div>
       </Button>
 
       <Button
         variant="outline"
-        className="w-full h-14 justify-start gap-3 rounded-2xl bg-muted/70 dark:bg-card/70 backdrop-blur-xl border-border/50 hover:bg-muted"
+        className="w-full h-14 justify-between gap-3 rounded-2xl bg-muted/70 dark:bg-card/70 backdrop-blur-xl border-border/50 hover:bg-muted px-3"
         onClick={handleReferralSupport}
       >
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-          <Users className="w-5 h-5 text-primary" />
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <Users className="w-5 h-5 text-primary" />
+          </div>
+          <span className="text-foreground font-medium">{t("feesAndLimits.referralSupport", "Поддержка по рефералам")}</span>
         </div>
-        <span className="text-foreground font-medium">{t("feesAndLimits.referralSupport", "Поддержка по рефералам")}</span>
+        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+          <Phone className="w-4 h-4 text-primary-foreground" />
+        </div>
       </Button>
 
       <Button
