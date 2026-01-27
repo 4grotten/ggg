@@ -617,7 +617,24 @@ const Settings = () => {
                       ))}
                     </div>
                   ) : (
-                    <span className="w-2 h-2 rounded-full bg-green-500 mr-1" />
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-2.5 h-2.5 rounded-full mr-1"
+                    >
+                      <motion.div
+                        animate={{ 
+                          opacity: [1, 0.4, 1],
+                          scale: [1, 1.05, 1]
+                        }}
+                        transition={{ 
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                        className="w-full h-full rounded-full bg-green-500"
+                      />
+                    </motion.div>
                   )}
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </div>
