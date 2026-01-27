@@ -5,6 +5,7 @@ interface CardWithGlareProps {
   children: ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  variant?: 'default' | 'metal';
 }
 
 interface TiltState {
@@ -14,7 +15,7 @@ interface TiltState {
   glareY: number;
 }
 
-export const CardWithGlare = ({ children, className = "", style }: CardWithGlareProps) => {
+export const CardWithGlare = ({ children, className = "", style, variant = 'default' }: CardWithGlareProps) => {
   const [tilt, setTilt] = useState<TiltState>({ rotateX: 0, rotateY: 0, glareX: 50, glareY: 50 });
   const [hasGyroscope, setHasGyroscope] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -96,6 +97,9 @@ export const CardWithGlare = ({ children, className = "", style }: CardWithGlare
   // Thin moving reflection band
   const bandPosition = 50 + tilt.rotateY * 2.5;
   
+  // Metal variant has more intense effects
+  const isMetal = variant === 'metal';
+  
   return (
     <motion.div 
       ref={cardRef}
@@ -113,21 +117,35 @@ export const CardWithGlare = ({ children, className = "", style }: CardWithGlare
     >
       {children}
       
-      {/* Subtle glare spot */}
+      {/* Glare spot - more intense for metal */}
       <div 
         className="absolute inset-0 pointer-events-none z-10"
         style={{
-          background: `radial-gradient(ellipse 60% 40% at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.1) 0%, transparent 50%)`,
+          background: isMetal
+            ? `radial-gradient(ellipse 100% 60% at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.1) 30%, transparent 60%)`
+            : `radial-gradient(ellipse 60% 40% at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.1) 0%, transparent 50%)`,
         }}
       />
       
-      {/* Thin reflection band */}
+      {/* Primary reflection band - more intense for metal */}
       <div 
         className="absolute inset-0 pointer-events-none z-10"
         style={{
-          background: `linear-gradient(${105 + tilt.rotateY * 2}deg, transparent ${bandPosition - 12}%, rgba(255,255,255,0.06) ${bandPosition - 4}%, rgba(255,255,255,0.15) ${bandPosition}%, rgba(255,255,255,0.06) ${bandPosition + 4}%, transparent ${bandPosition + 12}%)`,
+          background: isMetal
+            ? `linear-gradient(${105 + tilt.rotateY * 3}deg, transparent ${bandPosition - 18}%, rgba(255,255,255,0.15) ${bandPosition - 6}%, rgba(255,255,255,0.4) ${bandPosition}%, rgba(255,255,255,0.15) ${bandPosition + 6}%, transparent ${bandPosition + 18}%)`
+            : `linear-gradient(${105 + tilt.rotateY * 2}deg, transparent ${bandPosition - 12}%, rgba(255,255,255,0.06) ${bandPosition - 4}%, rgba(255,255,255,0.15) ${bandPosition}%, rgba(255,255,255,0.06) ${bandPosition + 4}%, transparent ${bandPosition + 12}%)`,
         }}
       />
+      
+      {/* Secondary shine for metal only */}
+      {isMetal && (
+        <div 
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background: `linear-gradient(${80 + tilt.rotateX * 2}deg, transparent ${30 + tilt.rotateX}%, rgba(255,255,255,0.08) ${45 + tilt.rotateX}%, rgba(255,255,255,0.15) ${50 + tilt.rotateX}%, rgba(255,255,255,0.08) ${55 + tilt.rotateX}%, transparent ${70 + tilt.rotateX}%)`,
+          }}
+        />
+      )}
     </motion.div>
   );
 };

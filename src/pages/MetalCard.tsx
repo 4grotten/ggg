@@ -131,6 +131,7 @@ const MetalCard = () => {
         >
         {/* Card Visual with Glare Effect */}
         <CardWithGlare 
+          variant="metal"
           className="w-full aspect-[1.586/1] rounded-2xl bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] p-6 flex flex-col justify-between"
         >
           {/* Metal texture overlay */}
