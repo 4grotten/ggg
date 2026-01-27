@@ -56,7 +56,7 @@ export const MobileLayout = ({
                 {header && !showBackButton && <div>{header}</div>}
               </div>
               {title && (
-                <h1 className="absolute left-1/2 -translate-x-1/2 text-base font-semibold text-foreground">
+                <h1 className="flex-1 text-center text-base font-semibold text-foreground truncate px-4">
                   {title}
                 </h1>
               )}
