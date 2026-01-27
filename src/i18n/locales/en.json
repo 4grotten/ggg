@@ -1,6 +1,31 @@
 {
   "auth": {
     "resetPassword": {
+      "title": "Forgot password?",
+      "description": "Enter your phone number to recover access",
+      "codeTitle": "Enter reset code",
+      "codeSentTo": "Code sent via WhatsApp to",
+      "codeSentViaSms": "Code sent via SMS to",
+      "codeSentViaWhatsApp": "Code sent via WhatsApp to",
+      "codeSentViaEmail": "Code sent to email",
+      "verify": "Verify",
+      "invalidCode": "Please enter a valid 6-digit code",
+      "wrongCode": "Wrong code. Please try again.",
+      "codeVerified": "Code verified!",
+      "error": "Verification failed",
+      "resendError": "Failed to send code",
+      "resendSuccess": "Code sent via WhatsApp!",
+      "newPasswordTitle": "New password",
+      "newPasswordDescription": "Create a secure password for your account",
+      "newPassword": "New password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat password",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Minimum 6 characters",
+      "setPassword": "Set password",
+      "success": "Password changed successfully!",
+      "setError": "Failed to set password",
       "sendToEmail": "Send code to email",
       "emailSent": "Code sent to email!",
       "emailError": "Failed to send email"
@@ -790,28 +815,6 @@
         "button": "Get Started",
         "ready": "Profile created successfully"
       }
-    },
-    "resetPassword": {
-      "codeTitle": "Enter reset code",
-      "codeSentTo": "Code sent via WhatsApp to",
-      "verify": "Verify",
-      "invalidCode": "Please enter a valid 6-digit code",
-      "wrongCode": "Wrong code. Please try again.",
-      "codeVerified": "Code verified!",
-      "error": "Verification failed",
-      "resendSuccess": "Code sent via WhatsApp!",
-      "resendError": "Failed to send code",
-      "title": "Set new password",
-      "subtitle": "Create a new password for your account",
-      "newPassword": "New password",
-      "passwordPlaceholder": "Enter new password",
-      "confirmPassword": "Confirm password",
-      "confirmPlaceholder": "Confirm new password",
-      "minChars": "Minimum 6 characters",
-      "passwordTooShort": "Password must be at least 6 characters",
-      "passwordsNotMatch": "Passwords do not match",
-      "submit": "Save password",
-      "success": "Password changed successfully!"
     }
   },
   "partner": {
