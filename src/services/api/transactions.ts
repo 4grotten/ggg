@@ -13,7 +13,7 @@ import { buildApiUrl, ENDPOINTS } from './config';
 // Mock data - will be replaced with actual API calls
 const mockTransactionGroups: TransactionGroup[] = [
   {
-    date: "January 17",
+    date: "17.01.2025",
     totalSpend: 0,
     transactions: [
       { id: "23", merchant: "Bank Transfer", time: "14:30", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", type: "bank_transfer_incoming" as TransactionType, status: "settled" },
@@ -21,7 +21,7 @@ const mockTransactionGroups: TransactionGroup[] = [
     ],
   },
   {
-    date: "January 12",
+    date: "12.01.2025",
     totalSpend: 3273.20,
     transactions: [
       { id: "21", merchant: "Bank Transfer", time: "19:45", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", type: "bank_transfer" as TransactionType, status: "settled" },
@@ -32,7 +32,7 @@ const mockTransactionGroups: TransactionGroup[] = [
     ],
   },
   {
-    date: "January 10",
+    date: "10.01.2025",
     totalSpend: 89.19,
     transactions: [
       { id: "1", merchant: "LIFE", time: "13:02", amountUSDT: 8.34, amountLocal: 29.87, localCurrency: "AED", color: "#3B82F6" },
@@ -41,14 +41,14 @@ const mockTransactionGroups: TransactionGroup[] = [
     ],
   },
   {
-    date: "January 02",
+    date: "02.01.2025",
     totalSpend: 62.82,
     transactions: [
       { id: "4", merchant: "OPERA", time: "20:20", amountUSDT: 62.82, amountLocal: 225.00, localCurrency: "AED", color: "#A855F7" },
     ],
   },
   {
-    date: "December 31",
+    date: "31.12.2024",
     totalSpend: 22.06,
     transactions: [
       { id: "5", merchant: "CELLAR", time: "20:48", amountUSDT: 22.06, amountLocal: 79.00, localCurrency: "AED", color: "#EAB308" },
@@ -56,7 +56,7 @@ const mockTransactionGroups: TransactionGroup[] = [
     ],
   },
   {
-    date: "December 30",
+    date: "30.12.2024",
     totalSpend: 678.58,
     transactions: [
       { id: "7", merchant: "BHPC", time: "20:16", amountUSDT: 125.64, amountLocal: 450.00, localCurrency: "AED", color: "#EAB308" },
@@ -69,14 +69,14 @@ const mockTransactionGroups: TransactionGroup[] = [
     ],
   },
   {
-    date: "December 29",
+    date: "29.12.2024",
     totalSpend: 67.01,
     transactions: [
       { id: "14", merchant: "LOGS", time: "23:27", amountUSDT: 67.01, amountLocal: 240.00, localCurrency: "AED", color: "#3B82F6" },
     ],
   },
   {
-    date: "December 21",
+    date: "21.12.2024",
     totalSpend: 204.55,
     transactions: [
       { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", type: "card_activation" },
