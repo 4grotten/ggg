@@ -606,7 +606,7 @@ const PartnerBonuses = () => {
             </div>
             
             {/* Referral levels row */}
-            <div className="p-3 relative z-10">
+            <div className="p-3 border-b border-border/30 relative z-10">
               <p className="text-xs text-muted-foreground text-center mb-2">
                 {t('partner.bonuses.referralLevelsLabel', 'Уровней реферальной программы')}
               </p>
@@ -619,6 +619,43 @@ const PartnerBonuses = () => {
                     <div 
                       key={idx} 
                       className={`text-center text-xs font-medium transition-all duration-200 ${
+                        isPartner 
+                          ? "text-emerald-500 dark:text-[#BFFF00]" 
+                          : isHovered 
+                            ? "text-primary" 
+                            : ""
+                      }`}
+                      style={{
+                        textShadow: isHovered 
+                          ? isPartner 
+                            ? "0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(16, 185, 129, 0.5)" 
+                            : "0 0 8px rgba(59, 130, 246, 0.6)"
+                          : "none"
+                      }}
+                      onMouseEnter={() => setHoveredColumnIndex(idx)}
+                      onMouseLeave={() => setHoveredColumnIndex(null)}
+                    >
+                      {value}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            
+            {/* Available levels row */}
+            <div className="p-3 relative z-10">
+              <p className="text-xs text-muted-foreground text-center mb-2">
+                {t('partner.bonuses.availableLevelsLabel', 'Доступные уровни')}
+              </p>
+              <div className="grid grid-cols-5 gap-1">
+                {["R1-R3", "R1-R3", "R1-R4", "R1-R4", t('partner.bonuses.allLevels', 'Все')].map((value, idx) => {
+                  const isHovered = hoveredColumnIndex === idx;
+                  const isPartner = idx === 4;
+                  
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`text-center text-[10px] font-medium transition-all duration-200 ${
                         isPartner 
                           ? "text-emerald-500 dark:text-[#BFFF00]" 
                           : isHovered 
