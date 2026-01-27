@@ -94,12 +94,15 @@ export const CardMiniature = ({ type, className = "" }: CardMiniatureProps) => {
     };
   }, [hasPermission]);
 
+  // Subtle glare - small spot that follows tilt
   const glareStyle = {
-    background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.1) 30%, transparent 60%)`,
+    background: `radial-gradient(ellipse 80% 50% at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.12) 0%, transparent 50%)`,
   };
 
+  // Thin reflection band that moves across card
+  const bandPosition = 50 + tilt.rotateY * 3;
   const reflectionStyle = {
-    background: `linear-gradient(${105 + tilt.rotateY * 2}deg, transparent 20%, rgba(255,255,255,0.15) ${35 + tilt.rotateY}%, rgba(255,255,255,0.25) ${40 + tilt.rotateY}%, rgba(255,255,255,0.15) ${45 + tilt.rotateY}%, transparent 60%)`,
+    background: `linear-gradient(${110 + tilt.rotateY * 3}deg, transparent ${bandPosition - 15}%, rgba(255,255,255,0.08) ${bandPosition - 5}%, rgba(255,255,255,0.18) ${bandPosition}%, rgba(255,255,255,0.08) ${bandPosition + 5}%, transparent ${bandPosition + 15}%)`,
   };
 
   if (type === "virtual") {
