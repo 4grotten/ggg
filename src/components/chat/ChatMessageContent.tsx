@@ -1,5 +1,6 @@
-import { ArrowDownLeft, ArrowUpRight, CreditCard, Wallet } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Wallet, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 interface ChatMessageContentProps {
   content: string;
@@ -24,81 +25,84 @@ interface ParsedBalance {
   isExpense: boolean;
 }
 
-const parseTransactionType = (typeStr: string): 'incoming' | 'outgoing' | 'card' => {
-  const lower = typeStr.toLowerCase();
-  if (lower.includes('пополнение') || lower.includes('входящий') || lower.includes('кэшбэк') || lower.includes('возврат')) {
-    return 'incoming';
-  }
-  if (lower.includes('оплата') || lower.includes('перевод') || lower.includes('комиссия') || lower.includes('вывод') || lower.includes('исходящий')) {
-    return 'outgoing';
-  }
-  return 'card';
-};
-
-const TransactionItem = ({ date, type, amount, description }: ParsedTransaction) => {
+const TransactionCard = ({ date, type, amount, description }: ParsedTransaction) => {
   const isPositive = amount > 0;
-  
-  const getIcon = () => {
-    if (isPositive) return <ArrowDownLeft className="w-4 h-4 text-white" />;
-    return <ArrowUpRight className="w-4 h-4 text-white" />;
-  };
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-2xl bg-background border border-border/50 shadow-sm my-1.5">
+    <Card className="p-0 overflow-hidden my-2 border-border/60 shadow-md">
       <div className={cn(
-        "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",
+        "h-1.5 w-full",
         isPositive ? "bg-success" : "bg-destructive"
-      )}>
-        {getIcon()}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-medium truncate">{type}</p>
-          <p className={cn(
-            "text-sm font-bold flex-shrink-0",
-            isPositive ? "text-success" : "text-destructive"
+      )} />
+      <div className="p-3.5">
+        <div className="flex items-start gap-3">
+          <div className={cn(
+            "w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm",
+            isPositive 
+              ? "bg-gradient-to-br from-success to-success/80" 
+              : "bg-gradient-to-br from-destructive to-destructive/80"
           )}>
-            {isPositive ? '+' : ''}{amount.toFixed(2)} AED
-          </p>
-        </div>
-        <div className="flex items-center justify-between gap-2 mt-0.5">
-          {description ? (
-            <p className="text-xs text-muted-foreground truncate">{description.trim()}</p>
-          ) : (
-            <span />
-          )}
-          <p className="text-xs text-muted-foreground flex-shrink-0">{date}</p>
+            {isPositive 
+              ? <ArrowDownLeft className="w-5 h-5 text-white" />
+              : <ArrowUpRight className="w-5 h-5 text-white" />
+            }
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground leading-tight">{type}</p>
+            {description && (
+              <p className="text-xs text-muted-foreground mt-0.5 truncate">{description.trim()}</p>
+            )}
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <Clock className="w-3 h-3 text-muted-foreground/70" />
+              <span className="text-[11px] text-muted-foreground">{date}</span>
+            </div>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <p className={cn(
+              "text-base font-bold",
+              isPositive ? "text-success" : "text-destructive"
+            )}>
+              {isPositive ? '+' : ''}{amount.toFixed(2)}
+            </p>
+            <p className="text-[10px] text-muted-foreground font-medium">AED</p>
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
 const BalanceCard = ({ label, amount, isIncome, isExpense }: ParsedBalance) => {
   const getIcon = () => {
-    if (isIncome) return <ArrowDownLeft className="w-4 h-4 text-success" />;
-    if (isExpense) return <ArrowUpRight className="w-4 h-4 text-destructive" />;
-    return <Wallet className="w-4 h-4 text-primary" />;
+    if (isIncome) return <ArrowDownLeft className="w-5 h-5 text-white" />;
+    if (isExpense) return <ArrowUpRight className="w-5 h-5 text-white" />;
+    return <Wallet className="w-5 h-5 text-white" />;
   };
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl bg-background/50 my-1">
-      <div className={cn(
-        "w-9 h-9 rounded-full flex items-center justify-center",
-        isIncome ? "bg-success/20" : isExpense ? "bg-destructive/20" : "bg-primary/20"
-      )}>
-        {getIcon()}
-      </div>
-      <div>
-        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
-        <p className={cn(
-          "text-sm font-bold",
-          isIncome ? "text-success" : isExpense ? "text-destructive" : "text-foreground"
+    <Card className="p-4 my-2 border-border/60 shadow-md">
+      <div className="flex items-center gap-3">
+        <div className={cn(
+          "w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm",
+          isIncome 
+            ? "bg-gradient-to-br from-success to-success/80" 
+            : isExpense 
+              ? "bg-gradient-to-br from-destructive to-destructive/80" 
+              : "bg-gradient-to-br from-primary to-primary/80"
         )}>
-          {amount} AED
-        </p>
+          {getIcon()}
+        </div>
+        <div className="flex-1">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
+          <p className={cn(
+            "text-lg font-bold mt-0.5",
+            isIncome ? "text-success" : isExpense ? "text-destructive" : "text-foreground"
+          )}>
+            {amount} <span className="text-sm font-medium text-muted-foreground">AED</span>
+          </p>
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -199,7 +203,7 @@ export const ChatMessageContent = ({ content }: ChatMessageContentProps) => {
         const tx = transactionMatches.find(t => line.includes(t.date) && line.includes(t.type));
         if (tx) {
           elements.push(
-            <TransactionItem key={`tx-${idx}`} {...tx} />
+            <TransactionCard key={`tx-${idx}`} {...tx} />
           );
         }
       } else if (line.trim()) {
