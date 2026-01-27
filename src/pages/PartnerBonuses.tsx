@@ -605,20 +605,20 @@ const PartnerBonuses = () => {
               </div>
             </div>
             
-            {/* Referral levels row */}
+            {/* Available levels row */}
             <div className="p-3 border-b border-border/30 relative z-10">
               <p className="text-xs text-muted-foreground text-center mb-2">
-                {t('partner.bonuses.referralLevelsLabel', 'Уровней реферальной программы')}
+                {t('partner.bonuses.availableLevelsLabel', 'Доступные уровни')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                {["1", "5", "9", "9", "∞"].map((value, idx) => {
+                {["R1-R3", "R1-R3", "R1-R4", "R1-R4", t('partner.bonuses.allLevels', 'Все')].map((value, idx) => {
                   const isHovered = hoveredColumnIndex === idx;
                   const isPartner = idx === 4;
                   
                   return (
                     <div 
                       key={idx} 
-                      className={`text-center text-xs font-medium transition-all duration-200 ${
+                      className={`text-center text-[10px] font-medium transition-all duration-200 ${
                         isPartner 
                           ? "text-emerald-500 dark:text-[#BFFF00]" 
                           : isHovered 
@@ -642,20 +642,20 @@ const PartnerBonuses = () => {
               </div>
             </div>
             
-            {/* Available levels row */}
+            {/* Referral levels row */}
             <div className="p-3 relative z-10">
               <p className="text-xs text-muted-foreground text-center mb-2">
-                {t('partner.bonuses.availableLevelsLabel', 'Доступные уровни')}
+                {t('partner.bonuses.referralLevelsLabel', 'Уровней реферальной программы')}
               </p>
               <div className="grid grid-cols-5 gap-1">
-                {["R1-R3", "R1-R3", "R1-R4", "R1-R4", t('partner.bonuses.allLevels', 'Все')].map((value, idx) => {
+                {["1", "5", "9", "9", "∞"].map((value, idx) => {
                   const isHovered = hoveredColumnIndex === idx;
                   const isPartner = idx === 4;
                   
                   return (
                     <div 
                       key={idx} 
-                      className={`text-center text-[10px] font-medium transition-all duration-200 ${
+                      className={`text-center text-xs font-medium transition-all duration-200 ${
                         isPartner 
                           ? "text-emerald-500 dark:text-[#BFFF00]" 
                           : isHovered 
