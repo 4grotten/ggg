@@ -19,7 +19,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
-import { changePassword } from "@/services/api/authApi";
+import { changePassword, getUserEmail, forgotPasswordEmail } from "@/services/api/authApi";
 
 const profileSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -59,6 +59,12 @@ const EditProfile = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  
+  // Forgot password email state
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [isSendingResetEmail, setIsSendingResetEmail] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -227,6 +233,48 @@ const EditProfile = () => {
     setShowCurrentPassword(false);
     setShowNewPassword(false);
     setShowConfirmPassword(false);
+    setUserEmail(null);
+    setResetEmailSent(false);
+  };
+
+  // Check if user has email when drawer opens
+  const handlePasswordDrawerOpen = async (open: boolean) => {
+    setIsPasswordDrawerOpen(open);
+    if (open) {
+      // Check for linked email
+      setIsCheckingEmail(true);
+      try {
+        const response = await getUserEmail();
+        if (response.data?.email) {
+          setUserEmail(response.data.email);
+        }
+      } catch (error) {
+        console.error('Failed to check email:', error);
+      } finally {
+        setIsCheckingEmail(false);
+      }
+    } else {
+      resetPasswordForm();
+    }
+  };
+
+  const handleForgotPasswordEmail = async () => {
+    if (!userEmail) return;
+    
+    setIsSendingResetEmail(true);
+    try {
+      const response = await forgotPasswordEmail();
+      if (response.error) {
+        toast.error(t("editProfile.changePassword.emailSendError"));
+      } else {
+        setResetEmailSent(true);
+        toast.success(t("editProfile.changePassword.emailSent"));
+      }
+    } catch (error) {
+      toast.error(t("editProfile.changePassword.emailSendError"));
+    } finally {
+      setIsSendingResetEmail(false);
+    }
   };
 
   return (
@@ -596,15 +644,51 @@ const EditProfile = () => {
       </Drawer>
 
       {/* Change Password Drawer */}
-      <Drawer open={isPasswordDrawerOpen} onOpenChange={(open) => {
-        setIsPasswordDrawerOpen(open);
-        if (!open) resetPasswordForm();
-      }}>
+      <Drawer open={isPasswordDrawerOpen} onOpenChange={handlePasswordDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{t("editProfile.changePassword.title")}</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-8 space-y-4">
+            {/* Forgot Password Link - only show if email is linked */}
+            {!isCheckingEmail && userEmail && !resetEmailSent && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-muted/50 rounded-xl p-4"
+              >
+                <p className="text-sm text-muted-foreground mb-2">
+                  {t("editProfile.changePassword.forgotPassword")}
+                </p>
+                <button
+                  onClick={handleForgotPasswordEmail}
+                  disabled={isSendingResetEmail}
+                  className="text-sm text-primary hover:underline flex items-center gap-2"
+                >
+                  {isSendingResetEmail ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : null}
+                  {t("editProfile.changePassword.sendToEmail", { email: userEmail.replace(/(.{2})(.*)(@.*)/, '$1***$3') })}
+                </button>
+              </motion.div>
+            )}
+            
+            {/* Email sent success message */}
+            {resetEmailSent && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 flex items-center gap-3"
+              >
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Check className="w-5 h-5 text-white" />
+                </div>
+                <p className="text-sm text-green-600 dark:text-green-400">
+                  {t("editProfile.changePassword.emailSentSuccess", { email: userEmail })}
+                </p>
+              </motion.div>
+            )}
+
             {/* Current Password */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
