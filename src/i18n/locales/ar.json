@@ -848,7 +848,8 @@
       "tariffCost": "تكلفة الخطة",
       "exchangeRate": "سعر الصرف",
       "paymentType": "نوع الدفع",
-      "purchaseSuccess": "تم شراء الخطة بنجاح!"
+      "purchaseSuccess": "تم شراء الخطة بنجاح!",
+      "selectTariff": "اختر الخطة"
     }
   }
 }

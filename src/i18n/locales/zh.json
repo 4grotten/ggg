@@ -855,7 +855,8 @@
       "tariffCost": "套餐费用",
       "exchangeRate": "汇率",
       "paymentType": "付款类型",
-      "purchaseSuccess": "套餐购买成功！"
+      "purchaseSuccess": "套餐购买成功！",
+      "selectTariff": "选择套餐"
     }
   }
 }

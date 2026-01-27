@@ -848,7 +848,8 @@
       "tariffCost": "Plan maliyeti",
       "exchangeRate": "Döviz kuru",
       "paymentType": "Ödeme tipi",
-      "purchaseSuccess": "Plan başarıyla satın alındı!"
+      "purchaseSuccess": "Plan başarıyla satın alındı!",
+      "selectTariff": "Plan seçin"
     }
   }
 }
