@@ -9,6 +9,7 @@ import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { CardWithGlare } from "@/components/card/CardWithGlare";
 import {
   Collapsible,
   CollapsibleContent,
@@ -128,13 +129,9 @@ const MetalCard = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-        {/* Card Visual */}
-        <motion.div 
-          className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] p-6 flex flex-col justify-between shadow-none"
-          style={{ boxShadow: "none", filter: "none" }}
-          initial={{ opacity: 0, y: 30, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        {/* Card Visual with Glare Effect */}
+        <CardWithGlare 
+          className="w-full aspect-[1.586/1] rounded-2xl bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] p-6 flex flex-col justify-between"
         >
           {/* Metal texture overlay */}
           <div 
@@ -167,7 +164,7 @@ const MetalCard = () => {
             <span className="text-2xl font-bold text-white/80 italic tracking-tight">VISA</span>
             <p className="text-xs text-white/60 font-medium">Metal</p>
           </div>
-        </motion.div>
+        </CardWithGlare>
 
         {/* Apple Pay Banner */}
         <motion.div 
