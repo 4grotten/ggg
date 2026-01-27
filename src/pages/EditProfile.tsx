@@ -415,7 +415,16 @@ const EditProfile = () => {
                 name="full_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("editProfile.fullName")}</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      {t("editProfile.fullName")}
+                      {!field.value && (
+                        <motion.span
+                          className="w-2 h-2 rounded-full bg-destructive"
+                          animate={{ opacity: [1, 0.3, 1] }}
+                          transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                      )}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -459,7 +468,16 @@ const EditProfile = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("editProfile.email")}</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      {t("editProfile.email")}
+                      {!field.value && (
+                        <motion.span
+                          className="w-2 h-2 rounded-full bg-destructive"
+                          animate={{ opacity: [1, 0.3, 1] }}
+                          transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                        />
+                      )}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -488,7 +506,16 @@ const EditProfile = () => {
                   
                   return (
                     <FormItem>
-                      <FormLabel>{t("editProfile.dateOfBirth")}</FormLabel>
+                      <FormLabel className="flex items-center gap-2">
+                        {t("editProfile.dateOfBirth")}
+                        {!field.value && (
+                          <motion.span
+                            className="w-2 h-2 rounded-full bg-destructive"
+                            animate={{ opacity: [1, 0.3, 1] }}
+                            transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+                          />
+                        )}
+                      </FormLabel>
                       <FormControl>
                         <button
                           type="button"
@@ -519,7 +546,16 @@ const EditProfile = () => {
                 name="gender"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("editProfile.gender")}</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      {t("editProfile.gender")}
+                      {!field.value && (
+                        <motion.span
+                          className="w-2 h-2 rounded-full bg-destructive"
+                          animate={{ opacity: [1, 0.3, 1] }}
+                          transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                        />
+                      )}
+                    </FormLabel>
                     <FormControl>
                       <button
                         type="button"
