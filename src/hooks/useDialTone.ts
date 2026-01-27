@@ -12,8 +12,15 @@ export const useDialTone = () => {
 
   // Returns true if it finished all rings; false if stopped early.
   const playRingTone = useCallback(async (ringCount?: number): Promise<boolean> => {
-    // Random ring count: 2, 3, or 5
-    const rings = ringCount ?? [2, 3, 5][Math.floor(Math.random() * 3)];
+    // Weighted random: 1 (30%), 2 (35%), 3 (25%), 5 (10% - rare)
+    const getRandomRings = () => {
+      const rand = Math.random();
+      if (rand < 0.30) return 1;      // 30%
+      if (rand < 0.65) return 2;      // 35%
+      if (rand < 0.90) return 3;      // 25%
+      return 5;                        // 10% - rare
+    };
+    const rings = ringCount ?? getRandomRings();
     
     // Create audio context
     if (!audioContextRef.current) {
