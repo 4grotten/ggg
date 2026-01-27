@@ -32,15 +32,34 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     let userId: string | null = null;
     
-    // First priority: explicit user_id from client (trusted internal call)
-    // This allows the client to pass the actual user ID when using external auth (test.apofiz.com)
-    if (body.user_id) {
+    // External user ID mapping (test.apofiz.com user.id → Supabase user_id)
+    // TODO: In production, this should be a database lookup table
+    const externalUserMapping: Record<number, string> = {
+      // Ренат Камиев's external ID → Supabase UUID
+      // Add your external user ID here after checking it
+      1: '00000000-0000-0000-0000-000000000001',
+      // Add more mappings as needed
+    };
+    
+    // First priority: external_user_id from client (maps test.apofiz.com users)
+    if (body.external_user_id) {
+      const externalId = parseInt(body.external_user_id);
+      userId = externalUserMapping[externalId] || null;
+      console.log(`Mapping external_user_id ${externalId} → ${userId || 'NOT FOUND'}`);
+      
+      // If no mapping found, use demo user for now
+      if (!userId) {
+        userId = '00000000-0000-0000-0000-000000000001';
+        console.log(`No mapping for external_user_id ${externalId}, using demo user`);
+      }
+    }
+    // Second priority: explicit user_id in body
+    else if (body.user_id) {
       userId = body.user_id;
       console.log(`Using explicit user_id from request: ${userId}`);
     }
-    // Second priority: Supabase JWT token
+    // Third priority: Supabase JWT token
     else if (authHeader?.startsWith('Bearer ')) {
-      // Try to verify as Supabase JWT
       const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
       const userClient = createClient(supabaseUrl, anonKey, {
         global: { headers: { Authorization: authHeader } }
@@ -52,15 +71,13 @@ serve(async (req) => {
       if (!claimsError && claimsData?.user) {
         userId = claimsData.user.id;
         console.log(`Authenticated via Supabase JWT: ${userId}`);
-      } else {
-        console.log('JWT verification failed, checking for external auth token');
       }
     }
     
-    // Fallback to demo user for unauthenticated requests (ElevenLabs agent testing)
+    // Fallback to demo user
     if (!userId) {
       userId = '00000000-0000-0000-0000-000000000001';
-      console.log('Using demo user ID');
+      console.log('Using demo user ID (fallback)');
     }
     
     // Use service role for actual query

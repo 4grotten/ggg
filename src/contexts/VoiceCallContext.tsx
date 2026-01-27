@@ -157,11 +157,11 @@ const clientTools = {
     }
     
     try {
-      console.log("Agent calling get_transactions:", params);
+      console.log("Agent calling get_transactions:", params, "user.id:", user.id);
       
-      // Use demo user for now - maps external user to demo transactions
-      // In production, this should map user.id to the Supabase user_id
-      const demoUserId = "00000000-0000-0000-0000-000000000001";
+      // Map external user ID to Supabase user_id
+      // The edge function will handle this mapping
+      const externalUserId = user.id;
       
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -174,7 +174,7 @@ const clientTools = {
         method: "POST",
         headers,
         cache: "no-store",
-        body: JSON.stringify({ ...params, user_id: demoUserId }),
+        body: JSON.stringify({ ...params, external_user_id: externalUserId }),
       });
       
       if (!response.ok) {
@@ -213,10 +213,10 @@ const clientTools = {
     }
     
     try {
-      console.log("Agent calling get_balance_summary");
+      console.log("Agent calling get_balance_summary, user.id:", user.id);
       
-      // Use demo user for now - maps external user to demo transactions
-      const demoUserId = "00000000-0000-0000-0000-000000000001";
+      // Map external user ID to Supabase user_id
+      const externalUserId = user.id;
       
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -229,7 +229,7 @@ const clientTools = {
         method: "POST",
         headers,
         cache: "no-store",
-        body: JSON.stringify({ summary: true, days: 30, user_id: demoUserId }),
+        body: JSON.stringify({ summary: true, days: 30, external_user_id: externalUserId }),
       });
       
       const data = await response.json();
@@ -258,10 +258,10 @@ const clientTools = {
     }
     
     try {
-      console.log("Agent calling get_spending_by_category:", params);
+      console.log("Agent calling get_spending_by_category:", params, "user.id:", user.id);
       
-      // Use demo user for now - maps external user to demo transactions
-      const demoUserId = "00000000-0000-0000-0000-000000000001";
+      // Map external user ID to Supabase user_id
+      const externalUserId = user.id;
       
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -274,7 +274,7 @@ const clientTools = {
         method: "POST",
         headers,
         cache: "no-store",
-        body: JSON.stringify({ summary: true, days: params.days || 30, user_id: demoUserId }),
+        body: JSON.stringify({ summary: true, days: params.days || 30, external_user_id: externalUserId }),
       });
       
       const data = await response.json();
