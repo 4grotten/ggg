@@ -60,6 +60,8 @@ interface AuthContextType {
     date_of_birth?: string;
     username?: string;
   }) => Promise<void>;
+  /** Switch to a different user instantly (from saved accounts) */
+  switchUser: (userData: UserProfile, token: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -260,6 +262,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await refreshUser();
   }, [refreshUser]);
 
+  /** Switch to a different user instantly (for multi-account) */
+  const switchUser = useCallback((userData: UserProfile, token: string) => {
+    // 1. Set token
+    setAuthToken(token);
+    // 2. Set user in localStorage
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userData));
+    // 3. Update React state immediately
+    setUser(userData);
+    // 4. Sync with Apofiz
+    syncWithApofiz(token, userData);
+    console.log('[AuthContext] Switched to user:', userData.id, userData.full_name);
+  }, []);
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user && checkIsAuthenticated(),
@@ -269,6 +284,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refreshUser,
     updateAvatar,
     updateUserProfile,
+    switchUser,
   };
 
   return (

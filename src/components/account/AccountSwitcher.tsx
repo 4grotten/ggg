@@ -22,21 +22,20 @@ interface AccountSwitcherProps {
 export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user, logout } = useAuth();
-  const { accounts, switchAccount, removeAccountById, refreshAccounts } = useMultiAccount();
+  const { user, switchUser } = useAuth();
+  const { accounts, removeAccountById, refreshAccounts } = useMultiAccount();
 
   // Ensure we always show the latest saved_accounts when the drawer opens
   useEffect(() => {
     if (open) refreshAccounts();
   }, [open, refreshAccounts]);
 
-  const handleSwitchAccount = async (account: SavedAccount) => {
-    const success = switchAccount(account);
-    if (success) {
-      onOpenChange(false);
-      // Reload page to apply new account
-      window.location.reload();
-    }
+  const handleSwitchAccount = (account: SavedAccount) => {
+    // Switch user instantly without page reload
+    switchUser(account.user, account.token);
+    onOpenChange(false);
+    // Navigate to dashboard after switch
+    navigate('/');
   };
 
   const handleAddAccount = () => {
