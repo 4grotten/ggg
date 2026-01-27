@@ -240,7 +240,7 @@ const TariffPayCrypto = () => {
                     <div className="space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">{t('partner.bonuses.tariffCost', 'Стоимость тарифа')}</span>
-                        <span className="font-medium">${tariff.price}</span>
+                        <span className="font-medium">${tariff.price.toLocaleString('en-US')} USD</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">{t('fees.networkFee', 'Комиссия сети')} (0.5%)</span>
