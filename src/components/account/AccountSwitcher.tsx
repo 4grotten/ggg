@@ -3,13 +3,23 @@
  * Shows list of accounts like Telegram/Instagram style
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, LogOut, X } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import { useMultiAccount, SavedAccount, saveCurrentAccount } from '@/hooks/useMultiAccount';
 import { useAuth } from '@/contexts/AuthContext';
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from '@/components/ui/animated-drawer-item';
@@ -24,6 +34,8 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
   const { t } = useTranslation();
   const { user, switchUser } = useAuth();
   const { accounts, removeAccountById, refreshAccounts } = useMultiAccount();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [accountToRemove, setAccountToRemove] = useState<SavedAccount | null>(null);
 
   // Ensure we always show the latest saved_accounts when the drawer opens
   useEffect(() => {
@@ -52,9 +64,23 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
     navigate('/auth/phone');
   };
 
-  const handleRemoveAccount = (e: React.MouseEvent, userId: number) => {
+  const handleRemoveClick = (e: React.MouseEvent, account: SavedAccount) => {
     e.stopPropagation();
-    removeAccountById(userId);
+    setAccountToRemove(account);
+    setLogoutConfirmOpen(true);
+  };
+
+  const handleConfirmRemove = () => {
+    if (accountToRemove) {
+      removeAccountById(accountToRemove.user.id);
+      setAccountToRemove(null);
+    }
+    setLogoutConfirmOpen(false);
+  };
+
+  const handleCancelRemove = () => {
+    setAccountToRemove(null);
+    setLogoutConfirmOpen(false);
   };
 
   const getInitials = (name: string | null | undefined) => {
@@ -147,10 +173,10 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
                       <p className="text-sm text-muted-foreground">{account.user.phone_number}</p>
                     </div>
                     <button
-                      onClick={(e) => handleRemoveAccount(e, account.user.id)}
-                      className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center hover:bg-red-500/20 transition-colors"
+                      onClick={(e) => handleRemoveClick(e, account)}
+                      className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center hover:bg-destructive/20 transition-colors"
                     >
-                      <LogOut className="w-4 h-4 text-red-500" />
+                      <LogOut className="w-4 h-4 text-destructive" />
                     </button>
                   </button>
                 </AnimatedDrawerItem>
@@ -158,6 +184,36 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
             </AnimatedDrawerContainer>
           )}
         </div>
+
+        {/* iOS-style Logout Confirmation Alert */}
+        <AlertDialog open={logoutConfirmOpen} onOpenChange={setLogoutConfirmOpen}>
+          <AlertDialogContent className="max-w-[280px] rounded-2xl p-0 gap-0 bg-background/95 backdrop-blur-xl border-border/50">
+            <AlertDialogHeader className="p-5 pb-3 text-center">
+              <AlertDialogTitle className="text-[17px] font-semibold text-center">
+                {t('settings.logoutFromAccount') || 'Выйти из аккаунта?'}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-[13px] text-muted-foreground text-center mt-1">
+                {accountToRemove?.user.full_name}
+                <br />
+                <span className="text-xs">{accountToRemove?.user.phone_number}</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col p-0 gap-0 border-t border-border/50">
+              <AlertDialogAction 
+                onClick={handleConfirmRemove}
+                className="w-full h-11 rounded-none bg-transparent hover:bg-muted/50 text-destructive font-medium text-[17px] border-0"
+              >
+                {t('settings.logout') || 'Выйти'}
+              </AlertDialogAction>
+              <AlertDialogCancel 
+                onClick={handleCancelRemove}
+                className="w-full h-11 rounded-none rounded-b-2xl bg-transparent hover:bg-muted/50 text-primary font-semibold text-[17px] border-t border-border/50 m-0"
+              >
+                {t('common.cancel') || 'Отмена'}
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DrawerContent>
     </Drawer>
   );
