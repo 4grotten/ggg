@@ -331,12 +331,12 @@ const TariffPayCrypto = () => {
               level="M"
               className="mb-3"
             />
-            <p className="text-xs text-muted-foreground mb-2">{t('openCard.sendExactAmount', 'Отправьте точную сумму')}</p>
+            <p className="text-xs text-gray-500 mb-2">{t('openCard.sendExactAmount', 'Отправьте точную сумму')}</p>
             <motion.p 
               key={`amount-${tariffId}`}
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-xl font-bold text-foreground"
+              className="text-xl font-bold text-gray-900"
             >
               {formatBalance(calculateTotal(tariffPrice).total)} USDT
             </motion.p>
@@ -345,7 +345,7 @@ const TariffPayCrypto = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-xs text-muted-foreground mt-2"
+              className="text-xs text-gray-500 mt-2"
             >
               {t('openCard.network', 'Сеть')}: {selectedNetwork.name}
             </motion.p>
