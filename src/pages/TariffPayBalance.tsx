@@ -160,112 +160,93 @@ const TariffPayBalance = () => {
       rightAction={<LanguageSwitcher />}
     >
       <div className="py-6 space-y-4 pb-32">
-        {/* Tariff Carousel */}
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground px-4">{t('partner.bonuses.selectTariff', 'Выберите тариф')}</p>
-          
-          <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex">
-              {ALL_TARIFFS.map((tariff, index) => {
-                const Icon = TARIFF_ICONS[tariff.id] || Crown;
-                const color = TARIFF_COLORS[tariff.id] || "text-primary";
-                const borderColor = TARIFF_BORDER_COLORS[tariff.id] || "border-primary/50";
-                const bgColor = TARIFF_BG_COLORS[tariff.id] || "bg-primary/10";
-                const isSelected = index === selectedTariffIndex;
-                
-                return (
-                  <div 
-                    key={tariff.id}
-                    className="flex-none w-[75%] min-w-0 pl-4 first:pl-4 last:pr-4"
+        {/* Tariff Card Carousel */}
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex">
+            {ALL_TARIFFS.map((tariff, index) => {
+              const Icon = TARIFF_ICONS[tariff.id] || Crown;
+              const color = TARIFF_COLORS[tariff.id] || "text-primary";
+              const bgColor = TARIFF_BG_COLORS[tariff.id] || "bg-primary/10";
+              const tariffPriceAed = usdToAed(tariff.price);
+              
+              return (
+                <div 
+                  key={tariff.id}
+                  className="flex-none w-full min-w-0 px-4"
+                >
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-5 rounded-2xl bg-muted/50 border border-border/50 space-y-4"
                   >
-                    <motion.button
-                      onClick={() => scrollToTariff(index)}
-                      animate={{ 
-                        scale: isSelected ? 1 : 0.92,
-                        opacity: isSelected ? 1 : 0.6
-                      }}
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      className={`w-full p-4 rounded-2xl border-2 transition-all ${
-                        isSelected 
-                          ? `${borderColor} ${bgColor}` 
-                          : 'border-border/30 bg-muted/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 rounded-2xl ${bgColor} flex items-center justify-center ${color}`}>
-                          <Icon className="w-6 h-6" />
-                        </div>
-                        <div className="flex-1 text-left">
-                          <p className="font-bold text-lg">{tariff.name}</p>
-                          <p className="text-2xl font-bold text-primary">${tariff.price}</p>
-                        </div>
-                        {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-6 h-6 rounded-full bg-primary flex items-center justify-center"
-                          >
-                            <Check className="w-4 h-4 text-primary-foreground" />
-                          </motion.div>
-                        )}
+                    {/* Tariff Header */}
+                    <div className="flex items-center gap-3 pb-4 border-b border-border/50">
+                      <div className={`w-12 h-12 rounded-2xl ${bgColor} flex items-center justify-center ${color}`}>
+                        <Icon className="w-6 h-6" />
                       </div>
-                    </motion.button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                      <div className="flex-1">
+                        <p className="font-bold text-lg">{tariff.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {t('partner.bonuses.tariffPurchase', 'Приобретение тарифа')}
+                        </p>
+                      </div>
+                    </div>
 
-          {/* Carousel Dots */}
-          <div className="flex justify-center gap-1.5 pt-2">
-            {ALL_TARIFFS.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => scrollToTariff(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === selectedTariffIndex 
-                    ? 'w-6 bg-primary' 
-                    : 'w-1.5 bg-muted-foreground/30'
-                }`}
-              />
-            ))}
+                    {/* Price Breakdown */}
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{t('partner.bonuses.tariffCost', 'Стоимость тарифа')}</span>
+                        <span className="font-medium">${tariff.price}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{t('partner.bonuses.exchangeRate', 'Курс обмена')}</span>
+                        <span className="font-medium">1 USD = 3.67 AED</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{t('partner.bonuses.paymentType', 'Тип оплаты')}</span>
+                        <span className="font-medium">{t('partner.bonuses.oneTimePayment', 'Единоразовый платёж')}</span>
+                      </div>
+                      <div className="flex justify-between text-base pt-3 border-t border-border/50">
+                        <span className="font-semibold">{t('openCard.totalToPay', 'Итого к оплате')}</span>
+                        <span className="font-bold text-primary">{formatBalance(tariffPriceAed)} AED</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Price Breakdown */}
-        <div className="px-4">
-          <motion.div 
-            key={tariffId}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-3"
-          >
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center ${tariffColor}`}>
-                <TariffIcon className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold">{tariffName}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('partner.bonuses.tariffPurchase', 'Приобретение тарифа')}
-                </p>
-              </div>
-            </div>
+        {/* Carousel Dots */}
+        <div className="flex justify-center gap-1.5">
+          {ALL_TARIFFS.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => scrollToTariff(index)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                index === selectedTariffIndex 
+                  ? 'w-6 bg-primary' 
+                  : 'w-1.5 bg-muted-foreground/30'
+              }`}
+            />
+          ))}
+        </div>
 
-            <div className="space-y-2 pt-3 border-t border-border/50">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('partner.bonuses.tariffCost', 'Стоимость тарифа')}</span>
-                <span className="font-medium">${tariffPrice}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('partner.bonuses.exchangeRate', 'Курс обмена')}</span>
-                <span className="font-medium">1 USD = 3.67 AED</span>
-              </div>
-              <div className="flex justify-between text-base pt-2 border-t border-border/50">
-                <span className="font-semibold">{t('openCard.totalToPay', 'Итого к оплате')}</span>
-                <span className="font-bold text-primary">{formatBalance(priceInAed)} AED</span>
-              </div>
-            </div>
+        {/* Tariff Description */}
+        <div className="px-4">
+          <motion.div
+            key={tariffId}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="p-4 rounded-2xl bg-primary/5 border border-primary/20"
+          >
+            <p className="text-sm text-primary">
+              {tariffId === 'smart' && t('partner.bonuses.smartDesc', 'Для начинающих партнёров')}
+              {tariffId === 'agent' && t('partner.bonuses.agentDesc', 'Для активных партнёров с растущей сетью')}
+              {tariffId === 'pro' && t('partner.bonuses.proDesc', 'Для активных и опытных партнёров с большой аудиторией')}
+              {tariffId === 'vip' && t('partner.bonuses.vipDesc', 'Для лидеров с максимальными привилегиями')}
+            </p>
           </motion.div>
         </div>
 
