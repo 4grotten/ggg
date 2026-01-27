@@ -547,6 +547,10 @@
       "december": "Декабрь"
     }
   },
+  "fees": {
+    "networkFee": "Комиссия сети",
+    "conversionFee": "Комиссия конвертации"
+  },
   "feesAndLimits": {
     "title": "Комиссии и проценты",
     "oneTimeFees": "Разовые комиссии",
@@ -913,7 +917,8 @@
       "exchangeRate": "Курс обмена",
       "paymentType": "Тип оплаты",
       "purchaseSuccess": "Тариф успешно приобретён!",
-      "selectTariff": "Выберите тариф"
+      "selectTariff": "Выберите тариф",
+      "baseAmount": "Сумма в AED"
     }
   }
 }

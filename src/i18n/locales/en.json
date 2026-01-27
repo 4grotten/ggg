@@ -547,6 +547,10 @@
       "december": "December"
     }
   },
+  "fees": {
+    "networkFee": "Network fee",
+    "conversionFee": "Conversion fee"
+  },
   "feesAndLimits": {
     "title": "Fees and Limits",
     "oneTimeFees": "One-Time Fees",
@@ -912,7 +916,8 @@
       "exchangeRate": "Exchange rate",
       "paymentType": "Payment type",
       "purchaseSuccess": "Plan purchased successfully!",
-      "selectTariff": "Select Plan"
+      "selectTariff": "Select Plan",
+      "baseAmount": "Amount in AED"
     }
   }
 }

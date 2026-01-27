@@ -541,6 +541,10 @@
     "limitsFor": "Limits für",
     "accountWithdrawal": "Auszahlung auf Konto"
   },
+  "fees": {
+    "networkFee": "Netzwerkgebühr",
+    "conversionFee": "Umrechnungsgebühr"
+  },
   "chat": {
     "aiAssistant": "KI-Assistent",
     "description": "Stellen Sie eine Frage zu Karten, Überweisungen, Limits oder anderen App-Funktionen",
@@ -849,7 +853,8 @@
       "exchangeRate": "Wechselkurs",
       "paymentType": "Zahlungsart",
       "purchaseSuccess": "Plan erfolgreich gekauft!",
-      "selectTariff": "Plan auswählen"
+      "selectTariff": "Plan auswählen",
+      "baseAmount": "Betrag in AED"
     }
   }
 }

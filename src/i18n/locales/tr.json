@@ -541,6 +541,10 @@
     "limitsFor": "Limitler",
     "accountWithdrawal": "Hesaba Çekim"
   },
+  "fees": {
+    "networkFee": "Ağ ücreti",
+    "conversionFee": "Dönüştürme ücreti"
+  },
   "chat": {
     "aiAssistant": "Yapay Zeka Asistanı",
     "description": "Kartlar, transferler, limitler veya diğer uygulama özellikleri hakkında soru sorun",
@@ -849,7 +853,8 @@
       "exchangeRate": "Döviz kuru",
       "paymentType": "Ödeme tipi",
       "purchaseSuccess": "Plan başarıyla satın alındı!",
-      "selectTariff": "Plan seçin"
+      "selectTariff": "Plan seçin",
+      "baseAmount": "AED tutarı"
     }
   }
 }
