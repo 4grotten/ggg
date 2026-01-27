@@ -58,13 +58,15 @@ interface Network {
   id: string;
   name: string;
   shortName: string;
+  address: string;
+  color: string;
 }
 
 const networks: Network[] = [
-  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20" },
-  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20" },
-  { id: "bep20", name: "BNB Chain (BEP20)", shortName: "BEP20" },
-  { id: "sol", name: "Solana (SOL)", shortName: "SOL" },
+  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", address: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc", color: "#FF0013" },
+  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD51", color: "#627EEA" },
+  { id: "bep20", name: "BNB Chain (BEP20)", shortName: "BEP20", address: "0xBb23F4AC5B47BBc3FF9c5E5ba7d8E4D92F6c8e4a", color: "#F3BA2F" },
+  { id: "sol", name: "Solana (SOL)", shortName: "SOL", address: "7nYp5xJRxPHhFGCLchVVkjQCma5LzKTgd8FKNsPxV2kL", color: "#9945FF" },
 ];
 
 const TariffPayCrypto = () => {
@@ -132,8 +134,8 @@ const TariffPayCrypto = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Mock wallet address
-  const walletAddress = "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc";
+  // Get wallet address based on selected network
+  const walletAddress = selectedNetwork.address;
 
   const formatBalance = (amount: number) => {
     return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -288,40 +290,82 @@ const TariffPayCrypto = () => {
 
         {/* Wallet Address with QR */}
         <div className="px-4">
-          <div className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-4">
+          <motion.div 
+            key={selectedNetwork.id}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-4"
+          >
             <p className="text-sm text-muted-foreground text-center">
               {t('topUp.sendExactAmount', 'Отправьте точную сумму на адрес')}
             </p>
             
             {/* QR Code */}
             <div className="flex justify-center">
-              <div className="bg-white p-4 rounded-xl">
+              <motion.div 
+                key={`qr-${selectedNetwork.id}`}
+                initial={{ opacity: 0, rotateY: 90 }}
+                animate={{ opacity: 1, rotateY: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="bg-white p-4 rounded-xl shadow-lg"
+                style={{ 
+                  boxShadow: `0 4px 20px ${selectedNetwork.color}30`
+                }}
+              >
                 <QRCodeSVG 
                   value={walletAddress} 
                   size={140}
                   level="H"
                   includeMargin={false}
+                  fgColor={selectedNetwork.color}
                 />
-              </div>
+              </motion.div>
             </div>
 
-            {/* Address */}
-            <button
-              onClick={handleCopy}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-background/50 border border-border/30"
+            {/* Network Badge */}
+            <motion.div 
+              key={`badge-${selectedNetwork.id}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="flex justify-center"
             >
-              <span className="text-sm font-mono text-foreground truncate pr-2">
+              <span 
+                className="px-3 py-1 rounded-full text-xs font-semibold text-white"
+                style={{ backgroundColor: selectedNetwork.color }}
+              >
+                {selectedNetwork.shortName}
+              </span>
+            </motion.div>
+
+            {/* Address */}
+            <motion.button
+              key={`addr-${selectedNetwork.id}`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.15 }}
+              onClick={handleCopy}
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-background/50 border border-border/30 hover:bg-background/80 transition-colors"
+            >
+              <span className="text-xs font-mono text-foreground truncate pr-2">
                 {walletAddress}
               </span>
               <div className="shrink-0">
                 {copied ? (
-                  <Check className="w-5 h-5 text-green-500" />
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                  >
+                    <Check className="w-5 h-5 text-green-500" />
+                  </motion.div>
                 ) : (
                   <Copy className="w-5 h-5 text-muted-foreground" />
                 )}
               </div>
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
 
         {/* Warning */}
