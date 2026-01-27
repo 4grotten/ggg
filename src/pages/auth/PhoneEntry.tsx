@@ -1145,9 +1145,14 @@ const PhoneEntry = () => {
         <div className="karta-footer-actions pb-6">
           <button
             onClick={handleContinue}
-            className="karta-btn-primary"
+            disabled={isLoading}
+            className="karta-btn-primary disabled:opacity-70"
           >
-            {t('common.continue')}
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              t('common.continue')
+            )}
           </button>
           
           {/* Show biometric login if enabled */}
