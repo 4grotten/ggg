@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CreditCard } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import { LevelCarousel } from "@/components/partner/LevelCarousel";
 import { ReferralTransactions, MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 import { PartnerCallButton } from "@/components/partner/PartnerCallButton";
 import { useVoiceCall } from "@/contexts/VoiceCallContext";
+import { Button } from "@/components/ui/button";
 
 const Partner = () => {
   const { t } = useTranslation();
@@ -99,6 +100,17 @@ const Partner = () => {
           currentFriends={stats.invited} 
           onLevelChange={handleLevelChange}
         />
+        
+        {/* Subscribe Button */}
+        <div className="px-4">
+          <Button
+            onClick={() => navigate('/partner/bonuses')}
+            className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 hover:from-violet-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/30"
+          >
+            <CreditCard className="w-5 h-5 mr-2" />
+            {t('partner.subscribe', 'Подписаться')}
+          </Button>
+        </div>
         
         {/* Referral Balance */}
         <ReferralBalance 
