@@ -394,7 +394,12 @@
       "submit": "Change Password",
       "success": "Password changed successfully!",
       "error": "Failed to change password",
-      "wrongPassword": "Wrong current password"
+      "wrongPassword": "Wrong current password",
+      "forgotPassword": "Forgot your password?",
+      "sendToEmail": "Send reset link to {{email}}",
+      "emailSent": "Reset link sent to email",
+      "emailSentSuccess": "Password reset link sent to {{email}}",
+      "emailSendError": "Failed to send reset link"
     }
   },
   "card": {

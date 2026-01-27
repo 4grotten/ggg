@@ -268,6 +268,22 @@ export async function logout() {
 }
 
 /**
+ * Получить привязанный email пользователя
+ * GET /users/get_email/
+ */
+export async function getUserEmail() {
+  return apiGet<{ email: string | null }>('/users/get_email/');
+}
+
+/**
+ * Отправить код сброса пароля на email
+ * POST /users/forgot_password_email/
+ */
+export async function forgotPasswordEmail() {
+  return apiPost<{ message: string }>('/users/forgot_password_email/');
+}
+
+/**
  * Сброс пароля — запрос кода
  * POST /users/forgot_password/
  */
