@@ -8,6 +8,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useCards } from "@/hooks/useCards";
 
 // Tariff icons mapping
@@ -157,7 +158,12 @@ const TariffPayBalance = () => {
           <h1 className="text-lg font-semibold">{t('partner.bonuses.payForTariff', 'Оплата тарифа')}</h1>
         </div>
       }
-      rightAction={<LanguageSwitcher />}
+      rightAction={
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
+        </div>
+      }
     >
       <div className="py-6 space-y-4 pb-32">
         {/* Card Selector - moved to top */}
