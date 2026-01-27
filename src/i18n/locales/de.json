@@ -887,5 +887,46 @@
       "selectTariff": "Plan auswählen",
       "baseAmount": "Betrag in AED"
     }
+  },
+  "editProfile": {
+    "title": "Profil bearbeiten",
+    "fullName": "Vollständiger Name",
+    "fullNamePlaceholder": "Geben Sie Ihren vollständigen Namen ein",
+    "fullNameDescription": "Ihr Name wie im Reisepass. Wird zur Identifikation und Profilanzeige verwendet.",
+    "username": "Benutzername",
+    "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
+    "usernameDescription": "Eindeutige Kennung für Überweisungen zwischen Benutzern. Nur Buchstaben, Zahlen und Unterstriche erlaubt.",
+    "email": "E-Mail",
+    "emailPlaceholder": "Geben Sie Ihre E-Mail ein",
+    "emailDescription": "Für Passwortwiederherstellung und wichtige Transaktionsbenachrichtigungen.",
+    "dateOfBirth": "Geburtsdatum",
+    "selectDateOfBirth": "Geburtsdatum auswählen",
+    "dateOfBirthDescription": "Erforderlich für die Identitätsprüfung und regulatorische Anforderungen.",
+    "gender": "Geschlecht",
+    "selectGender": "Geschlecht auswählen",
+    "genderDescription": "Optional. Wird für personalisierte Kommunikation in der App verwendet.",
+    "save": "Änderungen speichern",
+    "saved": "Profil erfolgreich aktualisiert",
+    "saveFailed": "Profil konnte nicht aktualisiert werden",
+    "changePassword": {
+      "title": "Passwort ändern",
+      "description": "Ändern Sie Ihr App-Anmeldepasswort. Wir empfehlen, Ihr Passwort regelmäßig zu ändern.",
+      "currentPassword": "Aktuelles Passwort",
+      "currentPlaceholder": "Aktuelles Passwort eingeben",
+      "currentRequired": "Bitte geben Sie das aktuelle Passwort ein",
+      "newPassword": "Neues Passwort",
+      "newPlaceholder": "Neues Passwort eingeben",
+      "confirmPassword": "Passwort bestätigen",
+      "confirmPlaceholder": "Neues Passwort bestätigen",
+      "submit": "Passwort ändern",
+      "success": "Passwort erfolgreich geändert!",
+      "error": "Passwort konnte nicht geändert werden",
+      "wrongPassword": "Falsches aktuelles Passwort",
+      "forgotPassword": "Passwort vergessen?",
+      "sendToEmail": "Link an {{email}} senden",
+      "emailSent": "Link per E-Mail gesendet",
+      "emailSentSuccess": "Passwort-Reset-Link an {{email}} gesendet",
+      "emailSendError": "Link konnte nicht gesendet werden"
+    }
   }
 }

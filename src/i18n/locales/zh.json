@@ -894,5 +894,46 @@
       "selectTariff": "选择套餐",
       "baseAmount": "AED金额"
     }
+  },
+  "editProfile": {
+    "title": "编辑个人资料",
+    "fullName": "全名",
+    "fullNamePlaceholder": "输入您的全名",
+    "fullNameDescription": "护照上显示的姓名。用于身份识别和个人资料显示。",
+    "username": "用户名",
+    "usernamePlaceholder": "输入您的用户名",
+    "usernameDescription": "用户间转账的唯一标识符。只允许字母、数字和下划线。",
+    "email": "电子邮箱",
+    "emailPlaceholder": "输入您的电子邮箱",
+    "emailDescription": "用于密码恢复和接收重要交易通知。",
+    "dateOfBirth": "出生日期",
+    "selectDateOfBirth": "选择出生日期",
+    "dateOfBirthDescription": "身份验证和合规要求所必需。",
+    "gender": "性别",
+    "selectGender": "选择性别",
+    "genderDescription": "可选。用于应用内个性化沟通。",
+    "save": "保存更改",
+    "saved": "个人资料更新成功",
+    "saveFailed": "更新个人资料失败",
+    "changePassword": {
+      "title": "修改密码",
+      "description": "更改您的应用登录密码。我们建议定期更改密码。",
+      "currentPassword": "当前密码",
+      "currentPlaceholder": "输入当前密码",
+      "currentRequired": "请输入当前密码",
+      "newPassword": "新密码",
+      "newPlaceholder": "输入新密码",
+      "confirmPassword": "确认密码",
+      "confirmPlaceholder": "确认新密码",
+      "submit": "修改密码",
+      "success": "密码修改成功！",
+      "error": "密码修改失败",
+      "wrongPassword": "当前密码错误",
+      "forgotPassword": "忘记密码？",
+      "sendToEmail": "发送重置链接到 {{email}}",
+      "emailSent": "链接已发送到邮箱",
+      "emailSentSuccess": "密码重置链接已发送到 {{email}}",
+      "emailSendError": "发送链接失败"
+    }
   }
 }

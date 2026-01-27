@@ -887,5 +887,46 @@
       "selectTariff": "Seleccionar plan",
       "baseAmount": "Monto en AED"
     }
+  },
+  "editProfile": {
+    "title": "Editar Perfil",
+    "fullName": "Nombre Completo",
+    "fullNamePlaceholder": "Ingrese su nombre completo",
+    "fullNameDescription": "Su nombre como aparece en su pasaporte. Se usa para identificación y visualización del perfil.",
+    "username": "Nombre de Usuario",
+    "usernamePlaceholder": "Ingrese su nombre de usuario",
+    "usernameDescription": "Identificador único para transferencias entre usuarios. Solo se permiten letras, números y guiones bajos.",
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "Ingrese su correo electrónico",
+    "emailDescription": "Para recuperación de contraseña y notificaciones de transacciones importantes.",
+    "dateOfBirth": "Fecha de Nacimiento",
+    "selectDateOfBirth": "Seleccionar fecha de nacimiento",
+    "dateOfBirthDescription": "Requerido para verificación de identidad y cumplimiento regulatorio.",
+    "gender": "Género",
+    "selectGender": "Seleccionar género",
+    "genderDescription": "Opcional. Se usa para personalizar las comunicaciones en la aplicación.",
+    "save": "Guardar Cambios",
+    "saved": "Perfil actualizado exitosamente",
+    "saveFailed": "Error al actualizar el perfil",
+    "changePassword": {
+      "title": "Cambiar Contraseña",
+      "description": "Cambie su contraseña de inicio de sesión. Recomendamos cambiar su contraseña regularmente.",
+      "currentPassword": "Contraseña Actual",
+      "currentPlaceholder": "Ingrese contraseña actual",
+      "currentRequired": "Por favor ingrese la contraseña actual",
+      "newPassword": "Nueva Contraseña",
+      "newPlaceholder": "Ingrese nueva contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "confirmPlaceholder": "Confirme la nueva contraseña",
+      "submit": "Cambiar Contraseña",
+      "success": "¡Contraseña cambiada exitosamente!",
+      "error": "Error al cambiar la contraseña",
+      "wrongPassword": "Contraseña actual incorrecta",
+      "forgotPassword": "¿Olvidó su contraseña?",
+      "sendToEmail": "Enviar enlace a {{email}}",
+      "emailSent": "Enlace enviado al correo",
+      "emailSentSuccess": "Enlace de restablecimiento enviado a {{email}}",
+      "emailSendError": "Error al enviar el enlace"
+    }
   }
 }
