@@ -166,11 +166,14 @@ const clientTools = {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
         "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        "Cache-Control": "no-store",
+        "Pragma": "no-cache",
       };
       
       const response = await fetch(getTransactionsUrl, {
         method: "POST",
         headers,
+        cache: "no-store",
         body: JSON.stringify({ ...params, user_id: demoUserId }),
       });
       
@@ -218,11 +221,14 @@ const clientTools = {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
         "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        "Cache-Control": "no-store",
+        "Pragma": "no-cache",
       };
       
       const response = await fetch(getTransactionsUrl, {
         method: "POST",
         headers,
+        cache: "no-store",
         body: JSON.stringify({ summary: true, days: 30, user_id: demoUserId }),
       });
       
@@ -260,11 +266,14 @@ const clientTools = {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
         "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        "Cache-Control": "no-store",
+        "Pragma": "no-cache",
       };
       
       const response = await fetch(getTransactionsUrl, {
         method: "POST",
         headers,
+        cache: "no-store",
         body: JSON.stringify({ summary: true, days: params.days || 30, user_id: demoUserId }),
       });
       
@@ -298,12 +307,43 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
       connectionSuccessRef.current = true;
       stopRingTone();
       toast.success("Звонок начат! 📞");
+
+      // IMPORTANT: reset / pin the agent to tool-based truth to avoid hallucinations from prior context.
+      // This does not trigger a spoken response, but updates the agent context.
+      try {
+        conversation.sendContextualUpdate(
+          [
+            "ВАЖНО: Игнорируй любую ранее сказанную финансовую информацию.",
+            "Единственный источник правды по транзакциям — результат инструментов get_transactions / get_balance_summary.",
+            "Если инструмент не вызывался, скажи что нужно запросить данные инструментом.",
+          ].join(" ")
+        );
+      } catch (e) {
+        console.warn("Failed to send contextual update", e);
+      }
     },
     onDisconnect: () => {
       console.log("Disconnected from ElevenLabs agent");
       setCurrentAgent(null);
       stopRingTone();
       toast.info("Звонок завершён");
+    },
+    onMessage: (message: any) => {
+      // Debugging: helps verify whether agent actually calls tools and what it receives.
+      // We'll see these logs in the browser console.
+      try {
+        if (message?.type === "client_tool_call") {
+          console.log("ElevenLabs client_tool_call:", message);
+        } else if (message?.type === "agent_tool_response") {
+          console.log("ElevenLabs agent_tool_response:", message);
+        } else if (message?.type === "agent_response") {
+          console.log("ElevenLabs agent_response:", message?.agent_response_event?.agent_response);
+        } else if (message?.type === "user_transcript") {
+          console.log("ElevenLabs user_transcript:", message?.user_transcription_event?.user_transcript);
+        }
+      } catch {
+        // ignore
+      }
     },
     onError: (error) => {
       console.error("ElevenLabs error:", error);
