@@ -123,6 +123,9 @@ const FeesAndLimits = () => {
       <AnimatedFeeIcon />
 
       <div className="px-4 pb-28">
+        {/* Support Buttons */}
+        <SupportButtons />
+
         {/* One-Time Fees */}
         <FeeSection title={t("feesAndLimits.oneTimeFees")} icon={<CreditCard className="w-4 h-4" />}>
           <FeeItem label={t("feesAndLimits.virtualCardAnnual")} value={`${VIRTUAL_CARD_ANNUAL_FEE.toFixed(2)} AED`} />
@@ -151,9 +154,6 @@ const FeesAndLimits = () => {
         <FeeSection title={t("feesAndLimits.transactionsSection")} icon={<ArrowLeftRight className="w-4 h-4" />}>
           <FeeItem label={t("feesAndLimits.currencyConversion")} value={`${CURRENCY_CONVERSION_FEE_PERCENT.toFixed(2)}%`} isLast />
         </FeeSection>
-
-        {/* Support Buttons */}
-        <SupportButtons />
 
         <PoweredByFooter />
       </div>
