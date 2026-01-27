@@ -10,25 +10,35 @@ interface CardTransactionsListProps {
 
 const getInitial = (name: string) => name.charAt(0).toUpperCase();
 
-const translateDate = (date: string, t: (key: string) => string): string => {
-  const monthsMap: { [key: string]: string } = {
-    "January": "transactions.months.january",
-    "February": "transactions.months.february",
-    "March": "transactions.months.march",
-    "April": "transactions.months.april",
-    "May": "transactions.months.may",
-    "June": "transactions.months.june",
-    "July": "transactions.months.july",
-    "August": "transactions.months.august",
-    "September": "transactions.months.september",
-    "October": "transactions.months.october",
-    "November": "transactions.months.november",
-    "December": "transactions.months.december",
+const formatDateNumeric = (date: string): string => {
+  const monthsMap: { [key: string]: number } = {
+    "January": 1,
+    "February": 2,
+    "March": 3,
+    "April": 4,
+    "May": 5,
+    "June": 6,
+    "July": 7,
+    "August": 8,
+    "September": 9,
+    "October": 10,
+    "November": 11,
+    "December": 12,
   };
   
-  for (const [month, key] of Object.entries(monthsMap)) {
+  // Already in numeric format (DD.MM.YYYY)
+  if (/^\d{2}\.\d{2}\.\d{4}$/.test(date)) {
+    return date;
+  }
+  
+  // Parse "Month Day" format (e.g., "January 17")
+  for (const [month, monthNum] of Object.entries(monthsMap)) {
     if (date.includes(month)) {
-      return date.replace(month, t(key));
+      const day = date.replace(month, "").trim();
+      const currentYear = new Date().getFullYear();
+      const paddedDay = day.padStart(2, "0");
+      const paddedMonth = String(monthNum).padStart(2, "0");
+      return `${paddedDay}.${paddedMonth}.${currentYear}`;
     }
   }
   return date;
@@ -114,7 +124,7 @@ const handleClick = (transaction: Transaction) => {
         >
           {/* Date Header */}
           <div className="flex items-center justify-between px-4">
-            <span className="font-semibold text-base">{translateDate(group.date, t)}</span>
+            <span className="font-semibold text-base">{formatDateNumeric(group.date)}</span>
             {group.totalSpend > 0 && (
               <span className="text-[#007AFF] text-sm font-medium">
                 -{group.totalSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
