@@ -56,10 +56,13 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       setCurrentAgent(agent);
       
-      // Start ringing sound (async, don't await)
-      playRingTone();
-      
-      // Connect to agent
+      // Simulate dialing: ALWAYS play 2/3/5 rings fully, then connect.
+      const completedAllRings = await playRingTone();
+      if (!completedAllRings) {
+        // User ended call while ringing; don't connect.
+        return;
+      }
+
       await conversation.startSession({
         agentId: AGENTS[agent],
         connectionType: "websocket",
