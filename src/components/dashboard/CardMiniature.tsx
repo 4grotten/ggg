@@ -94,15 +94,30 @@ export const CardMiniature = ({ type, className = "" }: CardMiniatureProps) => {
     };
   }, [hasPermission]);
 
-  // Subtle glare - small spot that follows tilt
+  // Glare styles - more intense for metal
   const glareStyle = {
     background: `radial-gradient(ellipse 80% 50% at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.12) 0%, transparent 50%)`,
+  };
+  
+  // More intense glare for metal card
+  const metalGlareStyle = {
+    background: `radial-gradient(ellipse 100% 60% at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 30%, transparent 60%)`,
   };
 
   // Thin reflection band that moves across card
   const bandPosition = 50 + tilt.rotateY * 3;
   const reflectionStyle = {
     background: `linear-gradient(${110 + tilt.rotateY * 3}deg, transparent ${bandPosition - 15}%, rgba(255,255,255,0.08) ${bandPosition - 5}%, rgba(255,255,255,0.18) ${bandPosition}%, rgba(255,255,255,0.08) ${bandPosition + 5}%, transparent ${bandPosition + 15}%)`,
+  };
+  
+  // More intense reflection for metal card
+  const metalReflectionStyle = {
+    background: `linear-gradient(${105 + tilt.rotateY * 4}deg, transparent ${bandPosition - 20}%, rgba(255,255,255,0.12) ${bandPosition - 8}%, rgba(255,255,255,0.35) ${bandPosition}%, rgba(255,255,255,0.12) ${bandPosition + 8}%, transparent ${bandPosition + 20}%)`,
+  };
+  
+  // Secondary shine band for metal
+  const metalSecondaryShine = {
+    background: `linear-gradient(${80 + tilt.rotateX * 2}deg, transparent ${30 + tilt.rotateX}%, rgba(255,255,255,0.06) ${45 + tilt.rotateX}%, rgba(255,255,255,0.12) ${50 + tilt.rotateX}%, rgba(255,255,255,0.06) ${55 + tilt.rotateX}%, transparent ${70 + tilt.rotateX}%)`,
   };
 
   if (type === "virtual") {
@@ -198,18 +213,26 @@ export const CardMiniature = ({ type, className = "" }: CardMiniatureProps) => {
         }}
       />
       
-      {/* Dynamic glass reflection */}
+      {/* Dynamic glass reflection - intense */}
       <motion.div 
         className="absolute inset-0 pointer-events-none z-10"
-        style={glareStyle}
+        style={metalGlareStyle}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.1 }}
       />
       
-      {/* Moving light reflection band */}
+      {/* Primary light reflection band - bright */}
       <motion.div 
         className="absolute inset-0 pointer-events-none z-10"
-        style={reflectionStyle}
+        style={metalReflectionStyle}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.1 }}
+      />
+      
+      {/* Secondary horizontal shine */}
+      <motion.div 
+        className="absolute inset-0 pointer-events-none z-10"
+        style={metalSecondaryShine}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.1 }}
       />
