@@ -19,6 +19,8 @@ import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/useMultiAccount";
+import { LEVELS } from "@/components/partner/LevelCarousel";
+import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 
 interface SettingsItemProps {
   icon: React.ReactNode;
@@ -688,13 +690,38 @@ const Settings = () => {
         })()}
 
         {/* Referral Partner */}
-        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
-          <SettingsItem
-            icon={<Users className="w-5 h-5" />}
-            label={t("settings.referralPartner") || "Referral Partner"}
-            onClick={() => navigate("/partner")}
-          />
-        </div>
+        {(() => {
+          // Calculate partner level from referrals
+          const uniqueUsers = new Set(MOCK_TRANSACTIONS.map(tx => tx.userName)).size;
+          const getCurrentLevel = () => {
+            for (let i = LEVELS.length - 1; i >= 0; i--) {
+              if (uniqueUsers >= LEVELS[i].minFriends) {
+                return LEVELS[i];
+              }
+            }
+            return LEVELS[0];
+          };
+          const currentLevel = getCurrentLevel();
+          
+          return (
+            <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+              <button
+                onClick={() => navigate("/partner")}
+                className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-foreground"><Users className="w-5 h-5" /></span>
+                  <span className="text-foreground font-medium">{t("settings.referralPartner") || "Referral Partner"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{currentLevel.icon}</span>
+                  <span className="text-sm font-medium text-primary">{currentLevel.id}</span>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </button>
+            </div>
+          );
+        })()}
 
         {/* Limits Settings */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
