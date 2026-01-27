@@ -548,17 +548,17 @@ const Settings = () => {
                 <span>{t("settings.personalData") || "Личные данные"}</span>
               </button>
               
-              {/* Verification status */}
+              {/* Verification status - verified when completed 3 steps */}
               <button
                 onClick={() => navigate("/profile-verification")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  getCompletedSteps() < 10
+                  getCompletedSteps() < 3
                     ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
                     : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
                 }`}
               >
                 <Check className="w-3.5 h-3.5" />
-                <span>{t("settings.verification") || "Верификация"}</span>
+                <span>{t("settings.verification")}</span>
               </button>
             </div>
           </>
