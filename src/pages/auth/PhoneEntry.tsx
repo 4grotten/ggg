@@ -1163,19 +1163,20 @@ const PhoneEntry = () => {
           <button
             onClick={handleContinue}
             disabled={buttonState === 'loading' || buttonState === 'success'}
-            className={`karta-btn-primary disabled:opacity-70 transition-colors duration-300 flex items-center justify-center ${
+            className={`karta-btn-primary disabled:opacity-70 transition-colors duration-300 flex items-center justify-center gap-2 ${
               buttonState === 'success' ? 'bg-green-500 hover:bg-green-500' : ''
             } ${
               buttonState === 'error' ? 'bg-destructive hover:bg-destructive' : ''
             }`}
           >
+            {t('common.continue')}
             <AnimatePresence mode="wait">
               {buttonState === 'loading' && (
                 <motion.div
                   key="loading"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.8, width: 0 }}
+                  animate={{ opacity: 1, scale: 1, width: 'auto' }}
+                  exit={{ opacity: 0, scale: 0.8, width: 0 }}
                   transition={{ duration: 0.2 }}
                 >
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -1202,17 +1203,6 @@ const PhoneEntry = () => {
                 >
                   <X className="w-5 h-5" />
                 </motion.div>
-              )}
-              {buttonState === 'idle' && (
-                <motion.span
-                  key="idle"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {t('common.continue')}
-                </motion.span>
               )}
             </AnimatePresence>
           </button>
