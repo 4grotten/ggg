@@ -160,31 +160,60 @@ export const CardMiniature = ({ type, className = "" }: CardMiniatureProps) => {
           transition={{ duration: 0.1 }}
         />
         
-        {/* Card content */}
-        <div className="relative h-full p-4 flex flex-col justify-between">
-          {/* Top row - Card name */}
-          <div className="flex items-center justify-between">
+        {/* Card content with parallax */}
+        <div className="relative h-full p-4 flex flex-col justify-between" style={{ transformStyle: 'preserve-3d' }}>
+          {/* Top row - Card name - slight parallax */}
+          <motion.div 
+            className="flex items-center justify-between"
+            animate={{
+              x: tilt.rotateY * 0.3,
+              y: tilt.rotateX * 0.3,
+            }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          >
             <span className="text-xs font-semibold text-black/70 tracking-wide">VIRTUAL</span>
-          </div>
+          </motion.div>
           
-          {/* Center logo */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* Center logo - strong parallax (closer to viewer) */}
+          <motion.div 
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            animate={{
+              x: tilt.rotateY * -1.2,
+              y: tilt.rotateX * -1.2,
+            }}
+            transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+            style={{ transform: 'translateZ(20px)' }}
+          >
             <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center">
               <svg width="16" height="12" viewBox="0 0 60 40" fill="none">
                 <path d="M30 5L45 20L30 35L15 20L30 5Z" fill="rgba(0,0,0,0.3)" />
                 <path d="M30 12L38 20L30 28L22 20L30 12Z" fill="rgba(200,245,66,0.8)" />
               </svg>
             </div>
-          </div>
+          </motion.div>
           
-          {/* Bottom row - Visa branding */}
-          <div className="flex items-end justify-between">
-            <div className="flex items-center gap-1.5">
+          {/* Bottom row - Visa branding - medium parallax */}
+          <motion.div 
+            className="flex items-end justify-between"
+            animate={{
+              x: tilt.rotateY * -0.6,
+              y: tilt.rotateX * -0.6,
+            }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+          >
+            <motion.div 
+              className="flex items-center gap-1.5"
+              animate={{
+                x: tilt.rotateY * 0.4,
+                y: tilt.rotateX * 0.4,
+              }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            >
               <div className="w-6 h-4 rounded bg-black/10" />
               <div className="w-4 h-4 rounded-full bg-black/10" />
-            </div>
+            </motion.div>
             <span className="text-base font-bold text-[#1a1f71] italic tracking-tight">VISA</span>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     );
@@ -245,31 +274,60 @@ export const CardMiniature = ({ type, className = "" }: CardMiniatureProps) => {
         }}
       />
       
-      {/* Card content */}
-      <div className="relative h-full p-4 flex flex-col justify-between">
-        {/* Top row - Card name */}
-        <div className="flex items-center justify-between">
+      {/* Card content with parallax */}
+      <div className="relative h-full p-4 flex flex-col justify-between" style={{ transformStyle: 'preserve-3d' }}>
+        {/* Top row - Card name - slight parallax */}
+        <motion.div 
+          className="flex items-center justify-between"
+          animate={{
+            x: tilt.rotateY * 0.3,
+            y: tilt.rotateX * 0.3,
+          }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        >
           <span className="text-xs font-semibold text-white/50 tracking-wide">METAL</span>
-        </div>
+        </motion.div>
         
-        {/* Center logo */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {/* Center logo - strong parallax (closer to viewer) */}
+        <motion.div 
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          animate={{
+            x: tilt.rotateY * -1.5,
+            y: tilt.rotateX * -1.5,
+          }}
+          transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+          style={{ transform: 'translateZ(25px)' }}
+        >
           <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
             <svg width="16" height="12" viewBox="0 0 60 40" fill="none">
               <path d="M30 5L45 20L30 35L15 20L30 5Z" fill="rgba(255,255,255,0.2)" />
               <path d="M30 12L38 20L30 28L22 20L30 12Z" fill="rgba(255,255,255,0.1)" />
             </svg>
           </div>
-        </div>
+        </motion.div>
         
-        {/* Bottom row - Visa branding */}
-        <div className="flex items-end justify-between">
-          <div className="flex items-center gap-1.5">
+        {/* Bottom row - Visa branding - medium parallax */}
+        <motion.div 
+          className="flex items-end justify-between"
+          animate={{
+            x: tilt.rotateY * -0.8,
+            y: tilt.rotateX * -0.8,
+          }}
+          transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+        >
+          <motion.div 
+            className="flex items-center gap-1.5"
+            animate={{
+              x: tilt.rotateY * 0.5,
+              y: tilt.rotateX * 0.5,
+            }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          >
             <div className="w-6 h-4 rounded bg-white/10" />
             <div className="w-4 h-4 rounded-full bg-white/10" />
-          </div>
+          </motion.div>
           <span className="text-base font-bold text-white/70 italic tracking-tight">VISA</span>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );

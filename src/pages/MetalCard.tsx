@@ -9,7 +9,7 @@ import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
-import { CardWithGlare } from "@/components/card/CardWithGlare";
+import { CardWithGlare, ParallaxElement } from "@/components/card/CardWithGlare";
 import {
   Collapsible,
   CollapsibleContent,
@@ -142,29 +142,29 @@ const MetalCard = () => {
             }}
           />
           
-          {/* Logo in center */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          {/* Logo in center - strong parallax */}
+          <ParallaxElement depth={3.5} className="absolute inset-0 flex items-center justify-center">
             <svg width="60" height="40" viewBox="0 0 60 40" fill="none">
               <path d="M30 5L45 20L30 35L15 20L30 5Z" fill="#666" />
               <path d="M30 12L38 20L30 28L22 20L30 12Z" fill="#333" />
             </svg>
-          </div>
+          </ParallaxElement>
           
-          {/* Cardholder name */}
-          <div className="relative mt-auto flex items-center gap-2">
+          {/* Cardholder name - medium parallax */}
+          <ParallaxElement depth={2.5} className="relative mt-auto flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
               <span className="text-xs text-white font-medium">RK</span>
             </div>
             <span className="text-sm font-semibold text-white bg-white/10 px-3 py-1 rounded-full">
               {cardData.holderName}
             </span>
-          </div>
+          </ParallaxElement>
           
-          {/* Visa logo */}
-          <div className="absolute bottom-6 right-6 text-right">
+          {/* Visa logo - medium parallax */}
+          <ParallaxElement depth={2} className="absolute bottom-6 right-6 text-right">
             <span className="text-2xl font-bold text-white/80 italic tracking-tight">VISA</span>
             <p className="text-xs text-white/60 font-medium">Metal</p>
-          </div>
+          </ParallaxElement>
         </CardWithGlare>
 
         {/* Apple Pay Banner */}
