@@ -413,7 +413,9 @@
       "sendToEmail": "Отправить ссылку на {{email}}",
       "emailSent": "Ссылка отправлена на почту",
       "emailSentSuccess": "Ссылка для сброса пароля отправлена на {{email}}",
-      "emailSendError": "Не удалось отправить ссылку"
+      "emailSendError": "Не удалось отправить ссылку",
+      "passwordsMatch": "Пароли совпадают",
+      "passwordsNotMatch": "Пароли не совпадают"
     }
   },
   "card": {

@@ -20,6 +20,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 import { changePassword, getUserEmail, forgotPasswordEmail } from "@/services/api/authApi";
+import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 
 const profileSchemaBase = z.object({
   full_name: z.string().min(1).min(2).max(100),
@@ -895,52 +896,18 @@ const EditProfile = () => {
               </div>
             </div>
 
-            {/* New Password */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                {t("editProfile.changePassword.newPassword")}
-              </label>
-              <div className="relative">
-                <Input
-                  type={showNewPassword ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder={t("editProfile.changePassword.newPlaceholder")}
-                  className="h-14 rounded-2xl border-border bg-card px-4 pr-12 text-base"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              <p className="text-xs text-muted-foreground">{t("auth.resetPassword.minChars")}</p>
-            </div>
-
-            {/* Confirm Password */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                {t("editProfile.changePassword.confirmPassword")}
-              </label>
-              <div className="relative">
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder={t("editProfile.changePassword.confirmPlaceholder")}
-                  className="h-14 rounded-2xl border-border bg-card px-4 pr-12 text-base"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
+            {/* New Password + Confirm Password with character matching */}
+            <PasswordMatchInput
+              password={newPassword}
+              confirmPassword={confirmPassword}
+              onPasswordChange={setNewPassword}
+              onConfirmPasswordChange={setConfirmPassword}
+              passwordLabel={t("editProfile.changePassword.newPassword")}
+              confirmLabel={t("editProfile.changePassword.confirmPassword")}
+              passwordPlaceholder={t("editProfile.changePassword.newPlaceholder")}
+              confirmPlaceholder={t("editProfile.changePassword.confirmPlaceholder")}
+              minCharsHint={t("auth.resetPassword.minChars")}
+            />
 
             {/* Error message */}
             <AnimatePresence>
