@@ -75,7 +75,7 @@ const Partner = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="absolute left-1/2 -translate-x-1/2 text-base font-semibold">{t('partner.program', 'Партнёрская программа')}</h1>
+          <h1 className="absolute left-1/2 -translate-x-1/2 text-base font-semibold text-center max-w-[180px] leading-tight">{t('partner.program', 'Партнёрская программа')}</h1>
           <div className="flex items-center gap-1">
             <ThemeSwitcher />
             <LanguageSwitcher />
