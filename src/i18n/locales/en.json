@@ -387,6 +387,11 @@
     "save": "Save Changes",
     "saved": "Profile updated successfully",
     "saveFailed": "Failed to update profile",
+    "validation": {
+      "nameRequired": "Name is required",
+      "nameTooShort": "Name must be at least 2 characters",
+      "nameTooLong": "Name must be less than 100 characters"
+    },
     "changePassword": {
       "title": "Change Password",
       "description": "Change your app login password. We recommend changing your password regularly.",

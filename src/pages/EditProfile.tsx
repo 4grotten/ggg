@@ -21,15 +21,15 @@ import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/ani
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 import { changePassword, getUserEmail, forgotPasswordEmail } from "@/services/api/authApi";
 
-const profileSchema = z.object({
-  full_name: z.string().min(2, "Name must be at least 2 characters").max(100),
-  username: z.string().min(3, "Username must be at least 3 characters").max(30).regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers and underscores").optional().or(z.literal("")),
-  email: z.string().email("Invalid email").optional().or(z.literal("")),
+const profileSchemaBase = z.object({
+  full_name: z.string().min(1).min(2).max(100),
+  username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/).optional().or(z.literal("")),
+  email: z.string().email().optional().or(z.literal("")),
   date_of_birth: z.string().optional(),
   gender: z.enum(["male", "female", ""]).optional(),
 });
 
-type ProfileFormData = z.infer<typeof profileSchema>;
+type ProfileFormData = z.infer<typeof profileSchemaBase>;
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -65,6 +65,18 @@ const EditProfile = () => {
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [isSendingResetEmail, setIsSendingResetEmail] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+
+  // Create schema with localized messages
+  const profileSchema = z.object({
+    full_name: z.string()
+      .min(1, t("editProfile.validation.nameRequired", "Name is required"))
+      .min(2, t("editProfile.validation.nameTooShort", "Name must be at least 2 characters"))
+      .max(100, t("editProfile.validation.nameTooLong", "Name must be less than 100 characters")),
+    username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/).optional().or(z.literal("")),
+    email: z.string().email().optional().or(z.literal("")),
+    date_of_birth: z.string().optional(),
+    gender: z.enum(["male", "female", ""]).optional(),
+  });
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
