@@ -243,7 +243,7 @@ const TariffPayBalance = () => {
               {selectedPaymentCard ? (
                 <>
                   <div className="w-12 shrink-0 rounded-[4px] overflow-hidden shadow-lg ring-1 ring-white/10" style={{ aspectRatio: '1.586' }}>
-                    <CardMiniature type={selectedPaymentCard.type} />
+                    <CardMiniature type={selectedPaymentCard.type} className="!rounded-none" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-semibold text-sm">{selectedPaymentCard.name}</p>
@@ -282,7 +282,7 @@ const TariffPayBalance = () => {
                       }`}
                     >
                       <div className="w-12 shrink-0 rounded-[4px] overflow-hidden shadow-md ring-1 ring-white/10" style={{ aspectRatio: '1.586' }}>
-                        <CardMiniature type={card.type} />
+                        <CardMiniature type={card.type} className="!rounded-none" />
                       </div>
                       <div className="flex-1 text-left">
                         <p className="font-semibold text-sm">{card.name}</p>
