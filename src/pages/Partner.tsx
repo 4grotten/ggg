@@ -44,7 +44,7 @@ const Partner = () => {
     if (isConnected) {
       endCall();
     }
-    navigate(-1);
+    navigate('/');
   }, [navigate, isConnected, endCall]);
 
   // Scroll to top on mount
