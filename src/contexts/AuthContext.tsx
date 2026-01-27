@@ -69,9 +69,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Роуты, которые не требуют авторизации
 const PUBLIC_ROUTES = ['/auth/phone', '/auth/code', '/auth/profile'];
 
+// Helper to get initial user from localStorage
+const getInitialUser = (): UserProfile | null => {
+  try {
+    const cached = localStorage.getItem(AUTH_USER_KEY);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Initialize user from localStorage immediately to prevent flash
+  const [user, setUser] = useState<UserProfile | null>(getInitialUser);
+  const [isLoading, setIsLoading] = useState(() => {
+    // If we have a token, we need to validate it, so start loading
+    // If no token, we're done loading immediately
+    return !!getAuthToken();
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const hasCheckedRef = useRef(false);
