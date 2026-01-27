@@ -200,7 +200,7 @@ const Settings = () => {
   const { theme, setTheme } = useTheme();
   const { i18n, t } = useTranslation();
   const { avatarUrl, setAvatarUrl } = useAvatar();
-  const { user, isAuthenticated, logout, updateAvatar, refreshUser } = useAuth();
+  const { user, isAuthenticated, logout, updateAvatar, refreshUser, switchUser } = useAuth();
   const { accounts, refreshAccounts } = useMultiAccount();
   
   // Refresh accounts list when component mounts
@@ -830,35 +830,46 @@ const Settings = () => {
                 {t("settings.savedAccounts") || "Saved Accounts"} ({accounts.length})
               </p>
             </div>
-            {accounts.map((account, index) => (
-              <div
-                key={account.id}
-                className={`flex items-center gap-3 px-4 py-3 ${
-                  index < accounts.length - 1 ? 'border-b border-border/30' : ''
-                } ${account.user.id === user?.id ? 'bg-primary/5' : ''}`}
-              >
-                <Avatar className="w-10 h-10">
-                  <AvatarImage 
-                    src={account.user.avatar?.medium || account.user.avatar?.file} 
-                    alt={account.user.full_name} 
-                  />
-                  <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                    {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {account.user.full_name}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {account.user.phone_number}
-                  </p>
-                </div>
-                {account.user.id === user?.id && (
-                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                )}
-              </div>
-            ))}
+            {accounts.map((account, index) => {
+              const isCurrentUser = account.user.id === user?.id;
+              return (
+                <button
+                  key={account.id}
+                  onClick={() => {
+                    if (!isCurrentUser) {
+                      switchUser(account.user, account.token);
+                      toast.success(t("settings.switchedTo") || `Switched to ${account.user.full_name}`);
+                      navigate('/');
+                    }
+                  }}
+                  disabled={isCurrentUser}
+                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
+                    index < accounts.length - 1 ? 'border-b border-border/30' : ''
+                  } ${isCurrentUser ? 'bg-primary/5 cursor-default' : 'hover:bg-muted/50 active:bg-muted/70'}`}
+                >
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage 
+                      src={account.user.avatar?.medium || account.user.avatar?.file} 
+                      alt={account.user.full_name} 
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                      {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {account.user.full_name}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {account.user.phone_number}
+                    </p>
+                  </div>
+                  {isCurrentUser && (
+                    <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
 
