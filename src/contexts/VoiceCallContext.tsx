@@ -5,7 +5,7 @@ import { useDialTone } from "@/hooks/useDialTone";
 import { getAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import type { UserProfile } from "@/services/api/authApi";
 import { fetchCards } from "@/services/api/cards";
-
+import { supabase } from "@/integrations/supabase/client";
 // Agent IDs
 export const AGENTS = {
   EVA: "agent_5801kfp8shb2fv48yefns7hvkh5a",      // Main chat assistant
@@ -58,8 +58,8 @@ const calculateAge = (dateOfBirth: string | null | undefined): number | null => 
   }
 };
 
-// Client tools for ElevenLabs agent
-const getTransactionsUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-transactions`;
+// Edge function name for transactions
+const TRANSACTIONS_FUNCTION = "get-transactions";
 
 const clientTools = {
   // MUST BE CALLED FIRST - Get user identity and authorization status
@@ -159,30 +159,16 @@ const clientTools = {
     try {
       console.log("Agent calling get_transactions:", params, "user.id:", user.id);
       
-      // Map external user ID to Supabase user_id
-      // The edge function will handle this mapping
-      const externalUserId = user.id;
-      
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        "Cache-Control": "no-store",
-        "Pragma": "no-cache",
-      };
-      
-      const response = await fetch(getTransactionsUrl, {
-        method: "POST",
-        headers,
-        cache: "no-store",
-        body: JSON.stringify({ ...params, external_user_id: externalUserId }),
+      // Use supabase.functions.invoke instead of raw fetch to avoid CORS/WebSocket issues
+      const { data, error } = await supabase.functions.invoke(TRANSACTIONS_FUNCTION, {
+        body: { ...params, external_user_id: user.id },
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
+      if (error) {
+        console.error("Error from edge function:", error);
+        throw error;
       }
       
-      const data = await response.json();
       console.log("Transactions fetched:", data);
       
       // Return formatted string for agent to speak
@@ -216,25 +202,15 @@ const clientTools = {
     try {
       console.log("Agent calling get_balance_summary, user.id:", user.id);
       
-      // Map external user ID to Supabase user_id
-      const externalUserId = user.id;
-      
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        "Cache-Control": "no-store",
-        "Pragma": "no-cache",
-      };
-      
-      const response = await fetch(getTransactionsUrl, {
-        method: "POST",
-        headers,
-        cache: "no-store",
-        body: JSON.stringify({ summary: true, days: 30, external_user_id: externalUserId }),
+      // Use supabase.functions.invoke instead of raw fetch
+      const { data, error } = await supabase.functions.invoke(TRANSACTIONS_FUNCTION, {
+        body: { summary: true, days: 30, external_user_id: user.id },
       });
       
-      const data = await response.json();
+      if (error) {
+        console.error("Error from edge function:", error);
+        throw error;
+      }
       
       if (data.summary) {
         const topMerchants = data.summary.top_merchants
@@ -262,25 +238,15 @@ const clientTools = {
     try {
       console.log("Agent calling get_spending_by_category:", params, "user.id:", user.id);
       
-      // Map external user ID to Supabase user_id
-      const externalUserId = user.id;
-      
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        "Cache-Control": "no-store",
-        "Pragma": "no-cache",
-      };
-      
-      const response = await fetch(getTransactionsUrl, {
-        method: "POST",
-        headers,
-        cache: "no-store",
-        body: JSON.stringify({ summary: true, days: params.days || 30, external_user_id: externalUserId }),
+      // Use supabase.functions.invoke instead of raw fetch
+      const { data, error } = await supabase.functions.invoke(TRANSACTIONS_FUNCTION, {
+        body: { summary: true, days: params.days || 30, external_user_id: user.id },
       });
       
-      const data = await response.json();
+      if (error) {
+        console.error("Error from edge function:", error);
+        throw error;
+      }
       
       if (data.summary?.by_type) {
         const categories = Object.entries(data.summary.by_type)
