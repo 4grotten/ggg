@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -26,6 +27,7 @@ const saveMessages = (messages: Message[]) => {
 };
 
 export const useAIChat = () => {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>(loadMessages);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +65,10 @@ export const useAIChat = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMsg] }),
+        body: JSON.stringify({ 
+          messages: [...messages, userMsg],
+          external_user_id: user?.id 
+        }),
       });
 
       if (!resp.ok) {
@@ -130,7 +135,7 @@ export const useAIChat = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [messages]);
+  }, [messages, user?.id]);
 
   const clearChat = useCallback(() => {
     setMessages([]);

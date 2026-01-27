@@ -1,9 +1,89 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Helper functions for formatting
+function formatTransactionType(type: string): string {
+  const typeMap: Record<string, string> = {
+    'top_up': 'Пополнение',
+    'withdrawal': 'Вывод',
+    'transfer_in': 'Входящий перевод',
+    'transfer_out': 'Исходящий перевод',
+    'card_payment': 'Оплата картой',
+    'refund': 'Возврат',
+    'fee': 'Комиссия',
+    'cashback': 'Кэшбэк',
+    'card_activation': 'Активация карты'
+  };
+  return typeMap[type] || type;
+}
+
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
+}
+
+async function fetchUserFinancialData(supabase: any, userId: string) {
+  // Fetch recent transactions
+  const { data: transactions, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error || !transactions?.length) {
+    return null;
+  }
+
+  // Calculate summary
+  const income = transactions
+    .filter((tx: any) => tx.amount > 0)
+    .reduce((sum: number, tx: any) => sum + parseFloat(tx.amount), 0);
+  
+  const expenses = transactions
+    .filter((tx: any) => tx.amount < 0)
+    .reduce((sum: number, tx: any) => sum + Math.abs(parseFloat(tx.amount)), 0);
+
+  // Group by category
+  const categoryTotals: Record<string, number> = {};
+  transactions
+    .filter((tx: any) => tx.amount < 0 && tx.merchant_category)
+    .forEach((tx: any) => {
+      const cat = tx.merchant_category;
+      categoryTotals[cat] = (categoryTotals[cat] || 0) + Math.abs(parseFloat(tx.amount));
+    });
+
+  // Format transactions for context
+  const formattedTransactions = transactions.slice(0, 10).map((tx: any) => 
+    `- ${formatDate(tx.created_at)}: ${formatTransactionType(tx.type)} ${tx.amount > 0 ? '+' : ''}${tx.amount} AED${tx.merchant_name ? ` (${tx.merchant_name})` : ''}${tx.description ? ` - ${tx.description}` : ''}`
+  ).join('\n');
+
+  // Format categories
+  const formattedCategories = Object.entries(categoryTotals)
+    .sort((a, b) => (b[1] as number) - (a[1] as number))
+    .slice(0, 5)
+    .map(([cat, amount]) => `- ${cat}: ${(amount as number).toFixed(2)} AED`)
+    .join('\n');
+
+  return {
+    balance: {
+      total: (income - expenses).toFixed(2),
+      income: income.toFixed(2),
+      expenses: expenses.toFixed(2)
+    },
+    transactions: formattedTransactions,
+    categories: formattedCategories,
+    transactionCount: transactions.length
+  };
+}
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -12,28 +92,62 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, user_id, external_user_id } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
     
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY is not configured");
       throw new Error("AI service is not configured");
     }
 
+    // Determine user ID for fetching financial data
+    // Priority: explicit user_id > external_user_id mapping > demo user
+    let effectiveUserId = user_id || '00000000-0000-0000-0000-000000000001';
+    
+    if (external_user_id && !user_id) {
+      // Map external user ID to Supabase UUID (same mapping as get-transactions)
+      const externalUserMapping: Record<number, string> = {
+        1: '00000000-0000-0000-0000-000000000001',
+      };
+      effectiveUserId = externalUserMapping[parseInt(external_user_id)] || effectiveUserId;
+    }
+
+    console.log(`Fetching financial data for user: ${effectiveUserId}`);
+    
+    // Fetch user's financial data
+    const financialData = await fetchUserFinancialData(supabase, effectiveUserId);
+    
+    // Build dynamic context with real user data
+    let userDataContext = '';
+    if (financialData) {
+      userDataContext = `
+
+## ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (АКТУАЛЬНЫЕ)
+### Баланс:
+- Общий баланс: ${financialData.balance.total} AED
+- Доходы за период: +${financialData.balance.income} AED
+- Расходы за период: -${financialData.balance.expenses} AED
+
+### Последние транзакции:
+${financialData.transactions}
+
+### Расходы по категориям:
+${financialData.categories || 'Нет данных по категориям'}
+
+Всего транзакций: ${financialData.transactionCount}`;
+    } else {
+      userDataContext = `
+
+## ДАННЫЕ ПОЛЬЗОВАТЕЛЯ
+Данные о транзакциях пользователя недоступны. Предложи пользователю проверить авторизацию или обратиться в поддержку.`;
+    }
+
     console.log("Sending request to AI gateway with", messages.length, "messages");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-5",
-        messages: [
-          { 
-            role: "system", 
-            content: `Ты - дружелюбный AI-ассистент для финансового приложения Easy Card. Отвечай кратко и по делу на языке пользователя. Используй эмодзи для дружелюбности.
+    const systemPrompt = `Ты - дружелюбный AI-ассистент для финансового приложения Easy Card. Отвечай кратко и по делу на языке пользователя. Используй эмодзи для дружелюбности.
 
 ## О Easy Card
 Easy Card - это финансовое приложение для управления виртуальными и металлическими картами в ОАЭ (валюта AED - дирхамы).
@@ -80,8 +194,19 @@ Easy Card - это финансовое приложение для управл
 ## Важно
 - Все карты работают в валюте AED (дирхамы ОАЭ)
 - Для использования карт нужно пройти верификацию
-- Поддерживаются сети TRC20 и ERC20 для крипто-пополнений` 
-          },
+- Поддерживаются сети TRC20 и ERC20 для крипто-пополнений
+${userDataContext}`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-5",
+        messages: [
+          { role: "system", content: systemPrompt },
           ...messages,
         ],
         stream: true,
