@@ -3,6 +3,7 @@ import { Send, Copy, Share2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Drawer,
   DrawerContent,
@@ -23,25 +24,51 @@ interface ShareButtonProps {
   label: string;
   gradient: string;
   shadowColor: string;
+  delay: number;
 }
 
-const ShareButton = memo(({ onClick, icon, label, gradient, shadowColor }: ShareButtonProps) => (
-  <button
+const ShareButton = memo(({ onClick, icon, label, gradient, shadowColor, delay }: ShareButtonProps) => (
+  <motion.button
     onClick={onClick}
-    className="flex flex-col items-center gap-2 active:scale-90 transition-transform duration-150"
+    initial={{ opacity: 0, y: 30, scale: 0.8 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    transition={{ 
+      delay: 0.5 + delay, 
+      duration: 0.4, 
+      type: "spring", 
+      stiffness: 300,
+      damping: 20 
+    }}
+    whileHover={{ scale: 1.1, y: -5 }}
+    whileTap={{ scale: 0.9 }}
+    className="flex flex-col items-center gap-2"
   >
-    <div
+    <motion.div
       className="relative w-16 h-16 rounded-2xl flex items-center justify-center overflow-hidden"
       style={{
         background: gradient,
         boxShadow: `0 8px 24px ${shadowColor}`,
       }}
+      animate={{
+        boxShadow: [
+          `0 8px 24px ${shadowColor}`,
+          `0 12px 32px ${shadowColor}`,
+          `0 8px 24px ${shadowColor}`,
+        ]
+      }}
+      transition={{ repeat: Infinity, duration: 2, delay: delay * 0.2 }}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+      {/* Shimmer effect */}
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+        initial={{ x: "-100%" }}
+        animate={{ x: "200%" }}
+        transition={{ repeat: Infinity, duration: 2, delay: 1 + delay * 0.3, ease: "easeInOut" }}
+      />
       <span className="relative z-10">{icon}</span>
-    </div>
+    </motion.div>
     <span className="text-xs text-muted-foreground">{label}</span>
-  </button>
+  </motion.button>
 ));
 
 ShareButton.displayName = "ShareButton";
@@ -82,43 +109,131 @@ export const ShareDrawer = memo(({ open, onOpenChange }: ShareDrawerProps) => {
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="max-h-[85vh] overflow-hidden">
+        {/* Animated background particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-32 h-32 rounded-full"
+              style={{
+                background: `radial-gradient(circle, ${
+                  i % 3 === 0 ? 'rgba(16, 185, 129, 0.15)' : 
+                  i % 3 === 1 ? 'rgba(124, 58, 237, 0.15)' : 
+                  'rgba(59, 130, 246, 0.15)'
+                } 0%, transparent 70%)`,
+                left: `${10 + i * 15}%`,
+                top: `${20 + (i % 2) * 40}%`,
+              }}
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.3, 0.6, 0.3],
+                x: [0, 20, 0],
+                y: [0, -15, 0],
+              }}
+              transition={{
+                duration: 4 + i * 0.5,
+                repeat: Infinity,
+                delay: i * 0.3,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+        </div>
+
         <DrawerHeader className="relative pb-2">
-          <button
+          <motion.button
             onClick={() => onOpenChange(false)}
-            className="absolute right-4 top-4 w-8 h-8 rounded-full bg-muted/80 flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 400 }}
+            whileHover={{ rotate: 90, scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="absolute right-4 top-4 w-8 h-8 rounded-full bg-muted/80 flex items-center justify-center z-10"
           >
             <X className="w-4 h-4" />
-          </button>
-          <DrawerTitle className="text-center text-lg font-semibold">
-            {t('partner.shareTitle', 'Пригласить друзей')}
-          </DrawerTitle>
+          </motion.button>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+          >
+            <DrawerTitle className="text-center text-lg font-semibold">
+              {t('partner.shareTitle', 'Пригласить друзей')}
+            </DrawerTitle>
+          </motion.div>
         </DrawerHeader>
         
-        <div className="px-6 pb-8">
-          {/* QR Code */}
-          <div className="flex justify-center mb-6">
-            <div className="bg-white p-4 rounded-3xl shadow-lg">
-              <QRCodeSVG
-                value={APP_LINK}
-                size={180}
-                level="H"
-                includeMargin={false}
-                bgColor="#FFFFFF"
-                fgColor="#000000"
+        <div className="px-6 pb-8 relative z-10">
+          {/* QR Code with fantastic entrance */}
+          <motion.div 
+            className="flex justify-center mb-6"
+            initial={{ opacity: 0, scale: 0.5, rotateY: 90 }}
+            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+            transition={{ 
+              delay: 0.2, 
+              duration: 0.6, 
+              type: "spring", 
+              stiffness: 200 
+            }}
+          >
+            <motion.div 
+              className="relative bg-white p-4 rounded-3xl"
+              animate={{
+                boxShadow: [
+                  "0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(124, 58, 237, 0.2)",
+                  "0 0 30px rgba(124, 58, 237, 0.4), 0 0 60px rgba(59, 130, 246, 0.3)",
+                  "0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(16, 185, 129, 0.2)",
+                  "0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(124, 58, 237, 0.2)",
+                ]
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            >
+              {/* Rotating border glow */}
+              <motion.div
+                className="absolute -inset-1 rounded-[28px] opacity-60"
+                style={{
+                  background: "conic-gradient(from 0deg, #10b981, #7c3aed, #3b82f6, #10b981)",
+                }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
               />
-            </div>
-          </div>
+              
+              {/* Inner container */}
+              <div className="relative bg-white p-4 rounded-3xl">
+                <QRCodeSVG
+                  value={APP_LINK}
+                  size={180}
+                  level="H"
+                  includeMargin={false}
+                  bgColor="#FFFFFF"
+                  fgColor="#000000"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
           
-          {/* Scan instruction */}
-          <p className="text-center text-sm text-muted-foreground mb-6">
+          {/* Scan instruction with typewriter-like appearance */}
+          <motion.p 
+            className="text-center text-sm text-muted-foreground mb-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.3 }}
+          >
             {t('partner.scanQR', 'Отсканируйте QR-код для перехода')}
-          </p>
+          </motion.p>
           
-          {/* Share buttons */}
-          <p className="text-sm text-muted-foreground text-center mb-4">
+          {/* Share via label */}
+          <motion.p 
+            className="text-sm text-muted-foreground text-center mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.45, duration: 0.3 }}
+          >
             {t('partner.shareVia', 'Поделиться через')}
-          </p>
+          </motion.p>
+          
+          {/* Share buttons with staggered entrance */}
           <div className="flex justify-center gap-6">
             <ShareButton
               onClick={handleShareTelegram}
@@ -126,6 +241,7 @@ export const ShareDrawer = memo(({ open, onOpenChange }: ShareDrawerProps) => {
               label="Telegram"
               gradient="linear-gradient(135deg, #0088cc 0%, #00c6ff 100%)"
               shadowColor="rgba(0, 136, 204, 0.4)"
+              delay={0}
             />
             <ShareButton
               onClick={handleCopyLink}
@@ -133,6 +249,7 @@ export const ShareDrawer = memo(({ open, onOpenChange }: ShareDrawerProps) => {
               label={t('partner.copyLink', 'Копировать')}
               gradient="linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)"
               shadowColor="rgba(124, 58, 237, 0.4)"
+              delay={0.1}
             />
             <ShareButton
               onClick={handleShare}
@@ -140,6 +257,7 @@ export const ShareDrawer = memo(({ open, onOpenChange }: ShareDrawerProps) => {
               label={t('partner.share', 'Ещё')}
               gradient="linear-gradient(135deg, #10b981 0%, #34d399 100%)"
               shadowColor="rgba(16, 185, 129, 0.4)"
+              delay={0.2}
             />
           </div>
         </div>
