@@ -77,13 +77,12 @@ export const PurchaseTariffDrawer = ({
         } 
       });
     } else if (optionId === "crypto") {
-      navigate("/top-up/crypto", { 
+      navigate("/partner/pay-crypto", { 
         state: { 
-          isTariffPurchase: true,
           tariffId,
           tariffName,
           tariffPrice,
-          prefilledAmount: tariffPrice
+          tariffDescription
         } 
       });
     }
