@@ -912,7 +912,8 @@
       "tariffCost": "Стоимость тарифа",
       "exchangeRate": "Курс обмена",
       "paymentType": "Тип оплаты",
-      "purchaseSuccess": "Тариф успешно приобретён!"
+      "purchaseSuccess": "Тариф успешно приобретён!",
+      "selectTariff": "Выберите тариф"
     }
   }
 }

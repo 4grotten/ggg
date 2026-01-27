@@ -848,7 +848,8 @@
       "tariffCost": "Plan-Kosten",
       "exchangeRate": "Wechselkurs",
       "paymentType": "Zahlungsart",
-      "purchaseSuccess": "Plan erfolgreich gekauft!"
+      "purchaseSuccess": "Plan erfolgreich gekauft!",
+      "selectTariff": "Plan auswählen"
     }
   }
 }

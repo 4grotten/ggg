@@ -848,7 +848,8 @@
       "tariffCost": "Costo del plan",
       "exchangeRate": "Tipo de cambio",
       "paymentType": "Tipo de pago",
-      "purchaseSuccess": "¡Plan comprado exitosamente!"
+      "purchaseSuccess": "¡Plan comprado exitosamente!",
+      "selectTariff": "Seleccionar plan"
     }
   }
 }

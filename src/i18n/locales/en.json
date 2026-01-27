@@ -911,7 +911,8 @@
       "tariffCost": "Plan cost",
       "exchangeRate": "Exchange rate",
       "paymentType": "Payment type",
-      "purchaseSuccess": "Plan purchased successfully!"
+      "purchaseSuccess": "Plan purchased successfully!",
+      "selectTariff": "Select Plan"
     }
   }
 }
