@@ -24,12 +24,23 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
+    // Parse request body first
+    const url = new URL(req.url);
+    const body = req.method === 'POST' ? await req.json() : {};
+    
     // Check for Authorization header (for authenticated users)
     const authHeader = req.headers.get('Authorization');
     let userId: string | null = null;
     
-    if (authHeader?.startsWith('Bearer ')) {
-      // Use anon key client with user's token for auth verification
+    // First priority: explicit user_id from client (trusted internal call)
+    // This allows the client to pass the actual user ID when using external auth (test.apofiz.com)
+    if (body.user_id) {
+      userId = body.user_id;
+      console.log(`Using explicit user_id from request: ${userId}`);
+    }
+    // Second priority: Supabase JWT token
+    else if (authHeader?.startsWith('Bearer ')) {
+      // Try to verify as Supabase JWT
       const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
       const userClient = createClient(supabaseUrl, anonKey, {
         global: { headers: { Authorization: authHeader } }
@@ -40,7 +51,9 @@ serve(async (req) => {
       
       if (!claimsError && claimsData?.user) {
         userId = claimsData.user.id;
-        console.log(`Authenticated user: ${userId}`);
+        console.log(`Authenticated via Supabase JWT: ${userId}`);
+      } else {
+        console.log('JWT verification failed, checking for external auth token');
       }
     }
     
@@ -53,10 +66,6 @@ serve(async (req) => {
     // Use service role for actual query
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse query parameters
-    const url = new URL(req.url);
-    const body = req.method === 'POST' ? await req.json() : {};
-    
     const type = body.type || url.searchParams.get('type');
     const limit = parseInt(body.limit || url.searchParams.get('limit') || '10');
     const days = parseInt(body.days || url.searchParams.get('days') || '30');
