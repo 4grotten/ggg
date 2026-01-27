@@ -46,6 +46,8 @@ import Chat from "./pages/Chat";
 import PhoneEntry from "./pages/auth/PhoneEntry";
 import ProfileSteps from "./pages/auth/ProfileSteps";
 import CodeEntry from "./pages/auth/CodeEntry";
+import ResetPasswordCode from "./pages/auth/ResetPasswordCode";
+import ResetPassword from "./pages/auth/ResetPassword";
 import EditProfile from "./pages/EditProfile";
 import Partner from "./pages/Partner";
 import ReferralHistory from "./pages/ReferralHistory";
@@ -165,6 +167,8 @@ const AppContent = () => {
             <Route path="/auth/phone" element={<PhoneEntry />} />
             <Route path="/auth/code" element={<CodeEntry />} />
             <Route path="/auth/profile" element={<ProfileSteps />} />
+            <Route path="/auth/reset-code" element={<ResetPasswordCode />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </motion.div>

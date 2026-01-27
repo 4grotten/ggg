@@ -558,7 +558,11 @@ const PhoneEntry = () => {
       if (response.error) {
         toast.error(response.error.message || t('auth.login.forgotPasswordError'));
       } else {
-        toast.success(t('auth.login.forgotPasswordSent') || 'Password reset code sent');
+        toast.success(t('auth.login.forgotPasswordSent') || 'Password reset code sent via WhatsApp');
+        // Navigate to reset code entry page
+        navigate("/auth/reset-code", { 
+          state: { phoneNumber: fullPhone }
+        });
       }
     } catch {
       toast.error(t('auth.login.forgotPasswordError') || 'Failed to send reset code');
