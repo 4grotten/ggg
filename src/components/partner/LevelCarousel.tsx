@@ -158,7 +158,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
                       <CreditCard className="w-3.5 h-3.5 relative z-10" />
-                      <span className="relative z-10">{t('partner.buyLevel', 'Купить')}</span>
+                      <span className="relative z-10">{t('partner.subscribe', 'Подписаться')}</span>
                     </button>
                   </motion.div>
                 )}
