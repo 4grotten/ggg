@@ -115,9 +115,28 @@ const TariffPayBalance = () => {
     }
   }, [userCards, selectedPaymentCardId]);
 
+  // Fee rates
+  const NETWORK_FEE_RATE = 0.005; // 0.5%
+  const CONVERSION_FEE_RATE = 0.015; // 1.5%
+
   // Convert USD to AED (approximate rate)
   const usdToAed = (usd: number) => usd * 3.67;
-  const priceInAed = usdToAed(tariffPrice);
+  
+  // Calculate fees and total
+  const calculateTotal = (priceUsd: number) => {
+    const baseAed = usdToAed(priceUsd);
+    const networkFee = baseAed * NETWORK_FEE_RATE;
+    const conversionFee = baseAed * CONVERSION_FEE_RATE;
+    return {
+      baseAed,
+      networkFee,
+      conversionFee,
+      total: baseAed + networkFee + conversionFee
+    };
+  };
+
+  const priceBreakdown = calculateTotal(tariffPrice);
+  const priceInAed = priceBreakdown.total;
 
   const selectedPaymentCard = userCards.find(c => c.id === selectedPaymentCardId);
   const hasEnoughBalance = selectedPaymentCard && (selectedPaymentCard.balance || 0) >= priceInAed;
@@ -238,7 +257,7 @@ const TariffPayBalance = () => {
               const Icon = TARIFF_ICONS[tariff.id] || Crown;
               const color = TARIFF_COLORS[tariff.id] || "text-primary";
               const bgColor = TARIFF_BG_COLORS[tariff.id] || "bg-primary/10";
-              const tariffPriceAed = usdToAed(tariff.price);
+              const breakdown = calculateTotal(tariff.price);
               
               return (
                 <div 
@@ -274,12 +293,24 @@ const TariffPayBalance = () => {
                         <span className="font-medium">1 USD = 3.67 AED</span>
                       </div>
                       <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{t('partner.bonuses.baseAmount', 'Сумма в AED')}</span>
+                        <span className="font-medium">{formatBalance(breakdown.baseAed)} AED</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{t('fees.networkFee', 'Комиссия сети')} (0.5%)</span>
+                        <span className="font-medium">{formatBalance(breakdown.networkFee)} AED</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">{t('fees.conversionFee', 'Комиссия конвертации')} (1.5%)</span>
+                        <span className="font-medium">{formatBalance(breakdown.conversionFee)} AED</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">{t('partner.bonuses.paymentType', 'Тип оплаты')}</span>
                         <span className="font-medium">{t('partner.bonuses.oneTimePayment', 'Единоразовый платёж')}</span>
                       </div>
                       <div className="flex justify-between text-base pt-3 border-t border-border/50">
                         <span className="font-semibold">{t('openCard.totalToPay', 'Итого к оплате')}</span>
-                        <span className="font-bold text-primary">{formatBalance(tariffPriceAed)} AED</span>
+                        <span className="font-bold text-primary">{formatBalance(breakdown.total)} AED</span>
                       </div>
                     </div>
                   </motion.div>

@@ -541,6 +541,10 @@
     "limitsFor": "Límites para",
     "accountWithdrawal": "Retiro a cuenta"
   },
+  "fees": {
+    "networkFee": "Comisión de red",
+    "conversionFee": "Comisión de conversión"
+  },
   "chat": {
     "aiAssistant": "Asistente IA",
     "description": "Haz una pregunta sobre tarjetas, transferencias, límites o cualquier otra función de la app",
@@ -849,7 +853,8 @@
       "exchangeRate": "Tipo de cambio",
       "paymentType": "Tipo de pago",
       "purchaseSuccess": "¡Plan comprado exitosamente!",
-      "selectTariff": "Seleccionar plan"
+      "selectTariff": "Seleccionar plan",
+      "baseAmount": "Monto en AED"
     }
   }
 }

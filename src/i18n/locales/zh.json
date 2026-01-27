@@ -547,6 +547,10 @@
     "limitsFor": "限额",
     "accountWithdrawal": "提款到账户"
   },
+  "fees": {
+    "networkFee": "网络费用",
+    "conversionFee": "转换费用"
+  },
   "chat": {
     "aiAssistant": "AI 助手",
     "description": "询问有关卡片、转账、限额或其他应用功能的问题",
@@ -856,7 +860,8 @@
       "exchangeRate": "汇率",
       "paymentType": "付款类型",
       "purchaseSuccess": "套餐购买成功！",
-      "selectTariff": "选择套餐"
+      "selectTariff": "选择套餐",
+      "baseAmount": "AED金额"
     }
   }
 }
