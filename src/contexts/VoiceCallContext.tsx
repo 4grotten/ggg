@@ -50,6 +50,24 @@ const calculateAge = (dateOfBirth: string | null): number | null => {
   return age;
 };
 
+// Mock cards data for balance (same as in cards.ts)
+const mockCardsData = [
+  { 
+    id: "1", 
+    type: "virtual", 
+    name: "Visa Virtual", 
+    balance: 213757.49,
+    lastFourDigits: "4521",
+  },
+  { 
+    id: "2", 
+    type: "metal", 
+    name: "Visa Metal", 
+    balance: 256508.98,
+    lastFourDigits: "8834",
+  },
+];
+
 // Client tools for ElevenLabs agent
 const getTransactionsUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-transactions`;
 
@@ -84,6 +102,38 @@ const clientTools = {
       message: user.full_name 
         ? `Пользователь авторизован. Имя: ${user.full_name}${age ? `, возраст: ${age} лет` : ", возраст не указан"}.`
         : "Пользователь авторизован, но имя не указано в профиле."
+    });
+  },
+  
+  // Get card balances - REQUIRES authenticated user
+  get_card_balance: async () => {
+    console.log("Agent calling get_card_balance");
+    
+    const token = getAuthToken();
+    if (!token) {
+      return JSON.stringify({
+        error: true,
+        message: "Для просмотра баланса карт необходимо авторизоваться. Пожалуйста, войдите в аккаунт."
+      });
+    }
+    
+    // Calculate total balance
+    const totalBalance = mockCardsData.reduce((sum, card) => sum + card.balance, 0);
+    
+    // Format cards info
+    const cardsInfo = mockCardsData.map(card => ({
+      type: card.type === "virtual" ? "Виртуальная карта" : "Металлическая карта",
+      name: card.name,
+      last_digits: card.lastFourDigits,
+      balance: card.balance,
+      balance_formatted: `${card.balance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`
+    }));
+    
+    return JSON.stringify({
+      total_balance: totalBalance,
+      total_balance_formatted: `${totalBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`,
+      cards: cardsInfo,
+      message: `Общий баланс: ${totalBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} дирхам. ${cardsInfo.map(c => `${c.type} *${c.last_digits}: ${c.balance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} дирхам`).join('. ')}.`
     });
   },
   
