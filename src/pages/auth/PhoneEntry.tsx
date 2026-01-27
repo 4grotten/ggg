@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { ChevronDown, Phone, HelpCircle, MessageSquare, KeyRound, Lock, Eye, EyeOff, Loader2, Fingerprint, ScanFace } from "lucide-react";
+import { ChevronDown, Phone, HelpCircle, MessageSquare, KeyRound, Lock, Eye, EyeOff, Loader2, Fingerprint, ScanFace, Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -268,6 +268,7 @@ const PhoneEntry = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   
   // Biometric auth
   const { 
@@ -376,6 +377,7 @@ const PhoneEntry = () => {
       }
       
       setIsLoading(true);
+      setButtonState('loading');
       setErrorMessage("");
       
       try {
@@ -386,8 +388,12 @@ const PhoneEntry = () => {
         
         if (checkResponse.error) {
           setShowError(true);
+          setButtonState('error');
           setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
-          setTimeout(() => setShowError(false), 600);
+          setTimeout(() => {
+            setShowError(false);
+            setButtonState('idle');
+          }, 1500);
           return;
         }
         
@@ -404,20 +410,25 @@ const PhoneEntry = () => {
             if (otpResponse.error) {
               console.warn('OTP send failed:', otpResponse.error.message);
               toast.error(otpResponse.error.message || t("auth.phone.error"));
+              setButtonState('error');
+              setTimeout(() => setButtonState('idle'), 1500);
             } else {
               const successMessage = isKyrgyzstan 
                 ? (t("auth.phone.codeSent") || "Verification code sent!")
                 : (t("auth.phone.codeSentWhatsApp") || "Code sent via WhatsApp!");
               toast.success(successMessage);
+              setButtonState('success');
             }
             
-            // Navigate to code entry page
-            navigate("/auth/code", { 
-              state: { 
-                phoneNumber: fullPhone,
-                authType: otpType
-              }
-            });
+            // Navigate to code entry page after showing success
+            setTimeout(() => {
+              navigate("/auth/code", { 
+                state: { 
+                  phoneNumber: fullPhone,
+                  authType: otpType
+                }
+              });
+            }, otpResponse.error ? 0 : 600);
           } else {
             // Existing user - show password login (NO OTP)
             if (token) {
@@ -425,17 +436,23 @@ const PhoneEntry = () => {
               setAuthToken(token);
               await getCurrentUser();
               toast.success(t("auth.login.success"));
-              navigate("/", { replace: true });
+              setButtonState('success');
+              setTimeout(() => navigate("/", { replace: true }), 600);
             } else {
               // No token - needs password login
+              setButtonState('idle');
               setIsLoginMode(true);
             }
           }
         }
       } catch {
         setShowError(true);
+        setButtonState('error');
         setErrorMessage(t("auth.phone.error") || "Something went wrong");
-        setTimeout(() => setShowError(false), 600);
+        setTimeout(() => {
+          setShowError(false);
+          setButtonState('idle');
+        }, 1500);
       } finally {
         setIsLoading(false);
       }
@@ -1145,14 +1162,59 @@ const PhoneEntry = () => {
         <div className="karta-footer-actions pb-6">
           <button
             onClick={handleContinue}
-            disabled={isLoading}
-            className="karta-btn-primary disabled:opacity-70"
+            disabled={buttonState === 'loading' || buttonState === 'success'}
+            className={`karta-btn-primary disabled:opacity-70 transition-colors duration-300 flex items-center justify-center ${
+              buttonState === 'success' ? 'bg-green-500 hover:bg-green-500' : ''
+            } ${
+              buttonState === 'error' ? 'bg-destructive hover:bg-destructive' : ''
+            }`}
           >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              t('common.continue')
-            )}
+            <AnimatePresence mode="wait">
+              {buttonState === 'loading' && (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                </motion.div>
+              )}
+              {buttonState === 'success' && (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Check className="w-5 h-5" />
+                </motion.div>
+              )}
+              {buttonState === 'error' && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="w-5 h-5" />
+                </motion.div>
+              )}
+              {buttonState === 'idle' && (
+                <motion.span
+                  key="idle"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {t('common.continue')}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
           
           {/* Show biometric login if enabled */}
