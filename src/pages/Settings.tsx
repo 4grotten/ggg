@@ -805,8 +805,12 @@ const Settings = () => {
             label={t("settings.addAccount") || "Add Account"}
             onClick={() => {
               // Save current account before adding new one
+              // Use explicit token to ensure we capture it before any navigation/state changes
               if (user) {
-                saveCurrentAccount(user);
+                const currentToken = localStorage.getItem('auth_token');
+                if (currentToken) {
+                  saveCurrentAccount(user, currentToken);
+                }
               }
               navigate("/auth/phone");
             }}

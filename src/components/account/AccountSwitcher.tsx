@@ -41,8 +41,13 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
 
   const handleAddAccount = () => {
     // Save current account BEFORE navigating to add new one
+    // Use explicit token to ensure we capture it before any navigation/state changes
     if (user) {
-      saveCurrentAccount(user);
+      const currentToken = localStorage.getItem('auth_token');
+      if (currentToken) {
+        saveCurrentAccount(user, currentToken);
+        console.log('[AccountSwitcher] Saved current account before adding new:', user.id, user.full_name);
+      }
     }
     onOpenChange(false);
     navigate('/auth/phone');

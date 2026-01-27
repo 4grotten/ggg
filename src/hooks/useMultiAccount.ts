@@ -39,9 +39,12 @@ const saveAccounts = (accounts: SavedAccount[]) => {
 /**
  * Add or update account in saved accounts
  */
-export const saveCurrentAccount = (user: UserProfile) => {
-  const token = getAuthToken();
-  if (!token || !user.id) return;
+export const saveCurrentAccount = (user: UserProfile, explicitToken?: string) => {
+  const token = explicitToken || getAuthToken();
+  if (!token || !user.id) {
+    console.warn('[MultiAccount] saveCurrentAccount skipped: no token or user.id', { hasToken: !!token, userId: user?.id });
+    return;
+  }
 
   const accounts = getSavedAccounts();
   const existingIndex = accounts.findIndex(a => a.user.id === user.id);
@@ -55,11 +58,14 @@ export const saveCurrentAccount = (user: UserProfile) => {
 
   if (existingIndex >= 0) {
     accounts[existingIndex] = account;
+    console.log('[MultiAccount] Updated existing account:', user.id, user.full_name);
   } else {
     accounts.push(account);
+    console.log('[MultiAccount] Added new account:', user.id, user.full_name);
   }
 
   saveAccounts(accounts);
+  console.log('[MultiAccount] Total accounts saved:', accounts.length);
 };
 
 /**
