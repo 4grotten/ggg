@@ -367,7 +367,9 @@
     "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)",
     "editProfile": "Редактировать профиль",
     "personalData": "Профиль",
-    "verification": "Верификация"
+    "verification": "Верификация",
+    "savedAccounts": "Сохранённые аккаунты",
+    "switchedTo": "Вы вошли как {{name}}"
   },
   "editProfile": {
     "title": "Редактирование профиля",
