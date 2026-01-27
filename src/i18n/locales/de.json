@@ -347,7 +347,17 @@
     "logoutSuccess": "Erfolgreich abgemeldet",
     "apofizNetwork": "Apofiz Handels- & Soziales Netzwerk",
     "guest": "Gast",
-    "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen"
+    "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen",
+    "accounts": "Konten",
+    "addAccount": "Konto hinzufügen",
+    "addAccountDesc": "In ein anderes Konto einloggen",
+    "switchAccount": "Konto wechseln",
+    "otherAccounts": "Andere Konten",
+    "editProfile": "Profil bearbeiten",
+    "personalData": "Profil",
+    "verification": "Verifizierung",
+    "savedAccounts": "Gespeicherte Konten",
+    "switchedTo": "Gewechselt zu {{name}}"
   },
   "card": {
     "back": "Zurück",

@@ -349,7 +349,17 @@
     "logoutSuccess": "已成功退出",
     "apofizNetwork": "Apofiz 商贸社交网络",
     "guest": "访客",
-    "loginToAccess": "登录以访问所有功能"
+    "loginToAccess": "登录以访问所有功能",
+    "accounts": "账户",
+    "addAccount": "添加账户",
+    "addAccountDesc": "登录其他账户",
+    "switchAccount": "切换账户",
+    "otherAccounts": "其他账户",
+    "editProfile": "编辑资料",
+    "personalData": "个人资料",
+    "verification": "身份验证",
+    "savedAccounts": "已保存账户",
+    "switchedTo": "已切换至 {{name}}"
   },
   "card": {
     "back": "返回",
