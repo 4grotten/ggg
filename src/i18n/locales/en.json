@@ -764,6 +764,28 @@
         "button": "Get Started",
         "ready": "Profile created successfully"
       }
+    },
+    "resetPassword": {
+      "codeTitle": "Enter reset code",
+      "codeSentTo": "Code sent via WhatsApp to",
+      "verify": "Verify",
+      "invalidCode": "Please enter a valid 6-digit code",
+      "wrongCode": "Wrong code. Please try again.",
+      "codeVerified": "Code verified!",
+      "error": "Verification failed",
+      "resendSuccess": "Code sent via WhatsApp!",
+      "resendError": "Failed to send code",
+      "title": "Set new password",
+      "subtitle": "Create a new password for your account",
+      "newPassword": "New password",
+      "passwordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm password",
+      "confirmPlaceholder": "Confirm new password",
+      "minChars": "Minimum 6 characters",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordsNotMatch": "Passwords do not match",
+      "submit": "Save password",
+      "success": "Password changed successfully!"
     }
   },
   "partner": {
