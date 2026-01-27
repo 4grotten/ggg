@@ -801,6 +801,8 @@
     "buyLevel": "Купить",
     "buyLevelSoon": "Скоро будет доступно",
     "subscribe": "Подписаться",
+    "availableWithPro": "Доступен с PRO",
+    "availableWithPartner": "Доступен с Партнёр",
     "cardIssuance": "За выпуск карт",
     "fromTransactions": "С транзакций",
     "referralBalance": "Реферальный счёт",

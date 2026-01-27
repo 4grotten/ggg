@@ -801,6 +801,8 @@
     "buyLevel": "Buy",
     "buyLevelSoon": "Coming soon",
     "subscribe": "Subscribe",
+    "availableWithPro": "Available with PRO",
+    "availableWithPartner": "Available with Partner",
     "cardIssuance": "For card issuance",
     "fromTransactions": "From transactions",
     "referralBalance": "Referral Balance",

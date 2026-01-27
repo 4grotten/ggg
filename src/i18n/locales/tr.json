@@ -739,6 +739,8 @@
     "cardIssuance": "Kart çıkarma için",
     "fromTransactions": "İşlemlerden",
     "subscribe": "Abone Ol",
+    "availableWithPro": "PRO ile Kullanılabilir",
+    "availableWithPartner": "Partner ile Kullanılabilir",
     "referralBalance": "Referans Bakiyesi",
     "invited": "Davet Edildi",
     "withdrawn": "Çekildi",
