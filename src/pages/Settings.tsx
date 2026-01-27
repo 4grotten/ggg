@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
@@ -398,6 +399,7 @@ const Settings = () => {
       title={t("settings.profile")}
       rightAction={
         <div className="flex items-center gap-2">
+          <ThemeSwitcher />
           <LanguageSwitcher />
           {isAuthenticated && (
             <button
