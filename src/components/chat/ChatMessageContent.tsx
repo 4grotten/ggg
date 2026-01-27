@@ -36,35 +36,39 @@ const parseTransactionType = (typeStr: string): 'incoming' | 'outgoing' | 'card'
 };
 
 const TransactionItem = ({ date, type, amount, description }: ParsedTransaction) => {
-  const txType = parseTransactionType(type);
   const isPositive = amount > 0;
   
   const getIcon = () => {
-    if (isPositive) return <ArrowDownLeft className="w-4 h-4 text-success" />;
-    return <ArrowUpRight className="w-4 h-4 text-destructive" />;
+    if (isPositive) return <ArrowDownLeft className="w-4 h-4 text-white" />;
+    return <ArrowUpRight className="w-4 h-4 text-white" />;
   };
 
   return (
-    <div className="flex items-center justify-between p-2.5 rounded-xl bg-background/50 hover:bg-background/80 transition-colors my-1">
-      <div className="flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-          {getIcon()}
-        </div>
-        <div className="text-left min-w-0">
-          <p className="text-xs font-medium truncate">{type}</p>
-          {description && (
-            <p className="text-[10px] text-muted-foreground truncate">{description.trim()}</p>
-          )}
-        </div>
+    <div className="flex items-center gap-3 p-3 rounded-2xl bg-background border border-border/50 shadow-sm my-1.5">
+      <div className={cn(
+        "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",
+        isPositive ? "bg-success" : "bg-destructive"
+      )}>
+        {getIcon()}
       </div>
-      <div className="text-right flex-shrink-0 ml-2">
-        <p className={cn(
-          "text-xs font-semibold",
-          isPositive ? "text-success" : "text-destructive"
-        )}>
-          {isPositive ? '+' : ''}{amount.toFixed(2)} AED
-        </p>
-        <p className="text-[10px] text-muted-foreground">{date}</p>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-medium truncate">{type}</p>
+          <p className={cn(
+            "text-sm font-bold flex-shrink-0",
+            isPositive ? "text-success" : "text-destructive"
+          )}>
+            {isPositive ? '+' : ''}{amount.toFixed(2)} AED
+          </p>
+        </div>
+        <div className="flex items-center justify-between gap-2 mt-0.5">
+          {description ? (
+            <p className="text-xs text-muted-foreground truncate">{description.trim()}</p>
+          ) : (
+            <span />
+          )}
+          <p className="text-xs text-muted-foreground flex-shrink-0">{date}</p>
+        </div>
       </div>
     </div>
   );
