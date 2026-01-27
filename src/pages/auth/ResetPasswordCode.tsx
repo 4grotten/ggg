@@ -8,10 +8,10 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { KeyRound, HelpCircle, Loader2, RefreshCw, MessageCircle } from "lucide-react";
+import { KeyRound, HelpCircle, Loader2, RefreshCw, MessageCircle, Mail, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { verifyResetCode, forgotPassword } from "@/services/api/authApi";
+import { verifyResetCode, forgotPassword, getUserEmail, forgotPasswordEmail } from "@/services/api/authApi";
 import { z } from "zod";
 
 // Validation schema
@@ -36,6 +36,11 @@ const ResetPasswordCode = () => {
   const [error, setError] = useState("");
   const [resendCooldown, setResendCooldown] = useState(RESEND_COOLDOWN);
   
+  // Email recovery state
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const verifyingRef = useRef(false);
   
@@ -45,6 +50,21 @@ const ResetPasswordCode = () => {
       navigate("/auth/phone", { replace: true });
     }
   }, [phoneNumber, navigate]);
+  
+  // Fetch user email on mount
+  useEffect(() => {
+    const fetchEmail = async () => {
+      try {
+        const response = await getUserEmail();
+        if (response.data?.email) {
+          setUserEmail(response.data.email);
+        }
+      } catch {
+        // Email not available, ignore
+      }
+    };
+    fetchEmail();
+  }, []);
   
   // Resend cooldown timer
   useEffect(() => {
@@ -183,6 +203,28 @@ const ResetPasswordCode = () => {
       setIsResending(false);
     }
   };
+  
+  // Send reset link to email
+  const handleSendToEmail = async () => {
+    if (isSendingEmail || emailSent) return;
+    
+    setIsSendingEmail(true);
+    
+    try {
+      const response = await forgotPasswordEmail();
+      
+      if (response.error) {
+        toast.error(response.error.message || t("editProfile.changePassword.emailError") || "Failed to send email");
+      } else {
+        setEmailSent(true);
+        toast.success(t("editProfile.changePassword.emailSent") || "Reset link sent to email!");
+      }
+    } catch {
+      toast.error(t("editProfile.changePassword.emailError") || "Failed to send email");
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
 
   return (
     <MobileLayout
@@ -274,7 +316,7 @@ const ResetPasswordCode = () => {
             )}
             
             {/* Resend button */}
-            <div className="text-center">
+            <div className="text-center space-y-3">
               <button
                 onClick={handleResend}
                 disabled={resendCooldown > 0 || isResending}
@@ -290,6 +332,29 @@ const ResetPasswordCode = () => {
                   : t("auth.code.resend") || "Resend code"
                 }
               </button>
+              
+              {/* Send to email option */}
+              {userEmail && (
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={handleSendToEmail}
+                  disabled={isSendingEmail || emailSent}
+                  className="text-primary font-medium disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+                >
+                  {isSendingEmail ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : emailSent ? (
+                    <Check className="w-4 h-4 text-emerald-500" />
+                  ) : (
+                    <Mail className="w-4 h-4" />
+                  )}
+                  {emailSent 
+                    ? t("editProfile.changePassword.emailSent") || "Email sent!"
+                    : `${t("editProfile.changePassword.sendToEmail") || "Send to"} ${userEmail.replace(/(.{2})(.*)(@.*)/, '$1***$3')}`
+                  }
+                </motion.button>
+              )}
             </div>
           </motion.div>
 
