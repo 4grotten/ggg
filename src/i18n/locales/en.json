@@ -365,7 +365,9 @@
     "switchAccount": "Switch Account",
     "otherAccounts": "Other accounts",
     "otherAccountsMock": "Mockups (no saved accounts found)",
-    "editProfile": "Edit Profile"
+    "editProfile": "Edit Profile",
+    "personalData": "Profile",
+    "verification": "Personal Data"
   },
   "editProfile": {
     "title": "Edit Profile",

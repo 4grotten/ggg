@@ -365,7 +365,9 @@
     "switchAccount": "Сменить аккаунт",
     "otherAccounts": "Другие аккаунты",
     "otherAccountsMock": "Примеры (сохранённые аккаунты не найдены)",
-    "editProfile": "Редактировать профиль"
+    "editProfile": "Редактировать профиль",
+    "personalData": "Профиль",
+    "verification": "Личные данные"
   },
   "editProfile": {
     "title": "Редактирование профиля",
