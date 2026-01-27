@@ -166,6 +166,7 @@ const clientTools = {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
         "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         "Cache-Control": "no-store",
         "Pragma": "no-cache",
       };
@@ -221,6 +222,7 @@ const clientTools = {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
         "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         "Cache-Control": "no-store",
         "Pragma": "no-cache",
       };
@@ -266,6 +268,7 @@ const clientTools = {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
         "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         "Cache-Control": "no-store",
         "Pragma": "no-cache",
       };
