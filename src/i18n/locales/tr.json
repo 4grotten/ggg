@@ -887,5 +887,46 @@
       "selectTariff": "Plan seçin",
       "baseAmount": "AED tutarı"
     }
+  },
+  "editProfile": {
+    "title": "Profili Düzenle",
+    "fullName": "Tam Ad",
+    "fullNamePlaceholder": "Tam adınızı girin",
+    "fullNameDescription": "Pasaportunuzdaki adınız. Kimlik doğrulama ve profil görüntüleme için kullanılır.",
+    "username": "Kullanıcı Adı",
+    "usernamePlaceholder": "Kullanıcı adınızı girin",
+    "usernameDescription": "Kullanıcılar arası transferler için benzersiz tanımlayıcı. Sadece harf, rakam ve alt çizgi kullanılabilir.",
+    "email": "E-posta",
+    "emailPlaceholder": "E-postanızı girin",
+    "emailDescription": "Şifre kurtarma ve önemli işlem bildirimleri için.",
+    "dateOfBirth": "Doğum Tarihi",
+    "selectDateOfBirth": "Doğum tarihini seçin",
+    "dateOfBirthDescription": "Kimlik doğrulama ve düzenleyici uyumluluk için gereklidir.",
+    "gender": "Cinsiyet",
+    "selectGender": "Cinsiyet seçin",
+    "genderDescription": "İsteğe bağlı. Uygulama içi kişiselleştirilmiş iletişim için kullanılır.",
+    "save": "Değişiklikleri Kaydet",
+    "saved": "Profil başarıyla güncellendi",
+    "saveFailed": "Profil güncellenemedi",
+    "changePassword": {
+      "title": "Şifre Değiştir",
+      "description": "Uygulama giriş şifrenizi değiştirin. Şifrenizi düzenli olarak değiştirmenizi öneririz.",
+      "currentPassword": "Mevcut Şifre",
+      "currentPlaceholder": "Mevcut şifreyi girin",
+      "currentRequired": "Lütfen mevcut şifreyi girin",
+      "newPassword": "Yeni Şifre",
+      "newPlaceholder": "Yeni şifreyi girin",
+      "confirmPassword": "Şifreyi Onayla",
+      "confirmPlaceholder": "Yeni şifreyi onaylayın",
+      "submit": "Şifreyi Değiştir",
+      "success": "Şifre başarıyla değiştirildi!",
+      "error": "Şifre değiştirilemedi",
+      "wrongPassword": "Yanlış mevcut şifre",
+      "forgotPassword": "Şifrenizi mi unuttunuz?",
+      "sendToEmail": "{{email}} adresine link gönder",
+      "emailSent": "Link e-postaya gönderildi",
+      "emailSentSuccess": "Şifre sıfırlama linki {{email}} adresine gönderildi",
+      "emailSendError": "Link gönderilemedi"
+    }
   }
 }

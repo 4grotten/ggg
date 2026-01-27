@@ -423,6 +423,9 @@ const EditProfile = () => {
                         className="h-14 rounded-2xl border-border bg-card px-4 text-base"
                       />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground mt-1.5 px-1">
+                      {t("editProfile.fullNameDescription")}
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -442,6 +445,9 @@ const EditProfile = () => {
                         className="h-14 rounded-2xl border-border bg-card px-4 text-base"
                       />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground mt-1.5 px-1">
+                      {t("editProfile.usernameDescription")}
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -462,6 +468,9 @@ const EditProfile = () => {
                         className="h-14 rounded-2xl border-border bg-card px-4 text-base"
                       />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground mt-1.5 px-1">
+                      {t("editProfile.emailDescription")}
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -495,6 +504,9 @@ const EditProfile = () => {
                           <ChevronDown className="w-5 h-5 text-muted-foreground" />
                         </button>
                       </FormControl>
+                      <p className="text-xs text-muted-foreground mt-1.5 px-1">
+                        {t("editProfile.dateOfBirthDescription")}
+                      </p>
                       <FormMessage />
                     </FormItem>
                   );
@@ -520,6 +532,9 @@ const EditProfile = () => {
                         <ChevronDown className="w-5 h-5 text-muted-foreground" />
                       </button>
                     </FormControl>
+                    <p className="text-xs text-muted-foreground mt-1.5 px-1">
+                      {t("editProfile.genderDescription")}
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
