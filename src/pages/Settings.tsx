@@ -549,15 +549,50 @@ const Settings = () => {
 
       <div className="space-y-3 px-4 pb-28">
         {/* Edit Profile - only for authenticated users */}
-        {isAuthenticated && (
-          <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
-            <SettingsItem
-              icon={<User className="w-5 h-5" />}
-              label={t("settings.editProfile") || "Edit Profile"}
-              onClick={() => navigate("/settings/edit-profile")}
-            />
-          </div>
-        )}
+        {isAuthenticated && (() => {
+          // Count unfilled important fields (excluding username)
+          const unfilledFieldsCount = [
+            !user?.full_name,
+            !user?.email,
+            !user?.date_of_birth,
+            !user?.gender
+          ].filter(Boolean).length;
+
+          return (
+            <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+              <button
+                onClick={() => navigate("/settings/edit-profile")}
+                className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-foreground"><User className="w-5 h-5" /></span>
+                  <span className="text-foreground font-medium">{t("settings.editProfile") || "Edit Profile"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Unfilled fields indicators */}
+                  {unfilledFieldsCount > 0 && (
+                    <div className="flex items-center gap-1 mr-1">
+                      {Array.from({ length: unfilledFieldsCount }).map((_, index) => (
+                        <motion.span
+                          key={index}
+                          className="w-2 h-2 rounded-full bg-destructive"
+                          animate={{ opacity: [1, 0.3, 1] }}
+                          transition={{ 
+                            duration: 1.2, 
+                            repeat: Infinity, 
+                            ease: "easeInOut",
+                            delay: index * 0.15
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </button>
+            </div>
+          );
+        })()}
 
         {/* Personal Details / Verification */}
         {(() => {
