@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useCallback, useRef, ReactNode } f
 import { useConversation } from "@elevenlabs/react";
 import { toast } from "sonner";
 import { useDialTone } from "@/hooks/useDialTone";
+import { getAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
+import type { UserProfile } from "@/services/api/authApi";
 
 // Agent IDs
 export const AGENTS = {
@@ -22,12 +24,77 @@ interface VoiceCallContextType {
 
 const VoiceCallContext = createContext<VoiceCallContextType | undefined>(undefined);
 
+// Helper to get current user from localStorage
+const getCurrentUserProfile = (): UserProfile | null => {
+  try {
+    const cached = localStorage.getItem(AUTH_USER_KEY);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+};
+
+// Helper to calculate age from date of birth
+const calculateAge = (dateOfBirth: string | null): number | null => {
+  if (!dateOfBirth) return null;
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 // Client tools for ElevenLabs agent
 const getTransactionsUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-transactions`;
 
 const clientTools = {
-  // Get user transactions
+  // MUST BE CALLED FIRST - Get user identity and authorization status
+  get_user_identity: async () => {
+    console.log("Agent calling get_user_identity");
+    
+    const token = getAuthToken();
+    const user = getCurrentUserProfile();
+    
+    // Check if user is a guest (not authenticated)
+    if (!token || !user) {
+      return JSON.stringify({
+        status: "guest",
+        message: "Пользователь не авторизован. Для доступа к финансовой информации необходимо войти в аккаунт. Попросите пользователя авторизоваться через кнопку входа в приложении."
+      });
+    }
+    
+    // User is authenticated - return profile info
+    const age = calculateAge(user.date_of_birth);
+    
+    return JSON.stringify({
+      status: "authenticated",
+      name: user.full_name || "Не указано",
+      age: age,
+      has_name: !!user.full_name,
+      has_age: !!user.date_of_birth,
+      phone: user.phone_number,
+      email: user.email || null,
+      gender: user.gender || null,
+      message: user.full_name 
+        ? `Пользователь авторизован. Имя: ${user.full_name}${age ? `, возраст: ${age} лет` : ", возраст не указан"}.`
+        : "Пользователь авторизован, но имя не указано в профиле."
+    });
+  },
+  
+  // Get user transactions - REQUIRES authenticated user
   get_transactions: async (params: { type?: string; limit?: number; days?: number; summary?: boolean }) => {
+    // Check authorization first
+    const token = getAuthToken();
+    if (!token) {
+      return "Для просмотра транзакций необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
+    }
+    
     try {
       console.log("Agent calling get_transactions:", params);
       const response = await fetch(getTransactionsUrl, {
@@ -65,8 +132,14 @@ const clientTools = {
     }
   },
   
-  // Get account balance summary
+  // Get account balance summary - REQUIRES authenticated user
   get_balance_summary: async () => {
+    // Check authorization first
+    const token = getAuthToken();
+    if (!token) {
+      return "Для просмотра баланса необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
+    }
+    
     try {
       console.log("Agent calling get_balance_summary");
       const response = await fetch(getTransactionsUrl, {
@@ -94,8 +167,14 @@ const clientTools = {
     }
   },
   
-  // Get spending by category
+  // Get spending by category - REQUIRES authenticated user
   get_spending_by_category: async (params: { days?: number }) => {
+    // Check authorization first
+    const token = getAuthToken();
+    if (!token) {
+      return "Для просмотра расходов по категориям необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
+    }
+    
     try {
       console.log("Agent calling get_spending_by_category:", params);
       const response = await fetch(getTransactionsUrl, {
