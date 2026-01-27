@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
-import apofizLogo from "@/assets/apofiz-logo.svg";
+import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { BalanceCard } from "@/components/dashboard/BalanceCard";
 import { ActionButtons } from "@/components/dashboard/ActionButtons";
@@ -183,7 +183,7 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">
               {t('dashboard.poweredBy')}
             </p>
-            <img src={apofizLogo} alt="Apofiz" className="w-4 h-4" />
+            <ApofizLogo className="w-4 h-4" />
             <span className="text-xs font-semibold text-foreground">Apofiz</span>
           </button>
         }
