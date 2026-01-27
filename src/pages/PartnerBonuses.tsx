@@ -122,6 +122,9 @@ const PartnerBonuses = () => {
   const [hoveredColumnIndex, setHoveredColumnIndex] = useState<number | null>(null);
   const [purchaseDrawerOpen, setPurchaseDrawerOpen] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Format price with comma separator
+  const formatPrice = (price: number) => price.toLocaleString('en-US');
   
   // Scroll carousel to selected tariff
   const scrollToTariff = useCallback((index: number) => {
@@ -267,7 +270,7 @@ const PartnerBonuses = () => {
                       {t(tariff.nameKey)}
                     </p>
                     <p className={`text-sm relative z-10 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
-                      {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
+                      {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${formatPrice(tariff.price)} USD`}
                     </p>
                   </motion.button>
                 );
@@ -329,7 +332,7 @@ const PartnerBonuses = () => {
                     <h2 className="text-2xl font-bold">{t(selectedTariff.nameKey)}</h2>
                   </div>
                   <p className="text-3xl font-bold">
-                    {selectedTariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${selectedTariff.price}`}
+                    {selectedTariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${formatPrice(selectedTariff.price)} USD`}
                   </p>
                 </div>
                 <span className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium text-muted-foreground">
@@ -482,7 +485,7 @@ const PartnerBonuses = () => {
                     }`}>{t(tariff.nameKey)}</p>
                   )}
                   <p className="text-xs text-muted-foreground font-medium">
-                    {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${tariff.price}`}
+                    {tariff.price === -1 ? t('partner.bonuses.priceless', 'Бесценно') : `$${formatPrice(tariff.price)}`}
                   </p>
                 </div>
               ))}
