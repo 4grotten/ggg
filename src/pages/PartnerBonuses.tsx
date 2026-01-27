@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { PartnerCallButton } from "@/components/partner/PartnerCallButton";
+import { PurchaseTariffDrawer } from "@/components/partner/PurchaseTariffDrawer";
 import { useVoiceCall } from "@/contexts/VoiceCallContext";
 
 // Tariff plans configuration
@@ -119,6 +120,7 @@ const PartnerBonuses = () => {
   const [selectedTariffIndex, setSelectedTariffIndex] = useState(2); // PRO by default
   const [currentTariffId] = useState("smart"); // Mock current tariff
   const [hoveredColumnIndex, setHoveredColumnIndex] = useState<number | null>(null);
+  const [purchaseDrawerOpen, setPurchaseDrawerOpen] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   
   // Scroll carousel to selected tariff
@@ -721,7 +723,7 @@ const PartnerBonuses = () => {
             <Button 
               className="relative w-full h-14 text-base font-bold rounded-2xl m-[2px] bg-background/80 dark:bg-card/80 backdrop-blur-xl text-foreground hover:bg-background/90 dark:hover:bg-card/90 border-0 overflow-hidden"
               style={{ width: "calc(100% - 4px)" }}
-              onClick={selectedTariff.id === "partner" ? (isConnected ? endCall : () => startCall("ANGIE")) : undefined}
+              onClick={selectedTariff.id === "partner" ? (isConnected ? endCall : () => startCall("ANGIE")) : () => setPurchaseDrawerOpen(true)}
               disabled={selectedTariff.id === "partner" && isConnecting}
             >
               {selectedTariff.id === "partner" ? (
@@ -804,6 +806,14 @@ const PartnerBonuses = () => {
           </motion.div>
         </div>
       )}
+      
+      {/* Purchase Tariff Drawer */}
+      <PurchaseTariffDrawer
+        open={purchaseDrawerOpen}
+        onOpenChange={setPurchaseDrawerOpen}
+        tariffName={t(selectedTariff.nameKey)}
+        tariffPrice={selectedTariff.price}
+      />
     </div>
   );
 };

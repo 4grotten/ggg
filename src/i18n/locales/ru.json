@@ -902,7 +902,11 @@
       "internationalExpansion": "Расширение за пределы региона",
       "whiteLabel": "White-label решение под ваш бренд",
       "prioritySupport": "Приоритетная техническая поддержка",
-      "contactUs": "Связаться с нами"
+      "contactUs": "Связаться с нами",
+      "purchaseTariff": "Приобрести тариф",
+      "payWithCard": "Оплата картой",
+      "payWithCrypto": "Оплата криптой",
+      "fromBalance": "С баланса карты"
     }
   }
 }
