@@ -599,8 +599,8 @@ const Settings = () => {
                   <span className="text-foreground font-medium">{t("settings.editProfile") || "Edit Profile"}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {/* Unfilled fields indicators */}
-                  {unfilledFieldsCount > 0 && (
+                  {/* Unfilled fields indicators - red dots when incomplete, green dot when complete */}
+                  {unfilledFieldsCount > 0 ? (
                     <div className="flex items-center gap-1 mr-1">
                       {Array.from({ length: unfilledFieldsCount }).map((_, index) => (
                         <motion.span
@@ -616,6 +616,8 @@ const Settings = () => {
                         />
                       ))}
                     </div>
+                  ) : (
+                    <span className="w-2 h-2 rounded-full bg-green-500 mr-1" />
                   )}
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </div>
