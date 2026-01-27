@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedBotHead } from "./AnimatedBotHead";
+import { ChatMessageContent } from "./ChatMessageContent";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -134,12 +135,16 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
       <div className="flex flex-col gap-1 flex-1">
         <div className="flex items-end gap-2">
           <div className={cn(
-            "max-w-[80%] rounded-2xl px-4 py-2",
+            "max-w-[85%] rounded-2xl px-4 py-2",
             isUser 
               ? "bg-primary text-primary-foreground rounded-tr-sm" 
               : "bg-secondary text-secondary-foreground rounded-tl-sm"
           )}>
-            <p className="text-sm whitespace-pre-wrap">{content}</p>
+            {isUser ? (
+              <p className="text-sm whitespace-pre-wrap">{content}</p>
+            ) : (
+              <ChatMessageContent content={content} />
+            )}
           </div>
           
           {/* TTS Button for assistant messages - on the right */}
