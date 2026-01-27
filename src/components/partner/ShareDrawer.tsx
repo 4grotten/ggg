@@ -189,14 +189,12 @@ export const ShareDrawer = memo(({ open, onOpenChange }: ShareDrawerProps) => {
               }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
-              {/* Rotating border glow */}
-              <motion.div
+              {/* Static gradient border glow */}
+              <div
                 className="absolute -inset-1 rounded-[28px] opacity-60"
                 style={{
                   background: "conic-gradient(from 0deg, #10b981, #7c3aed, #3b82f6, #10b981)",
                 }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
               />
               
               {/* Inner container */}
