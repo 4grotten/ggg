@@ -842,7 +842,14 @@
       "purchaseTariff": "شراء الخطة",
       "payWithCard": "الدفع بالبطاقة",
       "payWithCrypto": "الدفع بالعملات الرقمية",
-      "fromBalance": "من رصيد البطاقة"
+      "fromBalance": "من رصيد البطاقة",
+      "payForTariff": "دفع الخطة",
+      "tariffPurchase": "شراء الخطة",
+      "tariffCost": "تكلفة الخطة",
+      "exchangeRate": "سعر الصرف",
+      "paymentType": "نوع الدفع",
+      "purchaseSuccess": "تم شراء الخطة بنجاح!",
+      "selectTariff": "اختر الخطة"
     }
   }
 }

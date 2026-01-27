@@ -906,7 +906,14 @@
       "purchaseTariff": "Приобрести тариф",
       "payWithCard": "Оплата картой",
       "payWithCrypto": "Оплата криптой",
-      "fromBalance": "С баланса карты"
+      "fromBalance": "С баланса карты",
+      "payForTariff": "Оплата тарифа",
+      "tariffPurchase": "Приобретение тарифа",
+      "tariffCost": "Стоимость тарифа",
+      "exchangeRate": "Курс обмена",
+      "paymentType": "Тип оплаты",
+      "purchaseSuccess": "Тариф успешно приобретён!",
+      "selectTariff": "Выберите тариф"
     }
   }
 }

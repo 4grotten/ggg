@@ -842,7 +842,14 @@
       "purchaseTariff": "Comprar plan",
       "payWithCard": "Pagar con tarjeta",
       "payWithCrypto": "Pagar con cripto",
-      "fromBalance": "Del saldo de la tarjeta"
+      "fromBalance": "Del saldo de la tarjeta",
+      "payForTariff": "Pagar plan",
+      "tariffPurchase": "Compra de plan",
+      "tariffCost": "Costo del plan",
+      "exchangeRate": "Tipo de cambio",
+      "paymentType": "Tipo de pago",
+      "purchaseSuccess": "¡Plan comprado exitosamente!",
+      "selectTariff": "Seleccionar plan"
     }
   }
 }

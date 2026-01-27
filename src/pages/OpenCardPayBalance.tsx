@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE } from "@/lib/fees";
 import { useCards } from "@/hooks/useCards";
 
@@ -69,12 +68,7 @@ const OpenCardPayBalance = () => {
           <h1 className="text-lg font-semibold">{t('openCard.payFromBalance')}</h1>
         </div>
       }
-      rightAction={
-        <div className="flex items-center gap-2">
-          <ThemeSwitcher />
-          <LanguageSwitcher />
-        </div>
-      }
+      rightAction={<LanguageSwitcher />}
     >
       <div className="px-4 py-6 space-y-4 pb-32">
         {/* Payment Details */}
