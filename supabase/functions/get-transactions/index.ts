@@ -121,24 +121,10 @@ function formatTransactionType(type: string): string {
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-  if (diffDays === 0) {
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    if (diffHours === 0) {
-      const diffMins = Math.floor(diffMs / (1000 * 60));
-      return `${diffMins} минут назад`;
-    }
-    return `${diffHours} часов назад`;
-  } else if (diffDays === 1) {
-    return 'вчера';
-  } else if (diffDays < 7) {
-    return `${diffDays} дней назад`;
-  } else {
-    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-  }
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
 }
 
 function calculateSummary(transactions: any[]) {
