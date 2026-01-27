@@ -877,6 +877,8 @@
       "dedicatedSupport": "Dedicated support line",
       "cardIncomeLabel": "Income from card sales",
       "referralLevelsLabel": "Referral program levels",
+      "availableLevelsLabel": "Available levels",
+      "allLevels": "All",
       "padawan": "Padawan",
       "contract": "Contract",
       "priceless": "Priceless",
