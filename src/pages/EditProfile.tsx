@@ -458,7 +458,16 @@ const EditProfile = () => {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("editProfile.username")}</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      {t("editProfile.username")}
+                      {!field.value && (
+                        <motion.span
+                          className="w-2 h-2 rounded-full bg-destructive"
+                          animate={{ opacity: [1, 0.3, 1] }}
+                          transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut", delay: 0.1 }}
+                        />
+                      )}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}

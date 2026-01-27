@@ -550,9 +550,10 @@ const Settings = () => {
       <div className="space-y-3 px-4 pb-28">
         {/* Edit Profile - only for authenticated users */}
         {isAuthenticated && (() => {
-          // Count unfilled important fields (excluding username)
+          // Count unfilled important fields (including username)
           const unfilledFieldsCount = [
             !user?.full_name,
+            !user?.username,
             !user?.email,
             !user?.date_of_birth,
             !user?.gender
