@@ -195,7 +195,7 @@ const TariffPayBalance = () => {
             >
               {selectedPaymentCard ? (
                 <>
-                  <div className="w-14 h-9 shrink-0 rounded-md overflow-hidden shadow-lg ring-1 ring-white/10">
+                  <div className="w-12 shrink-0 rounded-[4px] overflow-hidden shadow-lg ring-1 ring-white/10" style={{ aspectRatio: '1.586' }}>
                     <CardMiniature type={selectedPaymentCard.type} />
                   </div>
                   <div className="flex-1 text-left">
@@ -234,7 +234,7 @@ const TariffPayBalance = () => {
                           : 'hover:bg-muted/50'
                       }`}
                     >
-                      <div className="w-14 h-9 shrink-0 rounded-md overflow-hidden shadow-md ring-1 ring-white/10">
+                      <div className="w-12 shrink-0 rounded-[4px] overflow-hidden shadow-md ring-1 ring-white/10" style={{ aspectRatio: '1.586' }}>
                         <CardMiniature type={card.type} />
                       </div>
                       <div className="flex-1 text-left">
