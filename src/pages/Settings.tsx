@@ -677,7 +677,7 @@ const Settings = () => {
         {/* Apofiz Social Network */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
-            icon={<img src={apofizLogo} alt="Apofiz" className="w-5 h-5" />}
+            icon={<img src={apofizLogo} alt="Apofiz" className="w-5 h-5 dark:invert dark:brightness-200" />}
             label={t("settings.apofizNetwork")}
             onClick={openApofizWithAuth}
           />
