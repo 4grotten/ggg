@@ -1,5 +1,6 @@
-import { ArrowDownLeft, ArrowUpRight, Wallet, Building2, CreditCard, CircleCheck, Coins } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Wallet, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 interface ChatMessageContentProps {
   content: string;
@@ -24,71 +25,50 @@ interface ParsedBalance {
   isExpense: boolean;
 }
 
-const getTransactionIcon = (type: string, isPositive: boolean) => {
-  const lower = type.toLowerCase();
-  if (lower.includes('банковский') || lower.includes('bank')) {
-    return <Building2 className="w-5 h-5 text-white" />;
-  }
-  if (lower.includes('пополнение') || lower.includes('topup') || lower.includes('top-up')) {
-    return <Coins className="w-5 h-5 text-white" />;
-  }
-  if (lower.includes('карт') || lower.includes('card')) {
-    return <CreditCard className="w-5 h-5 text-white" />;
-  }
-  if (isPositive) {
-    return <ArrowDownLeft className="w-5 h-5 text-white" />;
-  }
-  return <ArrowUpRight className="w-5 h-5 text-white" />;
-};
-
-const getIconBgColor = (type: string, isPositive: boolean) => {
-  const lower = type.toLowerCase();
-  if (lower.includes('банковский') || lower.includes('bank')) {
-    return "bg-violet-500";
-  }
-  if (lower.includes('пополнение') || lower.includes('topup')) {
-    return "bg-success";
-  }
-  if (lower.includes('карт') || lower.includes('card')) {
-    return "bg-blue-500";
-  }
-  return isPositive ? "bg-success" : "bg-violet-500";
-};
-
 const TransactionCard = ({ date, type, amount, description }: ParsedTransaction) => {
   const isPositive = amount > 0;
-  
-  // Extract time from date or use placeholder
-  const timeMatch = date.match(/(\d{2}:\d{2})/);
-  const displayTime = timeMatch ? timeMatch[1] : date;
 
   return (
-    <div className="flex items-center gap-3 py-3 px-1 my-1">
+    <Card className="p-0 overflow-hidden my-2 border-border/60 shadow-md">
       <div className={cn(
-        "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0",
-        getIconBgColor(type, isPositive)
-      )}>
-        {getTransactionIcon(type, isPositive)}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[15px] font-semibold text-foreground leading-tight">{type}</p>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-sm text-muted-foreground">{displayTime}</span>
-          <div className="flex items-center gap-1 text-success">
-            <CircleCheck className="w-3.5 h-3.5" />
-            <span className="text-sm">Завершено</span>
+        "h-1.5 w-full",
+        isPositive ? "bg-success" : "bg-destructive"
+      )} />
+      <div className="p-3.5">
+        <div className="flex items-start gap-3">
+          <div className={cn(
+            "w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm",
+            isPositive 
+              ? "bg-gradient-to-br from-success to-success/80" 
+              : "bg-gradient-to-br from-destructive to-destructive/80"
+          )}>
+            {isPositive 
+              ? <ArrowDownLeft className="w-5 h-5 text-white" />
+              : <ArrowUpRight className="w-5 h-5 text-white" />
+            }
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground leading-tight">{type}</p>
+            {description && (
+              <p className="text-xs text-muted-foreground mt-0.5 truncate">{description.trim()}</p>
+            )}
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <Clock className="w-3 h-3 text-muted-foreground/70" />
+              <span className="text-[11px] text-muted-foreground">{date}</span>
+            </div>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <p className={cn(
+              "text-base font-bold",
+              isPositive ? "text-success" : "text-destructive"
+            )}>
+              {isPositive ? '+' : ''}{amount.toFixed(2)}
+            </p>
+            <p className="text-[10px] text-muted-foreground font-medium">AED</p>
           </div>
         </div>
       </div>
-      <div className="text-right flex-shrink-0">
-        <p className={cn(
-          "text-lg font-bold",
-          isPositive ? "text-success" : "text-[#007AFF]"
-        )}>
-          {isPositive ? '+' : '-'}{Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} AED
-        </p>
-      </div>
-    </div>
+    </Card>
   );
 };
 
@@ -100,23 +80,29 @@ const BalanceCard = ({ label, amount, isIncome, isExpense }: ParsedBalance) => {
   };
 
   return (
-    <div className="flex items-center gap-3 py-3 px-1 my-1">
-      <div className={cn(
-        "w-12 h-12 rounded-2xl flex items-center justify-center",
-        isIncome ? "bg-success" : isExpense ? "bg-destructive" : "bg-primary"
-      )}>
-        {getIcon()}
-      </div>
-      <div className="flex-1">
-        <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
-        <p className={cn(
-          "text-lg font-bold mt-0.5",
-          isIncome ? "text-success" : isExpense ? "text-destructive" : "text-foreground"
+    <Card className="p-4 my-2 border-border/60 shadow-md">
+      <div className="flex items-center gap-3">
+        <div className={cn(
+          "w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm",
+          isIncome 
+            ? "bg-gradient-to-br from-success to-success/80" 
+            : isExpense 
+              ? "bg-gradient-to-br from-destructive to-destructive/80" 
+              : "bg-gradient-to-br from-primary to-primary/80"
         )}>
-          {amount} <span className="text-sm font-medium text-muted-foreground">AED</span>
-        </p>
+          {getIcon()}
+        </div>
+        <div className="flex-1">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
+          <p className={cn(
+            "text-lg font-bold mt-0.5",
+            isIncome ? "text-success" : isExpense ? "text-destructive" : "text-foreground"
+          )}>
+            {amount} <span className="text-sm font-medium text-muted-foreground">AED</span>
+          </p>
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
