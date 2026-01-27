@@ -838,7 +838,11 @@
       "internationalExpansion": "Uluslararası genişleme",
       "whiteLabel": "Markanız için white-label çözümü",
       "prioritySupport": "Öncelikli teknik destek",
-      "contactUs": "Bize Ulaşın"
+      "contactUs": "Bize Ulaşın",
+      "purchaseTariff": "Plan Satın Al",
+      "payWithCard": "Kartla Öde",
+      "payWithCrypto": "Kripto ile Öde",
+      "fromBalance": "Kart bakiyesinden"
     }
   }
 }

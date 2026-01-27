@@ -838,7 +838,11 @@
       "internationalExpansion": "Expansión internacional",
       "whiteLabel": "Solución de marca blanca para tu marca",
       "prioritySupport": "Soporte técnico prioritario",
-      "contactUs": "Contáctanos"
+      "contactUs": "Contáctanos",
+      "purchaseTariff": "Comprar plan",
+      "payWithCard": "Pagar con tarjeta",
+      "payWithCrypto": "Pagar con cripto",
+      "fromBalance": "Del saldo de la tarjeta"
     }
   }
 }

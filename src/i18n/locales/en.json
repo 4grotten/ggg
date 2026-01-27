@@ -901,7 +901,11 @@
       "internationalExpansion": "International expansion",
       "whiteLabel": "White-label solution for your brand",
       "prioritySupport": "Priority technical support",
-      "contactUs": "Contact Us"
+      "contactUs": "Contact Us",
+      "purchaseTariff": "Purchase Plan",
+      "payWithCard": "Pay with Card",
+      "payWithCrypto": "Pay with Crypto",
+      "fromBalance": "From card balance"
     }
   }
 }

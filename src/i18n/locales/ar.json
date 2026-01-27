@@ -838,7 +838,11 @@
       "internationalExpansion": "توسع دولي",
       "whiteLabel": "حل العلامة البيضاء لعلامتك التجارية",
       "prioritySupport": "دعم فني ذو أولوية",
-      "contactUs": "اتصل بنا"
+      "contactUs": "اتصل بنا",
+      "purchaseTariff": "شراء الخطة",
+      "payWithCard": "الدفع بالبطاقة",
+      "payWithCrypto": "الدفع بالعملات الرقمية",
+      "fromBalance": "من رصيد البطاقة"
     }
   }
 }
