@@ -141,22 +141,38 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                   </motion.div>
                 )}
                 
-                {/* Buy button (right side) for levels above current */}
+                {/* Subscribe button (right side) for levels above current */}
                 {idx > currentLevelIndex && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2 }}
                     className="absolute -top-3 right-12 z-20"
                   >
                     <button
                       onClick={() => navigate('/partner/bonuses')}
-                      className="relative px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 overflow-hidden active:scale-95 transition-transform"
+                      className="relative px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 overflow-hidden active:scale-95 transition-transform will-change-transform"
                       style={{
                         background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f857a6 100%)",
-                        boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
                       }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+                      {/* Rotating glow border */}
+                      <div 
+                        className="absolute -inset-[2px] rounded-full opacity-70 animate-[spin_4s_linear_infinite]"
+                        style={{
+                          background: "conic-gradient(from 0deg, #667eea, #764ba2, #f857a6, #667eea)",
+                          filter: "blur(4px)",
+                        }}
+                      />
+                      {/* Shimmer effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer rounded-full" />
+                      {/* Button background */}
+                      <div 
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f857a6 100%)",
+                        }}
+                      />
                       <CreditCard className="w-3.5 h-3.5 relative z-10" />
                       <span className="relative z-10">{t('partner.subscribe', 'Подписаться')}</span>
                     </button>
@@ -164,31 +180,20 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                 )}
                 
                 <div className="relative rounded-3xl p-[1px]">
-                  {/* Rotating gradient border for current level */}
+                  {/* Static gradient border for current level */}
                   {idx === currentLevelIndex && (
-                    <div className="absolute inset-0 rounded-3xl overflow-hidden">
-                      <motion.div
-                        className="absolute inset-[-100%] w-[300%] h-[300%]"
-                        style={{
-                          background: "conic-gradient(from 0deg at 50% 50%, transparent 0deg, #BFFF00 60deg, #7FFF00 120deg, #00FF88 180deg, #7FFF00 240deg, #BFFF00 300deg, transparent 360deg)",
-                        }}
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                      />
-                    </div>
+                    <div 
+                      className="absolute inset-0 rounded-3xl"
+                      style={{
+                        background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 50%, #00FF88 100%)",
+                      }}
+                    />
                   )}
                   <div
                     className={`relative bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-3xl p-5 overflow-hidden ${
                       idx !== currentLevelIndex ? "border border-border/50" : ""
                     }`}
                   >
-                    {/* Decorative gradient */}
-                    <div 
-                      className="absolute top-0 right-0 w-32 h-32 opacity-20"
-                      style={{
-                        background: "radial-gradient(circle at top right, rgba(191, 255, 0, 0.5) 0%, transparent 70%)"
-                      }}
-                    />
                     
                     {/* Level header */}
                     <div className="flex items-center justify-between mb-4">
