@@ -257,11 +257,41 @@ export async function logout() {
 }
 
 /**
- * Сброс пароля
+ * Сброс пароля — запрос кода
  * POST /users/forgot_password/
  */
 export async function forgotPassword(phone_number: string) {
   return apiPost<{ message: string }>('/users/forgot_password/', { phone_number });
+}
+
+/**
+ * Проверка кода сброса пароля
+ * POST /users/verify_reset_code/
+ */
+export async function verifyResetCode(phone_number: string, code: string) {
+  return apiPost<{ 
+    is_valid: boolean; 
+    error?: string; 
+    token?: string;
+  }>('/users/verify_reset_code/', { phone_number, code });
+}
+
+/**
+ * Установка нового пароля после сброса
+ * POST /users/reset_password/
+ */
+export async function resetPassword(
+  phone_number: string, 
+  code: string, 
+  new_password: string,
+  token?: string
+) {
+  return apiPost<{ message: string }>('/users/reset_password/', { 
+    phone_number, 
+    code, 
+    new_password,
+    ...(token && { token })
+  });
 }
 
 /**
