@@ -3,6 +3,7 @@
  * Shows list of accounts like Telegram/Instagram style
  */
 
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,7 +23,12 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user, logout } = useAuth();
-  const { accounts, switchAccount, removeAccountById } = useMultiAccount();
+  const { accounts, switchAccount, removeAccountById, refreshAccounts } = useMultiAccount();
+
+  // Ensure we always show the latest saved_accounts when the drawer opens
+  useEffect(() => {
+    if (open) refreshAccounts();
+  }, [open, refreshAccounts]);
 
   const handleSwitchAccount = async (account: SavedAccount) => {
     const success = switchAccount(account);
