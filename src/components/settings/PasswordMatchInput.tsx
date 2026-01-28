@@ -120,7 +120,7 @@ export const PasswordMatchInput = ({
                 <span className="text-muted-foreground text-base">{confirmPlaceholder}</span>
               </div>
             ) : (
-              <div className="flex items-center gap-0.5 overflow-hidden">
+              <div className="flex items-center gap-0.5 overflow-hidden h-6">
                 <AnimatePresence mode="popLayout">
                   {charComparison.map((item, index) => (
                     <motion.span
@@ -137,7 +137,7 @@ export const PasswordMatchInput = ({
                         damping: 25,
                         delay: index * 0.02
                       }}
-                      className="relative"
+                      className="relative flex items-center justify-center w-4 h-6"
                     >
                       {showConfirmPassword ? (
                         // Show actual characters with color
@@ -154,12 +154,12 @@ export const PasswordMatchInput = ({
                             duration: 0.4,
                             x: { duration: 0.3 }
                           }}
-                          className="text-base font-medium inline-block"
+                          className="text-base font-medium"
                         >
                           {item.char}
                         </motion.span>
                       ) : (
-                        // Show dots with color
+                        // Show dots with color - centered in fixed container
                         <motion.span
                           animate={item.match ? {
                             scale: [1, 1.3, 1],
@@ -175,7 +175,7 @@ export const PasswordMatchInput = ({
                             x: { duration: 0.3 },
                             backgroundColor: { duration: 0.2 }
                           }}
-                          className="w-2.5 h-2.5 rounded-full inline-block mx-0.5"
+                          className="w-2.5 h-2.5 rounded-full"
                           style={{ backgroundColor: item.match ? "#22c55e" : "#ef4444" }}
                         />
                       )}
@@ -196,11 +196,13 @@ export const PasswordMatchInput = ({
                 </AnimatePresence>
                 
                 {/* Blinking cursor */}
-                <motion.span
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="w-0.5 h-5 bg-foreground ml-0.5"
-                />
+                {isConfirmFocused && (
+                  <motion.span
+                    animate={{ opacity: [1, 0, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="w-0.5 h-5 bg-foreground ml-0.5"
+                  />
+                )}
               </div>
             )}
           </div>
