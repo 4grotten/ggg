@@ -239,7 +239,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                         <span className="text-xl font-bold">{t(level.nameKey, level.id)}</span>
                       </div>
                       <span className="text-sm text-muted-foreground">
-                        <span className="text-foreground font-bold">{currentFriends}</span>
+                        {t('partner.friends', 'Друзей')} <span className="text-foreground font-bold">{currentFriends}</span>
                         /{level.maxFriends === Infinity ? 1000 : level.maxFriends}
                       </span>
                     </div>
