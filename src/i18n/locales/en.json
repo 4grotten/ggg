@@ -370,7 +370,29 @@
     "personalData": "Profile",
     "verification": "Verification",
     "savedAccounts": "Saved Accounts",
-    "switchedTo": "Switched to {{name}}"
+    "switchedTo": "Switched to {{name}}",
+    "devices": {
+      "title": "Active Devices",
+      "noDevices": "No active devices",
+      "thisDevice": "This device",
+      "unknownDevice": "Unknown device",
+      "unknown": "Unknown",
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}} hours ago",
+      "daysAgo": "{{count}} days ago",
+      "location": "Location",
+      "lastActive": "Last active",
+      "app": "App",
+      "deviceDetails": "Device Details",
+      "removeDevice": "Remove Device",
+      "logoutThisDevice": "Log out from this device",
+      "logoutAll": "Log out from all devices",
+      "deviceRemoved": "Device removed",
+      "removeError": "Failed to remove device",
+      "loggedOutAll": "Logged out from all devices",
+      "logoutAllError": "Failed to log out from all devices"
+    }
   },
   "editProfile": {
     "title": "Edit Profile",

@@ -370,7 +370,29 @@
     "personalData": "Профиль",
     "verification": "Верификация",
     "savedAccounts": "Сохранённые аккаунты",
-    "switchedTo": "Вы вошли как {{name}}"
+    "switchedTo": "Вы вошли как {{name}}",
+    "devices": {
+      "title": "Активные устройства",
+      "noDevices": "Нет активных устройств",
+      "thisDevice": "Это устройство",
+      "unknownDevice": "Неизвестное устройство",
+      "unknown": "Неизвестно",
+      "justNow": "Только что",
+      "minutesAgo": "{{count}} мин. назад",
+      "hoursAgo": "{{count}} ч. назад",
+      "daysAgo": "{{count}} дн. назад",
+      "location": "Местоположение",
+      "lastActive": "Последняя активность",
+      "app": "Приложение",
+      "deviceDetails": "Детали устройства",
+      "removeDevice": "Удалить устройство",
+      "logoutThisDevice": "Выйти с этого устройства",
+      "logoutAll": "Выйти со всех устройств",
+      "deviceRemoved": "Устройство удалено",
+      "removeError": "Не удалось удалить устройство",
+      "loggedOutAll": "Вы вышли со всех устройств",
+      "logoutAllError": "Не удалось выйти со всех устройств"
+    }
   },
   "editProfile": {
     "title": "Редактирование профиля",
