@@ -362,6 +362,7 @@
       "title": "الأجهزة النشطة",
       "noDevices": "لا توجد أجهزة نشطة",
       "active": "نشط",
+      "inactive": "غير نشط",
       "currentDevice": "الجهاز الحالي",
       "otherDevices": "أجهزة أخرى",
       "activeCount": "{{count}} جلسات نشطة",
@@ -377,6 +378,7 @@
       "daysAgo": "منذ {{count}} يوم",
       "location": "الموقع",
       "lastActive": "آخر نشاط",
+      "loginTime": "وقت الدخول",
       "app": "التطبيق",
       "deviceDetails": "تفاصيل الجهاز",
       "removeDevice": "إزالة الجهاز",
@@ -385,7 +387,11 @@
       "deviceRemoved": "تمت إزالة الجهاز",
       "removeError": "فشل في إزالة الجهاز",
       "loggedOutAll": "تم تسجيل الخروج من جميع الأجهزة",
-      "logoutAllError": "فشل تسجيل الخروج من جميع الأجهزة"
+      "logoutAllError": "فشل تسجيل الخروج من جميع الأجهزة",
+      "activeTab": "نشط",
+      "historyTab": "السجل",
+      "noHistory": "لا يوجد سجل دخول",
+      "loadMore": "تحميل المزيد"
     }
   },
   "card": {

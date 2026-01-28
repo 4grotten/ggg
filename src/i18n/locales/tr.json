@@ -362,6 +362,7 @@
       "title": "Aktif Cihazlar",
       "noDevices": "Aktif cihaz yok",
       "active": "Aktif",
+      "inactive": "Pasif",
       "currentDevice": "Mevcut Cihaz",
       "otherDevices": "Diğer Cihazlar",
       "activeCount": "{{count}} aktif oturum",
@@ -377,6 +378,7 @@
       "daysAgo": "{{count}} gün önce",
       "location": "Konum",
       "lastActive": "Son aktivite",
+      "loginTime": "Giriş zamanı",
       "app": "Uygulama",
       "deviceDetails": "Cihaz Detayları",
       "removeDevice": "Cihazı Kaldır",
@@ -385,7 +387,11 @@
       "deviceRemoved": "Cihaz kaldırıldı",
       "removeError": "Cihaz kaldırılamadı",
       "loggedOutAll": "Tüm cihazlardan çıkış yapıldı",
-      "logoutAllError": "Tüm cihazlardan çıkış yapılamadı"
+      "logoutAllError": "Tüm cihazlardan çıkış yapılamadı",
+      "activeTab": "Aktif",
+      "historyTab": "Geçmiş",
+      "noHistory": "Giriş geçmişi yok",
+      "loadMore": "Daha fazla yükle"
     }
   },
   "card": {
