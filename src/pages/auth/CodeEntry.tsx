@@ -19,7 +19,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { verifyOtp, sendOtp } from "@/services/api/authApi";
 import { z } from "zod";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Input } from "@/components/ui/input";
 
 // Validation schema
 const codeSchema = z.string()
@@ -227,28 +227,28 @@ const CodeEntry = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="space-y-6"
           >
-            <InputOTP
-              maxLength={6}
-              value={code}
-              onChange={handleCodeChange}
-              disabled={isLoading}
-              autoFocus
-              containerClassName="justify-center gap-3"
-            >
-              <InputOTPGroup className="gap-3">
-                {[0, 1, 2, 3, 4, 5].map((index) => (
-                  <InputOTPSlot
-                    key={index}
-                    index={index}
-                    className={`w-12 h-14 text-2xl font-bold rounded-xl border-2 bg-background transition-all duration-200 ${
-                      error
-                        ? 'border-destructive text-destructive'
-                        : 'border-border data-[active=true]:border-primary'
-                    }`}
-                  />
-                ))}
-              </InputOTPGroup>
-            </InputOTP>
+            <div className="flex justify-center">
+              <div className="w-full max-w-[320px]">
+                <Input
+                  value={code}
+                  onChange={(e) => {
+                    const next = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    handleCodeChange(next);
+                  }}
+                  disabled={isLoading}
+                  autoFocus
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  enterKeyHint="done"
+                  maxLength={6}
+                  placeholder="••••••"
+                  aria-label={t("auth.code.title") || "Verification code"}
+                  className={
+                    "karta-input text-center text-2xl font-bold tracking-[0.35em] pl-[0.35em]"
+                  }
+                />
+              </div>
+            </div>
 
             
             {error && (
