@@ -671,7 +671,8 @@
       "continue": "Continuar",
       "codeSent": "¡Código de verificación enviado!",
       "codeSentWhatsApp": "¡Código enviado por WhatsApp!",
-      "error": "Algo salió mal. Por favor, inténtalo de nuevo."
+      "error": "Algo salió mal. Por favor, inténtalo de nuevo.",
+      "registerWithoutOtp": "Registro sin OTP (prueba)"
     },
     "code": {
       "title": "Ingresa el código de verificación",

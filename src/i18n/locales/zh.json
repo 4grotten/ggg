@@ -677,7 +677,8 @@
       "continue": "继续",
       "codeSent": "验证码已发送！",
       "codeSentWhatsApp": "验证码已通过WhatsApp发送！",
-      "error": "出现问题，请重试。"
+      "error": "出现问题，请重试。",
+      "registerWithoutOtp": "无OTP注册（测试）"
     },
     "code": {
       "title": "输入验证码",

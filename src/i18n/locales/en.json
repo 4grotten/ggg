@@ -739,7 +739,8 @@
       "continue": "Continue",
       "codeSent": "Verification code sent!",
       "codeSentWhatsApp": "Code sent via WhatsApp!",
-      "error": "Something went wrong. Please try again."
+      "error": "Something went wrong. Please try again.",
+      "registerWithoutOtp": "Register without OTP (test)"
     },
     "code": {
       "title": "Enter verification code",

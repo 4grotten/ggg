@@ -671,7 +671,8 @@
       "continue": "Devam",
       "codeSent": "Doğrulama kodu gönderildi!",
       "codeSentWhatsApp": "Kod WhatsApp ile gönderildi!",
-      "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin."
+      "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
+      "registerWithoutOtp": "OTP'siz Kayıt (test)"
     },
     "code": {
       "title": "Doğrulama kodunu girin",
