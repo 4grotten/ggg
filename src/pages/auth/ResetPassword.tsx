@@ -1,6 +1,7 @@
 /**
  * ResetPassword — экран установки нового пароля
  * Использует setPassword() с токеном, полученным после verifyCode()
+ * Использует PasswordMatchInput для визуальной обратной связи при вводе
  */
 
 import { useState, useEffect } from "react";
@@ -9,11 +10,12 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { Lock, Eye, EyeOff, HelpCircle, Loader2, Check } from "lucide-react";
+import { Lock, HelpCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { setPassword, getCurrentUser } from "@/services/api/authApi";
 import { z } from "zod";
+import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 
 // Validation schema
 const passwordSchema = z.string()
@@ -30,8 +32,6 @@ const ResetPassword = () => {
   
   const [password, setPasswordValue] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   
@@ -115,90 +115,35 @@ const ResetPassword = () => {
             </p>
           </motion.div>
 
-          {/* Password Inputs */}
+          {/* Password Inputs with character matching */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="space-y-6"
           >
-            {/* New Password */}
-            <div>
-              <label className="text-sm text-muted-foreground mb-2 block">
-                {t("auth.resetPassword.newPassword") || "New password"}
-              </label>
-              <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
-                error && !isPasswordValid ? 'border-destructive' : 'border-border'
-              }`}>
-                <Lock className="w-5 h-5 text-muted-foreground" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => {
-                    setPasswordValue(e.target.value);
-                    setError("");
-                  }}
-                  placeholder={t("auth.resetPassword.newPasswordPlaceholder") || "Enter new password"}
-                  className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {password.length > 0 && (
-                <p className={`text-xs mt-2 ${isPasswordValid ? 'text-emerald-500' : 'text-muted-foreground'}`}>
-                  {isPasswordValid ? '✓' : '○'} {t("auth.resetPassword.passwordTooShort") || "Minimum 6 characters"}
-                </p>
-              )}
-            </div>
-            
-            {/* Confirm Password */}
-            <div>
-              <label className="text-sm text-muted-foreground mb-2 block">
-                {t("auth.resetPassword.confirmPassword") || "Confirm password"}
-              </label>
-              <div className={`flex items-center gap-2 border-b pb-4 transition-colors duration-300 ${
-                confirmPassword.length > 0 && !passwordsMatch ? 'border-destructive' : 'border-border'
-              }`}>
-                <Lock className="w-5 h-5 text-muted-foreground" />
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setError("");
-                  }}
-                  placeholder={t("auth.resetPassword.confirmPasswordPlaceholder") || "Repeat password"}
-                  className="flex-1 text-lg bg-transparent border-none outline-none placeholder:text-muted-foreground"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-                {passwordsMatch && (
-                  <Check className="w-5 h-5 text-emerald-500" />
-                )}
-              </div>
-              {confirmPassword.length > 0 && !passwordsMatch && (
-                <p className="text-xs mt-2 text-destructive">
-                  {t("auth.resetPassword.passwordMismatch") || "Passwords do not match"}
-                </p>
-              )}
-            </div>
+            <PasswordMatchInput
+              password={password}
+              confirmPassword={confirmPassword}
+              onPasswordChange={(value) => {
+                setPasswordValue(value);
+                setError("");
+              }}
+              onConfirmPasswordChange={(value) => {
+                setConfirmPassword(value);
+                setError("");
+              }}
+              passwordLabel={t("auth.resetPassword.newPassword") || "New password"}
+              confirmLabel={t("auth.resetPassword.confirmPassword") || "Confirm password"}
+              passwordPlaceholder={t("auth.resetPassword.newPasswordPlaceholder") || "Enter new password"}
+              confirmPlaceholder={t("auth.resetPassword.confirmPasswordPlaceholder") || "Repeat password"}
+              minCharsHint={t("auth.resetPassword.passwordTooShort") || "Minimum 6 characters"}
+            />
             
             {error && (
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-destructive text-sm"
+                className="text-destructive text-sm mt-4"
               >
                 {error}
               </motion.p>
