@@ -1216,7 +1216,8 @@ const PhoneEntry = () => {
           </button>
           
           {/* DEV: Register without OTP for testing */}
-          {isPhoneValid && (
+          {/* DEV: Register without OTP for testing - always visible */}
+          {true && (
             <button
               type="button"
               onClick={() => {
