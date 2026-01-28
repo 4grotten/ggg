@@ -527,6 +527,7 @@
     "charge": "Charge",
     "continue": "Continue",
     "viaBankTransfer": "Top up via Bank Transfer",
+    "ibanTopUp": "IBAN Top Up",
     "uaeDomesticOnly": "UAE DOMESTIC TRANSFERS ONLY",
     "beneficiary": "Beneficiary",
     "accountNumber": "Account number",
