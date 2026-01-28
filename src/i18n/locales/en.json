@@ -374,6 +374,7 @@
     "devices": {
       "title": "Active Devices",
     "noDevices": "No active devices",
+    "active": "Active",
     "currentDevice": "Current Device",
     "otherDevices": "Other Devices",
     "activeCount": "{{count}} active sessions",

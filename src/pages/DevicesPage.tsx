@@ -404,10 +404,20 @@ const DeviceCard = ({ device, onClick, isCurrent, showDivider, t }: DeviceCardPr
         showDivider ? 'border-b border-border/50' : ''
       }`}
     >
-      <div className={`w-11 h-11 rounded-full flex items-center justify-center ${
-        isCurrent ? 'bg-primary/20' : 'bg-muted'
-      }`}>
-        <DeviceIcon className={`w-5 h-5 ${isCurrent ? 'text-primary' : 'text-foreground'}`} />
+      <div className="relative">
+        <div className={`w-11 h-11 rounded-full flex items-center justify-center ${
+          isCurrent ? 'bg-primary/20' : 'bg-muted'
+        }`}>
+          <DeviceIcon className={`w-5 h-5 ${isCurrent ? 'text-primary' : 'text-foreground'}`} />
+        </div>
+        {/* Active indicator */}
+        {device.is_active && (
+          <motion.div
+            className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-background"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        )}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
@@ -418,6 +428,11 @@ const DeviceCard = ({ device, onClick, isCurrent, showDivider, t }: DeviceCardPr
             <span className="flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
               <Check className="w-3 h-3" />
               {t("settings.devices.thisDevice")}
+            </span>
+          )}
+          {!isCurrent && device.is_active && (
+            <span className="text-xs bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full">
+              {t("settings.devices.active") || "Active"}
             </span>
           )}
         </div>
