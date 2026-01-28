@@ -1175,6 +1175,26 @@ const PhoneEntry = () => {
               <HelpCircle className="w-4 h-4" />
               {t('auth.phone.support')}
             </button>
+            
+            {/* DEV: Register without OTP for testing */}
+            <button
+              type="button"
+              onClick={() => {
+                const fullPhone = getFullPhoneNumber();
+                sessionStorage.setItem("registerPhone", fullPhone);
+                navigate("/auth/profile", { 
+                  state: { 
+                    isNewUser: true, 
+                    phoneNumber: fullPhone,
+                    otpVerified: true
+                  } 
+                });
+              }}
+              className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-2"
+            >
+              <KeyRound className="w-4 h-4" />
+              {t('auth.phone.registerWithoutOtp') || 'Register without OTP (test)'}
+            </button>
           </motion.div>
 
           <PoweredByFooter />
@@ -1229,28 +1249,6 @@ const PhoneEntry = () => {
             </AnimatePresence>
           </button>
           
-          {/* DEV: Register without OTP for testing */}
-          {/* DEV: Register without OTP for testing - always visible */}
-          {true && (
-            <button
-              type="button"
-              onClick={() => {
-                const fullPhone = getFullPhoneNumber();
-                sessionStorage.setItem("registerPhone", fullPhone);
-                navigate("/auth/profile", { 
-                  state: { 
-                    isNewUser: true, 
-                    phoneNumber: fullPhone,
-                    otpVerified: true // Bypass OTP check for testing
-                  } 
-                });
-              }}
-              className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-2"
-            >
-              <KeyRound className="w-4 h-4" />
-              {t('auth.phone.registerWithoutOtp') || 'Register without OTP (test)'}
-            </button>
-          )}
           
           {/* Show biometric login if enabled */}
           {isBiometricEnabled && biometricPhone && (
