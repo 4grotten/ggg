@@ -57,6 +57,7 @@ import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AvatarSync } from "./components/AvatarSync";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -213,6 +214,7 @@ const App = () => {
               <AuthProvider>
                 <AvatarProvider>
                   <AvatarSync />
+                  <ScrollToTop />
                   <VoiceCallProvider>
                     <AppContent />
                   </VoiceCallProvider>
