@@ -672,6 +672,7 @@
       "codeSent": "Bestätigungscode gesendet!",
       "codeSentWhatsApp": "Code per WhatsApp gesendet!",
       "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+      "forgotPassword": "Passwort vergessen?",
       "registerWithoutOtp": "Registrierung ohne OTP (Test)"
     },
     "code": {
