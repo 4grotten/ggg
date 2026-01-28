@@ -339,12 +339,31 @@ const ResetPasswordCode = () => {
             </div>
           </motion.div>
 
+          {/* Test: Change password without OTP */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+            className="mt-6"
+          >
+            <button 
+              onClick={() => navigate("/auth/reset-password", { 
+                replace: true,
+                state: { phoneNumber, skipOtp: true }
+              })}
+              className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-2"
+            >
+              <KeyRound className="w-4 h-4" />
+              {t("auth.resetPassword.changeWithoutOtp") || "Change password without OTP (test)"}
+            </button>
+          </motion.div>
+
           {/* Support Link */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="mt-8"
+            className="mt-4"
           >
             <button 
               onClick={() => navigate("/chat")}

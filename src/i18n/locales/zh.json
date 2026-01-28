@@ -665,7 +665,8 @@
       "setError": "设置密码失败",
       "sendToEmail": "发送代码到邮箱",
       "emailSent": "代码已发送到邮箱！",
-      "emailError": "发送邮件失败"
+      "emailError": "发送邮件失败",
+      "changeWithoutOtp": "无需OTP更改密码（测试）"
     },
     "phone": {
       "title": "输入您的手机号码",

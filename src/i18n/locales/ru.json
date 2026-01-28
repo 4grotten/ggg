@@ -727,7 +727,8 @@
       "emailError": "Не удалось отправить email",
       "codeSentViaSms": "Код отправлен по SMS на",
       "codeSentViaWhatsApp": "Код отправлен через WhatsApp на",
-      "codeSentViaEmail": "Код отправлен на email"
+      "codeSentViaEmail": "Код отправлен на email",
+      "changeWithoutOtp": "Сменить пароль без OTP (тест)"
     },
     "phone": {
       "title": "Введите номер телефона",

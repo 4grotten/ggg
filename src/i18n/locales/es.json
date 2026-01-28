@@ -659,7 +659,8 @@
       "setError": "Error al establecer la contraseña",
       "sendToEmail": "Enviar código al correo",
       "emailSent": "¡Código enviado al correo!",
-      "emailError": "Error al enviar el correo"
+      "emailError": "Error al enviar el correo",
+      "changeWithoutOtp": "Cambiar contraseña sin OTP (prueba)"
     },
     "phone": {
       "title": "Ingresa tu número de teléfono",
