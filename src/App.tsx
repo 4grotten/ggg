@@ -52,6 +52,7 @@ import EditProfile from "./pages/EditProfile";
 import Partner from "./pages/Partner";
 import ReferralHistory from "./pages/ReferralHistory";
 import PartnerBonuses from "./pages/PartnerBonuses";
+import DevicesPage from "./pages/DevicesPage";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
@@ -73,6 +74,7 @@ const hiddenNavRoutes = [
   "/auth/",
   "/open-card",
   "/settings/edit-profile",
+  "/settings/devices",
   "/partner",
 ];
 
@@ -127,6 +129,7 @@ const AppContent = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/edit-profile" element={<EditProfile />} />
+            <Route path="/settings/devices" element={<DevicesPage />} />
             <Route path="/fees-and-limits" element={<FeesAndLimits />} />
             <Route path="/limits-settings" element={<LimitsSettings />} />
             <Route path="/profile-verification" element={<ProfileVerification />} />
