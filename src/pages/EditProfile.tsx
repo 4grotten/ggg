@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2, Instagram, Send, AtSign, Link2, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -66,6 +66,28 @@ const EditProfile = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [isSendingResetEmail, setIsSendingResetEmail] = useState(false);
+  
+  // Social media state (stored locally since API doesn't support it yet)
+  interface SocialLinks {
+    instagram: string;
+    telegram: string;
+    tiktok: string;
+    website: string;
+  }
+  
+  const [isSocialDrawerOpen, setIsSocialDrawerOpen] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<SocialLinks>(() => {
+    const saved = localStorage.getItem('user_social_links');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return { instagram: "", telegram: "", tiktok: "", website: "" };
+      }
+    }
+    return { instagram: "", telegram: "", tiktok: "", website: "" };
+  });
+  const [isSavingSocial, setIsSavingSocial] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
   // Create schema with localized messages
@@ -297,6 +319,23 @@ const EditProfile = () => {
       setIsSendingResetEmail(false);
     }
   };
+
+  const handleSaveSocialLinks = async () => {
+    setIsSavingSocial(true);
+    try {
+      // Save to localStorage since API doesn't support social_links yet
+      localStorage.setItem('user_social_links', JSON.stringify(socialLinks));
+      toast.success(t("editProfile.socialLinks.saved") || "Social links saved");
+      setIsSocialDrawerOpen(false);
+    } catch (error) {
+      console.error('Failed to save social links:', error);
+      toast.error(t("editProfile.socialLinks.error") || "Failed to save");
+    } finally {
+      setIsSavingSocial(false);
+    }
+  };
+
+  const hasSocialLinks = Object.values(socialLinks).some(v => v && v.trim() !== "");
 
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
@@ -694,7 +733,7 @@ const EditProfile = () => {
               />
 
               {/* Change Password Button */}
-              <div className="pt-2">
+              <div className="pt-2 space-y-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -710,6 +749,38 @@ const EditProfile = () => {
                     <span className="text-foreground font-medium">{t("editProfile.changePassword.title")}</span>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
+
+                {/* Social Links Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsSocialDrawerOpen(true)}
+                  className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                      <Share2 className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <span className="text-foreground font-medium">{t("editProfile.socialLinks.title") || "Social Links"}</span>
+                      {hasSocialLinks && (
+                        <span className="text-xs text-muted-foreground">
+                          {[
+                            socialLinks.instagram && "Instagram",
+                            socialLinks.telegram && "Telegram",
+                            socialLinks.tiktok && "TikTok",
+                            socialLinks.website && t("editProfile.socialLinks.website"),
+                          ].filter(Boolean).join(", ")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {hasSocialLinks && (
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                    )}
+                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </div>
                 </button>
               </div>
             </form>
@@ -933,6 +1004,90 @@ const EditProfile = () => {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 t("editProfile.changePassword.submit")
+              )}
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Social Links Drawer */}
+      <Drawer open={isSocialDrawerOpen} onOpenChange={setIsSocialDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t("editProfile.socialLinks.title") || "Social Links"}</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-8 space-y-4">
+            {/* Instagram */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <Instagram className="w-4 h-4 text-pink-500" />
+                Instagram
+              </label>
+              <Input
+                value={socialLinks.instagram}
+                onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
+                placeholder="@username"
+                className="h-14 rounded-2xl border-border bg-card px-4 text-base"
+              />
+            </div>
+
+            {/* Telegram */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <Send className="w-4 h-4 text-blue-500" />
+                Telegram
+              </label>
+              <Input
+                value={socialLinks.telegram}
+                onChange={(e) => setSocialLinks({ ...socialLinks, telegram: e.target.value })}
+                placeholder="@username"
+                className="h-14 rounded-2xl border-border bg-card px-4 text-base"
+              />
+            </div>
+
+            {/* TikTok */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <AtSign className="w-4 h-4 text-foreground" />
+                TikTok
+              </label>
+              <Input
+                value={socialLinks.tiktok}
+                onChange={(e) => setSocialLinks({ ...socialLinks, tiktok: e.target.value })}
+                placeholder="@username"
+                className="h-14 rounded-2xl border-border bg-card px-4 text-base"
+              />
+            </div>
+
+            {/* Website */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <Globe className="w-4 h-4 text-green-500" />
+                {t("editProfile.socialLinks.website") || "Website"}
+              </label>
+              <Input
+                value={socialLinks.website}
+                onChange={(e) => setSocialLinks({ ...socialLinks, website: e.target.value })}
+                placeholder="https://example.com"
+                className="h-14 rounded-2xl border-border bg-card px-4 text-base"
+              />
+            </div>
+
+            {/* Description */}
+            <p className="text-xs text-muted-foreground px-1">
+              {t("editProfile.socialLinks.description") || "Add your social media profiles for easier communication"}
+            </p>
+
+            {/* Submit Button */}
+            <Button
+              onClick={handleSaveSocialLinks}
+              disabled={isSavingSocial}
+              className="w-full h-14 text-lg font-semibold mt-4"
+            >
+              {isSavingSocial ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                t("editProfile.save")
               )}
             </Button>
           </div>

@@ -950,6 +950,13 @@
       "emailSent": "Link e-postaya gönderildi",
       "emailSentSuccess": "Şifre sıfırlama linki {{email}} adresine gönderildi",
       "emailSendError": "Link gönderilemedi"
+    },
+    "socialLinks": {
+      "title": "Sosyal Bağlantılar",
+      "description": "Daha kolay iletişim için sosyal medya profillerinizi ekleyin",
+      "website": "Web Sitesi",
+      "saved": "Sosyal bağlantılar kaydedildi",
+      "error": "Kaydetme başarısız"
     }
   }
 }
