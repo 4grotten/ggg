@@ -491,6 +491,7 @@
     "shareDetails": "Compartir detalles",
     "bankTransfer": "Transferencia bancaria",
     "yourId": "Su ID",
+    "yourIdRequired": "Asegúrese de incluir su ID",
     "idWarning": "Asegúrese de incluir su ID en la descripción del pago para un depósito rápido en su cuenta. De lo contrario, los fondos pueden no acreditarse y serán devueltos."
   },
   "transactions": {

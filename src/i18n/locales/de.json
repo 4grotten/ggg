@@ -491,6 +491,7 @@
     "shareDetails": "Details teilen",
     "bankTransfer": "Banküberweisung",
     "yourId": "Ihre ID",
+    "yourIdRequired": "Geben Sie unbedingt Ihre ID an",
     "idWarning": "Bitte geben Sie unbedingt Ihre ID im Verwendungszweck an, damit die Einzahlung schnell auf Ihr Konto erfolgt. Andernfalls werden die Gelder möglicherweise nicht gutgeschrieben und zurücküberwiesen."
   },
   "transactions": {
