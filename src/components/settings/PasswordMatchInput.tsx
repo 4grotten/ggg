@@ -87,11 +87,11 @@ export const PasswordMatchInput = ({
         <div className="relative">
           {/* Hidden actual input */}
           <input
-            type={showConfirmPassword ? "text" : "password"}
+            type="text"
             value={confirmPassword}
             onChange={(e) => onConfirmPasswordChange(e.target.value)}
             className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-text"
-            autoComplete="new-password"
+            autoComplete="off"
           />
           
           {/* Visual representation */}
