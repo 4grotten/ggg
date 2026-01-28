@@ -160,22 +160,18 @@ export const PasswordMatchInput = ({
                         </motion.span>
                       ) : (
                         // Show dots with color - centered in fixed container
-                        <motion.span
+                        <motion.div
                           animate={item.match ? {
                             scale: [1, 1.3, 1],
-                            backgroundColor: "#22c55e",
                           } : {
                             x: [0, -2, 2, -2, 2, 0],
-                            backgroundColor: "#ef4444",
                           }}
                           transition={item.match ? {
                             scale: { duration: 0.3 },
-                            backgroundColor: { duration: 0.2 }
                           } : {
                             x: { duration: 0.3 },
-                            backgroundColor: { duration: 0.2 }
                           }}
-                          className="w-2.5 h-2.5 rounded-full"
+                          className="w-2.5 h-2.5 rounded-full shrink-0"
                           style={{ backgroundColor: item.match ? "#22c55e" : "#ef4444" }}
                         />
                       )}

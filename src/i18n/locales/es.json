@@ -654,6 +654,7 @@
       "confirmPasswordPlaceholder": "Repite la contraseña",
       "passwordMismatch": "Las contraseñas no coinciden",
       "passwordTooShort": "Mínimo 6 caracteres",
+      "minChars": "Mínimo 6 caracteres",
       "setPassword": "Establecer contraseña",
       "success": "¡Contraseña cambiada exitosamente!",
       "setError": "Error al establecer la contraseña",

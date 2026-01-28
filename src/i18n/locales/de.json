@@ -654,6 +654,7 @@
       "confirmPasswordPlaceholder": "Passwort wiederholen",
       "passwordMismatch": "Passwörter stimmen nicht überein",
       "passwordTooShort": "Mindestens 6 Zeichen",
+      "minChars": "Mindestens 6 Zeichen",
       "setPassword": "Passwort festlegen",
       "success": "Passwort erfolgreich geändert!",
       "setError": "Passwort konnte nicht festgelegt werden",
