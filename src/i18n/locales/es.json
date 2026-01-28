@@ -1,9 +1,4 @@
 {
-  "settings": {
-    "devices": {
-      "openMaps": "Abrir en Mapas"
-    }
-  },
   "profileVerification": {
     "title": "Verifica tu identidad",
     "description": "Completa el proceso de verificación para desbloquear todas las funciones y aumentar los límites de tu cuenta.",
@@ -401,7 +396,8 @@
       "sessionExpirationDesc": "Elige cuánto tiempo permanece activa esta sesión",
       "days": "{{count}}d",
       "expirationChanged": "Expiración de sesión actualizada",
-      "expirationError": "Error al actualizar la expiración"
+      "expirationError": "Error al actualizar la expiración",
+      "openMaps": "Abrir en Mapas"
     }
   },
   "card": {
