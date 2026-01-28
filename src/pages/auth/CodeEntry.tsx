@@ -8,7 +8,7 @@
  * - Обработка вставки из буфера обмена
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { verifyOtp, sendOtp } from "@/services/api/authApi";
 import { z } from "zod";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 // Validation schema
 const codeSchema = z.string()
@@ -40,14 +41,12 @@ const CodeEntry = () => {
   // Check if it's WhatsApp auth (non-+996 countries)
   const isWhatsAppAuth = authType === 'whatsapp';
   
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState("");
   const [resendCooldown, setResendCooldown] = useState(RESEND_COOLDOWN);
-  
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const verifyingRef = useRef(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   
   // Redirect if no phone number
   useEffect(() => {
@@ -64,101 +63,30 @@ const CodeEntry = () => {
     }
   }, [resendCooldown]);
   
-  // Handle input change
-  const handleInputChange = (index: number, value: string) => {
-    // Filter only digits
-    const digitsOnly = value.replace(/\D/g, "");
-    
-    // If multiple digits pasted/autofilled (iOS autofill sends full code to first input)
-    if (digitsOnly.length > 1) {
-      console.log('[OTP] Multiple digits detected:', digitsOnly);
-      const newCode = ["", "", "", "", "", ""];
-      for (let i = 0; i < Math.min(digitsOnly.length, 6); i++) {
-        newCode[i] = digitsOnly[i];
-      }
-      setCode(newCode);
-      setError("");
-      
-      // Focus appropriate field
-      if (digitsOnly.length >= 6) {
-        inputRefs.current[5]?.focus();
-        // Auto-submit
-        if (!isLoading) {
-          setTimeout(() => handleVerifyWithCleanup(digitsOnly.slice(0, 6)), 100);
-        }
-      } else {
-        inputRefs.current[Math.min(digitsOnly.length, 5)]?.focus();
-      }
-      return;
-    }
-    
-    // Single digit input
-    if (!/^\d*$/.test(digitsOnly)) return;
-    
-    const newCode = [...code];
-    newCode[index] = digitsOnly.slice(-1);
-    setCode(newCode);
+  // Handle code change from InputOTP
+  const handleCodeChange = (value: string) => {
+    setCode(value);
     setError("");
     
-    // Auto-focus next input
-    if (digitsOnly && index < 5) {
-      inputRefs.current[index + 1]?.focus();
+    // Auto-submit when all 6 digits entered
+    if (value.length === 6 && !isLoading && !isVerifying) {
+      handleVerify(value);
     }
-    
-    // Auto-submit when all digits entered
-    const fullCode = newCode.join("");
-    if (fullCode.length === 6 && !isLoading) {
-      handleVerifyWithCleanup(fullCode);
-    }
-  };
-  
-  // Handle backspace
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-  
-  // Handle paste
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    
-    if (pastedData.length > 0) {
-      const newCode = [...code];
-      for (let i = 0; i < pastedData.length; i++) {
-        newCode[i] = pastedData[i];
-      }
-      setCode(newCode);
-      
-      // Focus last filled or next empty input
-      const focusIndex = Math.min(pastedData.length, 5);
-      inputRefs.current[focusIndex]?.focus();
-      
-      // Auto-submit if complete
-      if (pastedData.length === 6) {
-        handleVerifyWithCleanup(pastedData);
-      }
-    }
-  };
-
-  // Handle verify
-  const handleVerifyWithCleanup = async (codeStr?: string) => {
-    await handleVerify(codeStr);
   };
   
   // Verify code
   const handleVerify = async (codeStr?: string) => {
-    // Prevent double-submit (auto-submit + button tap, etc.)
-    if (isLoading || verifyingRef.current) return;
-    verifyingRef.current = true;
+    // Prevent double-submit
+    if (isLoading || isVerifying) return;
+    setIsVerifying(true);
 
-    const fullCode = codeStr || code.join("");
+    const fullCode = codeStr || code;
     
     // Validate
     const validation = codeSchema.safeParse(fullCode);
     if (!validation.success) {
       setError(t("auth.code.invalidCode") || "Invalid code");
+      setIsVerifying(false);
       return;
     }
     
@@ -172,8 +100,7 @@ const CodeEntry = () => {
       // Check for API-level error
       if (response.error) {
         setError(response.error.message || t("auth.code.wrongCode"));
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        setCode("");
         return;
       }
       
@@ -190,14 +117,13 @@ const CodeEntry = () => {
         // API returns error message in data.error field
         const errorMessage = (response.data as { error?: string })?.error || t("auth.code.wrongCode");
         setError(errorMessage);
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        setCode("");
       }
     } catch {
       setError(t("auth.code.error") || "Verification failed");
     } finally {
       setIsLoading(false);
-      verifyingRef.current = false;
+      setIsVerifying(false);
     }
   };
   
@@ -220,8 +146,7 @@ const CodeEntry = () => {
           : (t("auth.code.resendSuccess") || "Code sent!");
         toast.success(successMessage);
         setResendCooldown(RESEND_COOLDOWN);
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        setCode("");
       }
     } catch {
       toast.error(t("auth.code.resendError") || "Failed to resend code");
@@ -302,32 +227,28 @@ const CodeEntry = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="space-y-6"
           >
-            <div className="flex justify-center gap-3">
-              {code.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => { inputRefs.current[index] = el; }}
-                  type="text"
-                  inputMode="numeric"
-                  // NO maxLength - allows iOS/Android autofill to insert full code
-                  value={digit}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={handlePaste}
-                  disabled={isLoading}
-                  // autocomplete="one-time-code" enables native iOS/Android OTP autofill
-                  autoComplete={index === 0 ? "one-time-code" : "off"}
-                  className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 bg-background transition-all duration-200 outline-none ${
-                    error
-                      ? 'border-destructive text-destructive'
-                      : digit
-                        ? 'border-primary'
-                        : 'border-border focus:border-primary'
-                  } disabled:opacity-50`}
-                  autoFocus={index === 0}
-                />
-              ))}
-            </div>
+            <InputOTP
+              maxLength={6}
+              value={code}
+              onChange={handleCodeChange}
+              disabled={isLoading}
+              autoFocus
+              containerClassName="justify-center gap-3"
+            >
+              <InputOTPGroup className="gap-3">
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <InputOTPSlot
+                    key={index}
+                    index={index}
+                    className={`w-12 h-14 text-2xl font-bold rounded-xl border-2 bg-background transition-all duration-200 ${
+                      error
+                        ? 'border-destructive text-destructive'
+                        : 'border-border data-[active=true]:border-primary'
+                    }`}
+                  />
+                ))}
+              </InputOTPGroup>
+            </InputOTP>
 
             
             {error && (
@@ -382,8 +303,8 @@ const CodeEntry = () => {
         {/* Verify Button */}
         <div className="karta-footer-actions">
           <button
-            onClick={() => handleVerifyWithCleanup()}
-            disabled={code.join("").length < 6 || isLoading}
+            onClick={() => handleVerify()}
+            disabled={code.length < 6 || isLoading}
             className="karta-btn-primary disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading ? (
