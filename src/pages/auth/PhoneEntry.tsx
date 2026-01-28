@@ -770,8 +770,20 @@ const PhoneEntry = () => {
                     name="password"
                     id="password"
                     autoComplete="current-password"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    enterKeyHint="done"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onPaste={(e) => {
+                      // Handle paste from password manager / Face ID
+                      const pastedText = e.clipboardData?.getData('text');
+                      if (pastedText) {
+                        e.preventDefault();
+                        setPassword(pastedText);
+                      }
+                    }}
                     onAnimationStart={(e) => {
                       // Detect browser autofill and sync state
                       if (e.animationName === 'onAutoFillStart' || (e.target as HTMLInputElement).matches(':-webkit-autofill')) {
