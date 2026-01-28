@@ -155,7 +155,7 @@ const DevicesPage = () => {
     try {
       const response = await deleteDevice(selectedDevice.id);
       if (!response.error) {
-        toast.success(t("settings.devices.deviceRemoved"));
+        toast.success(t("settings.devices.deviceLoggedOut"));
         setDevices(prev => prev.filter(d => d.id !== selectedDevice.id));
         setSelectedDevice(null);
         
@@ -453,7 +453,7 @@ const DevicesPage = () => {
                 </div>
               </div>
 
-              {/* Only show remove button for active devices */}
+              {/* Only show logout button for active devices */}
               {selectedDevice.is_active && (
                 <button
                   onClick={handleDeleteDevice}
@@ -463,12 +463,12 @@ const DevicesPage = () => {
                   {isDeleting ? (
                     <Loader2 className="w-5 h-5 text-red-500 animate-spin" />
                   ) : (
-                    <Trash2 className="w-5 h-5 text-red-500" />
+                    <LogOut className="w-5 h-5 text-red-500" />
                   )}
                   <span className="text-red-500 font-medium">
                     {isCurrentDevice(selectedDevice) 
                       ? t("settings.devices.logoutThisDevice")
-                      : t("settings.devices.removeDevice")
+                      : t("settings.devices.logoutDevice")
                     }
                   </span>
                 </button>
