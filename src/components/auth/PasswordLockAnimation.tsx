@@ -28,7 +28,7 @@ export const PasswordLockAnimation = ({ className }: PasswordLockAnimationProps)
       }, 500);
 
       // Show dots one by one
-      for (let i = 1; i <= 6; i++) {
+      for (let i = 1; i <= 4; i++) {
         setTimeout(() => {
           setVisibleDots(i);
         }, 500 + i * 180);
@@ -73,7 +73,7 @@ export const PasswordLockAnimation = ({ className }: PasswordLockAnimationProps)
             transition={{ duration: 0.2 }}
             className="flex items-center gap-1"
           >
-            {[0, 1, 2, 3, 4, 5].map((index) => (
+            {[0, 1, 2, 3].map((index) => (
               <motion.span
                 key={index}
                 initial={{ scale: 0, opacity: 0 }}
