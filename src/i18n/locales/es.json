@@ -357,7 +357,29 @@
     "personalData": "Perfil",
     "verification": "Verificación",
     "savedAccounts": "Cuentas guardadas",
-    "switchedTo": "Cambiado a {{name}}"
+    "switchedTo": "Cambiado a {{name}}",
+    "devices": {
+      "title": "Dispositivos activos",
+      "noDevices": "No hay dispositivos activos",
+      "thisDevice": "Este dispositivo",
+      "unknownDevice": "Dispositivo desconocido",
+      "unknown": "Desconocido",
+      "justNow": "Ahora mismo",
+      "minutesAgo": "hace {{count}} min",
+      "hoursAgo": "hace {{count}} h",
+      "daysAgo": "hace {{count}} días",
+      "location": "Ubicación",
+      "lastActive": "Última actividad",
+      "app": "Aplicación",
+      "deviceDetails": "Detalles del dispositivo",
+      "removeDevice": "Eliminar dispositivo",
+      "logoutThisDevice": "Cerrar sesión en este dispositivo",
+      "logoutAll": "Cerrar sesión en todos los dispositivos",
+      "deviceRemoved": "Dispositivo eliminado",
+      "removeError": "Error al eliminar el dispositivo",
+      "loggedOutAll": "Sesión cerrada en todos los dispositivos",
+      "logoutAllError": "Error al cerrar sesión en todos los dispositivos"
+    }
   },
   "card": {
     "back": "Atrás",

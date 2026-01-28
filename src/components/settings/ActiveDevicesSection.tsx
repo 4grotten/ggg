@@ -90,7 +90,7 @@ export const ActiveDevicesSection = ({ className }: ActiveDevicesSectionProps) =
     try {
       const response = await getActiveDevices();
       if (response.data) {
-        setDevices(response.data);
+        setDevices(response.data.list);
       }
     } catch (error) {
       console.error('Failed to fetch devices:', error);

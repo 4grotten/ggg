@@ -357,7 +357,29 @@
     "personalData": "الملف الشخصي",
     "verification": "التحقق",
     "savedAccounts": "الحسابات المحفوظة",
-    "switchedTo": "تم التبديل إلى {{name}}"
+    "switchedTo": "تم التبديل إلى {{name}}",
+    "devices": {
+      "title": "الأجهزة النشطة",
+      "noDevices": "لا توجد أجهزة نشطة",
+      "thisDevice": "هذا الجهاز",
+      "unknownDevice": "جهاز غير معروف",
+      "unknown": "غير معروف",
+      "justNow": "الآن",
+      "minutesAgo": "منذ {{count}} دقيقة",
+      "hoursAgo": "منذ {{count}} ساعة",
+      "daysAgo": "منذ {{count}} يوم",
+      "location": "الموقع",
+      "lastActive": "آخر نشاط",
+      "app": "التطبيق",
+      "deviceDetails": "تفاصيل الجهاز",
+      "removeDevice": "إزالة الجهاز",
+      "logoutThisDevice": "تسجيل الخروج من هذا الجهاز",
+      "logoutAll": "تسجيل الخروج من جميع الأجهزة",
+      "deviceRemoved": "تمت إزالة الجهاز",
+      "removeError": "فشل في إزالة الجهاز",
+      "loggedOutAll": "تم تسجيل الخروج من جميع الأجهزة",
+      "logoutAllError": "فشل تسجيل الخروج من جميع الأجهزة"
+    }
   },
   "card": {
     "back": "رجوع",
