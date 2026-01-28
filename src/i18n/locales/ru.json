@@ -740,6 +740,7 @@
       "codeSent": "Код подтверждения отправлен!",
       "codeSentWhatsApp": "Код отправлен через WhatsApp!",
       "error": "Что-то пошло не так. Попробуйте снова.",
+      "forgotPassword": "Забыли пароль?",
       "registerWithoutOtp": "Регистрация без OTP (тест)"
     },
     "code": {

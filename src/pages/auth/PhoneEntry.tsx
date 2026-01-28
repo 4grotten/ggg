@@ -1147,13 +1147,27 @@ const PhoneEntry = () => {
             </motion.div>
           </motion.div>
 
-          {/* Support Link */}
+          {/* Links: Forgot Password & Support */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="mt-8"
+            className="mt-8 flex flex-col gap-3"
           >
+            <button 
+              onClick={() => {
+                if (isPhoneValid) {
+                  handleForgotPassword();
+                } else {
+                  navigate("/auth/reset-code", { state: { fromPhoneEntry: true } });
+                }
+              }}
+              disabled={isLoading}
+              className="text-primary font-medium flex items-center gap-2 disabled:opacity-50"
+            >
+              <Lock className="w-4 h-4" />
+              {t('auth.phone.forgotPassword')}
+            </button>
             <button 
               onClick={() => navigate("/chat")}
               className="text-primary font-medium flex items-center gap-2"

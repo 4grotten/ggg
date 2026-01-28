@@ -672,6 +672,7 @@
       "codeSent": "تم إرسال رمز التحقق!",
       "codeSentWhatsApp": "تم إرسال الرمز عبر واتساب!",
       "error": "حدث خطأ ما. حاول مرة أخرى.",
+      "forgotPassword": "نسيت كلمة المرور؟",
       "registerWithoutOtp": "التسجيل بدون OTP (اختبار)"
     },
     "code": {
