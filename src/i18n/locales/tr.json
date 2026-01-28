@@ -491,6 +491,7 @@
     "shareDetails": "Bilgileri Paylaş",
     "bankTransfer": "Banka Havalesi",
     "yourId": "Kimliğiniz",
+    "yourIdRequired": "Kimlik numaranızı mutlaka belirtin",
     "idWarning": "Hesabınıza hızlı yatırım için ödeme açıklamasına kimlik numaranızı eklediğinizden emin olun. Aksi takdirde fonlar yatırılmayabilir ve iade edilebilir."
   },
   "transactions": {

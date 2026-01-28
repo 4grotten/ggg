@@ -557,6 +557,7 @@
     "shareDetails": "Share Details",
     "bankTransfer": "Bank Transfer",
     "yourId": "Your ID",
+    "yourIdRequired": "Be sure to include Your ID",
     "idWarning": "Be sure to include your ID in the payment description for fast deposit to your account. Otherwise, funds may not be credited and will be returned."
   },
   "transactions": {

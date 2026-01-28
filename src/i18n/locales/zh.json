@@ -497,6 +497,7 @@
     "shareDetails": "分享详情",
     "bankTransfer": "银行转账",
     "yourId": "您的ID",
+    "yourIdRequired": "请务必填写您的ID",
     "idWarning": "请务必在付款描述中包含您的ID，以便快速入账。否则，资金可能无法到账并将被退回。"
   },
   "transactions": {

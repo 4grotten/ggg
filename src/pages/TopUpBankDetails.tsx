@@ -53,7 +53,7 @@ const TopUpBankDetails = () => {
 
     const shareData = {
       title: "AED Bank Account Details",
-      text: `AED Wire Transfer Details:\n\n${detailsText}\n\n${t("topUp.yourId")}: ${userId}`,
+      text: `AED Wire Transfer Details:\n\n${detailsText}\n\n${t("topUp.yourIdRequired")}: ${userId}`,
     };
 
     try {
