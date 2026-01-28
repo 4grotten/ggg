@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
 import { WithdrawDrawer } from "./WithdrawDrawer";
+import { motion } from "framer-motion";
 
 interface ReferralBalanceProps {
   balance: number;
@@ -40,13 +41,41 @@ export const ReferralBalance = memo(({ balance, invited, withdrawn }: ReferralBa
             </div>
           </div>
           
-          <Button 
+          <button 
             onClick={() => setWithdrawDrawerOpen(true)}
-            className="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white"
+            className="relative w-full mt-4 py-4 rounded-xl font-semibold text-white overflow-hidden group active:scale-[0.98] transition-transform"
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+            }}
           >
-            <ArrowUpRight className="w-4 h-4 mr-2" />
-            {t('partner.withdraw', 'Вывести')}
-          </Button>
+            {/* Animated shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            
+            {/* Rotating conic glow */}
+            <div 
+              className="absolute -inset-1 rounded-xl opacity-50 blur-md animate-spin-slow -z-10"
+              style={{
+                background: "conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea)",
+              }}
+            />
+            
+            <div className="relative flex items-center justify-center gap-2">
+              <span className="text-base">{t('partner.withdraw', 'Вывести')}</span>
+              <motion.div
+                animate={{ 
+                  x: [0, 4, 0],
+                  y: [0, -4, 0],
+                }}
+                transition={{ 
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <ArrowUpRight className="w-5 h-5" />
+              </motion.div>
+            </div>
+          </button>
         </div>
       </div>
 
