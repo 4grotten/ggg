@@ -489,7 +489,9 @@
     "importantNote": "Wichtig",
     "includeReference": "Bitte geben Sie die Referenznummer in Ihrer Zahlung an, um eine schnelle Bearbeitung zu gewährleisten",
     "shareDetails": "Details teilen",
-    "bankTransfer": "Banküberweisung"
+    "bankTransfer": "Banküberweisung",
+    "yourId": "Ihre ID",
+    "idWarning": "Bitte geben Sie unbedingt Ihre ID im Verwendungszweck an, damit die Einzahlung schnell auf Ihr Konto erfolgt. Andernfalls werden die Gelder möglicherweise nicht gutgeschrieben und zurücküberwiesen."
   },
   "transactions": {
     "noTransactions": "Noch keine Transaktionen",
