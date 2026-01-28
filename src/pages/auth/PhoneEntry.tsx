@@ -1215,6 +1215,28 @@ const PhoneEntry = () => {
             </AnimatePresence>
           </button>
           
+          {/* DEV: Register without OTP for testing */}
+          {isPhoneValid && (
+            <button
+              type="button"
+              onClick={() => {
+                const fullPhone = getFullPhoneNumber();
+                sessionStorage.setItem("registerPhone", fullPhone);
+                navigate("/auth/profile", { 
+                  state: { 
+                    isNewUser: true, 
+                    phoneNumber: fullPhone,
+                    otpVerified: true // Bypass OTP check for testing
+                  } 
+                });
+              }}
+              className="w-full py-3 mt-3 font-medium rounded-2xl border border-orange-500/50 bg-orange-500/10 text-orange-500 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+            >
+              <KeyRound className="w-4 h-4" />
+              {t('auth.phone.registerWithoutOtp') || 'Регистрация без OTP (тест)'}
+            </button>
+          )}
+          
           {/* Show biometric login if enabled */}
           {isBiometricEnabled && biometricPhone && (
             <button
