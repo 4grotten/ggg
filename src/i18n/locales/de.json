@@ -671,7 +671,8 @@
       "continue": "Weiter",
       "codeSent": "Bestätigungscode gesendet!",
       "codeSentWhatsApp": "Code per WhatsApp gesendet!",
-      "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
+      "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+      "registerWithoutOtp": "Registrierung ohne OTP (Test)"
     },
     "code": {
       "title": "Bestätigungscode eingeben",
