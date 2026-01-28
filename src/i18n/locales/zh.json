@@ -1,9 +1,4 @@
 {
-  "settings": {
-    "devices": {
-      "openMaps": "在地图中打开"
-    }
-  },
   "profileVerification": {
     "title": "验证您的身份",
     "description": "完成验证流程以解锁所有功能并提高账户限额。",
@@ -403,7 +398,8 @@
       "sessionExpirationDesc": "选择此会话保持活跃的时间",
       "days": "{{count}}天",
       "expirationChanged": "会话过期时间已更新",
-      "expirationError": "更新过期时间失败"
+      "expirationError": "更新过期时间失败",
+      "openMaps": "在地图中打开"
     }
   },
   "card": {

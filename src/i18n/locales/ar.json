@@ -1,9 +1,4 @@
 {
-  "settings": {
-    "devices": {
-      "openMaps": "فتح في الخرائط"
-    }
-  },
   "profileVerification": {
     "title": "تحقق من هويتك",
     "description": "أكمل عملية التحقق لفتح جميع الميزات وزيادة حدود حسابك.",
@@ -401,7 +396,8 @@
       "sessionExpirationDesc": "اختر مدة بقاء هذه الجلسة نشطة",
       "days": "{{count}} يوم",
       "expirationChanged": "تم تحديث انتهاء الجلسة",
-      "expirationError": "فشل في تحديث الانتهاء"
+      "expirationError": "فشل في تحديث الانتهاء",
+      "openMaps": "فتح في الخرائط"
     }
   },
   "card": {

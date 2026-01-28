@@ -1,9 +1,4 @@
 {
-  "settings": {
-    "devices": {
-      "openMaps": "Open in Maps"
-    }
-  },
   "profileVerification": {
     "title": "Verify Your Identity",
     "description": "Complete the verification process to unlock all features and increase your account limits.",
@@ -414,7 +409,8 @@
       "sessionExpirationDesc": "Choose how long this session stays active",
       "days": "{{count}}d",
       "expirationChanged": "Session expiration updated",
-      "expirationError": "Failed to update expiration"
+      "expirationError": "Failed to update expiration",
+      "openMaps": "Open in Maps"
     }
   },
   "editProfile": {

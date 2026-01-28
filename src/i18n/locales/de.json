@@ -1,9 +1,4 @@
 {
-  "settings": {
-    "devices": {
-      "openMaps": "In Karten öffnen"
-    }
-  },
   "profileVerification": {
     "title": "Identität verifizieren",
     "description": "Schließen Sie den Verifizierungsprozess ab, um alle Funktionen freizuschalten und Ihre Kontolimits zu erhöhen.",
@@ -401,7 +396,8 @@
       "sessionExpirationDesc": "Wählen Sie, wie lange diese Sitzung aktiv bleibt",
       "days": "{{count}} T.",
       "expirationChanged": "Sitzungsablauf aktualisiert",
-      "expirationError": "Ablauf konnte nicht aktualisiert werden"
+      "expirationError": "Ablauf konnte nicht aktualisiert werden",
+      "openMaps": "In Karten öffnen"
     }
   },
   "card": {

@@ -1,9 +1,4 @@
 {
-  "settings": {
-    "devices": {
-      "openMaps": "Открыть карту"
-    }
-  },
   "profileVerification": {
     "title": "Подтвердите личность",
     "description": "Пройдите верификацию, чтобы разблокировать все функции и увеличить лимиты аккаунта.",
@@ -414,7 +409,8 @@
       "sessionExpirationDesc": "Выберите, сколько дней сессия будет активна",
       "days": "{{count}} дн.",
       "expirationChanged": "Срок действия сессии обновлён",
-      "expirationError": "Не удалось обновить срок действия"
+      "expirationError": "Не удалось обновить срок действия",
+      "openMaps": "Открыть карту"
     }
   },
   "editProfile": {
