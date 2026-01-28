@@ -1,4 +1,9 @@
 {
+  "settings": {
+    "devices": {
+      "openMaps": "Open in Maps"
+    }
+  },
   "profileVerification": {
     "title": "Verify Your Identity",
     "description": "Complete the verification process to unlock all features and increase your account limits.",

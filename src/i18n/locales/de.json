@@ -1,4 +1,9 @@
 {
+  "settings": {
+    "devices": {
+      "openMaps": "In Karten öffnen"
+    }
+  },
   "profileVerification": {
     "title": "Identität verifizieren",
     "description": "Schließen Sie den Verifizierungsprozess ab, um alle Funktionen freizuschalten und Ihre Kontolimits zu erhöhen.",

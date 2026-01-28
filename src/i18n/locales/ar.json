@@ -1,4 +1,9 @@
 {
+  "settings": {
+    "devices": {
+      "openMaps": "فتح في الخرائط"
+    }
+  },
   "profileVerification": {
     "title": "تحقق من هويتك",
     "description": "أكمل عملية التحقق لفتح جميع الميزات وزيادة حدود حسابك.",

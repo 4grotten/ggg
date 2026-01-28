@@ -1,4 +1,9 @@
 {
+  "settings": {
+    "devices": {
+      "openMaps": "在地图中打开"
+    }
+  },
   "profileVerification": {
     "title": "验证您的身份",
     "description": "完成验证流程以解锁所有功能并提高账户限额。",

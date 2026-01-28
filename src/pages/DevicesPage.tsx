@@ -23,6 +23,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { toast } from "sonner";
 import { getActiveDevices, getAuthorizationHistory, terminateDeviceSession, changeTokenExpiredTime, type ActiveDevice } from "@/services/api/devicesApi";
 import { useAuth } from "@/contexts/AuthContext";
+import { DeviceLocationMap } from "@/components/devices/DeviceLocationMap";
 
 type TabType = 'active' | 'history';
 
@@ -403,6 +404,14 @@ const DevicesPage = () => {
           
           {selectedDevice && (
             <div className="px-4 pb-6 space-y-4">
+              {/* Location Map - Hero section */}
+              {selectedDevice.location && (
+                <DeviceLocationMap 
+                  location={selectedDevice.location} 
+                  ip={selectedDevice.ip || undefined}
+                />
+              )}
+
               <div className="bg-muted/50 rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-3">
                   {(() => {
@@ -441,20 +450,6 @@ const DevicesPage = () => {
                 </div>
 
                 <div className="space-y-2 pt-2 border-t border-border/50">
-                  {selectedDevice.location && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">{t("settings.devices.location")}:</span>
-                      <span className="text-foreground">{selectedDevice.location}</span>
-                    </div>
-                  )}
-                  {selectedDevice.ip && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Globe className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">IP:</span>
-                      <span className="text-foreground">{selectedDevice.ip}</span>
-                    </div>
-                  )}
                   {selectedDevice.log_time && (
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="w-4 h-4 text-muted-foreground" />
