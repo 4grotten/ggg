@@ -953,7 +953,8 @@
     },
     "socialLinks": {
       "title": "Redes Sociales",
-      "description": "Agregue sus perfiles de redes sociales para facilitar la comunicación",
+      "description": "Pegue un enlace de perfil — la red social se detectará automáticamente",
+      "placeholder": "Pegar un enlace...",
       "website": "Sitio Web",
       "saved": "Enlaces sociales guardados",
       "error": "Error al guardar"

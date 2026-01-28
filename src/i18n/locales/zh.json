@@ -960,7 +960,8 @@
     },
     "socialLinks": {
       "title": "社交链接",
-      "description": "添加您的社交媒体资料以便于沟通",
+      "description": "粘贴个人资料链接 — 将自动检测社交网络",
+      "placeholder": "粘贴链接...",
       "website": "网站",
       "saved": "社交链接已保存",
       "error": "保存失败"

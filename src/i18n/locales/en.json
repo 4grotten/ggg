@@ -422,7 +422,8 @@
     },
     "socialLinks": {
       "title": "Social Links",
-      "description": "Add your social media profiles for easier communication",
+      "description": "Paste a profile link — the social network will be detected automatically",
+      "placeholder": "Paste a link...",
       "website": "Website",
       "saved": "Social links saved",
       "error": "Failed to save"
