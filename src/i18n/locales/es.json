@@ -361,6 +361,13 @@
     "devices": {
       "title": "Dispositivos activos",
       "noDevices": "No hay dispositivos activos",
+      "active": "Activo",
+      "currentDevice": "Dispositivo actual",
+      "otherDevices": "Otros dispositivos",
+      "activeCount": "{{count}} sesiones activas",
+      "loadError": "Error al cargar dispositivos",
+      "confirmLogoutAllTitle": "¿Cerrar todas las sesiones?",
+      "confirmLogoutAllDesc": "Se cerrará la sesión en todos los dispositivos, incluido este. Tendrás que iniciar sesión de nuevo.",
       "thisDevice": "Este dispositivo",
       "unknownDevice": "Dispositivo desconocido",
       "unknown": "Desconocido",

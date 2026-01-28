@@ -363,6 +363,13 @@
     "devices": {
       "title": "活跃设备",
       "noDevices": "没有活跃设备",
+      "active": "活跃",
+      "currentDevice": "当前设备",
+      "otherDevices": "其他设备",
+      "activeCount": "{{count}} 个活跃会话",
+      "loadError": "加载设备失败",
+      "confirmLogoutAllTitle": "结束所有会话？",
+      "confirmLogoutAllDesc": "这将使您从所有设备退出登录，包括当前设备。您需要重新登录。",
       "thisDevice": "当前设备",
       "unknownDevice": "未知设备",
       "unknown": "未知",

@@ -361,6 +361,13 @@
     "devices": {
       "title": "Aktive Geräte",
       "noDevices": "Keine aktiven Geräte",
+      "active": "Aktiv",
+      "currentDevice": "Aktuelles Gerät",
+      "otherDevices": "Andere Geräte",
+      "activeCount": "{{count}} aktive Sitzungen",
+      "loadError": "Geräte konnten nicht geladen werden",
+      "confirmLogoutAllTitle": "Alle Sitzungen beenden?",
+      "confirmLogoutAllDesc": "Sie werden von allen Geräten abgemeldet, einschließlich diesem. Sie müssen sich erneut anmelden.",
       "thisDevice": "Dieses Gerät",
       "unknownDevice": "Unbekanntes Gerät",
       "unknown": "Unbekannt",
