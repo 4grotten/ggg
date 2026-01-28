@@ -489,7 +489,9 @@
     "importantNote": "Importante",
     "includeReference": "Por favor incluya el número de referencia en su pago para asegurar un procesamiento rápido",
     "shareDetails": "Compartir detalles",
-    "bankTransfer": "Transferencia bancaria"
+    "bankTransfer": "Transferencia bancaria",
+    "yourId": "Su ID",
+    "idWarning": "Asegúrese de incluir su ID en la descripción del pago para un depósito rápido en su cuenta. De lo contrario, los fondos pueden no acreditarse y serán devueltos."
   },
   "transactions": {
     "noTransactions": "Sin transacciones aún",

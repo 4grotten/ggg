@@ -555,7 +555,9 @@
     "importantNote": "Important",
     "includeReference": "Please include the reference number in your payment to ensure quick processing",
     "shareDetails": "Share Details",
-    "bankTransfer": "Bank Transfer"
+    "bankTransfer": "Bank Transfer",
+    "yourId": "Your ID",
+    "idWarning": "Be sure to include your ID in the payment description for fast deposit to your account. Otherwise, funds may not be credited and will be returned."
   },
   "transactions": {
     "noTransactions": "No transactions yet",

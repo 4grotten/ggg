@@ -495,7 +495,9 @@
     "importantNote": "重要",
     "includeReference": "请在付款中包含参考编号以确保快速处理",
     "shareDetails": "分享详情",
-    "bankTransfer": "银行转账"
+    "bankTransfer": "银行转账",
+    "yourId": "您的ID",
+    "idWarning": "请务必在付款描述中包含您的ID，以便快速入账。否则，资金可能无法到账并将被退回。"
   },
   "transactions": {
     "noTransactions": "暂无交易记录",
