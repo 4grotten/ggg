@@ -1,174 +1,85 @@
 import { motion } from "framer-motion";
-import { MapPin, ExternalLink, Navigation } from "lucide-react";
+import { MapPin, ExternalLink, Navigation, Loader2 } from "lucide-react";
 import { countries } from "@/data/countries";
 import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DeviceLocationMapProps {
   location: string | null;
   ip?: string;
 }
 
-// Map of city/country names to country codes
-const locationToCountryCode: Record<string, string> = {
-  // Common cities and their country codes
-  "dubai": "AE",
-  "abu dhabi": "AE",
-  "sharjah": "AE",
-  "ajman": "AE",
-  "moscow": "RU",
-  "saint petersburg": "RU",
-  "st. petersburg": "RU",
-  "london": "GB",
-  "manchester": "GB",
-  "new york": "US",
-  "los angeles": "US",
-  "san francisco": "US",
-  "chicago": "US",
-  "berlin": "DE",
-  "munich": "DE",
-  "frankfurt": "DE",
-  "paris": "FR",
-  "lyon": "FR",
-  "marseille": "FR",
-  "tokyo": "JP",
-  "osaka": "JP",
-  "beijing": "CN",
-  "shanghai": "CN",
-  "shenzhen": "CN",
-  "istanbul": "TR",
-  "ankara": "TR",
-  "cairo": "EG",
-  "riyadh": "SA",
-  "jeddah": "SA",
-  "doha": "QA",
-  "kuwait city": "KW",
-  "manama": "BH",
-  "muscat": "OM",
-  "singapore": "SG",
-  "hong kong": "HK",
-  "taipei": "TW",
-  "seoul": "KR",
-  "sydney": "AU",
-  "melbourne": "AU",
-  "toronto": "CA",
-  "vancouver": "CA",
-  "amsterdam": "NL",
-  "brussels": "BE",
-  "zurich": "CH",
-  "geneva": "CH",
-  "vienna": "AT",
-  "warsaw": "PL",
-  "prague": "CZ",
-  "budapest": "HU",
-  "rome": "IT",
-  "milan": "IT",
-  "madrid": "ES",
-  "barcelona": "ES",
-  "lisbon": "PT",
-  "athens": "GR",
-  "dublin": "IE",
-  "oslo": "NO",
-  "stockholm": "SE",
-  "helsinki": "FI",
-  "copenhagen": "DK",
-  "mumbai": "IN",
-  "delhi": "IN",
-  "bangalore": "IN",
-  "jakarta": "ID",
-  "bangkok": "TH",
-  "kuala lumpur": "MY",
-  "manila": "PH",
-  "ho chi minh": "VN",
-  "hanoi": "VN",
-  // Countries
-  "united arab emirates": "AE",
-  "uae": "AE",
-  "russia": "RU",
-  "united kingdom": "GB",
-  "uk": "GB",
-  "united states": "US",
-  "usa": "US",
-  "germany": "DE",
-  "france": "FR",
-  "japan": "JP",
-  "china": "CN",
-  "turkey": "TR",
-  "egypt": "EG",
-  "saudi arabia": "SA",
-  "qatar": "QA",
-  "kuwait": "KW",
-  "bahrain": "BH",
-  "oman": "OM",
-  "india": "IN",
-  "indonesia": "ID",
-  "thailand": "TH",
-  "malaysia": "MY",
-  "philippines": "PH",
-  "vietnam": "VN",
-  "australia": "AU",
-  "canada": "CA",
-  "netherlands": "NL",
-  "belgium": "BE",
-  "switzerland": "CH",
-  "austria": "AT",
-  "poland": "PL",
-  "czech republic": "CZ",
-  "hungary": "HU",
-  "italy": "IT",
-  "spain": "ES",
-  "portugal": "PT",
-  "greece": "GR",
-  "ireland": "IE",
-  "norway": "NO",
-  "sweden": "SE",
-  "finland": "FI",
-  "denmark": "DK",
-};
-
-function getCountryFromLocation(location: string): { code: string; name: string; flag: string } | null {
-  const locationLower = location.toLowerCase();
-  
-  // First try to find by city or country name in our mapping
-  for (const [key, code] of Object.entries(locationToCountryCode)) {
-    if (locationLower.includes(key)) {
-      const country = countries.find(c => c.code === code);
-      if (country) return country;
-    }
-  }
-  
-  // Try to match country name directly from countries list
-  for (const country of countries) {
-    if (locationLower.includes(country.name.toLowerCase())) {
-      return country;
-    }
-  }
-  
-  return null;
+interface GeolocationData {
+  success: boolean;
+  ip: string;
+  country: string;
+  countryCode: string;
+  city: string;
+  region: string;
+  lat: number;
+  lon: number;
+  timezone: string;
+  isp: string;
+  mapsUrl: string;
+  error?: string;
 }
 
-function formatLocationForMaps(location: string): string {
-  // Format: "Country, City" -> "City, Country" for better Google Maps results
-  const parts = location.split(',').map(p => p.trim());
-  if (parts.length >= 2) {
-    // Reverse to put city first: "Dubai, United Arab Emirates"
-    return parts.reverse().join(', ');
-  }
-  return location;
-}
-
-function getGoogleMapsUrl(location: string): string {
-  const formattedLocation = formatLocationForMaps(location);
-  // Use the most reliable Google Maps URL format
-  return `https://maps.google.com/maps?q=${encodeURIComponent(formattedLocation)}&t=m`;
+function getCountryFlag(countryCode: string): string {
+  const country = countries.find(c => c.code === countryCode);
+  return country?.flag || "🌍";
 }
 
 export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
   const { t } = useTranslation();
+  const [geoData, setGeoData] = useState<GeolocationData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
-  if (!location) return null;
+  useEffect(() => {
+    async function fetchGeolocation() {
+      if (!ip) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const { data, error: fnError } = await supabase.functions.invoke('ip-geolocation', {
+          body: { ip }
+        });
+        
+        if (fnError) {
+          console.error('Geolocation function error:', fnError);
+          setError(fnError.message);
+          return;
+        }
+        
+        if (data?.success) {
+          setGeoData(data);
+        } else {
+          setError(data?.error || 'Failed to get geolocation');
+        }
+      } catch (err) {
+        console.error('Error fetching geolocation:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    fetchGeolocation();
+  }, [ip]);
   
-  const country = getCountryFromLocation(location);
-  const mapsUrl = getGoogleMapsUrl(location);
+  if (!location && !ip) return null;
+  
+  const displayLocation = geoData 
+    ? `${geoData.city}, ${geoData.country}`
+    : location;
+  
+  const displayCountryCode = geoData?.countryCode;
+  const countryFlag = displayCountryCode ? getCountryFlag(displayCountryCode) : null;
+  
+  const mapsUrl = geoData?.mapsUrl || `https://www.google.com/maps?q=${encodeURIComponent(location || '')}&z=14`;
   
   const handleOpenMaps = () => {
     window.open(mapsUrl, '_blank');
@@ -271,7 +182,9 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
               }}
             >
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/10">
-                {country ? (
+                {isLoading ? (
+                  <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                ) : countryFlag ? (
                   <motion.span
                     className="text-3xl"
                     initial={{ scale: 0, rotate: -180 }}
@@ -283,7 +196,7 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
                       delay: 0.2 
                     }}
                   >
-                    {country.flag}
+                    {countryFlag}
                   </motion.span>
                 ) : (
                   <MapPin className="w-6 h-6 text-primary" />
@@ -312,18 +225,20 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
               >
-                {location}
+                {isLoading ? t("common.loading") : displayLocation}
               </motion.p>
-              {country && (
+              
+              {geoData && (
                 <motion.p
                   className="text-xs text-muted-foreground"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  {country.name}
+                  {geoData.region} • {geoData.isp}
                 </motion.p>
               )}
+              
               {ip && (
                 <motion.p
                   className="text-xs text-muted-foreground/70 font-mono"
@@ -332,6 +247,27 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
                   transition={{ delay: 0.3 }}
                 >
                   IP: {ip}
+                </motion.p>
+              )}
+              
+              {geoData?.lat && geoData?.lon && (
+                <motion.p
+                  className="text-xs text-muted-foreground/50 font-mono"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  {geoData.lat.toFixed(4)}, {geoData.lon.toFixed(4)}
+                </motion.p>
+              )}
+              
+              {error && (
+                <motion.p
+                  className="text-xs text-destructive"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {error}
                 </motion.p>
               )}
             </div>
@@ -348,7 +284,8 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
             <button
               type="button"
               onClick={handleOpenMaps}
-              className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 rounded-xl transition-all group cursor-pointer"
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 rounded-xl transition-all group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Navigation className="w-4 h-4 text-primary group-hover:rotate-12 transition-transform" />
               <span className="text-xs font-medium text-primary hidden sm:inline">
