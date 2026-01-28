@@ -17,6 +17,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { toast } from "sonner";
 import { getActiveDevices, deleteDevice, type ActiveDevice } from "@/services/api/devicesApi";
@@ -159,6 +160,7 @@ const DevicesPage = () => {
       showBackButton
       onBack={() => navigate(-1)}
       title={t("settings.devices.title")}
+      rightAction={<LanguageSwitcher />}
     >
       <div className="px-4 pb-28 space-y-4">
         {isLoading ? (
