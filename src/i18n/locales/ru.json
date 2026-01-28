@@ -374,6 +374,7 @@
     "devices": {
       "title": "Активные устройства",
     "noDevices": "Нет активных устройств",
+    "active": "Активно",
     "currentDevice": "Текущее устройство",
     "otherDevices": "Другие устройства",
     "activeCount": "{{count}} активных сессий",
