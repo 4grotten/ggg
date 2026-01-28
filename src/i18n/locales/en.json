@@ -426,7 +426,8 @@
       "placeholder": "Paste a link...",
       "website": "Website",
       "saved": "Social links saved",
-      "error": "Failed to save"
+      "error": "Failed to save",
+      "loadError": "Failed to load social links"
     }
   },
   "card": {

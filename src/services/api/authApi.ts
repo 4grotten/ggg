@@ -2,7 +2,7 @@
  * Auth API endpoints для Apofiz Backend
  */
 
-import { apiPost, apiGet, setAuthToken, getAuthToken, AUTH_USER_KEY } from './apiClient';
+import { apiPost, apiGet, apiRequest, setAuthToken, getAuthToken, AUTH_USER_KEY } from './apiClient';
 import { saveCurrentAccount } from '@/hooks/useMultiAccount';
 
 // ============ Types ============
@@ -354,4 +354,35 @@ export async function updateProfile(data: {
   }
   
   return response;
+}
+
+// ============ Social Networks API ============
+
+export interface SocialNetworkItem {
+  id: number;
+  url: string;
+}
+
+/**
+ * Get user social networks
+ * GET /users/<user_id>/social_networks/
+ */
+export async function getSocialNetworks(userId: number) {
+  return apiGet<SocialNetworkItem[]>(`/users/${userId}/social_networks/`);
+}
+
+/**
+ * Add social network
+ * POST /users/<user_id>/social_networks/
+ */
+export async function addSocialNetwork(userId: number, url: string) {
+  return apiPost<SocialNetworkItem>(`/users/${userId}/social_networks/`, { url });
+}
+
+/**
+ * Delete social network
+ * DELETE /users/<user_id>/social_networks/<id>/
+ */
+export async function deleteSocialNetwork(userId: number, networkId: number) {
+  return apiRequest<void>(`/users/${userId}/social_networks/${networkId}/`, { method: 'DELETE' });
 }
