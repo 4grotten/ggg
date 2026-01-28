@@ -214,6 +214,7 @@ export interface SocialLink {
   url: string;
   networkId: string;
   networkName: string;
+  apiId?: number; // ID from API for existing links
 }
 
 interface SocialLinksInputProps {

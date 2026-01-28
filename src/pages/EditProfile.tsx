@@ -19,7 +19,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
-import { changePassword, getUserEmail, forgotPasswordEmail } from "@/services/api/authApi";
+import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, addSocialNetwork, deleteSocialNetwork, type SocialNetworkItem } from "@/services/api/authApi";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 import { SocialLinksInput, SocialLink, migrateSocialLinks } from "@/components/settings/SocialLinksInput";
 
@@ -68,33 +68,12 @@ const EditProfile = () => {
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [isSendingResetEmail, setIsSendingResetEmail] = useState(false);
   
-  // Social media state (stored locally since API doesn't support it yet)
+  // Social media state
   const [isSocialDrawerOpen, setIsSocialDrawerOpen] = useState(false);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => {
-    const saved = localStorage.getItem('user_social_links_v2');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return [];
-      }
-    }
-    // Migrate old format if exists
-    const oldSaved = localStorage.getItem('user_social_links');
-    if (oldSaved) {
-      try {
-        const oldLinks = JSON.parse(oldSaved);
-        const migrated = migrateSocialLinks(oldLinks);
-        localStorage.setItem('user_social_links_v2', JSON.stringify(migrated));
-        localStorage.removeItem('user_social_links');
-        return migrated;
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [isSavingSocial, setIsSavingSocial] = useState(false);
+  const [isLoadingSocial, setIsLoadingSocial] = useState(false);
+  const [originalSocialLinks, setOriginalSocialLinks] = useState<SocialNetworkItem[]>([]);
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
   // Create schema with localized messages
@@ -327,11 +306,100 @@ const EditProfile = () => {
     }
   };
 
+  // Load social links from API when drawer opens
+  const handleSocialDrawerOpen = async (open: boolean) => {
+    setIsSocialDrawerOpen(open);
+    if (open && user?.id) {
+      setIsLoadingSocial(true);
+      try {
+        const response = await getSocialNetworks(user.id);
+        if (response.data) {
+          setOriginalSocialLinks(response.data);
+          // Convert API format to SocialLink format
+          const links: SocialLink[] = response.data.map((item) => ({
+            id: `api-${item.id}`,
+            url: item.url,
+            networkId: detectNetworkFromUrl(item.url),
+            networkName: getNetworkNameFromUrl(item.url),
+            apiId: item.id, // Store API id for deletion
+          }));
+          setSocialLinks(links);
+        }
+      } catch (error) {
+        console.error('Failed to load social links:', error);
+        toast.error(t("editProfile.socialLinks.loadError") || "Failed to load social links");
+      } finally {
+        setIsLoadingSocial(false);
+      }
+    }
+  };
+
+  // Helper to detect network from URL
+  const detectNetworkFromUrl = (url: string): string => {
+    const lowerUrl = url.toLowerCase();
+    const patterns: Record<string, string[]> = {
+      instagram: ["instagram.com", "instagr.am"],
+      telegram: ["t.me", "telegram.me"],
+      tiktok: ["tiktok.com"],
+      youtube: ["youtube.com", "youtu.be"],
+      twitter: ["twitter.com", "x.com"],
+      facebook: ["facebook.com", "fb.com"],
+      linkedin: ["linkedin.com"],
+      github: ["github.com"],
+      whatsapp: ["wa.me", "whatsapp.com"],
+      vk: ["vk.com"],
+    };
+    for (const [networkId, domains] of Object.entries(patterns)) {
+      if (domains.some(d => lowerUrl.includes(d))) return networkId;
+    }
+    return "website";
+  };
+
+  const getNetworkNameFromUrl = (url: string): string => {
+    const networkId = detectNetworkFromUrl(url);
+    const names: Record<string, string> = {
+      instagram: "Instagram",
+      telegram: "Telegram",
+      tiktok: "TikTok",
+      youtube: "YouTube",
+      twitter: "X (Twitter)",
+      facebook: "Facebook",
+      linkedin: "LinkedIn",
+      github: "GitHub",
+      whatsapp: "WhatsApp",
+      vk: "VK",
+      website: "Website",
+    };
+    return names[networkId] || "Website";
+  };
+
   const handleSaveSocialLinks = async () => {
+    if (!user?.id) return;
+    
     setIsSavingSocial(true);
     try {
-      // Save to localStorage since API doesn't support social_links yet
-      localStorage.setItem('user_social_links_v2', JSON.stringify(socialLinks));
+      // Find links to delete (in original but not in current)
+      const currentApiIds = socialLinks
+        .filter(l => (l as any).apiId)
+        .map(l => (l as any).apiId as number);
+      
+      const toDelete = originalSocialLinks.filter(
+        orig => !currentApiIds.includes(orig.id)
+      );
+      
+      // Find new links to add (no apiId means new)
+      const toAdd = socialLinks.filter(l => !(l as any).apiId);
+      
+      // Delete removed links
+      for (const link of toDelete) {
+        await deleteSocialNetwork(user.id, link.id);
+      }
+      
+      // Add new links
+      for (const link of toAdd) {
+        await addSocialNetwork(user.id, link.url);
+      }
+      
       toast.success(t("editProfile.socialLinks.saved") || "Social links saved");
       setIsSocialDrawerOpen(false);
     } catch (error) {
@@ -761,7 +829,7 @@ const EditProfile = () => {
                 {/* Social Links Button */}
                 <button
                   type="button"
-                  onClick={() => setIsSocialDrawerOpen(true)}
+                  onClick={() => handleSocialDrawerOpen(true)}
                   className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
                 >
                   <div className="flex items-center gap-3">
@@ -1014,36 +1082,44 @@ const EditProfile = () => {
       </Drawer>
 
       {/* Social Links Drawer */}
-      <Drawer open={isSocialDrawerOpen} onOpenChange={setIsSocialDrawerOpen}>
+      <Drawer open={isSocialDrawerOpen} onOpenChange={handleSocialDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{t("editProfile.socialLinks.title") || "Social Links"}</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-8 space-y-4">
-            {/* Smart Social Links Input */}
-            <SocialLinksInput
-              links={socialLinks}
-              onChange={setSocialLinks}
-              placeholder={t("editProfile.socialLinks.placeholder") || "Paste a link..."}
-            />
+            {isLoadingSocial ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <>
+                {/* Smart Social Links Input */}
+                <SocialLinksInput
+                  links={socialLinks}
+                  onChange={setSocialLinks}
+                  placeholder={t("editProfile.socialLinks.placeholder") || "Paste a link..."}
+                />
 
-            {/* Description */}
-            <p className="text-xs text-muted-foreground px-1">
-              {t("editProfile.socialLinks.description") || "Add your social media profiles for easier communication"}
-            </p>
+                {/* Description */}
+                <p className="text-xs text-muted-foreground px-1">
+                  {t("editProfile.socialLinks.description") || "Add your social media profiles for easier communication"}
+                </p>
 
-            {/* Submit Button */}
-            <Button
-              onClick={handleSaveSocialLinks}
-              disabled={isSavingSocial}
-              className="w-full h-14 text-lg font-semibold mt-4"
-            >
-              {isSavingSocial ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                t("editProfile.save")
-              )}
-            </Button>
+                {/* Submit Button */}
+                <Button
+                  onClick={handleSaveSocialLinks}
+                  disabled={isSavingSocial}
+                  className="w-full h-14 text-lg font-semibold mt-4"
+                >
+                  {isSavingSocial ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    t("editProfile.save")
+                  )}
+                </Button>
+              </>
+            )}
           </div>
         </DrawerContent>
       </Drawer>
