@@ -727,7 +727,8 @@
       "setError": "Failed to set password",
       "sendToEmail": "Send code to email",
       "emailSent": "Code sent to email!",
-      "emailError": "Failed to send email"
+      "emailError": "Failed to send email",
+      "changeWithoutOtp": "Change password without OTP (test)"
     },
     "phone": {
       "title": "Enter your phone number",

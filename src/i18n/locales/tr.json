@@ -659,7 +659,8 @@
       "setError": "Şifre belirlenemedi",
       "sendToEmail": "Kodu e-postaya gönder",
       "emailSent": "Kod e-postaya gönderildi!",
-      "emailError": "E-posta gönderilemedi"
+      "emailError": "E-posta gönderilemedi",
+      "changeWithoutOtp": "OTP olmadan şifre değiştir (test)"
     },
     "phone": {
       "title": "Telefon numaranızı girin",

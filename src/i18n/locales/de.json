@@ -659,7 +659,8 @@
       "setError": "Passwort konnte nicht festgelegt werden",
       "sendToEmail": "Code an E-Mail senden",
       "emailSent": "Code an E-Mail gesendet!",
-      "emailError": "E-Mail konnte nicht gesendet werden"
+      "emailError": "E-Mail konnte nicht gesendet werden",
+      "changeWithoutOtp": "Passwort ohne OTP ändern (Test)"
     },
     "phone": {
       "title": "Geben Sie Ihre Telefonnummer ein",
