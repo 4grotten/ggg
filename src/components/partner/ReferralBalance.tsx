@@ -45,7 +45,7 @@ export const ReferralBalance = memo(({ balance, invited, withdrawn }: ReferralBa
             onClick={() => setWithdrawDrawerOpen(true)}
             className="relative w-full mt-4 py-4 rounded-xl font-semibold text-white overflow-hidden group active:scale-[0.98] transition-transform"
             style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+              background: "linear-gradient(135deg, #0066FF 0%, #0099FF 50%, #00CCFF 100%)",
             }}
           >
             {/* Animated shimmer */}
@@ -55,7 +55,7 @@ export const ReferralBalance = memo(({ balance, invited, withdrawn }: ReferralBa
             <div 
               className="absolute -inset-1 rounded-xl opacity-50 blur-md animate-spin-slow -z-10"
               style={{
-                background: "conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea)",
+                background: "conic-gradient(from 0deg, #0066FF, #0099FF, #00CCFF, #0066FF)",
               }}
             />
             
