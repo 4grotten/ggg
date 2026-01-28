@@ -679,6 +679,7 @@
       "codeSentWhatsApp": "验证码已通过WhatsApp发送！",
       "error": "出现问题，请重试。",
       "forgotPassword": "忘记密码？",
+      "enterPhoneFirst": "请先输入您的手机号码",
       "registerWithoutOtp": "无OTP注册（测试）"
     },
     "code": {

@@ -673,6 +673,7 @@
       "codeSentWhatsApp": "تم إرسال الرمز عبر واتساب!",
       "error": "حدث خطأ ما. حاول مرة أخرى.",
       "forgotPassword": "نسيت كلمة المرور؟",
+      "enterPhoneFirst": "الرجاء إدخال رقم هاتفك أولاً",
       "registerWithoutOtp": "التسجيل بدون OTP (اختبار)"
     },
     "code": {
