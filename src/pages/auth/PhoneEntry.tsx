@@ -1245,10 +1245,10 @@ const PhoneEntry = () => {
                   } 
                 });
               }}
-              className="w-full py-3 mt-3 font-medium rounded-2xl border border-orange-500/50 bg-orange-500/10 text-orange-500 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+              className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-2"
             >
               <KeyRound className="w-4 h-4" />
-              {t('auth.phone.registerWithoutOtp') || 'Регистрация без OTP (тест)'}
+              {t('auth.phone.registerWithoutOtp') || 'Register without OTP (test)'}
             </button>
           )}
           
