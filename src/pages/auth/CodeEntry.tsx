@@ -79,22 +79,29 @@ const CodeEntry = () => {
     return match ? match[1] : null;
   }, []);
 
-  // Fill code from string
+  // Fill code from string - directly fills all 6 inputs
   const fillCodeFromString = useCallback((codeStr: string) => {
     const digits = codeStr.replace(/\D/g, "").slice(0, 6);
+    console.log('[OTP] Filling code:', digits, 'length:', digits.length);
+    
     if (digits.length === 6) {
+      // Create array of digits
       const newCode = digits.split("");
+      console.log('[OTP] New code array:', newCode);
+      
+      // Update state
       setCode(newCode);
       setError("");
-      // Auto-submit
+      setShowClipboardHint(false);
+      setClipboardCode(null);
+      
+      // Auto-submit after state update
       if (!isLoading && !verifyingRef.current) {
-        // Small delay to show the filled code
+        // Use longer delay to ensure React has updated the state
         setTimeout(() => {
-          const fullCode = newCode.join("");
-          if (fullCode.length === 6) {
-            handleVerify(fullCode);
-          }
-        }, 300);
+          console.log('[OTP] Auto-submitting code:', digits);
+          handleVerifyWithCleanup(digits);
+        }, 500);
       }
       return true;
     }
