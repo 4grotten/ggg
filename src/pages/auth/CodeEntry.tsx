@@ -309,14 +309,13 @@ const CodeEntry = () => {
                   ref={(el) => { inputRefs.current[index] = el; }}
                   type="text"
                   inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={1}
+                  // NO maxLength - allows iOS/Android autofill to insert full code
                   value={digit}
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
                   disabled={isLoading}
-                  // autocomplete="one-time-code" enables native iOS/Android OTP autofill from notifications
+                  // autocomplete="one-time-code" enables native iOS/Android OTP autofill
                   autoComplete={index === 0 ? "one-time-code" : "off"}
                   className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 bg-background transition-all duration-200 outline-none ${
                     error
