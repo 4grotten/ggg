@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { verifyCode, forgotPassword, resendCode } from "@/services/api/authApi";
 import { z } from "zod";
+import { Input } from "@/components/ui/input";
 
 // Validation schema
 const codeSchema = z.string()
@@ -31,7 +32,7 @@ const ResetPasswordCode = () => {
   const phoneNumber = locationState?.phoneNumber || "";
   const hasEmail = locationState?.hasEmail || false;
   
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState("");
@@ -41,7 +42,6 @@ const ResetPasswordCode = () => {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const verifyingRef = useRef(false);
   
   // Redirect if no phone number
@@ -59,54 +59,13 @@ const ResetPasswordCode = () => {
     }
   }, [resendCooldown]);
   
-  // Handle input change
-  const handleInputChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
-    
-    const newCode = [...code];
-    newCode[index] = value.slice(-1);
-    setCode(newCode);
+  const handleCodeChange = (value: string) => {
+    const next = value.replace(/\D/g, "").slice(0, 6);
+    setCode(next);
     setError("");
-    
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-    
-    // Auto-submit when all digits entered
-    const fullCode = newCode.join("");
-    if (fullCode.length === 6 && !isLoading) {
-      handleVerify(fullCode);
-    }
-  };
-  
-  // Handle backspace
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-  
-  // Handle paste
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    
-    if (pastedData.length > 0) {
-      const newCode = [...code];
-      for (let i = 0; i < pastedData.length; i++) {
-        newCode[i] = pastedData[i];
-      }
-      setCode(newCode);
-      
-      // Focus last filled or next empty input
-      const focusIndex = Math.min(pastedData.length, 5);
-      inputRefs.current[focusIndex]?.focus();
-      
-      // Auto-submit if complete
-      if (pastedData.length === 6) {
-        handleVerify(pastedData);
-      }
+
+    if (next.length === 6 && !isLoading) {
+      handleVerify(next);
     }
   };
   
@@ -116,7 +75,7 @@ const ResetPasswordCode = () => {
     if (isLoading || verifyingRef.current) return;
     verifyingRef.current = true;
 
-    const fullCode = codeStr || code.join("");
+    const fullCode = codeStr || code;
     
     // Validate
     const validation = codeSchema.safeParse(fullCode);
@@ -135,8 +94,7 @@ const ResetPasswordCode = () => {
       
       if (response.error) {
         setError(response.error.message || t("auth.resetPassword.wrongCode") || "Wrong code");
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        setCode("");
         return;
       }
       
@@ -150,8 +108,7 @@ const ResetPasswordCode = () => {
         });
       } else {
         setError(t("auth.resetPassword.wrongCode") || "Wrong code");
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        setCode("");
       }
     } catch {
       setError(t("auth.resetPassword.error") || "Verification failed");
@@ -175,8 +132,7 @@ const ResetPasswordCode = () => {
       } else {
         toast.success(t("auth.resetPassword.resendSuccess") || "Code sent via WhatsApp!");
         setResendCooldown(RESEND_COOLDOWN);
-        setCode(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
+        setCode("");
       }
     } catch {
       toast.error(t("auth.resetPassword.resendError") || "Failed to resend code");
@@ -261,29 +217,26 @@ const ResetPasswordCode = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="space-y-6"
           >
-            <div className="flex justify-center gap-3">
-              {code.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => { inputRefs.current[index] = el; }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={index === 0 ? handlePaste : undefined}
+            <div className="flex justify-center">
+              <div className="w-full max-w-[320px]">
+                <Input
+                  value={code}
+                  onChange={(e) => handleCodeChange(e.target.value)}
                   disabled={isLoading}
-                  className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 bg-background transition-all duration-200 outline-none ${
-                    error
-                      ? 'border-destructive text-destructive'
-                      : digit
-                        ? 'border-emerald-500'
-                        : 'border-border focus:border-emerald-500'
-                  } disabled:opacity-50`}
-                  autoFocus={index === 0}
+                  autoFocus
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  enterKeyHint="done"
+                  maxLength={6}
+                  placeholder="••••••"
+                  aria-label={t("auth.resetPassword.codeTitle") || "Reset code"}
+                  className={
+                    `karta-input text-center text-2xl font-bold tracking-[0.35em] pl-[0.35em] ${
+                      error ? "border-destructive" : ""
+                    }`
+                  }
                 />
-              ))}
+              </div>
             </div>
             
             {error && (
@@ -381,7 +334,7 @@ const ResetPasswordCode = () => {
         <div className="karta-footer-actions">
           <button
             onClick={() => handleVerify()}
-            disabled={code.join("").length < 6 || isLoading}
+                disabled={code.length < 6 || isLoading}
             className="karta-btn-primary disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading ? (
