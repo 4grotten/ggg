@@ -654,6 +654,7 @@
       "confirmPasswordPlaceholder": "Şifreyi tekrarlayın",
       "passwordMismatch": "Şifreler eşleşmiyor",
       "passwordTooShort": "Minimum 6 karakter",
+      "minChars": "Minimum 6 karakter",
       "setPassword": "Şifre belirle",
       "success": "Şifre başarıyla değiştirildi!",
       "setError": "Şifre belirlenemedi",

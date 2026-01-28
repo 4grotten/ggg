@@ -723,6 +723,7 @@
       "confirmPasswordPlaceholder": "Repeat password",
       "passwordMismatch": "Passwords do not match",
       "passwordTooShort": "Minimum 6 characters",
+      "minChars": "Minimum 6 characters",
       "setPassword": "Set password",
       "success": "Password changed successfully!",
       "setError": "Failed to set password",

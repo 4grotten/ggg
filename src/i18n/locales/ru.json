@@ -720,6 +720,7 @@
       "confirmPasswordPlaceholder": "Повторите пароль",
       "passwordMismatch": "Пароли не совпадают",
       "passwordTooShort": "Минимум 6 символов",
+      "minChars": "Минимум 6 символов",
       "setPassword": "Установить пароль",
       "success": "Пароль успешно изменён!",
       "setError": "Не удалось установить пароль",

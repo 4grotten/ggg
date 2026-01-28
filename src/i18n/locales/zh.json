@@ -660,6 +660,7 @@
       "confirmPasswordPlaceholder": "重复密码",
       "passwordMismatch": "密码不匹配",
       "passwordTooShort": "最少6个字符",
+      "minChars": "最少6个字符",
       "setPassword": "设置密码",
       "success": "密码修改成功！",
       "setError": "设置密码失败",

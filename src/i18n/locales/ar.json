@@ -654,6 +654,7 @@
       "confirmPasswordPlaceholder": "كرر كلمة المرور",
       "passwordMismatch": "كلمات المرور غير متطابقة",
       "passwordTooShort": "6 أحرف كحد أدنى",
+      "minChars": "6 أحرف كحد أدنى",
       "setPassword": "تعيين كلمة المرور",
       "success": "تم تغيير كلمة المرور بنجاح!",
       "setError": "فشل تعيين كلمة المرور",
