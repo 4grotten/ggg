@@ -461,6 +461,7 @@
     "charge": "Cargo",
     "continue": "Continuar",
     "viaBankTransfer": "Recargar vía Transferencia Bancaria",
+    "ibanTopUp": "Recarga IBAN",
     "uaeDomesticOnly": "SOLO TRANSFERENCIAS NACIONALES EAU",
     "beneficiary": "Beneficiario",
     "accountNumber": "Número de cuenta",
