@@ -391,7 +391,12 @@
       "activeTab": "Aktif",
       "historyTab": "Geçmiş",
       "noHistory": "Giriş geçmişi yok",
-      "loadMore": "Daha fazla yükle"
+      "loadMore": "Daha fazla yükle",
+      "sessionExpiration": "Oturum Süresi",
+      "sessionExpirationDesc": "Bu oturumun ne kadar aktif kalacağını seçin",
+      "days": "{{count}} gün",
+      "expirationChanged": "Oturum süresi güncellendi",
+      "expirationError": "Süre güncellenemedi"
     }
   },
   "card": {

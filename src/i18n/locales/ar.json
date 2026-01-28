@@ -391,7 +391,12 @@
       "activeTab": "نشط",
       "historyTab": "السجل",
       "noHistory": "لا يوجد سجل دخول",
-      "loadMore": "تحميل المزيد"
+      "loadMore": "تحميل المزيد",
+      "sessionExpiration": "انتهاء الجلسة",
+      "sessionExpirationDesc": "اختر مدة بقاء هذه الجلسة نشطة",
+      "days": "{{count}} يوم",
+      "expirationChanged": "تم تحديث انتهاء الجلسة",
+      "expirationError": "فشل في تحديث الانتهاء"
     }
   },
   "card": {

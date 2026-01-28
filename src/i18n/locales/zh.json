@@ -393,7 +393,12 @@
       "activeTab": "活跃",
       "historyTab": "历史",
       "noHistory": "没有登录历史",
-      "loadMore": "加载更多"
+      "loadMore": "加载更多",
+      "sessionExpiration": "会话过期",
+      "sessionExpirationDesc": "选择此会话保持活跃的时间",
+      "days": "{{count}}天",
+      "expirationChanged": "会话过期时间已更新",
+      "expirationError": "更新过期时间失败"
     }
   },
   "card": {

@@ -404,7 +404,12 @@
       "activeTab": "Active",
       "historyTab": "History",
       "noHistory": "No authorization history",
-      "loadMore": "Load more"
+      "loadMore": "Load more",
+      "sessionExpiration": "Session Expiration",
+      "sessionExpirationDesc": "Choose how long this session stays active",
+      "days": "{{count}}d",
+      "expirationChanged": "Session expiration updated",
+      "expirationError": "Failed to update expiration"
     }
   },
   "editProfile": {

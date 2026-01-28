@@ -391,7 +391,12 @@
       "activeTab": "Aktiv",
       "historyTab": "Verlauf",
       "noHistory": "Keine Anmeldeverlauf",
-      "loadMore": "Mehr laden"
+      "loadMore": "Mehr laden",
+      "sessionExpiration": "Sitzungsablauf",
+      "sessionExpirationDesc": "Wählen Sie, wie lange diese Sitzung aktiv bleibt",
+      "days": "{{count}} T.",
+      "expirationChanged": "Sitzungsablauf aktualisiert",
+      "expirationError": "Ablauf konnte nicht aktualisiert werden"
     }
   },
   "card": {

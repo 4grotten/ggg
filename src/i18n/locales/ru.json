@@ -404,7 +404,12 @@
       "activeTab": "Активные",
       "historyTab": "История",
       "noHistory": "Нет истории авторизаций",
-      "loadMore": "Загрузить ещё"
+      "loadMore": "Загрузить ещё",
+      "sessionExpiration": "Срок действия сессии",
+      "sessionExpirationDesc": "Выберите, сколько дней сессия будет активна",
+      "days": "{{count}} дн.",
+      "expirationChanged": "Срок действия сессии обновлён",
+      "expirationError": "Не удалось обновить срок действия"
     }
   },
   "editProfile": {
