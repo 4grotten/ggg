@@ -213,15 +213,42 @@ const CodeEntry = () => {
   
   // Handle input change
   const handleInputChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
+    // Filter only digits
+    const digitsOnly = value.replace(/\D/g, "");
+    
+    // If multiple digits pasted/autofilled (iOS autofill sends full code to first input)
+    if (digitsOnly.length > 1) {
+      console.log('[OTP] Multiple digits detected:', digitsOnly);
+      const newCode = ["", "", "", "", "", ""];
+      for (let i = 0; i < Math.min(digitsOnly.length, 6); i++) {
+        newCode[i] = digitsOnly[i];
+      }
+      setCode(newCode);
+      setError("");
+      
+      // Focus appropriate field
+      if (digitsOnly.length >= 6) {
+        inputRefs.current[5]?.focus();
+        // Auto-submit
+        if (!isLoading) {
+          setTimeout(() => handleVerifyWithCleanup(digitsOnly.slice(0, 6)), 100);
+        }
+      } else {
+        inputRefs.current[Math.min(digitsOnly.length, 5)]?.focus();
+      }
+      return;
+    }
+    
+    // Single digit input
+    if (!/^\d*$/.test(digitsOnly)) return;
     
     const newCode = [...code];
-    newCode[index] = value.slice(-1);
+    newCode[index] = digitsOnly.slice(-1);
     setCode(newCode);
     setError("");
     
     // Auto-focus next input
-    if (value && index < 5) {
+    if (digitsOnly && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
     
@@ -431,12 +458,15 @@ const CodeEntry = () => {
                   ref={(el) => { inputRefs.current[index] = el; }}
                   type="text"
                   inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={index === 0 ? handlePaste : undefined}
+                  onPaste={handlePaste}
                   disabled={isLoading}
+                  // autocomplete="one-time-code" enables native iOS/Android OTP autofill from notifications
+                  autoComplete={index === 0 ? "one-time-code" : "off"}
                   className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 bg-background transition-all duration-200 outline-none ${
                     error
                       ? 'border-destructive text-destructive'
