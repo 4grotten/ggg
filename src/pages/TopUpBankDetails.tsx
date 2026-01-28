@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Copy, Share2, AlertTriangle } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { TOP_UP_BANK_FEE_PERCENT, TOP_UP_BANK_MIN_AMOUNT } from "@/lib/fees";
@@ -71,7 +72,7 @@ const TopUpBankDetails = () => {
   };
 
   return (
-    <MobileLayout showBackButton onBack={() => navigate(-1)}>
+    <MobileLayout showBackButton onBack={() => navigate(-1)} rightAction={<LanguageSwitcher />}>
       <div className="flex flex-col min-h-[calc(100vh-56px)] pb-28">
         {/* Title */}
         <div className="pt-4 pb-4 px-6">
