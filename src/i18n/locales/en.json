@@ -19,7 +19,8 @@
     "loading": "Loading...",
     "authorize": "Sign In",
     "next": "Next",
-    "apply": "Apply"
+    "apply": "Apply",
+    "dismiss": "Dismiss"
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",
@@ -760,7 +761,12 @@
       "invalidCode": "Please enter a valid 6-digit code",
       "wrongCode": "Wrong code. Please try again.",
       "success": "Code verified!",
-      "error": "Verification failed"
+      "error": "Verification failed",
+      "otpReceived": "Code received! Auto-filling...",
+      "otpAutoFilled": "Code auto-filled!",
+      "codeDetected": "Code detected!",
+      "codeFromClipboard": "Found code in clipboard:",
+      "autoFill": "Auto-fill"
     },
     "login": {
       "title": "Enter your password",

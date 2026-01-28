@@ -692,7 +692,12 @@
       "invalidCode": "Lütfen geçerli bir 6 haneli kod girin",
       "wrongCode": "Yanlış kod. Tekrar deneyin.",
       "success": "Kod doğrulandı!",
-      "error": "Doğrulama başarısız"
+      "error": "Doğrulama başarısız",
+      "otpReceived": "Kod alındı! Otomatik dolduruluyor...",
+      "otpAutoFilled": "Kod otomatik dolduruldu!",
+      "codeDetected": "Kod algılandı!",
+      "codeFromClipboard": "Panoda kod bulundu:",
+      "autoFill": "Otomatik doldur"
     },
     "login": {
       "title": "Şifrenizi girin",
