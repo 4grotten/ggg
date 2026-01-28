@@ -1,5 +1,6 @@
 /**
  * ResetPasswordCode — экран ввода кода для сброса пароля
+ * Использует единый input для iOS autofill + визуальные 6 ячеек
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -13,7 +14,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { verifyCode, forgotPassword, resendCode } from "@/services/api/authApi";
 import { z } from "zod";
-import { Input } from "@/components/ui/input";
+import { OtpInput } from "@/components/ui/otp-input";
 
 // Validation schema
 const codeSchema = z.string()
@@ -59,13 +60,14 @@ const ResetPasswordCode = () => {
     }
   }, [resendCooldown]);
   
+  // Handle code change
   const handleCodeChange = (value: string) => {
-    const next = value.replace(/\D/g, "").slice(0, 6);
-    setCode(next);
+    setCode(value);
     setError("");
-
-    if (next.length === 6 && !isLoading) {
-      handleVerify(next);
+    
+    // Auto-submit when all 6 digits entered
+    if (value.length === 6 && !isLoading) {
+      handleVerify(value);
     }
   };
   
@@ -217,27 +219,13 @@ const ResetPasswordCode = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="space-y-6"
           >
-            <div className="flex justify-center">
-              <div className="w-full max-w-[320px]">
-                <Input
-                  value={code}
-                  onChange={(e) => handleCodeChange(e.target.value)}
-                  disabled={isLoading}
-                  autoFocus
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  enterKeyHint="done"
-                  maxLength={6}
-                  placeholder="••••••"
-                  aria-label={t("auth.resetPassword.codeTitle") || "Reset code"}
-                  className={
-                    `karta-input text-center text-2xl font-bold tracking-[0.35em] pl-[0.35em] ${
-                      error ? "border-destructive" : ""
-                    }`
-                  }
-                />
-              </div>
-            </div>
+            <OtpInput
+              value={code}
+              onChange={handleCodeChange}
+              disabled={isLoading}
+              error={!!error}
+              autoFocus
+            />
             
             {error && (
               <motion.p
@@ -334,7 +322,7 @@ const ResetPasswordCode = () => {
         <div className="karta-footer-actions">
           <button
             onClick={() => handleVerify()}
-                disabled={code.length < 6 || isLoading}
+            disabled={code.length < 6 || isLoading}
             className="karta-btn-primary disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading ? (
