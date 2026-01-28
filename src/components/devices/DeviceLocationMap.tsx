@@ -158,7 +158,8 @@ function formatLocationForMaps(location: string): string {
 
 function getGoogleMapsUrl(location: string): string {
   const formattedLocation = formatLocationForMaps(location);
-  return `https://www.google.com/maps/search/${encodeURIComponent(formattedLocation)}`;
+  // Correct Google Maps URL format with query parameter
+  return `https://www.google.com/maps?q=${encodeURIComponent(formattedLocation)}`;
 }
 
 export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
