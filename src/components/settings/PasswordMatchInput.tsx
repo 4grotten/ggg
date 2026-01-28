@@ -51,25 +51,143 @@ export const PasswordMatchInput = ({
     confirmPassword.length === password.length && 
     charComparison.every(c => c.match);
 
+  // Character comparison for the first password field (shows which chars match when typing confirm)
+  const firstPasswordComparison = useMemo(() => {
+    if (!confirmPassword || !password) return [];
+    
+    return password.split("").map((char, index) => {
+      if (index >= confirmPassword.length) {
+        return { char, match: null, pending: true }; // Not yet typed in confirm
+      }
+      return { 
+        char, 
+        match: char === confirmPassword[index], 
+        pending: false 
+      };
+    });
+  }, [password, confirmPassword]);
+
+  const hasConfirmInput = confirmPassword.length > 0;
+
   return (
     <div className="space-y-4">
-      {/* New Password */}
+      {/* New Password - with matching highlight when confirm is being typed */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-foreground">
           {passwordLabel}
         </label>
         <div className="relative">
+          {/* Hidden actual input for the first password */}
           <input
-            type={showPassword ? "text" : "password"}
+            type="text"
             value={password}
             onChange={(e) => onPasswordChange(e.target.value)}
+            className={cn(
+              "absolute inset-0 w-full h-full z-10 cursor-text",
+              hasConfirmInput ? "opacity-0" : "opacity-100 flex h-14 w-full rounded-2xl border border-border bg-card px-4 pr-12 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            )}
             placeholder={passwordPlaceholder}
-            className="flex h-14 w-full rounded-2xl border border-border bg-card px-4 pr-12 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            autoComplete="new-password"
           />
+          
+          {/* Visual representation when confirm password is being typed */}
+          {hasConfirmInput ? (
+            <div 
+              className={cn(
+                "flex h-14 w-full rounded-2xl border bg-card px-4 pr-12 items-center transition-colors duration-300",
+                allMatch ? "border-green-500" : "border-border"
+              )}
+            >
+              <div className="flex items-center gap-0.5 overflow-hidden">
+                <AnimatePresence mode="popLayout">
+                  {firstPasswordComparison.map((item, index) => (
+                    <motion.span
+                      key={`first-${index}-${item.char}`}
+                      initial={{ scale: 1 }}
+                      animate={
+                        item.pending 
+                          ? { scale: 1, opacity: 0.4 }
+                          : item.match 
+                            ? { scale: [1, 1.2, 1], opacity: 1 }
+                            : { x: [0, -2, 2, -2, 2, 0], opacity: 1 }
+                      }
+                      transition={{ 
+                        duration: 0.3,
+                        delay: index * 0.02
+                      }}
+                      className="relative"
+                    >
+                      {showPassword ? (
+                        <motion.span
+                          animate={
+                            item.pending
+                              ? { color: "hsl(var(--muted-foreground))" }
+                              : item.match 
+                                ? { color: "#22c55e" }
+                                : { color: "#ef4444" }
+                          }
+                          transition={{ duration: 0.2 }}
+                          className="text-base font-medium inline-block"
+                        >
+                          {item.char}
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          animate={
+                            item.pending
+                              ? { backgroundColor: "hsl(var(--muted-foreground))", scale: 0.8 }
+                              : item.match 
+                                ? { backgroundColor: "#22c55e", scale: [1, 1.3, 1] }
+                                : { backgroundColor: "#ef4444", x: [0, -2, 2, -2, 2, 0] }
+                          }
+                          transition={{ duration: 0.3 }}
+                          className="w-2.5 h-2.5 rounded-full inline-block mx-0.5"
+                          style={{ 
+                            backgroundColor: item.pending 
+                              ? "hsl(var(--muted-foreground))" 
+                              : item.match ? "#22c55e" : "#ef4444" 
+                          }}
+                        />
+                      )}
+                      
+                      {/* Success sparkle effect for first password */}
+                      {!item.pending && item.match && (
+                        <motion.span
+                          initial={{ scale: 0, opacity: 1 }}
+                          animate={{ scale: 2, opacity: 0 }}
+                          transition={{ duration: 0.4 }}
+                          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                        >
+                          <span className="w-1 h-1 rounded-full bg-green-400" />
+                        </motion.span>
+                      )}
+                    </motion.span>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+          ) : (
+            <div className="flex h-14 w-full rounded-2xl border border-border bg-card px-4 pr-12 items-center pointer-events-none">
+              {password.length === 0 ? (
+                <span className="text-muted-foreground text-base">{passwordPlaceholder}</span>
+              ) : (
+                <div className="flex items-center gap-0.5">
+                  {password.split("").map((char, index) => (
+                    showPassword ? (
+                      <span key={index} className="text-base font-medium">{char}</span>
+                    ) : (
+                      <span key={index} className="w-2.5 h-2.5 rounded-full bg-foreground mx-0.5" />
+                    )
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors z-20"
           >
             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
