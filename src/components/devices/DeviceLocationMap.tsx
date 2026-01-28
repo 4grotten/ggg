@@ -146,8 +146,19 @@ function getCountryFromLocation(location: string): { code: string; name: string;
   return null;
 }
 
+function formatLocationForMaps(location: string): string {
+  // Format: "Country, City" -> "City, Country" for better Google Maps results
+  const parts = location.split(',').map(p => p.trim());
+  if (parts.length >= 2) {
+    // Reverse to put city first: "Dubai, United Arab Emirates"
+    return parts.reverse().join(', ');
+  }
+  return location;
+}
+
 function getGoogleMapsUrl(location: string): string {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+  const formattedLocation = formatLocationForMaps(location);
+  return `https://www.google.com/maps/search/${encodeURIComponent(formattedLocation)}`;
 }
 
 export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
@@ -157,6 +168,10 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
   
   const country = getCountryFromLocation(location);
   const mapsUrl = getGoogleMapsUrl(location);
+  
+  const handleOpenMaps = () => {
+    window.open(mapsUrl, '_blank');
+  };
   
   return (
     <motion.div
@@ -329,14 +344,9 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(mapsUrl, '_blank', 'noopener,noreferrer');
-              }}
+            <button
+              type="button"
+              onClick={handleOpenMaps}
               className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 rounded-xl transition-all group cursor-pointer"
             >
               <Navigation className="w-4 h-4 text-primary group-hover:rotate-12 transition-transform" />
@@ -344,7 +354,7 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
                 {t("settings.devices.openMaps")}
               </span>
               <ExternalLink className="w-3.5 h-3.5 text-primary/70" />
-            </a>
+            </button>
           </motion.div>
         </div>
         
