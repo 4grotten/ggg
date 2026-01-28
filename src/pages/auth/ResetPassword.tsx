@@ -10,12 +10,13 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { Lock, HelpCircle, Loader2 } from "lucide-react";
+import { HelpCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { setPassword, getCurrentUser } from "@/services/api/authApi";
 import { z } from "zod";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
+import { PasswordLockAnimation } from "@/components/auth/PasswordLockAnimation";
 
 // Validation schema
 const passwordSchema = z.string()
@@ -105,7 +106,7 @@ const ResetPassword = () => {
               animate={{ scale: 1 }}
               transition={{ duration: 0.3, delay: 0.2 }}
             >
-              <Lock className="w-12 h-12 text-primary" />
+              <PasswordLockAnimation />
             </motion.div>
             <h1 className="text-2xl font-bold">
               {t("auth.resetPassword.newPasswordTitle") || "Set new password"}
