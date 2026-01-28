@@ -217,9 +217,18 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                       }}
                     />
                   )}
+                  {/* Animated gradient border for R2 level */}
+                  {level.id === "R2" && idx !== currentLevelIndex && (
+                    <div 
+                      className="absolute inset-0 rounded-3xl animate-spin-slow"
+                      style={{
+                        background: "conic-gradient(from 0deg, #BFFF00, #7FFF00, #00FF88, #7FFF00, #BFFF00)",
+                      }}
+                    />
+                  )}
                   <div
                     className={`relative bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-3xl p-5 overflow-hidden ${
-                      idx !== currentLevelIndex ? "border border-border/50" : ""
+                      idx !== currentLevelIndex && level.id !== "R2" ? "border border-border/50" : ""
                     }`}
                   >
                     
