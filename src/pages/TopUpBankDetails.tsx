@@ -71,14 +71,17 @@ const TopUpBankDetails = () => {
   };
 
   return (
-    <MobileLayout 
-      showBackButton 
-      onBack={() => navigate(-1)}
-      title={t("topUp.viaBankTransfer")}
-    >
+    <MobileLayout showBackButton onBack={() => navigate(-1)}>
       <div className="flex flex-col min-h-[calc(100vh-56px)] pb-28">
+        {/* Title */}
+        <div className="pt-4 pb-4 px-6">
+          <h1 className="text-2xl font-bold text-center text-foreground">
+            {t("topUp.viaBankTransfer")}
+          </h1>
+        </div>
+
         {/* Subtitle */}
-        <div className="text-center pt-4 pb-4">
+        <div className="text-center pb-4">
           <span className="text-sm text-muted-foreground tracking-wide">
             {t("topUp.uaeDomesticOnly")}
           </span>
