@@ -237,7 +237,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                     
                     {/* Benefits */}
                     <div className="grid grid-cols-2 gap-3 relative z-10">
-                      <div className="bg-secondary dark:bg-zinc-800 rounded-2xl p-4 text-center">
+                      <div className="bg-zinc-200 dark:bg-zinc-800 rounded-2xl p-4 text-center">
                         <p className="text-xs text-muted-foreground mb-1">
                           {t('partner.cardIssuance', 'За выпуск карт')}
                         </p>
@@ -245,7 +245,7 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
                           {level.cardPercent}%
                         </p>
                       </div>
-                      <div className="bg-secondary dark:bg-zinc-800 rounded-2xl p-4 text-center">
+                      <div className="bg-zinc-200 dark:bg-zinc-800 rounded-2xl p-4 text-center">
                         <p className="text-xs text-muted-foreground mb-1">
                           {t('partner.fromTransactions', 'С транзакций')}
                         </p>
