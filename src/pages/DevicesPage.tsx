@@ -21,7 +21,7 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { toast } from "sonner";
-import { getActiveDevices, getAuthorizationHistory, deleteDevice, type ActiveDevice } from "@/services/api/devicesApi";
+import { getActiveDevices, getAuthorizationHistory, terminateDeviceSession, type ActiveDevice } from "@/services/api/devicesApi";
 import { useAuth } from "@/contexts/AuthContext";
 
 type TabType = 'active' | 'history';
@@ -148,12 +148,12 @@ const DevicesPage = () => {
     setSelectedDevice(device);
   };
 
-  const handleDeleteDevice = async () => {
+  const handleLogoutDevice = async () => {
     if (!selectedDevice) return;
     
     setIsDeleting(true);
     try {
-      const response = await deleteDevice(selectedDevice.id);
+      const response = await terminateDeviceSession(selectedDevice.id);
       if (!response.error) {
         toast.success(t("settings.devices.deviceLoggedOut"));
         setDevices(prev => prev.filter(d => d.id !== selectedDevice.id));
@@ -163,10 +163,10 @@ const DevicesPage = () => {
           await logout();
         }
       } else {
-        toast.error(t("settings.devices.removeError"));
+        toast.error(t("settings.devices.logoutError"));
       }
     } catch (error) {
-      toast.error(t("settings.devices.removeError"));
+      toast.error(t("settings.devices.logoutError"));
     } finally {
       setIsDeleting(false);
     }
@@ -177,7 +177,7 @@ const DevicesPage = () => {
     try {
       const otherDevices = devices.filter(d => !isCurrentDevice(d));
       for (const device of otherDevices) {
-        await deleteDevice(device.id);
+        await terminateDeviceSession(device.id);
       }
       
       toast.success(t("settings.devices.loggedOutAll"));
@@ -456,7 +456,7 @@ const DevicesPage = () => {
               {/* Only show logout button for active devices */}
               {selectedDevice.is_active && (
                 <button
-                  onClick={handleDeleteDevice}
+                  onClick={handleLogoutDevice}
                   disabled={isDeleting}
                   className="w-full flex items-center justify-center gap-3 py-4 px-4 bg-red-500/10 hover:bg-red-500/20 dark:bg-red-500/20 dark:hover:bg-red-500/30 rounded-xl transition-colors disabled:opacity-50"
                 >

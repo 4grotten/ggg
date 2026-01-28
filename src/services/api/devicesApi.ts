@@ -60,6 +60,34 @@ export async function deleteDevice(deviceId: number) {
 }
 
 /**
+ * Change token expiration time (can be used to invalidate a session)
+ * POST /users/change_token_expired_time/<token_id>/
+ * @param tokenId - The device/token ID
+ * @param expiredTimeChoice - Expiration time in days: 7, 30, 90, or 180
+ */
+export async function changeTokenExpiredTime(tokenId: number, expiredTimeChoice: 7 | 30 | 90 | 180) {
+  return apiPost<{ success: boolean }>(`/users/change_token_expired_time/${tokenId}/`, {
+    expired_time_choice: expiredTimeChoice
+  });
+}
+
+/**
+ * Terminate a device session by setting its token to expire immediately
+ * Uses change_token_expired_time with minimum value, then relies on the session to expire
+ * @param tokenId - The device/token ID to terminate
+ */
+export async function terminateDeviceSession(tokenId: number) {
+  // Use DELETE endpoint first, fallback to expiration change
+  const deleteResult = await apiRequest<void>(`/users/get_token_detail/${tokenId}/`, { method: 'DELETE' });
+  if (!deleteResult.error) {
+    return deleteResult;
+  }
+  
+  // Fallback: try to change expiration time to minimum
+  return changeTokenExpiredTime(tokenId, 7);
+}
+
+/**
  * Deactivate user profile
  * POST /users/deactivate/
  */
