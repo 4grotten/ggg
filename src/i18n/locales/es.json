@@ -950,6 +950,13 @@
       "emailSent": "Enlace enviado al correo",
       "emailSentSuccess": "Enlace de restablecimiento enviado a {{email}}",
       "emailSendError": "Error al enviar el enlace"
+    },
+    "socialLinks": {
+      "title": "Redes Sociales",
+      "description": "Agregue sus perfiles de redes sociales para facilitar la comunicación",
+      "website": "Sitio Web",
+      "saved": "Enlaces sociales guardados",
+      "error": "Error al guardar"
     }
   }
 }

@@ -419,6 +419,13 @@
       "emailSendError": "Failed to send reset link",
       "passwordsMatch": "Passwords match",
       "passwordsNotMatch": "Passwords do not match"
+    },
+    "socialLinks": {
+      "title": "Social Links",
+      "description": "Add your social media profiles for easier communication",
+      "website": "Website",
+      "saved": "Social links saved",
+      "error": "Failed to save"
     }
   },
   "card": {

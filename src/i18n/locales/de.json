@@ -950,6 +950,13 @@
       "emailSent": "Link per E-Mail gesendet",
       "emailSentSuccess": "Passwort-Reset-Link an {{email}} gesendet",
       "emailSendError": "Link konnte nicht gesendet werden"
+    },
+    "socialLinks": {
+      "title": "Soziale Netzwerke",
+      "description": "Fügen Sie Ihre Social-Media-Profile für einfachere Kommunikation hinzu",
+      "website": "Webseite",
+      "saved": "Soziale Links gespeichert",
+      "error": "Speichern fehlgeschlagen"
     }
   }
 }
