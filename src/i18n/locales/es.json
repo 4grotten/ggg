@@ -692,7 +692,12 @@
       "invalidCode": "Por favor ingresa un código válido de 6 dígitos",
       "wrongCode": "Código incorrecto. Inténtalo de nuevo.",
       "success": "¡Código verificado!",
-      "error": "Error de verificación"
+      "error": "Error de verificación",
+      "otpReceived": "¡Código recibido! Llenando automáticamente...",
+      "otpAutoFilled": "¡Código llenado automáticamente!",
+      "codeDetected": "¡Código detectado!",
+      "codeFromClipboard": "Código encontrado en el portapapeles:",
+      "autoFill": "Autollenar"
     },
     "login": {
       "title": "Ingresa tu contraseña",

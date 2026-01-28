@@ -698,7 +698,12 @@
       "invalidCode": "请输入有效的6位数验证码",
       "wrongCode": "验证码错误，请重试。",
       "success": "验证成功！",
-      "error": "验证失败"
+      "error": "验证失败",
+      "otpReceived": "收到验证码！自动填充中...",
+      "otpAutoFilled": "验证码已自动填充！",
+      "codeDetected": "检测到验证码！",
+      "codeFromClipboard": "在剪贴板中发现验证码：",
+      "autoFill": "自动填充"
     },
     "login": {
       "title": "输入密码",
