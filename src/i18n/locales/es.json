@@ -362,6 +362,7 @@
       "title": "Dispositivos activos",
       "noDevices": "No hay dispositivos activos",
       "active": "Activo",
+      "inactive": "Inactivo",
       "currentDevice": "Dispositivo actual",
       "otherDevices": "Otros dispositivos",
       "activeCount": "{{count}} sesiones activas",
@@ -377,6 +378,7 @@
       "daysAgo": "hace {{count}} días",
       "location": "Ubicación",
       "lastActive": "Última actividad",
+      "loginTime": "Hora de inicio",
       "app": "Aplicación",
       "deviceDetails": "Detalles del dispositivo",
       "removeDevice": "Eliminar dispositivo",
@@ -385,7 +387,11 @@
       "deviceRemoved": "Dispositivo eliminado",
       "removeError": "Error al eliminar el dispositivo",
       "loggedOutAll": "Sesión cerrada en todos los dispositivos",
-      "logoutAllError": "Error al cerrar sesión en todos los dispositivos"
+      "logoutAllError": "Error al cerrar sesión en todos los dispositivos",
+      "activeTab": "Activos",
+      "historyTab": "Historial",
+      "noHistory": "Sin historial de inicio de sesión",
+      "loadMore": "Cargar más"
     }
   },
   "card": {

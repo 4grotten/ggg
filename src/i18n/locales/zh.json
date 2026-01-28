@@ -364,6 +364,7 @@
       "title": "活跃设备",
       "noDevices": "没有活跃设备",
       "active": "活跃",
+      "inactive": "非活跃",
       "currentDevice": "当前设备",
       "otherDevices": "其他设备",
       "activeCount": "{{count}} 个活跃会话",
@@ -379,6 +380,7 @@
       "daysAgo": "{{count}}天前",
       "location": "位置",
       "lastActive": "最后活动",
+      "loginTime": "登录时间",
       "app": "应用",
       "deviceDetails": "设备详情",
       "removeDevice": "移除设备",
@@ -387,7 +389,11 @@
       "deviceRemoved": "设备已移除",
       "removeError": "移除设备失败",
       "loggedOutAll": "已退出所有设备",
-      "logoutAllError": "退出所有设备失败"
+      "logoutAllError": "退出所有设备失败",
+      "activeTab": "活跃",
+      "historyTab": "历史",
+      "noHistory": "没有登录历史",
+      "loadMore": "加载更多"
     }
   },
   "card": {

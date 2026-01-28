@@ -362,6 +362,7 @@
       "title": "Aktive Geräte",
       "noDevices": "Keine aktiven Geräte",
       "active": "Aktiv",
+      "inactive": "Inaktiv",
       "currentDevice": "Aktuelles Gerät",
       "otherDevices": "Andere Geräte",
       "activeCount": "{{count}} aktive Sitzungen",
@@ -377,6 +378,7 @@
       "daysAgo": "vor {{count}} Tagen",
       "location": "Standort",
       "lastActive": "Zuletzt aktiv",
+      "loginTime": "Anmeldezeit",
       "app": "App",
       "deviceDetails": "Gerätedetails",
       "removeDevice": "Gerät entfernen",
@@ -385,7 +387,11 @@
       "deviceRemoved": "Gerät entfernt",
       "removeError": "Gerät konnte nicht entfernt werden",
       "loggedOutAll": "Von allen Geräten abgemeldet",
-      "logoutAllError": "Abmeldung von allen Geräten fehlgeschlagen"
+      "logoutAllError": "Abmeldung von allen Geräten fehlgeschlagen",
+      "activeTab": "Aktiv",
+      "historyTab": "Verlauf",
+      "noHistory": "Keine Anmeldeverlauf",
+      "loadMore": "Mehr laden"
     }
   },
   "card": {
