@@ -1,4 +1,9 @@
 {
+  "settings": {
+    "devices": {
+      "openMaps": "Haritada aç"
+    }
+  },
   "profileVerification": {
     "title": "Kimliğinizi Doğrulayın",
     "description": "Tüm özelliklerin kilidini açmak ve hesap limitlerini artırmak için doğrulama işlemini tamamlayın.",
