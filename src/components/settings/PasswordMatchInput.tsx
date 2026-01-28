@@ -30,6 +30,7 @@ export const PasswordMatchInput = ({
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isConfirmFocused, setIsConfirmFocused] = useState(false);
 
   // Character-by-character comparison
   const charComparison = useMemo(() => {
@@ -90,6 +91,8 @@ export const PasswordMatchInput = ({
             type="text"
             value={confirmPassword}
             onChange={(e) => onConfirmPasswordChange(e.target.value)}
+            onFocus={() => setIsConfirmFocused(true)}
+            onBlur={() => setIsConfirmFocused(false)}
             className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-text"
             autoComplete="off"
           />
@@ -107,11 +110,13 @@ export const PasswordMatchInput = ({
           >
             {confirmPassword.length === 0 ? (
               <div className="flex items-center">
-                <motion.span
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="w-0.5 h-5 bg-primary mr-1"
-                />
+                {isConfirmFocused && (
+                  <motion.span
+                    animate={{ opacity: [1, 0, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="w-0.5 h-5 bg-primary mr-1"
+                  />
+                )}
                 <span className="text-muted-foreground text-base">{confirmPlaceholder}</span>
               </div>
             ) : (
