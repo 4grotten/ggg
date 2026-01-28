@@ -52,15 +52,7 @@ export async function getDeviceDetail(deviceId: number) {
 }
 
 /**
- * Delete/logout a device
- * DELETE /users/get_token_detail/<id>/
- */
-export async function deleteDevice(deviceId: number) {
-  return apiRequest<void>(`/users/get_token_detail/${deviceId}/`, { method: 'DELETE' });
-}
-
-/**
- * Change token expiration time (can be used to invalidate a session)
+ * Change token expiration time
  * POST /users/change_token_expired_time/<token_id>/
  * @param tokenId - The device/token ID
  * @param expiredTimeChoice - Expiration time in days: 7, 30, 90, or 180
@@ -72,23 +64,16 @@ export async function changeTokenExpiredTime(tokenId: number, expiredTimeChoice:
 }
 
 /**
- * Terminate a device session by setting its token to expire immediately
- * Uses change_token_expired_time with minimum value, then relies on the session to expire
+ * Terminate a device session by setting its token to minimum expiration
  * @param tokenId - The device/token ID to terminate
  */
 export async function terminateDeviceSession(tokenId: number) {
-  // Use DELETE endpoint first, fallback to expiration change
-  const deleteResult = await apiRequest<void>(`/users/get_token_detail/${tokenId}/`, { method: 'DELETE' });
-  if (!deleteResult.error) {
-    return deleteResult;
-  }
-  
-  // Fallback: try to change expiration time to minimum
+  // Set token expiration to minimum (7 days) to effectively end the session
   return changeTokenExpiredTime(tokenId, 7);
 }
 
 /**
- * Deactivate user profile
+ * Deactivate user profile (NOT for device logout!)
  * POST /users/deactivate/
  */
 export async function deactivateProfile() {

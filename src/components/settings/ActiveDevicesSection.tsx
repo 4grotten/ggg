@@ -8,7 +8,6 @@ import {
   Loader2, 
   MapPin, 
   Clock, 
-  Trash2, 
   LogOut,
   ChevronRight,
   X,
@@ -17,7 +16,7 @@ import {
 } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { toast } from "sonner";
-import { getActiveDevices, deleteDevice, type ActiveDevice } from "@/services/api/devicesApi";
+import { getActiveDevices, terminateDeviceSession, type ActiveDevice } from "@/services/api/devicesApi";
 import { logout as apiLogout } from "@/services/api/authApi";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -109,26 +108,26 @@ export const ActiveDevicesSection = ({ className }: ActiveDevicesSectionProps) =
     setSelectedDevice(device);
   };
 
-  const handleDeleteDevice = async () => {
+  const handleLogoutDevice = async () => {
     if (!selectedDevice) return;
     
     setIsDeleting(true);
     try {
-      const response = await deleteDevice(selectedDevice.id);
+      const response = await terminateDeviceSession(selectedDevice.id);
       if (!response.error) {
-        toast.success(t("settings.devices.deviceRemoved"));
+        toast.success(t("settings.devices.deviceLoggedOut"));
         setDevices(prev => prev.filter(d => d.id !== selectedDevice.id));
         setSelectedDevice(null);
         
-        // If deleted current device, logout
+        // If logged out from current device, logout
         if (isCurrentDevice(selectedDevice)) {
           await logout();
         }
       } else {
-        toast.error(t("settings.devices.removeError"));
+        toast.error(t("settings.devices.logoutError"));
       }
     } catch (error) {
-      toast.error(t("settings.devices.removeError"));
+      toast.error(t("settings.devices.logoutError"));
     } finally {
       setIsDeleting(false);
     }
@@ -137,10 +136,10 @@ export const ActiveDevicesSection = ({ className }: ActiveDevicesSectionProps) =
   const handleLogoutAll = async () => {
     setIsLoggingOutAll(true);
     try {
-      // Delete all devices except current one first
+      // Logout all devices except current one first
       const otherDevices = devices.filter(d => !isCurrentDevice(d));
       for (const device of otherDevices) {
-        await deleteDevice(device.id);
+        await terminateDeviceSession(device.id);
       }
       
       toast.success(t("settings.devices.loggedOutAll"));
@@ -361,21 +360,21 @@ export const ActiveDevicesSection = ({ className }: ActiveDevicesSectionProps) =
                 </div>
               </div>
 
-              {/* Remove Device Button */}
+              {/* Logout Device Button */}
               <button
-                onClick={handleDeleteDevice}
+                onClick={handleLogoutDevice}
                 disabled={isDeleting}
                 className="w-full flex items-center justify-center gap-3 py-4 px-4 bg-red-500/10 hover:bg-red-500/20 dark:bg-red-500/20 dark:hover:bg-red-500/30 rounded-xl transition-colors disabled:opacity-50"
               >
                 {isDeleting ? (
                   <Loader2 className="w-5 h-5 text-red-500 animate-spin" />
                 ) : (
-                  <Trash2 className="w-5 h-5 text-red-500" />
+                  <LogOut className="w-5 h-5 text-red-500" />
                 )}
                 <span className="text-red-500 font-medium">
                   {isCurrentDevice(selectedDevice) 
                     ? t("settings.devices.logoutThisDevice")
-                    : t("settings.devices.removeDevice")
+                    : t("settings.devices.logoutDevice")
                   }
                 </span>
               </button>
