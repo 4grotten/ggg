@@ -106,7 +106,14 @@ export const PasswordMatchInput = ({
             )}
           >
             {confirmPassword.length === 0 ? (
-              <span className="text-muted-foreground text-base">{confirmPlaceholder}</span>
+              <div className="flex items-center">
+                <motion.span
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="w-0.5 h-5 bg-primary mr-1"
+                />
+                <span className="text-muted-foreground text-base">{confirmPlaceholder}</span>
+              </div>
             ) : (
               <div className="flex items-center gap-0.5 overflow-hidden">
                 <AnimatePresence mode="popLayout">
