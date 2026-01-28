@@ -1159,7 +1159,7 @@ const PhoneEntry = () => {
                 if (isPhoneValid) {
                   handleForgotPassword();
                 } else {
-                  navigate("/auth/reset-code", { state: { fromPhoneEntry: true } });
+                  toast.error(t('auth.phone.enterPhoneFirst') || 'Please enter your phone number first');
                 }
               }}
               disabled={isLoading}

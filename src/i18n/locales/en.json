@@ -741,6 +741,7 @@
       "codeSentWhatsApp": "Code sent via WhatsApp!",
       "error": "Something went wrong. Please try again.",
       "forgotPassword": "Forgot password?",
+      "enterPhoneFirst": "Please enter your phone number first",
       "registerWithoutOtp": "Register without OTP (test)"
     },
     "code": {

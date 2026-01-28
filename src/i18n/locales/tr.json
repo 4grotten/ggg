@@ -673,6 +673,7 @@
       "codeSentWhatsApp": "Kod WhatsApp ile gönderildi!",
       "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
       "forgotPassword": "Şifremi unuttum?",
+      "enterPhoneFirst": "Lütfen önce telefon numaranızı girin",
       "registerWithoutOtp": "OTP'siz Kayıt (test)"
     },
     "code": {

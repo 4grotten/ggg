@@ -741,6 +741,7 @@
       "codeSentWhatsApp": "Код отправлен через WhatsApp!",
       "error": "Что-то пошло не так. Попробуйте снова.",
       "forgotPassword": "Забыли пароль?",
+      "enterPhoneFirst": "Сначала введите номер телефона",
       "registerWithoutOtp": "Регистрация без OTP (тест)"
     },
     "code": {

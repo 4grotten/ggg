@@ -673,6 +673,7 @@
       "codeSentWhatsApp": "Code per WhatsApp gesendet!",
       "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
       "forgotPassword": "Passwort vergessen?",
+      "enterPhoneFirst": "Bitte geben Sie zuerst Ihre Telefonnummer ein",
       "registerWithoutOtp": "Registrierung ohne OTP (Test)"
     },
     "code": {
