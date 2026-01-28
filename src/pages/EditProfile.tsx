@@ -19,7 +19,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
-import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, addSocialNetwork, deleteSocialNetwork, type SocialNetworkItem } from "@/services/api/authApi";
+import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 import { SocialLinksInput, SocialLink, migrateSocialLinks } from "@/components/settings/SocialLinksInput";
 
@@ -73,7 +73,6 @@ const EditProfile = () => {
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [isSavingSocial, setIsSavingSocial] = useState(false);
   const [isLoadingSocial, setIsLoadingSocial] = useState(false);
-  const [originalSocialLinks, setOriginalSocialLinks] = useState<SocialNetworkItem[]>([]);
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
   // Create schema with localized messages
@@ -314,14 +313,13 @@ const EditProfile = () => {
       try {
         const response = await getSocialNetworks(user.id);
         if (response.data) {
-          setOriginalSocialLinks(response.data);
           // Convert API format to SocialLink format
           const links: SocialLink[] = response.data.map((item) => ({
             id: `api-${item.id}`,
             url: item.url,
             networkId: detectNetworkFromUrl(item.url),
             networkName: getNetworkNameFromUrl(item.url),
-            apiId: item.id, // Store API id for deletion
+            apiId: item.id,
           }));
           setSocialLinks(links);
         }
@@ -374,30 +372,14 @@ const EditProfile = () => {
   };
 
   const handleSaveSocialLinks = async () => {
-    if (!user?.id) return;
-    
     setIsSavingSocial(true);
     try {
-      // Find links to delete (in original but not in current)
-      const currentApiIds = socialLinks
-        .filter(l => (l as any).apiId)
-        .map(l => (l as any).apiId as number);
+      // Collect all URLs and send in one request
+      const urls = socialLinks.map(l => l.url);
+      const response = await setSocialNetworks(urls);
       
-      const toDelete = originalSocialLinks.filter(
-        orig => !currentApiIds.includes(orig.id)
-      );
-      
-      // Find new links to add (no apiId means new)
-      const toAdd = socialLinks.filter(l => !(l as any).apiId);
-      
-      // Delete removed links
-      for (const link of toDelete) {
-        await deleteSocialNetwork(user.id, link.id);
-      }
-      
-      // Add new links
-      for (const link of toAdd) {
-        await addSocialNetwork(user.id, link.url);
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to save');
       }
       
       toast.success(t("editProfile.socialLinks.saved") || "Social links saved");

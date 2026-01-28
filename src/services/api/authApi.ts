@@ -363,6 +363,11 @@ export interface SocialNetworkItem {
   url: string;
 }
 
+export interface SetSocialNetworksResponse {
+  message: string;
+  networks: SocialNetworkItem[];
+}
+
 /**
  * Get user social networks
  * GET /users/<user_id>/social_networks/
@@ -372,17 +377,9 @@ export async function getSocialNetworks(userId: number) {
 }
 
 /**
- * Add social network
- * POST /users/<user_id>/social_networks/
+ * Set user social networks (replaces all)
+ * POST /users/social_networks/
  */
-export async function addSocialNetwork(userId: number, url: string) {
-  return apiPost<SocialNetworkItem>(`/users/${userId}/social_networks/`, { url });
-}
-
-/**
- * Delete social network
- * DELETE /users/<user_id>/social_networks/<id>/
- */
-export async function deleteSocialNetwork(userId: number, networkId: number) {
-  return apiRequest<void>(`/users/${userId}/social_networks/${networkId}/`, { method: 'DELETE' });
+export async function setSocialNetworks(urls: string[]) {
+  return apiPost<SetSocialNetworksResponse>('/users/social_networks/', { networks: urls });
 }
