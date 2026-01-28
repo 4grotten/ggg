@@ -11,8 +11,8 @@ import {
   uploadAvatar as apiUploadAvatar,
   updateProfile as apiUpdateProfile,
   type UserProfile,
-  type AvatarData
 } from '@/services/api/authApi';
+import { getSavedAccounts, removeAccount } from '@/hooks/useMultiAccount';
 import { 
   getAuthToken,
   setAuthToken,
@@ -192,17 +192,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const logout = useCallback(async () => {
+    const currentUserId = user?.id;
+    
     try {
       await apiLogout();
     } catch {
       // Игнорируем ошибки при logout
-    } finally {
+    }
+    
+    // Удаляем текущий аккаунт из сохраненных
+    if (currentUserId) {
+      removeAccount(currentUserId);
+    }
+    
+    // Получаем оставшиеся аккаунты
+    const remainingAccounts = getSavedAccounts();
+    
+    if (remainingAccounts.length > 0) {
+      // Переключаемся на следующий аккаунт в списке
+      const nextAccount = remainingAccounts[0];
+      setAuthToken(nextAccount.token);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(nextAccount.user));
+      setUser(nextAccount.user);
+      syncWithApofiz(nextAccount.token, nextAccount.user);
+      console.log('[AuthContext] Switched to next account after logout:', nextAccount.user.id, nextAccount.user.full_name);
+      navigate('/', { replace: true });
+    } else {
+      // Нет сохраненных аккаунтов — стандартный logout
       removeAuthToken();
-      clearApofizSync(); // Удаляем cookie при logout
+      clearApofizSync();
       setUser(null);
       navigate('/auth/phone', { replace: true });
     }
-  }, [navigate]);
+  }, [user, navigate]);
 
   const refreshUser = useCallback(async () => {
     const response = await getCurrentUser();
