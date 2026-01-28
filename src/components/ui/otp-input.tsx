@@ -37,7 +37,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(
     };
 
     // Split value into 6 digits for display
-    const digits = value.padEnd(6, "").split("").slice(0, 6);
+    const digits = Array.from({ length: 6 }, (_, i) => value[i] || "");
 
     return (
       <div
