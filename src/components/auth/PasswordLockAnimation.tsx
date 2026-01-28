@@ -18,20 +18,20 @@ export const PasswordLockAnimation = ({ className }: PasswordLockAnimationProps)
 
   useEffect(() => {
     const runCycle = () => {
-      // Phase 1: Open lock (0-500ms)
+      // Phase 1: Open lock (0-800ms)
       setPhase('open');
       setVisibleDots(0);
 
-      // Phase 2: Start typing dots (500ms - 1700ms, ~200ms per dot)
+      // Phase 2: Start typing dots (800ms - 1700ms, ~200ms per dot)
       setTimeout(() => {
         setPhase('typing');
-      }, 500);
+      }, 800);
 
       // Show dots one by one
       for (let i = 1; i <= 4; i++) {
         setTimeout(() => {
           setVisibleDots(i);
-        }, 500 + i * 180);
+        }, 800 + i * 180);
       }
 
       // Phase 3: Closed lock (1700ms - 3000ms)
