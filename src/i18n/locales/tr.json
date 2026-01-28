@@ -361,6 +361,13 @@
     "devices": {
       "title": "Aktif Cihazlar",
       "noDevices": "Aktif cihaz yok",
+      "active": "Aktif",
+      "currentDevice": "Mevcut Cihaz",
+      "otherDevices": "Diğer Cihazlar",
+      "activeCount": "{{count}} aktif oturum",
+      "loadError": "Cihazlar yüklenemedi",
+      "confirmLogoutAllTitle": "Tüm oturumları sonlandır?",
+      "confirmLogoutAllDesc": "Bu cihaz dahil tüm cihazlardan çıkış yapılacak. Tekrar giriş yapmanız gerekecek.",
       "thisDevice": "Bu cihaz",
       "unknownDevice": "Bilinmeyen cihaz",
       "unknown": "Bilinmiyor",

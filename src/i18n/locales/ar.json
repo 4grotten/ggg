@@ -361,6 +361,13 @@
     "devices": {
       "title": "الأجهزة النشطة",
       "noDevices": "لا توجد أجهزة نشطة",
+      "active": "نشط",
+      "currentDevice": "الجهاز الحالي",
+      "otherDevices": "أجهزة أخرى",
+      "activeCount": "{{count}} جلسات نشطة",
+      "loadError": "فشل في تحميل الأجهزة",
+      "confirmLogoutAllTitle": "إنهاء جميع الجلسات؟",
+      "confirmLogoutAllDesc": "سيتم تسجيل خروجك من جميع الأجهزة بما في ذلك هذا الجهاز. ستحتاج إلى تسجيل الدخول مرة أخرى.",
       "thisDevice": "هذا الجهاز",
       "unknownDevice": "جهاز غير معروف",
       "unknown": "غير معروف",
