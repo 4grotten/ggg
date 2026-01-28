@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2, Instagram, Send, AtSign, Link2, Globe } from "lucide-react";
+import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -21,6 +21,7 @@ import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/ani
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 import { changePassword, getUserEmail, forgotPasswordEmail } from "@/services/api/authApi";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
+import { SocialLinksInput, SocialLink, migrateSocialLinks } from "@/components/settings/SocialLinksInput";
 
 const profileSchemaBase = z.object({
   full_name: z.string().min(1).min(2).max(100),
@@ -68,24 +69,30 @@ const EditProfile = () => {
   const [isSendingResetEmail, setIsSendingResetEmail] = useState(false);
   
   // Social media state (stored locally since API doesn't support it yet)
-  interface SocialLinks {
-    instagram: string;
-    telegram: string;
-    tiktok: string;
-    website: string;
-  }
-  
   const [isSocialDrawerOpen, setIsSocialDrawerOpen] = useState(false);
-  const [socialLinks, setSocialLinks] = useState<SocialLinks>(() => {
-    const saved = localStorage.getItem('user_social_links');
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => {
+    const saved = localStorage.getItem('user_social_links_v2');
     if (saved) {
       try {
         return JSON.parse(saved);
       } catch {
-        return { instagram: "", telegram: "", tiktok: "", website: "" };
+        return [];
       }
     }
-    return { instagram: "", telegram: "", tiktok: "", website: "" };
+    // Migrate old format if exists
+    const oldSaved = localStorage.getItem('user_social_links');
+    if (oldSaved) {
+      try {
+        const oldLinks = JSON.parse(oldSaved);
+        const migrated = migrateSocialLinks(oldLinks);
+        localStorage.setItem('user_social_links_v2', JSON.stringify(migrated));
+        localStorage.removeItem('user_social_links');
+        return migrated;
+      } catch {
+        return [];
+      }
+    }
+    return [];
   });
   const [isSavingSocial, setIsSavingSocial] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -324,7 +331,7 @@ const EditProfile = () => {
     setIsSavingSocial(true);
     try {
       // Save to localStorage since API doesn't support social_links yet
-      localStorage.setItem('user_social_links', JSON.stringify(socialLinks));
+      localStorage.setItem('user_social_links_v2', JSON.stringify(socialLinks));
       toast.success(t("editProfile.socialLinks.saved") || "Social links saved");
       setIsSocialDrawerOpen(false);
     } catch (error) {
@@ -335,7 +342,7 @@ const EditProfile = () => {
     }
   };
 
-  const hasSocialLinks = Object.values(socialLinks).some(v => v && v.trim() !== "");
+  const hasSocialLinks = socialLinks.length > 0;
 
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
@@ -765,12 +772,8 @@ const EditProfile = () => {
                       <span className="text-foreground font-medium">{t("editProfile.socialLinks.title") || "Social Links"}</span>
                       {hasSocialLinks && (
                         <span className="text-xs text-muted-foreground">
-                          {[
-                            socialLinks.instagram && "Instagram",
-                            socialLinks.telegram && "Telegram",
-                            socialLinks.tiktok && "TikTok",
-                            socialLinks.website && t("editProfile.socialLinks.website"),
-                          ].filter(Boolean).join(", ")}
+                          {socialLinks.slice(0, 3).map(l => l.networkName).join(", ")}
+                          {socialLinks.length > 3 && ` +${socialLinks.length - 3}`}
                         </span>
                       )}
                     </div>
@@ -1017,61 +1020,12 @@ const EditProfile = () => {
             <DrawerTitle>{t("editProfile.socialLinks.title") || "Social Links"}</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-8 space-y-4">
-            {/* Instagram */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Instagram className="w-4 h-4 text-pink-500" />
-                Instagram
-              </label>
-              <Input
-                value={socialLinks.instagram}
-                onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
-                placeholder="@username"
-                className="h-14 rounded-2xl border-border bg-card px-4 text-base"
-              />
-            </div>
-
-            {/* Telegram */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Send className="w-4 h-4 text-blue-500" />
-                Telegram
-              </label>
-              <Input
-                value={socialLinks.telegram}
-                onChange={(e) => setSocialLinks({ ...socialLinks, telegram: e.target.value })}
-                placeholder="@username"
-                className="h-14 rounded-2xl border-border bg-card px-4 text-base"
-              />
-            </div>
-
-            {/* TikTok */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <AtSign className="w-4 h-4 text-foreground" />
-                TikTok
-              </label>
-              <Input
-                value={socialLinks.tiktok}
-                onChange={(e) => setSocialLinks({ ...socialLinks, tiktok: e.target.value })}
-                placeholder="@username"
-                className="h-14 rounded-2xl border-border bg-card px-4 text-base"
-              />
-            </div>
-
-            {/* Website */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Globe className="w-4 h-4 text-green-500" />
-                {t("editProfile.socialLinks.website") || "Website"}
-              </label>
-              <Input
-                value={socialLinks.website}
-                onChange={(e) => setSocialLinks({ ...socialLinks, website: e.target.value })}
-                placeholder="https://example.com"
-                className="h-14 rounded-2xl border-border bg-card px-4 text-base"
-              />
-            </div>
+            {/* Smart Social Links Input */}
+            <SocialLinksInput
+              links={socialLinks}
+              onChange={setSocialLinks}
+              placeholder={t("editProfile.socialLinks.placeholder") || "Paste a link..."}
+            />
 
             {/* Description */}
             <p className="text-xs text-muted-foreground px-1">

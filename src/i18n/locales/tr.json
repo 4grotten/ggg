@@ -953,7 +953,8 @@
     },
     "socialLinks": {
       "title": "Sosyal Bağlantılar",
-      "description": "Daha kolay iletişim için sosyal medya profillerinizi ekleyin",
+      "description": "Profil bağlantısını yapıştırın — sosyal ağ otomatik olarak algılanacak",
+      "placeholder": "Bir bağlantı yapıştırın...",
       "website": "Web Sitesi",
       "saved": "Sosyal bağlantılar kaydedildi",
       "error": "Kaydetme başarısız"
