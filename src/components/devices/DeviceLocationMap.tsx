@@ -322,23 +322,30 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
           </div>
           
           {/* Google Maps link button */}
-          <motion.a
-            href={mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 rounded-xl transition-all group"
+          <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, type: 'spring' }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Navigation className="w-4 h-4 text-primary group-hover:rotate-12 transition-transform" />
-            <span className="text-xs font-medium text-primary hidden sm:inline">
-              {t("settings.devices.openMaps")}
-            </span>
-            <ExternalLink className="w-3.5 h-3.5 text-primary/70" />
-          </motion.a>
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(mapsUrl, '_blank', 'noopener,noreferrer');
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 hover:bg-primary/20 rounded-xl transition-all group cursor-pointer"
+            >
+              <Navigation className="w-4 h-4 text-primary group-hover:rotate-12 transition-transform" />
+              <span className="text-xs font-medium text-primary hidden sm:inline">
+                {t("settings.devices.openMaps")}
+              </span>
+              <ExternalLink className="w-3.5 h-3.5 text-primary/70" />
+            </a>
+          </motion.div>
         </div>
         
         {/* Animated connection line */}
