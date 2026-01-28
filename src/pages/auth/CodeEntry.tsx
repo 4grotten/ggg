@@ -4,8 +4,8 @@
  * POST /resend_code/ для повторной отправки
  * 
  * Автозаполнение OTP:
- * - autocomplete="one-time-code" для нативного автозаполнения iOS/Android
- * - Обработка вставки из буфера обмена
+ * - Используется единый input с autoComplete="one-time-code" для iOS/Android
+ * - Визуально отображается как 6 отдельных ячеек
  */
 
 import { useState, useEffect } from "react";
@@ -19,7 +19,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { verifyOtp, sendOtp } from "@/services/api/authApi";
 import { z } from "zod";
-import { Input } from "@/components/ui/input";
+import { OtpInput } from "@/components/ui/otp-input";
 
 // Validation schema
 const codeSchema = z.string()
@@ -63,7 +63,7 @@ const CodeEntry = () => {
     }
   }, [resendCooldown]);
   
-  // Handle code change from InputOTP
+  // Handle code change
   const handleCodeChange = (value: string) => {
     setCode(value);
     setError("");
@@ -227,29 +227,13 @@ const CodeEntry = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="space-y-6"
           >
-            <div className="flex justify-center">
-              <div className="w-full max-w-[320px]">
-                <Input
-                  value={code}
-                  onChange={(e) => {
-                    const next = e.target.value.replace(/\D/g, "").slice(0, 6);
-                    handleCodeChange(next);
-                  }}
-                  disabled={isLoading}
-                  autoFocus
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  enterKeyHint="done"
-                  maxLength={6}
-                  placeholder="••••••"
-                  aria-label={t("auth.code.title") || "Verification code"}
-                  className={
-                    "karta-input text-center text-2xl font-bold tracking-[0.35em] pl-[0.35em]"
-                  }
-                />
-              </div>
-            </div>
-
+            <OtpInput
+              value={code}
+              onChange={handleCodeChange}
+              disabled={isLoading}
+              error={!!error}
+              autoFocus
+            />
             
             {error && (
               <motion.p
