@@ -9,19 +9,19 @@ import {
   Loader2, 
   MapPin, 
   Clock, 
-  Trash2, 
   LogOut,
   Globe,
   Laptop,
   Check,
   AlertTriangle,
-  History
+  History,
+  Timer
 } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { toast } from "sonner";
-import { getActiveDevices, getAuthorizationHistory, terminateDeviceSession, type ActiveDevice } from "@/services/api/devicesApi";
+import { getActiveDevices, getAuthorizationHistory, terminateDeviceSession, changeTokenExpiredTime, type ActiveDevice } from "@/services/api/devicesApi";
 import { useAuth } from "@/contexts/AuthContext";
 
 type TabType = 'active' | 'history';
@@ -97,6 +97,9 @@ const DevicesPage = () => {
   const [showConfirmLogoutAll, setShowConfirmLogoutAll] = useState(false);
   const [historyPage, setHistoryPage] = useState(1);
   const [historyTotalPages, setHistoryTotalPages] = useState(1);
+  const [isChangingExpiration, setIsChangingExpiration] = useState(false);
+
+  const EXPIRATION_OPTIONS: (7 | 30 | 90 | 180)[] = [7, 30, 90, 180];
 
   const fetchDevices = async () => {
     setIsLoading(true);
@@ -187,6 +190,31 @@ const DevicesPage = () => {
       toast.error(t("settings.devices.logoutAllError"));
     } finally {
       setIsLoggingOutAll(false);
+    }
+  };
+
+  const handleChangeExpiration = async (days: 7 | 30 | 90 | 180) => {
+    if (!selectedDevice || isChangingExpiration) return;
+    
+    setIsChangingExpiration(true);
+    try {
+      const response = await changeTokenExpiredTime(selectedDevice.id, days);
+      if (!response.error && response.data?.success) {
+        toast.success(t("settings.devices.expirationChanged"));
+        // Update the device in the list
+        setDevices(prev => prev.map(d => 
+          d.id === selectedDevice.id 
+            ? { ...d, expired_time_choice: days } 
+            : d
+        ));
+        setSelectedDevice(prev => prev ? { ...prev, expired_time_choice: days } : null);
+      } else {
+        toast.error(t("settings.devices.expirationError"));
+      }
+    } catch (error) {
+      toast.error(t("settings.devices.expirationError"));
+    } finally {
+      setIsChangingExpiration(false);
     }
   };
 
@@ -453,7 +481,45 @@ const DevicesPage = () => {
                 </div>
               </div>
 
-              {/* Only show logout button for active devices */}
+              {/* Session Expiration Settings - only for active devices */}
+              {selectedDevice.is_active && (
+                <div className="bg-muted/50 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">
+                      {t("settings.devices.sessionExpiration")}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t("settings.devices.sessionExpirationDesc")}
+                  </p>
+                  <div className="flex gap-2">
+                    {EXPIRATION_OPTIONS.map((days) => {
+                      const isSelected = selectedDevice.expired_time_choice === days;
+                      return (
+                        <button
+                          key={days}
+                          onClick={() => handleChangeExpiration(days)}
+                          disabled={isChangingExpiration}
+                          className={`flex-1 py-2.5 px-2 rounded-lg text-sm font-medium transition-all ${
+                            isSelected
+                              ? 'bg-primary text-primary-foreground shadow-sm'
+                              : 'bg-background hover:bg-muted text-foreground border border-border/50'
+                          } ${isChangingExpiration ? 'opacity-50' : ''}`}
+                        >
+                          {isChangingExpiration && isSelected ? (
+                            <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+                          ) : (
+                            t("settings.devices.days", { count: days })
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Logout button for active devices */}
               {selectedDevice.is_active && (
                 <button
                   onClick={handleLogoutDevice}

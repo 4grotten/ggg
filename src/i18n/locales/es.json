@@ -391,7 +391,12 @@
       "activeTab": "Activos",
       "historyTab": "Historial",
       "noHistory": "Sin historial de inicio de sesión",
-      "loadMore": "Cargar más"
+      "loadMore": "Cargar más",
+      "sessionExpiration": "Expiración de sesión",
+      "sessionExpirationDesc": "Elige cuánto tiempo permanece activa esta sesión",
+      "days": "{{count}}d",
+      "expirationChanged": "Expiración de sesión actualizada",
+      "expirationError": "Error al actualizar la expiración"
     }
   },
   "card": {
