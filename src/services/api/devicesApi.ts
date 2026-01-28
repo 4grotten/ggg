@@ -2,7 +2,7 @@
  * Devices API endpoints для Apofiz Backend
  */
 
-import { apiGet, apiRequest } from './apiClient';
+import { apiGet, apiPost, apiRequest } from './apiClient';
 
 export interface ActiveDevice {
   id: number;
@@ -21,12 +21,26 @@ export interface ActiveDevice {
   expired_time: string | null;
 }
 
+export interface PaginatedResponse<T> {
+  total_count: number;
+  total_pages: number;
+  list: T[];
+}
+
 /**
- * Get all active devices for current user
- * GET /users/get_active_devices/
+ * Get all active devices for current user (paginated)
+ * GET /users/get_active_devices/?page=1&limit=50
  */
-export async function getActiveDevices() {
-  return apiGet<ActiveDevice[]>('/users/get_active_devices/');
+export async function getActiveDevices(page = 1, limit = 50) {
+  return apiGet<PaginatedResponse<ActiveDevice>>(`/users/get_active_devices/?page=${page}&limit=${limit}`);
+}
+
+/**
+ * Get authorization history (paginated)
+ * GET /users/authorisation_history/?page=1&limit=20
+ */
+export async function getAuthorizationHistory(page = 1, limit = 20) {
+  return apiGet<PaginatedResponse<ActiveDevice>>(`/users/authorisation_history/?page=${page}&limit=${limit}`);
 }
 
 /**
@@ -43,4 +57,12 @@ export async function getDeviceDetail(deviceId: number) {
  */
 export async function deleteDevice(deviceId: number) {
   return apiRequest<void>(`/users/get_token_detail/${deviceId}/`, { method: 'DELETE' });
+}
+
+/**
+ * Deactivate user profile
+ * POST /users/deactivate/
+ */
+export async function deactivateProfile() {
+  return apiPost<{ success: boolean }>('/users/deactivate/');
 }

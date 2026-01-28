@@ -359,7 +359,29 @@
     "personalData": "个人资料",
     "verification": "身份验证",
     "savedAccounts": "已保存账户",
-    "switchedTo": "已切换至 {{name}}"
+    "switchedTo": "已切换至 {{name}}",
+    "devices": {
+      "title": "活跃设备",
+      "noDevices": "没有活跃设备",
+      "thisDevice": "当前设备",
+      "unknownDevice": "未知设备",
+      "unknown": "未知",
+      "justNow": "刚刚",
+      "minutesAgo": "{{count}}分钟前",
+      "hoursAgo": "{{count}}小时前",
+      "daysAgo": "{{count}}天前",
+      "location": "位置",
+      "lastActive": "最后活动",
+      "app": "应用",
+      "deviceDetails": "设备详情",
+      "removeDevice": "移除设备",
+      "logoutThisDevice": "退出此设备",
+      "logoutAll": "退出所有设备",
+      "deviceRemoved": "设备已移除",
+      "removeError": "移除设备失败",
+      "loggedOutAll": "已退出所有设备",
+      "logoutAllError": "退出所有设备失败"
+    }
   },
   "card": {
     "back": "返回",

@@ -357,7 +357,29 @@
     "personalData": "Profil",
     "verification": "Doğrulama",
     "savedAccounts": "Kayıtlı Hesaplar",
-    "switchedTo": "{{name}} hesabına geçildi"
+    "switchedTo": "{{name}} hesabına geçildi",
+    "devices": {
+      "title": "Aktif Cihazlar",
+      "noDevices": "Aktif cihaz yok",
+      "thisDevice": "Bu cihaz",
+      "unknownDevice": "Bilinmeyen cihaz",
+      "unknown": "Bilinmiyor",
+      "justNow": "Az önce",
+      "minutesAgo": "{{count}} dk önce",
+      "hoursAgo": "{{count}} saat önce",
+      "daysAgo": "{{count}} gün önce",
+      "location": "Konum",
+      "lastActive": "Son aktivite",
+      "app": "Uygulama",
+      "deviceDetails": "Cihaz Detayları",
+      "removeDevice": "Cihazı Kaldır",
+      "logoutThisDevice": "Bu cihazdan çıkış yap",
+      "logoutAll": "Tüm cihazlardan çıkış yap",
+      "deviceRemoved": "Cihaz kaldırıldı",
+      "removeError": "Cihaz kaldırılamadı",
+      "loggedOutAll": "Tüm cihazlardan çıkış yapıldı",
+      "logoutAllError": "Tüm cihazlardan çıkış yapılamadı"
+    }
   },
   "card": {
     "back": "Geri",
