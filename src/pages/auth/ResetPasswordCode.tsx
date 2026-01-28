@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { verifyCode, forgotPassword, resendCode } from "@/services/api/authApi";
 import { z } from "zod";
 import { OtpInput } from "@/components/ui/otp-input";
+import { PasswordLockAnimation } from "@/components/auth/PasswordLockAnimation";
 
 // Validation schema
 const codeSchema = z.string()
@@ -198,7 +199,7 @@ const ResetPasswordCode = () => {
                 x: { duration: 0.5 }
               }}
             >
-              <KeyRound className={`w-12 h-12 transition-colors duration-300 ${error ? 'text-destructive' : 'text-emerald-500'}`} />
+              <PasswordLockAnimation />
             </motion.div>
             <h1 className="text-2xl font-bold">
               {t("auth.resetPassword.codeTitle") || "Enter reset code"}
