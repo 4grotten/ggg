@@ -292,23 +292,78 @@ const Dashboard = () => {
         <div className="px-4 py-6 space-y-6 pb-28">
           {/* Balance - only for authenticated users */}
           {isAuthenticated && !balanceLoading && (
-            <BalanceCard balance={totalBalance} />
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 25,
+                delay: 0.1
+              }}
+            >
+              <BalanceCard balance={totalBalance} />
+            </motion.div>
           )}
           {isAuthenticated && balanceLoading && (
             <Skeleton className="h-32 w-full rounded-2xl" />
           )}
 
           {/* Action Buttons */}
-          <ActionButtons onTopUp={() => setTopUpOpen(true)} onSend={() => setSendOpen(true)} />
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 300, 
+              damping: 25,
+              delay: 0.2
+            }}
+          >
+            <ActionButtons onTopUp={() => setTopUpOpen(true)} onSend={() => setSendOpen(true)} />
+          </motion.div>
 
           {/* Verify Identity Card */}
-          <VerifyIdentityCard />
+          <motion.div
+            initial={{ opacity: 0, x: -50, rotateY: -15 }}
+            animate={{ opacity: 1, x: 0, rotateY: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 200, 
+              damping: 20,
+              delay: 0.3
+            }}
+          >
+            <VerifyIdentityCard />
+          </motion.div>
 
           {/* Partner Program Card */}
-          <PartnerCard onClick={() => setPartnerDrawerOpen(true)} />
+          <motion.div
+            initial={{ opacity: 0, x: 50, rotateY: 15 }}
+            animate={{ opacity: 1, x: 0, rotateY: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 200, 
+              damping: 20,
+              delay: 0.4
+            }}
+          >
+            <PartnerCard onClick={() => setPartnerDrawerOpen(true)} />
+          </motion.div>
 
           {/* Open New Card Button */}
-          <OpenCardButton onClick={() => setOpenCardOpen(true)} />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 400, 
+              damping: 25,
+              delay: 0.5
+            }}
+          >
+            <OpenCardButton onClick={() => setOpenCardOpen(true)} />
+          </motion.div>
 
           {/* Cards */}
           {cardsLoading ? (
@@ -317,31 +372,79 @@ const Dashboard = () => {
               <Skeleton className="h-24 w-full rounded-2xl" />
             </div>
           ) : (
-            <CardsList 
-              cards={isAuthenticated ? cards : cards.map(c => ({ ...c, balance: undefined }))} 
-              onCardClick={!isAuthenticated ? () => setAuthAlertOpen(true) : undefined}
-            />
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 200, 
+                damping: 20,
+                delay: 0.6
+              }}
+            >
+              <CardsList 
+                cards={isAuthenticated ? cards : cards.map(c => ({ ...c, balance: undefined }))} 
+                onCardClick={!isAuthenticated ? () => setAuthAlertOpen(true) : undefined}
+              />
+            </motion.div>
           )}
 
           {/* Send to Card */}
-          <SendToCardButton />
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 300, 
+              damping: 25,
+              delay: 0.7
+            }}
+          >
+            <SendToCardButton />
+          </motion.div>
 
           {/* Transactions - only for authenticated users */}
           {isAuthenticated && (
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 200, 
+                damping: 25,
+                delay: 0.8
+              }}
+            >
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-bold">{t('dashboard.transactions')}</h2>
-                <button
+                <motion.h2 
+                  className="text-xl font-bold"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 }}
+                >
+                  {t('dashboard.transactions')}
+                </motion.h2>
+                <motion.button
                   onClick={() => navigate("/card/virtual/history")}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <Clock className="w-4 h-4" />
                   {t('card.transactionHistory')}
-                </button>
+                </motion.button>
               </div>
 
               {/* Filter Tabs - Telegram Style */}
-              <div className="relative mb-4">
+              <motion.div 
+                className="relative mb-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.0 }}
+              >
                 <div 
                   ref={tabsContainerRef}
                   className="flex gap-0 overflow-x-auto scrollbar-hide relative"
@@ -356,8 +459,8 @@ const Dashboard = () => {
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                   
-                  {filterOptions.map((option) => (
-                    <button
+                  {filterOptions.map((option, index) => (
+                    <motion.button
                       key={option.key}
                       ref={(el) => {
                         if (el) tabRefs.current.set(option.key, el);
@@ -369,14 +472,17 @@ const Dashboard = () => {
                           ? "text-primary"
                           : "text-muted-foreground hover:text-foreground"
                       )}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.0 + index * 0.05 }}
                     >
                       {option.label}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
                 {/* Bottom border */}
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-border/50" />
-              </div>
+              </motion.div>
 
               {transactionsLoading ? (
                 <div className="space-y-4">
@@ -385,9 +491,15 @@ const Dashboard = () => {
                   <Skeleton className="h-24 w-full rounded-xl" />
                 </div>
               ) : (
-                <CardTransactionsList groups={filteredGroups} />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.1 }}
+                >
+                  <CardTransactionsList groups={filteredGroups} />
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           )}
 
         </div>
