@@ -975,34 +975,34 @@ const Settings = () => {
                     </button>
                   );
                 })}
-                
-                {/* Add Account button inside the collapsible */}
-                <button
-                  onClick={() => {
-                    // Save current account before adding new one
-                    if (user) {
-                      const currentToken = localStorage.getItem('auth_token');
-                      if (currentToken) {
-                        saveCurrentAccount(user, currentToken);
-                      }
-                    }
-                    // Use window.location for deployed environments with base paths
-                    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/phone' : '/auth/phone');
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 hover:bg-muted/50 active:bg-muted/70"
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-medium text-primary">
-                      {t("settings.addAccount") || "Add Account"}
-                    </p>
-                  </div>
-                </button>
               </motion.div>
             )}
           </AnimatePresence>
+          
+          {/* Add Account button - always visible outside collapsible */}
+          <button
+            onClick={() => {
+              // Save current account before adding new one
+              if (user) {
+                const currentToken = localStorage.getItem('auth_token');
+                if (currentToken) {
+                  saveCurrentAccount(user, currentToken);
+                }
+              }
+              // Use window.location for deployed environments with base paths
+              window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/phone' : '/auth/phone');
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 hover:bg-muted/50 active:bg-muted/70"
+          >
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Plus className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-medium text-primary">
+                {t("settings.addAccount") || "Add Account"}
+              </p>
+            </div>
+          </button>
         </AnimatedMenuSection>
 
         {/* Logout Button */}
