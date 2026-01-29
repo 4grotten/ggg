@@ -253,7 +253,7 @@ export const VerifyIdentityCard = ({
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handlePassportUpdateConfirm}
-              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
             >
               {t('common.yes')}
             </AlertDialogAction>
