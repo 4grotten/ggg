@@ -728,6 +728,9 @@ const PhoneEntry = () => {
 
             {/* Password Input - wrapped in form for browser autofill */}
             <form 
+              name="login"
+              method="post"
+              action="#"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleLogin();
@@ -744,13 +747,14 @@ const PhoneEntry = () => {
                 <div className="flex items-center gap-2 border-b pb-4 border-border opacity-60">
                   <Phone className="w-5 h-5 text-muted-foreground" />
                   <input
-                    type="tel"
+                    type="text"
                     name="username"
                     id="username"
-                    autoComplete="username"
+                    autoComplete="username webauthn"
                     value={getFullPhoneNumber()}
                     readOnly
                     tabIndex={-1}
+                    aria-label="Phone number"
                     className="flex-1 text-lg bg-transparent border-none outline-none text-muted-foreground cursor-default"
                   />
                 </div>
@@ -769,13 +773,23 @@ const PhoneEntry = () => {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     id="password"
-                    autoComplete="current-password"
+                    autoComplete="current-password webauthn"
                     autoCapitalize="off"
                     autoCorrect="off"
                     spellCheck={false}
                     enterKeyHint="done"
+                    aria-label="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onFocus={(e) => {
+                      // Trigger password manager on focus
+                      const input = e.target as HTMLInputElement;
+                      setTimeout(() => {
+                        if (input.value && input.value !== password) {
+                          setPassword(input.value);
+                        }
+                      }, 100);
+                    }}
                     onPaste={(e) => {
                       // Handle paste from password manager / Face ID
                       const pastedText = e.clipboardData?.getData('text');
