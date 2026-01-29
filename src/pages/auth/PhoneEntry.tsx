@@ -211,10 +211,13 @@ const passwordSchema = z.string()
 const PhoneEntry = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { login: authLogin } = useAuth();
+  const { login: authLogin, isAuthenticated, user } = useAuth();
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [dialCode, setDialCode] = useState("+971");
   const [currentIconIndex, setCurrentIconIndex] = useState(0);
+  
+  // "Add Account" mode - when user is already authenticated
+  const isAddAccountMode = isAuthenticated && !!user;
 
   // Auto-detect country on mount
   useEffect(() => {
@@ -289,7 +292,10 @@ const PhoneEntry = () => {
   const [biometricTriggered, setBiometricTriggered] = useState(false);
 
   // Auto-trigger biometric auth on page load if available
+  // BUT NOT in "Add Account" mode - user explicitly wants to add new account
   useEffect(() => {
+    if (isAddAccountMode) return; // Skip biometric auto-trigger when adding new account
+    
     if (isBiometricEnabled && biometricPhone && !biometricTriggered && !isLoading && !isLoginMode) {
       setBiometricTriggered(true);
       // Small delay to let the page render first
@@ -298,7 +304,7 @@ const PhoneEntry = () => {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isBiometricEnabled, biometricPhone, biometricTriggered, isLoading, isLoginMode]);
+  }, [isBiometricEnabled, biometricPhone, biometricTriggered, isLoading, isLoginMode, isAddAccountMode]);
   useEffect(() => {
     if (!isLoginMode) return;
     
@@ -1009,7 +1015,14 @@ const PhoneEntry = () => {
                 </motion.div>
               </AnimatePresence>
             </motion.div>
-            <h1 className="text-2xl font-bold">{t('auth.phone.title')}</h1>
+            <h1 className="text-2xl font-bold">
+              {isAddAccountMode ? (t('auth.addAccount.title') || 'Add Account') : t('auth.phone.title')}
+            </h1>
+            {isAddAccountMode && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {t('auth.addAccount.subtitle') || 'Sign in with a different phone number'}
+              </p>
+            )}
           </motion.div>
 
           {/* Phone Input */}
