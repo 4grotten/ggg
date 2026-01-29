@@ -1193,6 +1193,16 @@
           "2": "El token del dispositivo actual no puede ser terminado",
           "3": "Opciones disponibles: 7, 30, 90 o 180 días"
         }
+      },
+      "terminate-device-session": {
+        "title": "Terminar Sesión del Dispositivo",
+        "description": "Terminar inmediatamente una sesión de dispositivo específica desactivando su token. Esto cierra la sesión del usuario en ese dispositivo.",
+        "notes": {
+          "0": "Esto invalida inmediatamente la sesión del dispositivo",
+          "1": "El dispositivo desconectado necesitará autenticarse nuevamente",
+          "2": "No se puede terminar la sesión del dispositivo actual (el que hace la solicitud)",
+          "3": "Use el método GET en el mismo endpoint para obtener detalles del token"
+        }
       }
     }
   }

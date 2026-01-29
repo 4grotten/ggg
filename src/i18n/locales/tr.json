@@ -1193,6 +1193,16 @@
           "2": "Mevcut cihaz tokeni sonlandırılamaz",
           "3": "Kullanılabilir seçenekler: 7, 30, 90 veya 180 gün"
         }
+      },
+      "terminate-device-session": {
+        "title": "Cihaz Oturumunu Sonlandır",
+        "description": "Tokenini devre dışı bırakarak belirli bir cihaz oturumunu hemen sonlandırın. Bu, kullanıcıyı o cihazdan çıkış yapar.",
+        "notes": {
+          "0": "Bu, cihaz oturumunu hemen geçersiz kılar",
+          "1": "Çıkış yapılan cihazın tekrar kimlik doğrulaması yapması gerekecek",
+          "2": "Mevcut cihaz oturumu (isteği yapan) sonlandırılamaz",
+          "3": "Token detaylarını almak için aynı endpoint'te GET yöntemini kullanın"
+        }
       }
     }
   }
