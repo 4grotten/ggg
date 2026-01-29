@@ -13,7 +13,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -33,9 +33,9 @@ const iconColors: Record<string, { bg: string; text: string }> = {
   receipt: { bg: 'bg-green-500', text: 'text-white' },
   code: { bg: 'bg-cyan-500', text: 'text-white' },
   privacy: { bg: 'bg-gray-500', text: 'text-white' },
-  message: { bg: 'bg-sky-500', text: 'text-white' },
-  smartphone: { bg: 'bg-emerald-500', text: 'text-white' },
-  laptop: { bg: 'bg-teal-500', text: 'text-white' },
+  message: { bg: 'bg-green-600', text: 'text-white' },
+  download: { bg: 'bg-orange-500', text: 'text-white' },
+  laptop: { bg: 'bg-sky-500', text: 'text-white' },
   apofiz: { bg: 'bg-black dark:bg-zinc-800', text: 'text-white' },
   userplus: { bg: 'bg-rose-500', text: 'text-white' },
 };
@@ -822,7 +822,7 @@ const Settings = () => {
           />
           {!isInstalled && (
             <SettingsItem
-              icon={<ColoredIcon colorKey="smartphone"><Smartphone className="w-4 h-4" /></ColoredIcon>}
+              icon={<ColoredIcon colorKey="download"><Download className="w-4 h-4" /></ColoredIcon>}
               label={t("settings.installApp")}
               onClick={handleInstallClick}
             />
