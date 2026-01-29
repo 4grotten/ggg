@@ -1173,7 +1173,12 @@
       },
       "get-authorization-history": {
         "title": "Historial de Autorización",
-        "description": "Obtener lista paginada de todos los intentos de inicio de sesión e historial de sesiones."
+        "description": "Obtener lista paginada de todos los intentos de inicio de sesión e historial de sesiones.",
+        "notes": {
+          "0": "El historial incluye sesiones activas y expiradas",
+          "1": "Las entradas están ordenadas por log_time descendente (las más nuevas primero)",
+          "2": "is_active=false indica sesiones expiradas o terminadas"
+        }
       },
       "get-device-detail": {
         "title": "Detalles del Dispositivo",
@@ -1181,7 +1186,13 @@
       },
       "change-token-expiration": {
         "title": "Cambiar Expiración del Token",
-        "description": "Cambiar el tiempo de expiración para un token de dispositivo/sesión específico."
+        "description": "Cambiar el tiempo de expiración para un token de dispositivo/sesión específico.",
+        "notes": {
+          "0": "Use 7 días como mínimo para terminar efectivamente una sesión",
+          "1": "Los usuarios solo pueden modificar sus propias sesiones de dispositivos",
+          "2": "El token del dispositivo actual no puede ser terminado",
+          "3": "Opciones disponibles: 7, 30, 90 o 180 días"
+        }
       }
     }
   }

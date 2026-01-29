@@ -1173,7 +1173,12 @@
       },
       "get-authorization-history": {
         "title": "Autorisierungsverlauf",
-        "description": "Paginierte Liste aller Anmeldeversuche und Sitzungsverlauf abrufen."
+        "description": "Paginierte Liste aller Anmeldeversuche und Sitzungsverlauf abrufen.",
+        "notes": {
+          "0": "Der Verlauf enthält sowohl aktive als auch abgelaufene Sitzungen",
+          "1": "Einträge sind nach log_time absteigend sortiert (neueste zuerst)",
+          "2": "is_active=false bedeutet abgelaufene oder beendete Sitzungen"
+        }
       },
       "get-device-detail": {
         "title": "Gerätedetails",
@@ -1181,7 +1186,13 @@
       },
       "change-token-expiration": {
         "title": "Token-Ablauf ändern",
-        "description": "Ablaufzeit für ein bestimmtes Geräte-/Sitzungstoken ändern."
+        "description": "Ablaufzeit für ein bestimmtes Geräte-/Sitzungstoken ändern.",
+        "notes": {
+          "0": "Verwenden Sie mindestens 7 Tage, um eine Sitzung effektiv zu beenden",
+          "1": "Benutzer können nur ihre eigenen Gerätesitzungen ändern",
+          "2": "Das aktuelle Gerätetoken kann nicht beendet werden",
+          "3": "Verfügbare Optionen: 7, 30, 90 oder 180 Tage"
+        }
       }
     }
   }

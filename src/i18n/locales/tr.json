@@ -1173,7 +1173,12 @@
       },
       "get-authorization-history": {
         "title": "Yetkilendirme Geçmişi",
-        "description": "Tüm giriş denemelerinin ve oturum geçmişinin sayfalanmış listesini alın."
+        "description": "Tüm giriş denemelerinin ve oturum geçmişinin sayfalanmış listesini alın.",
+        "notes": {
+          "0": "Geçmiş hem aktif hem de süresi dolmuş oturumları içerir",
+          "1": "Girişler log_time'a göre azalan sırada sıralanır (en yeniler önce)",
+          "2": "is_active=false süresi dolmuş veya sonlandırılmış oturumları gösterir"
+        }
       },
       "get-device-detail": {
         "title": "Cihaz Detayları",
@@ -1181,7 +1186,13 @@
       },
       "change-token-expiration": {
         "title": "Token Süresini Değiştir",
-        "description": "Belirli bir cihaz/oturum tokeni için süre sonunu değiştirin."
+        "description": "Belirli bir cihaz/oturum tokeni için süre sonunu değiştirin.",
+        "notes": {
+          "0": "Bir oturumu etkili bir şekilde sonlandırmak için minimum 7 gün kullanın",
+          "1": "Kullanıcılar yalnızca kendi cihaz oturumlarını değiştirebilir",
+          "2": "Mevcut cihaz tokeni sonlandırılamaz",
+          "3": "Kullanılabilir seçenekler: 7, 30, 90 veya 180 gün"
+        }
       }
     }
   }
