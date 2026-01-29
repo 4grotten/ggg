@@ -14,7 +14,8 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, FileText } from "lucide-react";
+import { generateApiPdf } from "@/lib/generateApiPdf";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -845,9 +846,12 @@ const Settings = () => {
             onClick={() => navigate("/fees-and-limits")}
           />
           <SettingsItem
-            icon={<ColoredIcon colorKey="code"><Code className="w-4 h-4" /></ColoredIcon>}
+            icon={<ColoredIcon colorKey="code"><FileText className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.apiDocumentation")}
-            onClick={() => navigate("/settings/api")}
+            onClick={() => {
+              generateApiPdf();
+              toast.success(t('toast.pdfGenerated') || 'PDF downloaded successfully');
+            }}
           />
         </AnimatedMenuSection>
 
