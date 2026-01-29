@@ -621,7 +621,13 @@ const Settings = () => {
               
               {/* Verification status - verified when completed 3 steps */}
               <button
-                onClick={() => navigate("/profile-verification")}
+                onClick={() => {
+                  if (getCompletedSteps() >= 3) {
+                    setIsVerificationDialogOpen(true);
+                  } else {
+                    navigate("/profile-verification");
+                  }
+                }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   getCompletedSteps() < 3
                     ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
