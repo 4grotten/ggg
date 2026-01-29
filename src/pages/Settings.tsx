@@ -36,7 +36,7 @@ const iconColors: Record<string, { bg: string; text: string }> = {
   message: { bg: 'bg-sky-500', text: 'text-white' },
   smartphone: { bg: 'bg-emerald-500', text: 'text-white' },
   laptop: { bg: 'bg-teal-500', text: 'text-white' },
-  apofiz: { bg: 'bg-amber-500', text: 'text-white' },
+  apofiz: { bg: 'bg-black dark:bg-zinc-800', text: 'text-white' },
   userplus: { bg: 'bg-rose-500', text: 'text-white' },
 };
 
