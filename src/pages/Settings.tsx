@@ -920,8 +920,16 @@ const Settings = () => {
                   <ArrowLeftRight className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-foreground font-medium">
-                  {t("settings.switchAccount") || "Switch Account"} ({accounts.length})
+                  {t("settings.switchAccount") || "Switch Account"}
                 </span>
+                <span className="min-w-5 h-5 px-1.5 rounded-full bg-blue-500 text-white text-xs font-semibold flex items-center justify-center">
+                  {accounts.length}
+                </span>
+                <motion.div
+                  className="w-2 h-2 rounded-full bg-green-500"
+                  animate={{ opacity: [0.5, 1, 0.5], scale: [0.9, 1.1, 0.9] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                />
               </div>
               <motion.div
                 animate={{ rotate: isAccountsExpanded ? 180 : 0 }}
