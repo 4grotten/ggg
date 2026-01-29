@@ -1144,69 +1144,57 @@ const Settings = () => {
 
       {/* Edit Profile Confirmation Dialog */}
       <AlertDialog open={isEditProfileDialogOpen} onOpenChange={setIsEditProfileDialogOpen}>
-        <AlertDialogContent 
-          className="w-[270px] rounded-2xl p-0 gap-0 border-0 overflow-hidden"
-          style={{ backgroundColor: 'rgba(30, 30, 30, 0.95)', backdropFilter: 'blur(40px)' }}
-        >
-          <AlertDialogHeader className="pt-5 px-4 pb-4 text-center space-y-1">
-            <AlertDialogTitle className="text-[17px] font-semibold text-white leading-snug">
-              {t('settings.updateDataConfirmTitle') || 'Update Profile Data'}
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('settings.updateDataConfirmTitle') || 'Обновить данные?'}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] text-zinc-400 leading-snug">
-              {t('settings.updateDataConfirmDescription') || 'Are you sure you want to update your profile data?'}
+            <AlertDialogDescription>
+              {t('settings.updateDataConfirmDescription') || 'Вы уверены, что хотите обновить личные данные?'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex flex-row border-t border-zinc-700/50">
-            <AlertDialogCancel 
-              onClick={() => setIsEditProfileDialogOpen(false)}
-              className="flex-1 m-0 h-11 rounded-none border-0 bg-transparent text-[17px] font-normal text-[#0A84FF] hover:bg-zinc-800/50 active:bg-zinc-700/50"
-            >
-              {t('common.cancel') || 'Cancel'}
+          <AlertDialogFooter className="flex-row gap-3">
+            <AlertDialogCancel className="flex-1 mt-0">
+              {t('common.cancel') || 'Отмена'}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 setIsEditProfileDialogOpen(false);
                 navigate("/settings/edit-profile");
               }}
-              className="flex-1 m-0 h-11 rounded-none border-l border-zinc-700/50 bg-transparent text-[17px] font-semibold text-[#0A84FF] hover:bg-zinc-800/50 active:bg-zinc-700/50"
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
             >
-              {t('common.continue') || 'Continue'}
+              {t('common.continue') || 'Продолжить'}
             </AlertDialogAction>
-          </div>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Verification Confirmation Dialog */}
       <AlertDialog open={isVerificationDialogOpen} onOpenChange={setIsVerificationDialogOpen}>
-        <AlertDialogContent 
-          className="w-[270px] rounded-2xl p-0 gap-0 border-0 overflow-hidden"
-          style={{ backgroundColor: 'rgba(30, 30, 30, 0.95)', backdropFilter: 'blur(40px)' }}
-        >
-          <AlertDialogHeader className="pt-5 px-4 pb-4 text-center space-y-1">
-            <AlertDialogTitle className="text-[17px] font-semibold text-white leading-snug">
-              {t('settings.updateDataConfirmTitle') || 'Update Verification Data'}
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('settings.updateDataConfirmTitle') || 'Обновить данные?'}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] text-zinc-400 leading-snug">
-              {t('settings.updateVerificationConfirmDescription') || 'Are you sure you want to update your verification data? This may reset your verification status.'}
+            <AlertDialogDescription>
+              {t('settings.updateVerificationConfirmDescription') || 'Вы уверены, что хотите обновить данные верификации? Это может сбросить статус верификации.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex flex-row border-t border-zinc-700/50">
-            <AlertDialogCancel 
-              onClick={() => setIsVerificationDialogOpen(false)}
-              className="flex-1 m-0 h-11 rounded-none border-0 bg-transparent text-[17px] font-normal text-[#0A84FF] hover:bg-zinc-800/50 active:bg-zinc-700/50"
-            >
-              {t('common.cancel') || 'Cancel'}
+          <AlertDialogFooter className="flex-row gap-3">
+            <AlertDialogCancel className="flex-1 mt-0">
+              {t('common.cancel') || 'Отмена'}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 setIsVerificationDialogOpen(false);
                 navigate("/profile-verification");
               }}
-              className="flex-1 m-0 h-11 rounded-none border-l border-zinc-700/50 bg-transparent text-[17px] font-semibold text-[#0A84FF] hover:bg-zinc-800/50 active:bg-zinc-700/50"
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
             >
-              {t('common.continue') || 'Continue'}
+              {t('common.continue') || 'Продолжить'}
             </AlertDialogAction>
-          </div>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </MobileLayout>
