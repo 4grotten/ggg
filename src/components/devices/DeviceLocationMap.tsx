@@ -79,7 +79,7 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
   const displayCountryCode = geoData?.countryCode;
   const countryFlag = displayCountryCode ? getCountryFlag(displayCountryCode) : null;
   
-  const mapsUrl = geoData?.mapsUrl || `https://www.google.com/maps/@25.2048,55.2708,12z`;
+  const mapsUrl = geoData?.mapsUrl || `https://www.google.com/maps/@25.2048,55.2708`;
   
   const handleOpenMaps = () => {
     window.open(mapsUrl, '_blank');
