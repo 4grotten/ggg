@@ -819,6 +819,263 @@ export const apiCategories: ApiCategory[] = [
         ]
       }
     ]
+  },
+  // ============ DEVICES & SESSIONS ============
+  {
+    id: 'devices',
+    title: 'Devices & Sessions',
+    titleRu: 'Устройства и сессии',
+    icon: '📱',
+    endpoints: [
+      {
+        id: 'get-active-devices',
+        method: 'GET',
+        path: '/users/get_active_devices/',
+        title: 'Get Active Devices',
+        description: 'Retrieve a paginated list of all active devices/sessions for the current user.',
+        category: 'devices',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        queryParams: [
+          { name: 'page', type: 'number', required: false, description: 'Page number (default: 1)' },
+          { name: 'limit', type: 'number', required: false, description: 'Items per page (default: 50)' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url '${API_BASE_URL}/users/get_active_devices/?page=1&limit=50' \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "total_count": 3,
+  "total_pages": 1,
+  "list": [
+    {
+      "id": 1234,
+      "key": "token_key_abc123",
+      "user": 12345,
+      "location": "Dubai, UAE",
+      "device": "iPhone 15 Pro",
+      "ip": "192.168.1.100",
+      "log_time": "2024-01-20T15:30:00Z",
+      "version_app": "1.2.0",
+      "is_active": true,
+      "operating_system": "iOS 17.2",
+      "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2...)",
+      "last_active": "2024-01-20T16:45:00Z",
+      "expired_time_choice": 30,
+      "expired_time": "2024-02-19T15:30:00Z"
+    }
+  ]
+}`
+        },
+        responseParams: [
+          { name: 'total_count', type: 'number', required: true, description: 'Total number of active devices' },
+          { name: 'total_pages', type: 'number', required: true, description: 'Total number of pages' },
+          { name: 'list', type: 'array', required: true, description: 'Array of active device objects' },
+          { name: 'list[].id', type: 'number', required: true, description: 'Unique device/token ID' },
+          { name: 'list[].key', type: 'string', required: true, description: 'Token key (partial)' },
+          { name: 'list[].location', type: 'string', required: false, description: 'Geographic location of login' },
+          { name: 'list[].device', type: 'string', required: false, description: 'Device name/model' },
+          { name: 'list[].ip', type: 'string', required: true, description: 'IP address' },
+          { name: 'list[].is_active', type: 'boolean', required: true, description: 'Whether session is currently active' },
+          { name: 'list[].operating_system', type: 'string', required: false, description: 'OS name and version' },
+          { name: 'list[].last_active', type: 'string', required: false, description: 'Last activity timestamp (ISO 8601)' },
+          { name: 'list[].expired_time_choice', type: 'number', required: false, description: 'Token expiration setting in days', enum: ['7', '30', '90', '180'] },
+          { name: 'list[].expired_time', type: 'string', required: false, description: 'Token expiration datetime (ISO 8601)' }
+        ]
+      },
+      {
+        id: 'get-authorization-history',
+        method: 'GET',
+        path: '/users/authorisation_history/',
+        title: 'Get Authorization History',
+        description: 'Retrieve a paginated list of all login attempts and session history.',
+        category: 'devices',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        queryParams: [
+          { name: 'page', type: 'number', required: false, description: 'Page number (default: 1)' },
+          { name: 'limit', type: 'number', required: false, description: 'Items per page (default: 20)' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url '${API_BASE_URL}/users/authorisation_history/?page=1&limit=20' \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "total_count": 45,
+  "total_pages": 3,
+  "list": [
+    {
+      "id": 5678,
+      "key": "token_key_xyz789",
+      "user": 12345,
+      "location": "Abu Dhabi, UAE",
+      "device": "MacBook Pro",
+      "ip": "10.0.0.50",
+      "log_time": "2024-01-18T10:15:00Z",
+      "version_app": "1.1.5",
+      "is_active": false,
+      "operating_system": "macOS 14.2",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7...)",
+      "last_active": "2024-01-18T14:30:00Z",
+      "expired_time_choice": null,
+      "expired_time": null
+    }
+  ]
+}`
+        },
+        responseParams: [
+          { name: 'total_count', type: 'number', required: true, description: 'Total number of history entries' },
+          { name: 'total_pages', type: 'number', required: true, description: 'Total number of pages' },
+          { name: 'list', type: 'array', required: true, description: 'Array of authorization history entries' }
+        ],
+        notes: [
+          'History includes both active and expired sessions',
+          'Entries are sorted by log_time descending (newest first)',
+          'is_active=false indicates expired or terminated sessions'
+        ]
+      },
+      {
+        id: 'get-device-detail',
+        method: 'GET',
+        path: '/users/get_token_detail/{device_id}/',
+        title: 'Get Device Detail',
+        description: 'Retrieve detailed information about a specific device/session.',
+        category: 'devices',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'device_id', type: 'number', required: true, description: 'Device/token ID to get details for' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${API_BASE_URL}/users/get_token_detail/1234/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "id": 1234,
+  "key": "token_key_abc123",
+  "user": 12345,
+  "location": "Dubai, UAE",
+  "device": "iPhone 15 Pro",
+  "ip": "192.168.1.100",
+  "log_time": "2024-01-20T15:30:00Z",
+  "version_app": "1.2.0",
+  "is_active": true,
+  "operating_system": "iOS 17.2",
+  "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15",
+  "last_active": "2024-01-20T16:45:00Z",
+  "expired_time_choice": 30,
+  "expired_time": "2024-02-19T15:30:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'id', type: 'number', required: true, description: 'Device/token ID' },
+          { name: 'key', type: 'string', required: true, description: 'Token key' },
+          { name: 'user', type: 'number', required: true, description: 'User ID' },
+          { name: 'location', type: 'string', required: false, description: 'Login location' },
+          { name: 'device', type: 'string', required: false, description: 'Device name' },
+          { name: 'ip', type: 'string', required: true, description: 'IP address' },
+          { name: 'log_time', type: 'string', required: true, description: 'Login timestamp' },
+          { name: 'version_app', type: 'string', required: false, description: 'App version' },
+          { name: 'is_active', type: 'boolean', required: true, description: 'Session active status' },
+          { name: 'operating_system', type: 'string', required: false, description: 'Operating system' },
+          { name: 'user_agent', type: 'string', required: false, description: 'Full user agent string' },
+          { name: 'last_active', type: 'string', required: false, description: 'Last activity time' },
+          { name: 'expired_time_choice', type: 'number', required: false, description: 'Expiration setting (days)' },
+          { name: 'expired_time', type: 'string', required: false, description: 'Expiration datetime' }
+        ]
+      },
+      {
+        id: 'change-token-expiration',
+        method: 'POST',
+        path: '/users/change_token_expired_time/{token_id}/',
+        title: 'Change Token Expiration',
+        description: 'Change the expiration time for a specific device/session token. Can be used to extend session duration or terminate a session by setting minimum expiration.',
+        category: 'devices',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'token_id', type: 'number', required: true, description: 'Device/token ID to modify' }
+        ],
+        bodyParams: [
+          { name: 'expired_time_choice', type: 'enum', required: true, description: 'New expiration time in days', enum: ['7', '30', '90', '180'] }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/users/change_token_expired_time/1234/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "expired_time_choice": 30
+  }'`,
+          json: `{
+  "expired_time_choice": 30
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "success": true
+}`
+        },
+        responseParams: [
+          { name: 'success', type: 'boolean', required: true, description: 'Whether the operation was successful' }
+        ],
+        notes: [
+          'Use 7 days as minimum to effectively terminate a session',
+          'Users can only modify their own device sessions',
+          'The current device token cannot be terminated',
+          'Available options: 7, 30, 90, or 180 days'
+        ]
+      },
+      {
+        id: 'deactivate-profile',
+        method: 'POST',
+        path: '/users/deactivate/',
+        title: 'Deactivate Profile',
+        description: 'Deactivate the user profile. This is NOT for device logout - it deactivates the entire account.',
+        category: 'devices',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/users/deactivate/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "success": true
+}`
+        },
+        responseParams: [
+          { name: 'success', type: 'boolean', required: true, description: 'Whether the deactivation was successful' }
+        ],
+        notes: [
+          'WARNING: This deactivates the entire user account, not just a device session',
+          'Account can be reactivated by logging in again',
+          'All active sessions will be terminated'
+        ]
+      }
+    ]
   }
 ];
 
