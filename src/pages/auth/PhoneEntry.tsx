@@ -19,6 +19,7 @@ import { login as apiLogin, forgotPassword, getCurrentUser, sendOtp, registerAut
 import { setAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { z } from "zod";
 import { useBiometricAuth } from "@/hooks/useBiometricAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -210,6 +211,7 @@ const passwordSchema = z.string()
 const PhoneEntry = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { login: authLogin } = useAuth();
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [dialCode, setDialCode] = useState("+971");
   const [currentIconIndex, setCurrentIconIndex] = useState(0);
@@ -525,6 +527,11 @@ const PhoneEntry = () => {
       }
       
       if (response.data) {
+        // Sync user to AuthContext
+        if (response.data.user) {
+          authLogin(response.data.user);
+        }
+        
         // Show personalized welcome message with user name
         const userName = response.data.user?.full_name || response.data.user?.username;
         if (userName) {
@@ -622,6 +629,11 @@ const PhoneEntry = () => {
           setIsLoginMode(true);
           setPassword('');
         } else if (response.data) {
+          // Sync user to AuthContext
+          if (response.data.user) {
+            authLogin(response.data.user);
+          }
+          
           const userName = response.data.user?.full_name || response.data.user?.username;
           if (userName) {
             toast.success(`${t('auth.login.welcomeBack') || 'Welcome back'}, ${userName}!`);
