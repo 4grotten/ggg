@@ -6,8 +6,12 @@ import { motion } from "framer-motion";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
@@ -232,36 +236,28 @@ export const VerifyIdentityCard = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* iOS-style Alert Dialog for passport update */}
+      {/* Passport Update Dialog - matching Settings logout style */}
       <AlertDialog open={showPassportDialog} onOpenChange={setShowPassportDialog}>
-        <AlertDialogContent 
-          className="max-w-[270px] rounded-2xl p-0 overflow-hidden border-0 gap-0"
-          onOverlayClick={() => setShowPassportDialog(false)}
-        >
-          <div className="p-4 pb-3">
-            <AlertDialogTitle className="text-center text-[17px] font-semibold mb-1">
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
               {t('dashboard.passportUpdateTitle')}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground">
+            <AlertDialogDescription>
               {t('dashboard.passportUpdateDescription')}
             </AlertDialogDescription>
-          </div>
-          
-          {/* iOS-style buttons */}
-          <div className="flex flex-col">
-            <button
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3">
+            <AlertDialogCancel className="flex-1 mt-0">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction 
               onClick={handlePassportUpdateConfirm}
-              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] border-t border-border hover:bg-secondary/50 transition-colors"
+              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {t('common.yes')}
-            </button>
-            <button
-              onClick={handlePayFromPassportDialog}
-              className="w-full py-3 text-[17px] font-semibold text-[#007AFF] border-t border-border hover:bg-secondary/50 transition-colors"
-            >
-              {t('dashboard.payButton')}
-            </button>
-          </div>
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
