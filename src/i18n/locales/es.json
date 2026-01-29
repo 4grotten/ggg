@@ -397,7 +397,7 @@
       "days": "{{count}}d",
       "expirationChanged": "Expiración de sesión actualizada",
       "expirationError": "Error al actualizar la expiración",
-      "openMaps": "Abrir en Mapas"
+      "openMaps": "Google Maps"
     }
   },
   "card": {

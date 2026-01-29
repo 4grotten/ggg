@@ -410,7 +410,7 @@
       "days": "{{count}} дн.",
       "expirationChanged": "Срок действия сессии обновлён",
       "expirationError": "Не удалось обновить срок действия",
-      "openMaps": "Открыть карту"
+      "openMaps": "Google Maps"
     }
   },
   "editProfile": {

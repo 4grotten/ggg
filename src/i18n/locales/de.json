@@ -397,7 +397,7 @@
       "days": "{{count}} T.",
       "expirationChanged": "Sitzungsablauf aktualisiert",
       "expirationError": "Ablauf konnte nicht aktualisiert werden",
-      "openMaps": "In Karten öffnen"
+      "openMaps": "Google Maps"
     }
   },
   "card": {

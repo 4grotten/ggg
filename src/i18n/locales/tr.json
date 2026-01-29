@@ -397,7 +397,7 @@
       "days": "{{count}} gün",
       "expirationChanged": "Oturum süresi güncellendi",
       "expirationError": "Süre güncellenemedi",
-      "openMaps": "Haritada aç"
+      "openMaps": "Google Maps"
     }
   },
   "card": {
