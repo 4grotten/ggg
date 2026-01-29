@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
-import { ArrowLeft, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { ApiSidebar } from "@/components/api/ApiSidebar";
 import { ApiEndpointDetail } from "@/components/api/ApiEndpointDetail";
 import { ApiIntroduction } from "@/components/api/ApiIntroduction";
@@ -34,34 +34,22 @@ const ApiDocumentation = () => {
 
   return (
     <MobileLayout
-      header={
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/settings")}
-              className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h1 className="text-lg font-semibold">{t("settings.apiDocumentation")}</h1>
-          </div>
-          
-          <div className="flex items-center gap-1">
-            {/* Language switcher */}
-            <LanguageSwitcher />
-            
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-muted rounded-full transition-colors md:hidden"
-            >
-              {isSidebarOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+      showBackButton
+      onBack={() => navigate("/settings")}
+      title={t("settings.apiDocumentation")}
+      rightAction={
+        <div className="flex items-center gap-1">
+          <LanguageSwitcher />
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 hover:bg-muted rounded-full transition-colors md:hidden"
+          >
+            {isSidebarOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
+          </button>
         </div>
       }
     >
