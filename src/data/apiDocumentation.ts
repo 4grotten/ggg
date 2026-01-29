@@ -656,11 +656,11 @@ export const apiCategories: ApiCategory[] = [
     icon: '📁',
     endpoints: [
       {
-        id: 'upload-file',
+        id: 'upload-avatar',
         method: 'POST',
         path: '/files/',
-        title: 'Upload File',
-        description: 'Upload a file (avatar image). Returns file data with multiple size variants.',
+        title: 'Upload Avatar Image',
+        description: 'Upload an avatar image for user profile. Returns file data with multiple size variants (large, medium, small).',
         category: 'files',
         authorization: {
           type: 'Token',
