@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Copy, Check, Play, ChevronDown, ChevronRight } from "lucide-react";
+import { Copy, Check, Play, ChevronDown, ChevronRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ApiEndpoint, ApiParameter, API_BASE_URL } from "@/data/apiDocumentation";
 import { useTranslation } from "react-i18next";
-
+import TryItPanel from "./TryItPanel";
 interface ApiEndpointDetailProps {
   endpoint: ApiEndpoint;
 }
@@ -137,11 +137,32 @@ export const ApiEndpointDetail = ({ endpoint }: ApiEndpointDetailProps) => {
         {/* Try it button */}
         <button
           onClick={() => setShowTryIt(!showTryIt)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors",
+            showTryIt 
+              ? "bg-muted text-muted-foreground hover:bg-muted/80" 
+              : "bg-primary text-primary-foreground hover:bg-primary/90"
+          )}
         >
-          <Play className="w-4 h-4" />
-          Try it
+          {showTryIt ? (
+            <>
+              <X className="w-4 h-4" />
+              Close
+            </>
+          ) : (
+            <>
+              <Play className="w-4 h-4" />
+              Try it
+            </>
+          )}
         </button>
+
+        {/* Try It Panel */}
+        <TryItPanel 
+          endpoint={endpoint} 
+          isOpen={showTryIt} 
+          onClose={() => setShowTryIt(false)} 
+        />
       </div>
 
       {/* Request Example */}
