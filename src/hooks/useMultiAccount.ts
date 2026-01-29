@@ -41,12 +41,21 @@ const saveAccounts = (accounts: SavedAccount[]) => {
  */
 export const saveCurrentAccount = (user: UserProfile, explicitToken?: string) => {
   const token = explicitToken || getAuthToken();
+  console.log('[MultiAccount] saveCurrentAccount called:', { 
+    userId: user?.id, 
+    userName: user?.full_name, 
+    hasToken: !!token,
+    hasExplicitToken: !!explicitToken 
+  });
+  
   if (!token || !user.id) {
     console.warn('[MultiAccount] saveCurrentAccount skipped: no token or user.id', { hasToken: !!token, userId: user?.id });
     return;
   }
 
   const accounts = getSavedAccounts();
+  console.log('[MultiAccount] Current accounts before save:', accounts.map(a => ({ id: a.id, name: a.user.full_name })));
+  
   const existingIndex = accounts.findIndex(a => a.user.id === user.id);
 
   const account: SavedAccount = {
@@ -65,7 +74,7 @@ export const saveCurrentAccount = (user: UserProfile, explicitToken?: string) =>
   }
 
   saveAccounts(accounts);
-  console.log('[MultiAccount] Total accounts saved:', accounts.length);
+  console.log('[MultiAccount] Total accounts saved:', accounts.length, accounts.map(a => ({ id: a.id, name: a.user.full_name })));
 };
 
 /**
