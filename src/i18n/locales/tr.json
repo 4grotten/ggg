@@ -297,6 +297,8 @@
     "languageChanged": "Dil {{language}} olarak değiştirildi",
     "copied": "{{label}} kopyalandı",
     "linkCopied": "Bağlantı panoya kopyalandı",
+    "pdfGenerated": "PDF dokümantasyonu indirildi",
+    "pdfError": "PDF oluşturulamadı",
     "accountDetailsCopied": "Hesap bilgileri kopyalandı",
     "cardNumberCopied": "Kart numarası kopyalandı",
     "cardDetailsCopied": "Kart bilgileri kopyalandı",

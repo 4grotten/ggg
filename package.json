@@ -57,6 +57,7 @@
     "i18next": "^25.8.0",
     "input-otp": "^1.4.2",
     "js-cookie": "^3.0.5",
+    "jspdf": "^4.0.0",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",

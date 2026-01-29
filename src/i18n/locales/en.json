@@ -309,6 +309,8 @@
     "languageChanged": "Language changed to {{language}}",
     "copied": "{{label}} copied",
     "linkCopied": "Link copied to clipboard",
+    "pdfGenerated": "PDF documentation downloaded",
+    "pdfError": "Failed to generate PDF",
     "accountDetailsCopied": "Account details copied",
     "cardNumberCopied": "Card number copied",
     "cardDetailsCopied": "Card details copied",

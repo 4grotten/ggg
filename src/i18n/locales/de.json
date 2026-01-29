@@ -297,6 +297,8 @@
     "languageChanged": "Sprache geändert zu {{language}}",
     "copied": "{{label}} kopiert",
     "linkCopied": "Link in Zwischenablage kopiert",
+    "pdfGenerated": "PDF-Dokumentation heruntergeladen",
+    "pdfError": "PDF-Generierung fehlgeschlagen",
     "accountDetailsCopied": "Kontodaten kopiert",
     "cardNumberCopied": "Kartennummer kopiert",
     "cardDetailsCopied": "Kartendaten kopiert",

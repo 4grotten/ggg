@@ -309,6 +309,8 @@
     "languageChanged": "Язык изменён на {{language}}",
     "copied": "{{label}} скопировано",
     "linkCopied": "Ссылка скопирована",
+    "pdfGenerated": "PDF документация скачана",
+    "pdfError": "Ошибка при генерации PDF",
     "accountDetailsCopied": "Реквизиты счёта скопированы",
     "cardNumberCopied": "Номер карты скопирован",
     "cardDetailsCopied": "Данные карты скопированы",

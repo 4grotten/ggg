@@ -297,6 +297,8 @@
     "languageChanged": "Idioma cambiado a {{language}}",
     "copied": "{{label}} copiado",
     "linkCopied": "Enlace copiado al portapapeles",
+    "pdfGenerated": "Documentación PDF descargada",
+    "pdfError": "Error al generar PDF",
     "accountDetailsCopied": "Datos de la cuenta copiados",
     "cardNumberCopied": "Número de tarjeta copiado",
     "cardDetailsCopied": "Datos de tarjeta copiados",
