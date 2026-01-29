@@ -983,18 +983,14 @@ const Settings = () => {
           {/* Add Account button - always visible outside collapsible */}
           <button
             onClick={() => {
-              // Save current account before adding new one
               if (user) {
                 const currentToken = localStorage.getItem('auth_token');
                 if (currentToken) {
                   saveCurrentAccount(user, currentToken);
-                  console.log('[Settings] Saved current account before adding new:', user.id, user.full_name);
                 }
               }
-              // Navigate to auth page using Vite's BASE_URL
               const baseUrl = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
               const authPath = baseUrl + '/auth/phone';
-              console.log('[Settings] Navigating to:', window.location.origin + authPath);
               window.location.href = window.location.origin + authPath;
             }}
             className="w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 hover:bg-muted/50 active:bg-muted/70"
