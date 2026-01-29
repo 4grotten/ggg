@@ -758,10 +758,6 @@
     "sendToCard": "Send to card"
   },
   "auth": {
-    "addAccount": {
-      "title": "Add Account",
-      "subtitle": "Sign in with a different phone number"
-    },
     "resetPassword": {
       "title": "Forgot password?",
       "description": "Enter your phone number to recover access",
