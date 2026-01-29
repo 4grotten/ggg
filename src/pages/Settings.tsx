@@ -465,8 +465,6 @@ const Settings = () => {
 
   return (
     <MobileLayout
-      showBackButton
-      onBack={() => navigate(-1)}
       title={t("settings.profile")}
       rightAction={
         <div className="flex items-center gap-2">
