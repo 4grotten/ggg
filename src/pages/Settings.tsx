@@ -915,9 +915,14 @@ const Settings = () => {
               onClick={() => setIsAccountsExpanded(!isAccountsExpanded)}
               className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
             >
-              <p className="text-sm text-blue-500 font-medium">
-                {t("settings.savedAccounts") || "Saved Accounts"} ({accounts.length})
-              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Users className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <span className="text-sm text-primary font-medium">
+                  {t("settings.savedAccounts") || "Saved Accounts"} ({accounts.length})
+                </span>
+              </div>
               <motion.div
                 animate={{ rotate: isAccountsExpanded ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
