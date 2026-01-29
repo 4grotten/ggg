@@ -79,9 +79,8 @@ export const DeviceLocationMap = ({ location, ip }: DeviceLocationMapProps) => {
   const displayCountryCode = geoData?.countryCode;
   const countryFlag = displayCountryCode ? getCountryFlag(displayCountryCode) : null;
   
-  // Ensure URL always has https:// prefix
-  const rawMapsUrl = geoData?.mapsUrl || `https://www.google.com/maps/@25.2048,55.2708`;
-  const mapsUrl = rawMapsUrl.startsWith('http') ? rawMapsUrl : `https://${rawMapsUrl}`;
+  // Use official Google Maps URLs API format
+  const mapsUrl = geoData?.mapsUrl || `https://www.google.com/maps/search/?api=1&query=25.2048,55.2708`;
   
   const handleOpenMaps = () => {
     window.open(mapsUrl, '_blank');
