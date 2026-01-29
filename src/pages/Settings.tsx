@@ -943,8 +943,9 @@ const Settings = () => {
                         if (!isCurrentUser) {
                           switchUser(account.user, account.token);
                           toast.success(t("settings.switchedTo", { name: account.user.full_name }));
-                          // Use window.location for deployed environments with base paths
-                          window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/' : '/');
+                          // Navigate using Vite's BASE_URL for sub-path deployments
+                          const baseUrl = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+                          window.location.href = window.location.origin + baseUrl + '/';
                         }
                       }}
                       disabled={isCurrentUser}
@@ -990,9 +991,9 @@ const Settings = () => {
                   console.log('[Settings] Saved current account before adding new:', user.id, user.full_name);
                 }
               }
-              // Navigate to auth page - use base path detection
-              const basePath = window.location.pathname.split('/').slice(0, -1).join('/') || '';
-              const authPath = basePath.includes('easycard') ? '/easycard/auth/phone' : '/auth/phone';
+              // Navigate to auth page using Vite's BASE_URL
+              const baseUrl = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+              const authPath = baseUrl + '/auth/phone';
               console.log('[Settings] Navigating to:', window.location.origin + authPath);
               window.location.href = window.location.origin + authPath;
             }}
