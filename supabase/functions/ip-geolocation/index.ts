@@ -78,8 +78,8 @@ serve(async (req) => {
       );
     }
 
-    // Create Google Maps URL with exact coordinates
-    const mapsUrl = `https://www.google.com/maps?q=${data.lat},${data.lon}&z=14`;
+    // Create Google Maps URL with exact coordinates - using @lat,lon format
+    const mapsUrl = `https://www.google.com/maps/@${data.lat},${data.lon},14z`;
 
     const result: GeolocationResult = {
       success: true,
