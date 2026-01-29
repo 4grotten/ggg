@@ -236,6 +236,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = getAuthToken();
       if (token) {
         syncWithApofiz(token, response.data);
+        // Save/update in multi-account storage
+        saveCurrentAccount(response.data);
       }
     }
   }, []);
