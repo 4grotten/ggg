@@ -199,14 +199,6 @@ const AppContent = () => {
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
 
-  // Vite provides BASE_URL for sub-path deployments (e.g. "/easycard/").
-  // React Router expects basename without trailing slash, and "" for root.
-  const routerBasename = (() => {
-    const baseUrl = import.meta.env.BASE_URL ?? "/";
-    if (baseUrl === "/") return "";
-    return baseUrl.replace(/\/$/, "");
-  })();
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -224,7 +216,7 @@ const App = () => {
           {isLoading ? (
             <SplashScreen key="splash" />
           ) : (
-            <BrowserRouter basename={routerBasename}>
+            <BrowserRouter basename={window.location.pathname.startsWith('/EasyCard') ? '/EasyCard' : ''}>
               <AuthProvider>
                 <AvatarProvider>
                   <AvatarSync />

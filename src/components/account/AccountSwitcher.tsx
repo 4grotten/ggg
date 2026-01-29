@@ -34,21 +34,24 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
     // Switch user instantly without page reload
     switchUser(account.user, account.token);
     onOpenChange(false);
-    // Navigate using Vite's BASE_URL for sub-path deployments
-    const baseUrl = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
-    window.location.href = window.location.origin + baseUrl + '/';
+    // Use window.location for full page reload to ensure all state is updated
+    // This is critical for deployed environments with base paths like /easycard
+    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/' : '/');
   };
 
   const handleAddAccount = () => {
+    // Save current account BEFORE navigating to add new one
+    // Use explicit token to ensure we capture it before any navigation/state changes
     if (user) {
       const currentToken = localStorage.getItem('auth_token');
       if (currentToken) {
         saveCurrentAccount(user, currentToken);
+        console.log('[AccountSwitcher] Saved current account before adding new:', user.id, user.full_name);
       }
     }
     onOpenChange(false);
-    const baseUrl = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
-    window.location.href = window.location.origin + baseUrl + '/auth/phone';
+    // Use window.location for deployed environments with base paths
+    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/phone' : '/auth/phone');
   };
 
   const handleRemoveAccount = (e: React.MouseEvent, userId: number) => {
