@@ -14,7 +14,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, RefreshCw } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -896,8 +896,11 @@ const Settings = () => {
             className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <ColoredIcon colorKey="users"><Users className="w-4 h-4" /></ColoredIcon>
+              <ColoredIcon colorKey="users"><RefreshCw className="w-4 h-4" /></ColoredIcon>
               <span className="text-foreground font-medium">{t("settings.switchAccount") || "Switch Account"}</span>
+              <span className="text-xs font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                {accounts.length}
+              </span>
             </div>
             <motion.div
               animate={{ rotate: isAccountsExpanded ? 180 : 0 }}
