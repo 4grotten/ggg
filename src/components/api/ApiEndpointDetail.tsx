@@ -246,13 +246,13 @@ export const ApiEndpointDetail = ({ endpoint }: ApiEndpointDetailProps) => {
       {/* Notes */}
       {endpoint.notes && endpoint.notes.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-foreground">Notes</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('api.notes.title', 'Notes')}</h3>
           <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <ul className="space-y-2">
               {endpoint.notes.map((note, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-amber-600 dark:text-amber-400">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                  {note}
+                  {t(`api.endpoints.${endpoint.id}.notes.${i}`, note)}
                 </li>
               ))}
             </ul>

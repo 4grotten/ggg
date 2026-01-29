@@ -1108,14 +1108,26 @@
       "social": "Social Networks",
       "devices": "Devices & Sessions"
     },
+    "notes": {
+      "title": "Notes"
+    },
     "endpoints": {
       "otp-send": {
         "title": "Send OTP",
-        "description": "Send a one-time password to the user's phone number via SMS or WhatsApp for verification."
+        "description": "Send a one-time password to the user's phone number via SMS or WhatsApp for verification.",
+        "notes": {
+          "0": "Default OTP type is \"whatsapp\" if not specified",
+          "1": "For Kyrgyzstan (+996) numbers, SMS is used by default",
+          "2": "OTP is valid for 5 minutes"
+        }
       },
       "otp-verify": {
         "title": "Verify OTP",
-        "description": "Verify the OTP code sent to the user's phone. Returns authentication token on success."
+        "description": "Verify the OTP code sent to the user's phone. Returns authentication token on success.",
+        "notes": {
+          "0": "For existing users, token is returned immediately",
+          "1": "For new users, is_new_user will be true and token may be null until profile is initialized"
+        }
       },
       "register-auth": {
         "title": "Register / Check Phone",
@@ -1147,7 +1159,11 @@
       },
       "forgot-password": {
         "title": "Forgot Password",
-        "description": "Request a password reset code to be sent via SMS, WhatsApp, or email."
+        "description": "Request a password reset code to be sent via SMS, WhatsApp, or email.",
+        "notes": {
+          "0": "Email method is only available if user has email configured",
+          "1": "Default method is WhatsApp, except for +996 (Kyrgyzstan) which uses SMS"
+        }
       },
       "forgot-password-email": {
         "title": "Forgot Password (Email)",
@@ -1159,7 +1175,12 @@
       },
       "init-profile": {
         "title": "Initialize / Update Profile",
-        "description": "Initialize profile for new users or update existing profile data."
+        "description": "Initialize profile for new users or update existing profile data.",
+        "notes": {
+          "0": "This endpoint is used both for initial profile setup and subsequent updates",
+          "1": "Mandatory fields: full_name, username, email, date_of_birth, gender",
+          "2": "Username must be unique across all users"
+        }
       },
       "get-user-email": {
         "title": "Get User Email",
@@ -1167,11 +1188,22 @@
       },
       "deactivate-profile": {
         "title": "Deactivate Profile",
-        "description": "Deactivate the user profile. This is NOT for device logout - it deactivates the entire account."
+        "description": "Deactivate the user profile. This is NOT for device logout - it deactivates the entire account.",
+        "notes": {
+          "0": "WARNING: This deactivates the entire user account, not just a device session",
+          "1": "Account can be reactivated by logging in again",
+          "2": "All active sessions will be terminated"
+        }
       },
       "upload-avatar": {
         "title": "Upload Avatar Image",
-        "description": "Upload an avatar image for user profile. Returns file data with multiple size variants."
+        "description": "Upload an avatar image for user profile. Returns file data with multiple size variants.",
+        "notes": {
+          "0": "Maximum file size: 5MB",
+          "1": "Supported formats: JPEG, PNG",
+          "2": "Images are automatically resized to large, medium, and small variants",
+          "3": "Use the returned \"id\" in the init_profile endpoint to set as avatar"
+        }
       },
       "get-social-networks": {
         "title": "Get Social Networks",
@@ -1179,7 +1211,12 @@
       },
       "set-social-networks": {
         "title": "Set Social Networks",
-        "description": "Set or replace all social network links for the current user."
+        "description": "Set or replace all social network links for the current user.",
+        "notes": {
+          "0": "This endpoint replaces all existing social networks",
+          "1": "Send an empty array to remove all social networks",
+          "2": "Supported platforms: Instagram, Twitter/X, LinkedIn, Facebook, Telegram, etc."
+        }
       },
       "get-active-devices": {
         "title": "Get Active Devices",

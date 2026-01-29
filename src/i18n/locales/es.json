@@ -1057,14 +1057,26 @@
       "social": "Redes Sociales",
       "devices": "Dispositivos y Sesiones"
     },
+    "notes": {
+      "title": "Notas"
+    },
     "endpoints": {
       "otp-send": {
         "title": "Enviar OTP",
-        "description": "Enviar una contraseña de un solo uso al teléfono del usuario vía SMS o WhatsApp para verificación."
+        "description": "Enviar una contraseña de un solo uso al teléfono del usuario vía SMS o WhatsApp para verificación.",
+        "notes": {
+          "0": "El tipo de OTP predeterminado es \"whatsapp\" si no se especifica",
+          "1": "Para números de Kirguistán (+996), se usa SMS por defecto",
+          "2": "El OTP es válido durante 5 minutos"
+        }
       },
       "otp-verify": {
         "title": "Verificar OTP",
-        "description": "Verificar el código OTP enviado al teléfono del usuario. Devuelve token de autenticación si tiene éxito."
+        "description": "Verificar el código OTP enviado al teléfono del usuario. Devuelve token de autenticación si tiene éxito.",
+        "notes": {
+          "0": "Para usuarios existentes, el token se devuelve inmediatamente",
+          "1": "Para nuevos usuarios, is_new_user será true y el token puede ser null hasta que se inicialice el perfil"
+        }
       },
       "register-auth": {
         "title": "Registro / Verificar Teléfono",
@@ -1096,7 +1108,11 @@
       },
       "forgot-password": {
         "title": "Olvidé mi Contraseña",
-        "description": "Solicitar código de restablecimiento de contraseña vía SMS, WhatsApp o email."
+        "description": "Solicitar código de restablecimiento de contraseña vía SMS, WhatsApp o email.",
+        "notes": {
+          "0": "El método de email solo está disponible si el usuario tiene email configurado",
+          "1": "El método predeterminado es WhatsApp, excepto para +996 (Kirguistán) que usa SMS"
+        }
       },
       "forgot-password-email": {
         "title": "Olvidé mi Contraseña (Email)",
@@ -1108,7 +1124,12 @@
       },
       "init-profile": {
         "title": "Crear / Actualizar Perfil",
-        "description": "Crear perfil para nuevos usuarios o actualizar datos de perfil existentes."
+        "description": "Crear perfil para nuevos usuarios o actualizar datos de perfil existentes.",
+        "notes": {
+          "0": "Este endpoint se usa tanto para la configuración inicial del perfil como para actualizaciones posteriores",
+          "1": "Campos obligatorios: full_name, username, email, date_of_birth, gender",
+          "2": "El nombre de usuario debe ser único entre todos los usuarios"
+        }
       },
       "get-user-email": {
         "title": "Obtener Email del Usuario",
@@ -1116,11 +1137,22 @@
       },
       "deactivate-profile": {
         "title": "Desactivar Perfil",
-        "description": "Desactivar el perfil del usuario. Esto NO es cerrar sesión en el dispositivo - desactiva toda la cuenta."
+        "description": "Desactivar el perfil del usuario. Esto NO es cerrar sesión en el dispositivo - desactiva toda la cuenta.",
+        "notes": {
+          "0": "ADVERTENCIA: Esto desactiva toda la cuenta del usuario, no solo la sesión del dispositivo",
+          "1": "La cuenta se puede reactivar iniciando sesión nuevamente",
+          "2": "Todas las sesiones activas serán terminadas"
+        }
       },
       "upload-avatar": {
         "title": "Subir Avatar",
-        "description": "Subir imagen de avatar para el perfil. Devuelve datos del archivo con variantes de diferentes tamaños."
+        "description": "Subir imagen de avatar para el perfil. Devuelve datos del archivo con variantes de diferentes tamaños.",
+        "notes": {
+          "0": "Tamaño máximo de archivo: 5MB",
+          "1": "Formatos soportados: JPEG, PNG",
+          "2": "Las imágenes se redimensionan automáticamente a variantes large, medium y small",
+          "3": "Use el \"id\" devuelto en el endpoint init_profile para establecerlo como avatar"
+        }
       },
       "get-social-networks": {
         "title": "Obtener Redes Sociales",
@@ -1128,7 +1160,12 @@
       },
       "set-social-networks": {
         "title": "Establecer Redes Sociales",
-        "description": "Establecer o reemplazar todos los enlaces de redes sociales para el usuario actual."
+        "description": "Establecer o reemplazar todos los enlaces de redes sociales para el usuario actual.",
+        "notes": {
+          "0": "Este endpoint reemplaza todas las redes sociales existentes",
+          "1": "Envíe un array vacío para eliminar todas las redes sociales",
+          "2": "Plataformas soportadas: Instagram, Twitter/X, LinkedIn, Facebook, Telegram, etc."
+        }
       },
       "get-active-devices": {
         "title": "Obtener Dispositivos Activos",

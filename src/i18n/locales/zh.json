@@ -1064,14 +1064,26 @@
       "social": "社交网络",
       "devices": "设备与会话"
     },
+    "notes": {
+      "title": "注意事项"
+    },
     "endpoints": {
       "otp-send": {
         "title": "发送OTP",
-        "description": "通过SMS或WhatsApp向用户手机发送一次性密码以进行验证。"
+        "description": "通过SMS或WhatsApp向用户手机发送一次性密码以进行验证。",
+        "notes": {
+          "0": "如未指定，默认OTP类型为\"whatsapp\"",
+          "1": "对于吉尔吉斯斯坦（+996）号码，默认使用SMS",
+          "2": "OTP有效期为5分钟"
+        }
       },
       "otp-verify": {
         "title": "验证OTP",
-        "description": "验证发送到用户手机的OTP代码。成功后返回身份验证令牌。"
+        "description": "验证发送到用户手机的OTP代码。成功后返回身份验证令牌。",
+        "notes": {
+          "0": "对于现有用户，令牌会立即返回",
+          "1": "对于新用户，is_new_user将为true，令牌可能为null直到资料初始化完成"
+        }
       },
       "register-auth": {
         "title": "注册/检查手机",
@@ -1103,7 +1115,11 @@
       },
       "forgot-password": {
         "title": "忘记密码",
-        "description": "通过SMS、WhatsApp或电子邮件请求密码重置代码。"
+        "description": "通过SMS、WhatsApp或电子邮件请求密码重置代码。",
+        "notes": {
+          "0": "电子邮件方式仅在用户配置了邮箱时可用",
+          "1": "默认方式是WhatsApp，除了使用SMS的+996（吉尔吉斯斯坦）"
+        }
       },
       "forgot-password-email": {
         "title": "忘记密码（邮箱）",
@@ -1115,7 +1131,12 @@
       },
       "init-profile": {
         "title": "创建/更新资料",
-        "description": "为新用户创建资料或更新现有资料数据。"
+        "description": "为新用户创建资料或更新现有资料数据。",
+        "notes": {
+          "0": "此端点用于初始资料设置和后续更新",
+          "1": "必填字段：full_name, username, email, date_of_birth, gender",
+          "2": "用户名在所有用户中必须是唯一的"
+        }
       },
       "get-user-email": {
         "title": "获取用户邮箱",
@@ -1123,11 +1144,22 @@
       },
       "deactivate-profile": {
         "title": "停用资料",
-        "description": "停用用户资料。这不是设备登出——它会停用整个账户。"
+        "description": "停用用户资料。这不是设备登出——它会停用整个账户。",
+        "notes": {
+          "0": "警告：这会停用整个用户账户，而不仅仅是设备会话",
+          "1": "账户可以通过重新登录来重新激活",
+          "2": "所有活跃会话将被终止"
+        }
       },
       "upload-avatar": {
         "title": "上传头像",
-        "description": "上传个人资料头像图片。返回包含多种尺寸变体的文件数据。"
+        "description": "上传个人资料头像图片。返回包含多种尺寸变体的文件数据。",
+        "notes": {
+          "0": "最大文件大小：5MB",
+          "1": "支持的格式：JPEG, PNG",
+          "2": "图片会自动调整为large、medium和small变体",
+          "3": "使用返回的\"id\"在init_profile端点中设置为头像"
+        }
       },
       "get-social-networks": {
         "title": "获取社交网络",
@@ -1135,7 +1167,12 @@
       },
       "set-social-networks": {
         "title": "设置社交网络",
-        "description": "为当前用户设置或替换所有社交网络链接。"
+        "description": "为当前用户设置或替换所有社交网络链接。",
+        "notes": {
+          "0": "此端点会替换所有现有的社交网络",
+          "1": "发送空数组以删除所有社交网络",
+          "2": "支持的平台：Instagram, Twitter/X, LinkedIn, Facebook, Telegram等"
+        }
       },
       "get-active-devices": {
         "title": "获取活跃设备",

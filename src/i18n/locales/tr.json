@@ -1057,14 +1057,26 @@
       "social": "Sosyal Ağlar",
       "devices": "Cihazlar ve Oturumlar"
     },
+    "notes": {
+      "title": "Notlar"
+    },
     "endpoints": {
       "otp-send": {
         "title": "OTP Gönder",
-        "description": "Doğrulama için SMS veya WhatsApp aracılığıyla kullanıcının telefonuna tek kullanımlık şifre gönderin."
+        "description": "Doğrulama için SMS veya WhatsApp aracılığıyla kullanıcının telefonuna tek kullanımlık şifre gönderin.",
+        "notes": {
+          "0": "Belirtilmezse varsayılan OTP türü \"whatsapp\"tır",
+          "1": "Kırgızistan (+996) numaraları için varsayılan olarak SMS kullanılır",
+          "2": "OTP 5 dakika geçerlidir"
+        }
       },
       "otp-verify": {
         "title": "OTP Doğrula",
-        "description": "Kullanıcının telefonuna gönderilen OTP kodunu doğrulayın. Başarılı olursa kimlik doğrulama tokeni döndürür."
+        "description": "Kullanıcının telefonuna gönderilen OTP kodunu doğrulayın. Başarılı olursa kimlik doğrulama tokeni döndürür.",
+        "notes": {
+          "0": "Mevcut kullanıcılar için token hemen döndürülür",
+          "1": "Yeni kullanıcılar için is_new_user true olacak ve profil başlatılana kadar token null olabilir"
+        }
       },
       "register-auth": {
         "title": "Kayıt / Telefon Kontrolü",
@@ -1096,7 +1108,11 @@
       },
       "forgot-password": {
         "title": "Şifremi Unuttum",
-        "description": "SMS, WhatsApp veya e-posta ile şifre sıfırlama kodu isteyin."
+        "description": "SMS, WhatsApp veya e-posta ile şifre sıfırlama kodu isteyin.",
+        "notes": {
+          "0": "E-posta yöntemi yalnızca kullanıcının e-postası yapılandırılmışsa kullanılabilir",
+          "1": "Varsayılan yöntem WhatsApp'tır, SMS kullanan +996 (Kırgızistan) hariç"
+        }
       },
       "forgot-password-email": {
         "title": "Şifremi Unuttum (E-posta)",
@@ -1108,7 +1124,12 @@
       },
       "init-profile": {
         "title": "Profil Oluştur / Güncelle",
-        "description": "Yeni kullanıcılar için profil oluşturun veya mevcut profil verilerini güncelleyin."
+        "description": "Yeni kullanıcılar için profil oluşturun veya mevcut profil verilerini güncelleyin.",
+        "notes": {
+          "0": "Bu endpoint hem ilk profil kurulumu hem de sonraki güncellemeler için kullanılır",
+          "1": "Zorunlu alanlar: full_name, username, email, date_of_birth, gender",
+          "2": "Kullanıcı adı tüm kullanıcılar arasında benzersiz olmalıdır"
+        }
       },
       "get-user-email": {
         "title": "Kullanıcı E-postasını Al",
@@ -1116,11 +1137,22 @@
       },
       "deactivate-profile": {
         "title": "Profili Devre Dışı Bırak",
-        "description": "Kullanıcı profilini devre dışı bırakın. Bu cihaz çıkışı DEĞİLDİR - tüm hesabı devre dışı bırakır."
+        "description": "Kullanıcı profilini devre dışı bırakın. Bu cihaz çıkışı DEĞİLDİR - tüm hesabı devre dışı bırakır.",
+        "notes": {
+          "0": "UYARI: Bu sadece bir cihaz oturumunu değil, tüm kullanıcı hesabını devre dışı bırakır",
+          "1": "Hesap, tekrar giriş yaparak yeniden etkinleştirilebilir",
+          "2": "Tüm aktif oturumlar sonlandırılacaktır"
+        }
       },
       "upload-avatar": {
         "title": "Avatar Yükle",
-        "description": "Profil için avatar resmi yükleyin. Farklı boyut varyantlarıyla dosya verileri döndürür."
+        "description": "Profil için avatar resmi yükleyin. Farklı boyut varyantlarıyla dosya verileri döndürür.",
+        "notes": {
+          "0": "Maksimum dosya boyutu: 5MB",
+          "1": "Desteklenen formatlar: JPEG, PNG",
+          "2": "Resimler otomatik olarak large, medium ve small varyantlarına yeniden boyutlandırılır",
+          "3": "Avatar olarak ayarlamak için init_profile endpoint'inde döndürülen \"id\"yi kullanın"
+        }
       },
       "get-social-networks": {
         "title": "Sosyal Ağları Al",
@@ -1128,7 +1160,12 @@
       },
       "set-social-networks": {
         "title": "Sosyal Ağları Ayarla",
-        "description": "Mevcut kullanıcı için tüm sosyal ağ bağlantılarını ayarlayın veya değiştirin."
+        "description": "Mevcut kullanıcı için tüm sosyal ağ bağlantılarını ayarlayın veya değiştirin.",
+        "notes": {
+          "0": "Bu endpoint mevcut tüm sosyal ağları değiştirir",
+          "1": "Tüm sosyal ağları kaldırmak için boş bir dizi gönderin",
+          "2": "Desteklenen platformlar: Instagram, Twitter/X, LinkedIn, Facebook, Telegram vb."
+        }
       },
       "get-active-devices": {
         "title": "Aktif Cihazları Al",
