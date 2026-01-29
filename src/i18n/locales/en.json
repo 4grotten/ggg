@@ -410,7 +410,7 @@
       "days": "{{count}}d",
       "expirationChanged": "Session expiration updated",
       "expirationError": "Failed to update expiration",
-      "openMaps": "Open in Maps"
+      "openMaps": "Google Maps"
     }
   },
   "editProfile": {

@@ -397,7 +397,7 @@
       "days": "{{count}} يوم",
       "expirationChanged": "تم تحديث انتهاء الجلسة",
       "expirationError": "فشل في تحديث الانتهاء",
-      "openMaps": "فتح في الخرائط"
+      "openMaps": "Google Maps"
     }
   },
   "card": {
