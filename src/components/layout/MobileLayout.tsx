@@ -50,7 +50,7 @@ export const MobileLayout = ({
                         d="M15 19l-7-7 7-7"
                       />
                     </svg>
-                    <span className="text-sm">{t('common.back')}</span>
+                    <span className="text-sm hidden sm:inline">{t('common.back')}</span>
                   </button>
                 )}
                 {header && !showBackButton && <div>{header}</div>}
