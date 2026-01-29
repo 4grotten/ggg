@@ -281,6 +281,8 @@ const Settings = () => {
   const [showFlash, setShowFlash] = useState(false);
   const [isAccountsExpanded, setIsAccountsExpanded] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
+  const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
@@ -660,7 +662,14 @@ const Settings = () => {
           return (
             <AnimatedMenuSection index={0}>
               <button
-                onClick={() => navigate("/settings/edit-profile")}
+                onClick={() => {
+                  // If profile is complete, ask for confirmation
+                  if (unfilledFieldsCount === 0) {
+                    setIsEditProfileDialogOpen(true);
+                  } else {
+                    navigate("/settings/edit-profile");
+                  }
+                }}
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -719,7 +728,14 @@ const Settings = () => {
           return (
             <AnimatedMenuSection index={1}>
               <button
-                onClick={() => navigate("/profile-verification")}
+                onClick={() => {
+                  // If verified, ask for confirmation
+                  if (isVerified) {
+                    setIsVerificationDialogOpen(true);
+                  } else {
+                    navigate("/profile-verification");
+                  }
+                }}
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -1125,6 +1141,74 @@ const Settings = () => {
           onCropComplete={handleCropComplete}
         />
       )}
+
+      {/* Edit Profile Confirmation Dialog */}
+      <AlertDialog open={isEditProfileDialogOpen} onOpenChange={setIsEditProfileDialogOpen}>
+        <AlertDialogContent 
+          className="w-[300px] rounded-2xl p-0 gap-0 border-0 overflow-hidden"
+          style={{ backgroundColor: 'rgba(30, 30, 30, 0.95)', backdropFilter: 'blur(40px)' }}
+        >
+          <AlertDialogHeader className="pt-6 px-5 pb-4 text-center">
+            <AlertDialogTitle className="text-[17px] font-semibold text-white">
+              {t('settings.updateDataConfirmTitle') || 'Update Profile Data'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] text-zinc-400 mt-1">
+              {t('settings.updateDataConfirmDescription') || 'Are you sure you want to update your profile data?'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col p-0 border-t border-zinc-700/50">
+            <AlertDialogCancel 
+              onClick={() => setIsEditProfileDialogOpen(false)}
+              className="m-0 h-11 rounded-none border-0 bg-transparent text-[17px] font-normal text-blue-400 hover:bg-zinc-800/50"
+            >
+              {t('common.cancel') || 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setIsEditProfileDialogOpen(false);
+                navigate("/settings/edit-profile");
+              }}
+              className="m-0 h-11 rounded-none border-t border-zinc-700/50 bg-transparent text-[17px] font-semibold text-blue-400 hover:bg-zinc-800/50"
+            >
+              {t('common.continue') || 'Continue'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Verification Confirmation Dialog */}
+      <AlertDialog open={isVerificationDialogOpen} onOpenChange={setIsVerificationDialogOpen}>
+        <AlertDialogContent 
+          className="w-[300px] rounded-2xl p-0 gap-0 border-0 overflow-hidden"
+          style={{ backgroundColor: 'rgba(30, 30, 30, 0.95)', backdropFilter: 'blur(40px)' }}
+        >
+          <AlertDialogHeader className="pt-6 px-5 pb-4 text-center">
+            <AlertDialogTitle className="text-[17px] font-semibold text-white">
+              {t('settings.updateDataConfirmTitle') || 'Update Verification Data'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] text-zinc-400 mt-1">
+              {t('settings.updateVerificationConfirmDescription') || 'Are you sure you want to update your verification data? This may reset your verification status.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col p-0 border-t border-zinc-700/50">
+            <AlertDialogCancel 
+              onClick={() => setIsVerificationDialogOpen(false)}
+              className="m-0 h-11 rounded-none border-0 bg-transparent text-[17px] font-normal text-blue-400 hover:bg-zinc-800/50"
+            >
+              {t('common.cancel') || 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setIsVerificationDialogOpen(false);
+                navigate("/profile-verification");
+              }}
+              className="m-0 h-11 rounded-none border-t border-zinc-700/50 bg-transparent text-[17px] font-semibold text-blue-400 hover:bg-zinc-800/50"
+            >
+              {t('common.continue') || 'Continue'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MobileLayout>
   );
 };
