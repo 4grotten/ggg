@@ -1048,6 +1048,104 @@
       "burst": "Anlık limit",
       "minute": "dakika"
     },
-    "fullDocumentation": "Tam Dokümantasyon"
+    "fullDocumentation": "Tam Dokümantasyon",
+    "categories": {
+      "authentication": "Kimlik Doğrulama",
+      "password": "Şifre Yönetimi",
+      "profile": "Kullanıcı Profili",
+      "files": "Dosya Yüklemeleri",
+      "social": "Sosyal Ağlar",
+      "devices": "Cihazlar ve Oturumlar"
+    },
+    "endpoints": {
+      "otp-send": {
+        "title": "OTP Gönder",
+        "description": "Doğrulama için SMS veya WhatsApp aracılığıyla kullanıcının telefonuna tek kullanımlık şifre gönderin."
+      },
+      "otp-verify": {
+        "title": "OTP Doğrula",
+        "description": "Kullanıcının telefonuna gönderilen OTP kodunu doğrulayın. Başarılı olursa kimlik doğrulama tokeni döndürür."
+      },
+      "register-auth": {
+        "title": "Kayıt / Telefon Kontrolü",
+        "description": "Telefon numarasının kayıtlı olup olmadığını kontrol edin ve değilse kayıt sürecini başlatın."
+      },
+      "verify-code": {
+        "title": "SMS Kodunu Doğrula",
+        "description": "Kayıt sırasında gönderilen SMS kodunu doğrulayın."
+      },
+      "resend-code": {
+        "title": "Kodu Yeniden Gönder",
+        "description": "Doğrulama kodunu kullanıcının telefonuna yeniden gönderin."
+      },
+      "login": {
+        "title": "Şifre ile Giriş",
+        "description": "Telefon numarası ve şifre ile kullanıcı kimlik doğrulaması."
+      },
+      "logout": {
+        "title": "Çıkış",
+        "description": "Mevcut kimlik doğrulama tokenini geçersiz kılın ve oturumu sonlandırın."
+      },
+      "set-password": {
+        "title": "Şifre Belirle",
+        "description": "Kayıttan sonra yeni kullanıcı için şifre belirleyin."
+      },
+      "change-password": {
+        "title": "Şifre Değiştir",
+        "description": "Kimliği doğrulanmış kullanıcı için şifre değiştirin."
+      },
+      "forgot-password": {
+        "title": "Şifremi Unuttum",
+        "description": "SMS, WhatsApp veya e-posta ile şifre sıfırlama kodu isteyin."
+      },
+      "forgot-password-email": {
+        "title": "Şifremi Unuttum (E-posta)",
+        "description": "Kullanıcının kayıtlı e-postasına şifre sıfırlama kodu isteyin."
+      },
+      "get-current-user": {
+        "title": "Mevcut Kullanıcıyı Al",
+        "description": "Mevcut kimliği doğrulanmış kullanıcının profilini alın."
+      },
+      "init-profile": {
+        "title": "Profil Oluştur / Güncelle",
+        "description": "Yeni kullanıcılar için profil oluşturun veya mevcut profil verilerini güncelleyin."
+      },
+      "get-user-email": {
+        "title": "Kullanıcı E-postasını Al",
+        "description": "Mevcut kullanıcıyla ilişkili e-posta adresini alın."
+      },
+      "deactivate-profile": {
+        "title": "Profili Devre Dışı Bırak",
+        "description": "Kullanıcı profilini devre dışı bırakın. Bu cihaz çıkışı DEĞİLDİR - tüm hesabı devre dışı bırakır."
+      },
+      "upload-avatar": {
+        "title": "Avatar Yükle",
+        "description": "Profil için avatar resmi yükleyin. Farklı boyut varyantlarıyla dosya verileri döndürür."
+      },
+      "get-social-networks": {
+        "title": "Sosyal Ağları Al",
+        "description": "Belirli bir kullanıcı için sosyal ağ bağlantılarını alın."
+      },
+      "set-social-networks": {
+        "title": "Sosyal Ağları Ayarla",
+        "description": "Mevcut kullanıcı için tüm sosyal ağ bağlantılarını ayarlayın veya değiştirin."
+      },
+      "get-active-devices": {
+        "title": "Aktif Cihazları Al",
+        "description": "Mevcut kullanıcının tüm aktif cihazlarının/oturumlarının sayfalanmış listesini alın."
+      },
+      "get-authorization-history": {
+        "title": "Yetkilendirme Geçmişi",
+        "description": "Tüm giriş denemelerinin ve oturum geçmişinin sayfalanmış listesini alın."
+      },
+      "get-device-detail": {
+        "title": "Cihaz Detayları",
+        "description": "Belirli bir cihaz/oturum hakkında ayrıntılı bilgi alın."
+      },
+      "change-token-expiration": {
+        "title": "Token Süresini Değiştir",
+        "description": "Belirli bir cihaz/oturum tokeni için süre sonunu değiştirin."
+      }
+    }
   }
 }

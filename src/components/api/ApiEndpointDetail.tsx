@@ -131,8 +131,8 @@ export const ApiEndpointDetail = ({ endpoint }: ApiEndpointDetailProps) => {
           <code className="text-lg font-mono text-foreground">{endpoint.path}</code>
         </div>
         
-        <h1 className="text-2xl font-bold text-foreground">{endpoint.title}</h1>
-        <p className="text-muted-foreground">{endpoint.description}</p>
+        <h1 className="text-2xl font-bold text-foreground">{t(`api.endpoints.${endpoint.id}.title`, endpoint.title)}</h1>
+        <p className="text-muted-foreground">{t(`api.endpoints.${endpoint.id}.description`, endpoint.description)}</p>
         
         {/* Try it button */}
         <button

@@ -1055,6 +1055,104 @@
       "burst": "突发限制",
       "minute": "分钟"
     },
-    "fullDocumentation": "完整文档"
+    "fullDocumentation": "完整文档",
+    "categories": {
+      "authentication": "身份验证",
+      "password": "密码管理",
+      "profile": "用户资料",
+      "files": "文件上传",
+      "social": "社交网络",
+      "devices": "设备与会话"
+    },
+    "endpoints": {
+      "otp-send": {
+        "title": "发送OTP",
+        "description": "通过SMS或WhatsApp向用户手机发送一次性密码以进行验证。"
+      },
+      "otp-verify": {
+        "title": "验证OTP",
+        "description": "验证发送到用户手机的OTP代码。成功后返回身份验证令牌。"
+      },
+      "register-auth": {
+        "title": "注册/检查手机",
+        "description": "检查手机号码是否已注册，如果没有则启动注册流程。"
+      },
+      "verify-code": {
+        "title": "验证短信代码",
+        "description": "验证注册时发送的短信代码。"
+      },
+      "resend-code": {
+        "title": "重新发送代码",
+        "description": "将验证码重新发送到用户的手机号码。"
+      },
+      "login": {
+        "title": "密码登录",
+        "description": "使用手机号码和密码进行用户身份验证。"
+      },
+      "logout": {
+        "title": "登出",
+        "description": "使当前身份验证令牌无效并结束会话。"
+      },
+      "set-password": {
+        "title": "设置密码",
+        "description": "为注册后的新用户设置密码。"
+      },
+      "change-password": {
+        "title": "更改密码",
+        "description": "为已验证用户更改密码。"
+      },
+      "forgot-password": {
+        "title": "忘记密码",
+        "description": "通过SMS、WhatsApp或电子邮件请求密码重置代码。"
+      },
+      "forgot-password-email": {
+        "title": "忘记密码（邮箱）",
+        "description": "请求将密码重置代码发送到用户的注册邮箱。"
+      },
+      "get-current-user": {
+        "title": "获取当前用户",
+        "description": "获取当前已验证用户的资料。"
+      },
+      "init-profile": {
+        "title": "创建/更新资料",
+        "description": "为新用户创建资料或更新现有资料数据。"
+      },
+      "get-user-email": {
+        "title": "获取用户邮箱",
+        "description": "获取与当前用户关联的电子邮件地址。"
+      },
+      "deactivate-profile": {
+        "title": "停用资料",
+        "description": "停用用户资料。这不是设备登出——它会停用整个账户。"
+      },
+      "upload-avatar": {
+        "title": "上传头像",
+        "description": "上传个人资料头像图片。返回包含多种尺寸变体的文件数据。"
+      },
+      "get-social-networks": {
+        "title": "获取社交网络",
+        "description": "获取特定用户的社交网络链接。"
+      },
+      "set-social-networks": {
+        "title": "设置社交网络",
+        "description": "为当前用户设置或替换所有社交网络链接。"
+      },
+      "get-active-devices": {
+        "title": "获取活跃设备",
+        "description": "获取当前用户所有活跃设备/会话的分页列表。"
+      },
+      "get-authorization-history": {
+        "title": "授权历史",
+        "description": "获取所有登录尝试和会话历史的分页列表。"
+      },
+      "get-device-detail": {
+        "title": "设备详情",
+        "description": "获取特定设备/会话的详细信息。"
+      },
+      "change-token-expiration": {
+        "title": "更改令牌过期时间",
+        "description": "更改特定设备/会话令牌的过期时间。"
+      }
+    }
   }
 }
