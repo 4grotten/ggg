@@ -279,7 +279,17 @@ const Settings = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [showFlash, setShowFlash] = useState(false);
-  const [isAccountsExpanded, setIsAccountsExpanded] = useState(true);
+  const [isAccountsExpanded, setIsAccountsExpanded] = useState(() => {
+    const saved = localStorage.getItem('settings_accounts_expanded');
+    return saved === 'true';
+  });
+  
+  // Persist accounts expanded state
+  const toggleAccountsExpanded = () => {
+    const newValue = !isAccountsExpanded;
+    setIsAccountsExpanded(newValue);
+    localStorage.setItem('settings_accounts_expanded', String(newValue));
+  };
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
@@ -892,7 +902,7 @@ const Settings = () => {
         {/* Switch Account - Collapsible section with accounts list */}
         <AnimatedMenuSection index={9}>
           <button
-            onClick={() => setIsAccountsExpanded(!isAccountsExpanded)}
+            onClick={toggleAccountsExpanded}
             className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
           >
             <div className="flex items-center gap-3">
