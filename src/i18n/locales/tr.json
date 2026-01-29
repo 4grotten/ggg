@@ -346,6 +346,8 @@
     "apply": "Uygula",
     "logout": "Çıkış Yap",
     "logoutSuccess": "Başarıyla çıkış yapıldı",
+    "logoutConfirmTitle": "Hesaptan çıkış yapılsın mı?",
+    "logoutConfirmDescription": "Çıkış yapmak istediğinizden emin misiniz?",
     "apofizNetwork": "Apofiz Ticaret ve Sosyal Ağ",
     "guest": "Misafir",
     "loginToAccess": "Tüm özelliklere erişmek için giriş yapın",
