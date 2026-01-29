@@ -35,7 +35,7 @@ const ApiDocumentation = () => {
   return (
     <MobileLayout
       header={
-        <div className="flex items-center justify-between w-full px-4 py-3">
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/settings")}
@@ -46,7 +46,7 @@ const ApiDocumentation = () => {
             <h1 className="text-lg font-semibold">{t("settings.apiDocumentation")}</h1>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {/* Language switcher */}
             <LanguageSwitcher />
             
