@@ -919,7 +919,7 @@ const Settings = () => {
                 <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0">
                   <ArrowLeftRight className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-sm text-primary font-medium">
+                <span className="text-sm font-medium text-foreground">
                   {t("settings.switchAccount") || "Switch Account"} ({accounts.length})
                 </span>
               </div>
