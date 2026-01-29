@@ -37,7 +37,7 @@ const iconColors: Record<string, { bg: string; text: string }> = {
   download: { bg: 'bg-orange-500', text: 'text-white' },
   laptop: { bg: 'bg-sky-500', text: 'text-white' },
   apofiz: { bg: 'bg-black dark:bg-zinc-800', text: 'text-white' },
-  userplus: { bg: 'bg-rose-500', text: 'text-white' },
+  userplus: { bg: 'bg-blue-500', text: 'text-white' },
 };
 
 interface ColoredIconProps {
