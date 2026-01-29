@@ -987,9 +987,7 @@ const Settings = () => {
                       }
                     }
                     // Use window.location for deployed environments with base paths
-                    // Add ?addAccount=true to skip auto-biometric login
-                    const basePath = window.location.pathname.includes('/easycard') ? '/easycard' : '';
-                    window.location.href = window.location.origin + basePath + '/auth/phone?addAccount=true';
+                    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/phone' : '/auth/phone');
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 hover:bg-muted/50 active:bg-muted/70"
                 >
