@@ -346,6 +346,8 @@
     "apply": "Anwenden",
     "logout": "Abmelden",
     "logoutSuccess": "Erfolgreich abgemeldet",
+    "logoutConfirmTitle": "Vom Konto abmelden?",
+    "logoutConfirmDescription": "Möchten Sie sich wirklich abmelden?",
     "apofizNetwork": "Apofiz Handels- & Soziales Netzwerk",
     "guest": "Gast",
     "loginToAccess": "Melden Sie sich an, um alle Funktionen zu nutzen",

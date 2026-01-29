@@ -358,6 +358,8 @@
     "apply": "Apply",
     "logout": "Log Out",
     "logoutSuccess": "Successfully logged out",
+    "logoutConfirmTitle": "Log out of account?",
+    "logoutConfirmDescription": "Are you sure you want to log out?",
     "apofizNetwork": "Apofiz Trade & Social Network",
     "guest": "Guest",
     "loginToAccess": "Sign in to access all features",

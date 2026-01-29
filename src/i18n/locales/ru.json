@@ -358,6 +358,8 @@
     "apply": "Применить",
     "logout": "Выйти",
     "logoutSuccess": "Вы вышли из аккаунта",
+    "logoutConfirmTitle": "Выйти из аккаунта?",
+    "logoutConfirmDescription": "Вы уверены, что хотите выйти из аккаунта?",
     "apofizNetwork": "Торгово-социальная сеть Apofiz",
     "guest": "Гость",
     "loginToAccess": "Войдите, чтобы получить доступ ко всем функциям",

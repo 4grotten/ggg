@@ -346,6 +346,8 @@
     "apply": "Aplicar",
     "logout": "Cerrar sesión",
     "logoutSuccess": "Sesión cerrada correctamente",
+    "logoutConfirmTitle": "¿Cerrar sesión?",
+    "logoutConfirmDescription": "¿Estás seguro de que quieres cerrar sesión?",
     "apofizNetwork": "Red Comercial y Social Apofiz",
     "guest": "Invitado",
     "loginToAccess": "Inicia sesión para acceder a todas las funciones",

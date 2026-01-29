@@ -472,7 +472,7 @@ const Settings = () => {
           <LanguageSwitcher />
           {isAuthenticated && (
             <button
-              onClick={handleLogout}
+              onClick={() => setIsLogoutDialogOpen(true)}
               disabled={isLoggingOut}
               className="flex items-center justify-center w-9 h-9 rounded-full bg-red-500/10 hover:bg-red-500/20 dark:bg-red-500/20 dark:hover:bg-red-500/30 transition-colors disabled:opacity-50"
               aria-label="Logout"
