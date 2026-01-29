@@ -40,16 +40,13 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
   };
 
   const handleAddAccount = () => {
-    // Save current account BEFORE navigating to add new one
     if (user) {
       const currentToken = localStorage.getItem('auth_token');
       if (currentToken) {
         saveCurrentAccount(user, currentToken);
-        console.log('[AccountSwitcher] Saved current account before adding new:', user.id, user.full_name);
       }
     }
     onOpenChange(false);
-    // Navigate using Vite's BASE_URL for sub-path deployments
     const baseUrl = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
     window.location.href = window.location.origin + baseUrl + '/auth/phone';
   };
