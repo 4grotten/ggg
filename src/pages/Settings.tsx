@@ -22,6 +22,38 @@ import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/
 import { LEVELS } from "@/components/partner/LevelCarousel";
 import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 
+// Telegram-style colored icon backgrounds
+const iconColors: Record<string, { bg: string; text: string }> = {
+  user: { bg: 'bg-blue-500', text: 'text-white' },
+  briefcase: { bg: 'bg-orange-500', text: 'text-white' },
+  users: { bg: 'bg-violet-500', text: 'text-white' },
+  sliders: { bg: 'bg-indigo-500', text: 'text-white' },
+  globe: { bg: 'bg-purple-500', text: 'text-white' },
+  palette: { bg: 'bg-pink-500', text: 'text-white' },
+  receipt: { bg: 'bg-green-500', text: 'text-white' },
+  code: { bg: 'bg-cyan-500', text: 'text-white' },
+  privacy: { bg: 'bg-gray-500', text: 'text-white' },
+  message: { bg: 'bg-sky-500', text: 'text-white' },
+  smartphone: { bg: 'bg-emerald-500', text: 'text-white' },
+  laptop: { bg: 'bg-teal-500', text: 'text-white' },
+  apofiz: { bg: 'bg-amber-500', text: 'text-white' },
+  userplus: { bg: 'bg-rose-500', text: 'text-white' },
+};
+
+interface ColoredIconProps {
+  children: React.ReactNode;
+  colorKey: keyof typeof iconColors;
+}
+
+const ColoredIcon = ({ children, colorKey }: ColoredIconProps) => {
+  const colors = iconColors[colorKey] || iconColors.user;
+  return (
+    <div className={`w-8 h-8 rounded-lg ${colors.bg} ${colors.text} flex items-center justify-center`}>
+      {children}
+    </div>
+  );
+};
+
 interface SettingsItemProps {
   icon: React.ReactNode;
   label: string;
@@ -37,7 +69,7 @@ const SettingsItem = ({ icon, label, value, valueIcon, valueClassName, onClick }
     className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
   >
     <div className="flex items-center gap-3">
-      <span className="text-foreground">{icon}</span>
+      {icon}
       <span className="text-foreground font-medium">{label}</span>
     </div>
     <div className="flex items-center gap-2">
@@ -602,7 +634,7 @@ const Settings = () => {
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-foreground"><User className="w-5 h-5" /></span>
+                  <ColoredIcon colorKey="user"><User className="w-4 h-4" /></ColoredIcon>
                   <span className="text-foreground font-medium">{t("settings.editProfile") || "Edit Profile"}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -661,7 +693,7 @@ const Settings = () => {
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-foreground"><Briefcase className="w-5 h-5" /></span>
+                  <ColoredIcon colorKey="briefcase"><Briefcase className="w-4 h-4" /></ColoredIcon>
                   <span className="text-foreground font-medium">{t("settings.personalDetails")}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -715,7 +747,7 @@ const Settings = () => {
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-foreground"><Users className="w-5 h-5" /></span>
+                  <ColoredIcon colorKey="users"><Users className="w-4 h-4" /></ColoredIcon>
                   <span className="text-foreground font-medium">{t("settings.referralPartner") || "Referral Partner"}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -731,7 +763,7 @@ const Settings = () => {
         {/* Limits Settings */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
-            icon={<SlidersHorizontal className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="sliders"><SlidersHorizontal className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.limitsSettings") || "Limits Settings"}
             onClick={() => navigate("/limits-settings")}
           />
@@ -742,14 +774,14 @@ const Settings = () => {
         {/* Language & Appearance */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
-            icon={<Globe className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="globe"><Globe className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.language")}
             valueIcon={<span className="text-lg">{currentLanguage?.flag}</span>}
             value={currentLanguage?.name}
             onClick={() => setIsLanguageOpen(true)}
           />
           <SettingsItem
-            icon={<Palette className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="palette"><Palette className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.appearance")}
             valueIcon={currentTheme.icon && (
               <div className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-secondary flex items-center justify-center">
@@ -766,12 +798,12 @@ const Settings = () => {
         {/* Limits and Fees */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
-            icon={<Receipt className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="receipt"><Receipt className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.limitsAndFees")}
             onClick={() => navigate("/fees-and-limits")}
           />
           <SettingsItem
-            icon={<Code className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="code"><Code className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.apiDocumentation")}
             onClick={() => navigate("/settings/api")}
           />
@@ -780,17 +812,17 @@ const Settings = () => {
         {/* Support & Legal */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
-            icon={<Briefcase className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="privacy"><Briefcase className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.privacyPolicy")}
           />
           <SettingsItem
-            icon={<MessageCircle className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="message"><MessageCircle className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.askQuestion")}
             onClick={() => navigate("/chat")}
           />
           {!isInstalled && (
             <SettingsItem
-              icon={<Smartphone className="w-5 h-5" />}
+              icon={<ColoredIcon colorKey="smartphone"><Smartphone className="w-4 h-4" /></ColoredIcon>}
               label={t("settings.installApp")}
               onClick={handleInstallClick}
             />
@@ -801,7 +833,7 @@ const Settings = () => {
         {isAuthenticated && (
           <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
             <SettingsItem
-              icon={<Laptop className="w-5 h-5" />}
+              icon={<ColoredIcon colorKey="laptop"><Laptop className="w-4 h-4" /></ColoredIcon>}
               label={t("settings.devices.title")}
               onClick={() => navigate("/settings/devices")}
             />
@@ -811,7 +843,7 @@ const Settings = () => {
         {/* Apofiz Social Network */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
-            icon={<ApofizLogo className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="apofiz"><ApofizLogo className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.apofizNetwork")}
             onClick={openApofizWithAuth}
           />
@@ -822,7 +854,7 @@ const Settings = () => {
         {/* Add Account Button */}
         <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
           <SettingsItem
-            icon={<UserPlus className="w-5 h-5" />}
+            icon={<ColoredIcon colorKey="userplus"><UserPlus className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.addAccount") || "Add Account"}
             onClick={() => {
               // Save current account before adding new one
