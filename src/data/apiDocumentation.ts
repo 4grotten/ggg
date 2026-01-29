@@ -645,6 +645,37 @@ export const apiCategories: ApiCategory[] = [
         responseParams: [
           { name: 'email', type: 'string', required: false, description: 'User\'s email address (null if not set)' }
         ]
+      },
+      {
+        id: 'deactivate-profile',
+        method: 'POST',
+        path: '/users/deactivate/',
+        title: 'Deactivate Profile',
+        description: 'Deactivate the user profile. This is NOT for device logout - it deactivates the entire account.',
+        category: 'profile',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/users/deactivate/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "success": true
+}`
+        },
+        responseParams: [
+          { name: 'success', type: 'boolean', required: true, description: 'Whether the deactivation was successful' }
+        ],
+        notes: [
+          'WARNING: This deactivates the entire user account, not just a device session',
+          'Account can be reactivated by logging in again',
+          'All active sessions will be terminated'
+        ]
       }
     ]
   },
@@ -1042,37 +1073,6 @@ export const apiCategories: ApiCategory[] = [
           'Users can only modify their own device sessions',
           'The current device token cannot be terminated',
           'Available options: 7, 30, 90, or 180 days'
-        ]
-      },
-      {
-        id: 'deactivate-profile',
-        method: 'POST',
-        path: '/users/deactivate/',
-        title: 'Deactivate Profile',
-        description: 'Deactivate the user profile. This is NOT for device logout - it deactivates the entire account.',
-        category: 'devices',
-        authorization: {
-          type: 'Token',
-          description: 'Token authentication header of the form `Token <token>`'
-        },
-        requestExample: {
-          curl: `curl --request POST \\
-  --url ${API_BASE_URL}/users/deactivate/ \\
-  --header 'Authorization: Token abc123xyz789token'`
-        },
-        responseExample: {
-          status: 200,
-          json: `{
-  "success": true
-}`
-        },
-        responseParams: [
-          { name: 'success', type: 'boolean', required: true, description: 'Whether the deactivation was successful' }
-        ],
-        notes: [
-          'WARNING: This deactivates the entire user account, not just a device session',
-          'Account can be reactivated by logging in again',
-          'All active sessions will be terminated'
         ]
       }
     ]
