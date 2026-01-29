@@ -13,7 +13,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 const AnimatedBurger = ({ isOpen, onClick }: { isOpen: boolean; onClick: () => void }) => (
   <button
     onClick={onClick}
-    className="flex items-center justify-center w-9 h-8 rounded-full bg-secondary hover:bg-muted transition-colors md:hidden"
+    className="flex items-center justify-center w-9 h-9 rounded-full bg-secondary hover:bg-muted transition-colors md:hidden"
     aria-label="Toggle menu"
   >
     <div className="w-4 h-3 relative flex flex-col justify-between">
@@ -126,7 +126,7 @@ const ApiDocumentation = () => {
       onBack={() => navigate("/settings")}
       title={t("settings.apiDocumentation")}
       rightAction={
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <LanguageSwitcher />
           <AnimatedBurger 
             isOpen={isSidebarOpen} 
