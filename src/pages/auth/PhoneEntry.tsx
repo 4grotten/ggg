@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
@@ -210,7 +210,11 @@ const passwordSchema = z.string()
 
 const PhoneEntry = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t } = useTranslation();
+  
+  // Check if we're adding a new account (skip auto-biometric)
+  const isAddAccountMode = searchParams.get('addAccount') === 'true';
   const { login: authLogin } = useAuth();
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [dialCode, setDialCode] = useState("+971");
@@ -289,7 +293,10 @@ const PhoneEntry = () => {
   const [biometricTriggered, setBiometricTriggered] = useState(false);
 
   // Auto-trigger biometric auth on page load if available
+  // Skip auto-biometric if we're in "add account" mode
   useEffect(() => {
+    if (isAddAccountMode) return; // Skip auto-biometric when adding new account
+    
     if (isBiometricEnabled && biometricPhone && !biometricTriggered && !isLoading && !isLoginMode) {
       setBiometricTriggered(true);
       // Small delay to let the page render first
@@ -298,7 +305,7 @@ const PhoneEntry = () => {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isBiometricEnabled, biometricPhone, biometricTriggered, isLoading, isLoginMode]);
+  }, [isBiometricEnabled, biometricPhone, biometricTriggered, isLoading, isLoginMode, isAddAccountMode]);
   useEffect(() => {
     if (!isLoginMode) return;
     
