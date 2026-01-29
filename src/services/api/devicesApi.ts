@@ -2,7 +2,7 @@
  * Devices API endpoints для Apofiz Backend
  */
 
-import { apiGet, apiPost, apiRequest } from './apiClient';
+import { apiGet, apiPost, apiDelete } from './apiClient';
 
 export interface ActiveDevice {
   id: number;
@@ -64,12 +64,21 @@ export async function changeTokenExpiredTime(tokenId: number, expiredTimeChoice:
 }
 
 /**
- * Terminate a device session by setting its token to minimum expiration
+ * Terminate a device session by deactivating its token
+ * DELETE /users/get_or_deactivate_token/<token_id>/
  * @param tokenId - The device/token ID to terminate
  */
 export async function terminateDeviceSession(tokenId: number) {
-  // Set token expiration to minimum (7 days) to effectively end the session
-  return changeTokenExpiredTime(tokenId, 7);
+  return apiDelete<{ success: boolean }>(`/users/get_or_deactivate_token/${tokenId}/`);
+}
+
+/**
+ * Get or deactivate token (alternative method)
+ * DELETE /users/get_or_deactivate_token/<token_id>/
+ * @param tokenId - The device/token ID
+ */
+export async function deactivateToken(tokenId: number) {
+  return apiDelete<{ success: boolean }>(`/users/get_or_deactivate_token/${tokenId}/`);
 }
 
 /**
