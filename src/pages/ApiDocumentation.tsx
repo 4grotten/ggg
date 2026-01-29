@@ -9,21 +9,21 @@ import { ApiIntroduction } from "@/components/api/ApiIntroduction";
 import { getEndpointById } from "@/data/apiDocumentation";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 
-// Animated burger menu icon
+// Animated burger menu icon - styled to match LanguageSwitcher
 const AnimatedBurger = ({ isOpen, onClick }: { isOpen: boolean; onClick: () => void }) => (
   <button
     onClick={onClick}
-    className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors md:hidden"
+    className="flex items-center justify-center w-9 h-8 rounded-full bg-secondary hover:bg-muted transition-colors md:hidden"
     aria-label="Toggle menu"
   >
-    <div className="w-5 h-4 relative flex flex-col justify-between">
+    <div className="w-4 h-3 relative flex flex-col justify-between">
       <motion.span
         animate={{
           rotate: isOpen ? 45 : 0,
-          y: isOpen ? 7 : 0,
+          y: isOpen ? 5 : 0,
         }}
         transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-        className="block w-full h-0.5 bg-primary rounded-full origin-center"
+        className="block w-full h-0.5 bg-foreground rounded-full origin-center"
       />
       <motion.span
         animate={{
@@ -31,15 +31,15 @@ const AnimatedBurger = ({ isOpen, onClick }: { isOpen: boolean; onClick: () => v
           scaleX: isOpen ? 0 : 1,
         }}
         transition={{ duration: 0.2 }}
-        className="block w-full h-0.5 bg-primary rounded-full"
+        className="block w-full h-0.5 bg-foreground rounded-full"
       />
       <motion.span
         animate={{
           rotate: isOpen ? -45 : 0,
-          y: isOpen ? -7 : 0,
+          y: isOpen ? -5 : 0,
         }}
         transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-        className="block w-full h-0.5 bg-primary rounded-full origin-center"
+        className="block w-full h-0.5 bg-foreground rounded-full origin-center"
       />
     </div>
   </button>
