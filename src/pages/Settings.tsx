@@ -13,7 +13,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -278,6 +278,7 @@ const Settings = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [showFlash, setShowFlash] = useState(false);
+  const [isAccountsExpanded, setIsAccountsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
@@ -891,54 +892,75 @@ const Settings = () => {
           />
         </AnimatedMenuSection>
 
-        {/* Saved Accounts List */}
+        {/* Saved Accounts List - Collapsible */}
         {accounts.length > 0 && (
           <AnimatedMenuSection index={10}>
-            <div className="px-4 py-3 border-b border-border/50">
+            <button
+              onClick={() => setIsAccountsExpanded(!isAccountsExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+            >
               <p className="text-sm text-muted-foreground font-medium">
                 {t("settings.savedAccounts") || "Saved Accounts"} ({accounts.length})
               </p>
-            </div>
-            {accounts.map((account, index) => {
-              const isCurrentUser = account.user.id === user?.id;
-              return (
-                <button
-                  key={account.id}
-                  onClick={() => {
-                    if (!isCurrentUser) {
-                      switchUser(account.user, account.token);
-                      toast.success(t("settings.switchedTo", { name: account.user.full_name }));
-                      navigate('/');
-                    }
-                  }}
-                  disabled={isCurrentUser}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
-                    index < accounts.length - 1 ? 'border-b border-border/30' : ''
-                  } ${isCurrentUser ? 'bg-primary/5 cursor-default' : 'hover:bg-muted/50 active:bg-muted/70'}`}
+              <motion.div
+                animate={{ rotate: isAccountsExpanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </motion.div>
+            </button>
+            <AnimatePresence initial={false}>
+              {isAccountsExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                  className="overflow-hidden"
                 >
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage 
-                      src={account.user.avatar?.medium || account.user.avatar?.file} 
-                      alt={account.user.full_name} 
-                    />
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                      {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-medium text-foreground truncate">
-                      {account.user.full_name}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {account.user.phone_number}
-                    </p>
-                  </div>
-                  {isCurrentUser && (
-                    <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  )}
-                </button>
-              );
-            })}
+                  {accounts.map((account, index) => {
+                    const isCurrentUser = account.user.id === user?.id;
+                    return (
+                      <button
+                        key={account.id}
+                        onClick={() => {
+                          if (!isCurrentUser) {
+                            switchUser(account.user, account.token);
+                            toast.success(t("settings.switchedTo", { name: account.user.full_name }));
+                            navigate('/');
+                          }
+                        }}
+                        disabled={isCurrentUser}
+                        className={`w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 ${
+                          isCurrentUser ? 'bg-primary/5 cursor-default' : 'hover:bg-muted/50 active:bg-muted/70'
+                        }`}
+                      >
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage 
+                            src={account.user.avatar?.medium || account.user.avatar?.file} 
+                            alt={account.user.full_name} 
+                          />
+                          <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                            {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0 text-left">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {account.user.full_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {account.user.phone_number}
+                          </p>
+                        </div>
+                        {isCurrentUser && (
+                          <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </AnimatedMenuSection>
         )}
 
