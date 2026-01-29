@@ -668,14 +668,7 @@ const Settings = () => {
           return (
             <AnimatedMenuSection index={0}>
               <button
-                onClick={() => {
-                  // If profile is complete, ask for confirmation
-                  if (unfilledFieldsCount === 0) {
-                    setIsEditProfileDialogOpen(true);
-                  } else {
-                    navigate("/settings/edit-profile");
-                  }
-                }}
+                onClick={() => navigate("/settings/edit-profile")}
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
