@@ -466,6 +466,7 @@ const Settings = () => {
   return (
     <MobileLayout
       title={t("settings.profile")}
+      titleAlign="left"
       rightAction={
         <div className="flex items-center gap-2">
           <ThemeSwitcher className="mr-1" />

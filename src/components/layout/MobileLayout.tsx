@@ -5,6 +5,7 @@ interface MobileLayoutProps {
   children: ReactNode;
   header?: ReactNode;
   title?: string;
+  titleAlign?: "left" | "center";
   showBackButton?: boolean;
   onBack?: () => void;
   rightAction?: ReactNode;
@@ -15,6 +16,7 @@ export const MobileLayout = ({
   children,
   header,
   title,
+  titleAlign = "center",
   showBackButton = false,
   onBack,
   rightAction,
@@ -56,7 +58,7 @@ export const MobileLayout = ({
                 {header && !showBackButton && <div>{header}</div>}
               </div>
               {title && (
-                <h1 className="min-w-0 text-left sm:text-center text-base font-semibold text-foreground px-2 sm:px-4">
+                <h1 className={`min-w-0 text-base font-semibold text-foreground px-2 sm:px-4 ${titleAlign === "left" ? "text-left" : "text-left sm:text-center"}`}>
                   {title}
                 </h1>
               )}
