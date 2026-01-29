@@ -1224,7 +1224,12 @@
       },
       "get-authorization-history": {
         "title": "Get Authorization History",
-        "description": "Retrieve a paginated list of all login attempts and session history."
+        "description": "Retrieve a paginated list of all login attempts and session history.",
+        "notes": {
+          "0": "History includes both active and expired sessions",
+          "1": "Entries are sorted by log_time descending (newest first)",
+          "2": "is_active=false indicates expired or terminated sessions"
+        }
       },
       "get-device-detail": {
         "title": "Get Device Detail",
@@ -1232,7 +1237,13 @@
       },
       "change-token-expiration": {
         "title": "Change Token Expiration",
-        "description": "Change the expiration time for a specific device/session token."
+        "description": "Change the expiration time for a specific device/session token.",
+        "notes": {
+          "0": "Use 7 days as minimum to effectively terminate a session",
+          "1": "Users can only modify their own device sessions",
+          "2": "The current device token cannot be terminated",
+          "3": "Available options: 7, 30, 90, or 180 days"
+        }
       }
     }
   }
