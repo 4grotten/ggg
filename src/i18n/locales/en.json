@@ -1244,6 +1244,16 @@
           "2": "The current device token cannot be terminated",
           "3": "Available options: 7, 30, 90, or 180 days"
         }
+      },
+      "terminate-device-session": {
+        "title": "Terminate Device Session",
+        "description": "Immediately terminate a specific device session by deactivating its token. This logs the user out from that device.",
+        "notes": {
+          "0": "This immediately invalidates the device session",
+          "1": "The logged out device will need to authenticate again",
+          "2": "Cannot terminate the current device session (the one making the request)",
+          "3": "Use GET method on same endpoint to retrieve token details instead"
+        }
       }
     }
   }

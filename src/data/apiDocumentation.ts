@@ -1076,6 +1076,41 @@ export const apiCategories: ApiCategory[] = [
           'The current device token cannot be terminated',
           'Available options: 7, 30, 90, or 180 days'
         ]
+      },
+      {
+        id: 'terminate-device-session',
+        method: 'DELETE',
+        path: '/users/get_or_deactivate_token/{token_id}/',
+        title: 'Terminate Device Session',
+        description: 'Immediately terminate a specific device session by deactivating its token. This logs the user out from that device.',
+        category: 'devices',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'token_id', type: 'number', required: true, description: 'Device/token ID to terminate' }
+        ],
+        requestExample: {
+          curl: `curl --request DELETE \\
+  --url ${API_BASE_URL}/users/get_or_deactivate_token/2689/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "success": true
+}`
+        },
+        responseParams: [
+          { name: 'success', type: 'boolean', required: true, description: 'Whether the session was successfully terminated' }
+        ],
+        notes: [
+          'This immediately invalidates the device session',
+          'The logged out device will need to authenticate again',
+          'Cannot terminate the current device session (the one making the request)',
+          'Use GET method on same endpoint to retrieve token details instead'
+        ]
       }
     ]
   }

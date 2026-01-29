@@ -1193,6 +1193,16 @@
           "2": "Das aktuelle Gerätetoken kann nicht beendet werden",
           "3": "Verfügbare Optionen: 7, 30, 90 oder 180 Tage"
         }
+      },
+      "terminate-device-session": {
+        "title": "Gerätesitzung beenden",
+        "description": "Eine bestimmte Gerätesitzung sofort beenden, indem ihr Token deaktiviert wird. Dies meldet den Benutzer von diesem Gerät ab.",
+        "notes": {
+          "0": "Dies macht die Gerätesitzung sofort ungültig",
+          "1": "Das abgemeldete Gerät muss sich erneut authentifizieren",
+          "2": "Die aktuelle Gerätesitzung (die den Request stellt) kann nicht beendet werden",
+          "3": "Verwenden Sie die GET-Methode auf demselben Endpunkt, um Token-Details abzurufen"
+        }
       }
     }
   }
