@@ -7,6 +7,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -395,7 +396,7 @@ const EditProfile = () => {
   const hasSocialLinks = socialLinks.length > 0;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
+    <>
       {/* Success Animation Overlay */}
       <AnimatePresence>
         {showSuccessAnimation && (
@@ -483,26 +484,13 @@ const EditProfile = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Fixed Header - glassmorphism style */}
-      <div className="fixed top-0 left-0 right-0 z-20 bg-white/50 dark:bg-card/70 backdrop-blur-2xl border-b border-border/50">
-        <div className="flex items-center justify-between h-14 px-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center text-foreground hover:text-muted-foreground transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-            <span>{t("common.back")}</span>
-          </button>
-          <h1 className="text-lg font-semibold text-foreground">{t("editProfile.title")}</h1>
-          <div className="w-16" /> {/* Spacer for centering */}
-        </div>
-      </div>
 
-      {/* Scrollable Content - with top padding for fixed header */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pt-14 pb-28">
-        <div className="px-4 py-6">
+      <MobileLayout
+        title={t("editProfile.title")}
+        showBackButton
+        onBack={() => navigate(-1)}
+      >
+        <div className="px-4 py-6 pb-28">
           {/* Avatar */}
           <div className="flex justify-center mb-8">
             <input
@@ -839,7 +827,7 @@ const EditProfile = () => {
             </form>
           </Form>
         </div>
-      </div>
+      </MobileLayout>
 
       {/* Fixed Bottom Button - transparent glassmorphism */}
       <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-safe max-w-[800px] mx-auto">
@@ -1113,7 +1101,7 @@ const EditProfile = () => {
         imageSrc={cropImageSrc}
         onCropComplete={handleCropComplete}
       />
-    </div>
+    </>
   );
 };
 
