@@ -82,12 +82,19 @@ export const useBiometricAuth = () => {
   // Check availability on mount
   useEffect(() => {
     const checkAvailability = async () => {
-      const available = await isPlatformAuthenticatorAvailable();
-      setIsAvailable(available);
+      const webAuthnAvailable = isWebAuthnAvailable();
+      const platformAvailable = await isPlatformAuthenticatorAvailable();
+      
+      console.log('[Biometric] WebAuthn available:', webAuthnAvailable);
+      console.log('[Biometric] Platform authenticator available:', platformAvailable);
+      
+      setIsAvailable(platformAvailable);
       
       // Check if credential is stored
       const stored = localStorage.getItem(BIOMETRIC_CREDENTIAL_KEY);
       const phone = localStorage.getItem(BIOMETRIC_PHONE_KEY);
+      console.log('[Biometric] Stored credential:', !!stored, 'Stored phone:', phone);
+      
       if (stored && phone) {
         setIsEnabled(true);
         setStoredPhone(phone);
