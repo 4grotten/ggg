@@ -916,8 +916,8 @@ const Settings = () => {
               className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <ArrowLeftRight className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0">
+                  <ArrowLeftRight className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm text-primary font-medium">
                   {t("settings.switchAccount") || "Switch Account"} ({accounts.length})
