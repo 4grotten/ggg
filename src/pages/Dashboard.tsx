@@ -293,12 +293,11 @@ const Dashboard = () => {
           {/* Balance - only for authenticated users */}
           {isAuthenticated && !balanceLoading && (
             <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              initial={{ opacity: 0, y: 20, scale: 0.97, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
               transition={{ 
-                type: "spring", 
-                stiffness: 300, 
-                damping: 25,
+                duration: 0.8,
+                ease: [0.16, 1, 0.3, 1],
                 delay: 0.1
               }}
             >
@@ -311,12 +310,11 @@ const Dashboard = () => {
 
           {/* Action Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ 
-              type: "spring", 
-              stiffness: 300, 
-              damping: 25,
+              duration: 0.7,
+              ease: [0.16, 1, 0.3, 1],
               delay: 0.2
             }}
           >
@@ -325,12 +323,11 @@ const Dashboard = () => {
 
           {/* Verify Identity Card */}
           <motion.div
-            initial={{ opacity: 0, x: -50, rotateY: -15 }}
-            animate={{ opacity: 1, x: 0, rotateY: 0 }}
+            initial={{ opacity: 0, y: 25, scale: 0.98, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             transition={{ 
-              type: "spring", 
-              stiffness: 200, 
-              damping: 20,
+              duration: 0.9,
+              ease: [0.16, 1, 0.3, 1],
               delay: 0.3
             }}
           >
@@ -339,12 +336,11 @@ const Dashboard = () => {
 
           {/* Partner Program Card */}
           <motion.div
-            initial={{ opacity: 0, x: 50, rotateY: 15 }}
-            animate={{ opacity: 1, x: 0, rotateY: 0 }}
+            initial={{ opacity: 0, y: 25, scale: 0.98, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             transition={{ 
-              type: "spring", 
-              stiffness: 200, 
-              damping: 20,
+              duration: 0.9,
+              ease: [0.16, 1, 0.3, 1],
               delay: 0.4
             }}
           >
@@ -353,12 +349,11 @@ const Dashboard = () => {
 
           {/* Open New Card Button */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             transition={{ 
-              type: "spring", 
-              stiffness: 400, 
-              damping: 25,
+              duration: 0.8,
+              ease: [0.16, 1, 0.3, 1],
               delay: 0.5
             }}
           >
@@ -373,12 +368,11 @@ const Dashboard = () => {
             </div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ 
-                type: "spring", 
-                stiffness: 200, 
-                damping: 20,
+                duration: 1,
+                ease: [0.16, 1, 0.3, 1],
                 delay: 0.6
               }}
             >
@@ -391,12 +385,11 @@ const Dashboard = () => {
 
           {/* Send to Card */}
           <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            initial={{ opacity: 0, y: 20, scale: 0.97, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             transition={{ 
-              type: "spring", 
-              stiffness: 300, 
-              damping: 25,
+              duration: 0.8,
+              ease: [0.16, 1, 0.3, 1],
               delay: 0.7
             }}
           >
@@ -406,30 +399,29 @@ const Dashboard = () => {
           {/* Transactions - only for authenticated users */}
           {isAuthenticated && (
             <motion.div
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ 
-                type: "spring", 
-                stiffness: 200, 
-                damping: 25,
+                duration: 1,
+                ease: [0.16, 1, 0.3, 1],
                 delay: 0.8
               }}
             >
               <div className="flex items-center justify-between mb-3">
                 <motion.h2 
                   className="text-xl font-bold"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
+                  initial={{ opacity: 0, x: -15, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.9 }}
                 >
                   {t('dashboard.transactions')}
                 </motion.h2>
                 <motion.button
                   onClick={() => navigate("/card/virtual/history")}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
+                  initial={{ opacity: 0, x: 15, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.9 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -441,9 +433,9 @@ const Dashboard = () => {
               {/* Filter Tabs - Telegram Style */}
               <motion.div 
                 className="relative mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.0 }}
+                initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 1.0 }}
               >
                 <div 
                   ref={tabsContainerRef}
