@@ -987,7 +987,7 @@ const Settings = () => {
                       }
                     }
                     // Use window.location for deployed environments with base paths
-                    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/phone' : '/auth/phone');
+                    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/adduser' : '/auth/adduser');
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 hover:bg-muted/50 active:bg-muted/70"
                 >
