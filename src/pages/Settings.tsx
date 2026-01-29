@@ -608,7 +608,7 @@ const Settings = () => {
             <div className="flex items-center gap-3 mt-3">
               {/* Personal data status */}
               <button
-                onClick={() => navigate("/edit-profile")}
+                onClick={() => navigate("/settings/edit-profile")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   user?.has_empty_fields
                     ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
