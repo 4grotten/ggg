@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -279,6 +280,7 @@ const Settings = () => {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [showFlash, setShowFlash] = useState(false);
   const [isAccountsExpanded, setIsAccountsExpanded] = useState(false);
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
@@ -967,7 +969,7 @@ const Settings = () => {
         {/* Logout Button */}
         {isAuthenticated && (
           <button
-            onClick={handleLogout}
+            onClick={() => setIsLogoutDialogOpen(true)}
             disabled={isLoggingOut}
             className="w-full flex items-center justify-center gap-3 py-4 px-4 bg-red-500/10 hover:bg-red-500/20 dark:bg-red-500/20 dark:hover:bg-red-500/30 rounded-2xl transition-colors disabled:opacity-50"
           >
@@ -980,6 +982,29 @@ const Settings = () => {
           </button>
         )}
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("settings.logoutConfirmTitle") || "Выйти из аккаунта?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("settings.logoutConfirmDescription") || "Вы уверены, что хотите выйти из аккаунта?"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3">
+            <AlertDialogCancel className="flex-1 mt-0">
+              {t("common.cancel") || "Отмена"}
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleLogout}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+            >
+              {t("settings.logout") || "Выйти"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Language Selection Drawer */}
       <Drawer open={isLanguageOpen} onOpenChange={setIsLanguageOpen} shouldScaleBackground={false}>
