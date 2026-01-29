@@ -297,6 +297,8 @@
     "languageChanged": "تم تغيير اللغة إلى {{language}}",
     "copied": "تم نسخ {{label}}",
     "linkCopied": "تم نسخ الرابط",
+    "pdfGenerated": "تم تحميل وثائق PDF",
+    "pdfError": "فشل في إنشاء PDF",
     "accountDetailsCopied": "تم نسخ تفاصيل الحساب",
     "cardNumberCopied": "تم نسخ رقم البطاقة",
     "cardDetailsCopied": "تم نسخ تفاصيل البطاقة",

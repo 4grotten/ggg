@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
-import { ArrowLeft, Menu, X } from "lucide-react";
+import { ArrowLeft, Menu, X, Download, Loader2 } from "lucide-react";
 import { ApiSidebar } from "@/components/api/ApiSidebar";
 import { ApiEndpointDetail } from "@/components/api/ApiEndpointDetail";
 import { ApiIntroduction } from "@/components/api/ApiIntroduction";
 import { getEndpointById } from "@/data/apiDocumentation";
+import { generateApiPdf } from "@/lib/generateApiPdf";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const ApiDocumentation = () => {
   const navigate = useNavigate();
@@ -16,6 +18,22 @@ const ApiDocumentation = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState<string | null>(null);
   const [isIntroSelected, setIsIntroSelected] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    setIsGeneratingPdf(true);
+    try {
+      // Small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 100));
+      generateApiPdf();
+      toast.success(t('toast.pdfGenerated') || 'PDF downloaded successfully');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error(t('toast.pdfError') || 'Failed to generate PDF');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   const handleSelectEndpoint = (endpointId: string) => {
     setSelectedEndpoint(endpointId);
@@ -45,17 +63,33 @@ const ApiDocumentation = () => {
             <h1 className="text-lg font-semibold">{t("settings.apiDocumentation")}</h1>
           </div>
           
-          {/* Mobile menu toggle */}
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 hover:bg-muted rounded-full transition-colors md:hidden"
-          >
-            {isSidebarOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Download PDF button */}
+            <button
+              onClick={handleDownloadPdf}
+              disabled={isGeneratingPdf}
+              className="p-2 hover:bg-muted rounded-full transition-colors text-primary disabled:opacity-50"
+              title={t('api.downloadPdf') || 'Download PDF'}
+            >
+              {isGeneratingPdf ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Download className="w-5 h-5" />
+              )}
+            </button>
+            
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 hover:bg-muted rounded-full transition-colors md:hidden"
+            >
+              {isSidebarOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       }
     >

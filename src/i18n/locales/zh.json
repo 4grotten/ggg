@@ -300,6 +300,8 @@
     "languageChanged": "语言已更改为{{language}}",
     "copied": "{{label}}已复制",
     "linkCopied": "链接已复制到剪贴板",
+    "pdfGenerated": "PDF文档已下载",
+    "pdfError": "PDF生成失败",
     "accountDetailsCopied": "账户信息已复制",
     "cardNumberCopied": "卡号已复制",
     "dataUpdated": "数据已更新",
