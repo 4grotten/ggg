@@ -30,8 +30,8 @@ export const MobileLayout = ({
         {/* Fixed Header */}
         {hasHeader && (
           <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-            <div className="max-w-[800px] mx-auto flex items-center justify-between h-14 px-4">
-              <div className="flex-1 flex items-center">
+            <div className="max-w-[800px] mx-auto grid grid-cols-[auto,1fr,auto] items-center h-14 px-4">
+              <div className="flex items-center">
                 {showBackButton && (
                   <button
                     onClick={onBack}
@@ -56,11 +56,11 @@ export const MobileLayout = ({
                 {header && !showBackButton && <div>{header}</div>}
               </div>
               {title && (
-                <h1 className="flex-1 text-left sm:text-center text-base font-semibold text-foreground truncate px-2 sm:px-4">
+                <h1 className="min-w-0 text-left sm:text-center text-base font-semibold text-foreground px-2 sm:px-4">
                   {title}
                 </h1>
               )}
-              <div className="flex-1 flex justify-end pl-4">{rightAction}</div>
+              <div className="flex justify-end pl-2 sm:pl-4">{rightAction}</div>
             </div>
           </header>
         )}
