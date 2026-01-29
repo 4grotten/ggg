@@ -51,7 +51,7 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
     }
     onOpenChange(false);
     // Use window.location for deployed environments with base paths
-    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/adduser' : '/auth/adduser');
+    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/phone' : '/auth/phone');
   };
 
   const handleRemoveAccount = (e: React.MouseEvent, userId: number) => {

@@ -14,7 +14,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, RefreshCw } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -279,17 +279,7 @@ const Settings = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [showFlash, setShowFlash] = useState(false);
-  const [isAccountsExpanded, setIsAccountsExpanded] = useState(() => {
-    const saved = localStorage.getItem('settings_accounts_expanded');
-    return saved === 'true';
-  });
-  
-  // Persist accounts expanded state
-  const toggleAccountsExpanded = () => {
-    const newValue = !isAccountsExpanded;
-    setIsAccountsExpanded(newValue);
-    localStorage.setItem('settings_accounts_expanded', String(newValue));
-  };
+  const [isAccountsExpanded, setIsAccountsExpanded] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
@@ -899,111 +889,96 @@ const Settings = () => {
           />
         </AnimatedMenuSection>
 
-        {/* Switch Account - Collapsible section with accounts list */}
+        {/* Add Account Button */}
         <AnimatedMenuSection index={9}>
-          <button
-            onClick={toggleAccountsExpanded}
-            className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <ColoredIcon colorKey="users"><RefreshCw className="w-4 h-4" /></ColoredIcon>
-              <span className="text-foreground font-medium">{t("settings.switchAccount") || "Switch Account"}</span>
-              <span className="flex items-center gap-1.5 text-xs font-medium text-white bg-blue-500 px-2 py-0.5 rounded-full">
-                <motion.span
-                  animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-1.5 h-1.5 rounded-full bg-green-400"
-                />
-                {accounts.length}
-              </span>
-            </div>
-            <motion.div
-              animate={{ rotate: isAccountsExpanded ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ChevronDown className="w-5 h-5 text-muted-foreground" />
-            </motion.div>
-          </button>
-          <AnimatePresence initial={false}>
-            {isAccountsExpanded && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                className="overflow-hidden"
-              >
-                {/* Saved accounts list */}
-                {accounts.map((account) => {
-                  const isCurrentUser = account.user.id === user?.id;
-                  return (
-                    <button
-                      key={account.id}
-                      onClick={() => {
-                        if (!isCurrentUser) {
-                          switchUser(account.user, account.token);
-                          toast.success(t("settings.switchedTo", { name: account.user.full_name }));
-                          // Use window.location for deployed environments with base paths
-                          window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/' : '/');
-                        }
-                      }}
-                      disabled={isCurrentUser}
-                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 ${
-                        isCurrentUser ? 'bg-primary/5 cursor-default' : 'hover:bg-muted/50 active:bg-muted/70'
-                      }`}
-                    >
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage 
-                          src={account.user.avatar?.medium || account.user.avatar?.file} 
-                          alt={account.user.full_name} 
-                        />
-                        <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                          {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0 text-left">
-                        <p className="text-sm font-medium text-foreground truncate">
-                          {account.user.full_name}
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {account.user.phone_number}
-                        </p>
-                      </div>
-                      {isCurrentUser && (
-                        <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-                
-                {/* Add Account button inside the collapsible */}
-                <button
-                  onClick={() => {
-                    // Save current account before adding new one
-                    if (user) {
-                      const currentToken = localStorage.getItem('auth_token');
-                      if (currentToken) {
-                        saveCurrentAccount(user, currentToken);
-                      }
-                    }
-                    // Use window.location for deployed environments with base paths
-                    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/adduser' : '/auth/adduser');
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 hover:bg-muted/50 active:bg-muted/70"
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-medium text-primary">
-                      {t("settings.addAccount") || "Add Account"}
-                    </p>
-                  </div>
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <SettingsItem
+            icon={<ColoredIcon colorKey="userplus"><UserPlus className="w-4 h-4" /></ColoredIcon>}
+            label={t("settings.addAccount") || "Add Account"}
+            onClick={() => {
+              // Save current account before adding new one
+              // Use explicit token to ensure we capture it before any navigation/state changes
+              if (user) {
+                const currentToken = localStorage.getItem('auth_token');
+                if (currentToken) {
+                  saveCurrentAccount(user, currentToken);
+                }
+              }
+              navigate("/auth/phone");
+            }}
+          />
         </AnimatedMenuSection>
+
+        {/* Saved Accounts List - Collapsible */}
+        {accounts.length > 0 && (
+          <AnimatedMenuSection index={10}>
+            <button
+              onClick={() => setIsAccountsExpanded(!isAccountsExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+            >
+              <p className="text-sm text-blue-500 font-medium">
+                {t("settings.savedAccounts") || "Saved Accounts"} ({accounts.length})
+              </p>
+              <motion.div
+                animate={{ rotate: isAccountsExpanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </motion.div>
+            </button>
+            <AnimatePresence initial={false}>
+              {isAccountsExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                  className="overflow-hidden"
+                >
+                  {accounts.map((account, index) => {
+                    const isCurrentUser = account.user.id === user?.id;
+                    return (
+                      <button
+                        key={account.id}
+                        onClick={() => {
+                          if (!isCurrentUser) {
+                            switchUser(account.user, account.token);
+                            toast.success(t("settings.switchedTo", { name: account.user.full_name }));
+                            navigate('/');
+                          }
+                        }}
+                        disabled={isCurrentUser}
+                        className={`w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 ${
+                          isCurrentUser ? 'bg-primary/5 cursor-default' : 'hover:bg-muted/50 active:bg-muted/70'
+                        }`}
+                      >
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage 
+                            src={account.user.avatar?.medium || account.user.avatar?.file} 
+                            alt={account.user.full_name} 
+                          />
+                          <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                            {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0 text-left">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {account.user.full_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {account.user.phone_number}
+                          </p>
+                        </div>
+                        {isCurrentUser && (
+                          <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </AnimatedMenuSection>
+        )}
 
         {/* Logout Button */}
         {isAuthenticated && (

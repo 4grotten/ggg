@@ -287,7 +287,18 @@ const PhoneEntry = () => {
   const [pendingLoginPhone, setPendingLoginPhone] = useState<string | null>(null);
   const [pendingLoginPassword, setPendingLoginPassword] = useState<string | null>(null);
   const [biometricTriggered, setBiometricTriggered] = useState(false);
-  // NOTE: Auto-trigger biometric removed - users can manually tap biometric button if needed
+
+  // Auto-trigger biometric auth on page load if available
+  useEffect(() => {
+    if (isBiometricEnabled && biometricPhone && !biometricTriggered && !isLoading && !isLoginMode) {
+      setBiometricTriggered(true);
+      // Small delay to let the page render first
+      const timer = setTimeout(() => {
+        handleBiometricLogin();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isBiometricEnabled, biometricPhone, biometricTriggered, isLoading, isLoginMode]);
   useEffect(() => {
     if (!isLoginMode) return;
     

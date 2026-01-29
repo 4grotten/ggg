@@ -172,7 +172,6 @@ const AppContent = () => {
             <Route path="/verify/complete" element={<VerificationComplete />} />
             <Route path="/verify/success" element={<VerificationSuccess />} />
             <Route path="/auth/phone" element={<PhoneEntry />} />
-            <Route path="/auth/adduser" element={<PhoneEntry />} />
             <Route path="/auth/code" element={<CodeEntry />} />
             <Route path="/auth/profile" element={<ProfileSteps />} />
             <Route path="/auth/reset-code" element={<ResetPasswordCode />} />
