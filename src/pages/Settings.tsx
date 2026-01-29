@@ -54,6 +54,33 @@ const ColoredIcon = ({ children, colorKey }: ColoredIconProps) => {
   );
 };
 
+// Animated menu section with cascade effect
+interface AnimatedMenuSectionProps {
+  children: React.ReactNode;
+  index: number;
+}
+
+const AnimatedMenuSection = ({ children, index }: AnimatedMenuSectionProps) => (
+  <motion.div
+    initial={{ opacity: 0, y: -30, scale: 0.9 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    transition={{
+      duration: 0.5,
+      delay: index * 0.08,
+      ease: [0.23, 1, 0.32, 1], // cubic-bezier for smooth spring-like feel
+    }}
+  >
+    <motion.div
+      initial={{ filter: "blur(10px)" }}
+      animate={{ filter: "blur(0px)" }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50"
+    >
+      {children}
+    </motion.div>
+  </motion.div>
+);
+
 interface SettingsItemProps {
   icon: React.ReactNode;
   label: string;
@@ -628,7 +655,7 @@ const Settings = () => {
           ].filter(Boolean).length;
 
           return (
-            <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+            <AnimatedMenuSection index={0}>
               <button
                 onClick={() => navigate("/settings/edit-profile")}
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
@@ -678,7 +705,7 @@ const Settings = () => {
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </div>
               </button>
-            </div>
+            </AnimatedMenuSection>
           );
         })()}
 
@@ -687,7 +714,7 @@ const Settings = () => {
           const completedSteps = getCompletedSteps();
           const isVerified = completedSteps >= 3;
           return (
-            <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+            <AnimatedMenuSection index={1}>
               <button
                 onClick={() => navigate("/profile-verification")}
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
@@ -722,7 +749,7 @@ const Settings = () => {
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </div>
               </button>
-            </div>
+            </AnimatedMenuSection>
           );
         })()}
 
@@ -741,7 +768,7 @@ const Settings = () => {
           const currentLevel = getCurrentLevel();
           
           return (
-            <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+            <AnimatedMenuSection index={2}>
               <button
                 onClick={() => navigate("/partner")}
                 className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
@@ -756,23 +783,21 @@ const Settings = () => {
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </div>
               </button>
-            </div>
+            </AnimatedMenuSection>
           );
         })()}
 
         {/* Limits Settings */}
-        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <AnimatedMenuSection index={3}>
           <SettingsItem
             icon={<ColoredIcon colorKey="sliders"><SlidersHorizontal className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.limitsSettings") || "Limits Settings"}
             onClick={() => navigate("/limits-settings")}
           />
-        </div>
-
-        <div className="h-px bg-border" />
+        </AnimatedMenuSection>
 
         {/* Language & Appearance */}
-        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <AnimatedMenuSection index={4}>
           <SettingsItem
             icon={<ColoredIcon colorKey="globe"><Globe className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.language")}
@@ -791,12 +816,10 @@ const Settings = () => {
             value={currentTheme.name}
             onClick={() => setIsAppearanceOpen(true)}
           />
-        </div>
-
-        <div className="h-px bg-border" />
+        </AnimatedMenuSection>
 
         {/* Limits and Fees */}
-        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <AnimatedMenuSection index={5}>
           <SettingsItem
             icon={<ColoredIcon colorKey="receipt"><Receipt className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.limitsAndFees")}
@@ -807,10 +830,10 @@ const Settings = () => {
             label={t("settings.apiDocumentation")}
             onClick={() => navigate("/settings/api")}
           />
-        </div>
+        </AnimatedMenuSection>
 
         {/* Support & Legal */}
-        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <AnimatedMenuSection index={6}>
           <SettingsItem
             icon={<ColoredIcon colorKey="privacy"><Briefcase className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.privacyPolicy")}
@@ -827,32 +850,30 @@ const Settings = () => {
               onClick={handleInstallClick}
             />
           )}
-        </div>
+        </AnimatedMenuSection>
 
         {/* Active Devices - only for authenticated users */}
         {isAuthenticated && (
-          <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+          <AnimatedMenuSection index={7}>
             <SettingsItem
               icon={<ColoredIcon colorKey="laptop"><Laptop className="w-4 h-4" /></ColoredIcon>}
               label={t("settings.devices.title")}
               onClick={() => navigate("/settings/devices")}
             />
-          </div>
+          </AnimatedMenuSection>
         )}
 
         {/* Apofiz Social Network */}
-        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <AnimatedMenuSection index={8}>
           <SettingsItem
             icon={<ColoredIcon colorKey="apofiz"><ApofizLogo className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.apofizNetwork")}
             onClick={openApofizWithAuth}
           />
-        </div>
-
-        <div className="h-px bg-border" />
+        </AnimatedMenuSection>
 
         {/* Add Account Button */}
-        <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+        <AnimatedMenuSection index={9}>
           <SettingsItem
             icon={<ColoredIcon colorKey="userplus"><UserPlus className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.addAccount") || "Add Account"}
@@ -868,11 +889,11 @@ const Settings = () => {
               navigate("/auth/phone");
             }}
           />
-        </div>
+        </AnimatedMenuSection>
 
         {/* Saved Accounts List */}
         {accounts.length > 0 && (
-          <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
+          <AnimatedMenuSection index={10}>
             <div className="px-4 py-3 border-b border-border/50">
               <p className="text-sm text-muted-foreground font-medium">
                 {t("settings.savedAccounts") || "Saved Accounts"} ({accounts.length})
@@ -918,7 +939,7 @@ const Settings = () => {
                 </button>
               );
             })}
-          </div>
+          </AnimatedMenuSection>
         )}
 
         {/* Logout Button */}
