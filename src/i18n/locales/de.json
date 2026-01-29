@@ -1057,14 +1057,26 @@
       "social": "Soziale Netzwerke",
       "devices": "Geräte & Sitzungen"
     },
+    "notes": {
+      "title": "Hinweise"
+    },
     "endpoints": {
       "otp-send": {
         "title": "OTP senden",
-        "description": "Senden Sie ein Einmalpasswort an die Telefonnummer des Benutzers per SMS oder WhatsApp zur Verifizierung."
+        "description": "Senden Sie ein Einmalpasswort an die Telefonnummer des Benutzers per SMS oder WhatsApp zur Verifizierung.",
+        "notes": {
+          "0": "Standard-OTP-Typ ist \"whatsapp\", wenn nicht anders angegeben",
+          "1": "Für Kirgisistan (+996) Nummern wird standardmäßig SMS verwendet",
+          "2": "OTP ist 5 Minuten gültig"
+        }
       },
       "otp-verify": {
         "title": "OTP verifizieren",
-        "description": "Verifizieren Sie den an das Telefon gesendeten OTP-Code. Gibt bei Erfolg einen Authentifizierungstoken zurück."
+        "description": "Verifizieren Sie den an das Telefon gesendeten OTP-Code. Gibt bei Erfolg einen Authentifizierungstoken zurück.",
+        "notes": {
+          "0": "Für bestehende Benutzer wird der Token sofort zurückgegeben",
+          "1": "Für neue Benutzer ist is_new_user true und der Token kann null sein, bis das Profil initialisiert ist"
+        }
       },
       "register-auth": {
         "title": "Registrieren / Telefon prüfen",
@@ -1096,7 +1108,11 @@
       },
       "forgot-password": {
         "title": "Passwort vergessen",
-        "description": "Reset-Code per SMS, WhatsApp oder E-Mail anfordern."
+        "description": "Reset-Code per SMS, WhatsApp oder E-Mail anfordern.",
+        "notes": {
+          "0": "E-Mail-Methode ist nur verfügbar, wenn der Benutzer eine E-Mail konfiguriert hat",
+          "1": "Standardmethode ist WhatsApp, außer für +996 (Kirgisistan), wo SMS verwendet wird"
+        }
       },
       "forgot-password-email": {
         "title": "Passwort vergessen (E-Mail)",
@@ -1108,7 +1124,12 @@
       },
       "init-profile": {
         "title": "Profil erstellen / aktualisieren",
-        "description": "Profil für neue Benutzer erstellen oder bestehende Profildaten aktualisieren."
+        "description": "Profil für neue Benutzer erstellen oder bestehende Profildaten aktualisieren.",
+        "notes": {
+          "0": "Dieser Endpunkt wird sowohl für die anfängliche Profileinrichtung als auch für nachfolgende Aktualisierungen verwendet",
+          "1": "Pflichtfelder: full_name, username, email, date_of_birth, gender",
+          "2": "Der Benutzername muss bei allen Benutzern eindeutig sein"
+        }
       },
       "get-user-email": {
         "title": "Benutzer-E-Mail abrufen",
@@ -1116,11 +1137,22 @@
       },
       "deactivate-profile": {
         "title": "Profil deaktivieren",
-        "description": "Benutzerprofil deaktivieren. Dies ist KEIN Geräte-Logout - es deaktiviert das gesamte Konto."
+        "description": "Benutzerprofil deaktivieren. Dies ist KEIN Geräte-Logout - es deaktiviert das gesamte Konto.",
+        "notes": {
+          "0": "WARNUNG: Dies deaktiviert das gesamte Benutzerkonto, nicht nur eine Gerätesitzung",
+          "1": "Konto kann durch erneutes Anmelden reaktiviert werden",
+          "2": "Alle aktiven Sitzungen werden beendet"
+        }
       },
       "upload-avatar": {
         "title": "Avatar hochladen",
-        "description": "Avatar-Bild für das Profil hochladen. Gibt Dateidaten mit verschiedenen Größenvarianten zurück."
+        "description": "Avatar-Bild für das Profil hochladen. Gibt Dateidaten mit verschiedenen Größenvarianten zurück.",
+        "notes": {
+          "0": "Maximale Dateigröße: 5MB",
+          "1": "Unterstützte Formate: JPEG, PNG",
+          "2": "Bilder werden automatisch in large, medium und small Varianten skaliert",
+          "3": "Verwenden Sie die zurückgegebene \"id\" im init_profile-Endpunkt, um sie als Avatar festzulegen"
+        }
       },
       "get-social-networks": {
         "title": "Soziale Netzwerke abrufen",
@@ -1128,7 +1160,12 @@
       },
       "set-social-networks": {
         "title": "Soziale Netzwerke festlegen",
-        "description": "Alle Social-Media-Links für den aktuellen Benutzer festlegen oder ersetzen."
+        "description": "Alle Social-Media-Links für den aktuellen Benutzer festlegen oder ersetzen.",
+        "notes": {
+          "0": "Dieser Endpunkt ersetzt alle bestehenden sozialen Netzwerke",
+          "1": "Senden Sie ein leeres Array, um alle sozialen Netzwerke zu entfernen",
+          "2": "Unterstützte Plattformen: Instagram, Twitter/X, LinkedIn, Facebook, Telegram usw."
+        }
       },
       "get-active-devices": {
         "title": "Aktive Geräte abrufen",
