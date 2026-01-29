@@ -325,6 +325,7 @@
     "language": "Language",
     "appearance": "Appearance",
     "limitsAndFees": "Limits and Fees",
+    "apiDocumentation": "API Documentation",
     "referralPartner": "Referral Partner",
     "limitsSettings": "Limits Settings",
     "askQuestion": "Ask question",
@@ -1051,5 +1052,38 @@
       "selectTariff": "Select Plan",
       "baseAmount": "Amount in AED"
     }
+  },
+  "api": {
+    "introduction": {
+      "title": "Introduction",
+      "description": "EasyCard API allows you to integrate card management and payment functionality into your applications."
+    },
+    "authentication": {
+      "title": "Authentication",
+      "description": "All API requests require authentication using Bearer token in the Authorization header."
+    },
+    "endpoints": {
+      "balance": {
+        "title": "Get Balance",
+        "description": "Retrieve current account balance and available funds."
+      },
+      "cards": {
+        "title": "Get Cards",
+        "description": "List all cards associated with your account."
+      },
+      "transaction": {
+        "title": "Create Transaction",
+        "description": "Initiate a new payment or transfer transaction."
+      }
+    },
+    "rateLimits": {
+      "title": "Rate Limits",
+      "description": "API requests are limited to prevent abuse and ensure fair usage.",
+      "requests": "Max requests",
+      "hour": "hour",
+      "burst": "Burst limit",
+      "minute": "minute"
+    },
+    "fullDocumentation": "View Full Documentation"
   }
 }
