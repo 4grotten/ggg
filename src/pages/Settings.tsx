@@ -13,7 +13,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -769,6 +769,11 @@ const Settings = () => {
             icon={<Receipt className="w-5 h-5" />}
             label={t("settings.limitsAndFees")}
             onClick={() => navigate("/fees-and-limits")}
+          />
+          <SettingsItem
+            icon={<Code className="w-5 h-5" />}
+            label={t("settings.apiDocumentation")}
+            onClick={() => navigate("/settings/api")}
           />
         </div>
 
