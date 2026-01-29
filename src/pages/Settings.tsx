@@ -32,7 +32,7 @@ const iconColors: Record<string, { bg: string; text: string }> = {
   globe: { bg: 'bg-purple-500', text: 'text-white' },
   palette: { bg: 'bg-pink-500', text: 'text-white' },
   receipt: { bg: 'bg-green-500', text: 'text-white' },
-  code: { bg: 'bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-600 dark:from-emerald-300 dark:via-cyan-400 dark:to-blue-500 shadow-[0_0_15px_rgba(34,211,238,0.5)] dark:shadow-[0_0_20px_rgba(34,211,238,0.7)]', text: 'text-white' },
+  code: { bg: 'bg-zinc-900 dark:bg-black ring-1 ring-cyan-500/50 dark:ring-cyan-400/60 shadow-[0_0_12px_rgba(34,211,238,0.4)] dark:shadow-[0_0_20px_rgba(34,211,238,0.6)]', text: 'text-cyan-400 dark:text-cyan-300' },
   privacy: { bg: 'bg-gray-500', text: 'text-white' },
   message: { bg: 'bg-green-600', text: 'text-white' },
   download: { bg: 'bg-orange-500', text: 'text-white' },
