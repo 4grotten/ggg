@@ -898,7 +898,12 @@ const Settings = () => {
             <div className="flex items-center gap-3">
               <ColoredIcon colorKey="users"><RefreshCw className="w-4 h-4" /></ColoredIcon>
               <span className="text-foreground font-medium">{t("settings.switchAccount") || "Switch Account"}</span>
-              <span className="text-xs font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-white bg-blue-500 px-2 py-0.5 rounded-full">
+                <motion.span
+                  animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-1.5 h-1.5 rounded-full bg-green-400"
+                />
                 {accounts.length}
               </span>
             </div>
