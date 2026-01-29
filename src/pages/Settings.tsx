@@ -899,7 +899,7 @@ const Settings = () => {
               onClick={() => setIsAccountsExpanded(!isAccountsExpanded)}
               className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
             >
-              <p className="text-sm text-muted-foreground font-medium">
+              <p className="text-sm text-blue-500 font-medium">
                 {t("settings.savedAccounts") || "Saved Accounts"} ({accounts.length})
               </p>
               <motion.div
