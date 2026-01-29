@@ -15,6 +15,8 @@ import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2 } from "lucide-react";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -489,6 +491,12 @@ const EditProfile = () => {
         title={t("editProfile.title")}
         showBackButton
         onBack={() => navigate(-1)}
+        rightAction={
+          <div className="flex items-center gap-2">
+            <ThemeSwitcher className="mr-1" />
+            <LanguageSwitcher />
+          </div>
+        }
       >
         <div className="px-4 py-6 pb-28">
           {/* Avatar */}
