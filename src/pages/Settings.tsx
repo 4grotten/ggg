@@ -885,7 +885,7 @@ const Settings = () => {
         {/* Apofiz Social Network */}
         <AnimatedMenuSection index={8}>
           <SettingsItem
-            icon={<ColoredIcon colorKey="apofiz"><ApofizLogo className="w-4 h-4" /></ColoredIcon>}
+            icon={<ColoredIcon colorKey="apofiz"><ApofizLogo className="w-4 h-4" forceLight /></ColoredIcon>}
             label={t("settings.apofizNetwork")}
             onClick={openApofizWithAuth}
           />
