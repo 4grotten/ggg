@@ -19,10 +19,8 @@ export const ApiSidebar = ({
   onSelectIntro,
   isIntroSelected 
 }: ApiSidebarProps) => {
-  const { i18n } = useTranslation();
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(
-    apiCategories.map(c => c.id)
-  );
+  const { i18n, t } = useTranslation();
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   const toggleCategory = (categoryId: string) => {
     setExpandedCategories(prev => 
@@ -47,7 +45,7 @@ export const ApiSidebar = ({
     <div className="w-full h-full overflow-y-auto bg-background border-r border-border">
       <div className="p-4">
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          API Reference
+          {t("api.sidebar.title")}
         </h2>
         
         {/* Introduction */}
@@ -60,7 +58,7 @@ export const ApiSidebar = ({
               : "text-foreground hover:bg-muted"
           )}
         >
-          Introduction
+          {t("api.introduction.title")}
         </button>
         
         {/* Categories */}

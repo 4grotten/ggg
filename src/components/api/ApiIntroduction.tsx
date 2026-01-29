@@ -12,12 +12,12 @@ export const ApiIntroduction = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-4"
+        className="-mx-4 md:-mx-8 -mt-4 md:-mt-8 px-4 md:px-8 py-8 md:py-12 bg-primary"
       >
-        <h1 className="text-3xl font-bold text-foreground">
+        <h1 className="text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
           {t("api.introduction.title")}
         </h1>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-lg text-primary-foreground/80">
           {t("api.introduction.description")}
         </p>
       </motion.div>
@@ -47,26 +47,26 @@ export const ApiIntroduction = () => {
         transition={{ delay: 0.2 }}
         className="space-y-4"
       >
-        <h2 className="text-xl font-semibold text-foreground">Get Started in 3 Steps</h2>
+        <h2 className="text-xl font-semibold text-foreground">{t("api.getStarted.title")}</h2>
         
         <div className="grid gap-4">
           {[
             {
               step: 1,
-              title: "Get your API Key",
-              description: "Sign up for an EasyCard account and generate your API key from the dashboard.",
+              title: t("api.getStarted.step1.title"),
+              description: t("api.getStarted.step1.description"),
               icon: Key
             },
             {
               step: 2,
-              title: "Make your first request",
-              description: "Use your API key to authenticate and make requests to our endpoints.",
+              title: t("api.getStarted.step2.title"),
+              description: t("api.getStarted.step2.description"),
               icon: Zap
             },
             {
               step: 3,
-              title: "Go live",
-              description: "Switch from test mode to production and start processing real transactions.",
+              title: t("api.getStarted.step3.title"),
+              description: t("api.getStarted.step3.description"),
               icon: Shield
             }
           ].map((item) => (
@@ -150,9 +150,9 @@ Content-Type: application/json`}
         transition={{ delay: 0.5 }}
         className="space-y-4"
       >
-        <h2 className="text-xl font-semibold text-foreground">Error Handling</h2>
+        <h2 className="text-xl font-semibold text-foreground">{t("api.errorHandling.title")}</h2>
         <p className="text-muted-foreground">
-          The API uses conventional HTTP response codes to indicate the success or failure of requests.
+          {t("api.errorHandling.description")}
         </p>
         
         <div className="space-y-2">
