@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
-import { Key, Globe, Zap, Shield, Book, ExternalLink } from "lucide-react";
+import { Key, Globe, Zap, Shield, Book, Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from "@/data/apiDocumentation";
+import { generateApiPdf } from "@/lib/generateApiPdf";
+import { toast } from "sonner";
 
 export const ApiIntroduction = () => {
   const { t } = useTranslation();
@@ -184,21 +186,22 @@ Content-Type: application/json`}
       </motion.div>
 
       {/* Full Documentation Link */}
-      <motion.a
-        href="https://docs.easycard.ae"
-        target="_blank"
-        rel="noopener noreferrer"
+      <motion.button
+        onClick={() => {
+          generateApiPdf();
+          toast.success(t('toast.pdfGenerated') || 'PDF downloaded successfully');
+        }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="flex items-center justify-between p-4 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-colors"
+        className="w-full flex items-center justify-between p-4 rounded-xl bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-colors"
       >
         <div className="flex items-center gap-3">
           <Book className="w-5 h-5 text-primary" />
           <span className="font-medium text-primary">{t("api.fullDocumentation")}</span>
         </div>
-        <ExternalLink className="w-5 h-5 text-primary" />
-      </motion.a>
+        <Download className="w-5 h-5 text-primary" />
+      </motion.button>
     </div>
   );
 };
