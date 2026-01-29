@@ -1048,6 +1048,104 @@
       "burst": "Burst-Limit",
       "minute": "Minute"
     },
-    "fullDocumentation": "Vollständige Dokumentation"
+    "fullDocumentation": "Vollständige Dokumentation",
+    "categories": {
+      "authentication": "Authentifizierung",
+      "password": "Passwortverwaltung",
+      "profile": "Benutzerprofil",
+      "files": "Datei-Uploads",
+      "social": "Soziale Netzwerke",
+      "devices": "Geräte & Sitzungen"
+    },
+    "endpoints": {
+      "otp-send": {
+        "title": "OTP senden",
+        "description": "Senden Sie ein Einmalpasswort an die Telefonnummer des Benutzers per SMS oder WhatsApp zur Verifizierung."
+      },
+      "otp-verify": {
+        "title": "OTP verifizieren",
+        "description": "Verifizieren Sie den an das Telefon gesendeten OTP-Code. Gibt bei Erfolg einen Authentifizierungstoken zurück."
+      },
+      "register-auth": {
+        "title": "Registrieren / Telefon prüfen",
+        "description": "Prüfen Sie, ob eine Telefonnummer registriert ist, und starten Sie ggf. den Registrierungsprozess."
+      },
+      "verify-code": {
+        "title": "SMS-Code verifizieren",
+        "description": "Verifizieren Sie den bei der Registrierung gesendeten SMS-Code."
+      },
+      "resend-code": {
+        "title": "Code erneut senden",
+        "description": "Senden Sie den Bestätigungscode erneut an die Telefonnummer des Benutzers."
+      },
+      "login": {
+        "title": "Mit Passwort anmelden",
+        "description": "Benutzer mit Telefonnummer und Passwort authentifizieren."
+      },
+      "logout": {
+        "title": "Abmelden",
+        "description": "Aktuelles Authentifizierungstoken ungültig machen und Sitzung beenden."
+      },
+      "set-password": {
+        "title": "Passwort festlegen",
+        "description": "Passwort für einen neuen Benutzer nach der Registrierung festlegen."
+      },
+      "change-password": {
+        "title": "Passwort ändern",
+        "description": "Passwort für einen authentifizierten Benutzer ändern."
+      },
+      "forgot-password": {
+        "title": "Passwort vergessen",
+        "description": "Reset-Code per SMS, WhatsApp oder E-Mail anfordern."
+      },
+      "forgot-password-email": {
+        "title": "Passwort vergessen (E-Mail)",
+        "description": "Reset-Code an die registrierte E-Mail des Benutzers anfordern."
+      },
+      "get-current-user": {
+        "title": "Aktuellen Benutzer abrufen",
+        "description": "Profil des aktuell authentifizierten Benutzers abrufen."
+      },
+      "init-profile": {
+        "title": "Profil erstellen / aktualisieren",
+        "description": "Profil für neue Benutzer erstellen oder bestehende Profildaten aktualisieren."
+      },
+      "get-user-email": {
+        "title": "Benutzer-E-Mail abrufen",
+        "description": "E-Mail-Adresse des aktuellen Benutzers abrufen."
+      },
+      "deactivate-profile": {
+        "title": "Profil deaktivieren",
+        "description": "Benutzerprofil deaktivieren. Dies ist KEIN Geräte-Logout - es deaktiviert das gesamte Konto."
+      },
+      "upload-avatar": {
+        "title": "Avatar hochladen",
+        "description": "Avatar-Bild für das Profil hochladen. Gibt Dateidaten mit verschiedenen Größenvarianten zurück."
+      },
+      "get-social-networks": {
+        "title": "Soziale Netzwerke abrufen",
+        "description": "Social-Media-Links für einen bestimmten Benutzer abrufen."
+      },
+      "set-social-networks": {
+        "title": "Soziale Netzwerke festlegen",
+        "description": "Alle Social-Media-Links für den aktuellen Benutzer festlegen oder ersetzen."
+      },
+      "get-active-devices": {
+        "title": "Aktive Geräte abrufen",
+        "description": "Paginierte Liste aller aktiven Geräte/Sitzungen des aktuellen Benutzers abrufen."
+      },
+      "get-authorization-history": {
+        "title": "Autorisierungsverlauf",
+        "description": "Paginierte Liste aller Anmeldeversuche und Sitzungsverlauf abrufen."
+      },
+      "get-device-detail": {
+        "title": "Gerätedetails",
+        "description": "Detaillierte Informationen zu einem bestimmten Gerät/Sitzung abrufen."
+      },
+      "change-token-expiration": {
+        "title": "Token-Ablauf ändern",
+        "description": "Ablaufzeit für ein bestimmtes Geräte-/Sitzungstoken ändern."
+      }
+    }
   }
 }

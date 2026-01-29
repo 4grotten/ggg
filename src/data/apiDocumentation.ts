@@ -13,7 +13,9 @@ export interface ApiEndpoint {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   path: string;
   title: string;
+  titleKey?: string;
   description: string;
+  descriptionKey?: string;
   category: string;
   authorization?: {
     type: 'Bearer' | 'API Key' | 'Token';
@@ -38,7 +40,7 @@ export interface ApiEndpoint {
 export interface ApiCategory {
   id: string;
   title: string;
-  titleRu: string;
+  titleKey: string;
   icon: string;
   endpoints: ApiEndpoint[];
 }
@@ -52,7 +54,7 @@ export const apiCategories: ApiCategory[] = [
   {
     id: 'authentication',
     title: 'Authentication',
-    titleRu: 'Аутентификация',
+    titleKey: 'api.categories.authentication',
     icon: '🔐',
     endpoints: [
       {
@@ -340,7 +342,7 @@ export const apiCategories: ApiCategory[] = [
   {
     id: 'password',
     title: 'Password Management',
-    titleRu: 'Управление паролем',
+    titleKey: 'api.categories.password',
     icon: '🔑',
     endpoints: [
       {
@@ -492,7 +494,7 @@ export const apiCategories: ApiCategory[] = [
   {
     id: 'profile',
     title: 'User Profile',
-    titleRu: 'Профиль пользователя',
+    titleKey: 'api.categories.profile',
     icon: '👤',
     endpoints: [
       {
@@ -683,7 +685,7 @@ export const apiCategories: ApiCategory[] = [
   {
     id: 'files',
     title: 'File Uploads',
-    titleRu: 'Загрузка файлов',
+    titleKey: 'api.categories.files',
     icon: '📁',
     endpoints: [
       {
@@ -741,7 +743,7 @@ export const apiCategories: ApiCategory[] = [
   {
     id: 'social',
     title: 'Social Networks',
-    titleRu: 'Социальные сети',
+    titleKey: 'api.categories.social',
     icon: '🔗',
     endpoints: [
       {
@@ -855,7 +857,7 @@ export const apiCategories: ApiCategory[] = [
   {
     id: 'devices',
     title: 'Devices & Sessions',
-    titleRu: 'Устройства и сессии',
+    titleKey: 'api.categories.devices',
     icon: '📱',
     endpoints: [
       {

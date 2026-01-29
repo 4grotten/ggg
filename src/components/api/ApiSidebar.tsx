@@ -19,7 +19,7 @@ export const ApiSidebar = ({
   onSelectIntro,
   isIntroSelected 
 }: ApiSidebarProps) => {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   const toggleCategory = (categoryId: string) => {
@@ -71,7 +71,7 @@ export const ApiSidebar = ({
               >
                 <div className="flex items-center gap-2">
                   <span>{category.icon}</span>
-                  <span>{i18n.language === 'ru' ? category.titleRu : category.title}</span>
+                  <span>{t(category.titleKey)}</span>
                 </div>
                 {expandedCategories.includes(category.id) ? (
                   <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -87,7 +87,7 @@ export const ApiSidebar = ({
                   exit={{ height: 0, opacity: 0 }}
                   className="ml-4 space-y-0.5 mt-1"
                 >
-                  {category.endpoints.map((endpoint) => (
+                {category.endpoints.map((endpoint) => (
                     <button
                       key={endpoint.id}
                       onClick={() => onSelectEndpoint(endpoint.id)}
@@ -104,7 +104,7 @@ export const ApiSidebar = ({
                       )}>
                         {endpoint.method}
                       </span>
-                      <span className="truncate">{endpoint.title}</span>
+                      <span className="truncate">{t(`api.endpoints.${endpoint.id}.title`, endpoint.title)}</span>
                     </button>
                   ))}
                 </motion.div>

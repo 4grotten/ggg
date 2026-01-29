@@ -1091,20 +1091,6 @@
       "title": "Error Handling",
       "description": "The API uses conventional HTTP response codes to indicate the success or failure of requests."
     },
-    "endpoints": {
-      "balance": {
-        "title": "Get Balance",
-        "description": "Retrieve current account balance and available funds."
-      },
-      "cards": {
-        "title": "Get Cards",
-        "description": "List all cards associated with your account."
-      },
-      "transaction": {
-        "title": "Create Transaction",
-        "description": "Initiate a new payment or transfer transaction."
-      }
-    },
     "rateLimits": {
       "title": "Rate Limits",
       "description": "API requests are limited to prevent abuse and ensure fair usage.",
@@ -1113,6 +1099,104 @@
       "burst": "Burst limit",
       "minute": "minute"
     },
-    "fullDocumentation": "View Full Documentation"
+    "fullDocumentation": "View Full Documentation",
+    "categories": {
+      "authentication": "Authentication",
+      "password": "Password Management",
+      "profile": "User Profile",
+      "files": "File Uploads",
+      "social": "Social Networks",
+      "devices": "Devices & Sessions"
+    },
+    "endpoints": {
+      "otp-send": {
+        "title": "Send OTP",
+        "description": "Send a one-time password to the user's phone number via SMS or WhatsApp for verification."
+      },
+      "otp-verify": {
+        "title": "Verify OTP",
+        "description": "Verify the OTP code sent to the user's phone. Returns authentication token on success."
+      },
+      "register-auth": {
+        "title": "Register / Check Phone",
+        "description": "Check if a phone number is registered and initiate the registration process if not."
+      },
+      "verify-code": {
+        "title": "Verify SMS Code",
+        "description": "Verify the SMS code sent during registration."
+      },
+      "resend-code": {
+        "title": "Resend Code",
+        "description": "Resend verification code to the user's phone number."
+      },
+      "login": {
+        "title": "Login with Password",
+        "description": "Authenticate user with phone number and password."
+      },
+      "logout": {
+        "title": "Logout",
+        "description": "Invalidate the current authentication token and end the session."
+      },
+      "set-password": {
+        "title": "Set Password",
+        "description": "Set password for a new user after registration."
+      },
+      "change-password": {
+        "title": "Change Password",
+        "description": "Change password for an authenticated user."
+      },
+      "forgot-password": {
+        "title": "Forgot Password",
+        "description": "Request a password reset code to be sent via SMS, WhatsApp, or email."
+      },
+      "forgot-password-email": {
+        "title": "Forgot Password (Email)",
+        "description": "Request a password reset code to be sent to the user's registered email."
+      },
+      "get-current-user": {
+        "title": "Get Current User",
+        "description": "Retrieve the profile of the currently authenticated user."
+      },
+      "init-profile": {
+        "title": "Initialize / Update Profile",
+        "description": "Initialize profile for new users or update existing profile data."
+      },
+      "get-user-email": {
+        "title": "Get User Email",
+        "description": "Retrieve the email address associated with the current user."
+      },
+      "deactivate-profile": {
+        "title": "Deactivate Profile",
+        "description": "Deactivate the user profile. This is NOT for device logout - it deactivates the entire account."
+      },
+      "upload-avatar": {
+        "title": "Upload Avatar Image",
+        "description": "Upload an avatar image for user profile. Returns file data with multiple size variants."
+      },
+      "get-social-networks": {
+        "title": "Get Social Networks",
+        "description": "Retrieve social network links for a specific user."
+      },
+      "set-social-networks": {
+        "title": "Set Social Networks",
+        "description": "Set or replace all social network links for the current user."
+      },
+      "get-active-devices": {
+        "title": "Get Active Devices",
+        "description": "Retrieve a paginated list of all active devices/sessions for the current user."
+      },
+      "get-authorization-history": {
+        "title": "Get Authorization History",
+        "description": "Retrieve a paginated list of all login attempts and session history."
+      },
+      "get-device-detail": {
+        "title": "Get Device Detail",
+        "description": "Retrieve detailed information about a specific device/session."
+      },
+      "change-token-expiration": {
+        "title": "Change Token Expiration",
+        "description": "Change the expiration time for a specific device/session token."
+      }
+    }
   }
 }

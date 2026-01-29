@@ -97,7 +97,7 @@ export const generateApiPdf = () => {
   
   apiCategories.forEach((category, idx) => {
     doc.setTextColor(148, 163, 184);
-    doc.text(`${category.icon} ${category.titleRu}`, margin + 20, tocY);
+    doc.text(`${category.icon} ${category.title}`, margin + 20, tocY);
     doc.setTextColor(100, 116, 139);
     doc.text(`${category.endpoints.length} endpoints`, pageWidth - margin - 20, tocY, { align: 'right' });
     tocY += 8;
@@ -152,7 +152,7 @@ export const generateApiPdf = () => {
     doc.setTextColor(...COLORS.dark);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text(`${category.icon} ${category.titleRu}`, margin + 5, y + 3);
+    doc.text(`${category.icon} ${category.title}`, margin + 5, y + 3);
     y += 15;
 
     // Iterate through endpoints
