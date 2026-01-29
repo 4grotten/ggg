@@ -1008,5 +1008,46 @@
       "saved": "Sosyal bağlantılar kaydedildi",
       "error": "Kaydetme başarısız"
     }
+  },
+  "api": {
+    "sidebar": {
+      "title": "API Referansı"
+    },
+    "introduction": {
+      "title": "Giriş",
+      "description": "EasyCard API, kart yönetimi ve ödeme işlevlerini uygulamalarınıza entegre etmenizi sağlar."
+    },
+    "getStarted": {
+      "title": "3 Adımda Başlayın",
+      "step1": {
+        "title": "API Anahtarınızı Alın",
+        "description": "Bir EasyCard hesabı oluşturun ve panelden API anahtarınızı oluşturun."
+      },
+      "step2": {
+        "title": "İlk isteğinizi yapın",
+        "description": "Kimlik doğrulama için API anahtarınızı kullanın ve uç noktalarımıza istek gönderin."
+      },
+      "step3": {
+        "title": "Canlıya geçin",
+        "description": "Test modundan üretime geçin ve gerçek işlemleri işlemeye başlayın."
+      }
+    },
+    "authentication": {
+      "title": "Kimlik Doğrulama",
+      "description": "Tüm API istekleri, Authorization başlığında Bearer token kullanarak kimlik doğrulama gerektirir."
+    },
+    "errorHandling": {
+      "title": "Hata İşleme",
+      "description": "API, isteklerin başarılı veya başarısız olduğunu belirtmek için geleneksel HTTP yanıt kodlarını kullanır."
+    },
+    "rateLimits": {
+      "title": "İstek Limitleri",
+      "description": "Kötüye kullanımı önlemek ve adil kullanımı sağlamak için API istekleri sınırlıdır.",
+      "requests": "Maks. istek",
+      "hour": "saat",
+      "burst": "Anlık limit",
+      "minute": "dakika"
+    },
+    "fullDocumentation": "Tam Dokümantasyon"
   }
 }

@@ -1015,5 +1015,46 @@
       "saved": "社交链接已保存",
       "error": "保存失败"
     }
+  },
+  "api": {
+    "sidebar": {
+      "title": "API参考"
+    },
+    "introduction": {
+      "title": "介绍",
+      "description": "EasyCard API允许您将卡片管理和支付功能集成到您的应用程序中。"
+    },
+    "getStarted": {
+      "title": "3步开始",
+      "step1": {
+        "title": "获取API密钥",
+        "description": "注册EasyCard账户并从仪表板生成您的API密钥。"
+      },
+      "step2": {
+        "title": "发送第一个请求",
+        "description": "使用您的API密钥进行身份验证并向我们的端点发送请求。"
+      },
+      "step3": {
+        "title": "上线运行",
+        "description": "从测试模式切换到生产模式并开始处理真实交易。"
+      }
+    },
+    "authentication": {
+      "title": "身份验证",
+      "description": "所有API请求都需要在Authorization头中使用Bearer令牌进行身份验证。"
+    },
+    "errorHandling": {
+      "title": "错误处理",
+      "description": "API使用标准HTTP响应代码来指示请求的成功或失败。"
+    },
+    "rateLimits": {
+      "title": "请求限制",
+      "description": "为防止滥用并确保公平使用，API请求受到限制。",
+      "requests": "最大请求数",
+      "hour": "小时",
+      "burst": "突发限制",
+      "minute": "分钟"
+    },
+    "fullDocumentation": "完整文档"
   }
 }

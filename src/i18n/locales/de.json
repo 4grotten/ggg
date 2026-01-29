@@ -1008,5 +1008,46 @@
       "saved": "Soziale Links gespeichert",
       "error": "Speichern fehlgeschlagen"
     }
+  },
+  "api": {
+    "sidebar": {
+      "title": "API-Referenz"
+    },
+    "introduction": {
+      "title": "Einführung",
+      "description": "Die EasyCard API ermöglicht die Integration von Kartenverwaltung und Zahlungsfunktionen in Ihre Anwendungen."
+    },
+    "getStarted": {
+      "title": "Starten Sie in 3 Schritten",
+      "step1": {
+        "title": "API-Schlüssel erhalten",
+        "description": "Registrieren Sie sich für ein EasyCard-Konto und generieren Sie Ihren API-Schlüssel im Dashboard."
+      },
+      "step2": {
+        "title": "Erste Anfrage senden",
+        "description": "Verwenden Sie Ihren API-Schlüssel zur Authentifizierung und senden Sie Anfragen an unsere Endpunkte."
+      },
+      "step3": {
+        "title": "Live gehen",
+        "description": "Wechseln Sie vom Testmodus zur Produktion und beginnen Sie mit der Verarbeitung realer Transaktionen."
+      }
+    },
+    "authentication": {
+      "title": "Authentifizierung",
+      "description": "Alle API-Anfragen erfordern eine Authentifizierung mit Bearer-Token im Authorization-Header."
+    },
+    "errorHandling": {
+      "title": "Fehlerbehandlung",
+      "description": "Die API verwendet herkömmliche HTTP-Antwortcodes, um den Erfolg oder Misserfolg von Anfragen anzuzeigen."
+    },
+    "rateLimits": {
+      "title": "Anfragelimits",
+      "description": "API-Anfragen sind begrenzt, um Missbrauch zu verhindern und eine faire Nutzung zu gewährleisten.",
+      "requests": "Max. Anfragen",
+      "hour": "Stunde",
+      "burst": "Burst-Limit",
+      "minute": "Minute"
+    },
+    "fullDocumentation": "Vollständige Dokumentation"
   }
 }
