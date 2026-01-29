@@ -34,8 +34,9 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
     // Switch user instantly without page reload
     switchUser(account.user, account.token);
     onOpenChange(false);
-    // Navigate to dashboard after switch
-    navigate('/');
+    // Use window.location for full page reload to ensure all state is updated
+    // This is critical for deployed environments with base paths like /easycard
+    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/' : '/');
   };
 
   const handleAddAccount = () => {
@@ -49,7 +50,8 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
       }
     }
     onOpenChange(false);
-    navigate('/auth/phone');
+    // Use window.location for deployed environments with base paths
+    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/phone' : '/auth/phone');
   };
 
   const handleRemoveAccount = (e: React.MouseEvent, userId: number) => {
