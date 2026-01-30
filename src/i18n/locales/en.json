@@ -1,6 +1,15 @@
 {
   "screenLock": {
-    "viewSensitiveData": "To view sensitive data"
+    "title": "Screen Lock",
+    "description": "Protect your app with a passcode",
+    "enterPasscode": "Enter Passcode",
+    "viewSensitiveData": "To view sensitive data",
+    "wrongPasscode": "Wrong passcode",
+    "useBiometric": "Or use {{method}}",
+    "hideData": "Hide Sensitive Data",
+    "hideDataDescription": "Require passcode to view balances and card details",
+    "hideDataEnabled": "Data hiding enabled",
+    "hideDataDisabled": "Data hiding disabled"
   },
   "profileVerification": {
     "title": "Verify Your Identity",

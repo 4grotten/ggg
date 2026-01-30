@@ -1,6 +1,15 @@
 {
   "screenLock": {
-    "viewSensitiveData": "Для просмотра данных"
+    "title": "Блокировка экрана",
+    "description": "Защитите приложение паролем",
+    "enterPasscode": "Введите пароль",
+    "viewSensitiveData": "Для просмотра данных",
+    "wrongPasscode": "Неверный пароль",
+    "useBiometric": "Или используйте {{method}}",
+    "hideData": "Скрыть данные",
+    "hideDataDescription": "Требовать пароль для просмотра баланса и данных карт",
+    "hideDataEnabled": "Скрытие данных включено",
+    "hideDataDisabled": "Скрытие данных отключено"
   },
   "profileVerification": {
     "title": "Подтвердите личность",
