@@ -54,8 +54,8 @@ export const BottomNavigation = () => {
         const containerRect = container.getBoundingClientRect();
         const tabRect = activeTab.getBoundingClientRect();
         
-        // For edge tabs (Home/Profile), expand the selector more
-        const extraPadding = isEdgeTab ? 8 : 0;
+        // Expand selector horizontally
+        const extraPadding = 6;
         
         setSelectorStyle({
           left: tabRect.left - containerRect.left - extraPadding,
