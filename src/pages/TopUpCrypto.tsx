@@ -121,9 +121,22 @@ const TopUpCrypto = () => {
               level="H"
               includeMargin={false}
             />
-            <p className="text-center text-foreground font-medium mt-4">
-              {truncateAddress(walletAddress)}
-            </p>
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <p className="text-foreground font-medium">
+                {truncateAddress(walletAddress)}
+              </p>
+              <button
+                onClick={handleCopy}
+                className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                aria-label={t("topUp.copy")}
+              >
+                {copied ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Copy className="w-4 h-4 text-[#007AFF]" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
