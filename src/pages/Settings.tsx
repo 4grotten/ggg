@@ -14,7 +14,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, Lock } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -22,6 +22,8 @@ import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/ani
 import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/useMultiAccount";
 import { LEVELS } from "@/components/partner/LevelCarousel";
 import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
+import { ScreenLockDrawer } from "@/components/settings/ScreenLockDrawer";
+import { useScreenLock } from "@/hooks/useScreenLock";
 
 // Telegram-style colored icon backgrounds
 const iconColors: Record<string, { bg: string; text: string }> = {
@@ -39,6 +41,7 @@ const iconColors: Record<string, { bg: string; text: string }> = {
   laptop: { bg: 'bg-sky-500', text: 'text-white' },
   apofiz: { bg: 'bg-black dark:bg-zinc-800', text: 'text-white' },
   userplus: { bg: 'bg-blue-500', text: 'text-white' },
+  lock: { bg: 'bg-rose-500', text: 'text-white' },
 };
 
 interface ColoredIconProps {
@@ -283,6 +286,8 @@ const Settings = () => {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
+  const [isScreenLockOpen, setIsScreenLockOpen] = useState(false);
+  const { isEnabled: isScreenLockEnabled } = useScreenLock();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
@@ -833,6 +838,14 @@ const Settings = () => {
             value={currentTheme.name}
             onClick={() => setIsAppearanceOpen(true)}
           />
+          {/* Screen Lock */}
+          <SettingsItem
+            icon={<ColoredIcon colorKey="lock"><Lock className="w-4 h-4" /></ColoredIcon>}
+            label={t("screenLock.title")}
+            value={isScreenLockEnabled ? t("settings.enabled") || "On" : t("settings.disabled") || "Off"}
+            valueClassName={isScreenLockEnabled ? "text-sm font-medium text-green-500" : "text-muted-foreground text-sm"}
+            onClick={() => setIsScreenLockOpen(true)}
+          />
         </AnimatedMenuSection>
 
         {/* Limits and Fees */}
@@ -1208,6 +1221,12 @@ const Settings = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Screen Lock Drawer */}
+      <ScreenLockDrawer
+        isOpen={isScreenLockOpen}
+        onOpenChange={setIsScreenLockOpen}
+      />
     </MobileLayout>
   );
 };

@@ -379,6 +379,8 @@
     "verification": "Verification",
     "savedAccounts": "Saved Accounts",
     "switchedTo": "Switched to {{name}}",
+    "enabled": "On",
+    "disabled": "Off",
     "devices": {
       "title": "Active Devices",
       "noDevices": "No active devices",
@@ -1255,6 +1257,43 @@
           "3": "Use GET method on same endpoint to retrieve token details instead"
         }
       }
+    }
+  },
+  "screenLock": {
+    "title": "Screen Lock",
+    "passcode": "Passcode Lock",
+    "enabledDesc": "4-digit passcode is set",
+    "disabledDesc": "Protect your app with a passcode",
+    "biometricDesc": "Quick unlock with biometrics",
+    "autoLock": "Auto-lock",
+    "autoLockDesc": "Lock after inactivity",
+    "securityNote": "Screen lock adds an extra layer of security to protect your sensitive data.",
+    "createPasscode": "Create Passcode",
+    "confirmPasscode": "Confirm Passcode",
+    "enterPasscode": "Enter Passcode",
+    "createDesc": "Enter a {{length}}-digit passcode",
+    "confirmDesc": "Re-enter your passcode",
+    "verifyDesc": "Enter your current passcode to disable",
+    "passcodeTooShort": "Passcode must be {{length}} digits",
+    "passcodesNoMatch": "Passcodes don't match",
+    "wrongPasscode": "Wrong passcode",
+    "enabled": "Screen lock enabled",
+    "disabled": "Screen lock disabled",
+    "biometricEnabled": "{{method}} enabled",
+    "biometricDisabled": "{{method}} disabled",
+    "biometricFailed": "Failed to enable {{method}}",
+    "timeoutUpdated": "Lock timeout updated",
+    "enable": "Enable",
+    "unlockApp": "Unlock to continue",
+    "useBiometric": "Or use {{method}}",
+    "attempts": "attempts",
+    "timeout": {
+      "immediately": "Immediately",
+      "1min": "After 1 minute",
+      "5min": "After 5 minutes",
+      "15min": "After 15 minutes",
+      "30min": "After 30 minutes",
+      "never": "Never"
     }
   }
 }
