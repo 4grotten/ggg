@@ -85,12 +85,11 @@ export const BottomNavigation = () => {
         <div className="flex items-center justify-around relative">
           {/* iOS 26 liquid glass selector */}
           <motion.div
-            className="absolute overflow-hidden backdrop-blur-xl"
+            className="absolute overflow-hidden backdrop-blur-xl rounded-3xl"
             initial={false}
             animate={{
               left: selectorStyle.left,
               width: selectorStyle.width,
-              borderRadius: isEdgeTab ? 24 : 20,
             }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             style={{
@@ -100,7 +99,7 @@ export const BottomNavigation = () => {
               boxShadow: "inset 0 1px 1px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.05)",
             }}
           >
-            <div className="absolute inset-0 ring-1 ring-inset ring-white/30 dark:ring-white/15" style={{ borderRadius: "inherit" }} />
+            <div className="absolute inset-0 ring-1 ring-inset ring-white/30 dark:ring-white/15 rounded-3xl" />
           </motion.div>
           
           {navItems.map((item, index) => {
