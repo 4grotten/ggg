@@ -22,6 +22,7 @@ import { OpenCardDrawer } from "@/components/dashboard/OpenCardDrawer";
 import { AccountSwitcher } from "@/components/account/AccountSwitcher";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { AnimatedSection } from "@/components/dashboard/AnimatedSection";
+import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { TopUpDrawer } from "@/components/dashboard/TopUpDrawer";
@@ -44,6 +45,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useMultiAccount } from "@/hooks/useMultiAccount";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { useTransactionFilters, FilterType } from "@/hooks/useTransactionFilters";
+import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { preloadTgs } from "@/components/ui/TgsPlayer";
 import partnerNetworkHero from "@/assets/partner-network-hero.png";
 
@@ -52,6 +54,7 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const { avatarUrl } = useAvatar();
+  const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
   const queryClient = useQueryClient();
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
@@ -59,10 +62,13 @@ const Dashboard = () => {
   const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
   const [partnerDrawerOpen, setPartnerDrawerOpen] = useState(false);
   const [authAlertOpen, setAuthAlertOpen] = useState(false);
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   
   const { addCurrentAccount } = useMultiAccount();
   const { getCompletedSteps } = useVerificationProgress();
   const isVerified = getCompletedSteps() >= 3;
+  
+  const requiresAuth = isHideDataEnabled && isScreenLockEnabled;
 
   // Refs for sliding indicator
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -179,7 +185,16 @@ const Dashboard = () => {
 
           {/* Action Buttons */}
           <AnimatedSection delay={0.2} preset="fadeUp">
-            <ActionButtons onTopUp={() => setTopUpOpen(true)} onSend={() => setSendOpen(true)} />
+            <ActionButtons 
+              onTopUp={() => setTopUpOpen(true)} 
+              onSend={() => {
+                if (requiresAuth) {
+                  setShowUnlockDialog(true);
+                } else {
+                  setSendOpen(true);
+                }
+              }} 
+            />
           </AnimatedSection>
 
           {/* Verify Identity Card */}
@@ -347,6 +362,12 @@ const Dashboard = () => {
         </div>
       </AlertDialogContent>
     </AlertDialog>
+
+    <DataUnlockDialog
+      isOpen={showUnlockDialog}
+      onClose={() => setShowUnlockDialog(false)}
+      onSuccess={() => setSendOpen(true)}
+    />
   </>
 );
 };
