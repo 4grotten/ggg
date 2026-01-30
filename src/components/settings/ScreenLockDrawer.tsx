@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Shield, X, EyeOff } from 'lucide-react';
+import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Shield, X, EyeOff, Pause, Trash2 } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,12 @@ import { useScreenLockContext } from '@/contexts/ScreenLockContext';
 import type { LockTimeout } from '@/hooks/useScreenLock';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface ScreenLockDrawerProps {
   isOpen: boolean;
@@ -18,6 +24,7 @@ interface ScreenLockDrawerProps {
 }
 
 type SetupStep = 'main' | 'create-passcode' | 'verify-passcode' | 'timeout-select';
+type DisableAction = 'pause' | 'delete' | null;
 
 const PASSCODE_LENGTH = 4;
 
@@ -56,6 +63,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   const [error, setError] = useState('');
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [shake, setShake] = useState(false);
+  const [showDisableDialog, setShowDisableDialog] = useState(false);
+  const [pendingDisableAction, setPendingDisableAction] = useState<DisableAction>(null);
   
   // Track which phase of passcode entry we're in (1 = first entry, 2 = confirm)
   const [entryPhase, setEntryPhase] = useState<1 | 2>(1);
@@ -100,6 +109,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       setError('');
       setEntryPhase(1);
       setShake(false);
+      setShowDisableDialog(false);
+      setPendingDisableAction(null);
     }
   }, [isOpen]);
 
@@ -151,10 +162,21 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   useEffect(() => {
     if (step === 'verify-passcode' && passcode.length === PASSCODE_LENGTH) {
       if (verifyPasscode(passcode)) {
-        disableScreenLock();
-        toast.success(t('screenLock.disabled', 'Screen lock disabled'));
+        if (pendingDisableAction === 'pause') {
+          // Just disable but keep the passcode stored (conceptually "paused")
+          // For simplicity, we toggle off but user can re-enable without re-entering
+          localStorage.setItem('screen_lock_paused', 'true');
+          localStorage.setItem('screen_lock_enabled', 'false');
+          toast.success(t('screenLock.paused', 'Screen lock paused'));
+        } else {
+          // Full delete - remove everything
+          disableScreenLock();
+          localStorage.removeItem('screen_lock_paused');
+          toast.success(t('screenLock.deleted', 'Screen lock removed'));
+        }
         setStep('main');
         setPasscode('');
+        setPendingDisableAction(null);
       } else {
         setError(t('screenLock.wrongPasscode', 'Wrong passcode'));
         setShake(true);
@@ -165,7 +187,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         }, 400);
       }
     }
-  }, [step, passcode, verifyPasscode, disableScreenLock, t, focusInput]);
+  }, [step, passcode, verifyPasscode, disableScreenLock, t, focusInput, pendingDisableAction]);
 
   const handleEnableToggle = useCallback((checked: boolean) => {
     if (checked) {
@@ -176,10 +198,17 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       // Focus immediately from the user gesture to open the keyboard on iOS.
       focusInput();
     } else {
-      setStep('verify-passcode');
-      setPasscode('');
-      focusInput();
+      // Show dialog to choose pause or delete
+      setShowDisableDialog(true);
     }
+  }, [focusInput]);
+
+  const handleDisableChoice = useCallback((action: 'pause' | 'delete') => {
+    setShowDisableDialog(false);
+    setPendingDisableAction(action);
+    setStep('verify-passcode');
+    setPasscode('');
+    setTimeout(() => focusInput(), 100);
   }, [focusInput]);
 
   const handleBiometricToggle = useCallback(async (checked: boolean) => {
@@ -580,27 +609,65 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   );
 
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="relative flex items-center justify-between py-4 px-4">
-          <DrawerTitle className="flex items-center gap-2 text-base font-semibold">
-            <Lock className="w-5 h-5 text-primary" />
-            {step === 'timeout-select' 
-              ? t('screenLock.autoLock', 'Auto-lock')
-              : t('screenLock.title', 'Screen Lock')
-            }
-          </DrawerTitle>
-          <DrawerClose className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-            <X className="w-3.5 h-3.5 text-primary" />
-          </DrawerClose>
-        </DrawerHeader>
+    <>
+      <Drawer open={isOpen} onOpenChange={onOpenChange}>
+        <DrawerContent className="max-h-[90vh]">
+          <DrawerHeader className="relative flex items-center justify-between py-4 px-4">
+            <DrawerTitle className="flex items-center gap-2 text-base font-semibold">
+              <Lock className="w-5 h-5 text-primary" />
+              {step === 'timeout-select' 
+                ? t('screenLock.autoLock', 'Auto-lock')
+                : t('screenLock.title', 'Screen Lock')
+              }
+            </DrawerTitle>
+            <DrawerClose className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
+              <X className="w-3.5 h-3.5 text-primary" />
+            </DrawerClose>
+          </DrawerHeader>
 
-        <div className="px-4 pb-8 overflow-y-auto">
-          {step === 'main' && renderMainContent()}
-          {(step === 'create-passcode' || step === 'verify-passcode') && renderPasscodeInput()}
-          {step === 'timeout-select' && renderTimeoutSelect()}
-        </div>
-      </DrawerContent>
-    </Drawer>
+          <div className="px-4 pb-8 overflow-y-auto">
+            {step === 'main' && renderMainContent()}
+            {(step === 'create-passcode' || step === 'verify-passcode') && renderPasscodeInput()}
+            {step === 'timeout-select' && renderTimeoutSelect()}
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Pause or Delete Dialog */}
+      <AlertDialog open={showDisableDialog} onOpenChange={setShowDisableDialog}>
+        <AlertDialogContent className="w-[300px] rounded-2xl p-0 gap-0 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-0 shadow-2xl">
+          <div className="pt-5 pb-4 px-4 text-center">
+            <AlertDialogTitle className="text-[17px] font-semibold text-foreground mb-1">
+              {t('screenLock.disableTitle', 'Disable Screen Lock')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] text-muted-foreground leading-tight">
+              {t('screenLock.disableDesc', 'Would you like to pause temporarily or remove completely?')}
+            </AlertDialogDescription>
+          </div>
+          <div className="border-t border-[#C6C6C8] dark:border-[#38383A]">
+            <button
+              onClick={() => handleDisableChoice('pause')}
+              className="w-full flex items-center justify-center gap-2 py-[11px] text-[17px] text-[#007AFF] font-normal border-b border-[#C6C6C8] dark:border-[#38383A] active:bg-black/5 dark:active:bg-white/5 transition-colors"
+            >
+              <Pause className="w-4 h-4" />
+              {t('screenLock.pause', 'Pause temporarily')}
+            </button>
+            <button
+              onClick={() => handleDisableChoice('delete')}
+              className="w-full flex items-center justify-center gap-2 py-[11px] text-[17px] text-red-500 font-normal border-b border-[#C6C6C8] dark:border-[#38383A] active:bg-black/5 dark:active:bg-white/5 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              {t('screenLock.delete', 'Remove completely')}
+            </button>
+            <button
+              onClick={() => setShowDisableDialog(false)}
+              className="w-full py-[11px] text-[17px] text-[#007AFF] font-semibold active:bg-black/5 dark:active:bg-white/5 transition-colors"
+            >
+              {t('common.cancel', 'Cancel')}
+            </button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
