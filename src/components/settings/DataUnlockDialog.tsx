@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Fingerprint, Delete, AlertCircle, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -89,7 +90,7 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
     'delete',
   ];
 
-  return (
+  const dialogContent = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -97,8 +98,11 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[9999] bg-background backdrop-blur-sm flex flex-col items-center justify-center px-6"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+          className="fixed inset-0 flex flex-col items-center justify-center px-6 bg-background"
+          style={{ 
+            zIndex: 99999,
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
+          }}
         >
           {/* Close button */}
           <button
@@ -254,4 +258,6 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
       )}
     </AnimatePresence>
   );
+
+  return createPortal(dialogContent, document.body);
 };
