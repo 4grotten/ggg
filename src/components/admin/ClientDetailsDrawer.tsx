@@ -30,11 +30,11 @@ interface ClientDetailsDrawerProps {
 
 // Referral levels configuration - matching the real partner levels
 const REFERRAL_LEVELS = [
-  { id: "R1", name: "R1", icon: "🌱", color: "from-gray-400 to-gray-500", cardPercent: 15, txPercent: 0.05, minFriends: 0, maxFriends: 10 },
-  { id: "R2", name: "R2", icon: "🌿", color: "from-lime-400 to-lime-500", cardPercent: 20, txPercent: 0.1, minFriends: 10, maxFriends: 30 },
-  { id: "R3", name: "R3", icon: "💎", color: "from-blue-400 to-blue-500", cardPercent: 25, txPercent: 0.2, minFriends: 30, maxFriends: 50 },
-  { id: "R4", name: "R4", icon: "👑", color: "from-purple-400 to-purple-500", cardPercent: 30, txPercent: 0.3, minFriends: 50, maxFriends: 100 },
-  { id: "Partner", name: "Partner", icon: "🚀", color: "from-amber-400 to-amber-500", cardPercent: 35, txPercent: 0.5, minFriends: 100, maxFriends: Infinity },
+  { id: "R1", name: "R1", icon: "🌱", color: "from-gray-400 to-gray-500", cardPercent: 15, txPercent: 0.05, minFriends: 0, maxFriends: 10, description: "Начальный уровень для новых партнёров" },
+  { id: "R2", name: "R2", icon: "🌿", color: "from-lime-400 to-lime-500", cardPercent: 20, txPercent: 0.1, minFriends: 10, maxFriends: 30, description: "Растущий партнёр с активной сетью" },
+  { id: "R3", name: "R3", icon: "💎", color: "from-blue-400 to-blue-500", cardPercent: 25, txPercent: 0.2, minFriends: 30, maxFriends: 50, description: "Опытный партнёр с премиум-бонусами" },
+  { id: "R4", name: "R4", icon: "👑", color: "from-purple-400 to-purple-500", cardPercent: 30, txPercent: 0.3, minFriends: 50, maxFriends: 100, description: "Элитный партнёр с максимальными привилегиями" },
+  { id: "Partner", name: "Partner", icon: "🚀", color: "from-amber-400 to-amber-500", cardPercent: 35, txPercent: 0.5, minFriends: 100, maxFriends: Infinity, description: "Официальный партнёр компании" },
 ];
 
 export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetailsDrawerProps) {
@@ -157,46 +157,68 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
               <h4 className="font-semibold">Реферальный уровень</h4>
             </div>
             
-            <div className="grid grid-cols-3 gap-2">
+            <div className="space-y-2">
               {REFERRAL_LEVELS.map((level) => (
                 <button
                   key={level.id}
                   onClick={() => setSelectedLevel(level.id)}
                   className={cn(
-                    "relative p-3 rounded-2xl border-2 transition-all duration-200 text-center",
+                    "relative w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left",
                     selectedLevel === level.id
                       ? "border-primary bg-primary/10"
                       : "border-border/50 bg-muted/30 hover:border-border"
                   )}
                 >
-                  <div className={cn(
-                    "w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br flex items-center justify-center text-lg",
-                    level.color
-                  )}>
-                    {level.icon}
-                  </div>
-                  <p className="text-xs font-medium truncate">{level.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{level.cardPercent}%</p>
-                  
-                  {selectedLevel === level.id && (
-                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                      <CheckCircle className="w-3 h-3 text-primary-foreground" />
+                  <div className="flex items-center gap-4">
+                    {/* Icon */}
+                    <div className={cn(
+                      "w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-2xl shrink-0",
+                      level.color
+                    )}>
+                      {level.icon}
                     </div>
-                  )}
+                    
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-sm">{level.name}</span>
+                        {selectedLevel === level.id && (
+                          <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0">
+                            Текущий
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{level.description}</p>
+                    </div>
+                    
+                    {/* Stats */}
+                    <div className="text-right shrink-0">
+                      <div className="flex items-center gap-1 justify-end">
+                        <CreditCard className="w-3 h-3 text-primary" />
+                        <span className="text-sm font-bold text-primary">{level.cardPercent}%</span>
+                      </div>
+                      <div className="flex items-center gap-1 justify-end mt-0.5">
+                        <TrendingUp className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">{level.txPercent}%</span>
+                      </div>
+                    </div>
+                    
+                    {/* Checkmark */}
+                    {selectedLevel === level.id && (
+                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Friends requirement */}
+                  <div className="mt-2 pt-2 border-t border-border/30 flex items-center justify-between text-[10px] text-muted-foreground">
+                    <span>Требуется друзей: {level.minFriends}{level.maxFriends !== Infinity ? `–${level.maxFriends}` : '+'}</span>
+                    <span>Карта {level.cardPercent}% · TX {level.txPercent}%</span>
+                  </div>
                 </button>
               ))}
             </div>
-            
-            {currentLevelData && (
-              <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 space-y-1">
-                <p className="text-xs text-center">
-                  Карта: <span className="font-bold text-primary">{currentLevelData.cardPercent}%</span> · Транзакции: <span className="font-bold text-primary">{currentLevelData.txPercent}%</span>
-                </p>
-                <p className="text-[10px] text-center text-muted-foreground">
-                  Требуется друзей: {currentLevelData.minFriends}{currentLevelData.maxFriends !== Infinity ? `-${currentLevelData.maxFriends}` : '+'}
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Personal Fees Section */}
