@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Phone, User, CreditCard, TrendingUp, Percent, Shield, Award, ChevronRight, Save, Wallet, ArrowUpDown, Calendar, CheckCircle, XCircle, Crown } from "lucide-react";
+import { Phone, User, CreditCard, TrendingUp, Percent, Shield, Award, ChevronRight, Save, Wallet, ArrowUpDown, Calendar, CheckCircle, XCircle, Crown, Sparkles } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,9 +37,18 @@ const REFERRAL_LEVELS = [
   { id: "Partner", name: "Partner", icon: "🚀", color: "from-amber-400 to-amber-500", cardPercent: 35, txPercent: 0.5, minFriends: 100, maxFriends: Infinity, description: "Официальный партнёр компании" },
 ];
 
+// Subscription types configuration
+const SUBSCRIPTION_TYPES = [
+  { id: "free", name: "Бесплатная", icon: "🆓", color: "from-gray-400 to-gray-500", description: "Базовый функционал без дополнительных преимуществ" },
+  { id: "standard", name: "Стандартная", icon: "⭐", color: "from-blue-400 to-blue-500", description: "Расширенные лимиты и сниженные комиссии" },
+  { id: "premium", name: "Премиум", icon: "💎", color: "from-purple-400 to-purple-500", description: "Максимальные лимиты, приоритетная поддержка" },
+  { id: "vip", name: "VIP", icon: "👑", color: "from-amber-400 to-amber-500", description: "Эксклюзивные условия и персональный менеджер" },
+];
+
 export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetailsDrawerProps) {
   // Local state for editable fields
   const [selectedLevel, setSelectedLevel] = useState(client?.referralLevel || "R1");
+  const [selectedSubscription, setSelectedSubscription] = useState("free");
   const [isVIP, setIsVIP] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   
@@ -147,6 +156,47 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                 <span className="text-sm font-medium">Блокировка</span>
               </div>
               <Switch checked={isBlocked} onCheckedChange={setIsBlocked} />
+            </div>
+          </div>
+
+          {/* Subscription Type Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <h4 className="font-semibold">Вид подписки</h4>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2">
+              {SUBSCRIPTION_TYPES.map((sub) => (
+                <button
+                  key={sub.id}
+                  onClick={() => setSelectedSubscription(sub.id)}
+                  className={cn(
+                    "relative p-3 rounded-xl border-2 transition-all duration-200 text-left",
+                    selectedSubscription === sub.id
+                      ? "border-primary bg-primary/10"
+                      : "border-border/50 bg-muted/30 hover:border-border"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-xl shrink-0",
+                      sub.color
+                    )}>
+                      {sub.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-sm">{sub.name}</span>
+                        {selectedSubscription === sub.id && (
+                          <CheckCircle className="w-3.5 h-3.5 text-primary" />
+                        )}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1">{sub.description}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
