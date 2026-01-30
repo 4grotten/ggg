@@ -579,40 +579,41 @@ export default function AdminPanel() {
                     
                     <div className="relative p-5">
                       {/* Main content row */}
-                      <div className="flex items-center gap-4">
-                        {/* Avatar with photo */}
-                        <div className="relative shrink-0">
-                          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-primary/20 ring-2 ring-primary/20">
-                            <img 
-                              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" 
-                              alt="Александр Иванов"
-                              className="w-full h-full object-cover"
-                            />
+                      <div className="flex items-start gap-4">
+                        {/* Avatar with photo and status below */}
+                        <div className="flex flex-col items-center gap-2 shrink-0">
+                          <div className="relative">
+                            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-primary/20 ring-2 ring-primary/20">
+                              <img 
+                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" 
+                                alt="Александр Иванов"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            {/* Online indicator */}
+                            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
+                              <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                            </div>
                           </div>
-                          {/* Online indicator */}
-                          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                          </div>
+                          {/* VIP Badge below photo */}
+                          <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-[10px] px-2.5 py-0.5 font-semibold border-0 shadow-sm">
+                            VIP
+                          </Badge>
                         </div>
                         
                         {/* Info section */}
                         <div className="flex-1 min-w-0">
-                          {/* Name and badge */}
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-bold text-base truncate">Александр Иванов</h3>
-                            <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-[10px] px-2 py-0.5 font-semibold border-0 shadow-sm">
-                              VIP
-                            </Badge>
-                          </div>
+                          {/* Full Name */}
+                          <h3 className="font-bold text-lg mb-2">Александр Иванов</h3>
                           
                           {/* Phone number */}
-                          <div className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 w-fit">
+                          <div className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 w-fit mb-3">
                             <Phone className="w-4 h-4 text-primary" />
                             <span className="text-sm font-medium">+971 50 123 4567</span>
                           </div>
                           
                           {/* Tags */}
-                          <div className="flex items-center gap-2 mt-3 flex-wrap">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
                               <CheckCircle className="w-3 h-3" />
                               Верифицирован
@@ -623,15 +624,6 @@ export default function AdminPanel() {
                             </span>
                           </div>
                         </div>
-                        
-                        {/* Action button */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 w-12 h-12 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200"
-                        >
-                          <Eye className="w-5 h-5" />
-                        </Button>
                       </div>
                     </div>
                   </div>
