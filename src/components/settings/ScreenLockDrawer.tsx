@@ -286,8 +286,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   };
 
   const renderMainContent = () => (
-    <div className="space-y-4">
-      <AnimatedDrawerContainer>
+    <div className="space-y-5">
+      <AnimatedDrawerContainer className="space-y-3">
         <AnimatedDrawerItem index={0}>
           <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
             <div className="flex items-center gap-3">
