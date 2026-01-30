@@ -1,4 +1,4 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -569,40 +569,89 @@ export default function AdminPanel() {
                     </Button>
                   </div>
 
-                  {/* Mock User Card */}
-                  <div className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0 text-primary-foreground font-bold text-lg">
-                      А
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-sm">Александр Иванов</p>
-                        <Badge variant="default" className="text-[10px] px-1.5 py-0 bg-emerald-500">
-                          VIP
-                        </Badge>
+                  {/* Mock User Card - Ultra Modern Design */}
+                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-muted/30 border border-border/50 mb-4 group hover:border-primary/30 transition-all duration-300">
+                    {/* Glassmorphism overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    {/* Status indicator line */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500" />
+                    
+                    <div className="relative p-5">
+                      {/* Top row - Avatar, Name, Status */}
+                      <div className="flex items-start gap-4 mb-4">
+                        {/* Avatar with status ring */}
+                        <div className="relative">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold text-xl shadow-lg shadow-primary/25">
+                            А
+                          </div>
+                          {/* Online indicator */}
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                          </div>
+                        </div>
+                        
+                        {/* Name and badges */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-base truncate">Александр Иванов</h3>
+                            <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-[10px] px-2 py-0.5 font-semibold border-0 shadow-sm">
+                              VIP
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground font-medium">ID: #USR-2847291</p>
+                        </div>
+                        
+                        {/* Action button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 w-10 h-10 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+                        >
+                          <Eye className="w-5 h-5" />
+                        </Button>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          +971 50 123 4567
+                      
+                      {/* Info grid */}
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* Balance */}
+                        <div className="bg-muted/50 rounded-2xl p-3 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Баланс</p>
+                          <p className="text-base font-bold text-emerald-500">12,450</p>
+                          <p className="text-[10px] text-muted-foreground">AED</p>
+                        </div>
+                        
+                        {/* Phone */}
+                        <div className="bg-muted/50 rounded-2xl p-3 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Телефон</p>
+                          <p className="text-xs font-semibold truncate">+971 50 123</p>
+                          <p className="text-[10px] text-muted-foreground">4567</p>
+                        </div>
+                        
+                        {/* Registration */}
+                        <div className="bg-muted/50 rounded-2xl p-3 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Регистрация</p>
+                          <p className="text-xs font-semibold">15.01.2025</p>
+                          <p className="text-[10px] text-muted-foreground">12 дней</p>
+                        </div>
+                      </div>
+                      
+                      {/* Bottom tags */}
+                      <div className="flex items-center gap-2 mt-4 flex-wrap">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
+                          <CheckCircle className="w-3 h-3" />
+                          Верифицирован
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          15.01.2025
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-medium">
+                          <CreditCard className="w-3 h-3" />
+                          2 карты
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[10px] font-medium">
+                          <TrendingUp className="w-3 h-3" />
+                          Активный
                         </span>
                       </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm font-semibold text-emerald-500">12,450 AED</p>
-                      <p className="text-[10px] text-muted-foreground">Баланс</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0 rounded-xl text-primary hover:text-primary hover:bg-primary/10"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
                   </div>
 
                   {/* Clients List */}
