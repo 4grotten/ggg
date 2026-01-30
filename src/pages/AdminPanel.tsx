@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAdminManagement } from "@/hooks/useAdminManagement";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { useState, useEffect } from "react";
 import { AdminSetting, AppRole } from "@/types/admin";
 
@@ -279,10 +280,11 @@ export default function AdminPanel() {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div>
+            <div className="flex-1">
               <h1 className="text-lg font-semibold">Административная панель</h1>
               <p className="text-xs text-muted-foreground">Управление настройками системы</p>
             </div>
+            <LanguageSwitcher />
           </div>
         </div>
 
