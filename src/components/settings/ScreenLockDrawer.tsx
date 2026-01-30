@@ -622,14 +622,11 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             side="top" 
             className="h-auto max-h-[50vh] rounded-b-3xl border-b border-border/50 pt-[env(safe-area-inset-top)]"
           >
-            <SheetHeader className="flex flex-row items-center justify-between py-3 px-4 space-y-0">
+            <SheetHeader className="flex flex-row items-center py-3 px-4 space-y-0">
               <SheetTitle className="flex items-center gap-2 text-base font-semibold">
                 <Lock className="w-5 h-5 text-primary" />
                 {t('screenLock.title', 'Screen Lock')}
               </SheetTitle>
-              <SheetClose className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-                <X className="w-3.5 h-3.5 text-primary" />
-              </SheetClose>
             </SheetHeader>
 
             <div className="px-4 pb-6">
