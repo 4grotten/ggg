@@ -52,13 +52,26 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
   const [animationKeys, setAnimationKeys] = useState<Record<string, number>>({});
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [pendingCardId, setPendingCardId] = useState<string | null>(null);
+  const [pendingCardNavigation, setPendingCardNavigation] = useState<Card | null>(null);
   
   const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
+  
+  const requiresAuth = isHideDataEnabled && isScreenLockEnabled;
 
   const handleCardClick = (card: Card) => {
     if (onCardClick) {
       onCardClick(card);
-    } else if (card.type === "virtual") {
+      return;
+    }
+    
+    // Require auth before entering card page
+    if (requiresAuth) {
+      setPendingCardNavigation(card);
+      setShowUnlockDialog(true);
+      return;
+    }
+    
+    if (card.type === "virtual") {
       navigate("/card/virtual");
     } else if (card.type === "metal") {
       navigate("/card/metal");
@@ -70,7 +83,7 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
     
     const isCurrentlyVisible = visibleBalances.has(cardId);
     
-    if (!isCurrentlyVisible && isHideDataEnabled && isScreenLockEnabled) {
+    if (!isCurrentlyVisible && requiresAuth) {
       // Require authentication before showing
       setPendingCardId(cardId);
       setShowUnlockDialog(true);
@@ -90,6 +103,19 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
   };
 
   const handleUnlockSuccess = () => {
+    // Handle card navigation unlock
+    if (pendingCardNavigation) {
+      const card = pendingCardNavigation;
+      setPendingCardNavigation(null);
+      if (card.type === "virtual") {
+        navigate("/card/virtual");
+      } else if (card.type === "metal") {
+        navigate("/card/metal");
+      }
+      return;
+    }
+    
+    // Handle balance visibility unlock
     if (pendingCardId) {
       setVisibleBalances(prev => {
         const newSet = new Set(prev);
@@ -149,6 +175,7 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
         onClose={() => {
           setShowUnlockDialog(false);
           setPendingCardId(null);
+          setPendingCardNavigation(null);
         }}
         onSuccess={handleUnlockSuccess}
       />
