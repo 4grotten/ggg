@@ -6,6 +6,7 @@ const SCREEN_LOCK_BIOMETRIC_KEY = 'screen_lock_biometric';
 const SCREEN_LOCK_TIMEOUT_KEY = 'screen_lock_timeout';
 const SCREEN_LOCK_LAST_ACTIVITY_KEY = 'screen_lock_last_activity';
 const SCREEN_LOCK_HIDE_DATA_KEY = 'screen_lock_hide_data';
+const SCREEN_LOCK_PAUSED_KEY = 'screen_lock_paused';
 
 export type LockTimeout = 'immediately' | '1min' | '5min' | '15min' | '30min' | 'never';
 
@@ -35,6 +36,7 @@ export const useScreenLock = () => {
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [lockTimeout, setLockTimeoutState] = useState<LockTimeout>('immediately');
   const [isHideDataEnabled, setIsHideDataEnabled] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   // Initialize from localStorage
   useEffect(() => {
@@ -42,11 +44,13 @@ export const useScreenLock = () => {
     const biometric = localStorage.getItem(SCREEN_LOCK_BIOMETRIC_KEY) === 'true';
     const timeout = (localStorage.getItem(SCREEN_LOCK_TIMEOUT_KEY) as LockTimeout) || 'immediately';
     const hideData = localStorage.getItem(SCREEN_LOCK_HIDE_DATA_KEY) === 'true';
+    const paused = localStorage.getItem(SCREEN_LOCK_PAUSED_KEY) === 'true';
     
     setIsEnabled(enabled);
     setIsBiometricEnabled(biometric);
     setLockTimeoutState(timeout);
     setIsHideDataEnabled(hideData);
+    setIsPaused(paused);
 
     // Check if should be locked on app start
     if (enabled) {
@@ -130,7 +134,9 @@ export const useScreenLock = () => {
     localStorage.setItem(SCREEN_LOCK_PASSCODE_KEY, hashedPasscode);
     localStorage.setItem(SCREEN_LOCK_ENABLED_KEY, 'true');
     localStorage.setItem(SCREEN_LOCK_LAST_ACTIVITY_KEY, String(Date.now()));
+    localStorage.removeItem(SCREEN_LOCK_PAUSED_KEY);
     setIsEnabled(true);
+    setIsPaused(false);
   }, []);
 
   const disableScreenLock = useCallback(() => {
@@ -140,10 +146,28 @@ export const useScreenLock = () => {
     localStorage.removeItem(SCREEN_LOCK_TIMEOUT_KEY);
     localStorage.removeItem(SCREEN_LOCK_LAST_ACTIVITY_KEY);
     localStorage.removeItem(SCREEN_LOCK_HIDE_DATA_KEY);
+    localStorage.removeItem(SCREEN_LOCK_PAUSED_KEY);
     setIsEnabled(false);
     setIsBiometricEnabled(false);
     setIsLocked(false);
     setIsHideDataEnabled(false);
+    setIsPaused(false);
+  }, []);
+
+  const pauseScreenLock = useCallback(() => {
+    localStorage.setItem(SCREEN_LOCK_ENABLED_KEY, 'false');
+    localStorage.setItem(SCREEN_LOCK_PAUSED_KEY, 'true');
+    setIsEnabled(false);
+    setIsPaused(true);
+    setIsLocked(false);
+  }, []);
+
+  const resumeScreenLock = useCallback(() => {
+    localStorage.setItem(SCREEN_LOCK_ENABLED_KEY, 'true');
+    localStorage.removeItem(SCREEN_LOCK_PAUSED_KEY);
+    localStorage.setItem(SCREEN_LOCK_LAST_ACTIVITY_KEY, String(Date.now()));
+    setIsEnabled(true);
+    setIsPaused(false);
   }, []);
 
   const verifyPasscode = useCallback((passcode: string): boolean => {
@@ -205,8 +229,11 @@ export const useScreenLock = () => {
     isBiometricEnabled,
     lockTimeout,
     isHideDataEnabled,
+    isPaused,
     enableScreenLock,
     disableScreenLock,
+    pauseScreenLock,
+    resumeScreenLock,
     verifyPasscode,
     changePasscode,
     unlock,

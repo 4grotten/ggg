@@ -51,8 +51,11 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     isBiometricEnabled,
     lockTimeout,
     isHideDataEnabled,
+    isPaused,
     enableScreenLock,
     disableScreenLock,
+    pauseScreenLock,
+    resumeScreenLock,
     verifyPasscode,
     setBiometricEnabled,
     setLockTimeout,
@@ -169,15 +172,11 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     if (step === 'verify-passcode' && passcode.length === PASSCODE_LENGTH) {
       if (verifyPasscode(passcode)) {
         if (pendingDisableAction === 'pause') {
-          // Just disable but keep the passcode stored (conceptually "paused")
-          // For simplicity, we toggle off but user can re-enable without re-entering
-          localStorage.setItem('screen_lock_paused', 'true');
-          localStorage.setItem('screen_lock_enabled', 'false');
+          pauseScreenLock();
           toast.success(t('screenLock.paused', 'Screen lock paused'));
         } else {
           // Full delete - remove everything
           disableScreenLock();
-          localStorage.removeItem('screen_lock_paused');
           toast.success(t('screenLock.deleted', 'Screen lock removed'));
         }
         setStep('main');
@@ -193,10 +192,17 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         }, 400);
       }
     }
-  }, [step, passcode, verifyPasscode, disableScreenLock, t, focusInput, pendingDisableAction]);
+  }, [step, passcode, verifyPasscode, disableScreenLock, pauseScreenLock, t, focusInput, pendingDisableAction]);
 
   const handleEnableToggle = useCallback((checked: boolean) => {
     if (checked) {
+      // If paused, just resume without re-entering passcode
+      if (isPaused) {
+        resumeScreenLock();
+        toast.success(t('screenLock.resumed', 'Screen lock resumed'));
+        return;
+      }
+      // Otherwise start creation flow
       setStep('create-passcode');
       setEntryPhase(1);
       setPasscode('');
@@ -207,7 +213,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       // Show dialog to choose pause or delete
       setShowDisableDialog(true);
     }
-  }, [focusInput]);
+  }, [focusInput, isPaused, resumeScreenLock, t]);
 
   const handleDisableChoice = useCallback((action: 'pause' | 'delete') => {
     setShowDisableDialog(false);
@@ -336,10 +342,18 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     <div className="space-y-5">
       <AnimatedDrawerContainer className="space-y-3">
         <AnimatedDrawerItem index={0}>
-          <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
+          <div className={cn(
+            "flex items-center justify-between p-4 rounded-xl",
+            isPaused ? "bg-yellow-500/10" : "bg-muted/50"
+          )}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                {isEnabled ? (
+              <div className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center",
+                isPaused ? "bg-yellow-500/20" : isEnabled ? "bg-primary/10" : "bg-muted"
+              )}>
+                {isPaused ? (
+                  <Pause className="w-5 h-5 text-yellow-500" />
+                ) : isEnabled ? (
                   <Lock className="w-5 h-5 text-primary" />
                 ) : (
                   <LockOpen className="w-5 h-5 text-muted-foreground" />
@@ -349,8 +363,13 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
                 <p className="font-medium text-foreground">
                   {t('screenLock.passcode', 'Passcode Lock')}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  {isEnabled 
+                <p className={cn(
+                  "text-sm",
+                  isPaused ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"
+                )}>
+                  {isPaused
+                    ? t('screenLock.pausedDesc', 'Tap to resume')
+                    : isEnabled 
                     ? t('screenLock.enabledDesc', '4-digit passcode is set')
                     : t('screenLock.disabledDesc', 'Protect your app with a passcode')
                   }
@@ -358,8 +377,9 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
               </div>
             </div>
             <Switch 
-              checked={isEnabled} 
+              checked={isEnabled || isPaused} 
               onCheckedChange={handleEnableToggle}
+              className={isPaused ? "[&>span]:bg-yellow-500" : ""}
             />
           </div>
         </AnimatedDrawerItem>
