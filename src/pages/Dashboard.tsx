@@ -1,10 +1,9 @@
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, LogIn } from "lucide-react";
+import { Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
@@ -21,6 +20,8 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { OpenCardButton } from "@/components/dashboard/OpenCardButton";
 import { OpenCardDrawer } from "@/components/dashboard/OpenCardDrawer";
 import { AccountSwitcher } from "@/components/account/AccountSwitcher";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { AnimatedSection } from "@/components/dashboard/AnimatedSection";
 
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { TopUpDrawer } from "@/components/dashboard/TopUpDrawer";
@@ -38,15 +39,13 @@ import {
 import { useCards, useTotalBalance } from "@/hooks/useCards";
 import { useTransactionGroups } from "@/hooks/useTransactions";
 import { useQueryClient } from "@tanstack/react-query";
-import { TransactionGroup, Transaction } from "@/types/transaction";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useMultiAccount } from "@/hooks/useMultiAccount";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
+import { useTransactionFilters, FilterType } from "@/hooks/useTransactionFilters";
 import { preloadTgs } from "@/components/ui/TgsPlayer";
 import partnerNetworkHero from "@/assets/partner-network-hero.png";
-
-type FilterType = "all" | "income" | "expenses" | "transfers";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -60,10 +59,7 @@ const Dashboard = () => {
   const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
   const [partnerDrawerOpen, setPartnerDrawerOpen] = useState(false);
   const [authAlertOpen, setAuthAlertOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   
-  // Long press handling for avatar
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const { addCurrentAccount } = useMultiAccount();
   const { getCompletedSteps } = useVerificationProgress();
   const isVerified = getCompletedSteps() >= 3;
@@ -83,12 +79,12 @@ const Dashboard = () => {
   const totalBalance = balanceData?.balance || 0;
   const transactionGroups = transactionsData?.groups || [];
 
+  // Use transaction filters hook
+  const { activeFilter, setActiveFilter, filteredGroups } = useTransactionFilters(transactionGroups);
+
   // User display data
   const displayName = user?.full_name || 'Guest';
   const displayAvatar = user?.avatar?.small || user?.avatar?.file || avatarUrl;
-  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  const firstName = displayName.split(' ')[0];
-  
 
   // Preload Partner drawer animations and banner on mount
   useEffect(() => {
@@ -102,7 +98,7 @@ const Dashboard = () => {
     img.src = partnerNetworkHero;
   }, []);
 
-  // Save current account to multi-account storage (welcome toast is now shown only at login)
+  // Save current account to multi-account storage
   useEffect(() => {
     if (isAuthenticated && user) {
       addCurrentAccount(user);
@@ -130,43 +126,6 @@ const Dashboard = () => {
       });
     }
   }, [activeFilter]);
-
-  // Transaction filter helpers
-  const isIncomeTransaction = (tx: Transaction): boolean => {
-    return tx.type === "topup" || 
-           tx.type === "bank_transfer_incoming" || 
-           (tx.type === "card_transfer" && !!tx.senderCard);
-  };
-
-  const isExpenseTransaction = (tx: Transaction): boolean => {
-    return !tx.type || 
-           tx.type === "declined" || 
-           tx.type === "card_activation" ||
-           tx.type === "bank_transfer" ||
-           tx.type === "crypto_withdrawal";
-  };
-
-  const isTransferTransaction = (tx: Transaction): boolean => {
-    return tx.type === "card_transfer" || 
-           tx.type === "bank_transfer" || 
-           tx.type === "bank_transfer_incoming" ||
-           tx.type === "crypto_withdrawal";
-  };
-
-  // Filtered transactions
-  const filteredGroups = useMemo(() => {
-    return transactionGroups.map((group: TransactionGroup) => {
-      let filteredTxs = group.transactions;
-      if (activeFilter === "income") {
-        filteredTxs = group.transactions.filter(isIncomeTransaction);
-      } else if (activeFilter === "expenses") {
-        filteredTxs = group.transactions.filter(isExpenseTransaction);
-      } else if (activeFilter === "transfers") {
-        filteredTxs = group.transactions.filter(isTransferTransaction);
-      }
-      return { ...group, transactions: filteredTxs };
-    }).filter((group: TransactionGroup) => group.transactions.length > 0);
-  }, [transactionGroups, activeFilter]);
 
   const handleRefresh = useCallback(async () => {
     await Promise.all([
@@ -196,100 +155,13 @@ const Dashboard = () => {
           <div className="flex items-center gap-2">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            {isAuthenticated ? (
-              <motion.button 
-                onClick={() => navigate("/settings")}
-                onPointerDown={() => {
-                  longPressTimer.current = setTimeout(() => {
-                    setAccountSwitcherOpen(true);
-                  }, 500);
-                }}
-                onPointerUp={() => {
-                  if (longPressTimer.current) {
-                    clearTimeout(longPressTimer.current);
-                    longPressTimer.current = null;
-                  }
-                }}
-                onPointerLeave={() => {
-                  if (longPressTimer.current) {
-                    clearTimeout(longPressTimer.current);
-                    longPressTimer.current = null;
-                  }
-                }}
-                className="relative"
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 260, 
-                  damping: 20,
-                  delay: 0.2 
-                }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <motion.div
-                  initial={{ boxShadow: "0 0 0 0 rgba(var(--primary), 0)" }}
-                  animate={{ 
-                    boxShadow: [
-                      "0 0 0 0 hsl(var(--primary) / 0.4)",
-                      "0 0 0 8px hsl(var(--primary) / 0)",
-                      "0 0 0 0 hsl(var(--primary) / 0)"
-                    ]
-                  }}
-                  transition={{ duration: 1.5, delay: 0.5 }}
-                  className="rounded-full"
-                >
-                  <Avatar className="w-10 h-10 ring-2 ring-transparent transition-all duration-300 hover:ring-primary/50">
-                    <AvatarImage src={displayAvatar} alt={displayName} className="object-cover" />
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">{initials}</AvatarFallback>
-                  </Avatar>
-                </motion.div>
-                <motion.div 
-                  className={cn(
-                    "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center border-2 border-background",
-                    isVerified ? "bg-green-500" : "bg-red-500"
-                  )}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", delay: 0.6 }}
-                >
-                  {isVerified ? (
-                    <motion.div
-                      className="w-1.5 h-1.5 rounded-full bg-white"
-                      animate={{ opacity: [1, 0.5, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  ) : (
-                    <motion.div
-                      className="w-1.5 h-1.5 rounded-full bg-white"
-                      animate={{ 
-                        opacity: [1, 0.3, 1],
-                        scale: [1, 0.8, 1]
-                      }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                  )}
-                </motion.div>
-              </motion.button>
-            ) : (
-              <motion.button 
-                onClick={() => navigate("/auth/phone")}
-                className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/25"
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 260, 
-                  damping: 20,
-                  delay: 0.2 
-                }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <LogIn className="w-5 h-5 text-primary-foreground" />
-              </motion.button>
-            )}
+            <DashboardHeader
+              isAuthenticated={isAuthenticated}
+              displayName={displayName}
+              displayAvatar={displayAvatar}
+              isVerified={isVerified}
+              onAccountSwitcherOpen={() => setAccountSwitcherOpen(true)}
+            />
           </div>
         }
       >
@@ -297,73 +169,33 @@ const Dashboard = () => {
         <div className="px-4 py-6 space-y-6 pb-28">
           {/* Balance - only for authenticated users */}
           {isAuthenticated && !balanceLoading && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.97, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              transition={{ 
-                duration: 0.8,
-                ease: [0.16, 1, 0.3, 1],
-                delay: 0.1
-              }}
-            >
+            <AnimatedSection delay={0.1} preset="fadeUpScale">
               <BalanceCard balance={totalBalance} />
-            </motion.div>
+            </AnimatedSection>
           )}
           {isAuthenticated && balanceLoading && (
             <Skeleton className="h-32 w-full rounded-2xl" />
           )}
 
           {/* Action Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ 
-              duration: 0.7,
-              ease: [0.16, 1, 0.3, 1],
-              delay: 0.2
-            }}
-          >
+          <AnimatedSection delay={0.2} preset="fadeUp">
             <ActionButtons onTopUp={() => setTopUpOpen(true)} onSend={() => setSendOpen(true)} />
-          </motion.div>
+          </AnimatedSection>
 
           {/* Verify Identity Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 25, scale: 0.98, filter: "blur(10px)" }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-            transition={{ 
-              duration: 0.9,
-              ease: [0.16, 1, 0.3, 1],
-              delay: 0.3
-            }}
-          >
+          <AnimatedSection delay={0.3} preset="fadeUpBlur">
             <VerifyIdentityCard />
-          </motion.div>
+          </AnimatedSection>
 
           {/* Partner Program Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 25, scale: 0.98, filter: "blur(10px)" }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-            transition={{ 
-              duration: 0.9,
-              ease: [0.16, 1, 0.3, 1],
-              delay: 0.4
-            }}
-          >
+          <AnimatedSection delay={0.4} preset="fadeUpBlur">
             <PartnerCard onClick={() => setPartnerDrawerOpen(true)} />
-          </motion.div>
+          </AnimatedSection>
 
           {/* Open New Card Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95, filter: "blur(8px)" }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-            transition={{ 
-              duration: 0.8,
-              ease: [0.16, 1, 0.3, 1],
-              delay: 0.5
-            }}
-          >
+          <AnimatedSection delay={0.5} preset="fadeUpScale">
             <OpenCardButton onClick={() => setOpenCardOpen(true)} />
-          </motion.div>
+          </AnimatedSection>
 
           {/* Cards */}
           {cardsLoading ? (
@@ -372,46 +204,22 @@ const Dashboard = () => {
               <Skeleton className="h-24 w-full rounded-2xl" />
             </div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ 
-                duration: 1,
-                ease: [0.16, 1, 0.3, 1],
-                delay: 0.6
-              }}
-            >
+            <AnimatedSection delay={0.6} preset="fadeUpBlur">
               <CardsList 
                 cards={isAuthenticated ? cards : cards.map(c => ({ ...c, balance: undefined }))} 
                 onCardClick={!isAuthenticated ? () => setAuthAlertOpen(true) : undefined}
               />
-            </motion.div>
+            </AnimatedSection>
           )}
 
           {/* Send to Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.97, filter: "blur(8px)" }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-            transition={{ 
-              duration: 0.8,
-              ease: [0.16, 1, 0.3, 1],
-              delay: 0.7
-            }}
-          >
+          <AnimatedSection delay={0.7} preset="fadeUpScale">
             <SendToCardButton />
-          </motion.div>
+          </AnimatedSection>
 
           {/* Transactions - only for authenticated users */}
           {isAuthenticated && (
-            <motion.div
-              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ 
-                duration: 1,
-                ease: [0.16, 1, 0.3, 1],
-                delay: 0.8
-              }}
-            >
+            <AnimatedSection delay={0.8} preset="fadeUpBlur">
               <div className="flex items-center justify-between mb-3">
                 <motion.h2 
                   className="text-xl font-bold"
@@ -496,7 +304,7 @@ const Dashboard = () => {
                   <CardTransactionsList groups={filteredGroups} />
                 </motion.div>
               )}
-            </motion.div>
+            </AnimatedSection>
           )}
 
         </div>
