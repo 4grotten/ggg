@@ -18,6 +18,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useState, useEffect } from "react";
 import { AdminSetting, AppRole } from "@/types/admin";
 import { cn } from "@/lib/utils";
+import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
 
 // Settings field configuration
 const exchangeRateFields = [
@@ -233,6 +234,36 @@ export default function AdminPanel() {
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [filteredClients, setFilteredClients] = useState<typeof clients>(undefined);
   const [isClientSearching, setIsClientSearching] = useState(false);
+  const [clientDrawerOpen, setClientDrawerOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<{
+    id: string;
+    name: string;
+    phone: string;
+    avatarUrl?: string;
+    isVerified: boolean;
+    cardsCount: number;
+    referralLevel: string;
+    balance: number;
+    registrationDate: string;
+  } | null>(null);
+
+  // Mock client data for the card
+  const mockClientData = {
+    id: "mock-user-1",
+    name: "Александр Иванов",
+    phone: "+971 50 123 4567",
+    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+    isVerified: true,
+    cardsCount: 2,
+    referralLevel: "R2",
+    balance: 12450,
+    registrationDate: "15.01.2025",
+  };
+
+  const handleOpenClientDetails = (client: typeof mockClientData) => {
+    setSelectedClient(client);
+    setClientDrawerOpen(true);
+  };
 
   const handleUpdate = (category: string) => (key: string, value: number) => {
     updateSetting.mutate({ category, key, value });
@@ -570,7 +601,10 @@ export default function AdminPanel() {
                   </div>
 
                   {/* Mock User Card - Ultra Modern Design */}
-                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-muted/30 border border-border/50 mb-4 group hover:border-primary/30 transition-all duration-300">
+                  <div 
+                    onClick={() => handleOpenClientDetails(mockClientData)}
+                    className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-muted/30 border border-border/50 mb-4 group hover:border-primary/30 transition-all duration-300 cursor-pointer active:scale-[0.98]"
+                  >
                     {/* Glassmorphism overlay */}
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     
@@ -860,6 +894,12 @@ export default function AdminPanel() {
           )}
         </div>
       </motion.div>
+      {/* Client Details Drawer */}
+      <ClientDetailsDrawer
+        open={clientDrawerOpen}
+        onOpenChange={setClientDrawerOpen}
+        client={selectedClient}
+      />
     </MobileLayout>
   );
 }
