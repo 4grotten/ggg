@@ -366,6 +366,11 @@
     "verification": "Verificación",
     "savedAccounts": "Cuentas guardadas",
     "switchedTo": "Cambiado a {{name}}",
+    "enabled": "Activado",
+    "disabled": "Desactivado",
+    "hapticFeedback": "Vibración",
+    "hapticEnabled": "Vibración activada",
+    "hapticDisabled": "Vibración desactivada",
     "devices": {
       "title": "Dispositivos activos",
       "noDevices": "No hay dispositivos activos",

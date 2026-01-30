@@ -382,6 +382,9 @@
     "switchedTo": "Вы вошли как {{name}}",
     "enabled": "Вкл",
     "disabled": "Выкл",
+    "hapticFeedback": "Вибрация",
+    "hapticEnabled": "Вибрация включена",
+    "hapticDisabled": "Вибрация выключена",
     "devices": {
       "title": "Активные устройства",
       "noDevices": "Нет активных устройств",

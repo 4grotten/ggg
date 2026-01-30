@@ -368,6 +368,11 @@
     "verification": "身份验证",
     "savedAccounts": "已保存账户",
     "switchedTo": "已切换至 {{name}}",
+    "enabled": "开启",
+    "disabled": "关闭",
+    "hapticFeedback": "振动",
+    "hapticEnabled": "振动已开启",
+    "hapticDisabled": "振动已关闭",
     "devices": {
       "title": "活跃设备",
       "noDevices": "没有活跃设备",
