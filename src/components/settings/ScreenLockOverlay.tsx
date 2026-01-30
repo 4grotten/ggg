@@ -152,25 +152,32 @@ export const ScreenLockOverlay = ({
             transition={{ duration: 0.4 }}
             className="flex gap-4 mb-10"
           >
-            {Array.from({ length: PASSCODE_LENGTH }).map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ scale: 0 }}
-                animate={{ 
-                  scale: 1,
-                  backgroundColor: i < passcode.length 
-                    ? error ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'
-                    : 'hsl(var(--muted))'
-                }}
-                transition={{ delay: 0.1 + i * 0.05, duration: 0.2 }}
-                className={cn(
-                  "w-4 h-4 rounded-full transition-colors duration-200",
-                  i < passcode.length 
-                    ? error ? "bg-destructive" : "bg-primary" 
-                    : "bg-muted"
-                )}
-              />
-            ))}
+            {Array.from({ length: PASSCODE_LENGTH }).map((_, i) => {
+              const isFilled = i < passcode.length;
+              const isLatest = i === passcode.length - 1 && passcode.length > 0;
+              
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ scale: 0 }}
+                  animate={{ 
+                    scale: isLatest ? [1, 1.4, 1] : 1,
+                    backgroundColor: isFilled 
+                      ? error ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'
+                      : 'hsl(var(--muted))'
+                  }}
+                  transition={{ 
+                    scale: { duration: 0.3, ease: "easeOut" },
+                    backgroundColor: { duration: 0.2 }
+                  }}
+                  className={cn(
+                    "w-4 h-4 rounded-full transition-all duration-200",
+                    isFilled && !error && "shadow-[0_0_12px_hsl(var(--primary)/0.6)]",
+                    isFilled && error && "shadow-[0_0_12px_hsl(var(--destructive)/0.6)]"
+                  )}
+                />
+              );
+            })}
           </motion.div>
 
           {/* Keypad */}
@@ -201,7 +208,7 @@ export const ScreenLockOverlay = ({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5 + i * 0.03 }}
-                whileTap={item ? { scale: 0.9 } : undefined}
+                whileTap={item ? { scale: 0.9, backgroundColor: 'hsl(var(--muted))' } : undefined}
                 onClick={() => {
                   if (item === 'biometric') handleBiometric();
                   else if (item === 'delete') handleDelete();
@@ -211,7 +218,9 @@ export const ScreenLockOverlay = ({
                 className={cn(
                   "w-20 h-20 rounded-full flex items-center justify-center transition-colors",
                   item === null && "opacity-0 pointer-events-none",
-                  item && "hover:bg-muted/50"
+                  item === '0' && "bg-muted/50 hover:bg-muted",
+                  item === 'biometric' && "hover:bg-muted/50",
+                  item === 'delete' && "hover:bg-muted/50"
                 )}
               >
                 {item === 'biometric' && (
