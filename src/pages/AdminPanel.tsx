@@ -1089,7 +1089,7 @@ export default function AdminPanel() {
                                     <div>
                                       <div className="flex items-center gap-1.5">
                                         <p className="text-sm font-medium">{action.adminName}</p>
-                                        <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4">
+                                        <Badge className="text-[9px] px-1.5 py-0 h-4 bg-blue-500 hover:bg-blue-500 text-white">
                                           Admin
                                         </Badge>
                                       </div>
