@@ -528,24 +528,22 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   };
 
   const renderTimeoutSelect = () => (
-    <div className="space-y-4">
-      <AnimatedDrawerContainer>
-        {TIMEOUT_OPTIONS.map((option, index) => (
-          <AnimatedDrawerItem key={option.value} index={index}>
-            <button
-              onClick={() => handleTimeoutSelect(option.value)}
-              className="w-full flex items-center justify-between p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
-            >
-              <span className="font-medium text-foreground">
-                {t(option.labelKey, option.value)}
-              </span>
-              {lockTimeout === option.value && (
-                <Check className="w-5 h-5 text-primary" />
-              )}
-            </button>
-          </AnimatedDrawerItem>
-        ))}
-      </AnimatedDrawerContainer>
+    <div className="space-y-3">
+      {TIMEOUT_OPTIONS.map((option, index) => (
+        <AnimatedDrawerItem key={option.value} index={index}>
+          <button
+            onClick={() => handleTimeoutSelect(option.value)}
+            className="w-full flex items-center justify-between p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
+          >
+            <span className="font-medium text-foreground">
+              {t(option.labelKey, option.value)}
+            </span>
+            {lockTimeout === option.value && (
+              <Check className="w-5 h-5 text-primary" />
+            )}
+          </button>
+        </AnimatedDrawerItem>
+      ))}
     </div>
   );
 
