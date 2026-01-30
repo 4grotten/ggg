@@ -39,7 +39,7 @@ export const PasscodeLockAnimation = () => {
         {phase === 'stars' ? (
           <motion.div
             key="stars"
-            className="flex items-center justify-center gap-2"
+            className="flex items-center justify-center gap-1.5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
@@ -48,12 +48,12 @@ export const PasscodeLockAnimation = () => {
             {[0, 1, 2, 3].map((i) => (
               <motion.span
                 key={i}
-                className="text-primary font-bold text-lg"
-                initial={{ opacity: 0, scale: 0, y: 10 }}
+                className="text-primary text-sm font-black"
+                initial={{ opacity: 0, scale: 0, y: 5 }}
                 animate={{
                   opacity: i < visibleStars ? 1 : 0,
                   scale: i < visibleStars ? 1 : 0,
-                  y: i < visibleStars ? 0 : 10,
+                  y: i < visibleStars ? 0 : 5,
                 }}
                 transition={{
                   type: 'spring',
@@ -61,7 +61,7 @@ export const PasscodeLockAnimation = () => {
                   damping: 20,
                 }}
               >
-                ✱
+                ●
               </motion.span>
             ))}
           </motion.div>
