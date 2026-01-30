@@ -1,4 +1,16 @@
 {
+  "screenLock": {
+    "title": "Bildschirmsperre",
+    "description": "Schützen Sie Ihre App mit einem Passcode",
+    "enterPasscode": "Passcode eingeben",
+    "viewSensitiveData": "Um sensible Daten anzuzeigen",
+    "wrongPasscode": "Falscher Passcode",
+    "useBiometric": "Oder verwenden Sie {{method}}",
+    "hideData": "Sensible Daten verbergen",
+    "hideDataDescription": "Passcode zum Anzeigen von Guthaben und Kartendaten erforderlich",
+    "hideDataEnabled": "Datenverbergung aktiviert",
+    "hideDataDisabled": "Datenverbergung deaktiviert"
+  },
   "profileVerification": {
     "title": "Identität verifizieren",
     "description": "Schließen Sie den Verifizierungsprozess ab, um alle Funktionen freizuschalten und Ihre Kontolimits zu erhöhen.",

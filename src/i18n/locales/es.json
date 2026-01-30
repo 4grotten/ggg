@@ -1,4 +1,16 @@
 {
+  "screenLock": {
+    "title": "Bloqueo de Pantalla",
+    "description": "Protege tu app con un código",
+    "enterPasscode": "Ingresa el Código",
+    "viewSensitiveData": "Para ver datos sensibles",
+    "wrongPasscode": "Código incorrecto",
+    "useBiometric": "O usa {{method}}",
+    "hideData": "Ocultar Datos Sensibles",
+    "hideDataDescription": "Requiere código para ver saldos y detalles de tarjetas",
+    "hideDataEnabled": "Ocultación de datos activada",
+    "hideDataDisabled": "Ocultación de datos desactivada"
+  },
   "profileVerification": {
     "title": "Verifica tu identidad",
     "description": "Completa el proceso de verificación para desbloquear todas las funciones y aumentar los límites de tu cuenta.",

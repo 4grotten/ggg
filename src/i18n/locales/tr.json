@@ -1,4 +1,16 @@
 {
+  "screenLock": {
+    "title": "Ekran Kilidi",
+    "description": "Uygulamanızı şifre ile koruyun",
+    "enterPasscode": "Şifre Girin",
+    "viewSensitiveData": "Hassas verileri görüntülemek için",
+    "wrongPasscode": "Yanlış şifre",
+    "useBiometric": "Veya {{method}} kullanın",
+    "hideData": "Hassas Verileri Gizle",
+    "hideDataDescription": "Bakiye ve kart detaylarını görüntülemek için şifre gerekli",
+    "hideDataEnabled": "Veri gizleme etkin",
+    "hideDataDisabled": "Veri gizleme devre dışı"
+  },
   "profileVerification": {
     "title": "Kimliğinizi Doğrulayın",
     "description": "Tüm özelliklerin kilidini açmak ve hesap limitlerini artırmak için doğrulama işlemini tamamlayın.",

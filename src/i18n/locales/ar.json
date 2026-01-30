@@ -1,4 +1,16 @@
 {
+  "screenLock": {
+    "title": "قفل الشاشة",
+    "description": "احمِ تطبيقك برمز مرور",
+    "enterPasscode": "أدخل رمز المرور",
+    "viewSensitiveData": "لعرض البيانات الحساسة",
+    "wrongPasscode": "رمز مرور خاطئ",
+    "useBiometric": "أو استخدم {{method}}",
+    "hideData": "إخفاء البيانات الحساسة",
+    "hideDataDescription": "يتطلب رمز مرور لعرض الأرصدة وتفاصيل البطاقة",
+    "hideDataEnabled": "تم تمكين إخفاء البيانات",
+    "hideDataDisabled": "تم تعطيل إخفاء البيانات"
+  },
   "profileVerification": {
     "title": "تحقق من هويتك",
     "description": "أكمل عملية التحقق لفتح جميع الميزات وزيادة حدود حسابك.",

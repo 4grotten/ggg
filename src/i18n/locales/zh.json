@@ -1,4 +1,16 @@
 {
+  "screenLock": {
+    "title": "屏幕锁定",
+    "description": "使用密码保护您的应用",
+    "enterPasscode": "输入密码",
+    "viewSensitiveData": "查看敏感数据",
+    "wrongPasscode": "密码错误",
+    "useBiometric": "或使用{{method}}",
+    "hideData": "隐藏敏感数据",
+    "hideDataDescription": "查看余额和卡片详情需要密码",
+    "hideDataEnabled": "数据隐藏已启用",
+    "hideDataDisabled": "数据隐藏已禁用"
+  },
   "profileVerification": {
     "title": "验证您的身份",
     "description": "完成验证流程以解锁所有功能并提高账户限额。",

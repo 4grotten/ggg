@@ -98,19 +98,28 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 flex flex-col items-center justify-center px-6 bg-background"
+          className="fixed inset-0 flex items-center justify-center px-6 bg-black/60 backdrop-blur-md"
           style={{ 
             zIndex: 99999,
-            paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
           }}
+          onClick={onClose}
         >
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors"
+          {/* Modal Card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="relative w-full max-w-[320px] bg-card/95 backdrop-blur-xl rounded-3xl p-6 pt-5 shadow-2xl border border-border/50"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X className="w-5 h-5 text-muted-foreground" />
-          </button>
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-muted transition-colors"
+            >
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
 
           {/* Lock Icon */}
           <motion.div
@@ -254,6 +263,7 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
               {t('screenLock.useBiometric', 'Or use {{method}}', { method: getBiometricLabel() })}
             </motion.p>
           )}
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
