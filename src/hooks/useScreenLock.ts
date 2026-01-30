@@ -143,7 +143,6 @@ export const useScreenLock = () => {
   const verifyPasscode = useCallback((passcode: string): boolean => {
     const storedHash = localStorage.getItem(SCREEN_LOCK_PASSCODE_KEY);
     const inputHash = hashPasscode(passcode);
-    console.log('[ScreenLock] Verifying passcode:', { storedHash, inputHash, match: storedHash === inputHash });
     return storedHash === inputHash;
   }, []);
 
@@ -156,10 +155,7 @@ export const useScreenLock = () => {
   }, [verifyPasscode]);
 
   const unlock = useCallback((passcode: string): boolean => {
-    console.log('[ScreenLock] Attempting unlock with passcode length:', passcode.length);
-    const isValid = verifyPasscode(passcode);
-    console.log('[ScreenLock] Unlock result:', isValid);
-    if (isValid) {
+    if (verifyPasscode(passcode)) {
       setIsLocked(false);
       localStorage.setItem(SCREEN_LOCK_LAST_ACTIVITY_KEY, String(Date.now()));
       return true;
