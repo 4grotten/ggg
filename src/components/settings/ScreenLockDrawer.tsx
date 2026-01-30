@@ -230,6 +230,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       // If paused, just resume without re-entering passcode
       if (isPaused) {
         resumeScreenLock();
+        // Mark as verified so we don't ask for passcode again immediately
+        setAccessVerified(true);
         toast.success(t('screenLock.resumed', 'Screen lock resumed'));
         return;
       }
