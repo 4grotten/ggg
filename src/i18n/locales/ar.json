@@ -1264,5 +1264,123 @@
       "30min": "بعد 30 دقيقة",
       "never": "أبداً"
     }
+  },
+  "admin": {
+    "title": "لوحة الإدارة",
+    "subtitle": "إدارة النظام",
+    "accessDenied": "الوصول مرفوض",
+    "accessDeniedDesc": "ليس لديك صلاحية للوصول إلى لوحة الإدارة",
+    "backToSettings": "العودة إلى الإعدادات",
+    "tabs": {
+      "rates": "الأسعار",
+      "fees": "الرسوم",
+      "limits": "الحدود",
+      "clients": "العملاء",
+      "admins": "المسؤولون"
+    },
+    "subtabs": {
+      "admins": "المسؤولون",
+      "history": "السجل"
+    },
+    "stats": {
+      "rates": "سعر",
+      "fees": "رسوم",
+      "limits": "حد",
+      "clients": "عميل",
+      "admins": "مسؤول"
+    },
+    "exchangeRates": {
+      "title": "أسعار الصرف",
+      "description": "إدارة أسعار صرف العملات",
+      "usdtToAedBuy": "USDT → AED (شراء)",
+      "usdtToAedSell": "USDT → AED (بيع)",
+      "usdToAedBuy": "USD → AED (شراء)",
+      "usdToAedSell": "USD → AED (بيع)",
+      "aedToUsdBuy": "AED → USD (شراء)",
+      "aedToUsdSell": "AED → USD (بيع)"
+    },
+    "fees": {
+      "title": "الرسوم",
+      "description": "إدارة رسوم المعاملات",
+      "topUpCryptoFlat": "شحن العملات الرقمية (ثابت)",
+      "topUpBankPercent": "شحن بنكي",
+      "cardToCardPercent": "تحويل بطاقة لبطاقة",
+      "bankTransferPercent": "تحويل بنكي",
+      "networkFeePercent": "رسوم الشبكة",
+      "currencyConversionPercent": "تحويل العملة",
+      "virtualCardAnnual": "البطاقة الافتراضية (سنوي)",
+      "virtualCardReplacement": "استبدال البطاقة الافتراضية",
+      "metalCardAnnual": "البطاقة المعدنية (سنوي)",
+      "metalCardReplacement": "استبدال البطاقة المعدنية",
+      "virtualAccountOpening": "فتح حساب افتراضي"
+    },
+    "limits": {
+      "title": "الحدود",
+      "description": "إدارة حدود المعاملات",
+      "minLimits": "الحد الأدنى",
+      "maxLimits": "الحد الأقصى",
+      "dailyLimits": "الحدود اليومية",
+      "monthlyLimits": "الحدود الشهرية",
+      "topUpCryptoMin": "الحد الأدنى لشحن العملات الرقمية",
+      "topUpBankMin": "الحد الأدنى للشحن البنكي",
+      "transferMin": "الحد الأدنى للتحويل",
+      "withdrawalMin": "الحد الأدنى للسحب",
+      "topUpCryptoMax": "الحد الأقصى لشحن العملات الرقمية",
+      "topUpBankMax": "الحد الأقصى للشحن البنكي",
+      "transferMax": "الحد الأقصى للتحويل",
+      "withdrawalMax": "الحد الأقصى للسحب",
+      "dailyTopUp": "حد الشحن اليومي",
+      "dailyTransfer": "حد التحويل اليومي",
+      "dailyWithdrawal": "حد السحب اليومي",
+      "monthlyTopUp": "حد الشحن الشهري",
+      "monthlyTransfer": "حد التحويل الشهري",
+      "monthlyWithdrawal": "حد السحب الشهري"
+    },
+    "clients": {
+      "title": "قاعدة بيانات العملاء",
+      "description": "البحث وإدارة العملاء",
+      "searchPlaceholder": "البحث بالاسم أو الهاتف...",
+      "noClients": "لا يوجد عملاء مسجلين",
+      "notFound": "لم يتم العثور على عملاء"
+    },
+    "roles": {
+      "addRole": "إضافة دور",
+      "searchByPhoneOrId": "البحث بالهاتف أو المعرف",
+      "searchPlaceholder": "+971... أو UUID",
+      "currentRoles": "الأدوار الحالية",
+      "usersWithRoles": "مستخدمين لديهم أدوار",
+      "noUsersWithRoles": "لا يوجد مستخدمين لديهم أدوار",
+      "userNotFound": "المستخدم غير موجود",
+      "noName": "بدون اسم",
+      "admin": "مسؤول",
+      "moderator": "مشرف",
+      "user": "مستخدم",
+      "add": "إضافة"
+    },
+    "history": {
+      "title": "سجل التغييرات",
+      "description": "إجراءات المسؤولين",
+      "actions": "إجراء",
+      "empty": "السجل فارغ",
+      "emptyDesc": "ستظهر إجراءات المسؤولين هنا",
+      "justNow": "الآن",
+      "minutesAgo": "دقيقة مضت",
+      "hoursAgo": "ساعة مضت",
+      "yesterday": "أمس",
+      "daysAgo": "أيام مضت"
+    },
+    "actions": {
+      "addRole": "تم تعيين الدور",
+      "removeRole": "تم إزالة الدور",
+      "updateSetting": "تم تحديث الإعداد",
+      "updateClient": "تم تحديث العميل",
+      "blockClient": "تم حظر العميل",
+      "unblockClient": "تم إلغاء حظر العميل"
+    },
+    "common": {
+      "loading": "جاري تحميل الإعدادات...",
+      "new": "جديد",
+      "save": "حفظ"
+    }
   }
 }

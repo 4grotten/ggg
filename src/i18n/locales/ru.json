@@ -1317,5 +1317,123 @@
       "30min": "Через 30 минут",
       "never": "Никогда"
     }
+  },
+  "admin": {
+    "title": "Админ-панель",
+    "subtitle": "Управление системой",
+    "accessDenied": "Доступ запрещён",
+    "accessDeniedDesc": "У вас нет прав для доступа к административной панели",
+    "backToSettings": "Вернуться в настройки",
+    "tabs": {
+      "rates": "Курсы",
+      "fees": "Комиссии",
+      "limits": "Лимиты",
+      "clients": "Клиенты",
+      "admins": "Админы"
+    },
+    "subtabs": {
+      "admins": "Админы",
+      "history": "История"
+    },
+    "stats": {
+      "rates": "Курсов",
+      "fees": "Комиссий",
+      "limits": "Лимитов",
+      "clients": "Клиентов",
+      "admins": "Админов"
+    },
+    "exchangeRates": {
+      "title": "Курсы обмена",
+      "description": "Управление валютными курсами",
+      "usdtToAedBuy": "USDT → AED (покупка)",
+      "usdtToAedSell": "USDT → AED (продажа)",
+      "usdToAedBuy": "USD → AED (покупка)",
+      "usdToAedSell": "USD → AED (продажа)",
+      "aedToUsdBuy": "AED → USD (покупка)",
+      "aedToUsdSell": "AED → USD (продажа)"
+    },
+    "fees": {
+      "title": "Комиссии",
+      "description": "Управление комиссиями",
+      "topUpCryptoFlat": "Крипто пополнение (фикс)",
+      "topUpBankPercent": "Банковское пополнение",
+      "cardToCardPercent": "Перевод карта → карта",
+      "bankTransferPercent": "Банковский перевод",
+      "networkFeePercent": "Сетевая комиссия",
+      "currencyConversionPercent": "Конвертация валюты",
+      "virtualCardAnnual": "Виртуальная карта (год)",
+      "virtualCardReplacement": "Замена виртуальной карты",
+      "metalCardAnnual": "Металлическая карта (год)",
+      "metalCardReplacement": "Замена металлической карты",
+      "virtualAccountOpening": "Открытие виртуального счёта"
+    },
+    "limits": {
+      "title": "Лимиты",
+      "description": "Управление лимитами",
+      "minLimits": "Минимальные лимиты",
+      "maxLimits": "Максимальные лимиты",
+      "dailyLimits": "Дневные лимиты",
+      "monthlyLimits": "Месячные лимиты",
+      "topUpCryptoMin": "Мин. крипто пополнение",
+      "topUpBankMin": "Мин. банковское пополнение",
+      "transferMin": "Мин. перевод",
+      "withdrawalMin": "Мин. вывод",
+      "topUpCryptoMax": "Макс. крипто пополнение",
+      "topUpBankMax": "Макс. банковское пополнение",
+      "transferMax": "Макс. перевод",
+      "withdrawalMax": "Макс. вывод",
+      "dailyTopUp": "Дневной лимит пополнения",
+      "dailyTransfer": "Дневной лимит переводов",
+      "dailyWithdrawal": "Дневной лимит вывода",
+      "monthlyTopUp": "Месячный лимит пополнения",
+      "monthlyTransfer": "Месячный лимит переводов",
+      "monthlyWithdrawal": "Месячный лимит вывода"
+    },
+    "clients": {
+      "title": "База клиентов",
+      "description": "Поиск и управление клиентами",
+      "searchPlaceholder": "Поиск по имени или телефону...",
+      "noClients": "Нет зарегистрированных клиентов",
+      "notFound": "Клиенты не найдены"
+    },
+    "roles": {
+      "addRole": "Добавить роль",
+      "searchByPhoneOrId": "Поиск по телефону или ID",
+      "searchPlaceholder": "+971... или UUID",
+      "currentRoles": "Текущие роли",
+      "usersWithRoles": "пользователей с ролями",
+      "noUsersWithRoles": "Нет пользователей с ролями",
+      "userNotFound": "Пользователь не найден",
+      "noName": "Без имени",
+      "admin": "Администратор",
+      "moderator": "Модератор",
+      "user": "Пользователь",
+      "add": "Добавить"
+    },
+    "history": {
+      "title": "История изменений",
+      "description": "Действия администраторов",
+      "actions": "действий",
+      "empty": "История пуста",
+      "emptyDesc": "Здесь будут отображаться действия администраторов",
+      "justNow": "только что",
+      "minutesAgo": "мин. назад",
+      "hoursAgo": "ч. назад",
+      "yesterday": "вчера",
+      "daysAgo": "дн. назад"
+    },
+    "actions": {
+      "addRole": "Назначена роль",
+      "removeRole": "Снята роль",
+      "updateSetting": "Изменена настройка",
+      "updateClient": "Обновлён клиент",
+      "blockClient": "Клиент заблокирован",
+      "unblockClient": "Клиент разблокирован"
+    },
+    "common": {
+      "loading": "Загрузка настроек...",
+      "new": "новое",
+      "save": "Сохранить"
+    }
   }
 }

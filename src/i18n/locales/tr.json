@@ -1264,5 +1264,123 @@
       "30min": "30 dakika sonra",
       "never": "Asla"
     }
+  },
+  "admin": {
+    "title": "Yönetici Paneli",
+    "subtitle": "Sistem Yönetimi",
+    "accessDenied": "Erişim Engellendi",
+    "accessDeniedDesc": "Yönetici paneline erişim yetkiniz yok",
+    "backToSettings": "Ayarlara Dön",
+    "tabs": {
+      "rates": "Kurlar",
+      "fees": "Ücretler",
+      "limits": "Limitler",
+      "clients": "Müşteriler",
+      "admins": "Yöneticiler"
+    },
+    "subtabs": {
+      "admins": "Yöneticiler",
+      "history": "Geçmiş"
+    },
+    "stats": {
+      "rates": "Kur",
+      "fees": "Ücret",
+      "limits": "Limit",
+      "clients": "Müşteri",
+      "admins": "Yönetici"
+    },
+    "exchangeRates": {
+      "title": "Döviz Kurları",
+      "description": "Döviz kurlarını yönet",
+      "usdtToAedBuy": "USDT → AED (alış)",
+      "usdtToAedSell": "USDT → AED (satış)",
+      "usdToAedBuy": "USD → AED (alış)",
+      "usdToAedSell": "USD → AED (satış)",
+      "aedToUsdBuy": "AED → USD (alış)",
+      "aedToUsdSell": "AED → USD (satış)"
+    },
+    "fees": {
+      "title": "Ücretler",
+      "description": "İşlem ücretlerini yönet",
+      "topUpCryptoFlat": "Kripto yükleme (sabit)",
+      "topUpBankPercent": "Banka yükleme",
+      "cardToCardPercent": "Karttan karta",
+      "bankTransferPercent": "Banka transferi",
+      "networkFeePercent": "Ağ ücreti",
+      "currencyConversionPercent": "Döviz çevirimi",
+      "virtualCardAnnual": "Sanal kart (yıllık)",
+      "virtualCardReplacement": "Sanal kart değişimi",
+      "metalCardAnnual": "Metal kart (yıllık)",
+      "metalCardReplacement": "Metal kart değişimi",
+      "virtualAccountOpening": "Sanal hesap açılışı"
+    },
+    "limits": {
+      "title": "Limitler",
+      "description": "İşlem limitlerini yönet",
+      "minLimits": "Minimum Limitler",
+      "maxLimits": "Maksimum Limitler",
+      "dailyLimits": "Günlük Limitler",
+      "monthlyLimits": "Aylık Limitler",
+      "topUpCryptoMin": "Min kripto yükleme",
+      "topUpBankMin": "Min banka yükleme",
+      "transferMin": "Min transfer",
+      "withdrawalMin": "Min çekim",
+      "topUpCryptoMax": "Maks kripto yükleme",
+      "topUpBankMax": "Maks banka yükleme",
+      "transferMax": "Maks transfer",
+      "withdrawalMax": "Maks çekim",
+      "dailyTopUp": "Günlük yükleme limiti",
+      "dailyTransfer": "Günlük transfer limiti",
+      "dailyWithdrawal": "Günlük çekim limiti",
+      "monthlyTopUp": "Aylık yükleme limiti",
+      "monthlyTransfer": "Aylık transfer limiti",
+      "monthlyWithdrawal": "Aylık çekim limiti"
+    },
+    "clients": {
+      "title": "Müşteri Veritabanı",
+      "description": "Müşterileri ara ve yönet",
+      "searchPlaceholder": "İsim veya telefon ile ara...",
+      "noClients": "Kayıtlı müşteri yok",
+      "notFound": "Müşteri bulunamadı"
+    },
+    "roles": {
+      "addRole": "Rol Ekle",
+      "searchByPhoneOrId": "Telefon veya ID ile ara",
+      "searchPlaceholder": "+971... veya UUID",
+      "currentRoles": "Mevcut Roller",
+      "usersWithRoles": "rollü kullanıcı",
+      "noUsersWithRoles": "Rollü kullanıcı yok",
+      "userNotFound": "Kullanıcı bulunamadı",
+      "noName": "İsimsiz",
+      "admin": "Yönetici",
+      "moderator": "Moderatör",
+      "user": "Kullanıcı",
+      "add": "Ekle"
+    },
+    "history": {
+      "title": "Değişiklik Geçmişi",
+      "description": "Yönetici işlemleri",
+      "actions": "işlem",
+      "empty": "Geçmiş boş",
+      "emptyDesc": "Yönetici işlemleri burada görüntülenecek",
+      "justNow": "az önce",
+      "minutesAgo": "dk önce",
+      "hoursAgo": "sa önce",
+      "yesterday": "dün",
+      "daysAgo": "gün önce"
+    },
+    "actions": {
+      "addRole": "Rol atandı",
+      "removeRole": "Rol kaldırıldı",
+      "updateSetting": "Ayar güncellendi",
+      "updateClient": "Müşteri güncellendi",
+      "blockClient": "Müşteri engellendi",
+      "unblockClient": "Müşteri engeli kaldırıldı"
+    },
+    "common": {
+      "loading": "Ayarlar yükleniyor...",
+      "new": "yeni",
+      "save": "Kaydet"
+    }
   }
 }
