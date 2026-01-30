@@ -1,10 +1,9 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,17 +14,19 @@ import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAdminManagement } from "@/hooks/useAdminManagement";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useState, useEffect } from "react";
 import { AdminSetting, AppRole } from "@/types/admin";
+import { cn } from "@/lib/utils";
 
-// Settings field configuration for better UI
+// Settings field configuration
 const exchangeRateFields = [
-  { key: "usdt_to_aed_buy", label: "USDT → AED (покупка)", suffix: "AED" },
-  { key: "usdt_to_aed_sell", label: "USDT → AED (продажа)", suffix: "AED" },
-  { key: "usd_to_aed_buy", label: "USD → AED (покупка)", suffix: "AED" },
-  { key: "usd_to_aed_sell", label: "USD → AED (продажа)", suffix: "AED" },
-  { key: "aed_to_usd_buy", label: "AED → USD (покупка)", suffix: "USD" },
-  { key: "aed_to_usd_sell", label: "AED → USD (продажа)", suffix: "USD" },
+  { key: "usdt_to_aed_buy", label: "USDT → AED (покупка)", suffix: "AED", icon: TrendingUp },
+  { key: "usdt_to_aed_sell", label: "USDT → AED (продажа)", suffix: "AED", icon: TrendingUp },
+  { key: "usd_to_aed_buy", label: "USD → AED (покупка)", suffix: "AED", icon: DollarSign },
+  { key: "usd_to_aed_sell", label: "USD → AED (продажа)", suffix: "AED", icon: DollarSign },
+  { key: "aed_to_usd_buy", label: "AED → USD (покупка)", suffix: "USD", icon: DollarSign },
+  { key: "aed_to_usd_sell", label: "AED → USD (продажа)", suffix: "USD", icon: DollarSign },
 ];
 
 const feeFields = [
@@ -66,11 +67,13 @@ interface SettingsFieldProps {
   onUpdate: (key: string, value: number) => void;
   isPending: boolean;
   isMissing?: boolean;
+  index: number;
 }
 
-function SettingsField({ setting, label, suffix, onUpdate, isPending, isMissing }: SettingsFieldProps) {
+function SettingsField({ setting, label, suffix, onUpdate, isPending, isMissing, index }: SettingsFieldProps) {
   const [localValue, setLocalValue] = useState(setting.value.toString());
   const [isDirty, setIsDirty] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     setLocalValue(setting.value.toString());
@@ -90,42 +93,128 @@ function SettingsField({ setting, label, suffix, onUpdate, isPending, isMissing 
   };
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor={setting.key} className="text-sm font-medium flex items-center gap-2">
-        {label}
-        {isMissing && (
-          <span className="text-xs text-amber-500 font-normal">(не в базе)</span>
-        )}
-      </Label>
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Input
-            id={setting.key}
-            type="number"
-            step="0.01"
-            value={localValue}
-            onChange={handleChange}
-            className={`pr-14 ${isMissing ? 'border-amber-500/50' : ''}`}
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-            {suffix}
-          </span>
-        </div>
-        {isDirty && (
-          <Button
-            size="sm"
-            onClick={handleSave}
-            disabled={isPending}
-            className="shrink-0"
-          >
-            {isPending ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Сохранить"}
-          </Button>
-        )}
-      </div>
-      {setting.description && (
-        <p className="text-xs text-muted-foreground">{setting.description}</p>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className={cn(
+        "group relative p-4 rounded-2xl transition-all duration-300",
+        "bg-gradient-to-br from-muted/50 to-muted/30",
+        "border border-border/50",
+        isFocused && "ring-2 ring-primary/30 border-primary/50",
+        isDirty && "border-amber-500/50 bg-gradient-to-br from-amber-500/10 to-amber-500/5"
       )}
-    </div>
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <Label 
+            htmlFor={setting.key} 
+            className="text-sm font-medium text-foreground/80 flex items-center gap-2"
+          >
+            {label}
+            {isMissing && (
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-amber-500 border-amber-500/30">
+                новое
+              </Badge>
+            )}
+          </Label>
+          
+          <div className="flex items-center gap-2 mt-2">
+            <div className="relative flex-1">
+              <Input
+                id={setting.key}
+                type="number"
+                step="0.01"
+                value={localValue}
+                onChange={handleChange}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                className={cn(
+                  "pr-14 h-11 bg-background/50 border-border/50 rounded-xl",
+                  "focus:bg-background transition-colors",
+                  "text-base font-medium"
+                )}
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+                {suffix}
+              </span>
+            </div>
+            
+            <AnimatePresence>
+              {isDirty && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, width: 0 }}
+                  animate={{ opacity: 1, scale: 1, width: 'auto' }}
+                  exit={{ opacity: 0, scale: 0.8, width: 0 }}
+                >
+                  <Button
+                    size="sm"
+                    onClick={handleSave}
+                    disabled={isPending}
+                    className="h-11 px-4 rounded-xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                  >
+                    {isPending ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Zap className="w-4 h-4" />
+                    )}
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+interface GlassCardProps {
+  children: React.ReactNode;
+  title: string;
+  description?: string;
+  icon: React.ElementType;
+  iconColor?: string;
+  className?: string;
+}
+
+function GlassCard({ children, title, description, icon: Icon, iconColor = "text-primary", className }: GlassCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn(
+        "relative overflow-hidden rounded-3xl",
+        "bg-gradient-to-br from-card/80 to-card/60",
+        "backdrop-blur-xl border border-border/50",
+        "shadow-xl shadow-black/5",
+        className
+      )}
+    >
+      {/* Decorative gradient orb */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 blur-3xl" />
+      
+      <div className="relative p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className={cn(
+            "w-12 h-12 rounded-2xl flex items-center justify-center",
+            "bg-gradient-to-br from-primary/20 to-primary/10"
+          )}>
+            <Icon className={cn("w-6 h-6", iconColor)} />
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground">{title}</h3>
+            {description && (
+              <p className="text-xs text-muted-foreground">{description}</p>
+            )}
+          </div>
+        </div>
+        
+        <div className="space-y-3">
+          {children}
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -136,7 +225,6 @@ export default function AdminPanel() {
   const { settings, isLoading, updateSetting, getSettingsByCategory } = useAdminSettings();
   const { admins, isLoading: adminsLoading, searchUser, addAdmin, removeAdmin } = useAdminManagement();
   
-  // Admin management state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState<{
     user_id: string;
@@ -146,6 +234,7 @@ export default function AdminPanel() {
   } | null>(null);
   const [selectedRole, setSelectedRole] = useState<AppRole>("admin");
   const [isSearching, setIsSearching] = useState(false);
+  const [activeTab, setActiveTab] = useState("rates");
 
   const handleUpdate = (category: string) => (key: string, value: number) => {
     updateSetting.mutate({ category, key, value });
@@ -158,9 +247,6 @@ export default function AdminPanel() {
     try {
       const result = await searchUser(searchQuery.trim());
       setSearchResult(result);
-      if (!result) {
-        // Show toast for not found
-      }
     } finally {
       setIsSearching(false);
     }
@@ -181,23 +267,17 @@ export default function AdminPanel() {
 
   const getRoleBadgeVariant = (role: AppRole) => {
     switch (role) {
-      case "admin":
-        return "destructive";
-      case "moderator":
-        return "secondary";
-      default:
-        return "outline";
+      case "admin": return "destructive";
+      case "moderator": return "secondary";
+      default: return "outline";
     }
   };
 
   const getRoleLabel = (role: AppRole) => {
     switch (role) {
-      case "admin":
-        return "Администратор";
-      case "moderator":
-        return "Модератор";
-      default:
-        return "Пользователь";
+      case "admin": return "Администратор";
+      case "moderator": return "Модератор";
+      default: return "Пользователь";
     }
   };
 
@@ -206,12 +286,19 @@ export default function AdminPanel() {
     return (
       <MobileLayout>
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
-          <Shield className="w-16 h-16 text-muted-foreground mb-4" />
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200 }}
+            className="w-24 h-24 rounded-full bg-gradient-to-br from-destructive/20 to-destructive/10 flex items-center justify-center mb-6"
+          >
+            <Shield className="w-12 h-12 text-destructive" />
+          </motion.div>
           <h1 className="text-xl font-semibold text-center mb-2">Доступ запрещён</h1>
           <p className="text-muted-foreground text-center mb-6">
             У вас нет прав для доступа к административной панели
           </p>
-          <Button onClick={() => navigate("/settings")}>
+          <Button onClick={() => navigate("/settings")} className="rounded-xl">
             Вернуться в настройки
           </Button>
         </div>
@@ -227,17 +314,15 @@ export default function AdminPanel() {
     
     if (categorySettings.length === 0) {
       return (
-        <div className="text-center py-8 text-muted-foreground">
+        <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+          <RefreshCw className="w-8 h-8 animate-spin mb-2 opacity-50" />
           <p className="text-sm">Загрузка настроек...</p>
-          <p className="text-xs mt-1">Если данные не появляются, проверьте подключение к базе</p>
         </div>
       );
     }
     
-    return fields.map((field) => {
+    return fields.map((field, index) => {
       const setting = categorySettings.find((s) => s.key === field.key);
-      
-      // If setting doesn't exist in DB, show it with default 0 value
       const settingToUse: AdminSetting = setting || {
         id: `temp-${field.key}`,
         category: category as 'exchange_rates' | 'fees' | 'limits',
@@ -257,202 +342,207 @@ export default function AdminPanel() {
           onUpdate={handleUpdate(category)}
           isPending={updateSetting.isPending}
           isMissing={!setting}
+          index={index}
         />
       );
     });
   };
 
+  const tabConfig = [
+    { value: "rates", label: "Курсы", icon: TrendingUp, color: "from-emerald-500 to-teal-500" },
+    { value: "fees", label: "Комиссии", icon: Percent, color: "from-violet-500 to-purple-500" },
+    { value: "limits", label: "Лимиты", icon: Wallet, color: "from-orange-500 to-amber-500" },
+    { value: "admins", label: "Админы", icon: Users, color: "from-blue-500 to-cyan-500" },
+  ];
+
   return (
     <MobileLayout>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         className="min-h-screen bg-background"
       >
-        {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/settings")}
-              className="shrink-0"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold">Административная панель</h1>
-              <p className="text-xs text-muted-foreground">Управление настройками системы</p>
+        {/* Premium Header */}
+        <div className="sticky top-0 z-10">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background/80 backdrop-blur-xl" />
+          <div className="relative px-4 py-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/settings")}
+                className="shrink-0 rounded-xl bg-muted/50 hover:bg-muted"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    Админ-панель
+                  </h1>
+                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                </div>
+                <p className="text-xs text-muted-foreground truncate">
+                  Управление системой
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-1">
+                <ThemeSwitcher />
+                <LanguageSwitcher />
+              </div>
             </div>
-            <LanguageSwitcher />
+
+            {/* Stats Bar */}
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-center gap-2 mt-4 overflow-x-auto pb-1 scrollbar-hide"
+            >
+              {[
+                { label: "Курсов", value: exchangeRateFields.length, icon: Activity, color: "text-emerald-500" },
+                { label: "Комиссий", value: feeFields.length, icon: CreditCard, color: "text-violet-500" },
+                { label: "Лимитов", value: limitFields.length, icon: Wallet, color: "text-orange-500" },
+                { label: "Админов", value: admins?.length || 0, icon: Shield, color: "text-blue-500" },
+              ].map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.15 + i * 0.05 }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 shrink-0"
+                >
+                  <stat.icon className={cn("w-4 h-4", stat.color)} />
+                  <span className="text-xs font-medium">{stat.value}</span>
+                  <span className="text-xs text-muted-foreground">{stat.label}</span>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-4 pb-24">
+        <div className="px-4 pb-24">
           {isLoading || roleLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-48 w-full" />
-              <Skeleton className="h-48 w-full" />
+            <div className="space-y-4 mt-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-32 w-full rounded-3xl" />
+              ))}
             </div>
           ) : (
-            <Tabs defaultValue="rates" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-4">
-                <TabsTrigger value="rates" className="text-xs px-1">
-                  <TrendingUp className="w-4 h-4 mr-0.5" />
-                  Курсы
-                </TabsTrigger>
-                <TabsTrigger value="fees" className="text-xs px-1">
-                  <Percent className="w-4 h-4 mr-0.5" />
-                  Комиссии
-                </TabsTrigger>
-                <TabsTrigger value="limits" className="text-xs px-1">
-                  <DollarSign className="w-4 h-4 mr-0.5" />
-                  Лимиты
-                </TabsTrigger>
-                <TabsTrigger value="admins" className="text-xs px-1">
-                  <Users className="w-4 h-4 mr-0.5" />
-                  Админы
-                </TabsTrigger>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              {/* Custom Tab Switcher */}
+              <TabsList className="grid w-full grid-cols-4 h-14 p-1.5 bg-muted/50 rounded-2xl mb-6">
+                {tabConfig.map((tab) => (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className={cn(
+                      "relative flex flex-col items-center gap-0.5 h-full rounded-xl transition-all",
+                      "data-[state=active]:bg-background data-[state=active]:shadow-lg",
+                      "data-[state=active]:text-foreground"
+                    )}
+                  >
+                    <tab.icon className={cn(
+                      "w-4 h-4 transition-colors",
+                      activeTab === tab.value ? "text-primary" : "text-muted-foreground"
+                    )} />
+                    <span className="text-[10px] font-medium">{tab.label}</span>
+                  </TabsTrigger>
+                ))}
               </TabsList>
 
               {/* Exchange Rates Tab */}
-              <TabsContent value="rates">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-primary" />
-                      Курсы валют
-                    </CardTitle>
-                    <CardDescription>
-                      Настройка курсов обмена для покупки и продажи
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {renderSettingsGroup("exchange_rates", exchangeRateFields)}
-                  </CardContent>
-                </Card>
+              <TabsContent value="rates" className="mt-0">
+                <GlassCard
+                  title="Курсы валют"
+                  description="Курсы покупки и продажи"
+                  icon={TrendingUp}
+                  iconColor="text-emerald-500"
+                >
+                  {renderSettingsGroup("exchange_rates", exchangeRateFields)}
+                </GlassCard>
               </TabsContent>
 
               {/* Fees Tab */}
-              <TabsContent value="fees">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Percent className="w-5 h-5 text-primary" />
-                      Комиссии
-                    </CardTitle>
-                    <CardDescription>
-                      Настройка комиссий по всем типам операций
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {renderSettingsGroup("fees", feeFields)}
-                  </CardContent>
-                </Card>
+              <TabsContent value="fees" className="mt-0">
+                <GlassCard
+                  title="Комиссии"
+                  description="Все типы комиссий"
+                  icon={Percent}
+                  iconColor="text-violet-500"
+                >
+                  {renderSettingsGroup("fees", feeFields)}
+                </GlassCard>
               </TabsContent>
 
               {/* Limits Tab */}
-              <TabsContent value="limits">
-                <div className="space-y-4">
-                  {/* Minimum Limits */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Минимальные суммы</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {renderSettingsGroup(
-                        "limits",
-                        limitFields.filter((f) => f.group === "min")
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  {/* Maximum Limits */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Максимальные суммы</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {renderSettingsGroup(
-                        "limits",
-                        limitFields.filter((f) => f.group === "max")
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  {/* Daily Limits */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Дневные лимиты</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {renderSettingsGroup(
-                        "limits",
-                        limitFields.filter((f) => f.group === "daily")
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  {/* Monthly Limits */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Месячные лимиты</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {renderSettingsGroup(
-                        "limits",
-                        limitFields.filter((f) => f.group === "monthly")
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
+              <TabsContent value="limits" className="mt-0 space-y-4">
+                <GlassCard title="Минимальные суммы" icon={Wallet} iconColor="text-orange-500">
+                  {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "min"))}
+                </GlassCard>
+                
+                <GlassCard title="Максимальные суммы" icon={Wallet} iconColor="text-orange-500">
+                  {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "max"))}
+                </GlassCard>
+                
+                <GlassCard title="Дневные лимиты" icon={Activity} iconColor="text-amber-500">
+                  {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "daily"))}
+                </GlassCard>
+                
+                <GlassCard title="Месячные лимиты" icon={Activity} iconColor="text-amber-500">
+                  {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "monthly"))}
+                </GlassCard>
               </TabsContent>
 
               {/* Admins Tab */}
-              <TabsContent value="admins">
-                <div className="space-y-4">
-                  {/* Add Admin Card */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <UserPlus className="w-5 h-5 text-primary" />
-                        Добавить роль
-                      </CardTitle>
-                      <CardDescription>
-                        Поиск по номеру телефона или User ID
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex gap-2">
-                        <div className="relative flex-1">
-                          <Input
-                            placeholder="+971... или UUID"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && handleSearchUser()}
-                          />
-                        </div>
-                        <Button
-                          size="icon"
-                          onClick={handleSearchUser}
-                          disabled={isSearching || !searchQuery.trim()}
-                        >
-                          {isSearching ? (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Search className="w-4 h-4" />
-                          )}
-                        </Button>
-                      </div>
+              <TabsContent value="admins" className="mt-0 space-y-4">
+                {/* Add Admin Card */}
+                <GlassCard
+                  title="Добавить роль"
+                  description="Поиск по телефону или ID"
+                  icon={UserPlus}
+                  iconColor="text-blue-500"
+                >
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="+971... или UUID"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearchUser()}
+                        className="pl-10 h-12 rounded-xl bg-background/50"
+                      />
+                    </div>
+                    <Button
+                      size="icon"
+                      onClick={handleSearchUser}
+                      disabled={isSearching || !searchQuery.trim()}
+                      className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/80"
+                    >
+                      {isSearching ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Search className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
 
-                      {/* Search Result */}
-                      {searchResult && (
-                        <div className="p-3 border rounded-lg bg-muted/30 space-y-3">
+                  <AnimatePresence>
+                    {searchResult && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 space-y-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                              <Users className="w-5 h-5 text-primary" />
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                              <Users className="w-6 h-6 text-primary" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium truncate">
@@ -460,23 +550,18 @@ export default function AdminPanel() {
                                   ? `${searchResult.first_name || ""} ${searchResult.last_name || ""}`.trim()
                                   : "Без имени"}
                               </p>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                {searchResult.phone && (
-                                  <span className="flex items-center gap-1">
-                                    <Phone className="w-3 h-3" />
-                                    {searchResult.phone}
-                                  </span>
-                                )}
-                              </div>
+                              {searchResult.phone && (
+                                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  {searchResult.phone}
+                                </p>
+                              )}
                             </div>
                           </div>
                           
                           <div className="flex gap-2">
-                            <Select
-                              value={selectedRole}
-                              onValueChange={(v) => setSelectedRole(v as AppRole)}
-                            >
-                              <SelectTrigger className="flex-1">
+                            <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as AppRole)}>
+                              <SelectTrigger className="flex-1 h-11 rounded-xl bg-background/50">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -487,6 +572,7 @@ export default function AdminPanel() {
                             <Button
                               onClick={handleAddAdmin}
                               disabled={addAdmin.isPending}
+                              className="h-11 px-6 rounded-xl bg-gradient-to-r from-primary to-primary/80"
                             >
                               {addAdmin.isPending ? (
                                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -496,85 +582,91 @@ export default function AdminPanel() {
                             </Button>
                           </div>
                         </div>
-                      )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                      {searchQuery && !searchResult && !isSearching && (
-                        <p className="text-sm text-muted-foreground text-center py-2">
-                          Пользователь не найден
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
+                  {searchQuery && !searchResult && !isSearching && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-sm text-muted-foreground text-center py-2"
+                    >
+                      Пользователь не найден
+                    </motion.p>
+                  )}
+                </GlassCard>
 
-                  {/* Current Admins List */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-primary" />
-                        Текущие роли
-                      </CardTitle>
-                      <CardDescription>
-                        {admins?.length || 0} пользователей с ролями
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {adminsLoading ? (
-                        <div className="space-y-3">
-                          <Skeleton className="h-16 w-full" />
-                          <Skeleton className="h-16 w-full" />
-                        </div>
-                      ) : admins && admins.length > 0 ? (
-                        <div className="space-y-2">
-                          {admins.map((admin) => (
-                            <div
-                              key={admin.id}
-                              className="flex items-center gap-3 p-3 border rounded-lg"
-                            >
-                              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
-                                <Users className="w-5 h-5 text-muted-foreground" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm truncate">
-                                  {admin.first_name || admin.last_name
-                                    ? `${admin.first_name || ""} ${admin.last_name || ""}`.trim()
-                                    : "Без имени"}
-                                </p>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  {admin.phone && (
-                                    <span className="flex items-center gap-1">
-                                      <Phone className="w-3 h-3" />
-                                      {admin.phone}
-                                    </span>
-                                  )}
-                                  <span className="flex items-center gap-1 truncate">
-                                    <Hash className="w-3 h-3" />
-                                    {admin.user_id.slice(0, 8)}...
-                                  </span>
-                                </div>
-                              </div>
-                              <Badge variant={getRoleBadgeVariant(admin.role)}>
-                                {getRoleLabel(admin.role)}
-                              </Badge>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                onClick={() => removeAdmin.mutate(admin.id)}
-                                disabled={removeAdmin.isPending}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                {/* Current Admins List */}
+                <GlassCard
+                  title="Текущие роли"
+                  description={`${admins?.length || 0} пользователей с ролями`}
+                  icon={Shield}
+                  iconColor="text-blue-500"
+                >
+                  {adminsLoading ? (
+                    <div className="space-y-3">
+                      {[1, 2].map((i) => (
+                        <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+                      ))}
+                    </div>
+                  ) : admins && admins.length > 0 ? (
+                    <div className="space-y-2">
+                      {admins.map((admin, index) => (
+                        <motion.div
+                          key={admin.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 group hover:border-border transition-colors"
+                        >
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center shrink-0">
+                            <Users className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">
+                              {admin.first_name || admin.last_name
+                                ? `${admin.first_name || ""} ${admin.last_name || ""}`.trim()
+                                : "Без имени"}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              {admin.phone && (
+                                <span className="flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  {admin.phone}
+                                </span>
+                              )}
+                              <span className="flex items-center gap-1">
+                                <Hash className="w-3 h-3" />
+                                {admin.user_id.slice(0, 8)}...
+                              </span>
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground text-center py-4">
-                          Нет пользователей с ролями в базе данных
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
+                          </div>
+                          <Badge 
+                            variant={getRoleBadgeVariant(admin.role)}
+                            className="shrink-0"
+                          >
+                            {getRoleLabel(admin.role)}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="shrink-0 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => removeAdmin.mutate(admin.id)}
+                            disabled={removeAdmin.isPending}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <Users className="w-12 h-12 mb-2 opacity-30" />
+                      <p className="text-sm">Нет пользователей с ролями</p>
+                    </div>
+                  )}
+                </GlassCard>
               </TabsContent>
             </Tabs>
           )}

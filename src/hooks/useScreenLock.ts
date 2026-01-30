@@ -36,16 +36,23 @@ export const useScreenLock = () => {
 
   // Initialize from localStorage
   useEffect(() => {
-    // TEMPORARY: Force reset screen lock (remove after user confirms)
-    localStorage.removeItem(SCREEN_LOCK_ENABLED_KEY);
-    localStorage.removeItem(SCREEN_LOCK_PASSCODE_KEY);
-    localStorage.removeItem(SCREEN_LOCK_BIOMETRIC_KEY);
-    localStorage.removeItem(SCREEN_LOCK_TIMEOUT_KEY);
-    localStorage.removeItem(SCREEN_LOCK_LAST_ACTIVITY_KEY);
-    setIsEnabled(false);
-    setIsBiometricEnabled(false);
-    setIsLocked(false);
-    setLockTimeoutState('immediately');
+    const enabled = localStorage.getItem(SCREEN_LOCK_ENABLED_KEY) === 'true';
+    const biometric = localStorage.getItem(SCREEN_LOCK_BIOMETRIC_KEY) === 'true';
+    const timeout = (localStorage.getItem(SCREEN_LOCK_TIMEOUT_KEY) as LockTimeout) || 'immediately';
+    
+    setIsEnabled(enabled);
+    setIsBiometricEnabled(biometric);
+    setLockTimeoutState(timeout);
+
+    // Check if should be locked on app start
+    if (enabled) {
+      const lastActivity = parseInt(localStorage.getItem(SCREEN_LOCK_LAST_ACTIVITY_KEY) || '0');
+      const timeoutMs = TIMEOUT_MS[timeout];
+      
+      if (timeoutMs !== Infinity && Date.now() - lastActivity > timeoutMs) {
+        setIsLocked(true);
+      }
+    }
   }, []);
 
   // Track activity for timeout
