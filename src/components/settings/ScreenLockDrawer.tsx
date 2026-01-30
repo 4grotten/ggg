@@ -25,7 +25,7 @@ interface ScreenLockDrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type SetupStep = 'main' | 'create-passcode' | 'verify-passcode' | 'timeout-select';
+type SetupStep = 'main' | 'create-passcode' | 'verify-passcode' | 'timeout-select' | 'access-verify';
 type DisableAction = 'pause' | 'delete' | null;
 
 const PASSCODE_LENGTH = 4;
@@ -62,7 +62,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     setHideDataEnabled,
   } = useScreenLockContext();
 
-  const [step, setStep] = useState<SetupStep>('main');
+  const [step, setStep] = useState<SetupStep>(isEnabled && !isPaused ? 'access-verify' : 'main');
+  const [accessVerified, setAccessVerified] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [confirmPasscode, setConfirmPasscode] = useState('');
   const [error, setError] = useState('');
@@ -109,9 +110,10 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     return () => visualViewport?.removeEventListener('resize', handleResize);
   }, []);
 
-  // Reset state when drawer closes
+  // Reset state when drawer closes or set initial step based on lock state
   useEffect(() => {
     if (!isOpen) {
+      // When closing, reset everything
       setStep('main');
       setPasscode('');
       setConfirmPasscode('');
@@ -120,14 +122,22 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       setShake(false);
       setShowDisableDialog(false);
       setPendingDisableAction(null);
+      setAccessVerified(false);
+    } else {
+      // When opening, check if we need to verify access first
+      if (isEnabled && !isPaused && !accessVerified) {
+        setStep('access-verify');
+        setPasscode('');
+        setTimeout(() => focusInput(), 100);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, isEnabled, isPaused, accessVerified, focusInput]);
 
   // Focus input when entering passcode step
   // NOTE: focusing in an effect is often blocked on iOS (not a user gesture).
   // We keep a best-effort attempt, but primary focus happens in the click handler.
   useEffect(() => {
-    if (step !== 'create-passcode' && step !== 'verify-passcode') return;
+    if (step !== 'create-passcode' && step !== 'verify-passcode' && step !== 'access-verify') return;
     const t = window.setTimeout(() => focusInput(), 250);
     return () => window.clearTimeout(t);
   }, [step, focusInput]);
@@ -167,7 +177,26 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     }
   }, [step, entryPhase, confirmPasscode, passcode, enableScreenLock, t, focusInput]);
 
-  // Auto-submit verify passcode
+  // Auto-submit access verify passcode
+  useEffect(() => {
+    if (step === 'access-verify' && passcode.length === PASSCODE_LENGTH) {
+      if (verifyPasscode(passcode)) {
+        setAccessVerified(true);
+        setStep('main');
+        setPasscode('');
+      } else {
+        setError(t('screenLock.wrongPasscode', 'Wrong passcode'));
+        setShake(true);
+        setTimeout(() => {
+          setShake(false);
+          setPasscode('');
+          focusInput();
+        }, 400);
+      }
+    }
+  }, [step, passcode, verifyPasscode, t, focusInput]);
+
+  // Auto-submit verify passcode (for disable)
   useEffect(() => {
     if (step === 'verify-passcode' && passcode.length === PASSCODE_LENGTH) {
       if (verifyPasscode(passcode)) {
@@ -461,8 +490,12 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
 
   const renderPasscodeInput = () => {
     const isCreating = step === 'create-passcode';
+    const isAccessVerify = step === 'access-verify';
 
     const getTitle = () => {
+      if (step === 'access-verify') {
+        return t('screenLock.enterPasscode', 'Enter Passcode');
+      }
       if (step === 'verify-passcode') {
         return t('screenLock.enterPasscode', 'Enter Passcode');
       }
@@ -470,6 +503,9 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     };
 
     const getDescription = () => {
+      if (step === 'access-verify') {
+        return t('screenLock.accessVerifyDesc', 'Enter passcode to access settings');
+      }
       if (step === 'verify-passcode') {
         return t('screenLock.verifyDesc', 'Enter your current passcode to disable');
       }
@@ -718,6 +754,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           <div className="px-4 pb-8 overflow-y-auto">
             {step === 'main' && renderMainContent()}
             {step === 'timeout-select' && renderTimeoutSelect()}
+            {step === 'access-verify' && renderPasscodeInput()}
           </div>
         </DrawerContent>
       </Drawer>
