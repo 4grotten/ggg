@@ -667,7 +667,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   );
 
   // Determine if we're in passcode entry mode
-  const isPasscodeMode = step === 'create-passcode' || step === 'verify-passcode';
+  const isPasscodeMode = step === 'create-passcode' || step === 'verify-passcode' || step === 'access-verify';
 
   // Use Sheet for passcode entry (from top), Drawer for settings (from bottom)
   if (isPasscodeMode) {
@@ -754,7 +754,6 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           <div className="px-4 pb-8 overflow-y-auto">
             {step === 'main' && renderMainContent()}
             {step === 'timeout-select' && renderTimeoutSelect()}
-            {step === 'access-verify' && renderPasscodeInput()}
           </div>
         </DrawerContent>
       </Drawer>
