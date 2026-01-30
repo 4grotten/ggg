@@ -161,6 +161,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       if (confirmPasscode === passcode) {
         enableScreenLock(passcode);
         toast.success(t('screenLock.enabled', 'Screen lock enabled'));
+        // Mark as verified so we don't ask for passcode again immediately
+        setAccessVerified(true);
         setStep('main');
         setPasscode('');
         setConfirmPasscode('');
