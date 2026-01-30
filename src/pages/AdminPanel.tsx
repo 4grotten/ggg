@@ -569,6 +569,42 @@ export default function AdminPanel() {
                     </Button>
                   </div>
 
+                  {/* Mock User Card */}
+                  <div className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0 text-primary-foreground font-bold text-lg">
+                      А
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-sm">Александр Иванов</p>
+                        <Badge variant="default" className="text-[10px] px-1.5 py-0 bg-emerald-500">
+                          VIP
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                        <span className="flex items-center gap-1">
+                          <Phone className="w-3 h-3" />
+                          +971 50 123 4567
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          15.01.2025
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-semibold text-emerald-500">12,450 AED</p>
+                      <p className="text-[10px] text-muted-foreground">Баланс</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 rounded-xl text-primary hover:text-primary hover:bg-primary/10"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </div>
+
                   {/* Clients List */}
                   {clientsLoading ? (
                     <div className="space-y-3">
