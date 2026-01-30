@@ -366,6 +366,11 @@
     "verification": "Doğrulama",
     "savedAccounts": "Kayıtlı Hesaplar",
     "switchedTo": "{{name}} hesabına geçildi",
+    "enabled": "Açık",
+    "disabled": "Kapalı",
+    "hapticFeedback": "Titreşim",
+    "hapticEnabled": "Titreşim açıldı",
+    "hapticDisabled": "Titreşim kapatıldı",
     "devices": {
       "title": "Aktif Cihazlar",
       "noDevices": "Aktif cihaz yok",

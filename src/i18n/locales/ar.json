@@ -366,6 +366,11 @@
     "verification": "التحقق",
     "savedAccounts": "الحسابات المحفوظة",
     "switchedTo": "تم التبديل إلى {{name}}",
+    "enabled": "مفعّل",
+    "disabled": "معطّل",
+    "hapticFeedback": "الاهتزاز",
+    "hapticEnabled": "تم تفعيل الاهتزاز",
+    "hapticDisabled": "تم إيقاف الاهتزاز",
     "devices": {
       "title": "الأجهزة النشطة",
       "noDevices": "لا توجد أجهزة نشطة",
