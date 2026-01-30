@@ -61,7 +61,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { AvatarSync } from "./components/AvatarSync";
 import ScrollToTop from "./components/ScrollToTop";
 import { ScreenLockOverlay } from "./components/settings/ScreenLockOverlay";
-import { useScreenLock } from "./hooks/useScreenLock";
+import { ScreenLockProvider, useScreenLockContext } from "./contexts/ScreenLockContext";
 
 const queryClient = new QueryClient();
 
@@ -84,7 +84,7 @@ const hiddenNavRoutes = [
 
 const AppContent = () => {
   const location = useLocation();
-  const { isLocked, isBiometricEnabled, unlock, unlockWithBiometric } = useScreenLock();
+  const { isLocked, isBiometricEnabled, unlock, unlockWithBiometric } = useScreenLockContext();
   
   // Update theme-color meta tag when theme changes
   useThemeColor();
@@ -233,7 +233,9 @@ const App = () => {
                   <AvatarSync />
                   <ScrollToTop />
                   <VoiceCallProvider>
-                    <AppContent />
+                    <ScreenLockProvider>
+                      <AppContent />
+                    </ScreenLockProvider>
                   </VoiceCallProvider>
                 </AvatarProvider>
               </AuthProvider>

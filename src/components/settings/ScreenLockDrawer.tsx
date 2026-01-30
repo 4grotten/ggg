@@ -1,17 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Eye, EyeOff, Shield } from 'lucide-react';
+import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Shield } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from '@/components/ui/animated-drawer-item';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
-import { useScreenLock, type LockTimeout } from '@/hooks/useScreenLock';
+import { useScreenLockContext } from '@/contexts/ScreenLockContext';
+import type { LockTimeout } from '@/hooks/useScreenLock';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { PasscodeMatchInput } from '@/components/settings/PasscodeMatchInput';
 
 interface ScreenLockDrawerProps {
   isOpen: boolean;
@@ -47,13 +46,12 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     verifyPasscode,
     setBiometricEnabled,
     setLockTimeout,
-  } = useScreenLock();
+  } = useScreenLockContext();
 
   const [step, setStep] = useState<SetupStep>('main');
   const [passcode, setPasscode] = useState('');
   const [confirmPasscode, setConfirmPasscode] = useState('');
   const [error, setError] = useState('');
-  const [showPasscode, setShowPasscode] = useState(false);
 
   // Reset state when drawer closes
   useEffect(() => {
@@ -62,7 +60,6 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       setPasscode('');
       setConfirmPasscode('');
       setError('');
-      setShowPasscode(false);
     }
   }, [isOpen]);
 
@@ -83,6 +80,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         return;
       }
       setStep('confirm-passcode');
+      setConfirmPasscode('');
       setError('');
     } else if (step === 'confirm-passcode') {
       if (confirmPasscode !== passcode) {
@@ -127,6 +125,43 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       toast.success(t('screenLock.biometricDisabled', '{{method}} disabled', { method: getBiometricLabel() }));
     }
   }, [registerBiometric, setBiometricEnabled, getBiometricLabel, t]);
+
+  const biometricRow = useMemo(() => {
+    if (!isEnabled) return null;
+
+    const unavailable = !isBiometricAvailable;
+    return (
+      <AnimatedDrawerItem index={1}>
+        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Fingerprint className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="font-medium text-foreground">{getBiometricLabel()}</p>
+              <p className="text-sm text-muted-foreground">
+                {unavailable
+                  ? t('screenLock.biometricUnavailable', 'Not available on this device')
+                  : t('screenLock.biometricDesc', 'Quick unlock with biometrics')}
+              </p>
+            </div>
+          </div>
+          <Switch
+            checked={isBiometricEnabled}
+            onCheckedChange={handleBiometricToggle}
+            disabled={unavailable}
+          />
+        </div>
+      </AnimatedDrawerItem>
+    );
+  }, [
+    getBiometricLabel,
+    handleBiometricToggle,
+    isBiometricAvailable,
+    isBiometricEnabled,
+    isEnabled,
+    t,
+  ]);
 
   const handleTimeoutSelect = useCallback((timeout: LockTimeout) => {
     setLockTimeout(timeout);
@@ -173,30 +208,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           </div>
         </AnimatedDrawerItem>
 
-        {/* Biometric option - only show if screen lock is enabled and device supports it */}
-        {isEnabled && isBiometricAvailable && (
-          <AnimatedDrawerItem index={1}>
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                  <Fingerprint className="w-5 h-5 text-green-500" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">
-                    {getBiometricLabel()}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {t('screenLock.biometricDesc', 'Quick unlock with biometrics')}
-                  </p>
-                </div>
-              </div>
-              <Switch 
-                checked={isBiometricEnabled} 
-                onCheckedChange={handleBiometricToggle}
-              />
-            </div>
-          </AnimatedDrawerItem>
-        )}
+        {/* Biometric option (show even if unavailable, but disabled) */}
+        {biometricRow}
 
         {/* Lock timeout option */}
         {isEnabled && (
@@ -267,35 +280,18 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         </p>
       </div>
 
-      {/* Passcode input */}
-      <div className="relative">
-        <Input
-          type={showPasscode ? 'text' : 'password'}
-          inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={PASSCODE_LENGTH}
-          value={step === 'confirm-passcode' ? confirmPasscode : passcode}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, '').slice(0, PASSCODE_LENGTH);
-            if (step === 'confirm-passcode') {
-              setConfirmPasscode(value);
-            } else {
-              setPasscode(value);
-            }
-            setError('');
-          }}
-          className="text-center text-2xl tracking-[0.5em] font-mono pr-12"
-          placeholder="••••"
-          autoFocus
-        />
-        <button
-          type="button"
-          onClick={() => setShowPasscode(!showPasscode)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground"
-        >
-          {showPasscode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </button>
-      </div>
+      {/* Passcode input (step-by-step with match feedback) */}
+      <PasscodeMatchInput
+        value={step === 'confirm-passcode' ? confirmPasscode : passcode}
+        onChange={(next) => {
+          if (step === 'confirm-passcode') setConfirmPasscode(next);
+          else setPasscode(next);
+          setError('');
+        }}
+        length={PASSCODE_LENGTH}
+        compareTo={step === 'confirm-passcode' ? passcode : undefined}
+        autoFocus
+      />
 
       {/* Error message */}
       <AnimatePresence>

@@ -83,6 +83,14 @@ export const useScreenLock = () => {
     if (!isEnabled) return;
 
     const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        // Leaving the app: lock immediately if configured
+        if (lockTimeout === 'immediately') {
+          setIsLocked(true);
+        }
+        return;
+      }
+
       if (document.visibilityState === 'visible') {
         const lastActivity = parseInt(localStorage.getItem(SCREEN_LOCK_LAST_ACTIVITY_KEY) || '0');
         const timeoutMs = TIMEOUT_MS[lockTimeout];
@@ -95,6 +103,22 @@ export const useScreenLock = () => {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isEnabled, lockTimeout]);
+
+  // Extra reliability on mobile/PWA: lock on blur/pagehide for "immediately"
+  useEffect(() => {
+    if (!isEnabled) return;
+
+    const handleBlur = () => {
+      if (lockTimeout === 'immediately') setIsLocked(true);
+    };
+
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('pagehide', handleBlur);
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('pagehide', handleBlur);
+    };
   }, [isEnabled, lockTimeout]);
 
   const enableScreenLock = useCallback((passcode: string) => {
