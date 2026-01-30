@@ -54,22 +54,27 @@ export const BottomNavigation = () => {
         const containerRect = container.getBoundingClientRect();
         const tabRect = activeTab.getBoundingClientRect();
         
-        // For edge tabs, extend to container edges; for middle tabs, add some padding
-        let left = tabRect.left - containerRect.left;
-        let width = tabRect.width;
+        // Calculate tab center and extend symmetrically
+        const tabCenter = tabRect.left - containerRect.left + tabRect.width / 2;
+        
+        let left: number;
+        let width: number;
         
         if (activeIndex === 0) {
-          // First tab - extend to left edge
-          width = width + left;
+          // First tab - extend to left edge, mirror to right for centering
+          const leftExtension = tabRect.left - containerRect.left;
           left = 0;
+          width = tabRect.width + leftExtension * 2;
         } else if (activeIndex === navItems.length - 1) {
-          // Last tab - extend to right edge
-          width = containerRect.width - left;
+          // Last tab - extend to right edge, mirror to left for centering
+          const rightExtension = containerRect.width - (tabRect.left - containerRect.left + tabRect.width);
+          left = tabRect.left - containerRect.left - rightExtension;
+          width = tabRect.width + rightExtension * 2;
         } else {
-          // Middle tabs - add some horizontal padding
-          const extraPadding = 6;
-          left = left - extraPadding;
-          width = width + extraPadding * 2;
+          // Middle tabs - add symmetric padding
+          const extraPadding = 8;
+          left = tabRect.left - containerRect.left - extraPadding;
+          width = tabRect.width + extraPadding * 2;
         }
         
         setSelectorStyle({ left, width });
