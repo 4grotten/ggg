@@ -9,6 +9,8 @@ import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
+import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import {
   Collapsible,
   CollapsibleContent,
@@ -78,10 +80,13 @@ const metalCardTransactions = [
 const MetalCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
   const [showDetails, setShowDetails] = useState(false);
   const [billingOpen, setBillingOpen] = useState(false);
   const [balanceVisible, setBalanceVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'details' | 'balance' | null>(null);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -97,11 +102,37 @@ const MetalCard = () => {
     balance: 256508.98,
   };
 
+  const requiresAuth = isHideDataEnabled && isScreenLockEnabled;
+
   const toggleBalanceVisibility = () => {
+    if (!balanceVisible && requiresAuth) {
+      setPendingAction('balance');
+      setShowUnlockDialog(true);
+      return;
+    }
     if (!balanceVisible) {
       setAnimationKey(prev => prev + 1);
     }
     setBalanceVisible(!balanceVisible);
+  };
+
+  const toggleDetailsVisibility = () => {
+    if (!showDetails && requiresAuth) {
+      setPendingAction('details');
+      setShowUnlockDialog(true);
+      return;
+    }
+    setShowDetails(!showDetails);
+  };
+
+  const handleUnlockSuccess = () => {
+    if (pendingAction === 'balance') {
+      setAnimationKey(prev => prev + 1);
+      setBalanceVisible(true);
+    } else if (pendingAction === 'details') {
+      setShowDetails(true);
+    }
+    setPendingAction(null);
   };
 
   const handleRefresh = useCallback(async () => {
@@ -230,7 +261,7 @@ const MetalCard = () => {
               </Button>
               <Button
                 size="sm"
-                onClick={() => setShowDetails(!showDetails)}
+                onClick={toggleDetailsVisibility}
                 className="text-xs font-medium gap-1.5 rounded-full border-none bg-black hover:bg-[#007AFF] text-white"
               >
                 {showDetails ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -368,6 +399,15 @@ const MetalCard = () => {
         </div>
         </motion.div>
       </PullToRefresh>
+
+      <DataUnlockDialog
+        isOpen={showUnlockDialog}
+        onClose={() => {
+          setShowUnlockDialog(false);
+          setPendingAction(null);
+        }}
+        onSuccess={handleUnlockSuccess}
+      />
     </MobileLayout>
   );
 };
