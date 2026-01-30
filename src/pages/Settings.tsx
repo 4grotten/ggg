@@ -656,71 +656,12 @@ const Settings = () => {
           </>
         ) : (
           <>
-            {/* Guest avatar with camera edit option */}
             <button
-              onClick={handleAvatarClick}
-              className="relative group mb-4"
+              onClick={() => navigate("/auth/phone")}
+              className="w-24 h-24 rounded-full bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/25 hover:bg-primary/90 transition-colors"
             >
-              <div className="relative">
-                <Avatar className="w-28 h-28 ring-4 ring-background shadow-xl overflow-hidden">
-                  <AvatarImage 
-                    src={displayAvatar} 
-                    alt={displayName}
-                    className="object-cover"
-                  />
-                  <AvatarFallback className="text-2xl bg-muted">
-                    <User className="w-12 h-12 text-muted-foreground" />
-                  </AvatarFallback>
-                </Avatar>
-                
-                {/* Flash effect for guest */}
-                <AnimatePresence>
-                  {showFlash && (
-                    <>
-                      <motion.div
-                        initial={{ opacity: 1, scale: 1 }}
-                        animate={{ opacity: 0, scale: 1.5 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
-                        className="absolute inset-0 bg-white rounded-full z-30 pointer-events-none"
-                      />
-                      <motion.div
-                        initial={{ opacity: 0.8, scale: 1 }}
-                        animate={{ opacity: 0, scale: 2 }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        className="absolute inset-0 rounded-full border-4 border-primary z-30 pointer-events-none"
-                      />
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0 }}
-                        transition={{ delay: 0.2, duration: 0.3, type: "spring" }}
-                        className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"
-                      >
-                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                          <Check className="w-7 h-7 text-white" strokeWidth={3} />
-                        </div>
-                      </motion.div>
-                    </>
-                  )}
-                </AnimatePresence>
-              </div>
-              
-              {/* Hover overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera className="w-6 h-6 text-white" />
-              </div>
-              
-              {/* Edit badge */}
-              <motion.div 
-                className="absolute bottom-0 right-0 w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Camera className="w-4 h-4 text-primary-foreground" />
-              </motion.div>
+              <LogIn className="w-10 h-10 text-primary-foreground" />
             </button>
-            
             <h1 className="text-xl font-bold text-foreground">{t("settings.guest") || "Guest"}</h1>
             <p className="text-sm text-muted-foreground mt-1">{t("settings.loginToAccess") || "Sign in to access all features"}</p>
           </>
@@ -1322,19 +1263,6 @@ const Settings = () => {
         isOpen={isScreenLockOpen}
         onOpenChange={setIsScreenLockOpen}
       />
-
-      {/* Fixed Sign In button for guest at bottom */}
-      {!isAuthenticated && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 z-40 max-w-[800px] mx-auto">
-          <button
-            onClick={() => navigate("/auth/phone")}
-            className="w-full flex items-center justify-center gap-2 py-3.5 bg-primary text-primary-foreground rounded-2xl font-medium shadow-lg shadow-primary/25 hover:bg-primary/90 transition-colors"
-          >
-            <LogIn className="w-5 h-5" />
-            <span>{t("settings.signIn") || "Sign In"}</span>
-          </button>
-        </div>
-      )}
     </MobileLayout>
   );
 };
