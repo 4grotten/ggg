@@ -28,14 +28,13 @@ interface ClientDetailsDrawerProps {
   client: ClientData | null;
 }
 
-// Referral levels configuration
+// Referral levels configuration - matching the real partner levels
 const REFERRAL_LEVELS = [
-  { id: "R1", name: "Стартовый", color: "from-gray-400 to-gray-500", percent: 5 },
-  { id: "R2", name: "Базовый", color: "from-lime-400 to-lime-500", percent: 7 },
-  { id: "R3", name: "Продвинутый", color: "from-blue-400 to-blue-500", percent: 10 },
-  { id: "R4", name: "Эксперт", color: "from-purple-400 to-purple-500", percent: 12 },
-  { id: "R5", name: "Мастер", color: "from-amber-400 to-amber-500", percent: 15 },
-  { id: "R6", name: "Легенда", color: "from-rose-400 to-rose-500", percent: 20 },
+  { id: "R1", name: "R1", icon: "🌱", color: "from-gray-400 to-gray-500", cardPercent: 15, txPercent: 0.05, minFriends: 0, maxFriends: 10 },
+  { id: "R2", name: "R2", icon: "🌿", color: "from-lime-400 to-lime-500", cardPercent: 20, txPercent: 0.1, minFriends: 10, maxFriends: 30 },
+  { id: "R3", name: "R3", icon: "💎", color: "from-blue-400 to-blue-500", cardPercent: 25, txPercent: 0.2, minFriends: 30, maxFriends: 50 },
+  { id: "R4", name: "R4", icon: "👑", color: "from-purple-400 to-purple-500", cardPercent: 30, txPercent: 0.3, minFriends: 50, maxFriends: 100 },
+  { id: "Partner", name: "Partner", icon: "🚀", color: "from-amber-400 to-amber-500", cardPercent: 35, txPercent: 0.5, minFriends: 100, maxFriends: Infinity },
 ];
 
 export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetailsDrawerProps) {
@@ -171,13 +170,13 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                   )}
                 >
                   <div className={cn(
-                    "w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br flex items-center justify-center text-white font-bold text-sm",
+                    "w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br flex items-center justify-center text-lg",
                     level.color
                   )}>
-                    {level.id}
+                    {level.icon}
                   </div>
                   <p className="text-xs font-medium truncate">{level.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{level.percent}%</p>
+                  <p className="text-[10px] text-muted-foreground">{level.cardPercent}%</p>
                   
                   {selectedLevel === level.id && (
                     <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
@@ -189,9 +188,12 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
             </div>
             
             {currentLevelData && (
-              <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+              <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 space-y-1">
                 <p className="text-xs text-center">
-                  Текущий бонус: <span className="font-bold text-primary">{currentLevelData.percent}%</span> от оборота рефералов
+                  Карта: <span className="font-bold text-primary">{currentLevelData.cardPercent}%</span> · Транзакции: <span className="font-bold text-primary">{currentLevelData.txPercent}%</span>
+                </p>
+                <p className="text-[10px] text-center text-muted-foreground">
+                  Требуется друзей: {currentLevelData.minFriends}{currentLevelData.maxFriends !== Infinity ? `-${currentLevelData.maxFriends}` : '+'}
                 </p>
               </div>
             )}
