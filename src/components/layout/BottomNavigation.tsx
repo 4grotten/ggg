@@ -1,5 +1,5 @@
 import { Home, Info, MessageCircle, LogIn } from "lucide-react";
-import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
+import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,6 +18,7 @@ const navItems = [
 ];
 
 export const BottomNavigation = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { avatarUrl } = useAvatar();
   const { user, isAuthenticated } = useAuth();
@@ -32,7 +33,7 @@ export const BottomNavigation = () => {
   
   const hasMountedRef = useRef(false);
   const isInitializedRef = useRef(false);
-  const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const tabRefs = useRef<(HTMLElement | null)[]>([]);
   const [selectorStyle, setSelectorStyle] = useState<{ left: number; width: number } | null>(null);
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
 
@@ -81,12 +82,15 @@ export const BottomNavigation = () => {
   );
 
   const handleTabPress = useCallback(
-    (index: number) => {
+    (index: number, path: string) => {
       // Move selector immediately on first touch/press, without waiting for route change.
       setPressedIndex(index);
       updateSelector(index);
+      selection();
+      // Navigate immediately on pointer down
+      navigate(path);
     },
-    [updateSelector],
+    [updateSelector, selection, navigate],
   );
 
   useEffect(() => {
@@ -153,13 +157,11 @@ export const BottomNavigation = () => {
               // For unauthenticated users, show login button instead of avatar
               if (!isAuthenticated) {
                 return (
-                  <RouterNavLink
+                  <div
                     key={item.path}
-                    to="/auth/phone"
                     ref={(el) => { tabRefs.current[index] = el; }}
-                    onPointerDown={() => handleTabPress(index)}
-                    onClick={() => selection()}
-                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
+                    onPointerDown={() => handleTabPress(index, "/auth/phone")}
+                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation cursor-pointer"
                   >
                     <div className={cn(
                       "w-6 h-6 rounded-full bg-primary flex items-center justify-center transition-all",
@@ -175,18 +177,16 @@ export const BottomNavigation = () => {
                     >
                       {t("nav.login") || t(item.labelKey)}
                     </span>
-                  </RouterNavLink>
+                  </div>
                 );
               }
               
               return (
-                <RouterNavLink
+                <div
                   key={item.path}
-                  to={item.path}
                   ref={(el) => { tabRefs.current[index] = el; }}
-                  onPointerDown={() => handleTabPress(index)}
-                  onClick={() => selection()}
-                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
+                  onPointerDown={() => handleTabPress(index, item.path)}
+                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation cursor-pointer"
                 >
                   <Avatar className={cn(
                     "w-6 h-6 transition-all",
@@ -203,19 +203,17 @@ export const BottomNavigation = () => {
                   >
                     {t(item.labelKey)}
                   </span>
-                </RouterNavLink>
+                </div>
               );
             }
             
             const Icon = item.icon!;
             return (
-              <RouterNavLink
+              <div
                 key={item.path}
-                to={item.path}
                 ref={(el) => { tabRefs.current[index] = el; }}
-                onPointerDown={() => handleTabPress(index)}
-                onClick={() => selection()}
-                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
+                onPointerDown={() => handleTabPress(index, item.path)}
+                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation cursor-pointer"
               >
                 <div className="relative">
                   <Icon
@@ -245,7 +243,7 @@ export const BottomNavigation = () => {
                 >
                   {t(item.labelKey)}
                 </span>
-              </RouterNavLink>
+              </div>
             );
           })}
         </div>
