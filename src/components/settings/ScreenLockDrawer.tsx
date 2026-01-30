@@ -612,11 +612,19 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     </div>
   );
 
+  // Determine if we're in passcode entry mode
+  const isPasscodeMode = step === 'create-passcode' || step === 'verify-passcode';
+
   return (
     <>
       <Drawer open={isOpen} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[90vh]">
-          <DrawerHeader className="relative flex items-center justify-between py-4 px-4">
+        <DrawerContent 
+          className={cn(
+            "transition-all duration-200",
+            isPasscodeMode && isKeyboardOpen ? "max-h-[45vh]" : "max-h-[90vh]"
+          )}
+        >
+          <DrawerHeader className="relative flex items-center justify-between py-3 px-4">
             <DrawerTitle className="flex items-center gap-2 text-base font-semibold">
               <Lock className="w-5 h-5 text-primary" />
               {step === 'timeout-select' 
@@ -629,9 +637,12 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             </DrawerClose>
           </DrawerHeader>
 
-          <div className="px-4 pb-8 overflow-y-auto">
+          <div className={cn(
+            "px-4 overflow-y-auto transition-all duration-200",
+            isPasscodeMode && isKeyboardOpen ? "pb-2" : "pb-8"
+          )}>
             {step === 'main' && renderMainContent()}
-            {(step === 'create-passcode' || step === 'verify-passcode') && renderPasscodeInput()}
+            {isPasscodeMode && renderPasscodeInput()}
             {step === 'timeout-select' && renderTimeoutSelect()}
           </div>
         </DrawerContent>
