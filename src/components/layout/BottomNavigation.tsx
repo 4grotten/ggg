@@ -33,6 +33,7 @@ export const BottomNavigation = () => {
   const hasMountedRef = useRef(false);
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [selectorStyle, setSelectorStyle] = useState({ left: 0, width: 0 });
+  const [pressedIndex, setPressedIndex] = useState<number | null>(null);
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -42,59 +43,67 @@ export const BottomNavigation = () => {
   };
 
   const activeIndex = navItems.findIndex(item => isActive(item.path));
-  
-  // Check if active tab is first or last (Home or Profile)
-  const isEdgeTab = activeIndex === 0 || activeIndex === navItems.length - 1;
 
-  const updateSelector = useCallback(() => {
-    const activeTab = tabRefs.current[activeIndex];
-    if (activeTab) {
-      const container = activeTab.parentElement;
-      if (container) {
-        const containerRect = container.getBoundingClientRect();
-        const tabRect = activeTab.getBoundingClientRect();
-        
-        // Calculate tab center and extend symmetrically
-        const tabCenter = tabRect.left - containerRect.left + tabRect.width / 2;
-        
-        let left: number;
-        let width: number;
-        
-        if (activeIndex === 0) {
-          // First tab - extend to left edge, mirror to right for centering
-          const leftExtension = tabRect.left - containerRect.left;
-          left = 0;
-          width = tabRect.width + leftExtension * 2;
-        } else if (activeIndex === navItems.length - 1) {
-          // Last tab - extend to right edge, mirror to left for centering
-          const rightExtension = containerRect.width - (tabRect.left - containerRect.left + tabRect.width);
-          left = tabRect.left - containerRect.left - rightExtension;
-          width = tabRect.width + rightExtension * 2;
-        } else {
-          // Middle tabs - add symmetric padding
-          const extraPadding = 8;
-          left = tabRect.left - containerRect.left - extraPadding;
-          width = tabRect.width + extraPadding * 2;
-        }
-        
-        setSelectorStyle({ left, width });
-      }
+  const calcSelectorStyle = useCallback((index: number) => {
+    const tab = tabRefs.current[index];
+    if (!tab) return null;
+
+    const container = tab.parentElement;
+    if (!container) return null;
+
+    const containerRect = container.getBoundingClientRect();
+    const tabRect = tab.getBoundingClientRect();
+
+    const baseLeft = tabRect.left - containerRect.left;
+    const baseWidth = tabRect.width;
+
+    // Expand symmetrically; for edge tabs mirror the free space so label stays centered
+    if (index === 0) {
+      const leftExtension = baseLeft;
+      return { left: 0, width: baseWidth + leftExtension * 2 };
     }
-  }, [activeIndex, isEdgeTab]);
+    if (index === navItems.length - 1) {
+      const rightExtension = containerRect.width - (baseLeft + baseWidth);
+      return { left: baseLeft - rightExtension, width: baseWidth + rightExtension * 2 };
+    }
+
+    const extraPadding = 8;
+    return { left: baseLeft - extraPadding, width: baseWidth + extraPadding * 2 };
+  }, []);
+
+  const updateSelector = useCallback(
+    (index: number) => {
+      const next = calcSelectorStyle(index);
+      if (next) setSelectorStyle(next);
+    },
+    [calcSelectorStyle],
+  );
+
+  const handleTabPress = useCallback(
+    (index: number) => {
+      // Move selector immediately on first touch/press, without waiting for route change.
+      setPressedIndex(index);
+      updateSelector(index);
+    },
+    [updateSelector],
+  );
 
   useEffect(() => {
     hasMountedRef.current = true;
   }, []);
 
   useEffect(() => {
-    updateSelector();
+    // When route actually changes, sync selector to active tab and clear optimistic press.
+    setPressedIndex(null);
+    updateSelector(activeIndex);
   }, [activeIndex, updateSelector, i18n.language]);
 
   // Update on resize
   useEffect(() => {
-    window.addEventListener('resize', updateSelector);
-    return () => window.removeEventListener('resize', updateSelector);
-  }, [updateSelector]);
+    const onResize = () => updateSelector(pressedIndex ?? activeIndex);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [updateSelector, pressedIndex, activeIndex]);
 
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 px-4 max-w-[800px] mx-auto">
@@ -130,8 +139,9 @@ export const BottomNavigation = () => {
                     key={item.path}
                     to="/auth/phone"
                     ref={(el) => { tabRefs.current[index] = el; }}
+                    onPointerDown={() => handleTabPress(index)}
                     onClick={() => selection()}
-                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10"
+                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
                   >
                     <div className={cn(
                       "w-6 h-6 rounded-full bg-primary flex items-center justify-center transition-all",
@@ -156,8 +166,9 @@ export const BottomNavigation = () => {
                   key={item.path}
                   to={item.path}
                   ref={(el) => { tabRefs.current[index] = el; }}
+                  onPointerDown={() => handleTabPress(index)}
                   onClick={() => selection()}
-                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10"
+                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
                 >
                   <Avatar className={cn(
                     "w-6 h-6 transition-all",
@@ -184,8 +195,9 @@ export const BottomNavigation = () => {
                 key={item.path}
                 to={item.path}
                 ref={(el) => { tabRefs.current[index] = el; }}
+                onPointerDown={() => handleTabPress(index)}
                 onClick={() => selection()}
-                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10"
+                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
               >
                 <div className="relative">
                   <Icon
