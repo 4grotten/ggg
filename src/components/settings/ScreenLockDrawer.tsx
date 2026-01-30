@@ -425,36 +425,86 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
 
   const renderPasscodeInput = () => {
     const isCreating = step === 'create-passcode';
-    const dotStates = getDotStates();
 
     const getTitle = () => {
       if (step === 'verify-passcode') {
         return t('screenLock.enterPasscode', 'Enter Passcode');
       }
-      return entryPhase === 1 
-        ? t('screenLock.createPasscode', 'Create Passcode')
-        : t('screenLock.confirmPasscode', 'Confirm Passcode');
+      return t('screenLock.createPasscode', 'Create Passcode');
     };
 
     const getDescription = () => {
       if (step === 'verify-passcode') {
         return t('screenLock.verifyDesc', 'Enter your current passcode to disable');
       }
-      return entryPhase === 1 
-        ? t('screenLock.createDesc', 'Enter a {{length}}-digit passcode', { length: PASSCODE_LENGTH })
-        : t('screenLock.confirmDesc', 'Re-enter your passcode');
+      return t('screenLock.createDesc', 'Enter a {{length}}-digit passcode', { length: PASSCODE_LENGTH });
     };
+
+    // Generate dot states for first passcode (always filled or empty)
+    const getFirstPasscodeDots = () => {
+      return Array.from({ length: PASSCODE_LENGTH }).map((_, i) => {
+        return i < passcode.length ? 'filled' as const : 'empty' as const;
+      });
+    };
+
+    // Generate dot states for confirm passcode with character-by-character comparison
+    const getConfirmPasscodeDots = () => {
+      return Array.from({ length: PASSCODE_LENGTH }).map((_, i) => {
+        const hasDigit = i < confirmPasscode.length;
+        if (!hasDigit) return 'empty' as const;
+        return confirmPasscode[i] === passcode[i] ? 'match' as const : 'mismatch' as const;
+      });
+    };
+
+    // Single input for verify mode
+    const getVerifyDots = () => {
+      return Array.from({ length: PASSCODE_LENGTH }).map((_, i) => {
+        return i < passcode.length ? 'filled' as const : 'empty' as const;
+      });
+    };
+
+    const renderDots = (states: ('empty' | 'filled' | 'match' | 'mismatch')[], shouldShake: boolean) => (
+      <motion.div
+        animate={shouldShake ? { x: [-8, 8, -8, 8, 0] } : undefined}
+        transition={{ duration: 0.35 }}
+        className="flex items-center justify-center gap-4"
+      >
+        {states.map((state, i) => (
+          <motion.span
+            key={i}
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{
+              scale: state === 'mismatch' ? [1, 1.2, 1] : 1,
+              opacity: 1,
+              backgroundColor:
+                state === "empty"
+                  ? "hsl(var(--muted))"
+                  : state === "mismatch"
+                  ? "hsl(var(--destructive))"
+                  : state === "match"
+                  ? "hsl(142 71% 45%)" // green for match
+                  : "hsl(var(--primary))",
+            }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 500, 
+              damping: 30,
+              scale: { duration: 0.2 }
+            }}
+            className="w-5 h-5 rounded-full"
+          />
+        ))}
+      </motion.div>
+    );
 
     return (
       <div 
         className={cn(
           "flex flex-col transition-all duration-300",
-          isKeyboardOpen ? "justify-start pt-4" : "justify-end min-h-[50vh]"
+          isKeyboardOpen ? "justify-start pt-2" : "justify-end min-h-[50vh]"
         )}
       >
-        {/* Invisible but clickable input overlay.
-            IMPORTANT: do NOT use sr-only here — iOS often won't open the keyboard
-            for fully hidden inputs. */}
+        {/* Invisible but clickable input overlay */}
         <div className="relative">
           <input
             ref={inputRef}
@@ -473,84 +523,95 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             aria-label={t('screenLock.passcode', 'Passcode Lock')}
           />
 
-        <div className="space-y-6">
-          {/* Header with step indicators */}
-          <div className="text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
-            >
-              <Lock className="w-8 h-8 text-primary" />
-            </motion.div>
-            
-            {/* Step indicator for create flow */}
-            {isCreating && (
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <motion.div 
-                  className={cn(
-                    "w-2 h-2 rounded-full transition-colors",
-                    entryPhase >= 1 ? "bg-primary" : "bg-muted"
-                  )}
-                  animate={{ scale: entryPhase === 1 ? 1.2 : 1 }}
-                />
-                <motion.div 
-                  className={cn(
-                    "w-2 h-2 rounded-full transition-colors",
-                    entryPhase >= 2 ? "bg-primary" : "bg-muted"
-                  )}
-                  animate={{ scale: entryPhase === 2 ? 1.2 : 1 }}
-                />
+          <div className="space-y-4">
+            {/* Header with lock icon */}
+            <div className="text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3"
+              >
+                <Lock className="w-8 h-8 text-primary" />
+              </motion.div>
+              
+              {/* Step indicator for create flow */}
+              {isCreating && (
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <motion.div 
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-colors",
+                      entryPhase >= 1 ? "bg-primary" : "bg-muted"
+                    )}
+                    animate={{ scale: entryPhase === 1 ? 1.2 : 1 }}
+                  />
+                  <motion.div 
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-colors",
+                      entryPhase >= 2 ? "bg-primary" : "bg-muted"
+                    )}
+                    animate={{ scale: entryPhase === 2 ? 1.2 : 1 }}
+                  />
+                </div>
+              )}
+              
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={step}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {getTitle()}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {getDescription()}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* For verify mode - single row of dots */}
+            {step === 'verify-passcode' && (
+              <div className="py-4">
+                {renderDots(getVerifyDots(), shake && step === 'verify-passcode')}
               </div>
             )}
-            
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${step}-${entryPhase}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <h2 className="text-lg font-semibold text-foreground">
-                  {getTitle()}
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {getDescription()}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
 
-          {/* Visual dots */}
-          <motion.div
-            animate={shake ? { x: [-8, 8, -8, 8, 0] } : undefined}
-            transition={{ duration: 0.35 }}
-            className="w-full flex items-center justify-center gap-4 py-4"
-          >
-            <AnimatePresence mode="popLayout">
-              {dotStates.map((state, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ scale: 0.6, opacity: 0 }}
-                  animate={{
-                    scale: 1,
-                    opacity: 1,
-                    backgroundColor:
-                      state === "empty"
-                        ? "hsl(var(--muted))"
-                        : state === "mismatch"
-                        ? "hsl(var(--destructive))"
-                        : "hsl(var(--primary))",
-                  }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  className="w-5 h-5 rounded-full"
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        </div>
+            {/* For create mode - two rows of dots always visible */}
+            {isCreating && (
+              <div className="space-y-4 py-2">
+                {/* First passcode row */}
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground text-center">
+                    {t('screenLock.newPasscode', 'New passcode')}
+                  </p>
+                  <div className={cn(
+                    "p-3 rounded-xl transition-all",
+                    entryPhase === 1 ? "bg-primary/5 ring-2 ring-primary/20" : "bg-muted/30"
+                  )}>
+                    {renderDots(getFirstPasscodeDots(), false)}
+                  </div>
+                </div>
+
+                {/* Confirm passcode row */}
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground text-center">
+                    {t('screenLock.confirmPasscode', 'Confirm passcode')}
+                  </p>
+                  <div className={cn(
+                    "p-3 rounded-xl transition-all",
+                    entryPhase === 2 ? "bg-primary/5 ring-2 ring-primary/20" : "bg-muted/30",
+                    shake && entryPhase === 2 && "ring-destructive/30"
+                  )}>
+                    {renderDots(getConfirmPasscodeDots(), shake && entryPhase === 2)}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Error message */}
           <AnimatePresence>
@@ -559,7 +620,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="text-destructive text-sm text-center flex items-center justify-center gap-1"
+                className="text-destructive text-sm text-center flex items-center justify-center gap-1 mt-3"
               >
                 <AlertCircle className="w-4 h-4" />
                 {error}
@@ -568,7 +629,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           </AnimatePresence>
 
           {/* Cancel button */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-4">
             <Button
               variant="ghost"
               size="sm"
