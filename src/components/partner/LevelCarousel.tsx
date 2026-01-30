@@ -48,20 +48,9 @@ export const LevelCarousel = ({ currentFriends, onLevelChange }: LevelCarouselPr
     }
   }, [selectedLevelIndex, onLevelChange]);
   
-  // Scroll to current level on mount
+  // Initialize selected level without auto-scrolling
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const cardWidth = container.offsetWidth;
-      // Use setTimeout to ensure the container is fully rendered
-      setTimeout(() => {
-        container.scrollTo({
-          left: cardWidth * currentLevelIndex,
-          behavior: "auto"
-        });
-        setSelectedLevelIndex(currentLevelIndex);
-      }, 100);
-    }
+    setSelectedLevelIndex(currentLevelIndex);
   }, [currentLevelIndex]);
   
   useEffect(() => {
