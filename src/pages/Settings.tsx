@@ -24,6 +24,7 @@ import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/
 import { LEVELS } from "@/components/partner/LevelCarousel";
 import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 import { ScreenLockDrawer } from "@/components/settings/ScreenLockDrawer";
+import { PasswordVerifyDialog } from "@/components/settings/PasswordVerifyDialog";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { isHapticEnabled, setHapticEnabled, useHapticFeedback } from "@/hooks/useHapticFeedback";
@@ -295,6 +296,7 @@ const Settings = () => {
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
   const [isScreenLockOpen, setIsScreenLockOpen] = useState(false);
+  const [isAdminPasswordDialogOpen, setIsAdminPasswordDialogOpen] = useState(false);
   const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused } = useScreenLockContext();
   const { isAdmin } = useUserRole();
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
@@ -900,7 +902,7 @@ const Settings = () => {
             <SettingsItem
               icon={<ColoredIcon colorKey="admin"><ShieldCheck className="w-4 h-4" /></ColoredIcon>}
               label={t("settings.adminPanel") || "Административная панель"}
-              onClick={() => navigate("/settings/admin")}
+              onClick={() => setIsAdminPasswordDialogOpen(true)}
             />
           )}
         </AnimatedMenuSection>
@@ -1269,6 +1271,15 @@ const Settings = () => {
       <ScreenLockDrawer
         isOpen={isScreenLockOpen}
         onOpenChange={setIsScreenLockOpen}
+      />
+
+      {/* Admin Panel Password Verification */}
+      <PasswordVerifyDialog
+        isOpen={isAdminPasswordDialogOpen}
+        onOpenChange={setIsAdminPasswordDialogOpen}
+        onSuccess={() => navigate("/settings/admin")}
+        title={t("settings.adminPanel") || "Административная панель"}
+        description={t("auth.enterPasswordToAccess", "Введите пароль аккаунта для доступа")}
       />
     </MobileLayout>
   );
