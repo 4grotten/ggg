@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Shield } from 'lucide-react';
@@ -66,11 +66,12 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     const input = inputRef.current;
     if (!input) return;
     
-    // Use setTimeout to ensure we're in a user gesture context
-    setTimeout(() => {
+    // iOS Safari is picky: focus should happen as close to the user gesture as possible.
+    // Still keep a rAF to wait for layout/animation.
+    requestAnimationFrame(() => {
       input.focus();
       input.click();
-    }, 50);
+    });
   }, []);
 
   // Detect keyboard open/close via viewport resize (mobile)
@@ -101,13 +102,12 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   }, [isOpen]);
 
   // Focus input when entering passcode step
+  // NOTE: focusing in an effect is often blocked on iOS (not a user gesture).
+  // We keep a best-effort attempt, but primary focus happens in the click handler.
   useEffect(() => {
-    if (step === 'create-passcode' || step === 'verify-passcode') {
-      // Delay to allow drawer animation
-      setTimeout(() => {
-        focusInput();
-      }, 200);
-    }
+    if (step !== 'create-passcode' && step !== 'verify-passcode') return;
+    const t = window.setTimeout(() => focusInput(), 250);
+    return () => window.clearTimeout(t);
   }, [step, focusInput]);
 
   // Auto-advance to confirm phase when first passcode is complete
@@ -171,11 +171,14 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       setEntryPhase(1);
       setPasscode('');
       setConfirmPasscode('');
+      // Focus immediately from the user gesture to open the keyboard on iOS.
+      focusInput();
     } else {
       setStep('verify-passcode');
       setPasscode('');
+      focusInput();
     }
-  }, []);
+  }, [focusInput]);
 
   const handleBiometricToggle = useCallback(async (checked: boolean) => {
     if (checked) {
@@ -254,7 +257,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   };
 
   // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const next = e.target.value.replace(/\D/g, '').slice(0, PASSCODE_LENGTH);
     setError('');
     
@@ -388,20 +391,26 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           isKeyboardOpen ? "justify-start pt-4" : "justify-end min-h-[50vh]"
         )}
       >
-        {/* Hidden input - always mounted, never destroyed */}
-        <input
-          ref={inputRef}
-          value={getCurrentValue()}
-          onChange={handleInputChange}
-          type="tel"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          autoComplete="one-time-code"
-          autoCapitalize="off"
-          autoCorrect="off"
-          enterKeyHint="done"
-          className="sr-only"
-        />
+        {/* Invisible but clickable input overlay.
+            IMPORTANT: do NOT use sr-only here — iOS often won't open the keyboard
+            for fully hidden inputs. */}
+        <div className="relative">
+          <input
+            ref={inputRef}
+            value={getCurrentValue()}
+            onChange={handleInputChange}
+            onFocus={() => setError('')}
+            onClick={() => focusInput()}
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="one-time-code"
+            autoCapitalize="off"
+            autoCorrect="off"
+            enterKeyHint="done"
+            className="absolute inset-0 z-10 w-full h-full opacity-0"
+            aria-label={t('screenLock.passcode', 'Passcode Lock')}
+          />
 
         <div className="space-y-6">
           {/* Header with step indicators */}
@@ -453,14 +462,11 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             </AnimatePresence>
           </div>
 
-          {/* Passcode dots - clickable to focus input */}
-          <motion.button
-            type="button"
-            onClick={focusInput}
+          {/* Visual dots */}
+          <motion.div
             animate={shake ? { x: [-8, 8, -8, 8, 0] } : undefined}
             transition={{ duration: 0.35 }}
             className="w-full flex items-center justify-center gap-4 py-4"
-            aria-label="Passcode input"
           >
             <AnimatePresence mode="popLayout">
               {dotStates.map((state, i) => (
@@ -482,7 +488,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
                 />
               ))}
             </AnimatePresence>
-          </motion.button>
+          </motion.div>
+        </div>
 
           {/* Error message */}
           <AnimatePresence>
