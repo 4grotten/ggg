@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Shield, X, EyeOff, Pause, Trash2 } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from '@/components/ui/animated-drawer-item';
@@ -619,16 +620,74 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   // Determine if we're in passcode entry mode
   const isPasscodeMode = step === 'create-passcode' || step === 'verify-passcode';
 
+  // Use Sheet for passcode entry (from top), Drawer for settings (from bottom)
+  if (isPasscodeMode) {
+    return (
+      <>
+        <Sheet open={isOpen} onOpenChange={onOpenChange}>
+          <SheetContent 
+            side="top" 
+            className="h-auto max-h-[50vh] rounded-b-3xl border-b border-border/50 pt-[env(safe-area-inset-top)]"
+          >
+            <SheetHeader className="flex flex-row items-center justify-between py-3 px-4 space-y-0">
+              <SheetTitle className="flex items-center gap-2 text-base font-semibold">
+                <Lock className="w-5 h-5 text-primary" />
+                {t('screenLock.title', 'Screen Lock')}
+              </SheetTitle>
+              <SheetClose className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
+                <X className="w-3.5 h-3.5 text-primary" />
+              </SheetClose>
+            </SheetHeader>
+
+            <div className="px-4 pb-6">
+              {renderPasscodeInput()}
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        {/* Pause or Delete Dialog */}
+        <AlertDialog open={showDisableDialog} onOpenChange={setShowDisableDialog}>
+          <AlertDialogContent className="w-[300px] rounded-2xl p-0 gap-0 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-0 shadow-2xl">
+            <div className="pt-5 pb-4 px-4 text-center">
+              <AlertDialogTitle className="text-[17px] font-semibold text-foreground mb-1">
+                {t('screenLock.disableTitle', 'Disable Screen Lock')}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-[13px] text-muted-foreground leading-tight">
+                {t('screenLock.disableDesc', 'Would you like to pause temporarily or remove completely?')}
+              </AlertDialogDescription>
+            </div>
+            <div className="border-t border-[#C6C6C8] dark:border-[#38383A]">
+              <button
+                onClick={() => handleDisableChoice('pause')}
+                className="w-full flex items-center justify-center gap-2 py-[11px] text-[17px] text-[#007AFF] font-normal border-b border-[#C6C6C8] dark:border-[#38383A] active:bg-black/5 dark:active:bg-white/5 transition-colors"
+              >
+                <Pause className="w-4 h-4" />
+                {t('screenLock.pause', 'Pause temporarily')}
+              </button>
+              <button
+                onClick={() => handleDisableChoice('delete')}
+                className="w-full flex items-center justify-center gap-2 py-[11px] text-[17px] text-red-500 font-normal border-b border-[#C6C6C8] dark:border-[#38383A] active:bg-black/5 dark:active:bg-white/5 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                {t('screenLock.delete', 'Remove completely')}
+              </button>
+              <button
+                onClick={() => setShowDisableDialog(false)}
+                className="w-full py-[11px] text-[17px] text-[#007AFF] font-semibold active:bg-black/5 dark:active:bg-white/5 transition-colors"
+              >
+                {t('common.cancel', 'Cancel')}
+              </button>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
+    );
+  }
+
   return (
     <>
       <Drawer open={isOpen} onOpenChange={onOpenChange}>
-        <DrawerContent 
-          className="transition-all duration-200 max-h-[90vh]"
-          style={isPasscodeMode && isKeyboardOpen ? { 
-            transform: `translateY(-${Math.min(keyboardHeight, 300)}px)`,
-            marginBottom: `${Math.min(keyboardHeight, 300)}px`
-          } : undefined}
-        >
+        <DrawerContent className="max-h-[90vh]">
           <DrawerHeader className="relative flex items-center justify-between py-3 px-4">
             <DrawerTitle className="flex items-center gap-2 text-base font-semibold">
               <Lock className="w-5 h-5 text-primary" />
@@ -642,12 +701,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             </DrawerClose>
           </DrawerHeader>
 
-          <div className={cn(
-            "px-4 overflow-y-auto transition-all duration-200",
-            isPasscodeMode && isKeyboardOpen ? "pb-2" : "pb-8"
-          )}>
+          <div className="px-4 pb-8 overflow-y-auto">
             {step === 'main' && renderMainContent()}
-            {isPasscodeMode && renderPasscodeInput()}
             {step === 'timeout-select' && renderTimeoutSelect()}
           </div>
         </DrawerContent>
