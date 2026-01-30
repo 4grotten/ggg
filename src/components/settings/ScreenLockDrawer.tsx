@@ -536,14 +536,14 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             aria-label={t('screenLock.passcode', 'Passcode Lock')}
           />
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Header with animated icon */}
             <div className="text-center">
               <PasscodeLockAnimation />
               
               {/* Step indicator for create flow */}
               {isCreating && (
-                <div className="flex items-center justify-center gap-2 mt-3 mb-2">
+                <div className="flex items-center justify-center gap-2 mt-2">
                   <motion.div 
                     className={cn(
                       "w-2 h-2 rounded-full transition-colors",
@@ -560,32 +560,18 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
                   />
                 </div>
               )}
-              
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={step}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {getTitle()}
-                  </h2>
-                </motion.div>
-              </AnimatePresence>
             </div>
 
             {/* For verify mode - single row of dots */}
             {step === 'verify-passcode' && (
-              <div className="py-4">
+              <div className="py-2">
                 {renderDots(getVerifyDots(), shake && step === 'verify-passcode')}
               </div>
             )}
 
             {/* For create mode - two rows of dots always visible */}
             {isCreating && (
-              <div className="space-y-4 py-2">
+              <div className="space-y-3">
                 {/* First passcode row */}
                 <div className={cn(
                   "p-3 rounded-xl transition-all",
@@ -604,38 +590,21 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Error message */}
-          <AnimatePresence>
-            {error && (
-              <motion.p
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="text-destructive text-sm text-center flex items-center justify-center gap-1 mt-3"
-              >
-                <AlertCircle className="w-4 h-4" />
-                {error}
-              </motion.p>
-            )}
-          </AnimatePresence>
-
-          {/* Cancel button */}
-          <div className="flex justify-center mt-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setStep('main');
-                setPasscode('');
-                setConfirmPasscode('');
-                setError('');
-                setEntryPhase(1);
-              }}
-            >
-              {t('common.cancel', 'Cancel')}
-            </Button>
+            {/* Error message */}
+            <AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-destructive text-sm text-center flex items-center justify-center gap-1"
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
