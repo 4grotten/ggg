@@ -31,8 +31,9 @@ export const BottomNavigation = () => {
   const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   
   const hasMountedRef = useRef(false);
+  const isInitializedRef = useRef(false);
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const [selectorStyle, setSelectorStyle] = useState({ left: 0, width: 0 });
+  const [selectorStyle, setSelectorStyle] = useState<{ left: number; width: number } | null>(null);
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
 
   const isActive = (path: string) => {
@@ -92,10 +93,23 @@ export const BottomNavigation = () => {
     hasMountedRef.current = true;
   }, []);
 
+  // Initialize selector position without animation on first render
+  useEffect(() => {
+    if (!isInitializedRef.current) {
+      const style = calcSelectorStyle(activeIndex);
+      if (style) {
+        setSelectorStyle(style);
+        isInitializedRef.current = true;
+      }
+    }
+  }, [activeIndex, calcSelectorStyle]);
+
   useEffect(() => {
     // When route actually changes, sync selector to active tab and clear optimistic press.
-    setPressedIndex(null);
-    updateSelector(activeIndex);
+    if (isInitializedRef.current) {
+      setPressedIndex(null);
+      updateSelector(activeIndex);
+    }
   }, [activeIndex, updateSelector, i18n.language]);
 
   // Update on resize
@@ -110,23 +124,25 @@ export const BottomNavigation = () => {
       <div className="bg-white/50 dark:bg-card/70 backdrop-blur-2xl rounded-3xl shadow-lg border border-border/50 px-2 py-1.5 max-w-[400px] mx-auto">
         <div className="flex items-center justify-around relative">
           {/* iOS 26 liquid glass selector */}
-          <motion.div
-            className="absolute overflow-hidden backdrop-blur-xl rounded-[22px] pointer-events-none z-0"
-            initial={false}
-            animate={{
-              left: selectorStyle.left,
-              width: selectorStyle.width,
-            }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            style={{
-              height: "100%",
-              top: 0,
-              background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%)",
-              boxShadow: "inset 0 1px 1px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.05)",
-            }}
-          >
-            <div className="absolute inset-0 ring-1 ring-inset ring-white/30 dark:ring-white/15 rounded-[22px]" />
-          </motion.div>
+          {selectorStyle && (
+            <motion.div
+              className="absolute overflow-hidden backdrop-blur-xl rounded-[22px] pointer-events-none z-0"
+              initial={false}
+              animate={{
+                left: selectorStyle.left,
+                width: selectorStyle.width,
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              style={{
+                height: "100%",
+                top: 0,
+                background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%)",
+                boxShadow: "inset 0 1px 1px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.05)",
+              }}
+            >
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/30 dark:ring-white/15 rounded-[22px]" />
+            </motion.div>
+          )}
           
           {navItems.map((item, index) => {
             const active = isActive(item.path);
