@@ -3,6 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppRole } from "@/types/admin";
 
+// Hardcoded admin phone numbers (temporary solution until users register)
+const ADMIN_PHONE_NUMBERS = [
+  "+971585333939",
+  "+996555214242",
+  "971585333939",
+  "996555214242",
+];
+
 export function useUserRole() {
   const { user } = useAuth();
 
@@ -30,13 +38,21 @@ export function useUserRole() {
     retry: false,
   });
 
-  const isAdmin = roles?.includes("admin") ?? false;
+  // Check if user's phone number is in the hardcoded admin list
+  const userPhone = user?.phone_number || "";
+  const isHardcodedAdmin = ADMIN_PHONE_NUMBERS.some(
+    (phone) => userPhone.includes(phone.replace("+", "")) || phone.includes(userPhone.replace("+", ""))
+  );
+
+  const hasAdminRole = roles?.includes("admin") ?? false;
+  const isAdmin = hasAdminRole || isHardcodedAdmin;
   const isModerator = roles?.includes("moderator") ?? false;
 
   return {
     roles: roles ?? [],
     isAdmin,
     isModerator,
+    isHardcodedAdmin,
     isLoading,
     error,
   };
