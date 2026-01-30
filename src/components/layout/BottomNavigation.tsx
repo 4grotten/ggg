@@ -76,24 +76,37 @@ export const BottomNavigation = () => {
     <nav className="fixed bottom-4 left-0 right-0 z-50 px-4 max-w-[800px] mx-auto">
       <div className="bg-white/50 dark:bg-card/70 backdrop-blur-2xl rounded-3xl shadow-lg border border-border/50 px-2 py-1.5 max-w-[400px] mx-auto">
         <div className="flex items-center justify-around relative">
-          {/* Sliding selector */}
+          {/* iOS 26-style liquid glass selector */}
           <motion.div
-            className="absolute bg-gray-200/50 dark:bg-white/10 rounded-3xl"
+            className="absolute rounded-[22px] overflow-hidden"
             initial={false}
             animate={{
               left: selectorStyle.left,
               width: selectorStyle.width,
+              scale: hasMountedRef.current ? [1, 1.02, 1] : 1,
             }}
             transition={
               hasMountedRef.current
-                ? { type: "spring", stiffness: 400, damping: 30 }
+                ? { type: "spring", stiffness: 500, damping: 35, mass: 0.8 }
                 : { duration: 0 }
             }
             style={{
-              height: "calc(100% - 4px)",
-              top: "2px",
+              height: "calc(100% - 6px)",
+              top: "3px",
             }}
-          />
+          >
+            {/* Glass background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/40 to-white/30 dark:from-white/15 dark:via-white/10 dark:to-white/5 backdrop-blur-xl" />
+            
+            {/* Subtle inner glow */}
+            <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/20 to-white/40 dark:via-white/5 dark:to-white/10" />
+            
+            {/* Border glow effect */}
+            <div className="absolute inset-0 rounded-[22px] ring-1 ring-inset ring-white/50 dark:ring-white/20" />
+            
+            {/* Bottom reflection */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/60 dark:via-white/30 to-transparent" />
+          </motion.div>
           
           {navItems.map((item, index) => {
             const active = isActive(item.path);
