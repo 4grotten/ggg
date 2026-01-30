@@ -14,7 +14,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import { LEVELS } from "@/components/partner/LevelCarousel";
 import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 import { ScreenLockDrawer } from "@/components/settings/ScreenLockDrawer";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
+import { useUserRole } from "@/hooks/useUserRole";
 
 // Telegram-style colored icon backgrounds
 const iconColors: Record<string, { bg: string; text: string }> = {
@@ -42,6 +43,7 @@ const iconColors: Record<string, { bg: string; text: string }> = {
   apofiz: { bg: 'bg-black dark:bg-zinc-800', text: 'text-white' },
   userplus: { bg: 'bg-blue-500', text: 'text-white' },
   lock: { bg: 'bg-rose-500', text: 'text-white' },
+  admin: { bg: 'bg-amber-500', text: 'text-white' },
 };
 
 interface ColoredIconProps {
@@ -288,6 +290,7 @@ const Settings = () => {
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
   const [isScreenLockOpen, setIsScreenLockOpen] = useState(false);
   const { isEnabled: isScreenLockEnabled } = useScreenLockContext();
+  const { isAdmin } = useUserRole();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
@@ -860,6 +863,13 @@ const Settings = () => {
             label={t("settings.apiDocumentation")}
             onClick={() => navigate("/settings/api")}
           />
+          {isAdmin && (
+            <SettingsItem
+              icon={<ColoredIcon colorKey="admin"><ShieldCheck className="w-4 h-4" /></ColoredIcon>}
+              label={t("settings.adminPanel") || "Административная панель"}
+              onClick={() => navigate("/settings/admin")}
+            />
+          )}
         </AnimatedMenuSection>
 
         {/* Support & Legal */}
