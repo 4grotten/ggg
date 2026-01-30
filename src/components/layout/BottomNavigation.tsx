@@ -93,8 +93,8 @@ export const BottomNavigation = () => {
             }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             style={{
-              height: "calc(100% - 4px)",
-              top: "2px",
+              height: "100%",
+              top: 0,
               background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%)",
               boxShadow: "inset 0 1px 1px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.05)",
             }}
