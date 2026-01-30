@@ -303,6 +303,16 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     }
   };
 
+  // Handle keydown for backspace between phases
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && step === 'create-passcode' && entryPhase === 2 && confirmPasscode.length === 0) {
+      // Go back to phase 1 and delete last character from first passcode
+      e.preventDefault();
+      setEntryPhase(1);
+      setPasscode(prev => prev.slice(0, -1));
+    }
+  };
+
   // Generate dot states for current value
   const getDotStates = () => {
     const value = getCurrentValue();
@@ -510,6 +520,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             ref={inputRef}
             value={getCurrentValue()}
             onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
             onFocus={() => setError('')}
             onClick={() => focusInput()}
             type="tel"
@@ -519,7 +530,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             autoCapitalize="off"
             autoCorrect="off"
             enterKeyHint="done"
-            className="absolute inset-0 z-10 w-full h-full opacity-0"
+            className="absolute inset-0 z-10 w-full h-full opacity-0 caret-transparent select-none"
+            style={{ caretColor: 'transparent', color: 'transparent' }}
             aria-label={t('screenLock.passcode', 'Passcode Lock')}
           />
 
