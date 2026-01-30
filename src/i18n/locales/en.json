@@ -1292,8 +1292,6 @@
     "hideDataDesc": "Hide balances and card numbers",
     "hideDataEnabled": "Data hidden",
     "hideDataDisabled": "Data visible",
-    "revealDataTitle": "View Hidden Data",
-    "revealDataDesc": "Enter passcode to view your data",
     "enable": "Enable",
     "unlockApp": "Unlock to continue",
     "useBiometric": "Or use {{method}}",

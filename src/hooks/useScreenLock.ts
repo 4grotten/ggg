@@ -35,7 +35,6 @@ export const useScreenLock = () => {
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [lockTimeout, setLockTimeoutState] = useState<LockTimeout>('immediately');
   const [isHideDataEnabled, setIsHideDataEnabled] = useState(false);
-  const [isDataRevealed, setIsDataRevealed] = useState(false);
 
   // Initialize from localStorage
   useEffect(() => {
@@ -93,10 +92,6 @@ export const useScreenLock = () => {
         if (lockTimeout === 'immediately') {
           setIsLocked(true);
         }
-        // Also hide revealed data when leaving the app
-        if (isHideDataEnabled) {
-          setIsDataRevealed(false);
-        }
         return;
       }
 
@@ -112,7 +107,7 @@ export const useScreenLock = () => {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isEnabled, lockTimeout, isHideDataEnabled]);
+  }, [isEnabled, lockTimeout]);
 
   // Extra reliability on mobile/PWA: lock on blur/pagehide for "immediately"
   useEffect(() => {
@@ -202,24 +197,7 @@ export const useScreenLock = () => {
   const setHideDataEnabled = useCallback((enabled: boolean) => {
     localStorage.setItem(SCREEN_LOCK_HIDE_DATA_KEY, String(enabled));
     setIsHideDataEnabled(enabled);
-    // Reset revealed state when toggling hide data
-    if (enabled) {
-      setIsDataRevealed(false);
-    }
   }, []);
-
-  // Reveal hidden data after authentication
-  const revealData = useCallback(() => {
-    setIsDataRevealed(true);
-  }, []);
-
-  // Hide data again
-  const hideData = useCallback(() => {
-    setIsDataRevealed(false);
-  }, []);
-
-  // Check if data should be hidden (hideData enabled AND not revealed)
-  const shouldHideData = isHideDataEnabled && !isDataRevealed;
 
   return {
     isEnabled,
@@ -227,8 +205,6 @@ export const useScreenLock = () => {
     isBiometricEnabled,
     lockTimeout,
     isHideDataEnabled,
-    isDataRevealed,
-    shouldHideData,
     enableScreenLock,
     disableScreenLock,
     verifyPasscode,
@@ -239,7 +215,5 @@ export const useScreenLock = () => {
     setBiometricEnabled,
     setLockTimeout,
     setHideDataEnabled,
-    revealData,
-    hideData,
   };
 };

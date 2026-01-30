@@ -1240,8 +1240,6 @@
     "hideDataDesc": "Bakiye ve kart numaralarını gizle",
     "hideDataEnabled": "Veriler gizlendi",
     "hideDataDisabled": "Veriler görünür",
-    "revealDataTitle": "Gizli Verileri Görüntüle",
-    "revealDataDesc": "Verileri görmek için parolayı girin",
     "enable": "Etkinleştir",
     "unlockApp": "Devam etmek için kilidi açın",
     "useBiometric": "Veya {{method}} kullanın",

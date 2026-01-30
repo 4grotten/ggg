@@ -1247,8 +1247,6 @@
     "hideDataDesc": "隐藏余额和卡号",
     "hideDataEnabled": "数据已隐藏",
     "hideDataDisabled": "数据可见",
-    "revealDataTitle": "查看隐藏数据",
-    "revealDataDesc": "输入密码查看数据",
     "enable": "启用",
     "unlockApp": "解锁以继续",
     "useBiometric": "或使用{{method}}",

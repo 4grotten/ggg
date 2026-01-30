@@ -1240,8 +1240,6 @@
     "hideDataDesc": "Guthaben und Kartennummern verbergen",
     "hideDataEnabled": "Daten verborgen",
     "hideDataDisabled": "Daten sichtbar",
-    "revealDataTitle": "Verborgene Daten anzeigen",
-    "revealDataDesc": "Passcode eingeben um Daten anzuzeigen",
     "enable": "Aktivieren",
     "unlockApp": "Zum Fortfahren entsperren",
     "useBiometric": "Oder {{method}} verwenden",
