@@ -723,15 +723,6 @@ const Settings = () => {
             
             <h1 className="text-xl font-bold text-foreground">{t("settings.guest") || "Guest"}</h1>
             <p className="text-sm text-muted-foreground mt-1">{t("settings.loginToAccess") || "Sign in to access all features"}</p>
-            
-            {/* Sign In button for guest */}
-            <button
-              onClick={() => navigate("/auth/phone")}
-              className="mt-4 flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-full font-medium shadow-lg shadow-primary/25 hover:bg-primary/90 transition-colors"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>{t("settings.signIn") || "Sign In"}</span>
-            </button>
           </>
         )}
       </div>
@@ -1331,6 +1322,19 @@ const Settings = () => {
         isOpen={isScreenLockOpen}
         onOpenChange={setIsScreenLockOpen}
       />
+
+      {/* Fixed Sign In button for guest at bottom */}
+      {!isAuthenticated && (
+        <div className="fixed bottom-20 left-0 right-0 px-4 z-40 max-w-[800px] mx-auto">
+          <button
+            onClick={() => navigate("/auth/phone")}
+            className="w-full flex items-center justify-center gap-2 py-3.5 bg-primary text-primary-foreground rounded-2xl font-medium shadow-lg shadow-primary/25 hover:bg-primary/90 transition-colors"
+          >
+            <LogIn className="w-5 h-5" />
+            <span>{t("settings.signIn") || "Sign In"}</span>
+          </button>
+        </div>
+      )}
     </MobileLayout>
   );
 };
