@@ -555,23 +555,16 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
               </div>
             )}
 
-            {/* For create mode - two rows of dots always visible */}
+            {/* For create mode - two rows of dots */}
             {isCreating && (
-              <div className="space-y-3">
+              <div className="space-y-6 py-2">
                 {/* First passcode row */}
-                <div className={cn(
-                  "p-3 rounded-xl transition-all",
-                  entryPhase === 1 ? "bg-primary/5 ring-2 ring-primary/20" : "bg-muted/30"
-                )}>
+                <div className="py-2">
                   {renderDots(getFirstPasscodeDots(), false)}
                 </div>
 
                 {/* Confirm passcode row */}
-                <div className={cn(
-                  "p-3 rounded-xl transition-all",
-                  entryPhase === 2 ? "bg-primary/5 ring-2 ring-primary/20" : "bg-muted/30",
-                  shake && entryPhase === 2 && "ring-destructive/30"
-                )}>
+                <div className="py-2">
                   {renderDots(getConfirmPasscodeDots(), shake && entryPhase === 2)}
                 </div>
               </div>
