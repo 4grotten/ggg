@@ -408,9 +408,9 @@ export default function AdminPanel() {
         animate={{ opacity: 1 }}
         className="min-h-screen bg-background"
       >
-        {/* Premium Header */}
+        {/* Premium Header - Only title is sticky */}
         <div className="sticky top-0 z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background/80 backdrop-blur-xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/95 backdrop-blur-xl" />
           <div className="relative px-4 py-4">
             <div className="flex items-center gap-3">
               <Button
@@ -439,39 +439,38 @@ export default function AdminPanel() {
                 <LanguageSwitcher />
               </div>
             </div>
-
-            {/* Stats Bar */}
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex items-center gap-2 mt-4 overflow-x-auto pb-1 scrollbar-hide"
-            >
-              {[
-                { label: "Курсов", value: exchangeRateFields.length, icon: Activity, color: "text-emerald-500" },
-                { label: "Комиссий", value: feeFields.length, icon: CreditCard, color: "text-violet-500" },
-                { label: "Лимитов", value: limitFields.length, icon: Wallet, color: "text-orange-500" },
-                { label: "Клиентов", value: clients?.length || 0, icon: UsersRound, color: "text-cyan-500" },
-                { label: "Админов", value: admins?.length || 0, icon: Shield, color: "text-blue-500" },
-              ].map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.15 + i * 0.05 }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 shrink-0"
-                >
-                  <stat.icon className={cn("w-4 h-4", stat.color)} />
-                  <span className="text-xs font-medium">{stat.value}</span>
-                  <span className="text-xs text-muted-foreground">{stat.label}</span>
-                </motion.div>
-              ))}
-            </motion.div>
           </div>
         </div>
 
-        {/* Content */}
+        {/* Content - Stats and Tabs scroll with content */}
         <div className="px-4 pb-24">
+          {/* Stats Bar - scrolls with content */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide"
+          >
+            {[
+              { label: "Курсов", value: exchangeRateFields.length, icon: Activity, color: "text-emerald-500" },
+              { label: "Комиссий", value: feeFields.length, icon: CreditCard, color: "text-violet-500" },
+              { label: "Лимитов", value: limitFields.length, icon: Wallet, color: "text-orange-500" },
+              { label: "Клиентов", value: clients?.length || 0, icon: UsersRound, color: "text-cyan-500" },
+              { label: "Админов", value: admins?.length || 0, icon: Shield, color: "text-blue-500" },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15 + i * 0.05 }}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 shrink-0"
+              >
+                <stat.icon className={cn("w-4 h-4", stat.color)} />
+                <span className="text-xs font-medium">{stat.value}</span>
+                <span className="text-xs text-muted-foreground">{stat.label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
           {isLoading || roleLoading ? (
             <div className="space-y-4 mt-4">
               {[1, 2, 3].map((i) => (
