@@ -96,11 +96,11 @@ export const BottomNavigation = () => {
             style={{
               height: isEdgeTab ? "calc(100% - 4px)" : "calc(100% - 6px)",
               top: isEdgeTab ? "2px" : "3px",
-              background: "linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%)",
-              boxShadow: "inset 0 1px 2px rgba(255,255,255,0.5), 0 0 12px rgba(255,255,255,0.1)",
+              background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%)",
+              boxShadow: "inset 0 1px 1px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.05)",
             }}
           >
-            <div className="absolute inset-0 ring-1 ring-inset ring-white/50 dark:ring-white/20" style={{ borderRadius: "inherit" }} />
+            <div className="absolute inset-0 ring-1 ring-inset ring-white/30 dark:ring-white/15" style={{ borderRadius: "inherit" }} />
           </motion.div>
           
           {navItems.map((item, index) => {
