@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface PasscodeMatchInputProps {
@@ -23,7 +23,7 @@ export const PasscodeMatchInput = ({
 
   useEffect(() => {
     if (!autoFocus) return;
-    const t = window.setTimeout(() => inputRef.current?.focus(), 50);
+    const t = window.setTimeout(() => inputRef.current?.focus(), 80);
     return () => window.clearTimeout(t);
   }, [autoFocus]);
 
@@ -68,21 +68,31 @@ export const PasscodeMatchInput = ({
         onClick={() => inputRef.current?.focus()}
         animate={shake ? { x: [-8, 8, -8, 8, 0] } : undefined}
         transition={{ duration: 0.35 }}
-        className="w-full flex items-center justify-center gap-3 py-3"
+        className="w-full flex items-center justify-center gap-4 py-4"
         aria-label="Passcode input"
       >
-        {perIndexState.map((state, i) => (
-          <span
-            key={i}
-            className={cn(
-              "w-4 h-4 rounded-full transition-colors",
-              state === "empty" && "bg-muted",
-              state === "filled" && "bg-primary",
-              state === "match" && "bg-primary",
-              state === "mismatch" && "bg-destructive"
-            )}
-          />
-        ))}
+        <AnimatePresence mode="popLayout">
+          {perIndexState.map((state, i) => (
+            <motion.span
+              key={i}
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{
+                scale: 1,
+                opacity: 1,
+                backgroundColor:
+                  state === "empty"
+                    ? "hsl(var(--muted))"
+                    : state === "mismatch"
+                    ? "hsl(var(--destructive))"
+                    : "hsl(var(--primary))",
+              }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              className={cn(
+                "w-5 h-5 rounded-full"
+              )}
+            />
+          ))}
+        </AnimatePresence>
       </motion.button>
     </div>
   );

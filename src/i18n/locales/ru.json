@@ -1283,6 +1283,7 @@
     "biometricEnabled": "{{method}} включён",
     "biometricDisabled": "{{method}} отключён",
     "biometricFailed": "Не удалось включить {{method}}",
+    "biometricUnavailable": "Недоступно на этом устройстве",
     "timeoutUpdated": "Таймаут блокировки обновлён",
     "enable": "Включить",
     "unlockApp": "Разблокируйте для продолжения",

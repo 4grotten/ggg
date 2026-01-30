@@ -1282,6 +1282,7 @@
     "biometricEnabled": "{{method}} enabled",
     "biometricDisabled": "{{method}} disabled",
     "biometricFailed": "Failed to enable {{method}}",
+    "biometricUnavailable": "Not available on this device",
     "timeoutUpdated": "Lock timeout updated",
     "enable": "Enable",
     "unlockApp": "Unlock to continue",
