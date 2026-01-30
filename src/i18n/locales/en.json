@@ -5,6 +5,8 @@
     "enterPasscode": "Enter Passcode",
     "viewSensitiveData": "To view sensitive data",
     "wrongPasscode": "Wrong passcode",
+    "unlocked": "Unlocked",
+    "accessGranted": "Access granted",
     "useBiometric": "Or use {{method}}",
     "hideData": "Hide Sensitive Data",
     "hideDataDescription": "Require passcode to view balances and card details",
