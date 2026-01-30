@@ -1293,6 +1293,8 @@
     "hideDataDesc": "Скрыть баланс и номера карт",
     "hideDataEnabled": "Данные скрыты",
     "hideDataDisabled": "Данные видны",
+    "revealDataTitle": "Просмотр скрытых данных",
+    "revealDataDesc": "Введите пароль для просмотра",
     "enable": "Включить",
     "unlockApp": "Разблокируйте для продолжения",
     "useBiometric": "Или используйте {{method}}",
