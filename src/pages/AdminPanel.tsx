@@ -601,13 +601,13 @@ export default function AdminPanel() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               {/* Custom Tab Switcher with sliding indicator - scrolls with content */}
               <div className="relative h-14 p-1.5 bg-muted/50 rounded-2xl mb-6 mt-4">
-                {/* Animated sliding background */}
+                {/* Animated sliding background - centered on each tab */}
                 <motion.div
                   className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg"
                   initial={false}
                   animate={{
-                    left: `calc(${tabConfig.findIndex(t => t.value === activeTab) * 20}% + 6px)`,
-                    width: 'calc(20% - 6px)',
+                    left: `calc(${tabConfig.findIndex(t => t.value === activeTab) * 20}% + 10% - calc(20% - 12px) / 2)`,
+                    width: 'calc(20% - 12px)',
                   }}
                   transition={{
                     type: "spring",
