@@ -11,6 +11,7 @@ import { useScreenLockContext } from '@/contexts/ScreenLockContext';
 import type { LockTimeout } from '@/hooks/useScreenLock';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { PasscodeLockAnimation } from './PasscodeLockAnimation';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -536,20 +537,13 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           />
 
           <div className="space-y-4">
-            {/* Header with lock icon */}
+            {/* Header with animated icon */}
             <div className="text-center">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3"
-              >
-                <Lock className="w-8 h-8 text-primary" />
-              </motion.div>
+              <PasscodeLockAnimation />
               
               {/* Step indicator for create flow */}
               {isCreating && (
-                <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="flex items-center justify-center gap-2 mt-3 mb-2">
                   <motion.div 
                     className={cn(
                       "w-2 h-2 rounded-full transition-colors",
@@ -578,9 +572,6 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
                   <h2 className="text-lg font-semibold text-foreground">
                     {getTitle()}
                   </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {getDescription()}
-                  </p>
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -596,30 +587,20 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             {isCreating && (
               <div className="space-y-4 py-2">
                 {/* First passcode row */}
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground text-center">
-                    {t('screenLock.newPasscode', 'New passcode')}
-                  </p>
-                  <div className={cn(
-                    "p-3 rounded-xl transition-all",
-                    entryPhase === 1 ? "bg-primary/5 ring-2 ring-primary/20" : "bg-muted/30"
-                  )}>
-                    {renderDots(getFirstPasscodeDots(), false)}
-                  </div>
+                <div className={cn(
+                  "p-3 rounded-xl transition-all",
+                  entryPhase === 1 ? "bg-primary/5 ring-2 ring-primary/20" : "bg-muted/30"
+                )}>
+                  {renderDots(getFirstPasscodeDots(), false)}
                 </div>
 
                 {/* Confirm passcode row */}
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground text-center">
-                    {t('screenLock.confirmPasscode', 'Confirm passcode')}
-                  </p>
-                  <div className={cn(
-                    "p-3 rounded-xl transition-all",
-                    entryPhase === 2 ? "bg-primary/5 ring-2 ring-primary/20" : "bg-muted/30",
-                    shake && entryPhase === 2 && "ring-destructive/30"
-                  )}>
-                    {renderDots(getConfirmPasscodeDots(), shake && entryPhase === 2)}
-                  </div>
+                <div className={cn(
+                  "p-3 rounded-xl transition-all",
+                  entryPhase === 2 ? "bg-primary/5 ring-2 ring-primary/20" : "bg-muted/30",
+                  shake && entryPhase === 2 && "ring-destructive/30"
+                )}>
+                  {renderDots(getConfirmPasscodeDots(), shake && entryPhase === 2)}
                 </div>
               </div>
             )}
