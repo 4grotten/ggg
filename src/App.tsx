@@ -127,15 +127,7 @@ const AppContent = () => {
 
   return (
     <>
-      <AnimatePresence mode="popLayout">
-        <motion.div
-          key={location.pathname}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
-          className="min-h-screen"
-        >
+      <div className="min-h-screen">
           <Routes location={location}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
@@ -186,10 +178,9 @@ const AppContent = () => {
             <Route path="/auth/profile" element={<ProfileSteps />} />
             <Route path="/auth/reset-code" element={<ResetPasswordCode />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </motion.div>
-      </AnimatePresence>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
       <AnimatePresence>
         {shouldShowNav && (
           <motion.div
