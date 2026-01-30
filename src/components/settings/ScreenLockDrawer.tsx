@@ -509,12 +509,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     );
 
     return (
-      <div 
-        className={cn(
-          "flex flex-col transition-all duration-300",
-          isKeyboardOpen ? "justify-start pt-2" : "justify-end min-h-[50vh]"
-        )}
-      >
+      <div className="flex flex-col">
         {/* Invisible but clickable input overlay */}
         <div className="relative">
           <input
@@ -537,30 +532,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           />
 
           <div className="space-y-3">
-            {/* Header with animated icon */}
-            <div className="text-center">
-              <PasscodeLockAnimation />
-              
-              {/* Step indicator for create flow */}
-              {isCreating && (
-                <div className="flex items-center justify-center gap-2 mt-2">
-                  <motion.div 
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-colors",
-                      entryPhase >= 1 ? "bg-primary" : "bg-muted"
-                    )}
-                    animate={{ scale: entryPhase === 1 ? 1.2 : 1 }}
-                  />
-                  <motion.div 
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-colors",
-                      entryPhase >= 2 ? "bg-primary" : "bg-muted"
-                    )}
-                    animate={{ scale: entryPhase === 2 ? 1.2 : 1 }}
-                  />
-                </div>
-              )}
-            </div>
+            {/* Animated icon */}
+            <PasscodeLockAnimation />
 
             {/* For verify mode - single row of dots */}
             {step === 'verify-passcode' && (
