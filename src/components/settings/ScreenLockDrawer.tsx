@@ -10,7 +10,7 @@ import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { useScreenLockContext } from '@/contexts/ScreenLockContext';
 import type { LockTimeout } from '@/hooks/useScreenLock';
 import { toast } from 'sonner';
-import { PasscodeMatchInput } from '@/components/settings/PasscodeMatchInput';
+import { cn } from '@/lib/utils';
 
 interface ScreenLockDrawerProps {
   isOpen: boolean;
@@ -53,12 +53,25 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   const [confirmPasscode, setConfirmPasscode] = useState('');
   const [error, setError] = useState('');
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [shake, setShake] = useState(false);
   
   // Track which phase of passcode entry we're in (1 = first entry, 2 = confirm)
   const [entryPhase, setEntryPhase] = useState<1 | 2>(1);
   
-  // Ref to track if we should auto-advance
-  const autoAdvanceRef = useRef(false);
+  // Single input ref - never destroyed
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Force focus on the input
+  const focusInput = useCallback(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    
+    // Use setTimeout to ensure we're in a user gesture context
+    setTimeout(() => {
+      input.focus();
+      input.click();
+    }, 50);
+  }, []);
 
   // Detect keyboard open/close via viewport resize (mobile)
   useEffect(() => {
@@ -68,7 +81,6 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     
     const handleResize = () => {
       const currentHeight = visualViewport?.height ?? window.innerHeight;
-      // If viewport shrinks significantly, keyboard is likely open
       setIsKeyboardOpen(currentHeight < initialHeight * 0.75);
     };
 
@@ -84,27 +96,36 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       setConfirmPasscode('');
       setError('');
       setEntryPhase(1);
+      setShake(false);
     }
   }, [isOpen]);
+
+  // Focus input when entering passcode step
+  useEffect(() => {
+    if (step === 'create-passcode' || step === 'verify-passcode') {
+      // Delay to allow drawer animation
+      setTimeout(() => {
+        focusInput();
+      }, 200);
+    }
+  }, [step, focusInput]);
 
   // Auto-advance to confirm phase when first passcode is complete
   useEffect(() => {
     if (step === 'create-passcode' && entryPhase === 1 && passcode.length === PASSCODE_LENGTH) {
-      autoAdvanceRef.current = true;
-      // Small delay for visual feedback
-      const timer = setTimeout(() => {
+      setTimeout(() => {
         setEntryPhase(2);
         setConfirmPasscode('');
         setError('');
+        // Keep focus on same input
+        focusInput();
       }, 300);
-      return () => clearTimeout(timer);
     }
-  }, [step, entryPhase, passcode]);
+  }, [step, entryPhase, passcode, focusInput]);
 
   // Auto-submit when confirm passcode is complete
   useEffect(() => {
     if (step === 'create-passcode' && entryPhase === 2 && confirmPasscode.length === PASSCODE_LENGTH) {
-      // Check if matches
       if (confirmPasscode === passcode) {
         enableScreenLock(passcode);
         toast.success(t('screenLock.enabled', 'Screen lock enabled'));
@@ -114,13 +135,15 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         setEntryPhase(1);
       } else {
         setError(t('screenLock.passcodesNoMatch', "Passcodes don't match"));
-        // Reset confirm after shake animation
+        setShake(true);
         setTimeout(() => {
+          setShake(false);
           setConfirmPasscode('');
+          focusInput();
         }, 400);
       }
     }
-  }, [step, entryPhase, confirmPasscode, passcode, enableScreenLock, t]);
+  }, [step, entryPhase, confirmPasscode, passcode, enableScreenLock, t, focusInput]);
 
   // Auto-submit verify passcode
   useEffect(() => {
@@ -132,10 +155,15 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         setPasscode('');
       } else {
         setError(t('screenLock.wrongPasscode', 'Wrong passcode'));
-        setTimeout(() => setPasscode(''), 400);
+        setShake(true);
+        setTimeout(() => {
+          setShake(false);
+          setPasscode('');
+          focusInput();
+        }, 400);
       }
     }
-  }, [step, passcode, verifyPasscode, disableScreenLock, t]);
+  }, [step, passcode, verifyPasscode, disableScreenLock, t, focusInput]);
 
   const handleEnableToggle = useCallback((checked: boolean) => {
     if (checked) {
@@ -217,6 +245,43 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     return t(option.labelKey, timeout);
   };
 
+  // Get current value based on step/phase
+  const getCurrentValue = () => {
+    if (step === 'create-passcode') {
+      return entryPhase === 1 ? passcode : confirmPasscode;
+    }
+    return passcode;
+  };
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const next = e.target.value.replace(/\D/g, '').slice(0, PASSCODE_LENGTH);
+    setError('');
+    
+    if (step === 'create-passcode') {
+      if (entryPhase === 1) {
+        setPasscode(next);
+      } else {
+        setConfirmPasscode(next);
+      }
+    } else {
+      setPasscode(next);
+    }
+  };
+
+  // Generate dot states for current value
+  const getDotStates = () => {
+    const value = getCurrentValue();
+    const compareTo = step === 'create-passcode' && entryPhase === 2 ? passcode : undefined;
+    
+    return Array.from({ length: PASSCODE_LENGTH }).map((_, i) => {
+      const hasDigit = i < value.length;
+      if (!hasDigit) return 'empty' as const;
+      if (!compareTo) return 'filled' as const;
+      return value[i] === compareTo[i] ? 'match' as const : 'mismatch' as const;
+    });
+  };
+
   const renderMainContent = () => (
     <div className="space-y-4">
       <AnimatedDrawerContainer>
@@ -296,22 +361,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
 
   const renderPasscodeInput = () => {
     const isCreating = step === 'create-passcode';
-    const currentValue = isCreating 
-      ? (entryPhase === 1 ? passcode : confirmPasscode)
-      : passcode;
-    
-    const handleChange = (next: string) => {
-      setError('');
-      if (isCreating) {
-        if (entryPhase === 1) {
-          setPasscode(next);
-        } else {
-          setConfirmPasscode(next);
-        }
-      } else {
-        setPasscode(next);
-      }
-    };
+    const dotStates = getDotStates();
 
     const getTitle = () => {
       if (step === 'verify-passcode') {
@@ -333,10 +383,26 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
 
     return (
       <div 
-        className={`flex flex-col transition-all duration-300 ${
-          isKeyboardOpen ? 'justify-start pt-4' : 'justify-end min-h-[50vh]'
-        }`}
+        className={cn(
+          "flex flex-col transition-all duration-300",
+          isKeyboardOpen ? "justify-start pt-4" : "justify-end min-h-[50vh]"
+        )}
       >
+        {/* Hidden input - always mounted, never destroyed */}
+        <input
+          ref={inputRef}
+          value={getCurrentValue()}
+          onChange={handleInputChange}
+          type="tel"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          autoComplete="one-time-code"
+          autoCapitalize="off"
+          autoCorrect="off"
+          enterKeyHint="done"
+          className="sr-only"
+        />
+
         <div className="space-y-6">
           {/* Header with step indicators */}
           <div className="text-center">
@@ -353,15 +419,17 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             {isCreating && (
               <div className="flex items-center justify-center gap-2 mb-3">
                 <motion.div 
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    entryPhase >= 1 ? 'bg-primary' : 'bg-muted'
-                  }`}
+                  className={cn(
+                    "w-2 h-2 rounded-full transition-colors",
+                    entryPhase >= 1 ? "bg-primary" : "bg-muted"
+                  )}
                   animate={{ scale: entryPhase === 1 ? 1.2 : 1 }}
                 />
                 <motion.div 
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    entryPhase >= 2 ? 'bg-primary' : 'bg-muted'
-                  }`}
+                  className={cn(
+                    "w-2 h-2 rounded-full transition-colors",
+                    entryPhase >= 2 ? "bg-primary" : "bg-muted"
+                  )}
                   animate={{ scale: entryPhase === 2 ? 1.2 : 1 }}
                 />
               </div>
@@ -385,15 +453,36 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             </AnimatePresence>
           </div>
 
-          {/* Passcode dots */}
-          <PasscodeMatchInput
-            key={`${step}-${entryPhase}`}
-            value={currentValue}
-            onChange={handleChange}
-            length={PASSCODE_LENGTH}
-            compareTo={isCreating && entryPhase === 2 ? passcode : undefined}
-            autoFocus
-          />
+          {/* Passcode dots - clickable to focus input */}
+          <motion.button
+            type="button"
+            onClick={focusInput}
+            animate={shake ? { x: [-8, 8, -8, 8, 0] } : undefined}
+            transition={{ duration: 0.35 }}
+            className="w-full flex items-center justify-center gap-4 py-4"
+            aria-label="Passcode input"
+          >
+            <AnimatePresence mode="popLayout">
+              {dotStates.map((state, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  animate={{
+                    scale: 1,
+                    opacity: 1,
+                    backgroundColor:
+                      state === "empty"
+                        ? "hsl(var(--muted))"
+                        : state === "mismatch"
+                        ? "hsl(var(--destructive))"
+                        : "hsl(var(--primary))",
+                  }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  className="w-5 h-5 rounded-full"
+                />
+              ))}
+            </AnimatePresence>
+          </motion.button>
 
           {/* Error message */}
           <AnimatePresence>
