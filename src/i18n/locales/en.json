@@ -1318,5 +1318,123 @@
       "30min": "After 30 minutes",
       "never": "Never"
     }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "subtitle": "System Management",
+    "accessDenied": "Access Denied",
+    "accessDeniedDesc": "You don't have permission to access the admin panel",
+    "backToSettings": "Back to Settings",
+    "tabs": {
+      "rates": "Rates",
+      "fees": "Fees",
+      "limits": "Limits",
+      "clients": "Clients",
+      "admins": "Admins"
+    },
+    "subtabs": {
+      "admins": "Admins",
+      "history": "History"
+    },
+    "stats": {
+      "rates": "Rates",
+      "fees": "Fees",
+      "limits": "Limits",
+      "clients": "Clients",
+      "admins": "Admins"
+    },
+    "exchangeRates": {
+      "title": "Exchange Rates",
+      "description": "Manage currency exchange rates",
+      "usdtToAedBuy": "USDT → AED (buy)",
+      "usdtToAedSell": "USDT → AED (sell)",
+      "usdToAedBuy": "USD → AED (buy)",
+      "usdToAedSell": "USD → AED (sell)",
+      "aedToUsdBuy": "AED → USD (buy)",
+      "aedToUsdSell": "AED → USD (sell)"
+    },
+    "fees": {
+      "title": "Fees",
+      "description": "Manage transaction fees",
+      "topUpCryptoFlat": "Crypto top-up (flat)",
+      "topUpBankPercent": "Bank top-up",
+      "cardToCardPercent": "Card to card transfer",
+      "bankTransferPercent": "Bank transfer",
+      "networkFeePercent": "Network fee",
+      "currencyConversionPercent": "Currency conversion",
+      "virtualCardAnnual": "Virtual card (annual)",
+      "virtualCardReplacement": "Virtual card replacement",
+      "metalCardAnnual": "Metal card (annual)",
+      "metalCardReplacement": "Metal card replacement",
+      "virtualAccountOpening": "Virtual account opening"
+    },
+    "limits": {
+      "title": "Limits",
+      "description": "Manage transaction limits",
+      "minLimits": "Minimum Limits",
+      "maxLimits": "Maximum Limits",
+      "dailyLimits": "Daily Limits",
+      "monthlyLimits": "Monthly Limits",
+      "topUpCryptoMin": "Min crypto top-up",
+      "topUpBankMin": "Min bank top-up",
+      "transferMin": "Min transfer",
+      "withdrawalMin": "Min withdrawal",
+      "topUpCryptoMax": "Max crypto top-up",
+      "topUpBankMax": "Max bank top-up",
+      "transferMax": "Max transfer",
+      "withdrawalMax": "Max withdrawal",
+      "dailyTopUp": "Daily top-up limit",
+      "dailyTransfer": "Daily transfer limit",
+      "dailyWithdrawal": "Daily withdrawal limit",
+      "monthlyTopUp": "Monthly top-up limit",
+      "monthlyTransfer": "Monthly transfer limit",
+      "monthlyWithdrawal": "Monthly withdrawal limit"
+    },
+    "clients": {
+      "title": "Client Database",
+      "description": "Search and manage clients",
+      "searchPlaceholder": "Search by name or phone...",
+      "noClients": "No registered clients",
+      "notFound": "No clients found"
+    },
+    "roles": {
+      "addRole": "Add Role",
+      "searchByPhoneOrId": "Search by phone or ID",
+      "searchPlaceholder": "+971... or UUID",
+      "currentRoles": "Current Roles",
+      "usersWithRoles": "users with roles",
+      "noUsersWithRoles": "No users with roles",
+      "userNotFound": "User not found",
+      "noName": "No name",
+      "admin": "Administrator",
+      "moderator": "Moderator",
+      "user": "User",
+      "add": "Add"
+    },
+    "history": {
+      "title": "Change History",
+      "description": "Administrator actions",
+      "actions": "actions",
+      "empty": "History is empty",
+      "emptyDesc": "Administrator actions will be displayed here",
+      "justNow": "just now",
+      "minutesAgo": "min ago",
+      "hoursAgo": "h ago",
+      "yesterday": "yesterday",
+      "daysAgo": "days ago"
+    },
+    "actions": {
+      "addRole": "Role assigned",
+      "removeRole": "Role removed",
+      "updateSetting": "Setting updated",
+      "updateClient": "Client updated",
+      "blockClient": "Client blocked",
+      "unblockClient": "Client unblocked"
+    },
+    "common": {
+      "loading": "Loading settings...",
+      "new": "new",
+      "save": "Save"
+    }
   }
 }

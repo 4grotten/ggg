@@ -1271,5 +1271,123 @@
       "30min": "30分钟后",
       "never": "永不"
     }
+  },
+  "admin": {
+    "title": "管理面板",
+    "subtitle": "系统管理",
+    "accessDenied": "拒绝访问",
+    "accessDeniedDesc": "您没有权限访问管理面板",
+    "backToSettings": "返回设置",
+    "tabs": {
+      "rates": "汇率",
+      "fees": "费用",
+      "limits": "限额",
+      "clients": "客户",
+      "admins": "管理员"
+    },
+    "subtabs": {
+      "admins": "管理员",
+      "history": "历史"
+    },
+    "stats": {
+      "rates": "汇率",
+      "fees": "费用",
+      "limits": "限额",
+      "clients": "客户",
+      "admins": "管理员"
+    },
+    "exchangeRates": {
+      "title": "汇率",
+      "description": "管理货币汇率",
+      "usdtToAedBuy": "USDT → AED（买入）",
+      "usdtToAedSell": "USDT → AED（卖出）",
+      "usdToAedBuy": "USD → AED（买入）",
+      "usdToAedSell": "USD → AED（卖出）",
+      "aedToUsdBuy": "AED → USD（买入）",
+      "aedToUsdSell": "AED → USD（卖出）"
+    },
+    "fees": {
+      "title": "费用",
+      "description": "管理交易费用",
+      "topUpCryptoFlat": "加密货币充值（固定）",
+      "topUpBankPercent": "银行充值",
+      "cardToCardPercent": "卡对卡转账",
+      "bankTransferPercent": "银行转账",
+      "networkFeePercent": "网络费用",
+      "currencyConversionPercent": "货币兑换",
+      "virtualCardAnnual": "虚拟卡（年费）",
+      "virtualCardReplacement": "虚拟卡更换",
+      "metalCardAnnual": "金属卡（年费）",
+      "metalCardReplacement": "金属卡更换",
+      "virtualAccountOpening": "虚拟账户开户"
+    },
+    "limits": {
+      "title": "限额",
+      "description": "管理交易限额",
+      "minLimits": "最低限额",
+      "maxLimits": "最高限额",
+      "dailyLimits": "每日限额",
+      "monthlyLimits": "每月限额",
+      "topUpCryptoMin": "最低加密货币充值",
+      "topUpBankMin": "最低银行充值",
+      "transferMin": "最低转账",
+      "withdrawalMin": "最低提现",
+      "topUpCryptoMax": "最高加密货币充值",
+      "topUpBankMax": "最高银行充值",
+      "transferMax": "最高转账",
+      "withdrawalMax": "最高提现",
+      "dailyTopUp": "每日充值限额",
+      "dailyTransfer": "每日转账限额",
+      "dailyWithdrawal": "每日提现限额",
+      "monthlyTopUp": "每月充值限额",
+      "monthlyTransfer": "每月转账限额",
+      "monthlyWithdrawal": "每月提现限额"
+    },
+    "clients": {
+      "title": "客户数据库",
+      "description": "搜索和管理客户",
+      "searchPlaceholder": "按姓名或电话搜索...",
+      "noClients": "没有注册客户",
+      "notFound": "未找到客户"
+    },
+    "roles": {
+      "addRole": "添加角色",
+      "searchByPhoneOrId": "按电话或ID搜索",
+      "searchPlaceholder": "+971... 或 UUID",
+      "currentRoles": "当前角色",
+      "usersWithRoles": "个用户有角色",
+      "noUsersWithRoles": "没有用户有角色",
+      "userNotFound": "用户未找到",
+      "noName": "无名称",
+      "admin": "管理员",
+      "moderator": "版主",
+      "user": "用户",
+      "add": "添加"
+    },
+    "history": {
+      "title": "更改历史",
+      "description": "管理员操作",
+      "actions": "个操作",
+      "empty": "历史为空",
+      "emptyDesc": "管理员操作将在此显示",
+      "justNow": "刚刚",
+      "minutesAgo": "分钟前",
+      "hoursAgo": "小时前",
+      "yesterday": "昨天",
+      "daysAgo": "天前"
+    },
+    "actions": {
+      "addRole": "角色已分配",
+      "removeRole": "角色已移除",
+      "updateSetting": "设置已更新",
+      "updateClient": "客户已更新",
+      "blockClient": "客户已封禁",
+      "unblockClient": "客户已解封"
+    },
+    "common": {
+      "loading": "加载设置中...",
+      "new": "新",
+      "save": "保存"
+    }
   }
 }

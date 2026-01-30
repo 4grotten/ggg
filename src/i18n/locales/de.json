@@ -1264,5 +1264,123 @@
       "30min": "Nach 30 Minuten",
       "never": "Nie"
     }
+  },
+  "admin": {
+    "title": "Admin-Panel",
+    "subtitle": "Systemverwaltung",
+    "accessDenied": "Zugriff verweigert",
+    "accessDeniedDesc": "Sie haben keine Berechtigung für das Admin-Panel",
+    "backToSettings": "Zurück zu Einstellungen",
+    "tabs": {
+      "rates": "Kurse",
+      "fees": "Gebühren",
+      "limits": "Limits",
+      "clients": "Kunden",
+      "admins": "Admins"
+    },
+    "subtabs": {
+      "admins": "Admins",
+      "history": "Verlauf"
+    },
+    "stats": {
+      "rates": "Kurse",
+      "fees": "Gebühren",
+      "limits": "Limits",
+      "clients": "Kunden",
+      "admins": "Admins"
+    },
+    "exchangeRates": {
+      "title": "Wechselkurse",
+      "description": "Währungskurse verwalten",
+      "usdtToAedBuy": "USDT → AED (Kauf)",
+      "usdtToAedSell": "USDT → AED (Verkauf)",
+      "usdToAedBuy": "USD → AED (Kauf)",
+      "usdToAedSell": "USD → AED (Verkauf)",
+      "aedToUsdBuy": "AED → USD (Kauf)",
+      "aedToUsdSell": "AED → USD (Verkauf)"
+    },
+    "fees": {
+      "title": "Gebühren",
+      "description": "Transaktionsgebühren verwalten",
+      "topUpCryptoFlat": "Krypto-Aufladung (fest)",
+      "topUpBankPercent": "Bankaufladung",
+      "cardToCardPercent": "Karte zu Karte",
+      "bankTransferPercent": "Banküberweisung",
+      "networkFeePercent": "Netzwerkgebühr",
+      "currencyConversionPercent": "Währungsumrechnung",
+      "virtualCardAnnual": "Virtuelle Karte (jährlich)",
+      "virtualCardReplacement": "Ersatz virtuelle Karte",
+      "metalCardAnnual": "Metallkarte (jährlich)",
+      "metalCardReplacement": "Ersatz Metallkarte",
+      "virtualAccountOpening": "Virtuelles Konto eröffnen"
+    },
+    "limits": {
+      "title": "Limits",
+      "description": "Transaktionslimits verwalten",
+      "minLimits": "Mindestlimits",
+      "maxLimits": "Höchstlimits",
+      "dailyLimits": "Tageslimits",
+      "monthlyLimits": "Monatslimits",
+      "topUpCryptoMin": "Min. Krypto-Aufladung",
+      "topUpBankMin": "Min. Bankaufladung",
+      "transferMin": "Min. Überweisung",
+      "withdrawalMin": "Min. Auszahlung",
+      "topUpCryptoMax": "Max. Krypto-Aufladung",
+      "topUpBankMax": "Max. Bankaufladung",
+      "transferMax": "Max. Überweisung",
+      "withdrawalMax": "Max. Auszahlung",
+      "dailyTopUp": "Tägliches Aufladungslimit",
+      "dailyTransfer": "Tägliches Überweisungslimit",
+      "dailyWithdrawal": "Tägliches Auszahlungslimit",
+      "monthlyTopUp": "Monatliches Aufladungslimit",
+      "monthlyTransfer": "Monatliches Überweisungslimit",
+      "monthlyWithdrawal": "Monatliches Auszahlungslimit"
+    },
+    "clients": {
+      "title": "Kundendatenbank",
+      "description": "Kunden suchen und verwalten",
+      "searchPlaceholder": "Nach Name oder Telefon suchen...",
+      "noClients": "Keine registrierten Kunden",
+      "notFound": "Keine Kunden gefunden"
+    },
+    "roles": {
+      "addRole": "Rolle hinzufügen",
+      "searchByPhoneOrId": "Nach Telefon oder ID suchen",
+      "searchPlaceholder": "+971... oder UUID",
+      "currentRoles": "Aktuelle Rollen",
+      "usersWithRoles": "Benutzer mit Rollen",
+      "noUsersWithRoles": "Keine Benutzer mit Rollen",
+      "userNotFound": "Benutzer nicht gefunden",
+      "noName": "Kein Name",
+      "admin": "Administrator",
+      "moderator": "Moderator",
+      "user": "Benutzer",
+      "add": "Hinzufügen"
+    },
+    "history": {
+      "title": "Änderungsverlauf",
+      "description": "Administratoraktionen",
+      "actions": "Aktionen",
+      "empty": "Verlauf ist leer",
+      "emptyDesc": "Hier werden Administratoraktionen angezeigt",
+      "justNow": "gerade eben",
+      "minutesAgo": "Min. her",
+      "hoursAgo": "Std. her",
+      "yesterday": "gestern",
+      "daysAgo": "Tage her"
+    },
+    "actions": {
+      "addRole": "Rolle zugewiesen",
+      "removeRole": "Rolle entfernt",
+      "updateSetting": "Einstellung aktualisiert",
+      "updateClient": "Kunde aktualisiert",
+      "blockClient": "Kunde gesperrt",
+      "unblockClient": "Kunde entsperrt"
+    },
+    "common": {
+      "loading": "Einstellungen laden...",
+      "new": "neu",
+      "save": "Speichern"
+    }
   }
 }

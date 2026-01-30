@@ -1264,5 +1264,123 @@
       "30min": "Después de 30 minutos",
       "never": "Nunca"
     }
+  },
+  "admin": {
+    "title": "Panel de Administración",
+    "subtitle": "Gestión del Sistema",
+    "accessDenied": "Acceso Denegado",
+    "accessDeniedDesc": "No tienes permiso para acceder al panel de administración",
+    "backToSettings": "Volver a Configuración",
+    "tabs": {
+      "rates": "Tasas",
+      "fees": "Comisiones",
+      "limits": "Límites",
+      "clients": "Clientes",
+      "admins": "Admins"
+    },
+    "subtabs": {
+      "admins": "Admins",
+      "history": "Historial"
+    },
+    "stats": {
+      "rates": "Tasas",
+      "fees": "Comisiones",
+      "limits": "Límites",
+      "clients": "Clientes",
+      "admins": "Admins"
+    },
+    "exchangeRates": {
+      "title": "Tasas de Cambio",
+      "description": "Gestionar tasas de cambio de divisas",
+      "usdtToAedBuy": "USDT → AED (compra)",
+      "usdtToAedSell": "USDT → AED (venta)",
+      "usdToAedBuy": "USD → AED (compra)",
+      "usdToAedSell": "USD → AED (venta)",
+      "aedToUsdBuy": "AED → USD (compra)",
+      "aedToUsdSell": "AED → USD (venta)"
+    },
+    "fees": {
+      "title": "Comisiones",
+      "description": "Gestionar comisiones de transacciones",
+      "topUpCryptoFlat": "Recarga cripto (fijo)",
+      "topUpBankPercent": "Recarga bancaria",
+      "cardToCardPercent": "Tarjeta a tarjeta",
+      "bankTransferPercent": "Transferencia bancaria",
+      "networkFeePercent": "Comisión de red",
+      "currencyConversionPercent": "Conversión de moneda",
+      "virtualCardAnnual": "Tarjeta virtual (anual)",
+      "virtualCardReplacement": "Reemplazo tarjeta virtual",
+      "metalCardAnnual": "Tarjeta metálica (anual)",
+      "metalCardReplacement": "Reemplazo tarjeta metálica",
+      "virtualAccountOpening": "Apertura cuenta virtual"
+    },
+    "limits": {
+      "title": "Límites",
+      "description": "Gestionar límites de transacciones",
+      "minLimits": "Límites Mínimos",
+      "maxLimits": "Límites Máximos",
+      "dailyLimits": "Límites Diarios",
+      "monthlyLimits": "Límites Mensuales",
+      "topUpCryptoMin": "Recarga cripto mín.",
+      "topUpBankMin": "Recarga bancaria mín.",
+      "transferMin": "Transferencia mín.",
+      "withdrawalMin": "Retiro mín.",
+      "topUpCryptoMax": "Recarga cripto máx.",
+      "topUpBankMax": "Recarga bancaria máx.",
+      "transferMax": "Transferencia máx.",
+      "withdrawalMax": "Retiro máx.",
+      "dailyTopUp": "Límite diario de recarga",
+      "dailyTransfer": "Límite diario de transferencia",
+      "dailyWithdrawal": "Límite diario de retiro",
+      "monthlyTopUp": "Límite mensual de recarga",
+      "monthlyTransfer": "Límite mensual de transferencia",
+      "monthlyWithdrawal": "Límite mensual de retiro"
+    },
+    "clients": {
+      "title": "Base de Datos de Clientes",
+      "description": "Buscar y gestionar clientes",
+      "searchPlaceholder": "Buscar por nombre o teléfono...",
+      "noClients": "No hay clientes registrados",
+      "notFound": "No se encontraron clientes"
+    },
+    "roles": {
+      "addRole": "Agregar Rol",
+      "searchByPhoneOrId": "Buscar por teléfono o ID",
+      "searchPlaceholder": "+971... o UUID",
+      "currentRoles": "Roles Actuales",
+      "usersWithRoles": "usuarios con roles",
+      "noUsersWithRoles": "No hay usuarios con roles",
+      "userNotFound": "Usuario no encontrado",
+      "noName": "Sin nombre",
+      "admin": "Administrador",
+      "moderator": "Moderador",
+      "user": "Usuario",
+      "add": "Agregar"
+    },
+    "history": {
+      "title": "Historial de Cambios",
+      "description": "Acciones de administradores",
+      "actions": "acciones",
+      "empty": "El historial está vacío",
+      "emptyDesc": "Las acciones de los administradores se mostrarán aquí",
+      "justNow": "ahora mismo",
+      "minutesAgo": "min atrás",
+      "hoursAgo": "h atrás",
+      "yesterday": "ayer",
+      "daysAgo": "días atrás"
+    },
+    "actions": {
+      "addRole": "Rol asignado",
+      "removeRole": "Rol eliminado",
+      "updateSetting": "Configuración actualizada",
+      "updateClient": "Cliente actualizado",
+      "blockClient": "Cliente bloqueado",
+      "unblockClient": "Cliente desbloqueado"
+    },
+    "common": {
+      "loading": "Cargando configuración...",
+      "new": "nuevo",
+      "save": "Guardar"
+    }
   }
 }
