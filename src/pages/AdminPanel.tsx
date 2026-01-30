@@ -61,6 +61,125 @@ const limitFields = [
   { key: "monthly_withdrawal_limit", label: "Месячный лимит вывода", suffix: "AED", group: "monthly" },
 ];
 
+// Mock admin action history
+interface AdminAction {
+  id: string;
+  adminName: string;
+  adminPhone: string;
+  action: 'add_role' | 'remove_role' | 'update_setting' | 'update_client' | 'block_client' | 'unblock_client';
+  targetName?: string;
+  targetPhone?: string;
+  details: string;
+  timestamp: Date;
+}
+
+const MOCK_ADMIN_HISTORY: AdminAction[] = [
+  {
+    id: '1',
+    adminName: 'Александр Петров',
+    adminPhone: '+971 58 533 3939',
+    action: 'add_role',
+    targetName: 'Мария Иванова',
+    targetPhone: '+971 50 123 4567',
+    details: 'Назначена роль "Модератор"',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 минут назад
+  },
+  {
+    id: '2',
+    adminName: 'Дмитрий Козлов',
+    adminPhone: '+996 555 214 242',
+    action: 'update_setting',
+    details: 'Изменён курс USDT → AED: 3.67 → 3.68',
+    timestamp: new Date(Date.now() - 1000 * 60 * 45), // 45 минут назад
+  },
+  {
+    id: '3',
+    adminName: 'Александр Петров',
+    adminPhone: '+971 58 533 3939',
+    action: 'block_client',
+    targetName: 'Иван Сидоров',
+    targetPhone: '+971 55 987 6543',
+    details: 'Клиент заблокирован: подозрительная активность',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 часа назад
+  },
+  {
+    id: '4',
+    adminName: 'Дмитрий Козлов',
+    adminPhone: '+996 555 214 242',
+    action: 'update_client',
+    targetName: 'Анна Смирнова',
+    targetPhone: '+971 52 456 7890',
+    details: 'Повышен реферальный уровень: R1 → R2',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 часов назад
+  },
+  {
+    id: '5',
+    adminName: 'Александр Петров',
+    adminPhone: '+971 58 533 3939',
+    action: 'remove_role',
+    targetName: 'Олег Николаев',
+    targetPhone: '+971 54 321 0987',
+    details: 'Снята роль "Модератор"',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 день назад
+  },
+  {
+    id: '6',
+    adminName: 'Дмитрий Козлов',
+    adminPhone: '+996 555 214 242',
+    action: 'update_setting',
+    details: 'Изменена комиссия на пополнение: 1.5% → 1.2%',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 дня назад
+  },
+  {
+    id: '7',
+    adminName: 'Александр Петров',
+    adminPhone: '+971 58 533 3939',
+    action: 'unblock_client',
+    targetName: 'Елена Волкова',
+    targetPhone: '+971 56 789 0123',
+    details: 'Клиент разблокирован после проверки',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 дня назад
+  },
+];
+
+const getActionIcon = (action: AdminAction['action']) => {
+  switch (action) {
+    case 'add_role': return UserPlus;
+    case 'remove_role': return Trash2;
+    case 'update_setting': return TrendingUp;
+    case 'update_client': return Users;
+    case 'block_client': return Shield;
+    case 'unblock_client': return CheckCircle;
+    default: return Activity;
+  }
+};
+
+const getActionColor = (action: AdminAction['action']) => {
+  switch (action) {
+    case 'add_role': return 'text-green-500 bg-green-500/10';
+    case 'remove_role': return 'text-red-500 bg-red-500/10';
+    case 'update_setting': return 'text-blue-500 bg-blue-500/10';
+    case 'update_client': return 'text-violet-500 bg-violet-500/10';
+    case 'block_client': return 'text-orange-500 bg-orange-500/10';
+    case 'unblock_client': return 'text-emerald-500 bg-emerald-500/10';
+    default: return 'text-muted-foreground bg-muted';
+  }
+};
+
+const formatRelativeTime = (date: Date) => {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 1) return 'только что';
+  if (diffMins < 60) return `${diffMins} мин. назад`;
+  if (diffHours < 24) return `${diffHours} ч. назад`;
+  if (diffDays === 1) return 'вчера';
+  return `${diffDays} дн. назад`;
+};
+
 interface SettingsFieldProps {
   setting: AdminSetting;
   label: string;
@@ -940,16 +1059,63 @@ export default function AdminPanel() {
                       {/* History Card */}
                       <GlassCard
                         title="История изменений"
-                        description="Действия администраторов"
+                        description={`${MOCK_ADMIN_HISTORY.length} действий`}
                         icon={History}
                         iconColor="text-violet-500"
                       >
-                        <div className="flex flex-col items-center py-12 text-muted-foreground">
-                          <History className="w-16 h-16 mb-4 opacity-20" />
-                          <p className="text-sm font-medium mb-1">История пуста</p>
-                          <p className="text-xs text-center max-w-[200px]">
-                            Здесь будут отображаться действия администраторов
-                          </p>
+                        <div className="space-y-3">
+                          {MOCK_ADMIN_HISTORY.map((action, index) => {
+                            const ActionIcon = getActionIcon(action.action);
+                            const colorClasses = getActionColor(action.action);
+                            const [iconColor, bgColor] = colorClasses.split(' ');
+                            
+                            return (
+                              <motion.div
+                                key={action.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-2"
+                              >
+                                {/* Header: Admin info + time */}
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <div className={cn(
+                                      "w-8 h-8 rounded-lg flex items-center justify-center",
+                                      bgColor
+                                    )}>
+                                      <ActionIcon className={cn("w-4 h-4", iconColor)} />
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium">{action.adminName}</p>
+                                      <p className="text-xs text-muted-foreground">{action.adminPhone}</p>
+                                    </div>
+                                  </div>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatRelativeTime(action.timestamp)}
+                                  </span>
+                                </div>
+                                
+                                {/* Action details */}
+                                <p className="text-sm text-foreground/80 pl-10">
+                                  {action.details}
+                                </p>
+                                
+                                {/* Target user if exists */}
+                                {action.targetName && (
+                                  <div className="flex items-center gap-2 pl-10">
+                                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
+                                      <Users className="w-3 h-3 text-muted-foreground" />
+                                      <span className="font-medium">{action.targetName}</span>
+                                      {action.targetPhone && (
+                                        <span className="text-muted-foreground">{action.targetPhone}</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </motion.div>
+                            );
+                          })}
                         </div>
                       </GlassCard>
                     </motion.div>
