@@ -23,7 +23,7 @@ import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/
 import { LEVELS } from "@/components/partner/LevelCarousel";
 import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 import { ScreenLockDrawer } from "@/components/settings/ScreenLockDrawer";
-import { useScreenLock } from "@/hooks/useScreenLock";
+import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 
 // Telegram-style colored icon backgrounds
 const iconColors: Record<string, { bg: string; text: string }> = {
@@ -287,7 +287,7 @@ const Settings = () => {
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
   const [isScreenLockOpen, setIsScreenLockOpen] = useState(false);
-  const { isEnabled: isScreenLockEnabled } = useScreenLock();
+  const { isEnabled: isScreenLockEnabled } = useScreenLockContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
