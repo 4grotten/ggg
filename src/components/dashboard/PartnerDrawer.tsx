@@ -36,10 +36,10 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
   // Preload TGS animations when drawer opens
   useEffect(() => {
     if (open) {
-      preloadTgs("/animations/GlassDuck.tgs");
-      preloadTgs("/animations/money-coins.tgs");
-      preloadTgs("/animations/wowduck.tgs");
-      preloadTgs("/animations/WonDuck.tgs");
+      preloadTgs("./animations/GlassDuck.tgs");
+      preloadTgs("./animations/money-coins.tgs");
+      preloadTgs("./animations/wowduck.tgs");
+      preloadTgs("./animations/WonDuck.tgs");
     }
   }, [open]);
 
@@ -164,7 +164,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               </div>
               
               <TgsPlayer 
-                src="/animations/GlassDuck.tgs" 
+                src="./animations/GlassDuck.tgs" 
                 className="w-full h-full relative z-10"
               />
             </div>
@@ -218,7 +218,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               </div>
               
               <TgsPlayer 
-                src="/animations/money-coins.tgs" 
+                src="./animations/money-coins.tgs" 
                 className="w-full h-full relative z-10"
               />
             </div>
@@ -276,7 +276,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               </div>
               
               <TgsPlayer 
-                src="/animations/wowduck.tgs" 
+                src="./animations/wowduck.tgs" 
                 className="w-full h-full relative z-10"
               />
             </div>
@@ -367,7 +367,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
               </div>
               
               <TgsPlayer 
-                src="/animations/WonDuck.tgs" 
+                src="./animations/WonDuck.tgs" 
                 className="w-full h-full relative z-10"
               />
             </div>

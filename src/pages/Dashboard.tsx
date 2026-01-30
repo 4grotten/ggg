@@ -91,10 +91,10 @@ const Dashboard = () => {
 
   // Preload Partner drawer animations on mount
   useEffect(() => {
-    preloadTgs("/animations/GlassDuck.tgs");
-    preloadTgs("/animations/money-coins.tgs");
-    preloadTgs("/animations/wowduck.tgs");
-    preloadTgs("/animations/WonDuck.tgs");
+    preloadTgs("./animations/GlassDuck.tgs");
+    preloadTgs("./animations/money-coins.tgs");
+    preloadTgs("./animations/wowduck.tgs");
+    preloadTgs("./animations/WonDuck.tgs");
   }, []);
 
   // Save current account to multi-account storage (welcome toast is now shown only at login)
