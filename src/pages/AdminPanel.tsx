@@ -1,4 +1,4 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -231,6 +231,7 @@ export default function AdminPanel() {
   const [selectedRole, setSelectedRole] = useState<AppRole>("admin");
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState("rates");
+  const [activeAdminsSubTab, setActiveAdminsSubTab] = useState<"admins" | "history">("admins");
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [filteredClients, setFilteredClients] = useState<typeof clients>(undefined);
   const [isClientSearching, setIsClientSearching] = useState(false);
@@ -720,174 +721,240 @@ export default function AdminPanel() {
 
               {/* Admins Tab */}
               <TabsContent value="admins" className="mt-0 space-y-4">
-                {/* Add Admin Card */}
-                <GlassCard
-                  title="Добавить роль"
-                  description="Поиск по телефону или ID"
-                  icon={UserPlus}
-                  iconColor="text-blue-500"
-                >
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        placeholder="+971... или UUID"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSearchUser()}
-                        className="pl-10 h-12 rounded-xl bg-background/50"
-                      />
-                    </div>
-                    <Button
-                      size="icon"
-                      onClick={handleSearchUser}
-                      disabled={isSearching || !searchQuery.trim()}
-                      className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/80"
-                    >
-                      {isSearching ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Search className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-
-                  <AnimatePresence>
-                    {searchResult && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 space-y-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                              <Users className="w-6 h-6 text-primary" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate">
-                                {searchResult.first_name || searchResult.last_name
-                                  ? `${searchResult.first_name || ""} ${searchResult.last_name || ""}`.trim()
-                                  : "Без имени"}
-                              </p>
-                              {searchResult.phone && (
-                                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                  <Phone className="w-3 h-3" />
-                                  {searchResult.phone}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as AppRole)}>
-                              <SelectTrigger className="flex-1 h-11 rounded-xl bg-background/50">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="admin">Администратор</SelectItem>
-                                <SelectItem value="moderator">Модератор</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Button
-                              onClick={handleAddAdmin}
-                              disabled={addAdmin.isPending}
-                              className="h-11 px-6 rounded-xl bg-gradient-to-r from-primary to-primary/80"
-                            >
-                              {addAdmin.isPending ? (
-                                <RefreshCw className="w-4 h-4 animate-spin" />
-                              ) : (
-                                "Добавить"
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
+                {/* Sub-tabs for Admins section */}
+                <div className="flex gap-2 p-1 bg-muted/50 rounded-xl">
+                  <button
+                    onClick={() => setActiveAdminsSubTab("admins")}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all",
+                      activeAdminsSubTab === "admins"
+                        ? "bg-background shadow-sm text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
-                  </AnimatePresence>
+                  >
+                    <Users className="w-4 h-4" />
+                    Админы
+                  </button>
+                  <button
+                    onClick={() => setActiveAdminsSubTab("history")}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all",
+                      activeAdminsSubTab === "history"
+                        ? "bg-background shadow-sm text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <History className="w-4 h-4" />
+                    История
+                  </button>
+                </div>
 
-                  {searchQuery && !searchResult && !isSearching && (
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-sm text-muted-foreground text-center py-2"
+                <AnimatePresence mode="wait">
+                  {activeAdminsSubTab === "admins" ? (
+                    <motion.div
+                      key="admins-subtab"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-4"
                     >
-                      Пользователь не найден
-                    </motion.p>
-                  )}
-                </GlassCard>
-
-                {/* Current Admins List */}
-                <GlassCard
-                  title="Текущие роли"
-                  description={`${admins?.length || 0} пользователей с ролями`}
-                  icon={Shield}
-                  iconColor="text-blue-500"
-                >
-                  {adminsLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2].map((i) => (
-                        <Skeleton key={i} className="h-20 w-full rounded-2xl" />
-                      ))}
-                    </div>
-                  ) : admins && admins.length > 0 ? (
-                    <div className="space-y-2">
-                      {admins.map((admin, index) => (
-                        <motion.div
-                          key={admin.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 group hover:border-border transition-colors"
-                        >
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center shrink-0">
-                            <Users className="w-5 h-5 text-muted-foreground" />
+                      {/* Add Admin Card */}
+                      <GlassCard
+                        title="Добавить роль"
+                        description="Поиск по телефону или ID"
+                        icon={UserPlus}
+                        iconColor="text-blue-500"
+                      >
+                        <div className="flex gap-2">
+                          <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                              placeholder="+971... или UUID"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              onKeyDown={(e) => e.key === "Enter" && handleSearchUser()}
+                              className="pl-10 h-12 rounded-xl bg-background/50"
+                            />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">
-                              {admin.first_name || admin.last_name
-                                ? `${admin.first_name || ""} ${admin.last_name || ""}`.trim()
-                                : "Без имени"}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              {admin.phone && (
-                                <span className="flex items-center gap-1">
-                                  <Phone className="w-3 h-3" />
-                                  {admin.phone}
-                                </span>
-                              )}
-                              <span className="flex items-center gap-1">
-                                <Hash className="w-3 h-3" />
-                                {admin.user_id.slice(0, 8)}...
-                              </span>
-                            </div>
-                          </div>
-                          <Badge 
-                            variant={getRoleBadgeVariant(admin.role)}
-                            className="shrink-0"
-                          >
-                            {getRoleLabel(admin.role)}
-                          </Badge>
                           <Button
-                            variant="ghost"
                             size="icon"
-                            className="shrink-0 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => removeAdmin.mutate(admin.id)}
-                            disabled={removeAdmin.isPending}
+                            onClick={handleSearchUser}
+                            disabled={isSearching || !searchQuery.trim()}
+                            className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/80"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            {isSearching ? (
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Search className="w-4 h-4" />
+                            )}
                           </Button>
-                        </motion.div>
-                      ))}
-                    </div>
+                        </div>
+
+                        <AnimatePresence>
+                          {searchResult && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 space-y-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                                    <Users className="w-6 h-6 text-primary" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium truncate">
+                                      {searchResult.first_name || searchResult.last_name
+                                        ? `${searchResult.first_name || ""} ${searchResult.last_name || ""}`.trim()
+                                        : "Без имени"}
+                                    </p>
+                                    {searchResult.phone && (
+                                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                        <Phone className="w-3 h-3" />
+                                        {searchResult.phone}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                  <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as AppRole)}>
+                                    <SelectTrigger className="flex-1 h-11 rounded-xl bg-background/50">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="admin">Администратор</SelectItem>
+                                      <SelectItem value="moderator">Модератор</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    onClick={handleAddAdmin}
+                                    disabled={addAdmin.isPending}
+                                    className="h-11 px-6 rounded-xl bg-gradient-to-r from-primary to-primary/80"
+                                  >
+                                    {addAdmin.isPending ? (
+                                      <RefreshCw className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      "Добавить"
+                                    )}
+                                  </Button>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        {searchQuery && !searchResult && !isSearching && (
+                          <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-sm text-muted-foreground text-center py-2"
+                          >
+                            Пользователь не найден
+                          </motion.p>
+                        )}
+                      </GlassCard>
+
+                      {/* Current Admins List */}
+                      <GlassCard
+                        title="Текущие роли"
+                        description={`${admins?.length || 0} пользователей с ролями`}
+                        icon={Shield}
+                        iconColor="text-blue-500"
+                      >
+                        {adminsLoading ? (
+                          <div className="space-y-3">
+                            {[1, 2].map((i) => (
+                              <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+                            ))}
+                          </div>
+                        ) : admins && admins.length > 0 ? (
+                          <div className="space-y-2">
+                            {admins.map((admin, index) => (
+                              <motion.div
+                                key={admin.id}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 group hover:border-border transition-colors"
+                              >
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center shrink-0">
+                                  <Users className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm truncate">
+                                    {admin.first_name || admin.last_name
+                                      ? `${admin.first_name || ""} ${admin.last_name || ""}`.trim()
+                                      : "Без имени"}
+                                  </p>
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    {admin.phone && (
+                                      <span className="flex items-center gap-1">
+                                        <Phone className="w-3 h-3" />
+                                        {admin.phone}
+                                      </span>
+                                    )}
+                                    <span className="flex items-center gap-1">
+                                      <Hash className="w-3 h-3" />
+                                      {admin.user_id.slice(0, 8)}...
+                                    </span>
+                                  </div>
+                                </div>
+                                <Badge 
+                                  variant={getRoleBadgeVariant(admin.role)}
+                                  className="shrink-0"
+                                >
+                                  {getRoleLabel(admin.role)}
+                                </Badge>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="shrink-0 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => removeAdmin.mutate(admin.id)}
+                                  disabled={removeAdmin.isPending}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </motion.div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center py-8 text-muted-foreground">
+                            <Users className="w-12 h-12 mb-2 opacity-30" />
+                            <p className="text-sm">Нет пользователей с ролями</p>
+                          </div>
+                        )}
+                      </GlassCard>
+                    </motion.div>
                   ) : (
-                    <div className="flex flex-col items-center py-8 text-muted-foreground">
-                      <Users className="w-12 h-12 mb-2 opacity-30" />
-                      <p className="text-sm">Нет пользователей с ролями</p>
-                    </div>
+                    <motion.div
+                      key="history-subtab"
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-4"
+                    >
+                      {/* History Card */}
+                      <GlassCard
+                        title="История изменений"
+                        description="Действия администраторов"
+                        icon={History}
+                        iconColor="text-violet-500"
+                      >
+                        <div className="flex flex-col items-center py-12 text-muted-foreground">
+                          <History className="w-16 h-16 mb-4 opacity-20" />
+                          <p className="text-sm font-medium mb-1">История пуста</p>
+                          <p className="text-xs text-center max-w-[200px]">
+                            Здесь будут отображаться действия администраторов
+                          </p>
+                        </div>
+                      </GlassCard>
+                    </motion.div>
                   )}
-                </GlassCard>
+                </AnimatePresence>
               </TabsContent>
             </Tabs>
           )}
