@@ -410,7 +410,7 @@ export default function AdminPanel() {
       >
         {/* Premium Header - Only title is sticky with high z-index */}
         <div className="sticky top-0 z-50">
-          <div className="absolute inset-0 bg-background" />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
           <div className="relative px-4 py-4">
             <div className="flex items-center gap-3">
               <Button
