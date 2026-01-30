@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useVoiceCall } from "@/contexts/VoiceCallContext";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 
 const navItems = [
   { icon: Home, labelKey: "nav.home", path: "/" },
@@ -22,6 +23,7 @@ export const BottomNavigation = () => {
   const { user, isAuthenticated } = useAuth();
   const { isConnected, isSpeaking } = useVoiceCall();
   const { t, i18n } = useTranslation();
+  const { selection } = useHapticFeedback();
   
   // Priority: API avatar (small) > local avatar > fallback
   const displayAvatar = user?.avatar?.small || user?.avatar?.file || avatarUrl;
@@ -104,6 +106,7 @@ export const BottomNavigation = () => {
                     key={item.path}
                     to="/auth/phone"
                     ref={(el) => { tabRefs.current[index] = el; }}
+                    onClick={() => selection()}
                     className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10"
                   >
                     <div className={cn(
@@ -129,6 +132,7 @@ export const BottomNavigation = () => {
                   key={item.path}
                   to={item.path}
                   ref={(el) => { tabRefs.current[index] = el; }}
+                  onClick={() => selection()}
                   className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10"
                 >
                   <Avatar className={cn(
@@ -156,6 +160,7 @@ export const BottomNavigation = () => {
                 key={item.path}
                 to={item.path}
                 ref={(el) => { tabRefs.current[index] = el; }}
+                onClick={() => selection()}
                 className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10"
               >
                 <div className="relative">

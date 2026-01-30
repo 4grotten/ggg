@@ -1,5 +1,6 @@
 import { useTheme } from "next-themes";
-import { Toaster as Sonner, toast } from "sonner";
+import { Toaster as Sonner, toast as sonnerToast, ExternalToast } from "sonner";
+import { hapticFeedback } from "@/hooks/useHapticFeedback";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
@@ -27,5 +28,33 @@ const Toaster = ({ ...props }: ToasterProps) => {
     />
   );
 };
+
+// Wrapped toast with haptic feedback
+const toast = Object.assign(
+  (message: string | React.ReactNode, data?: ExternalToast) => sonnerToast(message, data),
+  {
+    success: (message: string | React.ReactNode, data?: ExternalToast) => {
+      hapticFeedback.success();
+      return sonnerToast.success(message, data);
+    },
+    error: (message: string | React.ReactNode, data?: ExternalToast) => {
+      hapticFeedback.error();
+      return sonnerToast.error(message, data);
+    },
+    warning: (message: string | React.ReactNode, data?: ExternalToast) => {
+      hapticFeedback.warning();
+      return sonnerToast.warning(message, data);
+    },
+    info: (message: string | React.ReactNode, data?: ExternalToast) => {
+      hapticFeedback.tap();
+      return sonnerToast.info(message, data);
+    },
+    loading: sonnerToast.loading,
+    promise: sonnerToast.promise,
+    custom: sonnerToast.custom,
+    dismiss: sonnerToast.dismiss,
+    message: sonnerToast.message,
+  }
+);
 
 export { Toaster, toast };

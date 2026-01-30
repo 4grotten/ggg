@@ -14,7 +14,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 import { ScreenLockDrawer } from "@/components/settings/ScreenLockDrawer";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { useUserRole } from "@/hooks/useUserRole";
+import { isHapticEnabled, setHapticEnabled, useHapticFeedback } from "@/hooks/useHapticFeedback";
 
 // Telegram-style colored icon backgrounds
 const iconColors: Record<string, { bg: string; text: string }> = {
@@ -44,6 +45,7 @@ const iconColors: Record<string, { bg: string; text: string }> = {
   userplus: { bg: 'bg-blue-500', text: 'text-white' },
   lock: { bg: 'bg-rose-500', text: 'text-white' },
   admin: { bg: 'bg-amber-500', text: 'text-white' },
+  vibrate: { bg: 'bg-teal-500', text: 'text-white' },
 };
 
 interface ColoredIconProps {
@@ -291,6 +293,8 @@ const Settings = () => {
   const [isScreenLockOpen, setIsScreenLockOpen] = useState(false);
   const { isEnabled: isScreenLockEnabled } = useScreenLockContext();
   const { isAdmin } = useUserRole();
+  const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
+  const { tap } = useHapticFeedback();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
@@ -849,6 +853,30 @@ const Settings = () => {
             valueClassName={isScreenLockEnabled ? "text-sm font-medium text-green-500" : "text-muted-foreground text-sm"}
             onClick={() => setIsScreenLockOpen(true)}
           />
+          {/* Haptic Feedback */}
+          <button
+            onClick={() => {
+              const newValue = !hapticEnabled;
+              setHapticEnabled(newValue);
+              setHapticEnabledState(newValue);
+              if (newValue) {
+                tap(); // Provide feedback when enabling
+              }
+              toast.success(newValue ? (t("settings.hapticEnabled") || "Вибрация включена") : (t("settings.hapticDisabled") || "Вибрация выключена"));
+            }}
+            className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <ColoredIcon colorKey="vibrate"><Vibrate className="w-4 h-4" /></ColoredIcon>
+              <span className="text-foreground font-medium">{t("settings.hapticFeedback") || "Вибрация"}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={hapticEnabled ? "text-sm font-medium text-green-500" : "text-muted-foreground text-sm"}>
+                {hapticEnabled ? t("settings.enabled") || "Вкл" : t("settings.disabled") || "Выкл"}
+              </span>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </div>
+          </button>
         </AnimatedMenuSection>
 
         {/* Limits and Fees */}
