@@ -44,6 +44,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useMultiAccount } from "@/hooks/useMultiAccount";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { preloadTgs } from "@/components/ui/TgsPlayer";
+import partnerNetworkHero from "@/assets/partner-network-hero.png";
 
 type FilterType = "all" | "income" | "expenses" | "transfers";
 
@@ -89,12 +90,16 @@ const Dashboard = () => {
   const firstName = displayName.split(' ')[0];
   
 
-  // Preload Partner drawer animations on mount
+  // Preload Partner drawer animations and banner on mount
   useEffect(() => {
     preloadTgs("./animations/GlassDuck.tgs");
     preloadTgs("./animations/money-coins.tgs");
     preloadTgs("./animations/wowduck.tgs");
     preloadTgs("./animations/WonDuck.tgs");
+    
+    // Preload partner banner image
+    const img = new Image();
+    img.src = partnerNetworkHero;
   }, []);
 
   // Save current account to multi-account storage (welcome toast is now shown only at login)
