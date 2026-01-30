@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Fingerprint, Delete, AlertCircle } from 'lucide-react';
+import { Lock, LockOpen, Fingerprint, Delete, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { cn } from '@/lib/utils';
@@ -27,30 +27,35 @@ export const ScreenLockOverlay = ({
   const [error, setError] = useState(false);
   const [shake, setShake] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [unlocking, setUnlocking] = useState(false);
 
   const handleDigitPress = useCallback((digit: string) => {
-    if (passcode.length >= PASSCODE_LENGTH) return;
+    if (passcode.length >= PASSCODE_LENGTH || unlocking) return;
     
     setError(false);
     const newPasscode = passcode + digit;
     setPasscode(newPasscode);
 
-    // Auto-submit when complete
+    // Auto-submit when complete - instant check
     if (newPasscode.length === PASSCODE_LENGTH) {
-      setTimeout(() => {
-        const success = onUnlock(newPasscode);
-        if (!success) {
-          setError(true);
-          setShake(true);
-          setAttempts(prev => prev + 1);
-          setTimeout(() => {
-            setPasscode('');
-            setShake(false);
-          }, 500);
-        }
-      }, 100);
+      const success = onUnlock(newPasscode);
+      if (success) {
+        setUnlocking(true);
+        // Quick unlock animation
+        setTimeout(() => {
+          setUnlocking(false);
+        }, 500);
+      } else {
+        setError(true);
+        setShake(true);
+        setAttempts(prev => prev + 1);
+        setTimeout(() => {
+          setPasscode('');
+          setShake(false);
+        }, 400);
+      }
     }
-  }, [passcode, onUnlock]);
+  }, [passcode, onUnlock, unlocking]);
 
   const handleDelete = useCallback(() => {
     setPasscode(prev => prev.slice(0, -1));
@@ -63,7 +68,10 @@ export const ScreenLockOverlay = ({
     try {
       const result = await authenticateWithBiometric();
       if (result.success) {
-        onBiometricUnlock();
+        setUnlocking(true);
+        setTimeout(() => {
+          onBiometricUnlock();
+        }, 400);
       }
     } catch (err) {
       console.error('Biometric auth failed:', err);
@@ -83,6 +91,7 @@ export const ScreenLockOverlay = ({
       setPasscode('');
       setError(false);
       setAttempts(0);
+      setUnlocking(false);
     }
   }, [isLocked]);
 
@@ -103,16 +112,66 @@ export const ScreenLockOverlay = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center px-8"
         >
-          {/* Lock Icon */}
+          {/* Lock Icon with unlock/error animation */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            animate={{ 
+              scale: 1, 
+              rotate: 0,
+              x: shake ? [-4, 4, -4, 4, -2, 2, 0] : 0
+            }}
+            transition={{ 
+              type: 'spring', 
+              stiffness: 200, 
+              damping: 15,
+              x: { duration: 0.4, ease: "easeOut" }
+            }}
             className="mb-6"
           >
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Lock className="w-8 h-8 text-primary" />
-            </div>
+            <motion.div 
+              className={cn(
+                "w-16 h-16 rounded-full flex items-center justify-center",
+                unlocking ? "bg-green-500/20" : error ? "bg-destructive/20" : "bg-primary/10"
+              )}
+              animate={{
+                scale: unlocking ? [1, 1.15, 1] : error ? [1, 1.1, 1] : 1,
+                boxShadow: unlocking 
+                  ? ['0 0 0 0 rgba(34, 197, 94, 0)', '0 0 40px 15px rgba(34, 197, 94, 0.5)', '0 0 25px 10px rgba(34, 197, 94, 0.3)']
+                  : error 
+                  ? ['0 0 0 0 rgba(239, 68, 68, 0)', '0 0 30px 12px rgba(239, 68, 68, 0.5)', '0 0 0 0 rgba(239, 68, 68, 0)']
+                  : '0 0 0 0 rgba(0, 122, 255, 0)'
+              }}
+              transition={{ duration: 0.4 }}
+            >
+              {unlocking ? (
+                <motion.div
+                  key="unlocked"
+                  initial={{ scale: 0, rotate: -45, opacity: 0 }}
+                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.05 }}
+                >
+                  <LockOpen className="w-8 h-8 text-green-500" strokeWidth={2.5} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="locked"
+                  animate={{ 
+                    rotate: error ? [0, -10, 10, -10, 10, 0] : 0
+                  }}
+                  transition={{ 
+                    rotate: { duration: 0.4, ease: "easeOut" }
+                  }}
+                >
+                  <Lock 
+                    className={cn(
+                      "w-8 h-8 transition-colors duration-200",
+                      error ? "text-destructive" : "text-primary"
+                    )} 
+                    strokeWidth={2.5} 
+                  />
+                </motion.div>
+              )}
+            </motion.div>
           </motion.div>
 
           {/* Title */}
@@ -163,17 +222,20 @@ export const ScreenLockOverlay = ({
                   animate={{ 
                     scale: isLatest ? [1, 1.4, 1] : 1,
                     backgroundColor: isFilled 
-                      ? error ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'
+                      ? error ? 'hsl(var(--destructive))' 
+                      : unlocking ? 'rgb(34, 197, 94)'
+                      : 'hsl(var(--primary))'
                       : 'hsl(var(--muted))'
                   }}
                   transition={{ 
-                    scale: { duration: 0.3, ease: "easeOut" },
-                    backgroundColor: { duration: 0.2 }
+                    scale: { duration: 0.15, ease: "easeOut" },
+                    backgroundColor: { duration: 0.1 }
                   }}
                   className={cn(
-                    "w-4 h-4 rounded-full transition-all duration-200",
-                    isFilled && !error && "shadow-[0_0_12px_hsl(var(--primary)/0.6)]",
-                    isFilled && error && "shadow-[0_0_12px_hsl(var(--destructive)/0.6)]"
+                    "w-4 h-4 rounded-full",
+                    isFilled && !error && !unlocking && "shadow-[0_0_14px_4px_hsl(var(--primary)/0.6)]",
+                    isFilled && error && "shadow-[0_0_14px_4px_hsl(var(--destructive)/0.6)]",
+                    isFilled && unlocking && "shadow-[0_0_14px_4px_rgba(34,197,94,0.6)]"
                   )}
                 />
               );
