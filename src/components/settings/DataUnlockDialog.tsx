@@ -131,48 +131,45 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ 
-                scale: unlocking ? [1, 1.2, 1] : 1, 
-                opacity: 1,
-                rotate: unlocking ? [0, -10, 0] : 0
+                scale: 1, 
+                opacity: 1
               }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-              className="mb-3"
+              className="mb-3 flex items-center justify-center"
             >
               <motion.div 
                 className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300",
-                  unlocking ? "bg-green-500/20" : "bg-primary/20"
+                  "w-12 h-12 rounded-full flex items-center justify-center",
+                  unlocking ? "bg-green-500/30" : "bg-primary/20"
                 )}
                 animate={{
+                  scale: unlocking ? [1, 1.15, 1] : 1,
                   boxShadow: unlocking 
-                    ? ['0 0 0 0 rgba(34, 197, 94, 0)', '0 0 20px 8px rgba(34, 197, 94, 0.4)', '0 0 0 0 rgba(34, 197, 94, 0)']
+                    ? ['0 0 0 0 rgba(34, 197, 94, 0)', '0 0 30px 12px rgba(34, 197, 94, 0.5)', '0 0 20px 8px rgba(34, 197, 94, 0.3)']
                     : '0 0 0 0 rgba(0, 122, 255, 0)'
                 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.4 }}
               >
-                <AnimatePresence mode="wait">
-                  {unlocking ? (
-                    <motion.div
-                      key="unlocked"
-                      initial={{ scale: 0, rotate: -30 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      exit={{ scale: 0 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                    >
-                      <LockOpen className="w-5 h-5 text-green-500" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="locked"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0, rotate: 30 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                    >
-                      <Lock className="w-5 h-5 text-primary" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {unlocking ? (
+                  <motion.div
+                    key="unlocked"
+                    initial={{ scale: 0, rotate: -45, opacity: 0 }}
+                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.05 }}
+                  >
+                    <LockOpen className="w-6 h-6 text-green-500" strokeWidth={2.5} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="locked"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, rotate: 45, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  >
+                    <Lock className="w-6 h-6 text-primary" strokeWidth={2.5} />
+                  </motion.div>
+                )}
               </motion.div>
             </motion.div>
 
