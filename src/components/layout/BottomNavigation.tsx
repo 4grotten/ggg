@@ -104,23 +104,22 @@ export const BottomNavigation = () => {
     }
   }, [activeIndex, calcSelectorStyle]);
 
-  // Only clear pressed state on route change, don't move selector automatically
+  // Keep selector in sync with the actually opened route.
+  // This prevents a mismatch where the selector stays on an old tab while another page is open.
   useEffect(() => {
     if (isInitializedRef.current) {
       setPressedIndex(null);
+      // Avoid fighting the optimistic press animation; once route changes, snap to the new active.
+      updateSelector(activeIndex);
     }
-  }, [activeIndex]);
+  }, [activeIndex, updateSelector, i18n.language]);
 
-  // Update on resize only if selector was already positioned
+  // Update on resize
   useEffect(() => {
-    const onResize = () => {
-      if (selectorStyle) {
-        updateSelector(pressedIndex ?? activeIndex);
-      }
-    };
+    const onResize = () => updateSelector(pressedIndex ?? activeIndex);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [updateSelector, pressedIndex, activeIndex, selectorStyle]);
+  }, [updateSelector, pressedIndex, activeIndex]);
 
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 px-4 max-w-[800px] mx-auto">
