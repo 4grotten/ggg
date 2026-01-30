@@ -1087,7 +1087,12 @@ export default function AdminPanel() {
                                       <ActionIcon className={cn("w-4 h-4", iconColor)} />
                                     </div>
                                     <div>
-                                      <p className="text-sm font-medium">{action.adminName}</p>
+                                      <div className="flex items-center gap-1.5">
+                                        <p className="text-sm font-medium">{action.adminName}</p>
+                                        <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4">
+                                          Admin
+                                        </Badge>
+                                      </div>
                                       <p className="text-xs text-muted-foreground">{action.adminPhone}</p>
                                     </div>
                                   </div>
