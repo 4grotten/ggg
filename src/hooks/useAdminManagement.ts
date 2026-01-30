@@ -59,25 +59,27 @@ export function useAdminManagement() {
     // Clean phone number
     const cleanQuery = query.replace(/\s+/g, "").replace(/^\+/, "");
     
-    // Try to find by phone first
-    let { data, error } = await supabase
-      .from("profiles")
-      .select("user_id, phone, first_name, last_name")
-      .or(`phone.ilike.%${cleanQuery}%,user_id.eq.${query}`)
-      .limit(1)
-      .single();
-
-    if (error || !data) {
-      // Try exact phone match with + prefix
-      const { data: phoneData } = await supabase
+    // Check if it looks like a UUID
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(query);
+    
+    if (isUUID) {
+      // Search by user_id
+      const { data } = await supabase
         .from("profiles")
         .select("user_id, phone, first_name, last_name")
-        .ilike("phone", `%${cleanQuery}%`)
-        .limit(1)
-        .single();
+        .eq("user_id", query)
+        .maybeSingle();
       
-      return phoneData || null;
+      return data;
     }
+    
+    // Search by phone
+    const { data } = await supabase
+      .from("profiles")
+      .select("user_id, phone, first_name, last_name")
+      .ilike("phone", `%${cleanQuery}%`)
+      .limit(1)
+      .maybeSingle();
 
     return data;
   };
