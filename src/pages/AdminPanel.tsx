@@ -408,9 +408,9 @@ export default function AdminPanel() {
         animate={{ opacity: 1 }}
         className="min-h-screen bg-background"
       >
-        {/* Premium Header - Only title is sticky */}
-        <div className="sticky top-0 z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/95 backdrop-blur-xl" />
+        {/* Premium Header - Only title is sticky with high z-index */}
+        <div className="sticky top-0 z-50">
+          <div className="absolute inset-0 bg-background" />
           <div className="relative px-4 py-4">
             <div className="flex items-center gap-3">
               <Button
@@ -442,7 +442,7 @@ export default function AdminPanel() {
           </div>
         </div>
 
-        {/* Content - Stats and Tabs scroll with content */}
+        {/* Content - Stats and Tabs scroll with content, lower z-index */}
         <div className="px-4 pb-24">
           {/* Stats Bar - scrolls with content */}
           <motion.div 
