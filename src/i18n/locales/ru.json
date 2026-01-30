@@ -1277,6 +1277,8 @@
     "confirmPasscode": "Подтвердить пароль",
     "enterPasscode": "Введите пароль",
     "viewSensitiveData": "Для просмотра данных",
+    "unlocked": "Разблокировано",
+    "accessGranted": "Доступ разрешён",
     "createDesc": "Введите {{length}}-значный пароль",
     "confirmDesc": "Повторите пароль",
     "verifyDesc": "Введите текущий пароль для отключения",

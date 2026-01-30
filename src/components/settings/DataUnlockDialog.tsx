@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Fingerprint, Delete, AlertCircle, X } from 'lucide-react';
+import { Lock, LockOpen, Fingerprint, Delete, AlertCircle, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { useScreenLockContext } from '@/contexts/ScreenLockContext';
@@ -23,31 +23,35 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
   const [passcode, setPasscode] = useState('');
   const [error, setError] = useState(false);
   const [shake, setShake] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
 
   const handleDigitPress = useCallback((digit: string) => {
-    if (passcode.length >= PASSCODE_LENGTH) return;
+    if (passcode.length >= PASSCODE_LENGTH || unlocking) return;
     
     setError(false);
     const newPasscode = passcode + digit;
     setPasscode(newPasscode);
 
     if (newPasscode.length === PASSCODE_LENGTH) {
-      setTimeout(() => {
-        const success = verifyPasscode(newPasscode);
-        if (success) {
+      // Immediate check - no delay
+      const success = verifyPasscode(newPasscode);
+      if (success) {
+        setUnlocking(true);
+        // Quick unlock animation then close
+        setTimeout(() => {
           onSuccess();
           onClose();
-        } else {
-          setError(true);
-          setShake(true);
-          setTimeout(() => {
-            setPasscode('');
-            setShake(false);
-          }, 500);
-        }
-      }, 100);
+        }, 400);
+      } else {
+        setError(true);
+        setShake(true);
+        setTimeout(() => {
+          setPasscode('');
+          setShake(false);
+        }, 400);
+      }
     }
-  }, [passcode, verifyPasscode, onSuccess, onClose]);
+  }, [passcode, verifyPasscode, onSuccess, onClose, unlocking]);
 
   const handleDelete = useCallback(() => {
     setPasscode(prev => prev.slice(0, -1));
@@ -60,8 +64,11 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
     try {
       const result = await authenticateWithBiometric();
       if (result.success) {
-        onSuccess();
-        onClose();
+        setUnlocking(true);
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 400);
       }
     } catch (err) {
       console.error('Biometric auth failed:', err);
@@ -80,6 +87,7 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
     if (isOpen) {
       setPasscode('');
       setError(false);
+      setUnlocking(false);
     }
   }, [isOpen]);
 
@@ -97,172 +105,187 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 flex items-center justify-center px-6 bg-black/60 backdrop-blur-md"
-          style={{ 
-            zIndex: 99999,
-          }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 flex items-center justify-center px-8 bg-black/40 backdrop-blur-sm"
+          style={{ zIndex: 99999 }}
           onClick={onClose}
         >
-          {/* Modal Card */}
+          {/* Compact Modal Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.85, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="relative w-full max-w-[320px] bg-card/95 backdrop-blur-xl rounded-3xl p-6 pt-5 shadow-2xl border border-border/50"
+            exit={{ opacity: 0, scale: 0.85, y: 30 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+            className="relative w-full max-w-[280px] bg-card/90 backdrop-blur-xl rounded-2xl p-5 pt-4 shadow-2xl border border-white/10"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-muted transition-colors"
+              className="absolute top-2.5 right-2.5 p-1 rounded-full hover:bg-white/10 transition-colors"
             >
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
 
-          {/* Lock Icon */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="mb-4"
-          >
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Lock className="w-6 h-6 text-primary" />
-            </div>
-          </motion.div>
-
-          {/* Title */}
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="text-lg font-semibold text-foreground mb-1"
-          >
-            {t('screenLock.enterPasscode', 'Enter Passcode')}
-          </motion.h1>
-
-          {/* Subtitle / Error */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className={cn(
-              "text-sm mb-6 flex items-center gap-1",
-              error ? "text-destructive" : "text-muted-foreground"
-            )}
-          >
-            {error ? (
-              <>
-                <AlertCircle className="w-4 h-4" />
-                {t('screenLock.wrongPasscode', 'Wrong passcode')}
-              </>
-            ) : (
-              t('screenLock.viewSensitiveData', 'To view sensitive data')
-            )}
-          </motion.p>
-
-          {/* Dots */}
-          <motion.div
-            animate={shake ? { x: [-8, 8, -8, 8, 0] } : {}}
-            transition={{ duration: 0.4 }}
-            className="flex gap-3 mb-8"
-          >
-            {Array.from({ length: PASSCODE_LENGTH }).map((_, i) => {
-              const isFilled = i < passcode.length;
-              const isLatest = i === passcode.length - 1 && passcode.length > 0;
-              
-              return (
-                <motion.div
-                  key={i}
-                  animate={{ 
-                    scale: isLatest ? [1, 1.3, 1] : 1,
-                    backgroundColor: isFilled 
-                      ? error ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'
-                      : 'hsl(var(--muted))'
-                  }}
-                  transition={{ 
-                    scale: { duration: 0.25, ease: "easeOut" },
-                    backgroundColor: { duration: 0.15 }
-                  }}
-                  className={cn(
-                    "w-3 h-3 rounded-full transition-all duration-200",
-                    isFilled && !error && "shadow-[0_0_10px_hsl(var(--primary)/0.5)]",
-                    isFilled && error && "shadow-[0_0_10px_hsl(var(--destructive)/0.5)]"
-                  )}
-                />
-              );
-            })}
-          </motion.div>
-
-          {/* Compact Keypad */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="grid grid-cols-3 gap-3"
-          >
-            {digits.map((digit, i) => (
-              <motion.button
-                key={digit}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.15 + i * 0.02 }}
-                whileTap={{ scale: 0.92, backgroundColor: 'hsl(var(--muted))' }}
-                onClick={() => handleDigitPress(digit)}
-                className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center text-xl font-semibold text-foreground hover:bg-muted transition-colors"
-              >
-                {digit}
-              </motion.button>
-            ))}
-            
-            {/* Bottom row */}
-            {bottomRow.map((item, i) => (
-              <motion.button
-                key={item || `empty-${i}`}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 + i * 0.02 }}
-                whileTap={item ? { scale: 0.92, backgroundColor: 'hsl(var(--muted))' } : undefined}
-                onClick={() => {
-                  if (item === 'biometric') handleBiometric();
-                  else if (item === 'delete') handleDelete();
-                  else if (item === '0') handleDigitPress('0');
-                }}
-                disabled={!item}
-                className={cn(
-                  "w-16 h-16 rounded-full flex items-center justify-center transition-colors",
-                  item === null && "opacity-0 pointer-events-none",
-                  item === '0' && "bg-muted/50 hover:bg-muted",
-                  item === 'biometric' && "hover:bg-muted/50",
-                  item === 'delete' && "hover:bg-muted/50"
-                )}
-              >
-                {item === 'biometric' && (
-                  <Fingerprint className="w-6 h-6 text-primary" />
-                )}
-                {item === 'delete' && (
-                  <Delete className="w-5 h-5 text-muted-foreground" />
-                )}
-                {item === '0' && (
-                  <span className="text-xl font-semibold text-foreground">0</span>
-                )}
-              </motion.button>
-            ))}
-          </motion.div>
-
-          {/* Biometric hint */}
-          {isBiometricEnabled && isBiometricAvailable && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="mt-5 text-xs text-muted-foreground"
+            {/* Lock Icon with unlock animation */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ 
+                scale: unlocking ? [1, 1.2, 1] : 1, 
+                opacity: 1,
+                rotate: unlocking ? [0, -10, 0] : 0
+              }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              className="mb-3"
             >
-              {t('screenLock.useBiometric', 'Or use {{method}}', { method: getBiometricLabel() })}
-            </motion.p>
-          )}
+              <motion.div 
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300",
+                  unlocking ? "bg-green-500/20" : "bg-primary/20"
+                )}
+                animate={{
+                  boxShadow: unlocking 
+                    ? ['0 0 0 0 rgba(34, 197, 94, 0)', '0 0 20px 8px rgba(34, 197, 94, 0.4)', '0 0 0 0 rgba(34, 197, 94, 0)']
+                    : '0 0 0 0 rgba(0, 122, 255, 0)'
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                <AnimatePresence mode="wait">
+                  {unlocking ? (
+                    <motion.div
+                      key="unlocked"
+                      initial={{ scale: 0, rotate: -30 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                    >
+                      <LockOpen className="w-5 h-5 text-green-500" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="locked"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0, rotate: 30 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                    >
+                      <Lock className="w-5 h-5 text-primary" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </motion.div>
+
+            {/* Title */}
+            <h1 className="text-base font-semibold text-foreground mb-0.5">
+              {unlocking ? t('screenLock.unlocked', 'Unlocked') : t('screenLock.enterPasscode', 'Enter Passcode')}
+            </h1>
+
+            {/* Subtitle / Error */}
+            <p className={cn(
+              "text-xs mb-4 flex items-center gap-1",
+              error ? "text-destructive" : "text-muted-foreground"
+            )}>
+              {error ? (
+                <>
+                  <AlertCircle className="w-3 h-3" />
+                  {t('screenLock.wrongPasscode', 'Wrong passcode')}
+                </>
+              ) : unlocking ? (
+                t('screenLock.accessGranted', 'Access granted')
+              ) : (
+                t('screenLock.viewSensitiveData', 'To view sensitive data')
+              )}
+            </p>
+
+            {/* Dots - brighter glow */}
+            <motion.div
+              animate={shake ? { x: [-6, 6, -6, 6, 0] } : {}}
+              transition={{ duration: 0.3 }}
+              className="flex justify-center gap-2.5 mb-5"
+            >
+              {Array.from({ length: PASSCODE_LENGTH }).map((_, i) => {
+                const isFilled = i < passcode.length;
+                const isLatest = i === passcode.length - 1 && passcode.length > 0;
+                
+                return (
+                  <motion.div
+                    key={i}
+                    animate={{ 
+                      scale: isLatest ? [1, 1.4, 1] : 1,
+                      backgroundColor: isFilled 
+                        ? error ? 'hsl(var(--destructive))' 
+                        : unlocking ? 'rgb(34, 197, 94)'
+                        : 'hsl(var(--primary))'
+                        : 'hsl(var(--muted))'
+                    }}
+                    transition={{ 
+                      scale: { duration: 0.15, ease: "easeOut" },
+                      backgroundColor: { duration: 0.1 }
+                    }}
+                    className={cn(
+                      "w-2.5 h-2.5 rounded-full",
+                      isFilled && !error && !unlocking && "shadow-[0_0_12px_3px_hsl(var(--primary)/0.6)]",
+                      isFilled && error && "shadow-[0_0_12px_3px_hsl(var(--destructive)/0.6)]",
+                      isFilled && unlocking && "shadow-[0_0_12px_3px_rgba(34,197,94,0.6)]"
+                    )}
+                  />
+                );
+              })}
+            </motion.div>
+
+            {/* Compact Keypad */}
+            <div className="grid grid-cols-3 gap-2">
+              {digits.map((digit) => (
+                <motion.button
+                  key={digit}
+                  whileTap={{ scale: 0.9, backgroundColor: 'hsl(var(--primary)/0.3)' }}
+                  onClick={() => handleDigitPress(digit)}
+                  disabled={unlocking}
+                  className="w-14 h-14 mx-auto rounded-full bg-muted/40 flex items-center justify-center text-lg font-semibold text-foreground hover:bg-muted/60 transition-colors disabled:opacity-50"
+                >
+                  {digit}
+                </motion.button>
+              ))}
+              
+              {/* Bottom row */}
+              {bottomRow.map((item, i) => (
+                <motion.button
+                  key={item || `empty-${i}`}
+                  whileTap={item ? { scale: 0.9 } : undefined}
+                  onClick={() => {
+                    if (item === 'biometric') handleBiometric();
+                    else if (item === 'delete') handleDelete();
+                    else if (item === '0') handleDigitPress('0');
+                  }}
+                  disabled={!item || unlocking}
+                  className={cn(
+                    "w-14 h-14 mx-auto rounded-full flex items-center justify-center transition-colors",
+                    item === null && "opacity-0 pointer-events-none",
+                    item === '0' && "bg-muted/40 hover:bg-muted/60",
+                    item === 'biometric' && "hover:bg-muted/40",
+                    item === 'delete' && "hover:bg-muted/40"
+                  )}
+                >
+                  {item === 'biometric' && (
+                    <Fingerprint className="w-5 h-5 text-primary" />
+                  )}
+                  {item === 'delete' && (
+                    <Delete className="w-4 h-4 text-muted-foreground" />
+                  )}
+                  {item === '0' && (
+                    <span className="text-lg font-semibold text-foreground">0</span>
+                  )}
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Biometric hint */}
+            {isBiometricEnabled && isBiometricAvailable && !unlocking && (
+              <p className="mt-4 text-[10px] text-center text-muted-foreground">
+                {t('screenLock.useBiometric', 'Or use {{method}}', { method: getBiometricLabel() })}
+              </p>
+            )}
           </motion.div>
         </motion.div>
       )}
