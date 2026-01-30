@@ -295,7 +295,7 @@ const Settings = () => {
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
   const [isScreenLockOpen, setIsScreenLockOpen] = useState(false);
-  const { isEnabled: isScreenLockEnabled } = useScreenLockContext();
+  const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused } = useScreenLockContext();
   const { isAdmin } = useUserRole();
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
   const { tap } = useHapticFeedback();
@@ -853,8 +853,20 @@ const Settings = () => {
           <SettingsItem
             icon={<ColoredIcon colorKey="lock"><ScanFace className="w-4 h-4" /></ColoredIcon>}
             label={t("screenLock.title")}
-            value={isScreenLockEnabled ? t("settings.enabled") || "On" : t("settings.disabled") || "Off"}
-            valueClassName={isScreenLockEnabled ? "text-sm font-medium text-green-500" : "text-muted-foreground text-sm"}
+            value={
+              isScreenLockPaused 
+                ? t("screenLock.pausedDesc") || "Paused" 
+                : isScreenLockEnabled 
+                  ? t("settings.enabled") || "On" 
+                  : t("settings.disabled") || "Off"
+            }
+            valueClassName={
+              isScreenLockPaused 
+                ? "text-sm font-medium text-yellow-500" 
+                : isScreenLockEnabled 
+                  ? "text-sm font-medium text-green-500" 
+                  : "text-muted-foreground text-sm"
+            }
             onClick={() => setIsScreenLockOpen(true)}
           />
           {/* Haptic Feedback */}
