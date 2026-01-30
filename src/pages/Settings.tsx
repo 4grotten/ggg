@@ -28,36 +28,39 @@ import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { isHapticEnabled, setHapticEnabled, useHapticFeedback } from "@/hooks/useHapticFeedback";
 
-// Telegram-style colored icon backgrounds
-const iconColors: Record<string, { bg: string; text: string }> = {
-  user: { bg: 'bg-blue-500', text: 'text-white' },
-  briefcase: { bg: 'bg-orange-500', text: 'text-white' },
-  users: { bg: 'bg-violet-500', text: 'text-white' },
-  sliders: { bg: 'bg-indigo-500', text: 'text-white' },
-  globe: { bg: 'bg-purple-500', text: 'text-white' },
-  palette: { bg: 'bg-pink-500', text: 'text-white' },
-  receipt: { bg: 'bg-green-500', text: 'text-white' },
-  code: { bg: 'bg-primary', text: 'text-primary-foreground' },
-  privacy: { bg: 'bg-gray-500', text: 'text-white' },
-  message: { bg: 'bg-green-600', text: 'text-white' },
-  download: { bg: 'bg-orange-500', text: 'text-white' },
-  laptop: { bg: 'bg-sky-500', text: 'text-white' },
-  apofiz: { bg: 'bg-black dark:bg-zinc-800', text: 'text-white' },
-  userplus: { bg: 'bg-blue-500', text: 'text-white' },
-  lock: { bg: 'bg-rose-500', text: 'text-white' },
-  admin: { bg: 'bg-amber-500', text: 'text-white' },
-  vibrate: { bg: 'bg-teal-500', text: 'text-white' },
+// Telegram-style colored icon backgrounds with gradients
+const iconGradients: Record<string, string> = {
+  user: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+  briefcase: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
+  users: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+  sliders: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
+  globe: 'linear-gradient(135deg, #a855f7 0%, #c084fc 100%)',
+  palette: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+  receipt: 'linear-gradient(135deg, #22c55e 0%, #4ade80 100%)',
+  code: 'linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%)',
+  privacy: 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)',
+  message: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+  download: 'linear-gradient(135deg, #f97316 0%, #fbbf24 100%)',
+  laptop: 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)',
+  apofiz: 'linear-gradient(135deg, #18181b 0%, #3f3f46 100%)',
+  userplus: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+  lock: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)',
+  admin: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+  vibrate: 'linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)',
 };
 
 interface ColoredIconProps {
   children: React.ReactNode;
-  colorKey: keyof typeof iconColors;
+  colorKey: keyof typeof iconGradients;
 }
 
 const ColoredIcon = ({ children, colorKey }: ColoredIconProps) => {
-  const colors = iconColors[colorKey] || iconColors.user;
+  const gradient = iconGradients[colorKey] || iconGradients.user;
   return (
-    <div className={`w-8 h-8 rounded-lg ${colors.bg} ${colors.text} flex items-center justify-center`}>
+    <div 
+      className="w-8 h-8 rounded-lg text-white flex items-center justify-center"
+      style={{ background: gradient }}
+    >
       {children}
     </div>
   );
