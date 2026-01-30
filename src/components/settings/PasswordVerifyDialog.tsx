@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { login } from '@/services/api/authApi';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -30,6 +31,7 @@ export const PasswordVerifyDialog = ({
   description,
 }: PasswordVerifyDialogProps) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -43,26 +45,21 @@ export const PasswordVerifyDialog = ({
       return;
     }
 
+    // Get phone number from current user
+    const phoneNumber = user?.phone_number;
+    if (!phoneNumber) {
+      setError(t('auth.userNotFound', 'User not found'));
+      return;
+    }
+
     setIsVerifying(true);
     setError('');
 
     try {
-      // Get current user email
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user?.email) {
-        setError(t('auth.userNotFound', 'User not found'));
-        setIsVerifying(false);
-        return;
-      }
+      // Authenticate via API with phone + password
+      const response = await login(phoneNumber, password);
 
-      // Re-authenticate with password
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: password,
-      });
-
-      if (authError) {
+      if (response.error || !response.data?.token) {
         setError(t('auth.wrongPassword', 'Wrong password'));
         setShake(true);
         setTimeout(() => setShake(false), 400);
@@ -80,13 +77,13 @@ export const PasswordVerifyDialog = ({
       }, 600);
     } catch (err) {
       console.error('Password verification error:', err);
-      setError(t('auth.verificationFailed', 'Verification failed'));
+      setError(t('auth.wrongPassword', 'Wrong password'));
       setShake(true);
       setTimeout(() => setShake(false), 400);
     } finally {
       setIsVerifying(false);
     }
-  }, [password, t, onOpenChange, onSuccess]);
+  }, [password, user, t, onOpenChange, onSuccess]);
 
   const handleClose = () => {
     setPassword('');
