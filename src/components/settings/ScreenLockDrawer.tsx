@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Shield } from 'lucide-react';
@@ -17,7 +17,7 @@ interface ScreenLockDrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type SetupStep = 'main' | 'create-passcode' | 'confirm-passcode' | 'verify-passcode' | 'timeout-select';
+type SetupStep = 'main' | 'create-passcode' | 'verify-passcode' | 'timeout-select';
 
 const PASSCODE_LENGTH = 4;
 
@@ -52,6 +52,29 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   const [passcode, setPasscode] = useState('');
   const [confirmPasscode, setConfirmPasscode] = useState('');
   const [error, setError] = useState('');
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  
+  // Track which phase of passcode entry we're in (1 = first entry, 2 = confirm)
+  const [entryPhase, setEntryPhase] = useState<1 | 2>(1);
+  
+  // Ref to track if we should auto-advance
+  const autoAdvanceRef = useRef(false);
+
+  // Detect keyboard open/close via viewport resize (mobile)
+  useEffect(() => {
+    if (typeof visualViewport === 'undefined') return;
+    
+    const initialHeight = window.innerHeight;
+    
+    const handleResize = () => {
+      const currentHeight = visualViewport?.height ?? window.innerHeight;
+      // If viewport shrinks significantly, keyboard is likely open
+      setIsKeyboardOpen(currentHeight < initialHeight * 0.75);
+    };
+
+    visualViewport?.addEventListener('resize', handleResize);
+    return () => visualViewport?.removeEventListener('resize', handleResize);
+  }, []);
 
   // Reset state when drawer closes
   useEffect(() => {
@@ -60,40 +83,48 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
       setPasscode('');
       setConfirmPasscode('');
       setError('');
+      setEntryPhase(1);
     }
   }, [isOpen]);
 
-  const handleEnableToggle = useCallback((checked: boolean) => {
-    if (checked) {
-      // Start setup flow
-      setStep('create-passcode');
-    } else {
-      // Need to verify current passcode first
-      setStep('verify-passcode');
-    }
-  }, []);
-
-  const handlePasscodeSubmit = useCallback(() => {
-    if (step === 'create-passcode') {
-      if (passcode.length < PASSCODE_LENGTH) {
-        setError(t('screenLock.passcodeTooShort', 'Passcode must be {{length}} digits', { length: PASSCODE_LENGTH }));
-        return;
-      }
-      setStep('confirm-passcode');
-      setConfirmPasscode('');
-      setError('');
-    } else if (step === 'confirm-passcode') {
-      if (confirmPasscode !== passcode) {
-        setError(t('screenLock.passcodesNoMatch', "Passcodes don't match"));
+  // Auto-advance to confirm phase when first passcode is complete
+  useEffect(() => {
+    if (step === 'create-passcode' && entryPhase === 1 && passcode.length === PASSCODE_LENGTH) {
+      autoAdvanceRef.current = true;
+      // Small delay for visual feedback
+      const timer = setTimeout(() => {
+        setEntryPhase(2);
         setConfirmPasscode('');
-        return;
+        setError('');
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [step, entryPhase, passcode]);
+
+  // Auto-submit when confirm passcode is complete
+  useEffect(() => {
+    if (step === 'create-passcode' && entryPhase === 2 && confirmPasscode.length === PASSCODE_LENGTH) {
+      // Check if matches
+      if (confirmPasscode === passcode) {
+        enableScreenLock(passcode);
+        toast.success(t('screenLock.enabled', 'Screen lock enabled'));
+        setStep('main');
+        setPasscode('');
+        setConfirmPasscode('');
+        setEntryPhase(1);
+      } else {
+        setError(t('screenLock.passcodesNoMatch', "Passcodes don't match"));
+        // Reset confirm after shake animation
+        setTimeout(() => {
+          setConfirmPasscode('');
+        }, 400);
       }
-      enableScreenLock(passcode);
-      toast.success(t('screenLock.enabled', 'Screen lock enabled'));
-      setStep('main');
-      setPasscode('');
-      setConfirmPasscode('');
-    } else if (step === 'verify-passcode') {
+    }
+  }, [step, entryPhase, confirmPasscode, passcode, enableScreenLock, t]);
+
+  // Auto-submit verify passcode
+  useEffect(() => {
+    if (step === 'verify-passcode' && passcode.length === PASSCODE_LENGTH) {
       if (verifyPasscode(passcode)) {
         disableScreenLock();
         toast.success(t('screenLock.disabled', 'Screen lock disabled'));
@@ -101,14 +132,25 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         setPasscode('');
       } else {
         setError(t('screenLock.wrongPasscode', 'Wrong passcode'));
-        setPasscode('');
+        setTimeout(() => setPasscode(''), 400);
       }
     }
-  }, [step, passcode, confirmPasscode, enableScreenLock, verifyPasscode, disableScreenLock, t]);
+  }, [step, passcode, verifyPasscode, disableScreenLock, t]);
+
+  const handleEnableToggle = useCallback((checked: boolean) => {
+    if (checked) {
+      setStep('create-passcode');
+      setEntryPhase(1);
+      setPasscode('');
+      setConfirmPasscode('');
+    } else {
+      setStep('verify-passcode');
+      setPasscode('');
+    }
+  }, []);
 
   const handleBiometricToggle = useCallback(async (checked: boolean) => {
     if (checked) {
-      // Register biometric
       try {
         const success = await registerBiometric('screen-lock');
         if (success) {
@@ -177,8 +219,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
 
   const renderMainContent = () => (
     <div className="space-y-4">
-      {/* Enable/Disable Toggle */}
-        <AnimatedDrawerContainer>
+      <AnimatedDrawerContainer>
         <AnimatedDrawerItem index={0}>
           <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
             <div className="flex items-center gap-3">
@@ -208,10 +249,8 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           </div>
         </AnimatedDrawerItem>
 
-        {/* Biometric option (show even if unavailable, but disabled) */}
         {biometricRow}
 
-        {/* Lock timeout option */}
         {isEnabled && (
           <AnimatedDrawerItem index={2}>
             <button
@@ -242,7 +281,6 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         )}
       </AnimatedDrawerContainer>
 
-      {/* Security note */}
       <AnimatedDrawerContainer>
         <AnimatedDrawerItem index={3}>
           <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-xl">
@@ -256,85 +294,142 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     </div>
   );
 
-  const renderPasscodeInput = () => (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
-        >
-          <Lock className="w-8 h-8 text-primary" />
-        </motion.div>
-        <h2 className="text-lg font-semibold text-foreground">
-          {step === 'create-passcode' && t('screenLock.createPasscode', 'Create Passcode')}
-          {step === 'confirm-passcode' && t('screenLock.confirmPasscode', 'Confirm Passcode')}
-          {step === 'verify-passcode' && t('screenLock.enterPasscode', 'Enter Passcode')}
-        </h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          {step === 'create-passcode' && t('screenLock.createDesc', 'Enter a {{length}}-digit passcode', { length: PASSCODE_LENGTH })}
-          {step === 'confirm-passcode' && t('screenLock.confirmDesc', 'Re-enter your passcode')}
-          {step === 'verify-passcode' && t('screenLock.verifyDesc', 'Enter your current passcode to disable')}
-        </p>
+  const renderPasscodeInput = () => {
+    const isCreating = step === 'create-passcode';
+    const currentValue = isCreating 
+      ? (entryPhase === 1 ? passcode : confirmPasscode)
+      : passcode;
+    
+    const handleChange = (next: string) => {
+      setError('');
+      if (isCreating) {
+        if (entryPhase === 1) {
+          setPasscode(next);
+        } else {
+          setConfirmPasscode(next);
+        }
+      } else {
+        setPasscode(next);
+      }
+    };
+
+    const getTitle = () => {
+      if (step === 'verify-passcode') {
+        return t('screenLock.enterPasscode', 'Enter Passcode');
+      }
+      return entryPhase === 1 
+        ? t('screenLock.createPasscode', 'Create Passcode')
+        : t('screenLock.confirmPasscode', 'Confirm Passcode');
+    };
+
+    const getDescription = () => {
+      if (step === 'verify-passcode') {
+        return t('screenLock.verifyDesc', 'Enter your current passcode to disable');
+      }
+      return entryPhase === 1 
+        ? t('screenLock.createDesc', 'Enter a {{length}}-digit passcode', { length: PASSCODE_LENGTH })
+        : t('screenLock.confirmDesc', 'Re-enter your passcode');
+    };
+
+    return (
+      <div 
+        className={`flex flex-col transition-all duration-300 ${
+          isKeyboardOpen ? 'justify-start pt-4' : 'justify-end min-h-[50vh]'
+        }`}
+      >
+        <div className="space-y-6">
+          {/* Header with step indicators */}
+          <div className="text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
+            >
+              <Lock className="w-8 h-8 text-primary" />
+            </motion.div>
+            
+            {/* Step indicator for create flow */}
+            {isCreating && (
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <motion.div 
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    entryPhase >= 1 ? 'bg-primary' : 'bg-muted'
+                  }`}
+                  animate={{ scale: entryPhase === 1 ? 1.2 : 1 }}
+                />
+                <motion.div 
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    entryPhase >= 2 ? 'bg-primary' : 'bg-muted'
+                  }`}
+                  animate={{ scale: entryPhase === 2 ? 1.2 : 1 }}
+                />
+              </div>
+            )}
+            
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${step}-${entryPhase}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <h2 className="text-lg font-semibold text-foreground">
+                  {getTitle()}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {getDescription()}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Passcode dots */}
+          <PasscodeMatchInput
+            key={`${step}-${entryPhase}`}
+            value={currentValue}
+            onChange={handleChange}
+            length={PASSCODE_LENGTH}
+            compareTo={isCreating && entryPhase === 2 ? passcode : undefined}
+            autoFocus
+          />
+
+          {/* Error message */}
+          <AnimatePresence>
+            {error && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-destructive text-sm text-center flex items-center justify-center gap-1"
+              >
+                <AlertCircle className="w-4 h-4" />
+                {error}
+              </motion.p>
+            )}
+          </AnimatePresence>
+
+          {/* Cancel button */}
+          <div className="flex justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setStep('main');
+                setPasscode('');
+                setConfirmPasscode('');
+                setError('');
+                setEntryPhase(1);
+              }}
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+          </div>
+        </div>
       </div>
-
-      {/* Passcode input (step-by-step with match feedback) */}
-      <PasscodeMatchInput
-        value={step === 'confirm-passcode' ? confirmPasscode : passcode}
-        onChange={(next) => {
-          if (step === 'confirm-passcode') setConfirmPasscode(next);
-          else setPasscode(next);
-          setError('');
-        }}
-        length={PASSCODE_LENGTH}
-        compareTo={step === 'confirm-passcode' ? passcode : undefined}
-        autoFocus
-      />
-
-      {/* Error message */}
-      <AnimatePresence>
-        {error && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="text-destructive text-sm text-center flex items-center justify-center gap-1"
-          >
-            <AlertCircle className="w-4 h-4" />
-            {error}
-          </motion.p>
-        )}
-      </AnimatePresence>
-
-      {/* Buttons */}
-      <div className="flex gap-3">
-        <Button
-          variant="outline"
-          className="flex-1"
-          onClick={() => {
-            setStep('main');
-            setPasscode('');
-            setConfirmPasscode('');
-            setError('');
-          }}
-        >
-          {t('common.cancel', 'Cancel')}
-        </Button>
-        <Button
-          className="flex-1"
-          onClick={handlePasscodeSubmit}
-          disabled={(step === 'confirm-passcode' ? confirmPasscode : passcode).length < PASSCODE_LENGTH}
-        >
-          {step === 'confirm-passcode' 
-            ? t('screenLock.enable', 'Enable')
-            : t('common.continue', 'Continue')
-          }
-        </Button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderTimeoutSelect = () => (
     <div className="space-y-4">
@@ -373,7 +468,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
 
         <div className="px-4 pb-8 overflow-y-auto">
           {step === 'main' && renderMainContent()}
-          {(step === 'create-passcode' || step === 'confirm-passcode' || step === 'verify-passcode') && renderPasscodeInput()}
+          {(step === 'create-passcode' || step === 'verify-passcode') && renderPasscodeInput()}
           {step === 'timeout-select' && renderTimeoutSelect()}
         </div>
       </DrawerContent>
