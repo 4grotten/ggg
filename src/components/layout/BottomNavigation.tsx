@@ -102,7 +102,7 @@ export const BottomNavigation = () => {
         <div className="flex items-center justify-around relative">
           {/* iOS 26 liquid glass selector */}
           <motion.div
-            className="absolute overflow-hidden backdrop-blur-xl rounded-[22px] pointer-events-none"
+            className="absolute overflow-hidden backdrop-blur-xl rounded-[22px] pointer-events-none z-0"
             initial={false}
             animate={{
               left: selectorStyle.left,
