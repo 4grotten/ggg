@@ -1240,6 +1240,8 @@
     "hideDataDesc": "Ocultar saldos y números de tarjeta",
     "hideDataEnabled": "Datos ocultos",
     "hideDataDisabled": "Datos visibles",
+    "revealDataTitle": "Ver Datos Ocultos",
+    "revealDataDesc": "Ingresa el código para ver tus datos",
     "enable": "Activar",
     "unlockApp": "Desbloquea para continuar",
     "useBiometric": "O usa {{method}}",

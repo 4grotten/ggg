@@ -1240,6 +1240,8 @@
     "hideDataDesc": "إخفاء الأرصدة وأرقام البطاقات",
     "hideDataEnabled": "تم إخفاء البيانات",
     "hideDataDisabled": "البيانات مرئية",
+    "revealDataTitle": "عرض البيانات المخفية",
+    "revealDataDesc": "أدخل رمز المرور لعرض البيانات",
     "enable": "تمكين",
     "unlockApp": "افتح للمتابعة",
     "useBiometric": "أو استخدم {{method}}",
