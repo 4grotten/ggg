@@ -509,7 +509,12 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     );
 
     return (
-      <div className="flex flex-col">
+      <div 
+        className={cn(
+          "flex flex-col transition-all duration-200",
+          isKeyboardOpen && "pb-[env(safe-area-inset-bottom)]"
+        )}
+      >
         {/* Invisible but clickable input overlay */}
         <div className="relative">
           <input
@@ -531,9 +536,12 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             aria-label={t('screenLock.passcode', 'Passcode Lock')}
           />
 
-          <div className="space-y-3">
-            {/* Animated icon */}
-            <PasscodeLockAnimation />
+          <div className={cn(
+            "space-y-3 transition-all duration-200",
+            isKeyboardOpen && "scale-[0.9] origin-top"
+          )}>
+            {/* Animated icon - hide when keyboard is open */}
+            {!isKeyboardOpen && <PasscodeLockAnimation />}
 
             {/* For verify mode - single row of dots */}
             {step === 'verify-passcode' && (
