@@ -54,13 +54,25 @@ export const BottomNavigation = () => {
         const containerRect = container.getBoundingClientRect();
         const tabRect = activeTab.getBoundingClientRect();
         
-        // Expand selector horizontally
-        const extraPadding = 6;
+        // For edge tabs, extend to container edges; for middle tabs, add some padding
+        let left = tabRect.left - containerRect.left;
+        let width = tabRect.width;
         
-        setSelectorStyle({
-          left: tabRect.left - containerRect.left - extraPadding,
-          width: tabRect.width + extraPadding * 2,
-        });
+        if (activeIndex === 0) {
+          // First tab - extend to left edge
+          width = width + left;
+          left = 0;
+        } else if (activeIndex === navItems.length - 1) {
+          // Last tab - extend to right edge
+          width = containerRect.width - left;
+        } else {
+          // Middle tabs - add some horizontal padding
+          const extraPadding = 6;
+          left = left - extraPadding;
+          width = width + extraPadding * 2;
+        }
+        
+        setSelectorStyle({ left, width });
       }
     }
   }, [activeIndex, isEdgeTab]);
