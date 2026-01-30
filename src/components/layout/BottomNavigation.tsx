@@ -83,84 +83,24 @@ export const BottomNavigation = () => {
     <nav className="fixed bottom-4 left-0 right-0 z-50 px-4 max-w-[800px] mx-auto">
       <div className="bg-white/50 dark:bg-card/70 backdrop-blur-2xl rounded-3xl shadow-lg border border-border/50 px-2 py-1.5 max-w-[400px] mx-auto">
         <div className="flex items-center justify-around relative">
-          {/* iOS 26-style liquid glass selector */}
+          {/* iOS 26 liquid glass selector */}
           <motion.div
-            className="absolute overflow-hidden"
+            className="absolute overflow-hidden backdrop-blur-xl"
             initial={false}
             animate={{
               left: selectorStyle.left,
               width: selectorStyle.width,
-              borderRadius: isEdgeTab ? 26 : 22,
-              scaleY: hasMountedRef.current ? [1, 1.08, 1] : 1,
+              borderRadius: isEdgeTab ? 24 : 20,
             }}
-            transition={
-              hasMountedRef.current
-                ? { 
-                    type: "spring", 
-                    stiffness: 300, 
-                    damping: 25, 
-                    mass: 1.2,
-                    scaleY: { duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }
-                  }
-                : { duration: 0 }
-            }
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
             style={{
               height: isEdgeTab ? "calc(100% - 4px)" : "calc(100% - 6px)",
               top: isEdgeTab ? "2px" : "3px",
+              background: "linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%)",
+              boxShadow: "inset 0 1px 2px rgba(255,255,255,0.5), 0 0 12px rgba(255,255,255,0.1)",
             }}
           >
-            {/* Liquid morphing background */}
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/50 to-white/35 dark:from-white/20 dark:via-white/12 dark:to-white/6 backdrop-blur-2xl"
-              animate={{
-                background: isEdgeTab 
-                  ? "linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0.4) 100%)"
-                  : "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.3) 100%)"
-              }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            />
-            
-            {/* Animated liquid shine */}
-            <motion.div 
-              className="absolute inset-0"
-              animate={{
-                background: [
-                  "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
-                  "linear-gradient(90deg, transparent 100%, rgba(255,255,255,0.4) 150%, transparent 200%)"
-                ],
-                x: ["-100%", "100%"]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 3,
-                ease: "easeInOut"
-              }}
-            />
-            
-            {/* Inner glow with liquid effect */}
-            <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/25 to-white/50 dark:via-white/8 dark:to-white/15" />
-            
-            {/* Soft border with glow */}
-            <motion.div 
-              className="absolute inset-0 ring-1 ring-inset ring-white/60 dark:ring-white/25"
-              style={{ borderRadius: "inherit" }}
-              animate={{
-                boxShadow: isEdgeTab 
-                  ? "inset 0 1px 2px rgba(255,255,255,0.5), 0 0 20px rgba(255,255,255,0.15)"
-                  : "inset 0 1px 1px rgba(255,255,255,0.3), 0 0 10px rgba(255,255,255,0.1)"
-              }}
-            />
-            
-            {/* Bottom reflection bar */}
-            <motion.div 
-              className="absolute bottom-0.5 left-1/2 h-[2px] bg-gradient-to-r from-transparent via-white/70 dark:via-white/40 to-transparent"
-              animate={{
-                width: isEdgeTab ? "85%" : "70%",
-                x: "-50%"
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            />
+            <div className="absolute inset-0 ring-1 ring-inset ring-white/50 dark:ring-white/20" style={{ borderRadius: "inherit" }} />
           </motion.div>
           
           {navItems.map((item, index) => {
