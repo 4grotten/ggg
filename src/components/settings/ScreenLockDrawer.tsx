@@ -63,6 +63,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
   const [confirmPasscode, setConfirmPasscode] = useState('');
   const [error, setError] = useState('');
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [shake, setShake] = useState(false);
   const [showDisableDialog, setShowDisableDialog] = useState(false);
   const [pendingDisableAction, setPendingDisableAction] = useState<DisableAction>(null);
@@ -94,7 +95,10 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     
     const handleResize = () => {
       const currentHeight = visualViewport?.height ?? window.innerHeight;
-      setIsKeyboardOpen(currentHeight < initialHeight * 0.75);
+      const heightDiff = initialHeight - currentHeight;
+      const isOpen = heightDiff > 150; // Keyboard is open if diff > 150px
+      setIsKeyboardOpen(isOpen);
+      setKeyboardHeight(isOpen ? heightDiff : 0);
     };
 
     visualViewport?.addEventListener('resize', handleResize);
@@ -619,10 +623,11 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     <>
       <Drawer open={isOpen} onOpenChange={onOpenChange}>
         <DrawerContent 
-          className={cn(
-            "transition-all duration-200",
-            isPasscodeMode && isKeyboardOpen ? "max-h-[45vh]" : "max-h-[90vh]"
-          )}
+          className="transition-all duration-200 max-h-[90vh]"
+          style={isPasscodeMode && isKeyboardOpen ? { 
+            transform: `translateY(-${Math.min(keyboardHeight, 300)}px)`,
+            marginBottom: `${Math.min(keyboardHeight, 300)}px`
+          } : undefined}
         >
           <DrawerHeader className="relative flex items-center justify-between py-3 px-4">
             <DrawerTitle className="flex items-center gap-2 text-base font-semibold">
