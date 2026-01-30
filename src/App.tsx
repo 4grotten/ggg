@@ -58,7 +58,7 @@ import AdminPanel from "./pages/AdminPanel";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { AvatarSync } from "./components/AvatarSync";
 import ScrollToTop from "./components/ScrollToTop";
 import { ScreenLockOverlay } from "./components/settings/ScreenLockOverlay";
@@ -87,7 +87,8 @@ const hiddenNavRoutes = [
 
 const AppContent = () => {
   const location = useLocation();
-  const { isLocked, isBiometricEnabled, unlock, unlockWithBiometric } = useScreenLockContext();
+  const { isLocked, isBiometricEnabled, unlock, unlockWithBiometric, isEnabled } = useScreenLockContext();
+  const { isAuthenticated } = useAuth();
   
   // Update theme-color meta tag when theme changes
   useThemeColor();
@@ -95,6 +96,9 @@ const AppContent = () => {
   const shouldShowNav = !hiddenNavRoutes.some(route => 
     location.pathname.startsWith(route)
   );
+  
+  // Only show screen lock for authenticated users
+  const shouldShowLock = isLocked && isEnabled && isAuthenticated;
 
   // Page transition variants
   const pageVariants = {
@@ -200,13 +204,15 @@ const AppContent = () => {
         )}
       </AnimatePresence>
       
-      {/* Screen Lock Overlay */}
-      <ScreenLockOverlay
-        isLocked={isLocked}
-        isBiometricEnabled={isBiometricEnabled}
-        onUnlock={unlock}
-        onBiometricUnlock={unlockWithBiometric}
-      />
+      {/* Screen Lock Overlay - only for authenticated users */}
+      {shouldShowLock && (
+        <ScreenLockOverlay
+          isLocked={isLocked}
+          isBiometricEnabled={isBiometricEnabled}
+          onUnlock={unlock}
+          onBiometricUnlock={unlockWithBiometric}
+        />
+      )}
     </>
   );
 };
