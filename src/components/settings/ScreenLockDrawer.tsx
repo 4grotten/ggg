@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Shield, X } from 'lucide-react';
+import { Lock, LockOpen, Fingerprint, Clock, ChevronRight, Check, AlertCircle, Shield, X, EyeOff } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -41,11 +41,13 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
     isEnabled,
     isBiometricEnabled,
     lockTimeout,
+    isHideDataEnabled,
     enableScreenLock,
     disableScreenLock,
     verifyPasscode,
     setBiometricEnabled,
     setLockTimeout,
+    setHideDataEnabled,
   } = useScreenLockContext();
 
   const [step, setStep] = useState<SetupStep>('main');
@@ -317,40 +319,70 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
           </div>
         </AnimatedDrawerItem>
 
-        {biometricRow}
-
         {isEnabled && (
-          <AnimatedDrawerItem index={2}>
-            <button
-              onClick={() => setStep('timeout-select')}
-              className="w-full flex items-center justify-between p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-orange-500" />
+          <>
+            {biometricRow}
+
+            <AnimatedDrawerItem index={2}>
+              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center">
+                    <EyeOff className="w-5 h-5 text-violet-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">
+                      {t('screenLock.hideData', 'Hide Sensitive Data')}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {t('screenLock.hideDataDesc', 'Hide balances and card numbers')}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="font-medium text-foreground">
-                    {t('screenLock.autoLock', 'Auto-lock')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {t('screenLock.autoLockDesc', 'Lock after inactivity')}
-                  </p>
+                <Switch
+                  checked={isHideDataEnabled}
+                  onCheckedChange={(checked) => {
+                    setHideDataEnabled(checked);
+                    toast.success(checked 
+                      ? t('screenLock.hideDataEnabled', 'Data hidden') 
+                      : t('screenLock.hideDataDisabled', 'Data visible')
+                    );
+                  }}
+                />
+              </div>
+            </AnimatedDrawerItem>
+
+            <AnimatedDrawerItem index={3}>
+              <button
+                onClick={() => setStep('timeout-select')}
+                className="w-full flex items-center justify-between p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-orange-500" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-medium text-foreground">
+                      {t('screenLock.autoLock', 'Auto-lock')}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {t('screenLock.autoLockDesc', 'Lock after inactivity')}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-primary font-medium">
-                  {getTimeoutLabel(lockTimeout)}
-                </span>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </div>
-            </button>
-          </AnimatedDrawerItem>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-primary font-medium">
+                    {getTimeoutLabel(lockTimeout)}
+                  </span>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </button>
+            </AnimatedDrawerItem>
+          </>
         )}
       </AnimatedDrawerContainer>
 
       <AnimatedDrawerContainer>
-        <AnimatedDrawerItem index={3}>
+        <AnimatedDrawerItem index={4}>
           <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-xl">
             <Shield className="w-5 h-5 text-primary mt-0.5 shrink-0" />
             <p className="text-sm text-muted-foreground">

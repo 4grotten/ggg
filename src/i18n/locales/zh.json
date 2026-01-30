@@ -1217,5 +1217,47 @@
         }
       }
     }
+  },
+  "screenLock": {
+    "title": "屏幕锁定",
+    "passcode": "密码锁",
+    "enabledDesc": "已设置4位密码",
+    "disabledDesc": "使用密码保护您的应用",
+    "biometricDesc": "使用生物识别快速解锁",
+    "autoLock": "自动锁定",
+    "autoLockDesc": "闲置后锁定",
+    "securityNote": "屏幕锁定为保护您的敏感数据增加了额外的安全层。",
+    "createPasscode": "创建密码",
+    "confirmPasscode": "确认密码",
+    "enterPasscode": "输入密码",
+    "createDesc": "输入{{length}}位密码",
+    "confirmDesc": "重新输入您的密码",
+    "verifyDesc": "输入当前密码以禁用",
+    "passcodeTooShort": "密码必须是{{length}}位数字",
+    "passcodesNoMatch": "密码不匹配",
+    "wrongPasscode": "密码错误",
+    "enabled": "屏幕锁定已启用",
+    "disabled": "屏幕锁定已禁用",
+    "biometricEnabled": "{{method}}已启用",
+    "biometricDisabled": "{{method}}已禁用",
+    "biometricFailed": "无法启用{{method}}",
+    "biometricUnavailable": "此设备不可用",
+    "timeoutUpdated": "锁定超时已更新",
+    "hideData": "隐藏敏感数据",
+    "hideDataDesc": "隐藏余额和卡号",
+    "hideDataEnabled": "数据已隐藏",
+    "hideDataDisabled": "数据可见",
+    "enable": "启用",
+    "unlockApp": "解锁以继续",
+    "useBiometric": "或使用{{method}}",
+    "attempts": "次尝试",
+    "timeout": {
+      "immediately": "立即",
+      "1min": "1分钟后",
+      "5min": "5分钟后",
+      "15min": "15分钟后",
+      "30min": "30分钟后",
+      "never": "永不"
+    }
   }
 }

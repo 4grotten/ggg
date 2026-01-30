@@ -1210,5 +1210,47 @@
         }
       }
     }
+  },
+  "screenLock": {
+    "title": "Bildschirmsperre",
+    "passcode": "Passcode-Sperre",
+    "enabledDesc": "4-stelliger Passcode ist eingestellt",
+    "disabledDesc": "Schützen Sie Ihre App mit einem Passcode",
+    "biometricDesc": "Schnelles Entsperren mit Biometrie",
+    "autoLock": "Automatische Sperre",
+    "autoLockDesc": "Sperren nach Inaktivität",
+    "securityNote": "Die Bildschirmsperre fügt eine zusätzliche Sicherheitsebene hinzu, um Ihre sensiblen Daten zu schützen.",
+    "createPasscode": "Passcode erstellen",
+    "confirmPasscode": "Passcode bestätigen",
+    "enterPasscode": "Passcode eingeben",
+    "createDesc": "Geben Sie einen {{length}}-stelligen Passcode ein",
+    "confirmDesc": "Passcode erneut eingeben",
+    "verifyDesc": "Aktuellen Passcode eingeben zum Deaktivieren",
+    "passcodeTooShort": "Passcode muss {{length}} Ziffern haben",
+    "passcodesNoMatch": "Passcodes stimmen nicht überein",
+    "wrongPasscode": "Falscher Passcode",
+    "enabled": "Bildschirmsperre aktiviert",
+    "disabled": "Bildschirmsperre deaktiviert",
+    "biometricEnabled": "{{method}} aktiviert",
+    "biometricDisabled": "{{method}} deaktiviert",
+    "biometricFailed": "{{method}} konnte nicht aktiviert werden",
+    "biometricUnavailable": "Auf diesem Gerät nicht verfügbar",
+    "timeoutUpdated": "Sperrzeitüberschreitung aktualisiert",
+    "hideData": "Sensible Daten verbergen",
+    "hideDataDesc": "Guthaben und Kartennummern verbergen",
+    "hideDataEnabled": "Daten verborgen",
+    "hideDataDisabled": "Daten sichtbar",
+    "enable": "Aktivieren",
+    "unlockApp": "Zum Fortfahren entsperren",
+    "useBiometric": "Oder {{method}} verwenden",
+    "attempts": "Versuche",
+    "timeout": {
+      "immediately": "Sofort",
+      "1min": "Nach 1 Minute",
+      "5min": "Nach 5 Minuten",
+      "15min": "Nach 15 Minuten",
+      "30min": "Nach 30 Minuten",
+      "never": "Nie"
+    }
   }
 }
