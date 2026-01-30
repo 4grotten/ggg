@@ -127,25 +127,33 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
 
-            {/* Lock Icon with unlock animation */}
+            {/* Lock Icon with unlock/error animation */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ 
                 scale: 1, 
-                opacity: 1
+                opacity: 1,
+                x: shake ? [-4, 4, -4, 4, -2, 2, 0] : 0
               }}
-              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 400, 
+                damping: 20,
+                x: { duration: 0.4, ease: "easeOut" }
+              }}
               className="mb-3 flex items-center justify-center"
             >
               <motion.div 
                 className={cn(
                   "w-12 h-12 rounded-full flex items-center justify-center",
-                  unlocking ? "bg-green-500/30" : "bg-primary/20"
+                  unlocking ? "bg-green-500/30" : error ? "bg-destructive/20" : "bg-primary/20"
                 )}
                 animate={{
-                  scale: unlocking ? [1, 1.15, 1] : 1,
+                  scale: unlocking ? [1, 1.15, 1] : error ? [1, 1.1, 1] : 1,
                   boxShadow: unlocking 
                     ? ['0 0 0 0 rgba(34, 197, 94, 0)', '0 0 30px 12px rgba(34, 197, 94, 0.5)', '0 0 20px 8px rgba(34, 197, 94, 0.3)']
+                    : error 
+                    ? ['0 0 0 0 rgba(239, 68, 68, 0)', '0 0 25px 10px rgba(239, 68, 68, 0.5)', '0 0 0 0 rgba(239, 68, 68, 0)']
                     : '0 0 0 0 rgba(0, 122, 255, 0)'
                 }}
                 transition={{ duration: 0.4 }}
@@ -163,11 +171,25 @@ export const DataUnlockDialog = ({ isOpen, onClose, onSuccess }: DataUnlockDialo
                   <motion.div
                     key="locked"
                     initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, rotate: 45, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                    animate={{ 
+                      scale: 1, 
+                      opacity: 1,
+                      rotate: error ? [0, -8, 8, -8, 8, 0] : 0
+                    }}
+                    transition={{ 
+                      type: 'spring', 
+                      stiffness: 400, 
+                      damping: 20,
+                      rotate: { duration: 0.4, ease: "easeOut" }
+                    }}
                   >
-                    <Lock className="w-6 h-6 text-primary" strokeWidth={2.5} />
+                    <Lock 
+                      className={cn(
+                        "w-6 h-6 transition-colors duration-200",
+                        error ? "text-destructive" : "text-primary"
+                      )} 
+                      strokeWidth={2.5} 
+                    />
                   </motion.div>
                 )}
               </motion.div>
