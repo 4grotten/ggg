@@ -1,4 +1,4 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -9,10 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAdminManagement } from "@/hooks/useAdminManagement";
 import { useState, useEffect } from "react";
-import { AdminSetting } from "@/types/admin";
+import { AdminSetting, AppRole } from "@/types/admin";
 
 // Settings field configuration for better UI
 const exchangeRateFields = [
@@ -130,9 +133,71 @@ export default function AdminPanel() {
   const { t } = useTranslation();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { settings, isLoading, updateSetting, getSettingsByCategory } = useAdminSettings();
+  const { admins, isLoading: adminsLoading, searchUser, addAdmin, removeAdmin } = useAdminManagement();
+  
+  // Admin management state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResult, setSearchResult] = useState<{
+    user_id: string;
+    phone: string | null;
+    first_name: string | null;
+    last_name: string | null;
+  } | null>(null);
+  const [selectedRole, setSelectedRole] = useState<AppRole>("admin");
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleUpdate = (category: string) => (key: string, value: number) => {
     updateSetting.mutate({ category, key, value });
+  };
+
+  const handleSearchUser = async () => {
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    setSearchResult(null);
+    try {
+      const result = await searchUser(searchQuery.trim());
+      setSearchResult(result);
+      if (!result) {
+        // Show toast for not found
+      }
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleAddAdmin = () => {
+    if (!searchResult) return;
+    addAdmin.mutate(
+      { userId: searchResult.user_id, role: selectedRole },
+      {
+        onSuccess: () => {
+          setSearchQuery("");
+          setSearchResult(null);
+        },
+      }
+    );
+  };
+
+  const getRoleBadgeVariant = (role: AppRole) => {
+    switch (role) {
+      case "admin":
+        return "destructive";
+      case "moderator":
+        return "secondary";
+      default:
+        return "outline";
+    }
+  };
+
+  const getRoleLabel = (role: AppRole) => {
+    switch (role) {
+      case "admin":
+        return "Администратор";
+      case "moderator":
+        return "Модератор";
+      default:
+        return "Пользователь";
+    }
   };
 
   // Access denied screen
@@ -231,18 +296,22 @@ export default function AdminPanel() {
             </div>
           ) : (
             <Tabs defaultValue="rates" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="rates" className="text-xs">
-                  <TrendingUp className="w-4 h-4 mr-1" />
+              <TabsList className="grid w-full grid-cols-4 mb-4">
+                <TabsTrigger value="rates" className="text-xs px-1">
+                  <TrendingUp className="w-4 h-4 mr-0.5" />
                   Курсы
                 </TabsTrigger>
-                <TabsTrigger value="fees" className="text-xs">
-                  <Percent className="w-4 h-4 mr-1" />
+                <TabsTrigger value="fees" className="text-xs px-1">
+                  <Percent className="w-4 h-4 mr-0.5" />
                   Комиссии
                 </TabsTrigger>
-                <TabsTrigger value="limits" className="text-xs">
-                  <DollarSign className="w-4 h-4 mr-1" />
+                <TabsTrigger value="limits" className="text-xs px-1">
+                  <DollarSign className="w-4 h-4 mr-0.5" />
                   Лимиты
+                </TabsTrigger>
+                <TabsTrigger value="admins" className="text-xs px-1">
+                  <Users className="w-4 h-4 mr-0.5" />
+                  Админы
                 </TabsTrigger>
               </TabsList>
 
@@ -333,6 +402,173 @@ export default function AdminPanel() {
                       {renderSettingsGroup(
                         "limits",
                         limitFields.filter((f) => f.group === "monthly")
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* Admins Tab */}
+              <TabsContent value="admins">
+                <div className="space-y-4">
+                  {/* Add Admin Card */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <UserPlus className="w-5 h-5 text-primary" />
+                        Добавить роль
+                      </CardTitle>
+                      <CardDescription>
+                        Поиск по номеру телефона или User ID
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Input
+                            placeholder="+971... или UUID"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSearchUser()}
+                          />
+                        </div>
+                        <Button
+                          size="icon"
+                          onClick={handleSearchUser}
+                          disabled={isSearching || !searchQuery.trim()}
+                        >
+                          {isSearching ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Search className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+
+                      {/* Search Result */}
+                      {searchResult && (
+                        <div className="p-3 border rounded-lg bg-muted/30 space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <Users className="w-5 h-5 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">
+                                {searchResult.first_name || searchResult.last_name
+                                  ? `${searchResult.first_name || ""} ${searchResult.last_name || ""}`.trim()
+                                  : "Без имени"}
+                              </p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                {searchResult.phone && (
+                                  <span className="flex items-center gap-1">
+                                    <Phone className="w-3 h-3" />
+                                    {searchResult.phone}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <Select
+                              value={selectedRole}
+                              onValueChange={(v) => setSelectedRole(v as AppRole)}
+                            >
+                              <SelectTrigger className="flex-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="admin">Администратор</SelectItem>
+                                <SelectItem value="moderator">Модератор</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              onClick={handleAddAdmin}
+                              disabled={addAdmin.isPending}
+                            >
+                              {addAdmin.isPending ? (
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                              ) : (
+                                "Добавить"
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {searchQuery && !searchResult && !isSearching && (
+                        <p className="text-sm text-muted-foreground text-center py-2">
+                          Пользователь не найден
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Current Admins List */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Shield className="w-5 h-5 text-primary" />
+                        Текущие роли
+                      </CardTitle>
+                      <CardDescription>
+                        {admins?.length || 0} пользователей с ролями
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {adminsLoading ? (
+                        <div className="space-y-3">
+                          <Skeleton className="h-16 w-full" />
+                          <Skeleton className="h-16 w-full" />
+                        </div>
+                      ) : admins && admins.length > 0 ? (
+                        <div className="space-y-2">
+                          {admins.map((admin) => (
+                            <div
+                              key={admin.id}
+                              className="flex items-center gap-3 p-3 border rounded-lg"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+                                <Users className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm truncate">
+                                  {admin.first_name || admin.last_name
+                                    ? `${admin.first_name || ""} ${admin.last_name || ""}`.trim()
+                                    : "Без имени"}
+                                </p>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  {admin.phone && (
+                                    <span className="flex items-center gap-1">
+                                      <Phone className="w-3 h-3" />
+                                      {admin.phone}
+                                    </span>
+                                  )}
+                                  <span className="flex items-center gap-1 truncate">
+                                    <Hash className="w-3 h-3" />
+                                    {admin.user_id.slice(0, 8)}...
+                                  </span>
+                                </div>
+                              </div>
+                              <Badge variant={getRoleBadgeVariant(admin.role)}>
+                                {getRoleLabel(admin.role)}
+                              </Badge>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => removeAdmin.mutate(admin.id)}
+                                disabled={removeAdmin.isPending}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          Нет пользователей с ролями в базе данных
+                        </p>
                       )}
                     </CardContent>
                   </Card>
