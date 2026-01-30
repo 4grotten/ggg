@@ -63,6 +63,7 @@ import { AvatarSync } from "./components/AvatarSync";
 import ScrollToTop from "./components/ScrollToTop";
 import { ScreenLockOverlay } from "./components/settings/ScreenLockOverlay";
 import { ScreenLockProvider, useScreenLockContext } from "./contexts/ScreenLockContext";
+import { SettingsProvider } from "./contexts/SettingsContext";
 
 const queryClient = new QueryClient();
 
@@ -232,15 +233,17 @@ const App = () => {
           ) : (
             <BrowserRouter basename={window.location.pathname.startsWith('/EasyCard') ? '/EasyCard' : ''}>
               <AuthProvider>
-                <AvatarProvider>
-                  <AvatarSync />
-                  <ScrollToTop />
-                  <VoiceCallProvider>
-                    <ScreenLockProvider>
-                      <AppContent />
-                    </ScreenLockProvider>
-                  </VoiceCallProvider>
-                </AvatarProvider>
+                <SettingsProvider>
+                  <AvatarProvider>
+                    <AvatarSync />
+                    <ScrollToTop />
+                    <VoiceCallProvider>
+                      <ScreenLockProvider>
+                        <AppContent />
+                      </ScreenLockProvider>
+                    </VoiceCallProvider>
+                  </AvatarProvider>
+                </SettingsProvider>
               </AuthProvider>
             </BrowserRouter>
           )}

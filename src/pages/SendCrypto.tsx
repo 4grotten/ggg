@@ -13,7 +13,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
-import { USDT_TO_AED_SEND, AED_TO_USDT_RATE, NETWORK_FEE_PERCENT } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
 interface Card {
@@ -53,6 +53,7 @@ const SendCrypto = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const settings = useSettings();
   
   // Check if this is a referral withdrawal
   const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
@@ -70,8 +71,8 @@ const SendCrypto = () => {
   // Use referral balance or card balance
   const availableBalance = isReferralWithdrawal ? referralBalance : selectedCard.balance;
 
-  const amountCrypto = amountAED ? (parseFloat(amountAED) * AED_TO_USDT_RATE).toFixed(2) : "0.00";
-  const networkFee = amountAED ? (parseFloat(amountCrypto) * NETWORK_FEE_PERCENT / 100).toFixed(2) : "0.00";
+  const amountCrypto = amountAED ? (parseFloat(amountAED) * settings.AED_TO_USDT_RATE).toFixed(2) : "0.00";
+  const networkFee = amountAED ? (parseFloat(amountCrypto) * settings.NETWORK_FEE_PERCENT / 100).toFixed(2) : "0.00";
   const amountAfterFee = amountAED ? (parseFloat(amountCrypto) - parseFloat(networkFee)).toFixed(2) : "0.00";
   const isValid = walletAddress.length >= 20 && parseFloat(amountAED) > 0 && parseFloat(amountAED) <= availableBalance;
 
@@ -294,7 +295,7 @@ const SendCrypto = () => {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("send.networkFee")} ({NETWORK_FEE_PERCENT}%)</span>
+              <span className="text-muted-foreground">{t("send.networkFee")} ({settings.NETWORK_FEE_PERCENT}%)</span>
               <span className="font-medium text-[#FFA000]">-{networkFee} {selectedCoin.symbol}</span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border">
@@ -305,7 +306,7 @@ const SendCrypto = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t("send.exchangeRate")}</span>
-              <span className="font-medium">1 USDT = {USDT_TO_AED_SEND.toFixed(2)} AED</span>
+              <span className="font-medium">1 USDT = {settings.USDT_TO_AED_SELL.toFixed(2)} AED</span>
             </div>
           </div>
 

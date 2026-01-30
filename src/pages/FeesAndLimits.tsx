@@ -8,21 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Receipt, CreditCard, ArrowDownToLine, Send, ArrowLeftRight, Percent, Banknote, CircleDollarSign, Headphones, Users, MessageCircle, Phone, PhoneOff } from "lucide-react";
 import { useVoiceCall, AGENTS, AgentType } from "@/contexts/VoiceCallContext";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  VIRTUAL_CARD_ANNUAL_FEE,
-  VIRTUAL_CARD_REPLACEMENT_FEE,
-  METAL_CARD_ANNUAL_FEE,
-  METAL_CARD_REPLACEMENT_FEE,
-  VIRTUAL_ACCOUNT_OPENING_FEE,
-  USDT_TO_AED_TOP_UP,
-  USDT_TO_AED_SEND,
-  TOP_UP_CRYPTO_FEE,
-  TOP_UP_BANK_FEE_PERCENT,
-  CARD_TO_CARD_FEE_PERCENT,
-  BANK_TRANSFER_FEE_PERCENT,
-  NETWORK_FEE_PERCENT,
-  CURRENCY_CONVERSION_FEE_PERCENT,
-} from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface FeeItemProps {
   label: string;
@@ -107,6 +93,7 @@ const AnimatedFeeIcon = () => {
 const FeesAndLimits = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const settings = useSettings();
 
   // Scroll to top on mount
   useEffect(() => {
@@ -128,31 +115,31 @@ const FeesAndLimits = () => {
 
         {/* One-Time Fees */}
         <FeeSection title={t("feesAndLimits.oneTimeFees")} icon={<CreditCard className="w-4 h-4" />}>
-          <FeeItem label={t("feesAndLimits.virtualCardAnnual")} value={`${VIRTUAL_CARD_ANNUAL_FEE.toFixed(2)} AED`} />
-          <FeeItem label={t("feesAndLimits.virtualCardReplacement")} value={`${VIRTUAL_CARD_REPLACEMENT_FEE.toFixed(2)} AED`} />
-          <FeeItem label={t("feesAndLimits.metalCardAnnual")} value={`${METAL_CARD_ANNUAL_FEE.toFixed(2)} AED`} />
-          <FeeItem label={t("feesAndLimits.metalCardReplacement")} value={`${METAL_CARD_REPLACEMENT_FEE.toFixed(2)} AED`} />
-          <FeeItem label={t("feesAndLimits.virtualAccountOpening")} value={`${VIRTUAL_ACCOUNT_OPENING_FEE.toFixed(2)} AED`} isLast />
+          <FeeItem label={t("feesAndLimits.virtualCardAnnual")} value={`${settings.VIRTUAL_CARD_ANNUAL_FEE.toFixed(2)} AED`} />
+          <FeeItem label={t("feesAndLimits.virtualCardReplacement")} value={`${settings.VIRTUAL_CARD_REPLACEMENT_FEE.toFixed(2)} AED`} />
+          <FeeItem label={t("feesAndLimits.metalCardAnnual")} value={`${settings.METAL_CARD_ANNUAL_FEE.toFixed(2)} AED`} />
+          <FeeItem label={t("feesAndLimits.metalCardReplacement")} value={`${settings.METAL_CARD_REPLACEMENT_FEE.toFixed(2)} AED`} />
+          <FeeItem label={t("feesAndLimits.virtualAccountOpening")} value={`${settings.VIRTUAL_ACCOUNT_OPENING_FEE.toFixed(2)} AED`} isLast />
         </FeeSection>
 
         {/* Top Up */}
         <FeeSection title={t("feesAndLimits.topUp")} icon={<ArrowDownToLine className="w-4 h-4" />}>
-          <FeeItem label={t("feesAndLimits.exchangeRate")} value={`1 USDT = ${USDT_TO_AED_TOP_UP.toFixed(2)} AED`} />
-          <FeeItem label={t("feesAndLimits.withCrypto")} value={`${TOP_UP_CRYPTO_FEE.toFixed(2)} USDT`} />
-          <FeeItem label={t("feesAndLimits.withBankTransfer")} value={`${TOP_UP_BANK_FEE_PERCENT}%`} isLast />
+          <FeeItem label={t("feesAndLimits.exchangeRate")} value={`1 USDT = ${settings.USDT_TO_AED_BUY.toFixed(2)} AED`} />
+          <FeeItem label={t("feesAndLimits.withCrypto")} value={`${settings.TOP_UP_CRYPTO_FEE.toFixed(2)} USDT`} />
+          <FeeItem label={t("feesAndLimits.withBankTransfer")} value={`${settings.TOP_UP_BANK_FEE_PERCENT}%`} isLast />
         </FeeSection>
 
         {/* Send */}
         <FeeSection title={t("feesAndLimits.send")} icon={<Send className="w-4 h-4" />}>
-          <FeeItem label={t("feesAndLimits.easyCardToEasyCard")} value={`${CARD_TO_CARD_FEE_PERCENT}%`} />
-          <FeeItem label={t("feesAndLimits.toBankAccount")} value={`${BANK_TRANSFER_FEE_PERCENT}%`} />
-          <FeeItem label={t("feesAndLimits.networkFee")} value={`${NETWORK_FEE_PERCENT}%`} />
-          <FeeItem label={t("feesAndLimits.exchangeRate")} value={`1 USDT = ${USDT_TO_AED_SEND.toFixed(2)} AED`} isLast />
+          <FeeItem label={t("feesAndLimits.easyCardToEasyCard")} value={`${settings.CARD_TO_CARD_FEE_PERCENT}%`} />
+          <FeeItem label={t("feesAndLimits.toBankAccount")} value={`${settings.BANK_TRANSFER_FEE_PERCENT}%`} />
+          <FeeItem label={t("feesAndLimits.networkFee")} value={`${settings.NETWORK_FEE_PERCENT}%`} />
+          <FeeItem label={t("feesAndLimits.exchangeRate")} value={`1 USDT = ${settings.USDT_TO_AED_SELL.toFixed(2)} AED`} isLast />
         </FeeSection>
 
         {/* Transactions */}
         <FeeSection title={t("feesAndLimits.transactionsSection")} icon={<ArrowLeftRight className="w-4 h-4" />}>
-          <FeeItem label={t("feesAndLimits.currencyConversion")} value={`${CURRENCY_CONVERSION_FEE_PERCENT.toFixed(2)}%`} isLast />
+          <FeeItem label={t("feesAndLimits.currencyConversion")} value={`${settings.CURRENCY_CONVERSION_FEE_PERCENT.toFixed(2)}%`} isLast />
         </FeeSection>
 
         <PoweredByFooter />

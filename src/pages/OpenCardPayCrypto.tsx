@@ -8,7 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE, USDT_TO_AED_TOP_UP, TOP_UP_CRYPTO_FEE } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import {
   Select,
   SelectContent,
@@ -23,19 +23,25 @@ interface NetworkInfo {
   id: NetworkType;
   name: string;
   address: string;
-  fee: number;
 }
 
+const networkAddresses: Record<NetworkType, string> = {
+  trc20: "TN7X8dH3qwP9mKvL2YnZ6bR4cF5jW1sA8e",
+  erc20: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21",
+  bep20: "0x8B4d2F7E3a9C1bD5f6A8c0E3d9F2b7A4c6D1e8F3",
+};
+
 const networks: NetworkInfo[] = [
-  { id: "trc20", name: "TRC20 (Tron)", address: "TN7X8dH3qwP9mKvL2YnZ6bR4cF5jW1sA8e", fee: TOP_UP_CRYPTO_FEE },
-  { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21", fee: TOP_UP_CRYPTO_FEE },
-  { id: "bep20", name: "BEP20 (BSC)", address: "0x8B4d2F7E3a9C1bD5f6A8c0E3d9F2b7A4c6D1e8F3", fee: TOP_UP_CRYPTO_FEE },
+  { id: "trc20", name: "TRC20 (Tron)", address: networkAddresses.trc20 },
+  { id: "erc20", name: "ERC20 (Ethereum)", address: networkAddresses.erc20 },
+  { id: "bep20", name: "BEP20 (BSC)", address: networkAddresses.bep20 },
 ];
 
 const OpenCardPayCrypto = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
+  const settings = useSettings();
   const cardType = searchParams.get("type") as "virtual" | "metal" || "virtual";
   
   // Network selection
@@ -48,8 +54,8 @@ const OpenCardPayCrypto = () => {
   const currentNetwork = networks.find(n => n.id === selectedNetwork) || networks[0];
   const cryptoWalletAddress = currentNetwork.address;
 
-  const cardIssuanceFee = cardType === "virtual" ? VIRTUAL_CARD_ANNUAL_FEE : METAL_CARD_ANNUAL_FEE;
-  const cryptoAmountUsdt = (cardIssuanceFee / USDT_TO_AED_TOP_UP) + currentNetwork.fee;
+  const cardIssuanceFee = cardType === "virtual" ? settings.VIRTUAL_CARD_ANNUAL_FEE : settings.METAL_CARD_ANNUAL_FEE;
+  const cryptoAmountUsdt = (cardIssuanceFee / settings.USDT_TO_AED_BUY) + settings.TOP_UP_CRYPTO_FEE;
 
   // Scroll to top on mount
   useEffect(() => {
@@ -132,7 +138,7 @@ const OpenCardPayCrypto = () => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t('openCard.exchangeRate')}</span>
-              <span className="font-medium">1 USDT = {USDT_TO_AED_TOP_UP} AED</span>
+              <span className="font-medium">1 USDT = {settings.USDT_TO_AED_BUY} AED</span>
             </div>
             <motion.div 
               key={`fee-${selectedNetwork}`}
@@ -141,7 +147,7 @@ const OpenCardPayCrypto = () => {
               className="flex justify-between text-sm"
             >
               <span className="text-muted-foreground">{t('openCard.networkFee')}</span>
-              <span className="font-medium">{currentNetwork.fee} USDT</span>
+              <span className="font-medium">{settings.TOP_UP_CRYPTO_FEE} USDT</span>
             </motion.div>
             <motion.div 
               key={`total-${selectedNetwork}`}
