@@ -480,8 +480,8 @@ export default function AdminPanel() {
             </div>
           ) : (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              {/* Custom Tab Switcher with sliding indicator */}
-              <div className="relative h-14 p-1.5 bg-muted/50 rounded-2xl mb-6">
+              {/* Custom Tab Switcher with sliding indicator - scrolls with content */}
+              <div className="relative h-14 p-1.5 bg-muted/50 rounded-2xl mb-6 mt-4">
                 {/* Animated sliding background */}
                 <motion.div
                   className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg"
