@@ -1,5 +1,5 @@
 import { Home, Info, MessageCircle, LogIn } from "lucide-react";
-import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,7 +19,6 @@ const navItems = [
 
 export const BottomNavigation = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { avatarUrl } = useAvatar();
   const { user, isAuthenticated } = useAuth();
   const { isConnected, isSpeaking } = useVoiceCall();
@@ -82,14 +81,12 @@ export const BottomNavigation = () => {
   );
 
   const handleTabPress = useCallback(
-    (index: number, path: string) => {
-      // Move selector and navigate immediately on first touch/press
+    (index: number) => {
+      // Move selector immediately on first touch/press, without waiting for route change.
       setPressedIndex(index);
       updateSelector(index);
-      selection();
-      navigate(path);
     },
-    [updateSelector, selection, navigate],
+    [updateSelector],
   );
 
   useEffect(() => {
@@ -154,11 +151,13 @@ export const BottomNavigation = () => {
               // For unauthenticated users, show login button instead of avatar
               if (!isAuthenticated) {
                 return (
-                  <div
+                  <RouterNavLink
                     key={item.path}
-                    ref={(el) => { tabRefs.current[index] = el as any; }}
-                    onPointerDown={() => handleTabPress(index, "/auth/phone")}
-                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation cursor-pointer"
+                    to="/auth/phone"
+                    ref={(el) => { tabRefs.current[index] = el; }}
+                    onPointerDown={() => handleTabPress(index)}
+                    onClick={() => selection()}
+                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
                   >
                     <div className={cn(
                       "w-6 h-6 rounded-full bg-primary flex items-center justify-center transition-all",
@@ -174,16 +173,18 @@ export const BottomNavigation = () => {
                     >
                       {t("nav.login") || t(item.labelKey)}
                     </span>
-                  </div>
+                  </RouterNavLink>
                 );
               }
               
               return (
-                <div
+                <RouterNavLink
                   key={item.path}
-                  ref={(el) => { tabRefs.current[index] = el as any; }}
-                  onPointerDown={() => handleTabPress(index, item.path)}
-                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation cursor-pointer"
+                  to={item.path}
+                  ref={(el) => { tabRefs.current[index] = el; }}
+                  onPointerDown={() => handleTabPress(index)}
+                  onClick={() => selection()}
+                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
                 >
                   <Avatar className={cn(
                     "w-6 h-6 transition-all",
@@ -200,17 +201,19 @@ export const BottomNavigation = () => {
                   >
                     {t(item.labelKey)}
                   </span>
-                </div>
+                </RouterNavLink>
               );
             }
             
             const Icon = item.icon!;
             return (
-              <div
+              <RouterNavLink
                 key={item.path}
-                ref={(el) => { tabRefs.current[index] = el as any; }}
-                onPointerDown={() => handleTabPress(index, item.path)}
-                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation cursor-pointer"
+                to={item.path}
+                ref={(el) => { tabRefs.current[index] = el; }}
+                onPointerDown={() => handleTabPress(index)}
+                onClick={() => selection()}
+                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation"
               >
                 <div className="relative">
                   <Icon
@@ -240,7 +243,7 @@ export const BottomNavigation = () => {
                 >
                   {t(item.labelKey)}
                 </span>
-              </div>
+              </RouterNavLink>
             );
           })}
         </div>
