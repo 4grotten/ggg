@@ -578,12 +578,16 @@ export default function AdminPanel() {
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500" />
                     
                     <div className="relative p-5">
-                      {/* Top row - Avatar, Name, Status */}
-                      <div className="flex items-start gap-4 mb-4">
-                        {/* Avatar with status ring */}
-                        <div className="relative">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold text-xl shadow-lg shadow-primary/25">
-                            А
+                      {/* Main content row */}
+                      <div className="flex items-center gap-4">
+                        {/* Avatar with photo */}
+                        <div className="relative shrink-0">
+                          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-primary/20 ring-2 ring-primary/20">
+                            <img 
+                              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" 
+                              alt="Александр Иванов"
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                           {/* Online indicator */}
                           <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
@@ -591,65 +595,43 @@ export default function AdminPanel() {
                           </div>
                         </div>
                         
-                        {/* Name and badges */}
+                        {/* Info section */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
+                          {/* Name and badge */}
+                          <div className="flex items-center gap-2 mb-2">
                             <h3 className="font-bold text-base truncate">Александр Иванов</h3>
                             <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-[10px] px-2 py-0.5 font-semibold border-0 shadow-sm">
                               VIP
                             </Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground font-medium">ID: #USR-2847291</p>
+                          
+                          {/* Phone number */}
+                          <div className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 w-fit">
+                            <Phone className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-medium">+971 50 123 4567</span>
+                          </div>
+                          
+                          {/* Tags */}
+                          <div className="flex items-center gap-2 mt-3 flex-wrap">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
+                              <CheckCircle className="w-3 h-3" />
+                              Верифицирован
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-medium">
+                              <CreditCard className="w-3 h-3" />
+                              2 карты
+                            </span>
+                          </div>
                         </div>
                         
                         {/* Action button */}
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="shrink-0 w-10 h-10 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+                          className="shrink-0 w-12 h-12 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200"
                         >
                           <Eye className="w-5 h-5" />
                         </Button>
-                      </div>
-                      
-                      {/* Info grid */}
-                      <div className="grid grid-cols-3 gap-3">
-                        {/* Balance */}
-                        <div className="bg-muted/50 rounded-2xl p-3 text-center">
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Баланс</p>
-                          <p className="text-base font-bold text-emerald-500">12,450</p>
-                          <p className="text-[10px] text-muted-foreground">AED</p>
-                        </div>
-                        
-                        {/* Phone */}
-                        <div className="bg-muted/50 rounded-2xl p-3 text-center">
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Телефон</p>
-                          <p className="text-xs font-semibold truncate">+971 50 123</p>
-                          <p className="text-[10px] text-muted-foreground">4567</p>
-                        </div>
-                        
-                        {/* Registration */}
-                        <div className="bg-muted/50 rounded-2xl p-3 text-center">
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Регистрация</p>
-                          <p className="text-xs font-semibold">15.01.2025</p>
-                          <p className="text-[10px] text-muted-foreground">12 дней</p>
-                        </div>
-                      </div>
-                      
-                      {/* Bottom tags */}
-                      <div className="flex items-center gap-2 mt-4 flex-wrap">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
-                          <CheckCircle className="w-3 h-3" />
-                          Верифицирован
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-medium">
-                          <CreditCard className="w-3 h-3" />
-                          2 карты
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[10px] font-medium">
-                          <TrendingUp className="w-3 h-3" />
-                          Активный
-                        </span>
                       </div>
                     </div>
                   </div>
