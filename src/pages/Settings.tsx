@@ -9,6 +9,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Switch } from "@/components/ui/switch";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -854,29 +855,23 @@ const Settings = () => {
             onClick={() => setIsScreenLockOpen(true)}
           />
           {/* Haptic Feedback */}
-          <button
-            onClick={() => {
-              const newValue = !hapticEnabled;
-              setHapticEnabled(newValue);
-              setHapticEnabledState(newValue);
-              if (newValue) {
-                tap(); // Provide feedback when enabling
-              }
-              toast.success(newValue ? (t("settings.hapticEnabled") || "Вибрация включена") : (t("settings.hapticDisabled") || "Вибрация выключена"));
-            }}
-            className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
-          >
+          <div className="w-full flex items-center justify-between py-4 px-4">
             <div className="flex items-center gap-3">
               <ColoredIcon colorKey="vibrate"><Vibrate className="w-4 h-4" /></ColoredIcon>
               <span className="text-foreground font-medium">{t("settings.hapticFeedback") || "Вибрация"}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className={hapticEnabled ? "text-sm font-medium text-green-500" : "text-muted-foreground text-sm"}>
-                {hapticEnabled ? t("settings.enabled") || "Вкл" : t("settings.disabled") || "Выкл"}
-              </span>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-          </button>
+            <Switch
+              checked={hapticEnabled}
+              onCheckedChange={(checked) => {
+                setHapticEnabled(checked);
+                setHapticEnabledState(checked);
+                if (checked) {
+                  tap();
+                }
+                toast.success(checked ? (t("settings.hapticEnabled") || "Вибрация включена") : (t("settings.hapticDisabled") || "Вибрация выключена"));
+              }}
+            />
+          </div>
         </AnimatedMenuSection>
 
         {/* Limits and Fees */}
