@@ -132,7 +132,7 @@ export const BottomNavigation = () => {
           {/* iOS 26 liquid glass selector */}
           {selectorStyle && (
             <motion.div
-              className="absolute overflow-hidden backdrop-blur-xl rounded-[22px] pointer-events-none z-0"
+              className="absolute overflow-hidden backdrop-blur-xl rounded-[22px] pointer-events-none z-0 bg-gradient-to-br from-black/10 via-black/5 to-black/10 dark:from-white/35 dark:via-white/15 dark:to-white/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_0_8px_rgba(255,255,255,0.05)]"
               initial={false}
               animate={{
                 left: selectorStyle.left,
@@ -142,11 +142,9 @@ export const BottomNavigation = () => {
               style={{
                 height: "100%",
                 top: 0,
-                background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%)",
-                boxShadow: "inset 0 1px 1px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.05)",
               }}
             >
-              <div className="absolute inset-0 ring-1 ring-inset ring-white/30 dark:ring-white/15 rounded-[22px]" />
+              <div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/15 rounded-[22px]" />
             </motion.div>
           )}
           
