@@ -1,16 +1,4 @@
 {
-  "screenLock": {
-    "title": "Блокировка экрана",
-    "description": "Защитите приложение паролем",
-    "enterPasscode": "Введите пароль",
-    "viewSensitiveData": "Для просмотра данных",
-    "wrongPasscode": "Неверный пароль",
-    "useBiometric": "Или используйте {{method}}",
-    "hideData": "Скрыть данные",
-    "hideDataDescription": "Требовать пароль для просмотра баланса и данных карт",
-    "hideDataEnabled": "Скрытие данных включено",
-    "hideDataDisabled": "Скрытие данных отключено"
-  },
   "profileVerification": {
     "title": "Подтвердите личность",
     "description": "Пройдите верификацию, чтобы разблокировать все функции и увеличить лимиты аккаунта.",
@@ -1288,6 +1276,7 @@
     "createPasscode": "Создать пароль",
     "confirmPasscode": "Подтвердить пароль",
     "enterPasscode": "Введите пароль",
+    "viewSensitiveData": "Для просмотра данных",
     "createDesc": "Введите {{length}}-значный пароль",
     "confirmDesc": "Повторите пароль",
     "verifyDesc": "Введите текущий пароль для отключения",
