@@ -61,9 +61,10 @@ interface SettingsFieldProps {
   suffix: string;
   onUpdate: (key: string, value: number) => void;
   isPending: boolean;
+  isMissing?: boolean;
 }
 
-function SettingsField({ setting, label, suffix, onUpdate, isPending }: SettingsFieldProps) {
+function SettingsField({ setting, label, suffix, onUpdate, isPending, isMissing }: SettingsFieldProps) {
   const [localValue, setLocalValue] = useState(setting.value.toString());
   const [isDirty, setIsDirty] = useState(false);
 
@@ -86,8 +87,11 @@ function SettingsField({ setting, label, suffix, onUpdate, isPending }: Settings
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={setting.key} className="text-sm font-medium">
+      <Label htmlFor={setting.key} className="text-sm font-medium flex items-center gap-2">
         {label}
+        {isMissing && (
+          <span className="text-xs text-amber-500 font-normal">(не в базе)</span>
+        )}
       </Label>
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -97,7 +101,7 @@ function SettingsField({ setting, label, suffix, onUpdate, isPending }: Settings
             step="0.01"
             value={localValue}
             onChange={handleChange}
-            className="pr-14"
+            className={`pr-14 ${isMissing ? 'border-amber-500/50' : ''}`}
           />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
             {suffix}
@@ -155,18 +159,38 @@ export default function AdminPanel() {
   ) => {
     const categorySettings = getSettingsByCategory(category);
     
+    if (categorySettings.length === 0) {
+      return (
+        <div className="text-center py-8 text-muted-foreground">
+          <p className="text-sm">Загрузка настроек...</p>
+          <p className="text-xs mt-1">Если данные не появляются, проверьте подключение к базе</p>
+        </div>
+      );
+    }
+    
     return fields.map((field) => {
       const setting = categorySettings.find((s) => s.key === field.key);
-      if (!setting) return null;
+      
+      // If setting doesn't exist in DB, show it with default 0 value
+      const settingToUse: AdminSetting = setting || {
+        id: `temp-${field.key}`,
+        category: category as 'exchange_rates' | 'fees' | 'limits',
+        key: field.key,
+        value: 0,
+        description: null,
+        updated_at: new Date().toISOString(),
+        updated_by: null,
+      };
 
       return (
         <SettingsField
           key={field.key}
-          setting={setting}
+          setting={settingToUse}
           label={field.label}
           suffix={field.suffix}
           onUpdate={handleUpdate(category)}
           isPending={updateSetting.isPending}
+          isMissing={!setting}
         />
       );
     });
