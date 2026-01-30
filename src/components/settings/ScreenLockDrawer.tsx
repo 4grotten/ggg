@@ -377,9 +377,9 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
               </div>
             </div>
             <Switch 
-              checked={isEnabled || isPaused} 
+              checked={isEnabled} 
               onCheckedChange={handleEnableToggle}
-              className={isPaused ? "[&>span]:bg-yellow-500" : ""}
+              className={isPaused ? "data-[state=unchecked]:bg-yellow-500 [&>span]:bg-yellow-900" : ""}
             />
           </div>
         </AnimatedDrawerItem>
