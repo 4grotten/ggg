@@ -344,15 +344,15 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
         <AnimatedDrawerItem index={0}>
           <div className={cn(
             "flex items-center justify-between p-4 rounded-xl",
-            isPaused ? "bg-yellow-500/10" : "bg-muted/50"
+            isPaused ? "bg-orange-500/10" : "bg-muted/50"
           )}>
             <div className="flex items-center gap-3">
               <div className={cn(
                 "w-10 h-10 rounded-full flex items-center justify-center",
-                isPaused ? "bg-yellow-500/20" : isEnabled ? "bg-primary/10" : "bg-muted"
+                isPaused ? "bg-orange-500/20" : isEnabled ? "bg-primary/10" : "bg-muted"
               )}>
                 {isPaused ? (
-                  <Pause className="w-5 h-5 text-yellow-500" />
+                  <Pause className="w-5 h-5 text-orange-500" />
                 ) : isEnabled ? (
                   <Lock className="w-5 h-5 text-primary" />
                 ) : (
@@ -365,7 +365,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
                 </p>
                 <p className={cn(
                   "text-sm",
-                  isPaused ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"
+                  isPaused ? "text-orange-600 dark:text-orange-400" : "text-muted-foreground"
                 )}>
                   {isPaused
                     ? t('screenLock.pausedDesc', 'Tap to resume')
@@ -379,7 +379,7 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             <Switch 
               checked={isEnabled} 
               onCheckedChange={handleEnableToggle}
-              className={isPaused ? "data-[state=unchecked]:bg-yellow-500 [&>span]:bg-yellow-900" : ""}
+              className={isPaused ? "data-[state=unchecked]:bg-orange-500 [&>span]:bg-orange-900" : ""}
             />
           </div>
         </AnimatedDrawerItem>
