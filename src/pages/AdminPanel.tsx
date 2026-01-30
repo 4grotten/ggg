@@ -93,10 +93,7 @@ function SettingsField({ setting, label, suffix, onUpdate, isPending, isMissing,
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
+    <div
       className={cn(
         "group relative p-4 rounded-2xl transition-all duration-300",
         "bg-gradient-to-br from-muted/50 to-muted/30",
@@ -165,7 +162,7 @@ function SettingsField({ setting, label, suffix, onUpdate, isPending, isMissing,
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -180,9 +177,7 @@ interface GlassCardProps {
 
 function GlassCard({ children, title, description, icon: Icon, iconColor = "text-primary", className }: GlassCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className={cn(
         "relative overflow-hidden rounded-3xl",
         "bg-gradient-to-br from-card/80 to-card/60",
@@ -214,7 +209,7 @@ function GlassCard({ children, title, description, icon: Icon, iconColor = "text
           {children}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -433,26 +428,45 @@ export default function AdminPanel() {
             </div>
           ) : (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              {/* Custom Tab Switcher */}
-              <TabsList className="grid w-full grid-cols-4 h-14 p-1.5 bg-muted/50 rounded-2xl mb-6">
-                {tabConfig.map((tab) => (
-                  <TabsTrigger
-                    key={tab.value}
-                    value={tab.value}
-                    className={cn(
-                      "relative flex flex-col items-center gap-0.5 h-full rounded-xl transition-all",
-                      "data-[state=active]:bg-background data-[state=active]:shadow-lg",
-                      "data-[state=active]:text-foreground"
-                    )}
-                  >
-                    <tab.icon className={cn(
-                      "w-4 h-4 transition-colors",
-                      activeTab === tab.value ? "text-primary" : "text-muted-foreground"
-                    )} />
-                    <span className="text-[10px] font-medium">{tab.label}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+              {/* Custom Tab Switcher with sliding indicator */}
+              <div className="relative h-14 p-1.5 bg-muted/50 rounded-2xl mb-6">
+                {/* Animated sliding background */}
+                <motion.div
+                  className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg"
+                  initial={false}
+                  animate={{
+                    left: `calc(${tabConfig.findIndex(t => t.value === activeTab) * 25}% + 6px)`,
+                    width: 'calc(25% - 6px)',
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30,
+                  }}
+                />
+                
+                {/* Tab buttons */}
+                <div className="relative grid grid-cols-4 h-full">
+                  {tabConfig.map((tab) => (
+                    <button
+                      key={tab.value}
+                      onClick={() => setActiveTab(tab.value)}
+                      className={cn(
+                        "relative z-10 flex flex-col items-center justify-center gap-0.5 h-full rounded-xl transition-colors",
+                        activeTab === tab.value ? "text-foreground" : "text-muted-foreground"
+                      )}
+                    >
+                      <tab.icon className={cn(
+                        "w-4 h-4 transition-colors",
+                        activeTab === tab.value ? "text-primary" : "text-muted-foreground"
+                      )} />
+                      <span className="text-[10px] font-medium">{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tab content without layout animations */}
 
               {/* Exchange Rates Tab */}
               <TabsContent value="rates" className="mt-0">
