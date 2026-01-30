@@ -54,6 +54,36 @@ export function useAdminManagement() {
     },
   });
 
+  // Fetch all clients (profiles)
+  const { data: clients, isLoading: clientsLoading, refetch: refetchClients } = useQuery({
+    queryKey: ["admin-clients"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Search clients
+  const searchClients = async (query: string) => {
+    const cleanQuery = query.replace(/\s+/g, "").replace(/^\+/, "");
+    
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .or(`phone.ilike.%${cleanQuery}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+    return data;
+  };
+
   // Search user by phone or user_id
   const searchUser = async (query: string): Promise<ProfileSearchResult | null> => {
     // Clean phone number
@@ -136,7 +166,11 @@ export function useAdminManagement() {
   return {
     admins,
     isLoading,
+    clients,
+    clientsLoading,
+    refetchClients,
     searchUser,
+    searchClients,
     addAdmin,
     removeAdmin,
   };

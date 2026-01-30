@@ -1,4 +1,4 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -218,7 +218,7 @@ export default function AdminPanel() {
   const { t } = useTranslation();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { settings, isLoading, updateSetting, getSettingsByCategory } = useAdminSettings();
-  const { admins, isLoading: adminsLoading, searchUser, addAdmin, removeAdmin } = useAdminManagement();
+  const { admins, isLoading: adminsLoading, clients, clientsLoading, searchUser, searchClients, addAdmin, removeAdmin } = useAdminManagement();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState<{
@@ -230,6 +230,9 @@ export default function AdminPanel() {
   const [selectedRole, setSelectedRole] = useState<AppRole>("admin");
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState("rates");
+  const [clientSearchQuery, setClientSearchQuery] = useState("");
+  const [filteredClients, setFilteredClients] = useState<typeof clients>(undefined);
+  const [isClientSearching, setIsClientSearching] = useState(false);
 
   const handleUpdate = (category: string) => (key: string, value: number) => {
     updateSetting.mutate({ category, key, value });
@@ -343,11 +346,28 @@ export default function AdminPanel() {
     });
   };
 
+  const handleClientSearch = async () => {
+    if (!clientSearchQuery.trim()) {
+      setFilteredClients(undefined);
+      return;
+    }
+    setIsClientSearching(true);
+    try {
+      const results = await searchClients(clientSearchQuery.trim());
+      setFilteredClients(results);
+    } finally {
+      setIsClientSearching(false);
+    }
+  };
+
+  const displayedClients = filteredClients !== undefined ? filteredClients : clients;
+
   const tabConfig = [
-    { value: "rates", label: "Курсы", icon: TrendingUp, color: "from-emerald-500 to-teal-500" },
-    { value: "fees", label: "Комиссии", icon: Percent, color: "from-violet-500 to-purple-500" },
-    { value: "limits", label: "Лимиты", icon: Wallet, color: "from-orange-500 to-amber-500" },
-    { value: "admins", label: "Админы", icon: Users, color: "from-blue-500 to-cyan-500" },
+    { value: "rates", label: "Курсы", icon: TrendingUp },
+    { value: "fees", label: "Комиссии", icon: Percent },
+    { value: "limits", label: "Лимиты", icon: Wallet },
+    { value: "clients", label: "Клиенты", icon: UsersRound },
+    { value: "admins", label: "Админы", icon: Users },
   ];
 
   return (
@@ -400,6 +420,7 @@ export default function AdminPanel() {
                 { label: "Курсов", value: exchangeRateFields.length, icon: Activity, color: "text-emerald-500" },
                 { label: "Комиссий", value: feeFields.length, icon: CreditCard, color: "text-violet-500" },
                 { label: "Лимитов", value: limitFields.length, icon: Wallet, color: "text-orange-500" },
+                { label: "Клиентов", value: clients?.length || 0, icon: UsersRound, color: "text-cyan-500" },
                 { label: "Админов", value: admins?.length || 0, icon: Shield, color: "text-blue-500" },
               ].map((stat, i) => (
                 <motion.div
@@ -435,8 +456,8 @@ export default function AdminPanel() {
                   className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg"
                   initial={false}
                   animate={{
-                    left: `calc(${tabConfig.findIndex(t => t.value === activeTab) * 25}% + 6px)`,
-                    width: 'calc(25% - 6px)',
+                    left: `calc(${tabConfig.findIndex(t => t.value === activeTab) * 20}% + 6px)`,
+                    width: 'calc(20% - 6px)',
                   }}
                   transition={{
                     type: "spring",
@@ -446,7 +467,7 @@ export default function AdminPanel() {
                 />
                 
                 {/* Tab buttons */}
-                <div className="relative grid grid-cols-4 h-full">
+                <div className="relative grid grid-cols-5 h-full">
                   {tabConfig.map((tab) => (
                     <button
                       key={tab.value}
@@ -508,6 +529,100 @@ export default function AdminPanel() {
                 
                 <GlassCard title="Месячные лимиты" icon={Activity} iconColor="text-amber-500">
                   {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "monthly"))}
+                </GlassCard>
+              </TabsContent>
+
+              {/* Clients Tab */}
+              <TabsContent value="clients" className="mt-0 space-y-4">
+                <GlassCard
+                  title="Клиенты"
+                  description={`${displayedClients?.length || 0} пользователей`}
+                  icon={UsersRound}
+                  iconColor="text-cyan-500"
+                >
+                  {/* Search */}
+                  <div className="flex gap-2 mb-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Поиск по имени или телефону..."
+                        value={clientSearchQuery}
+                        onChange={(e) => {
+                          setClientSearchQuery(e.target.value);
+                          if (!e.target.value.trim()) setFilteredClients(undefined);
+                        }}
+                        onKeyDown={(e) => e.key === "Enter" && handleClientSearch()}
+                        className="pl-10 h-11 rounded-xl bg-background/50"
+                      />
+                    </div>
+                    <Button
+                      size="icon"
+                      onClick={handleClientSearch}
+                      disabled={isClientSearching}
+                      className="h-11 w-11 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600"
+                    >
+                      {isClientSearching ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Search className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Clients List */}
+                  {clientsLoading ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+                      ))}
+                    </div>
+                  ) : displayedClients && displayedClients.length > 0 ? (
+                    <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                      {displayedClients.map((client) => (
+                        <div
+                          key={client.id}
+                          className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 hover:border-border transition-colors"
+                        >
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/10 flex items-center justify-center shrink-0">
+                            <UsersRound className="w-5 h-5 text-cyan-500" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">
+                              {client.first_name || client.last_name
+                                ? `${client.first_name || ""} ${client.last_name || ""}`.trim()
+                                : "Без имени"}
+                            </p>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              {client.phone && (
+                                <span className="flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  {client.phone}
+                                </span>
+                              )}
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(client.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="shrink-0 rounded-xl text-muted-foreground hover:text-foreground"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <UsersRound className="w-12 h-12 mb-2 opacity-30" />
+                      <p className="text-sm">
+                        {clientSearchQuery ? "Клиенты не найдены" : "Нет зарегистрированных клиентов"}
+                      </p>
+                    </div>
+                  )}
                 </GlassCard>
               </TabsContent>
 
