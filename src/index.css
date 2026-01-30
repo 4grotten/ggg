@@ -181,6 +181,16 @@
   animation: shimmer 2.5s ease-in-out infinite;
 }
 
+/* Spin slow animation for PartnerCard rainbow border */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
   /* Fix autofill styling for iOS/Safari */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
