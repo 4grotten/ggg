@@ -604,10 +604,10 @@ export const ScreenLockDrawer = ({ isOpen, onOpenChange }: ScreenLockDrawerProps
             {/* Animated icon - hide when keyboard is open */}
             {!isKeyboardOpen && <PasscodeLockAnimation />}
 
-            {/* For verify mode - single row of dots */}
-            {step === 'verify-passcode' && (
+            {/* For verify mode (both access-verify and verify-passcode) - single row of dots */}
+            {(step === 'verify-passcode' || step === 'access-verify') && (
               <div className="py-2">
-                {renderDots(getVerifyDots(), shake && step === 'verify-passcode')}
+                {renderDots(getVerifyDots(), shake && (step === 'verify-passcode' || step === 'access-verify'))}
               </div>
             )}
 
