@@ -1210,5 +1210,47 @@
         }
       }
     }
+  },
+  "screenLock": {
+    "title": "قفل الشاشة",
+    "passcode": "قفل رمز المرور",
+    "enabledDesc": "تم تعيين رمز مرور من 4 أرقام",
+    "disabledDesc": "احمِ تطبيقك برمز مرور",
+    "biometricDesc": "فتح سريع بالبيانات البيومترية",
+    "autoLock": "القفل التلقائي",
+    "autoLockDesc": "القفل بعد الخمول",
+    "securityNote": "قفل الشاشة يضيف طبقة أمان إضافية لحماية بياناتك الحساسة.",
+    "createPasscode": "إنشاء رمز مرور",
+    "confirmPasscode": "تأكيد رمز المرور",
+    "enterPasscode": "أدخل رمز المرور",
+    "createDesc": "أدخل رمز مرور من {{length}} أرقام",
+    "confirmDesc": "أعد إدخال رمز المرور",
+    "verifyDesc": "أدخل رمز المرور الحالي للتعطيل",
+    "passcodeTooShort": "يجب أن يكون رمز المرور {{length}} أرقام",
+    "passcodesNoMatch": "رموز المرور غير متطابقة",
+    "wrongPasscode": "رمز مرور خاطئ",
+    "enabled": "تم تمكين قفل الشاشة",
+    "disabled": "تم تعطيل قفل الشاشة",
+    "biometricEnabled": "تم تمكين {{method}}",
+    "biometricDisabled": "تم تعطيل {{method}}",
+    "biometricFailed": "فشل في تمكين {{method}}",
+    "biometricUnavailable": "غير متوفر على هذا الجهاز",
+    "timeoutUpdated": "تم تحديث مهلة القفل",
+    "hideData": "إخفاء البيانات الحساسة",
+    "hideDataDesc": "إخفاء الأرصدة وأرقام البطاقات",
+    "hideDataEnabled": "تم إخفاء البيانات",
+    "hideDataDisabled": "البيانات مرئية",
+    "enable": "تمكين",
+    "unlockApp": "افتح للمتابعة",
+    "useBiometric": "أو استخدم {{method}}",
+    "attempts": "محاولات",
+    "timeout": {
+      "immediately": "فوراً",
+      "1min": "بعد دقيقة واحدة",
+      "5min": "بعد 5 دقائق",
+      "15min": "بعد 15 دقيقة",
+      "30min": "بعد 30 دقيقة",
+      "never": "أبداً"
+    }
   }
 }

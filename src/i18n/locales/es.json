@@ -1210,5 +1210,47 @@
         }
       }
     }
+  },
+  "screenLock": {
+    "title": "Bloqueo de Pantalla",
+    "passcode": "Bloqueo con Código",
+    "enabledDesc": "Código de 4 dígitos establecido",
+    "disabledDesc": "Protege tu app con un código",
+    "biometricDesc": "Desbloqueo rápido con biometría",
+    "autoLock": "Bloqueo Automático",
+    "autoLockDesc": "Bloquear tras inactividad",
+    "securityNote": "El bloqueo de pantalla añade una capa extra de seguridad para proteger tus datos sensibles.",
+    "createPasscode": "Crear Código",
+    "confirmPasscode": "Confirmar Código",
+    "enterPasscode": "Ingresa el Código",
+    "createDesc": "Ingresa un código de {{length}} dígitos",
+    "confirmDesc": "Reingresa tu código",
+    "verifyDesc": "Ingresa tu código actual para desactivar",
+    "passcodeTooShort": "El código debe tener {{length}} dígitos",
+    "passcodesNoMatch": "Los códigos no coinciden",
+    "wrongPasscode": "Código incorrecto",
+    "enabled": "Bloqueo de pantalla activado",
+    "disabled": "Bloqueo de pantalla desactivado",
+    "biometricEnabled": "{{method}} activado",
+    "biometricDisabled": "{{method}} desactivado",
+    "biometricFailed": "No se pudo activar {{method}}",
+    "biometricUnavailable": "No disponible en este dispositivo",
+    "timeoutUpdated": "Tiempo de bloqueo actualizado",
+    "hideData": "Ocultar Datos Sensibles",
+    "hideDataDesc": "Ocultar saldos y números de tarjeta",
+    "hideDataEnabled": "Datos ocultos",
+    "hideDataDisabled": "Datos visibles",
+    "enable": "Activar",
+    "unlockApp": "Desbloquea para continuar",
+    "useBiometric": "O usa {{method}}",
+    "attempts": "intentos",
+    "timeout": {
+      "immediately": "Inmediatamente",
+      "1min": "Después de 1 minuto",
+      "5min": "Después de 5 minutos",
+      "15min": "Después de 15 minutos",
+      "30min": "Después de 30 minutos",
+      "never": "Nunca"
+    }
   }
 }

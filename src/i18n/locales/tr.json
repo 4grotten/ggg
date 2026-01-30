@@ -1210,5 +1210,47 @@
         }
       }
     }
+  },
+  "screenLock": {
+    "title": "Ekran Kilidi",
+    "passcode": "Parola Kilidi",
+    "enabledDesc": "4 haneli parola ayarlandı",
+    "disabledDesc": "Uygulamanızı parola ile koruyun",
+    "biometricDesc": "Biyometri ile hızlı kilit açma",
+    "autoLock": "Otomatik Kilitleme",
+    "autoLockDesc": "Hareketsizlik sonrası kilitle",
+    "securityNote": "Ekran kilidi, hassas verilerinizi korumak için ekstra bir güvenlik katmanı ekler.",
+    "createPasscode": "Parola Oluştur",
+    "confirmPasscode": "Parolayı Onayla",
+    "enterPasscode": "Parola Girin",
+    "createDesc": "{{length}} haneli bir parola girin",
+    "confirmDesc": "Parolanızı tekrar girin",
+    "verifyDesc": "Devre dışı bırakmak için mevcut parolayı girin",
+    "passcodeTooShort": "Parola {{length}} hane olmalıdır",
+    "passcodesNoMatch": "Parolalar eşleşmiyor",
+    "wrongPasscode": "Yanlış parola",
+    "enabled": "Ekran kilidi etkinleştirildi",
+    "disabled": "Ekran kilidi devre dışı bırakıldı",
+    "biometricEnabled": "{{method}} etkinleştirildi",
+    "biometricDisabled": "{{method}} devre dışı bırakıldı",
+    "biometricFailed": "{{method}} etkinleştirilemedi",
+    "biometricUnavailable": "Bu cihazda mevcut değil",
+    "timeoutUpdated": "Kilit zaman aşımı güncellendi",
+    "hideData": "Hassas Verileri Gizle",
+    "hideDataDesc": "Bakiye ve kart numaralarını gizle",
+    "hideDataEnabled": "Veriler gizlendi",
+    "hideDataDisabled": "Veriler görünür",
+    "enable": "Etkinleştir",
+    "unlockApp": "Devam etmek için kilidi açın",
+    "useBiometric": "Veya {{method}} kullanın",
+    "attempts": "deneme",
+    "timeout": {
+      "immediately": "Hemen",
+      "1min": "1 dakika sonra",
+      "5min": "5 dakika sonra",
+      "15min": "15 dakika sonra",
+      "30min": "30 dakika sonra",
+      "never": "Asla"
+    }
   }
 }
