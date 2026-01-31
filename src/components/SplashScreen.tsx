@@ -126,23 +126,6 @@ const SplashScreen = () => {
             filter: "drop-shadow(0 20px 40px hsla(270, 100%, 50%, 0.5))"
           }}
         />
-        
-        {/* Light reflection sweep */}
-        <motion.div
-          initial={{ x: "-150%", opacity: 0 }}
-          animate={{ 
-            x: ["−150%", "250%"],
-            opacity: [0, 0.5, 0]
-          }}
-          transition={{ 
-            duration: 2.5,
-            delay: 1,
-            repeat: Infinity,
-            repeatDelay: 3,
-            ease: "easeInOut"
-          }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 rounded-2xl pointer-events-none"
-        />
       </motion.div>
     </motion.div>
   );
