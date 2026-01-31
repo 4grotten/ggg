@@ -107,18 +107,9 @@
       AR: Easy Card — بطاقات VISA الافتراضية والمعدنية للدفع حول العالم. الشحن عبر البنك أو العملات المشفرة، السحب من أي صراف آلي. متاح للجميع.
       ES: Easy Card — Tarjetas VISA virtuales y metálicas para pagos en todo el mundo. Recarga por banco o cripto, retiro en cualquier cajero. Disponible para todos.
     -->
-    
-    <!-- Critical CSS to prevent white flash before React loads -->
-    <style>
-      html, body, #root {
-        background: #050510 !important;
-        min-height: 100vh;
-        min-height: 100dvh;
-      }
-    </style>
   </head>
 
-  <body>
+  <body style="background: #050510;">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
