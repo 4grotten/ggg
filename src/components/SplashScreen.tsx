@@ -144,7 +144,7 @@ const SplashScreen = () => {
         />
         
         {/* Card Image */}
-        <div className="relative overflow-hidden rounded-2xl" style={{ isolation: "isolate" }}>
+        <div className="relative overflow-hidden" style={{ borderRadius: 18, isolation: "isolate" }}>
           <motion.img
             src="./easy-card-banner.png"
             alt="Easy Card"
@@ -153,6 +153,7 @@ const SplashScreen = () => {
             animate={isReady ? { rotateY: 0, rotateX: 0 } : { rotateY: -15, rotateX: 8 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
             style={{ 
+              borderRadius: 18,
               filter: "drop-shadow(0 20px 40px hsla(270, 100%, 50%, 0.5))"
             }}
           />
@@ -162,17 +163,17 @@ const SplashScreen = () => {
             <div
               className="absolute overflow-hidden pointer-events-none"
               style={{
-                top: 4,
-                left: 4,
-                right: 4,
-                bottom: 4,
-                borderRadius: 20,
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                borderRadius: 18,
               }}
             >
               <div
                 className="absolute inset-0 mix-blend-screen"
                 style={{
-                  borderRadius: 20,
+                  borderRadius: 18,
                   background:
                     "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
                   animation: "splash-glint 2.2s ease-in-out 1.2s infinite",
