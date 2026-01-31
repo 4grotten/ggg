@@ -4,28 +4,31 @@ import easyCardImage from "@/assets/easy-card.png";
 
 // Memoized glow layer for fantastic effect
 const GlowLayer = memo(({ 
-  inset, 
+  className,
   blur, 
   gradient, 
   duration, 
   delay = 0,
+  style = {},
 }: { 
-  inset: string;
+  className: string;
   blur: number;
   gradient: string;
   duration: number;
   delay?: number;
+  style?: React.CSSProperties;
 }) => (
   <motion.div 
-    className={`absolute ${inset} rounded-3xl`}
+    className={className}
     style={{ 
       background: gradient,
       filter: `blur(${blur}px)`,
-      willChange: "opacity, transform"
+      willChange: "opacity, transform",
+      ...style
     }}
     animate={{
-      opacity: [0.5, 1, 0.5],
-      scale: [0.98, 1.05, 0.98]
+      opacity: [0.6, 1, 0.6],
+      scale: [0.98, 1.03, 0.98]
     }}
     transition={{
       duration,
@@ -44,9 +47,26 @@ const SplashScreen = () => {
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="fixed inset-0 bg-gradient-to-br from-background via-background to-muted flex items-center justify-center z-50"
+      className="fixed inset-0 bg-background flex items-center justify-center z-50 overflow-hidden"
     >
-      {/* Floating Card - smaller size */}
+      {/* Full screen ambient glow - softer at edges */}
+      <GlowLayer
+        className="absolute inset-0"
+        blur={120}
+        gradient="radial-gradient(ellipse 80% 60% at 50% 55%, rgba(139, 92, 246, 0.4) 0%, rgba(99, 102, 241, 0.25) 30%, rgba(59, 130, 246, 0.1) 60%, transparent 100%)"
+        duration={4}
+      />
+      
+      {/* Large outer glow - fills most of screen */}
+      <GlowLayer
+        className="absolute w-[150vw] h-[120vh] -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
+        blur={80}
+        gradient="radial-gradient(ellipse 50% 40% at 50% 50%, rgba(168, 85, 247, 0.5) 0%, rgba(139, 92, 246, 0.3) 35%, rgba(79, 70, 229, 0.15) 60%, transparent 85%)"
+        duration={3.5}
+        delay={0.2}
+      />
+
+      {/* Floating Card */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ 
@@ -59,28 +79,32 @@ const SplashScreen = () => {
           opacity: { duration: 0.8 },
           y: { duration: 3, repeat: Infinity, ease: "easeInOut" }
         }}
-        className="relative w-[70vw] max-w-xs"
+        className="relative w-[70vw] max-w-xs z-10"
       >
-        {/* Fantastic Glow Behind Card - Purple/Blue radiating effect */}
+        {/* Intense glow directly behind card */}
         <GlowLayer
-          inset="-inset-8"
-          blur={40}
-          gradient="radial-gradient(ellipse at center, rgba(139, 92, 246, 0.8) 0%, rgba(99, 102, 241, 0.5) 40%, rgba(59, 130, 246, 0.2) 70%, transparent 90%)"
-          duration={3}
-        />
-        <GlowLayer
-          inset="-inset-6"
-          blur={25}
-          gradient="radial-gradient(ellipse at center, rgba(168, 85, 247, 0.9) 0%, rgba(139, 92, 246, 0.6) 35%, transparent 70%)"
+          className="absolute -inset-20 rounded-[50%]"
+          blur={60}
+          gradient="radial-gradient(ellipse at center, rgba(168, 85, 247, 1) 0%, rgba(139, 92, 246, 0.8) 25%, rgba(99, 102, 241, 0.5) 50%, rgba(59, 130, 246, 0.2) 75%, transparent 100%)"
           duration={2.5}
-          delay={0.4}
         />
+        
+        {/* Bright core glow */}
         <GlowLayer
-          inset="-inset-4"
-          blur={15}
-          gradient="radial-gradient(ellipse at center, rgba(192, 132, 252, 0.7) 0%, rgba(167, 139, 250, 0.4) 40%, transparent 65%)"
+          className="absolute -inset-12 rounded-3xl"
+          blur={35}
+          gradient="radial-gradient(ellipse at center, rgba(192, 132, 252, 1) 0%, rgba(168, 85, 247, 0.9) 30%, rgba(139, 92, 246, 0.5) 60%, transparent 85%)"
           duration={2}
-          delay={0.8}
+          delay={0.3}
+        />
+        
+        {/* Inner intense glow */}
+        <GlowLayer
+          className="absolute -inset-6 rounded-2xl"
+          blur={20}
+          gradient="radial-gradient(ellipse at center, rgba(216, 180, 254, 0.9) 0%, rgba(192, 132, 252, 0.7) 40%, transparent 70%)"
+          duration={1.8}
+          delay={0.6}
         />
         
         {/* Card Image */}
