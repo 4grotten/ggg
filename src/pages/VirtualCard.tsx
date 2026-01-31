@@ -157,8 +157,7 @@ const VirtualCard = () => {
         >
         {/* Card Visual */}
         <motion.div 
-          className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden shadow-none"
-          style={{ boxShadow: "none", filter: "none" }}
+          className="relative w-full aspect-[1.586/1]"
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -166,11 +165,11 @@ const VirtualCard = () => {
           <img 
             src={virtualCardImage} 
             alt="Virtual Card"
-            className="w-full h-full object-cover rounded-2xl"
+            className="absolute inset-0 w-full h-full object-contain"
           />
           
           {/* Cardholder name overlay */}
-          <div className="absolute bottom-6 left-6 flex items-center gap-2">
+          <div className="absolute bottom-4 left-4 flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
               <span className="text-xs text-white font-medium">RK</span>
             </div>
