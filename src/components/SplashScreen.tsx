@@ -3,11 +3,13 @@ import { motion } from "framer-motion";
 
 const SplashScreen = () => {
   const [isReady, setIsReady] = useState(false);
+  const [isSwaying, setIsSwaying] = useState(false);
 
   // Wait for page to be fully ready and painted before starting animation
   useEffect(() => {
     let rafId: number;
     let timeoutId: ReturnType<typeof setTimeout>;
+    let swayTimeoutId: ReturnType<typeof setTimeout>;
     
     const startAnimation = () => {
       // Triple RAF + small delay ensures the screen is actually visible to user
@@ -17,6 +19,11 @@ const SplashScreen = () => {
             // Additional 150ms delay for PWA/RWA where rendering may be delayed
             timeoutId = setTimeout(() => {
               setIsReady(true);
+              
+              // After 3 seconds of card being still, start swaying
+              swayTimeoutId = setTimeout(() => {
+                setIsSwaying(true);
+              }, 3000);
             }, 150);
           });
         });
@@ -32,12 +39,14 @@ const SplashScreen = () => {
         window.removeEventListener('load', startAnimation);
         cancelAnimationFrame(rafId);
         clearTimeout(timeoutId);
+        clearTimeout(swayTimeoutId);
       };
     }
     
     return () => {
       cancelAnimationFrame(rafId);
       clearTimeout(timeoutId);
+      clearTimeout(swayTimeoutId);
     };
   }, []);
 
@@ -114,12 +123,14 @@ const SplashScreen = () => {
         animate={isReady ? { 
           scale: 1, 
           opacity: 1,
-          y: [0, -15, 0]
+          y: 0,
+          rotate: isSwaying ? [0, -3, 3, -2, 2, 0] : 0
         } : { scale: 0.6, opacity: 0, y: 80 }}
         transition={{ 
           scale: { duration: 1, ease: [0.16, 1, 0.3, 1] },
           opacity: { duration: 0.8 },
-          y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }
+          y: { duration: 1, ease: [0.16, 1, 0.3, 1] },
+          rotate: isSwaying ? { duration: 2, ease: "easeInOut" } : { duration: 0 }
         }}
         className="relative w-[60vw] max-w-[280px]"
         style={{ perspective: "1000px" }}
@@ -158,8 +169,8 @@ const SplashScreen = () => {
             }}
           />
           
-          {/* Fantasy glint overlay - pure CSS, starts after card loads */}
-          {isReady && (
+          {/* Fantasy glint overlay - starts only when swaying */}
+          {isSwaying && (
             <div
               className="absolute overflow-hidden pointer-events-none"
               style={{
@@ -176,8 +187,7 @@ const SplashScreen = () => {
                   borderRadius: 18,
                   background:
                     "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
-                  animation: "splash-glint 2.2s ease-in-out 1.2s infinite",
-                  opacity: 0,
+                  animation: "splash-glint 0.8s ease-in-out 3",
                 }}
               />
             </div>
