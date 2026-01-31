@@ -130,14 +130,15 @@ const SplashScreen = () => {
           
           {/* Fantasy glint overlay - 4px inset from card edges */}
           <div
-            className="absolute pointer-events-none mix-blend-screen animate-[fantasy-glint_2.2s_ease-in-out_infinite] rounded-3xl overflow-hidden"
+            className="absolute pointer-events-none mix-blend-screen animate-[fantasy-glint_2.2s_ease-in-out_infinite] overflow-hidden"
             style={{
               top: 4,
               left: 4,
               right: 4,
               bottom: 4,
+              borderRadius: 20,
               background:
-                "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.18) 28%, rgba(255,255,255,0.55) 44%, rgba(255,215,160,0.65) 50%, rgba(255,255,255,0.55) 56%, rgba(255,255,255,0.18) 72%, transparent 90%)",
+                "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
               opacity: isReady ? 1 : 0,
               transition: "opacity 200ms ease",
             }}
