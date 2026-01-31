@@ -224,7 +224,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {isLoading ? (
             <SplashScreen key="splash" />
           ) : (
