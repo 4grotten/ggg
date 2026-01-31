@@ -322,6 +322,17 @@
     "appAlreadyInstalled": "التطبيق مثبت بالفعل",
     "installInstructions": "اضغط على مشاركة → إضافة إلى الشاشة الرئيسية للتثبيت"
   },
+  "share": {
+    "cardDetails": "تفاصيل البطاقة",
+    "accountDetails": "تفاصيل الحساب",
+    "selectAsset": "اختر الأصل",
+    "selectAssetDesc": "اختر أصلًا لمشاركة عنوان المحفظة",
+    "selectNetwork": "اختر الشبكة",
+    "selectNetworkFor": "اختر الشبكة لـ",
+    "sendOnly": "أرسل فقط",
+    "toThisAddress": "إلى هذا العنوان عبر",
+    "viaNetwork": "عبر"
+  },
   "settings": {
     "profile": "الملف الشخصي",
     "personalDetails": "البيانات الشخصية",
