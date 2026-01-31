@@ -145,7 +145,7 @@ const SplashScreen = () => {
                 style={{
                   background:
                     "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
-                  animation: "splash-glint 2.2s ease-in-out 1.2s infinite",
+                  animation: "splash-glint 2.2s ease-in-out 1.8s infinite",
                   opacity: 0,
                 }}
               />
