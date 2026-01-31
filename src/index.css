@@ -191,6 +191,22 @@
   animation: spin-slow 8s linear infinite;
 }
 
+/* Card glow animation */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
   /* Fix autofill styling for iOS/Safari */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
