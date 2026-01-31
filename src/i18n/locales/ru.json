@@ -333,6 +333,9 @@
     "toThisAddress": "на этот адрес через",
     "viaNetwork": "через"
   },
+  "bank": {
+    "name": "Название банка"
+  },
   "settings": {
     "profile": "Профиль",
     "personalDetails": "Личные данные",
@@ -512,6 +515,8 @@
   "card": {
     "back": "Назад",
     "addToApplePay": "Как добавить карту в Apple Pay?",
+    "number": "Номер карты",
+    "holder": "Держатель карты",
     "expiry": "Срок действия",
     "cvv": "CVV",
     "hide": "Скрыть",

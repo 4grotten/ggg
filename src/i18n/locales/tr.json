@@ -333,6 +333,9 @@
     "toThisAddress": "bu adrese şu yolla",
     "viaNetwork": "üzerinden"
   },
+  "bank": {
+    "name": "Banka Adı"
+  },
   "settings": {
     "profile": "Profil",
     "personalDetails": "Kişisel Bilgiler",
@@ -452,6 +455,8 @@
   "card": {
     "back": "Geri",
     "addToApplePay": "Kartı Apple Pay'e nasıl eklerim?",
+    "number": "Kart Numarası",
+    "holder": "Kart Sahibi",
     "expiry": "Son Kullanma",
     "cvv": "CVV",
     "hide": "Gizle",

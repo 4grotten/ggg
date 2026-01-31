@@ -335,6 +335,9 @@
     "toThisAddress": "到此地址通过",
     "viaNetwork": "通过"
   },
+  "bank": {
+    "name": "银行名称"
+  },
   "settings": {
     "profile": "个人资料",
     "personalDetails": "个人信息",
@@ -454,6 +457,8 @@
   "card": {
     "back": "返回",
     "addToApplePay": "如何将卡添加到Apple Pay？",
+    "number": "卡号",
+    "holder": "持卡人",
     "expiry": "有效期",
     "cvv": "CVV",
     "hide": "隐藏",
