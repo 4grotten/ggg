@@ -115,7 +115,7 @@ const SplashScreen = () => {
         />
         
         {/* Card Image */}
-        <div className="relative overflow-hidden rounded-2xl" style={{ isolation: "isolate" }}>
+        <div className="relative overflow-hidden rounded-3xl" style={{ isolation: "isolate" }}>
           <motion.img
             src="./easy-card-banner.png"
             alt="Easy Card"
