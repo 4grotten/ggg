@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import easyCardImage from "@/assets/easy-card.png";
+import easyCardImage from "@/assets/easy-card-splash.svg";
 
 // Memoized glow layer
 const GlowLayer = memo(({ 
