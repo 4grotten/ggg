@@ -493,7 +493,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     const isLastStep = step === 3;
     
     return (
-      <div className="relative rounded-2xl p-[2px] overflow-hidden">
+      <div className="relative rounded-2xl p-[6px] overflow-hidden">
         {/* Animated rainbow border */}
         <div 
           className="absolute inset-0 rounded-2xl animate-spin-slow"
@@ -502,14 +502,14 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
           }}
         />
         <div 
-          className="absolute inset-[-2px] rounded-2xl opacity-40 blur-sm animate-spin-slow"
+          className="absolute inset-[-6px] rounded-2xl opacity-40 blur-lg animate-spin-slow"
           style={{
             background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
           }}
         />
         <button
           onClick={isLastStep ? handleGoToPartnerPage : handleContinue}
-          className="relative w-full py-4 font-semibold rounded-[14px] overflow-hidden partner-continue-btn"
+          className="relative w-full py-4 font-semibold rounded-[10px] overflow-hidden partner-continue-btn"
           style={{
             background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
           }}
