@@ -9,12 +9,12 @@ export const CardMiniature = ({ type, className = "" }: CardMiniatureProps) => {
   if (type === "virtual") {
     return (
       <div 
-        className={`relative w-[90%] aspect-[1.7/1] ${className}`}
+        className={`relative w-full aspect-[1.586/1] ${className}`}
       >
-        <img
+        <img 
           src={virtualCardImage} 
           alt="Virtual Card"
-          className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+          className="absolute inset-0 w-full h-full object-fill rounded-2xl"
         />
       </div>
     );
