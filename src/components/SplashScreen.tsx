@@ -74,16 +74,20 @@ const SplashScreen = () => {
 
       {/* Floating Card with 3D effect */}
       <motion.div
-        initial={{ scale: 1, opacity: 1 }}
+        initial={{ scale: 0.6, opacity: 0, y: 80, rotateX: 30, rotateY: -20 }}
         animate={{ 
+          scale: 1, 
+          opacity: 1,
           y: [0, -10, 0],
           rotateX: [0, 2, 0],
           rotateY: [0, -2, 0]
         }}
         transition={{ 
-          y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-          rotateX: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-          rotateY: { duration: 5, repeat: Infinity, ease: "easeInOut" }
+          scale: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 0.6 },
+          y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
+          rotateX: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
+          rotateY: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }
         }}
         className="relative w-[70vw] max-w-xs z-10"
         style={{ 
