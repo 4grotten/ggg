@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Lock, LockOpen, RefreshCw, Eye, EyeOff, X, ChevronUp, Clock, Share2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Lock, LockOpen, RefreshCw, Eye, EyeOff, X, ChevronUp, Clock, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -250,6 +250,38 @@ const CardPage = () => {
         <div className="px-4 py-6 space-y-5">
           {/* Card Carousel */}
           <div className="relative overflow-hidden max-w-xs sm:max-w-sm mx-auto">
+            {/* Left Arrow - Desktop only */}
+            <button
+              onClick={() => {
+                if (activeIndex > 0) {
+                  setDirection(-1);
+                  setActiveIndex(activeIndex - 1);
+                }
+              }}
+              className={`hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 z-10 w-10 h-10 items-center justify-center rounded-full bg-secondary hover:bg-muted transition-all ${
+                activeIndex === 0 ? "opacity-30 cursor-not-allowed" : "opacity-100"
+              }`}
+              disabled={activeIndex === 0}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Right Arrow - Desktop only */}
+            <button
+              onClick={() => {
+                if (activeIndex < cardTypes.length - 1) {
+                  setDirection(1);
+                  setActiveIndex(activeIndex + 1);
+                }
+              }}
+              className={`hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 z-10 w-10 h-10 items-center justify-center rounded-full bg-secondary hover:bg-muted transition-all ${
+                activeIndex === cardTypes.length - 1 ? "opacity-30 cursor-not-allowed" : "opacity-100"
+              }`}
+              disabled={activeIndex === cardTypes.length - 1}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
             <motion.div
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
