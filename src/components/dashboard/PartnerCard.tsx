@@ -10,7 +10,7 @@ export const PartnerCard = ({ onClick }: PartnerCardProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className="relative rounded-2xl p-[2px] overflow-hidden">
+    <div className="relative rounded-2xl p-[4px] overflow-hidden">
       {/* Animated rainbow border with glow */}
       <div 
         className="absolute inset-0 rounded-2xl blur-[1px] animate-spin-slow"
@@ -21,7 +21,7 @@ export const PartnerCard = ({ onClick }: PartnerCardProps) => {
       
       {/* Glow effect layer */}
       <div 
-        className="absolute inset-[-2px] rounded-2xl opacity-40 blur-md animate-spin-slow"
+        className="absolute inset-[-4px] rounded-2xl opacity-40 blur-md animate-spin-slow"
         style={{
           background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
         }}
