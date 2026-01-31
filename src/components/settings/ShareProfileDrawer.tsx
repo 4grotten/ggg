@@ -511,19 +511,71 @@ Easy Card UAE`;
     }
   };
   
-  // Build business card data for QR
-  const buildBusinessCardData = () => {
+  // Build vCard format for QR code - enables automatic contact saving when scanned
+  const buildVCardData = () => {
     const selectedFields = businessCardFields.filter(f => f.checked);
     const selectedSocials = socialLinks.filter(link => socialChecked[link.id]);
     
-    let data = `Easy Card\n`;
-    selectedFields.forEach(field => {
-      data += `${field.value}\n`;
+    // Get field values by id
+    const getFieldValue = (id: string) => selectedFields.find(f => f.id === id)?.value || "";
+    
+    const fullName = getFieldValue("name");
+    const phone = getFieldValue("phone");
+    const email = getFieldValue("email");
+    const username = getFieldValue("username").replace("@", ""); // Remove @ prefix
+    
+    // Start vCard format
+    let vcard = `BEGIN:VCARD\n`;
+    vcard += `VERSION:3.0\n`;
+    
+    // Full name (FN is required in vCard 3.0)
+    if (fullName) {
+      vcard += `FN:${fullName}\n`;
+      // Try to split name into parts for N field
+      const nameParts = fullName.split(" ");
+      if (nameParts.length >= 2) {
+        vcard += `N:${nameParts.slice(1).join(" ")};${nameParts[0]};;;\n`;
+      } else {
+        vcard += `N:;${fullName};;;\n`;
+      }
+    } else {
+      vcard += `FN:Easy Card Contact\n`;
+      vcard += `N:;Easy Card Contact;;;\n`;
+    }
+    
+    // Phone number
+    if (phone) {
+      vcard += `TEL;TYPE=CELL:${phone}\n`;
+    }
+    
+    // Email
+    if (email) {
+      vcard += `EMAIL:${email}\n`;
+    }
+    
+    // Organization / Note with username
+    vcard += `ORG:Easy Card UAE\n`;
+    if (username) {
+      vcard += `NOTE:Username: @${username}\n`;
+    }
+    
+    // Add social links as URLs
+    selectedSocials.forEach((link, index) => {
+      const platform = detectPlatform(link.url);
+      if (index === 0) {
+        vcard += `URL:${link.url}\n`;
+      } else {
+        // Additional URLs as X-SOCIALPROFILE
+        vcard += `X-SOCIALPROFILE;TYPE=${platform.name.toLowerCase()}:${link.url}\n`;
+      }
     });
-    selectedSocials.forEach(link => {
-      data += `${link.url}\n`;
-    });
-    return data.trim();
+    
+    // App URL
+    vcard += `URL;TYPE=WORK:https://easycarduae.lovable.app\n`;
+    
+    vcard += `END:VCARD`;
+    
+    return vcard;
   };
 
   return (
@@ -788,7 +840,7 @@ Easy Card UAE`;
                 <div className="flex flex-col items-center">
                   <div className="bg-white p-6 rounded-3xl shadow-lg">
                     <QRCodeSVG 
-                      value={buildBusinessCardData()} 
+                      value={buildVCardData()} 
                       size={200}
                       level="M"
                       includeMargin={false}
