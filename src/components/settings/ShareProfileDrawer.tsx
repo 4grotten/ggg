@@ -539,8 +539,8 @@ Easy Card UAE`;
         vcard += `N:;${fullName};;;\n`;
       }
     } else {
-      vcard += `FN:Easy Card Contact\n`;
-      vcard += `N:;Easy Card Contact;;;\n`;
+      vcard += `FN:Contact\n`;
+      vcard += `N:;Contact;;;\n`;
     }
     
     // Phone number
@@ -553,8 +553,7 @@ Easy Card UAE`;
       vcard += `EMAIL:${email}\n`;
     }
     
-    // Organization / Note with username
-    vcard += `ORG:Easy Card UAE\n`;
+    // Note with username
     if (username) {
       vcard += `NOTE:Username: @${username}\n`;
     }
@@ -570,8 +569,6 @@ Easy Card UAE`;
       }
     });
     
-    // App URL
-    vcard += `URL;TYPE=WORK:https://easycarduae.lovable.app\n`;
     
     vcard += `END:VCARD`;
     
