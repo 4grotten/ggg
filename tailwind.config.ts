@@ -182,7 +182,7 @@ export default {
         "ios-alert-in": "ios-alert-in 0.2s ease-out forwards",
         "ios-alert-out": "ios-alert-out 0.15s ease-in forwards",
         "shimmer": "shimmer 2.5s ease-in-out infinite",
-        "spin-slow": "spin-slow 4s linear infinite",
+        "spin-slow": "spin-slow 2s linear infinite",
         "partner-pulse-glow": "partner-pulse-glow 3s ease-in-out infinite",
         "partner-orbit": "partner-orbit 12s linear infinite",
         "partner-node-pulse": "partner-node-pulse 2s ease-in-out infinite",
