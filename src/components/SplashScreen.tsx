@@ -120,7 +120,7 @@ const SplashScreen = () => {
         <motion.div
           initial={{ x: "-150%", opacity: 0 }}
           animate={{ 
-            x: ["−150%", "250%"],
+            x: ["-150%", "250%"],
             opacity: [0, 0.5, 0]
           }}
           transition={{ 
