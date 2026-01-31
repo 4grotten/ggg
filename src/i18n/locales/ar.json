@@ -29,7 +29,9 @@
     "yes": "نعم",
     "aed": "AED",
     "usdt": "USDT",
-    "authorize": "تسجيل الدخول"
+    "authorize": "تسجيل الدخول",
+    "share": "مشاركة",
+    "copy": "نسخ"
   },
   "dashboard": {
     "welcome": "مرحباً، {{name}}!",
@@ -335,6 +337,16 @@
     "addToHomeScreen": "إضافة للشاشة الرئيسية",
     "installApp": "تثبيت التطبيق",
     "share": "مشاركة",
+    "businessCard": "بطاقة العمل",
+    "shareContactInfo": "مشاركة معلومات الاتصال",
+    "cards": "البطاقات",
+    "accounts": "الحسابات",
+    "cryptoWallets": "محافظ العملات المشفرة",
+    "selectNetwork": "اختر الشبكة للمشاركة",
+    "selectNetworkDesc": "اختر شبكة لعرض عنوان المحفظة",
+    "shareCard": "تفاصيل البطاقة",
+    "shareAccount": "تفاصيل الحساب",
+    "shareCrypto": "محفظة العملات المشفرة",
     "shareApp": "مشاركة التطبيق",
     "installStep1Desc": "ابحث عن أيقونة المشاركة في متصفحك",
     "installStep2": "اختر 'إضافة للشاشة الرئيسية'",

@@ -29,7 +29,9 @@
     "yes": "Sí",
     "aed": "AED",
     "usdt": "USDT",
-    "authorize": "Iniciar Sesión"
+    "authorize": "Iniciar Sesión",
+    "share": "Compartir",
+    "copy": "Copiar"
   },
   "dashboard": {
     "welcome": "¡Bienvenido, {{name}}!",
@@ -335,6 +337,16 @@
     "addToHomeScreen": "Añadir a inicio",
     "installApp": "Instalar aplicación",
     "share": "Compartir",
+    "businessCard": "Tarjeta de Visita",
+    "shareContactInfo": "Compartir información de contacto",
+    "cards": "Tarjetas",
+    "accounts": "Cuentas",
+    "cryptoWallets": "Billeteras Crypto",
+    "selectNetwork": "Seleccionar red para compartir",
+    "selectNetworkDesc": "Selecciona una red para ver la dirección de la billetera",
+    "shareCard": "Detalles de Tarjeta",
+    "shareAccount": "Detalles de Cuenta",
+    "shareCrypto": "Billetera Crypto",
     "shareApp": "Compartir aplicación",
     "installStep1Desc": "Busca el icono de compartir en tu navegador",
     "installStep2": "Selecciona 'Añadir a pantalla de inicio'",

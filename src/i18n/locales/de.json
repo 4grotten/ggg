@@ -29,7 +29,9 @@
     "yes": "Ja",
     "aed": "AED",
     "usdt": "USDT",
-    "authorize": "Anmelden"
+    "authorize": "Anmelden",
+    "share": "Teilen",
+    "copy": "Kopieren"
   },
   "dashboard": {
     "welcome": "Willkommen, {{name}}!",
@@ -335,6 +337,16 @@
     "addToHomeScreen": "Zum Startbildschirm",
     "installApp": "App installieren",
     "share": "Teilen",
+    "businessCard": "Visitenkarte",
+    "shareContactInfo": "Kontaktdaten teilen",
+    "cards": "Karten",
+    "accounts": "Konten",
+    "cryptoWallets": "Krypto-Wallets",
+    "selectNetwork": "Netzwerk zum Teilen auswählen",
+    "selectNetworkDesc": "Netzwerk auswählen, um Wallet-Adresse anzuzeigen",
+    "shareCard": "Kartendetails",
+    "shareAccount": "Kontodetails",
+    "shareCrypto": "Krypto-Wallet",
     "shareApp": "App teilen",
     "installStep1Desc": "Suchen Sie das Teilen-Symbol in Ihrem Browser",
     "installStep2": "Wählen Sie 'Zum Home-Bildschirm'",
