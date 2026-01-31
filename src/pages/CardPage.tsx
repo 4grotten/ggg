@@ -249,7 +249,7 @@ const CardPage = () => {
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 py-6 space-y-5">
           {/* Card Carousel */}
-          <div className="relative overflow-hidden">
+          <div className="relative overflow-hidden max-w-xs sm:max-w-sm mx-auto">
             <motion.div
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
