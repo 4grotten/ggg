@@ -335,6 +335,7 @@
     "installInstructions": "Tap Share → Add to Home Screen to install"
   },
   "settings": {
+    "share": "Share",
     "profile": "Profile",
     "personalDetails": "Personal Details",
     "notVerified": "Not verified",
