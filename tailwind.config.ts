@@ -115,6 +115,22 @@ export default {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(200%)" },
         },
+        "fantasy-glint": {
+          "0%": { 
+            transform: "translateX(-100%) skewX(-15deg)",
+            opacity: "0"
+          },
+          "20%": { 
+            opacity: "0.6"
+          },
+          "80%": { 
+            opacity: "0.6"
+          },
+          "100%": { 
+            transform: "translateX(200%) skewX(-15deg)",
+            opacity: "0"
+          },
+        },
         "spin-slow": {
           from: { transform: "rotate(0deg)" },
           to: { transform: "rotate(360deg)" },
@@ -182,6 +198,7 @@ export default {
         "ios-alert-in": "ios-alert-in 0.2s ease-out forwards",
         "ios-alert-out": "ios-alert-out 0.15s ease-in forwards",
         "shimmer": "shimmer 2.5s ease-in-out infinite",
+        "fantasy-glint": "fantasy-glint 4s ease-in-out infinite",
         "spin-slow": "spin-slow 2s linear infinite",
         "partner-pulse-glow": "partner-pulse-glow 3s ease-in-out infinite",
         "partner-orbit": "partner-orbit 12s linear infinite",
