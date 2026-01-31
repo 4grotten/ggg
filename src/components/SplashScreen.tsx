@@ -68,16 +68,16 @@ const SplashScreen = () => {
 
       {/* Floating Card */}
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.7, opacity: 0, y: 50 }}
         animate={{ 
           scale: 1, 
           opacity: 1,
           y: [0, -10, 0]
         }}
         transition={{ 
-          scale: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+          scale: { duration: 1, ease: [0.16, 1, 0.3, 1] },
           opacity: { duration: 0.8 },
-          y: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+          y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }
         }}
         className="relative w-[70vw] max-w-xs z-10"
       >
@@ -112,42 +112,70 @@ const SplashScreen = () => {
           src={easyCardImage}
           alt="Easy Card"
           className="relative z-10 w-full h-auto rounded-xl"
-          initial={{ rotateY: -10, rotateX: 5 }}
+          initial={{ rotateY: -15, rotateX: 8 }}
           animate={{ rotateY: 0, rotateX: 0 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
         />
         
-        {/* Moving Light Reflection on Card */}
+        {/* Primary Moving Light Reflection - bright diagonal shine */}
         <motion.div
           initial={{ x: "-150%", opacity: 0 }}
           animate={{ 
             x: ["-150%", "250%"],
-            opacity: [0, 0.6, 0]
+            opacity: [0, 0.8, 0]
           }}
           transition={{ 
-            duration: 2.5,
-            delay: 0.8,
+            duration: 1.8,
+            delay: 0.6,
+            repeat: Infinity,
+            repeatDelay: 2,
+            ease: "easeInOut"
+          }}
+          className="absolute inset-0 z-20 bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-12 rounded-xl pointer-events-none overflow-hidden"
+        />
+        
+        {/* Secondary shimmer wave */}
+        <motion.div
+          animate={{ 
+            x: ["-200%", "300%"],
+            opacity: [0, 0.4, 0]
+          }}
+          transition={{ 
+            duration: 2.2,
+            delay: 1.5,
             repeat: Infinity,
             repeatDelay: 2.5,
             ease: "easeInOut"
           }}
-          className="absolute inset-0 z-20 bg-gradient-to-r from-transparent via-white/35 to-transparent skew-x-12 rounded-xl pointer-events-none overflow-hidden"
+          className="absolute inset-0 z-20 bg-gradient-to-r from-transparent via-purple-100/40 to-transparent -skew-x-12 rounded-xl pointer-events-none overflow-hidden"
         />
         
-        {/* Secondary Light Wave on Card */}
+        {/* Edge highlight - top */}
         <motion.div
-          animate={{ 
-            x: ["-200%", "300%"],
-            opacity: [0, 0.3, 0]
+          animate={{
+            opacity: [0.3, 0.7, 0.3]
           }}
-          transition={{ 
-            duration: 3,
-            delay: 2,
+          transition={{
+            duration: 2,
             repeat: Infinity,
-            repeatDelay: 3,
             ease: "easeInOut"
           }}
-          className="absolute inset-0 z-20 bg-gradient-to-r from-transparent via-purple-200/25 to-transparent -skew-x-12 rounded-xl pointer-events-none overflow-hidden"
+          className="absolute top-0 left-4 right-4 h-[2px] z-20 bg-gradient-to-r from-transparent via-white/60 to-transparent rounded-full pointer-events-none"
+        />
+        
+        {/* Corner glint */}
+        <motion.div
+          animate={{
+            opacity: [0, 1, 0],
+            scale: [0.8, 1.2, 0.8]
+          }}
+          transition={{
+            duration: 2.5,
+            delay: 0.8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-3 right-4 w-4 h-4 z-20 bg-white/70 blur-sm rounded-full pointer-events-none"
         />
       </motion.div>
     </motion.div>
