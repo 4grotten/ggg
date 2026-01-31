@@ -4,12 +4,31 @@ import { motion } from "framer-motion";
 const SplashScreen = () => {
   const [isReady, setIsReady] = useState(false);
 
-  // Wait for page to be fully ready before starting animation
+  // Wait for page to be fully ready and painted before starting animation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 100);
-    return () => clearTimeout(timer);
+    // Use requestAnimationFrame to ensure the DOM is painted
+    let rafId: number;
+    const startAnimation = () => {
+      rafId = requestAnimationFrame(() => {
+        // Double RAF ensures paint is complete
+        rafId = requestAnimationFrame(() => {
+          setIsReady(true);
+        });
+      });
+    };
+    
+    // Wait for document to be fully interactive
+    if (document.readyState === 'complete') {
+      startAnimation();
+    } else {
+      window.addEventListener('load', startAnimation);
+      return () => {
+        window.removeEventListener('load', startAnimation);
+        cancelAnimationFrame(rafId);
+      };
+    }
+    
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   return (
