@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import easyCardImage from "@/assets/easy-card.png";
 
+// Card image placeholder - upload compressed version to restore
 // Memoized glow layer
 const GlowLayer = memo(({ 
   className,
@@ -103,11 +103,9 @@ const SplashScreen = () => {
           duration={2}
         />
         
-        {/* Card Image with 3D shadow effect */}
-        <motion.img
-          src={easyCardImage}
-          alt="Easy Card"
-          className="relative z-10 w-full h-auto rounded-xl"
+        {/* Card placeholder - upload compressed image to restore */}
+        <motion.div
+          className="relative z-10 w-full aspect-[1.58] rounded-xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 flex items-center justify-center"
           style={{ 
             boxShadow: `
               0 25px 50px -12px rgba(139, 92, 246, 0.5),
@@ -117,7 +115,9 @@ const SplashScreen = () => {
             `,
             transform: "translateZ(20px)"
           }}
-        />
+        >
+          <span className="text-white/80 text-2xl font-bold">Easy Card</span>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
