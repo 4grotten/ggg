@@ -47,7 +47,7 @@ const iconGradients: Record<string, string> = {
   userplus: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
   lock: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)',
   admin: 'linear-gradient(135deg, #1e3a5f 0%, #0a0a0a 100%)',
-  vibrate: 'linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)',
+  vibrate: 'linear-gradient(135deg, #f97316 0%, #22c55e 100%)',
 };
 
 interface ColoredIconProps {
