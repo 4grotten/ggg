@@ -158,7 +158,7 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
             {/* Balance overlay at bottom */}
             {card.balance !== undefined && (
               <div className="absolute bottom-0 left-0 right-0 pl-5 pr-3 pb-3 pt-6 bg-gradient-to-t from-black/40 to-transparent rounded-b-2xl">
-                <p className="text-base font-semibold text-white text-left drop-shadow-sm">
+                <p className="text-lg font-bold text-white text-left drop-shadow-md">
                   {visibleBalances.has(card.id) 
                     ? <><AnimatedNumber key={animationKeys[card.id] || 0} value={card.balance} /> AED</>
                     : "••••••"
