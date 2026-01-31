@@ -322,6 +322,17 @@
     "appAlreadyInstalled": "App ist bereits installiert",
     "installInstructions": "Tippen Sie auf Teilen → Zum Home-Bildschirm zur Installation"
   },
+  "share": {
+    "cardDetails": "Kartendetails",
+    "accountDetails": "Kontodetails",
+    "selectAsset": "Asset auswählen",
+    "selectAssetDesc": "Wählen Sie ein Asset, um die Wallet-Adresse zu teilen",
+    "selectNetwork": "Netzwerk auswählen",
+    "selectNetworkFor": "Netzwerk auswählen für",
+    "sendOnly": "Senden Sie nur",
+    "toThisAddress": "an diese Adresse über",
+    "viaNetwork": "über"
+  },
   "settings": {
     "profile": "Profil",
     "personalDetails": "Persönliche Daten",

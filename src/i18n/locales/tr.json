@@ -322,6 +322,17 @@
     "appAlreadyInstalled": "Uygulama zaten yüklü",
     "installInstructions": "Yüklemek için Paylaş → Ana Ekrana Ekle'ye dokunun"
   },
+  "share": {
+    "cardDetails": "Kart Bilgileri",
+    "accountDetails": "Hesap Bilgileri",
+    "selectAsset": "Varlık Seçin",
+    "selectAssetDesc": "Cüzdan adresini paylaşmak için varlık seçin",
+    "selectNetwork": "Ağ Seçin",
+    "selectNetworkFor": "İçin ağ seçin",
+    "sendOnly": "Sadece gönderin",
+    "toThisAddress": "bu adrese şu yolla",
+    "viaNetwork": "üzerinden"
+  },
   "settings": {
     "profile": "Profil",
     "personalDetails": "Kişisel Bilgiler",

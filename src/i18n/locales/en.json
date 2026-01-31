@@ -336,6 +336,17 @@
     "appAlreadyInstalled": "App is already installed",
     "installInstructions": "Tap Share → Add to Home Screen to install"
   },
+  "share": {
+    "cardDetails": "Card Details",
+    "accountDetails": "Account Details",
+    "selectAsset": "Select Asset",
+    "selectAssetDesc": "Select an asset to share wallet address",
+    "selectNetwork": "Select Network",
+    "selectNetworkFor": "Select network for",
+    "sendOnly": "Send only",
+    "toThisAddress": "to this address via",
+    "viaNetwork": "via"
+  },
   "settings": {
     "share": "Share",
     "businessCard": "Business Card",

@@ -23,12 +23,13 @@ interface ShareProfileDrawerProps {
   onClose: () => void;
 }
 
-type ViewType = "main" | "card" | "account" | "crypto" | "network";
+type ViewType = "main" | "card" | "account" | "crypto" | "asset" | "network";
 
 interface CardData {
   id: string;
   name: string;
   number: string;
+  fullNumber: string;
   type: "virtual" | "metal";
   holder: string;
   expiry: string;
@@ -44,6 +45,14 @@ interface AccountData {
   currency: string;
 }
 
+interface CryptoAsset {
+  id: string;
+  name: string;
+  symbol: string;
+  icon: string;
+  networks: CryptoNetwork[];
+}
+
 interface CryptoNetwork {
   id: string;
   name: string;
@@ -56,6 +65,7 @@ const mockCards: CardData[] = [
     id: "1",
     name: "Virtual Card",
     number: "4532 •••• •••• 7823",
+    fullNumber: "4532 8721 4563 7823",
     type: "virtual",
     holder: "JOHN DOE",
     expiry: "12/28",
@@ -65,6 +75,7 @@ const mockCards: CardData[] = [
     id: "2", 
     name: "Metal Card",
     number: "5412 •••• •••• 3456",
+    fullNumber: "5412 9087 6543 3456",
     type: "metal",
     holder: "JOHN DOE",
     expiry: "06/29",
@@ -83,10 +94,37 @@ const mockAccounts: AccountData[] = [
   }
 ];
 
-const cryptoNetworks: CryptoNetwork[] = [
-  { id: "trc20", name: "TRC20 (Tron)", address: "TJYxBLjN5gKPxTdMjrKPfpXUPe5BYUj9kD" },
-  { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f1B2d1" },
-  { id: "bep20", name: "BEP20 (BSC)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f1B2d1" }
+const cryptoAssets: CryptoAsset[] = [
+  {
+    id: "usdt",
+    name: "Tether",
+    symbol: "USDT",
+    icon: "💵",
+    networks: [
+      { id: "trc20", name: "TRC20 (Tron)", address: "TJYxBLjN5gKPxTdMjrKPfpXUPe5BYUj9kD" },
+      { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f1B2d1" },
+      { id: "bep20", name: "BEP20 (BSC)", address: "0x8A2d35Cc6634C0532925a3b844Bc9e7595f1B2e2" }
+    ]
+  },
+  {
+    id: "btc",
+    name: "Bitcoin",
+    symbol: "BTC",
+    icon: "₿",
+    networks: [
+      { id: "btc", name: "Bitcoin Network", address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" }
+    ]
+  },
+  {
+    id: "eth",
+    name: "Ethereum",
+    symbol: "ETH",
+    icon: "Ξ",
+    networks: [
+      { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f1B2d1" },
+      { id: "bep20", name: "BEP20 (BSC)", address: "0x8A2d35Cc6634C0532925a3b844Bc9e7595f1B2e2" }
+    ]
+  }
 ];
 
 export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps) => {
@@ -95,6 +133,7 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
   const [currentView, setCurrentView] = useState<ViewType>("main");
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<AccountData | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<CryptoAsset | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState<CryptoNetwork | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -102,14 +141,18 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     setCurrentView("main");
     setSelectedCard(null);
     setSelectedAccount(null);
+    setSelectedAsset(null);
     setSelectedNetwork(null);
     onClose();
   };
 
   const handleBack = () => {
     if (currentView === "network") {
-      setCurrentView("crypto");
+      setCurrentView("asset");
       setSelectedNetwork(null);
+    } else if (currentView === "asset") {
+      setCurrentView("crypto");
+      setSelectedAsset(null);
     } else {
       setCurrentView("main");
       setSelectedCard(null);
@@ -170,9 +213,9 @@ Email: john.doe@example.com
   const handleShareCard = (card: CardData) => {
     const cardData = `💳 ${card.name}
 
-Card Number: ${card.number}
-Holder: ${card.holder}
-Expiry: ${card.expiry}
+${t("card.number") || "Card Number"}: ${card.fullNumber}
+${t("card.holder") || "Holder"}: ${card.holder}
+${t("card.expiry") || "Expiry"}: ${card.expiry}
 
 Easy Card UAE`;
     handleShare(cardData, `${card.name} - Easy Card`);
@@ -190,27 +233,29 @@ Easy Card UAE`;
     handleShare(accountData, `${account.name} - Easy Card`);
   };
 
-  const handleShareCryptoWallet = (network: CryptoNetwork) => {
-    const walletData = `₿ USDT Wallet (${network.name})
+  const handleShareCryptoWallet = (asset: CryptoAsset, network: CryptoNetwork) => {
+    const walletData = `${asset.icon} ${asset.name} (${asset.symbol}) - ${network.name}
 
-Address: ${network.address}
+${t("crypto.walletAddress") || "Address"}: ${network.address}
 
-Send only USDT to this address via ${network.name} network.
+${t("share.sendOnly") || "Send only"} ${asset.symbol} ${t("share.toThisAddress") || "to this address via"} ${network.name}.
 
 Easy Card UAE`;
-    handleShare(walletData, `USDT ${network.name} Wallet - Easy Card`);
+    handleShare(walletData, `${asset.symbol} ${network.name} - Easy Card`);
   };
 
   const getTitle = () => {
     switch (currentView) {
       case "card":
-        return selectedCard?.name || t("settings.shareCard") || "Card Details";
+        return selectedCard?.name || t("share.cardDetails") || "Card Details";
       case "account":
-        return selectedAccount?.name || t("settings.shareAccount") || "Account Details";
+        return selectedAccount?.name || t("share.accountDetails") || "Account Details";
       case "crypto":
-        return t("settings.shareCrypto") || "Crypto Wallet";
+        return t("share.selectAsset") || "Select Asset";
+      case "asset":
+        return selectedAsset?.name || t("share.selectNetwork") || "Select Network";
       case "network":
-        return selectedNetwork?.name || "Network";
+        return `${selectedAsset?.symbol || ""} - ${selectedNetwork?.name || ""}`;
       default:
         return t("settings.share") || "Share";
     }
@@ -428,7 +473,7 @@ Easy Card UAE`;
               </motion.div>
             )}
 
-            {/* Crypto Network Selection */}
+            {/* Crypto Asset Selection */}
             {currentView === "crypto" && (
               <motion.div
                 key="crypto"
@@ -438,9 +483,47 @@ Easy Card UAE`;
                 className="space-y-3"
               >
                 <p className="text-sm text-muted-foreground px-1">
-                  {t("settings.selectNetworkDesc") || "Select a network to view wallet address"}
+                  {t("share.selectAssetDesc") || "Select an asset to share wallet address"}
                 </p>
-                {cryptoNetworks.map((network) => (
+                {cryptoAssets.map((asset) => (
+                  <button
+                    key={asset.id}
+                    onClick={() => {
+                      tap();
+                      setSelectedAsset(asset);
+                      setCurrentView("asset");
+                    }}
+                    className="w-full flex items-center gap-4 p-4 bg-muted/50 rounded-2xl hover:bg-muted/70 transition-colors"
+                  >
+                    <div 
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                      style={{ background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)" }}
+                    >
+                      {asset.icon}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium">{asset.name}</p>
+                      <p className="text-sm text-muted-foreground">{asset.symbol}</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </button>
+                ))}
+              </motion.div>
+            )}
+
+            {/* Network Selection for Asset */}
+            {currentView === "asset" && selectedAsset && (
+              <motion.div
+                key="asset"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-3"
+              >
+                <p className="text-sm text-muted-foreground px-1">
+                  {t("share.selectNetworkFor") || "Select network for"} {selectedAsset.symbol}
+                </p>
+                {selectedAsset.networks.map((network) => (
                   <button
                     key={network.id}
                     onClick={() => {
@@ -452,7 +535,7 @@ Easy Card UAE`;
                   >
                     <div 
                       className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)" }}
+                      style={{ background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)" }}
                     >
                       <Wallet className="w-5 h-5 text-white" />
                     </div>
@@ -469,7 +552,7 @@ Easy Card UAE`;
             )}
 
             {/* Network Wallet View with QR */}
-            {currentView === "network" && selectedNetwork && (
+            {currentView === "network" && selectedNetwork && selectedAsset && (
               <motion.div
                 key="network"
                 initial={{ opacity: 0, x: 20 }}
@@ -477,6 +560,13 @@ Easy Card UAE`;
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
+                {/* Asset Header */}
+                <div className="text-center">
+                  <span className="text-4xl">{selectedAsset.icon}</span>
+                  <p className="font-semibold mt-2">{selectedAsset.symbol}</p>
+                  <p className="text-sm text-muted-foreground">{selectedNetwork.name}</p>
+                </div>
+
                 {/* QR Code */}
                 <div className="flex justify-center">
                   <div className="bg-white p-4 rounded-2xl">
@@ -494,6 +584,11 @@ Easy Card UAE`;
                   <p className="font-mono text-sm break-all">{selectedNetwork.address}</p>
                 </div>
 
+                {/* Warning */}
+                <p className="text-xs text-center text-muted-foreground">
+                  {t("share.sendOnly") || "Send only"} {selectedAsset.symbol} {t("share.viaNetwork") || "via"} {selectedNetwork.name}
+                </p>
+
                 {/* Action Buttons */}
                 <div className="flex gap-3">
                   <button
@@ -508,7 +603,7 @@ Easy Card UAE`;
                     <span>{t("common.copy") || "Copy"}</span>
                   </button>
                   <button
-                    onClick={() => handleShareCryptoWallet(selectedNetwork)}
+                    onClick={() => handleShareCryptoWallet(selectedAsset, selectedNetwork)}
                     className="flex-1 flex items-center justify-center gap-2 py-4 px-4 bg-primary text-primary-foreground rounded-2xl font-medium hover:bg-primary/90 transition-colors"
                   >
                     <Share2 className="w-5 h-5" />

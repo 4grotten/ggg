@@ -322,6 +322,17 @@
     "appAlreadyInstalled": "La app ya está instalada",
     "installInstructions": "Toca Compartir → Añadir a pantalla de inicio para instalar"
   },
+  "share": {
+    "cardDetails": "Detalles de Tarjeta",
+    "accountDetails": "Detalles de Cuenta",
+    "selectAsset": "Seleccionar Activo",
+    "selectAssetDesc": "Selecciona un activo para compartir la dirección de billetera",
+    "selectNetwork": "Seleccionar Red",
+    "selectNetworkFor": "Seleccionar red para",
+    "sendOnly": "Enviar solo",
+    "toThisAddress": "a esta dirección vía",
+    "viaNetwork": "vía"
+  },
   "settings": {
     "profile": "Perfil",
     "personalDetails": "Datos personales",

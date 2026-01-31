@@ -322,6 +322,17 @@
     "appAlreadyInstalled": "Приложение уже установлено",
     "installInstructions": "Нажмите «Поделиться» → «На экран Домой» для установки"
   },
+  "share": {
+    "cardDetails": "Данные карты",
+    "accountDetails": "Данные счёта",
+    "selectAsset": "Выберите актив",
+    "selectAssetDesc": "Выберите актив для получения адреса кошелька",
+    "selectNetwork": "Выберите сеть",
+    "selectNetworkFor": "Выберите сеть для",
+    "sendOnly": "Отправляйте только",
+    "toThisAddress": "на этот адрес через",
+    "viaNetwork": "через"
+  },
   "settings": {
     "profile": "Профиль",
     "personalDetails": "Личные данные",
