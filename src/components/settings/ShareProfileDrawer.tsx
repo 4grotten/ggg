@@ -748,43 +748,23 @@ Easy Card UAE`;
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-5"
               >
-                {/* Hero Card with Avatar and Name - Animated Blue Gradient */}
+                {/* Hero Card with Avatar and Name - CSS Animated Blue Gradient */}
                 <motion.div 
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
-                  className="relative overflow-hidden rounded-3xl p-6"
+                  className="relative overflow-hidden rounded-3xl p-6 animate-gradient-shift"
                   style={{
-                    background: "linear-gradient(-45deg, #3b82f6, #1e40af, #7c3aed, #2563eb)",
-                    backgroundSize: "300% 300%",
-                    animation: "gradientShift 6s ease infinite"
+                    background: "linear-gradient(-45deg, #3b82f6, #1e40af, #7c3aed, #2563eb)"
                   }}
                 >
-                  {/* Background decoration - animated glow */}
-                  <div className="absolute inset-0 overflow-hidden">
-                    <motion.div 
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        opacity: [0.2, 0.4, 0.2]
-                      }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/10 rounded-full blur-3xl" 
-                    />
-                    <motion.div 
-                      animate={{ 
-                        scale: [1, 1.3, 1],
-                        opacity: [0.15, 0.3, 0.15]
-                      }}
-                      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                      className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-purple-400/20 rounded-full blur-3xl" 
-                    />
-                    <motion.div 
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      className="absolute top-4 right-4"
-                    >
+                  {/* Background decoration - CSS animated glow */}
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/10 rounded-full blur-3xl animate-glow-pulse" />
+                    <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-purple-400/20 rounded-full blur-3xl animate-glow-pulse-alt" />
+                    <div className="absolute top-4 right-4 animate-sparkle-rotate">
                       <Sparkles className="w-5 h-5 text-white/40" />
-                    </motion.div>
+                    </div>
                   </div>
                   
                   <div className="relative z-10 flex items-center gap-4">
@@ -828,7 +808,7 @@ Easy Card UAE`;
                   </div>
                 </motion.div>
 
-                {/* Action Buttons with Animated Gradients */}
+                {/* Action Buttons with CSS Animated Gradients */}
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -838,12 +818,9 @@ Easy Card UAE`;
                   <button
                     onClick={handleShareBusinessCard}
                     disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
-                    className="flex-1 flex items-center justify-center gap-3 py-4 px-6 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100"
+                    className="flex-1 flex items-center justify-center gap-3 py-4 px-6 text-white rounded-2xl font-semibold shadow-[0_10px_25px_-5px_rgba(59,130,246,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(59,130,246,0.5)] hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100 animate-gradient-shift"
                     style={{
-                      background: "linear-gradient(-45deg, #3b82f6, #1e40af, #7c3aed, #2563eb)",
-                      backgroundSize: "300% 300%",
-                      animation: "gradientShift 6s ease infinite",
-                      boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.4)"
+                      background: "linear-gradient(-45deg, #3b82f6, #1e40af, #7c3aed, #2563eb)"
                     }}
                   >
                     <Share2 className="w-5 h-5" />
@@ -855,13 +832,10 @@ Easy Card UAE`;
                       setCurrentView("businessCardQR");
                     }}
                     disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
-                    className="flex items-center justify-center gap-2 py-4 px-5 text-white rounded-2xl font-semibold hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="flex items-center justify-center gap-2 py-4 px-5 text-white rounded-2xl font-semibold shadow-[0_8px_20px_-5px_rgba(59,130,246,0.35)] hover:shadow-[0_12px_25px_-5px_rgba(59,130,246,0.45)] hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 animate-gradient-shift"
                     style={{
                       background: "linear-gradient(-45deg, #1e40af, #3b82f6, #6366f1, #2563eb)",
-                      backgroundSize: "300% 300%",
-                      animation: "gradientShift 5s ease infinite",
-                      animationDelay: "0.5s",
-                      boxShadow: "0 8px 20px -5px rgba(59, 130, 246, 0.35)"
+                      animationDelay: "0.5s"
                     }}
                   >
                     <QrCode className="w-5 h-5" />
@@ -977,60 +951,27 @@ Easy Card UAE`;
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                {/* QR Card with Avatar - Animated Purple-Blue Gradient */}
+                {/* QR Card with Avatar - CSS Animated Purple-Blue Gradient */}
                 <motion.div 
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 300 }}
-                  className="relative overflow-hidden rounded-3xl p-6"
+                  className="relative overflow-hidden rounded-3xl p-6 animate-gradient-shift"
                   style={{
                     background: "linear-gradient(-45deg, #7c3aed, #3b82f6, #8b5cf6, #2563eb)",
-                    backgroundSize: "400% 400%",
-                    animation: "gradientShift 8s ease infinite"
+                    backgroundSize: "400% 400%"
                   }}
                 >
-                  {/* Animated background decorations */}
-                  <div className="absolute inset-0 overflow-hidden">
-                    <motion.div 
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.5, 0.3],
-                        x: [0, 30, 0],
-                        y: [0, -20, 0]
-                      }}
-                      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/10 rounded-full blur-3xl" 
-                    />
-                    <motion.div 
-                      animate={{ 
-                        scale: [1, 1.3, 1],
-                        opacity: [0.2, 0.4, 0.2],
-                        x: [0, -20, 0],
-                        y: [0, 30, 0]
-                      }}
-                      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                      className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-purple-500/20 rounded-full blur-3xl" 
-                    />
-                    <motion.div 
-                      animate={{ 
-                        rotate: [0, 360],
-                        scale: [1, 1.1, 1]
-                      }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      className="absolute top-4 right-4"
-                    >
+                  {/* CSS animated background decorations */}
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/10 rounded-full blur-3xl animate-floating-glow" />
+                    <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-purple-500/20 rounded-full blur-3xl animate-floating-glow-alt" />
+                    <div className="absolute top-4 right-4 animate-sparkle-rotate">
                       <Sparkles className="w-6 h-6 text-white/40" />
-                    </motion.div>
-                    <motion.div 
-                      animate={{ 
-                        rotate: [360, 0],
-                        scale: [1, 1.2, 1]
-                      }}
-                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                      className="absolute bottom-4 left-4"
-                    >
+                    </div>
+                    <div className="absolute bottom-4 left-4 animate-sparkle-rotate-reverse">
                       <Sparkles className="w-4 h-4 text-white/30" />
-                    </motion.div>
+                    </div>
                   </div>
                   
                   <div className="relative z-10 flex flex-col items-center">
