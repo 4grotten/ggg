@@ -231,7 +231,7 @@ const CardPage = () => {
   };
 
   const renderCardVisual = () => {
-    return <CardMiniature type={currentCardType} />;
+    return <CardMiniature type={currentCardType} showGlow />;
   };
 
   return (
