@@ -115,11 +115,11 @@ const SplashScreen = () => {
         />
         
         {/* Card Image */}
-        <div className="relative overflow-hidden rounded-2xl">
+        <div className="relative overflow-hidden rounded-2xl" style={{ isolation: "isolate" }}>
           <motion.img
             src="./easy-card-banner.png"
             alt="Easy Card"
-            className="relative w-full h-auto rounded-2xl"
+            className="relative w-full h-auto block"
             initial={{ rotateY: -15, rotateX: 8 }}
             animate={isReady ? { rotateY: 0, rotateX: 0 } : { rotateY: -15, rotateX: 8 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
@@ -130,7 +130,7 @@ const SplashScreen = () => {
           
           {/* Fantasy glint overlay */}
           <div 
-            className="absolute inset-0 animate-fantasy-glint pointer-events-none rounded-2xl"
+            className="absolute inset-0 animate-fantasy-glint pointer-events-none"
             style={{
               background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 35%, rgba(200,180,255,0.25) 42%, rgba(180,220,255,0.3) 50%, rgba(255,200,255,0.25) 58%, rgba(255,255,255,0.1) 65%, transparent 80%)",
             }}
