@@ -55,7 +55,7 @@ const SplashScreen = () => {
         
         {/* Card Image */}
         <motion.img
-          src="./og-image.png"
+          src="./easy-card-banner.png"
           alt="Easy Card"
           className="relative w-full h-auto rounded-2xl"
           initial={{ rotateY: -10, rotateX: 5 }}
