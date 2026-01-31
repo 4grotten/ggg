@@ -159,19 +159,20 @@ const SplashScreen = () => {
           
           {/* Fantasy glint overlay - pure CSS, starts after card loads */}
           {isReady && (
-          <div
+            <div
               className="absolute overflow-hidden pointer-events-none"
               style={{
                 top: 4,
                 left: 4,
                 right: 4,
                 bottom: 4,
-                borderRadius: 22,
+                borderRadius: 20,
               }}
             >
               <div
                 className="absolute inset-0 mix-blend-screen"
                 style={{
+                  borderRadius: 20,
                   background:
                     "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
                   animation: "splash-glint 2.2s ease-in-out 1.2s infinite",
