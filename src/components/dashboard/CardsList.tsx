@@ -142,12 +142,12 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
             {card.balance !== undefined && (
               <div
                 onClick={(e) => toggleBalanceVisibility(e, card.id)}
-                className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/30 transition-colors"
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/50 transition-colors"
               >
                 {visibleBalances.has(card.id) ? (
-                  <Eye className="w-3.5 h-3.5 text-white/80" />
+                  <Eye className="w-4 h-4 text-white" />
                 ) : (
-                  <EyeOff className="w-3.5 h-3.5 text-white/80" />
+                  <EyeOff className="w-4 h-4 text-white" />
                 )}
               </div>
             )}
