@@ -1,8 +1,8 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import partnerGrowthImage from "@/assets/partner-network-hero.png";
 
-// Placeholder - upload compressed banner to restore
 // Memoized glow layer to prevent re-renders
 const GlowLayer = memo(({ 
   inset, 
@@ -78,12 +78,13 @@ export const HeroBanner = memo(() => {
         darkOnly
       />
       
-      {/* Banner placeholder - upload compressed image to restore */}
-      <div 
-        className="relative z-10 w-full aspect-[2.5] rounded-2xl bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 flex items-center justify-center opacity-80"
-      >
-        <span className="text-white/90 text-xl font-semibold">{t('partner.inviteFriendsTitle', 'Приглашайте друзей')}</span>
-      </div>
+      {/* Image */}
+      <img 
+        src={partnerGrowthImage} 
+        alt={t('partner.inviteFriendsTitle', 'Приглашайте друзей')}
+        className="relative z-10 w-full h-auto rounded-2xl opacity-80"
+        loading="eager"
+      />
     </div>
   );
 });

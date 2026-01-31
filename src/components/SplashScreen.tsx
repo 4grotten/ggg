@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
+import easyCardImage from "@/assets/easy-card.png";
 
-// Card image placeholder - upload compressed version to restore
 // Memoized glow layer
 const GlowLayer = memo(({ 
   className,
@@ -74,7 +74,7 @@ const SplashScreen = () => {
 
       {/* Floating Card with 3D effect */}
       <motion.div
-        initial={{ scale: 0.3, opacity: 0 }}
+        initial={{ scale: 0.6, opacity: 0, y: 80, rotateX: 30, rotateY: -20 }}
         animate={{ 
           scale: 1, 
           opacity: 1,
@@ -83,8 +83,8 @@ const SplashScreen = () => {
           rotateY: [0, -2, 0]
         }}
         transition={{ 
-          scale: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.2 },
-          opacity: { duration: 0.4, delay: 0.2 },
+          scale: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 0.6 },
           y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
           rotateX: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
           rotateY: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }
@@ -103,9 +103,11 @@ const SplashScreen = () => {
           duration={2}
         />
         
-        {/* Card placeholder - upload compressed image to restore */}
-        <motion.div
-          className="relative z-10 w-full aspect-[1.58] rounded-xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 flex items-center justify-center"
+        {/* Card Image with 3D shadow effect */}
+        <motion.img
+          src={easyCardImage}
+          alt="Easy Card"
+          className="relative z-10 w-full h-auto rounded-xl"
           style={{ 
             boxShadow: `
               0 25px 50px -12px rgba(139, 92, 246, 0.5),
@@ -115,9 +117,7 @@ const SplashScreen = () => {
             `,
             transform: "translateZ(20px)"
           }}
-        >
-          <span className="text-white/80 text-2xl font-bold">Easy Card</span>
-        </motion.div>
+        />
       </motion.div>
     </motion.div>
   );
