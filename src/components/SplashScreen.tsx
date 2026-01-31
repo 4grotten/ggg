@@ -39,14 +39,19 @@ const SplashScreen = () => {
         background: "radial-gradient(ellipse 80% 60% at 50% 50%, hsl(270, 80%, 25%) 0%, hsl(260, 70%, 15%) 40%, hsl(250, 60%, 8%) 70%, hsl(240, 50%, 4%) 100%)"
       }}
     >
-      {/* Ambient Purple Glow Layers */}
-      <div className="absolute inset-0">
+      {/* Ambient Purple Glow Layers - only show when ready */}
+      <motion.div 
+        className="absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isReady ? 1 : 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
         {/* Core glow */}
         <motion.div
-          animate={{ 
+          animate={isReady ? { 
             opacity: [0.6, 0.9, 0.6],
             scale: [1, 1.1, 1]
-          }}
+          } : { opacity: 0 }}
           transition={{ 
             duration: 3, 
             repeat: Infinity, 
@@ -61,10 +66,10 @@ const SplashScreen = () => {
         
         {/* Secondary glow ring */}
         <motion.div
-          animate={{ 
+          animate={isReady ? { 
             opacity: [0.4, 0.7, 0.4],
             rotate: [0, 180, 360]
-          }}
+          } : { opacity: 0 }}
           transition={{ 
             duration: 8, 
             repeat: Infinity, 
@@ -79,9 +84,9 @@ const SplashScreen = () => {
         
         {/* Outer ambient */}
         <motion.div
-          animate={{ 
+          animate={isReady ? { 
             opacity: [0.3, 0.5, 0.3]
-          }}
+          } : { opacity: 0 }}
           transition={{ 
             duration: 4, 
             repeat: Infinity, 
@@ -94,9 +99,9 @@ const SplashScreen = () => {
             filter: "blur(120px)"
           }}
         />
-      </div>
+      </motion.div>
 
-      {/* Floating Card */}
+      {/* Floating Card - only show when ready */}
       <motion.div
         initial={{ scale: 0.6, opacity: 0, y: 80 }}
         animate={isReady ? { 
@@ -114,10 +119,11 @@ const SplashScreen = () => {
       >
         {/* Card glow underneath */}
         <motion.div
-          animate={{ 
+          initial={{ opacity: 0 }}
+          animate={isReady ? { 
             opacity: [0.5, 0.8, 0.5],
             scale: [0.9, 1.05, 0.9]
-          }}
+          } : { opacity: 0 }}
           transition={{ 
             duration: 3, 
             repeat: Infinity, 
@@ -137,8 +143,8 @@ const SplashScreen = () => {
             src="./easy-card-banner.png"
             alt="Easy Card"
             className="relative w-full h-auto block"
-            initial={{ rotateY: -15, rotateX: 8 }}
-            animate={isReady ? { rotateY: 0, rotateX: 0 } : { rotateY: -15, rotateX: 8 }}
+            initial={{ rotateY: -15, rotateX: 8, opacity: 0 }}
+            animate={isReady ? { rotateY: 0, rotateX: 0, opacity: 1 } : { rotateY: -15, rotateX: 8, opacity: 0 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
             style={{ 
               filter: "drop-shadow(0 20px 40px hsla(270, 100%, 50%, 0.5))"
@@ -162,7 +168,7 @@ const SplashScreen = () => {
                 style={{
                   background:
                     "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
-                  animation: "splash-glint 2.2s ease-in-out 1.2s infinite",
+                  animation: "splash-glint 2.2s ease-in-out 0.5s infinite",
                   opacity: 0,
                 }}
               />
