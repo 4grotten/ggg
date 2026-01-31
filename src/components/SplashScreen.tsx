@@ -5,48 +5,17 @@ const SplashScreen = () => {
   const [isReady, setIsReady] = useState(false);
   const [isSwaying, setIsSwaying] = useState(false);
 
-  // Wait for page to be fully ready and painted before starting animation
   useEffect(() => {
-    let rafId: number;
-    let timeoutId: ReturnType<typeof setTimeout>;
-    let swayTimeoutId: ReturnType<typeof setTimeout>;
+    // Start animation immediately, no delays
+    setIsReady(true);
     
-    const startAnimation = () => {
-      // Triple RAF + small delay ensures the screen is actually visible to user
-      rafId = requestAnimationFrame(() => {
-        rafId = requestAnimationFrame(() => {
-          rafId = requestAnimationFrame(() => {
-            // Additional 150ms delay for PWA/RWA where rendering may be delayed
-            timeoutId = setTimeout(() => {
-              setIsReady(true);
-              
-              // After 3 seconds of card being still, start swaying
-              swayTimeoutId = setTimeout(() => {
-                setIsSwaying(true);
-              }, 3000);
-            }, 150);
-          });
-        });
-      });
-    };
-    
-    // Wait for document to be fully loaded
-    if (document.readyState === 'complete') {
-      startAnimation();
-    } else {
-      window.addEventListener('load', startAnimation);
-      return () => {
-        window.removeEventListener('load', startAnimation);
-        cancelAnimationFrame(rafId);
-        clearTimeout(timeoutId);
-        clearTimeout(swayTimeoutId);
-      };
-    }
+    // After 3 seconds of card being still, start swaying with glints
+    const swayTimer = setTimeout(() => {
+      setIsSwaying(true);
+    }, 3000);
     
     return () => {
-      cancelAnimationFrame(rafId);
-      clearTimeout(timeoutId);
-      clearTimeout(swayTimeoutId);
+      clearTimeout(swayTimer);
     };
   }, []);
 
