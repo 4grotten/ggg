@@ -335,7 +335,12 @@
     "profileData": "بيانات الملف الشخصي",
     "noProfileData": "لا توجد بيانات ملف شخصي",
     "socialLinks": "الروابط الاجتماعية",
-    "noSocialLinks": "لم تتم إضافة روابط اجتماعية"
+    "noSocialLinks": "لم تتم إضافة روابط اجتماعية",
+    "qrBusinessCard": "بطاقة عمل QR",
+    "qr": "QR",
+    "digitalPaymentCard": "بطاقة دفع رقمية",
+    "scanQRToGetContact": "امسح QR للحصول على معلومات الاتصال",
+    "includedInQR": "مضمن في QR"
   },
   "bank": {
     "name": "اسم البنك"

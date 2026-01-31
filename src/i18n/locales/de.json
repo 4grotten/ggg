@@ -335,7 +335,12 @@
     "profileData": "Profildaten",
     "noProfileData": "Keine Profildaten verfügbar",
     "socialLinks": "Soziale Links",
-    "noSocialLinks": "Keine sozialen Links hinzugefügt"
+    "noSocialLinks": "Keine sozialen Links hinzugefügt",
+    "qrBusinessCard": "QR-Visitenkarte",
+    "qr": "QR",
+    "digitalPaymentCard": "Digitale Zahlungskarte",
+    "scanQRToGetContact": "QR scannen für Kontaktdaten",
+    "includedInQR": "Im QR enthalten"
   },
   "bank": {
     "name": "Bankname"

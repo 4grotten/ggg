@@ -337,7 +337,12 @@
     "profileData": "个人资料",
     "noProfileData": "暂无个人资料",
     "socialLinks": "社交链接",
-    "noSocialLinks": "未添加社交链接"
+    "noSocialLinks": "未添加社交链接",
+    "qrBusinessCard": "二维码名片",
+    "qr": "二维码",
+    "digitalPaymentCard": "数字支付卡",
+    "scanQRToGetContact": "扫描二维码获取联系方式",
+    "includedInQR": "包含在二维码中"
   },
   "bank": {
     "name": "银行名称"

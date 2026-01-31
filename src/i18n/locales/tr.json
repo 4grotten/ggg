@@ -335,7 +335,12 @@
     "profileData": "Profil Verileri",
     "noProfileData": "Profil verisi yok",
     "socialLinks": "Sosyal Bağlantılar",
-    "noSocialLinks": "Sosyal bağlantı eklenmedi"
+    "noSocialLinks": "Sosyal bağlantı eklenmedi",
+    "qrBusinessCard": "QR Kartvizit",
+    "qr": "QR",
+    "digitalPaymentCard": "Dijital Ödeme Kartı",
+    "scanQRToGetContact": "İletişim bilgilerini almak için QR'ı tarayın",
+    "includedInQR": "QR'a Dahil"
   },
   "bank": {
     "name": "Banka Adı"
