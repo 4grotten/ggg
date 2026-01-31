@@ -17,7 +17,7 @@ export const CardMiniature = ({ type, className = "" }: CardMiniatureProps) => {
       <img 
         src={cardImage} 
         alt={altText}
-        className="absolute inset-0 w-full h-full object-fill rounded-2xl"
+        className="absolute inset-0 w-full h-full object-contain"
       />
     </div>
   );
