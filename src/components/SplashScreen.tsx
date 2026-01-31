@@ -130,7 +130,7 @@ const SplashScreen = () => {
           
           {/* Fantasy glint overlay - 4px inset from card edges */}
           <div
-            className="absolute pointer-events-none mix-blend-screen animate-[fantasy-glint_2.2s_ease-in-out_infinite] rounded-xl overflow-hidden"
+            className="absolute pointer-events-none mix-blend-screen animate-[fantasy-glint_2.2s_ease-in-out_infinite] rounded-2xl overflow-hidden"
             style={{
               top: 4,
               left: 4,
