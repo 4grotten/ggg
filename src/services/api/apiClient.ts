@@ -89,58 +89,8 @@ export async function apiRequest<T = unknown>(
   };
 
   const scheduleVerifyToken = () => {
-    // Prevent spamming verification calls.
-    try {
-      const existing = sessionStorage.getItem('auth_401_verify_pending');
-      if (existing === '1') return;
-      sessionStorage.setItem('auth_401_verify_pending', '1');
-    } catch {
-      // If sessionStorage is blocked, just fall back to old behavior.
-      removeAuthToken();
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
-        window.location.href = '/auth/phone';
-      }
-      return;
-    }
-
-    // Defer: avoid doing more work in the same tick as the failing request.
-    setTimeout(async () => {
-      const currentToken = getAuthToken();
-      if (!currentToken) {
-        try {
-          sessionStorage.removeItem('auth_401_verify_pending');
-        } catch {
-          // ignore
-        }
-        return;
-      }
-
-      try {
-        const verifyRes = await fetch(`${API_BASE_URL}/users/me/`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${currentToken}`,
-          },
-        });
-
-        if (verifyRes.status === 401) {
-          // Token is definitely invalid -> clear and redirect
-          removeAuthToken();
-          if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
-            window.location.href = '/auth/phone';
-          }
-        }
-      } catch {
-        // Network error while verifying -> do NOT log out.
-      } finally {
-        try {
-          sessionStorage.removeItem('auth_401_verify_pending');
-        } catch {
-          // ignore
-        }
-      }
-    }, 0);
+    // Just log the 401, don't remove token or redirect
+    console.warn('[Auth] 401 received, token may be invalid but keeping session');
   };
   
   try {
@@ -151,23 +101,9 @@ export async function apiRequest<T = unknown>(
     
     // Обработка 401 - невалидный токен
     if (response.status === 401) {
-      // Safer behavior: a random 401 from any endpoint shouldn't instantly kick the user.
-      // 1) If we don't have a token -> just return 401.
-      // 2) If it's /users/me/ -> token is definitively invalid -> log out immediately.
-      // 3) Otherwise -> schedule a background verification via /users/me/.
+      // Просто логируем 401, НЕ удаляем токен и НЕ делаем редирект
       saveAuthDebug({ reason: 'api_401', url, method: options.method ?? 'GET' });
-
-      if (token) {
-        if (endpoint === '/users/me/' || endpoint === '/users/me') {
-          removeAuthToken();
-          // Редирект на страницу входа
-          if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
-            window.location.href = '/auth/phone';
-          }
-        } else {
-          scheduleVerifyToken();
-        }
-      }
+      console.warn('[Auth] 401 received from:', endpoint);
 
       return {
         data: null,
