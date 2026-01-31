@@ -249,7 +249,7 @@ const CardPage = () => {
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 py-6 space-y-5">
           {/* Card Carousel */}
-          <div className="relative overflow-hidden max-w-xs sm:max-w-sm mx-auto">
+          <div className="relative flex items-center justify-center">
             {/* Left Arrow - Desktop only */}
             <button
               onClick={() => {
@@ -258,13 +258,43 @@ const CardPage = () => {
                   setActiveIndex(activeIndex - 1);
                 }
               }}
-              className={`hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 z-10 w-10 h-10 items-center justify-center rounded-full bg-secondary hover:bg-muted transition-all ${
+              className={`hidden sm:flex absolute left-0 z-10 w-10 h-10 items-center justify-center rounded-full bg-secondary hover:bg-muted transition-all ${
                 activeIndex === 0 ? "opacity-30 cursor-not-allowed" : "opacity-100"
               }`}
               disabled={activeIndex === 0}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
+
+            <div className="w-full max-w-xs sm:max-w-sm overflow-hidden">
+              <motion.div
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.1}
+                onDragEnd={handleDragEnd}
+                className="cursor-grab active:cursor-grabbing"
+              >
+                {renderCardVisual()}
+              </motion.div>
+              
+              {/* Pagination dots */}
+              <div className="flex justify-center gap-2 mt-4">
+                {cardTypes.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setDirection(index > activeIndex ? 1 : -1);
+                      setActiveIndex(index);
+                    }}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === activeIndex 
+                        ? "bg-primary w-6" 
+                        : "bg-muted-foreground/30"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
 
             {/* Right Arrow - Desktop only */}
             <button
@@ -274,41 +304,13 @@ const CardPage = () => {
                   setActiveIndex(activeIndex + 1);
                 }
               }}
-              className={`hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 z-10 w-10 h-10 items-center justify-center rounded-full bg-secondary hover:bg-muted transition-all ${
+              className={`hidden sm:flex absolute right-0 z-10 w-10 h-10 items-center justify-center rounded-full bg-secondary hover:bg-muted transition-all ${
                 activeIndex === cardTypes.length - 1 ? "opacity-30 cursor-not-allowed" : "opacity-100"
               }`}
               disabled={activeIndex === cardTypes.length - 1}
             >
               <ChevronRight className="w-5 h-5" />
             </button>
-
-            <motion.div
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.1}
-              onDragEnd={handleDragEnd}
-              className="cursor-grab active:cursor-grabbing"
-            >
-              {renderCardVisual()}
-            </motion.div>
-            
-            {/* Pagination dots */}
-            <div className="flex justify-center gap-2 mt-4">
-              {cardTypes.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setDirection(index > activeIndex ? 1 : -1);
-                    setActiveIndex(index);
-                  }}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === activeIndex 
-                      ? "bg-primary w-6" 
-                      : "bg-muted-foreground/30"
-                  }`}
-                />
-              ))}
-            </div>
           </div>
 
           {/* Apple Pay Banner */}
