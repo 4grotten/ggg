@@ -333,6 +333,9 @@
     "toThisAddress": "إلى هذا العنوان عبر",
     "viaNetwork": "عبر"
   },
+  "bank": {
+    "name": "اسم البنك"
+  },
   "settings": {
     "profile": "الملف الشخصي",
     "personalDetails": "البيانات الشخصية",
@@ -452,6 +455,8 @@
   "card": {
     "back": "رجوع",
     "addToApplePay": "كيف أضيف البطاقة إلى Apple Pay؟",
+    "number": "رقم البطاقة",
+    "holder": "حامل البطاقة",
     "expiry": "تاريخ الانتهاء",
     "cvv": "CVV",
     "hide": "إخفاء",

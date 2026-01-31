@@ -347,6 +347,9 @@
     "toThisAddress": "to this address via",
     "viaNetwork": "via"
   },
+  "bank": {
+    "name": "Bank Name"
+  },
   "settings": {
     "share": "Share",
     "businessCard": "Business Card",
@@ -527,6 +530,8 @@
   "card": {
     "back": "Back",
     "addToApplePay": "How to Add Card to Apple Pay?",
+    "number": "Card Number",
+    "holder": "Card Holder",
     "expiry": "Expiry",
     "cvv": "CVV",
     "hide": "Hide",

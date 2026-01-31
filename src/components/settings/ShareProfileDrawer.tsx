@@ -49,7 +49,8 @@ interface CryptoAsset {
   id: string;
   name: string;
   symbol: string;
-  icon: string;
+  color: string;
+  iconType: "usdt" | "usdc" | "btc" | "eth";
   networks: CryptoNetwork[];
 }
 
@@ -99,7 +100,8 @@ const cryptoAssets: CryptoAsset[] = [
     id: "usdt",
     name: "Tether",
     symbol: "USDT",
-    icon: "💵",
+    color: "linear-gradient(135deg, #26A17B 0%, #1a7a5c 100%)",
+    iconType: "usdt",
     networks: [
       { id: "trc20", name: "TRC20 (Tron)", address: "TJYxBLjN5gKPxTdMjrKPfpXUPe5BYUj9kD" },
       { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f1B2d1" },
@@ -107,10 +109,23 @@ const cryptoAssets: CryptoAsset[] = [
     ]
   },
   {
+    id: "usdc",
+    name: "USD Coin",
+    symbol: "USDC",
+    color: "linear-gradient(135deg, #2775CA 0%, #1a5a9e 100%)",
+    iconType: "usdc",
+    networks: [
+      { id: "erc20", name: "ERC20 (Ethereum)", address: "0x852d35Cc6634C0532925a3b844Bc9e7595f1C3e2" },
+      { id: "bep20", name: "BEP20 (BSC)", address: "0x962d35Cc6634C0532925a3b844Bc9e7595f1D4f3" },
+      { id: "polygon", name: "Polygon", address: "0xa72d35Cc6634C0532925a3b844Bc9e7595f1E5g4" }
+    ]
+  },
+  {
     id: "btc",
     name: "Bitcoin",
     symbol: "BTC",
-    icon: "₿",
+    color: "linear-gradient(135deg, #F7931A 0%, #c67515 100%)",
+    iconType: "btc",
     networks: [
       { id: "btc", name: "Bitcoin Network", address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" }
     ]
@@ -119,13 +134,49 @@ const cryptoAssets: CryptoAsset[] = [
     id: "eth",
     name: "Ethereum",
     symbol: "ETH",
-    icon: "Ξ",
+    color: "linear-gradient(135deg, #627EEA 0%, #4a63bb 100%)",
+    iconType: "eth",
     networks: [
       { id: "erc20", name: "ERC20 (Ethereum)", address: "0x742d35Cc6634C0532925a3b844Bc9e7595f1B2d1" },
       { id: "bep20", name: "BEP20 (BSC)", address: "0x8A2d35Cc6634C0532925a3b844Bc9e7595f1B2e2" }
     ]
   }
 ];
+
+// Crypto icon components
+const CryptoIcon = ({ type, className = "w-5 h-5" }: { type: CryptoAsset["iconType"]; className?: string }) => {
+  switch (type) {
+    case "usdt":
+      return (
+        <svg className={className} viewBox="0 0 32 32" fill="none">
+          <path d="M17.922 17.383v-.002c-.11.008-.677.042-1.942.042-1.01 0-1.721-.03-1.971-.042v.003c-3.888-.171-6.79-.848-6.79-1.658 0-.809 2.902-1.486 6.79-1.66v2.644c.254.018.982.061 1.988.061 1.207 0 1.812-.05 1.925-.06v-2.643c3.88.173 6.775.85 6.775 1.658 0 .81-2.895 1.485-6.775 1.657m0-3.59v-2.366h5.414V7.819H8.595v3.608h5.414v2.365c-4.4.202-7.709 1.074-7.709 2.118 0 1.044 3.309 1.915 7.709 2.118v7.582h3.913v-7.584c4.393-.202 7.694-1.073 7.694-2.116 0-1.043-3.301-1.914-7.694-2.117" fill="white"/>
+        </svg>
+      );
+    case "usdc":
+      return (
+        <svg className={className} viewBox="0 0 32 32" fill="none">
+          <path d="M16 6C10.477 6 6 10.477 6 16s4.477 10 10 10 10-4.477 10-10S21.523 6 16 6zm0 18.5c-4.687 0-8.5-3.813-8.5-8.5S11.313 7.5 16 7.5s8.5 3.813 8.5 8.5-3.813 8.5-8.5 8.5z" fill="white"/>
+          <path d="M17.5 13.5c0-1.1-.9-1.5-2-1.7v3.4c1.1-.2 2-.6 2-1.7zm-3.5 5.2v-3.6c-1.3.2-2.2.8-2.2 1.8s.9 1.6 2.2 1.8z" fill="white"/>
+          <path d="M16 4C9.373 4 4 9.373 4 16s5.373 12 12 12 12-5.373 12-12S22.627 4 16 4zm3 15.4c-.5 1.1-1.4 1.8-2.5 2v1.1h-1v-1.1c-2.1-.3-3-1.5-3.2-3h1.5c.1.8.6 1.5 1.7 1.7v-3.7c-2-.4-3.2-1.1-3.2-2.8 0-1.5 1.1-2.5 3.2-2.8V9.5h1v1.3c1.8.2 2.7 1.2 2.9 2.7h-1.5c-.1-.7-.5-1.2-1.4-1.4v3.5c2.1.4 3.3 1.1 3.3 2.9 0 .3-.1.6-.2.9h-.6z" fill="white"/>
+        </svg>
+      );
+    case "btc":
+      return (
+        <svg className={className} viewBox="0 0 32 32" fill="none">
+          <path d="M21.329 14.69c.292-1.948-1.193-2.996-3.223-3.695l.659-2.64-1.608-.4-.641 2.571c-.423-.105-.857-.204-1.289-.303l.646-2.588-1.607-.4-.659 2.639c-.35-.08-.694-.159-1.027-.242l.002-.008-2.218-.553-.428 1.717s1.193.274 1.168.29c.651.163.769.593.749.935l-.75 3.009c.045.011.103.028.167.053l-.17-.042-1.052 4.217c-.08.197-.282.493-.738.38.016.024-1.169-.291-1.169-.291l-.798 1.84 2.093.522c.389.098.771.2 1.147.296l-.666 2.672 1.606.4.659-2.64c.439.119.865.228 1.282.333l-.657 2.63 1.608.4.665-2.668c2.745.52 4.808.31 5.677-2.173.7-1.999-.035-3.153-1.48-3.904 1.053-.243 1.845-.936 2.058-2.366zm-3.68 5.159c-.497 1.998-3.858.918-4.948.647l.883-3.54c1.09.272 4.582.811 4.066 2.893zm.497-5.186c-.453 1.817-3.25.893-4.157.667l.8-3.21c.907.226 3.825.648 3.357 2.543z" fill="white"/>
+        </svg>
+      );
+    case "eth":
+      return (
+        <svg className={className} viewBox="0 0 32 32" fill="none">
+          <path d="M16 4L8 16.5l8 4.8 8-4.8L16 4z" fill="white" fillOpacity="0.6"/>
+          <path d="M8 16.5l8 4.8v-9.4l-8 4.6z" fill="white"/>
+          <path d="M16 21.3l8-4.8-8-4.6v9.4z" fill="white" fillOpacity="0.8"/>
+          <path d="M8 18l8 10 8-10-8 4.8L8 18z" fill="white"/>
+        </svg>
+      );
+  }
+};
 
 export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps) => {
   const { t } = useTranslation();
@@ -234,7 +285,7 @@ Easy Card UAE`;
   };
 
   const handleShareCryptoWallet = (asset: CryptoAsset, network: CryptoNetwork) => {
-    const walletData = `${asset.icon} ${asset.name} (${asset.symbol}) - ${network.name}
+    const walletData = `💰 ${asset.name} (${asset.symbol}) - ${network.name}
 
 ${t("crypto.walletAddress") || "Address"}: ${network.address}
 
@@ -496,10 +547,10 @@ Easy Card UAE`;
                     className="w-full flex items-center gap-4 p-4 bg-muted/50 rounded-2xl hover:bg-muted/70 transition-colors"
                   >
                     <div 
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                      style={{ background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)" }}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: asset.color }}
                     >
-                      {asset.icon}
+                      <CryptoIcon type={asset.iconType} />
                     </div>
                     <div className="flex-1 text-left">
                       <p className="font-medium">{asset.name}</p>
@@ -561,9 +612,14 @@ Easy Card UAE`;
                 className="space-y-6"
               >
                 {/* Asset Header */}
-                <div className="text-center">
-                  <span className="text-4xl">{selectedAsset.icon}</span>
-                  <p className="font-semibold mt-2">{selectedAsset.symbol}</p>
+                <div className="flex flex-col items-center">
+                  <div 
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3"
+                    style={{ background: selectedAsset.color }}
+                  >
+                    <CryptoIcon type={selectedAsset.iconType} className="w-8 h-8" />
+                  </div>
+                  <p className="font-semibold text-lg">{selectedAsset.symbol}</p>
                   <p className="text-sm text-muted-foreground">{selectedNetwork.name}</p>
                 </div>
 
