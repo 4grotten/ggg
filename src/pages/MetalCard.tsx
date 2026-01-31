@@ -162,7 +162,7 @@ const MetalCard = () => {
         >
         {/* Card Visual */}
         <motion.div 
-          className="relative w-full aspect-[1.586/1]"
+          className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden"
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -173,14 +173,34 @@ const MetalCard = () => {
             className="absolute inset-0 w-full h-full object-contain"
           />
           
-          {/* Cardholder name overlay */}
-          <div className="absolute bottom-4 left-4 flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
-              <span className="text-xs text-white font-medium">RK</span>
+          {/* Eye icon in top right corner */}
+          <button
+            onClick={toggleBalanceVisibility}
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/50 transition-colors"
+          >
+            {balanceVisible ? (
+              <Eye className="w-4 h-4 text-white" />
+            ) : (
+              <EyeOff className="w-4 h-4 text-white" />
+            )}
+          </button>
+          
+          {/* Balance overlay at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8 bg-gradient-to-t from-black/50 to-transparent rounded-b-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
+                <span className="text-xs text-white font-medium">RK</span>
+              </div>
+              <span className="text-sm font-semibold text-white">
+                {cardData.holderName}
+              </span>
             </div>
-            <span className="text-sm font-semibold text-white bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
-              {cardData.holderName}
-            </span>
+            <p className="text-xl font-bold text-white drop-shadow-md">
+              {balanceVisible 
+                ? <><AnimatedNumber key={animationKey} value={cardData.balance} /> AED</>
+                : "••••••"
+              }
+            </p>
           </div>
         </motion.div>
 
@@ -329,49 +349,11 @@ const MetalCard = () => {
           </Button>
         </motion.div>
 
-        {/* Balance Section */}
-        <motion.div 
-          className="bg-secondary rounded-xl p-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.35 }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">{t("card.cardBalance")}</p>
-              <AnimatePresence mode="wait">
-                <motion.p 
-                  key={balanceVisible ? "visible" : "hidden"}
-                  className="text-2xl font-bold"
-                  initial={{ opacity: 0, filter: "blur(8px)" }}
-                  animate={{ opacity: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, filter: "blur(8px)" }}
-                  transition={{ duration: 0.25 }}
-                >
-                  {balanceVisible ? (
-                    <><AnimatedNumber key={animationKey} value={cardData.balance} /> AED</>
-                  ) : "••••••"}
-                </motion.p>
-              </AnimatePresence>
-            </div>
-            <button
-              onClick={toggleBalanceVisibility}
-              className="p-2 rounded-full hover:bg-muted transition-colors"
-            >
-              {balanceVisible ? (
-                <Eye className="w-5 h-5 text-muted-foreground" />
-              ) : (
-                <EyeOff className="w-5 h-5 text-muted-foreground" />
-              )}
-            </button>
-          </div>
-        </motion.div>
-
         {/* Transactions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
+          transition={{ duration: 0.4, delay: 0.35 }}
         >
           <h2 className="text-lg font-bold mb-3">{t("card.transactions")}</h2>
           <CardTransactionsList groups={metalCardTransactions} />
