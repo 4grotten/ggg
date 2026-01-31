@@ -157,7 +157,7 @@ const VirtualCard = () => {
         >
         {/* Card Visual */}
         <motion.div 
-          className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden"
+          className="relative w-full max-w-md mx-auto aspect-[1.586/1] rounded-2xl overflow-hidden"
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
