@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronDown, ChevronUp, X, Eye, EyeOff, Copy } from "lucide-react";
-import metalCardImage from "@/assets/metal-card.png";
+import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -167,11 +167,7 @@ const MetalCard = () => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          <img 
-            src={metalCardImage} 
-            alt="Metal Card"
-            className="absolute inset-0 w-full h-full object-contain"
-          />
+          <CardMiniature type="metal" />
           
           {/* Eye icon in top right corner */}
           <button
