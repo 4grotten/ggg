@@ -170,15 +170,15 @@ const MetalCard = () => {
           <img 
             src={metalCardImage} 
             alt="Metal Card"
-            className="absolute inset-0 w-full h-full object-fill rounded-2xl"
+            className="absolute inset-0 w-full h-full object-contain"
           />
           
           {/* Cardholder name overlay */}
-          <div className="absolute bottom-6 left-6 flex items-center gap-2">
+          <div className="absolute bottom-4 left-4 flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
               <span className="text-xs text-white font-medium">RK</span>
             </div>
-            <span className="text-sm font-semibold text-white bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+            <span className="text-sm font-semibold text-white bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
               {cardData.holderName}
             </span>
           </div>
