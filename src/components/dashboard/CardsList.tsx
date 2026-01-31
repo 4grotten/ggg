@@ -158,7 +158,7 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
               
               {/* Fantasy glint overlay */}
               <div 
-                className="absolute inset-0 animate-fantasy-glint pointer-events-none"
+                className="absolute inset-0 animate-fantasy-glint pointer-events-none rounded-[22px]"
                 style={{
                   background: "linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.1) 15%, rgba(200,180,255,0.25) 35%, rgba(180,220,255,0.3) 50%, rgba(255,200,255,0.25) 65%, rgba(255,255,255,0.1) 85%, transparent 100%)",
                   animationDelay: `${Math.random() * 2}s`,
