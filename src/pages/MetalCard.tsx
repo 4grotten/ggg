@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronDown, ChevronUp, X, Eye, EyeOff, Copy } from "lucide-react";
+import metalCardImage from "@/assets/metal-card.png";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -161,42 +162,25 @@ const MetalCard = () => {
         >
         {/* Card Visual */}
         <motion.div 
-          className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] p-6 flex flex-col justify-between shadow-none"
-          style={{ boxShadow: "none", filter: "none" }}
+          className="relative w-full aspect-[1.586/1]"
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          {/* Metal texture overlay */}
-          <div 
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)`,
-            }}
+          <img 
+            src={metalCardImage} 
+            alt="Metal Card"
+            className="absolute inset-0 w-full h-full object-fill rounded-2xl"
           />
           
-          {/* Logo in center */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg width="60" height="40" viewBox="0 0 60 40" fill="none">
-              <path d="M30 5L45 20L30 35L15 20L30 5Z" fill="#666" />
-              <path d="M30 12L38 20L30 28L22 20L30 12Z" fill="#333" />
-            </svg>
-          </div>
-          
-          {/* Cardholder name */}
-          <div className="relative mt-auto flex items-center gap-2">
+          {/* Cardholder name overlay */}
+          <div className="absolute bottom-6 left-6 flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
               <span className="text-xs text-white font-medium">RK</span>
             </div>
-            <span className="text-sm font-semibold text-white bg-white/10 px-3 py-1 rounded-full">
+            <span className="text-sm font-semibold text-white bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
               {cardData.holderName}
             </span>
-          </div>
-          
-          {/* Visa logo */}
-          <div className="absolute bottom-6 right-6 text-right">
-            <span className="text-2xl font-bold text-white/80 italic tracking-tight">VISA</span>
-            <p className="text-xs text-white/60 font-medium">Metal</p>
           </div>
         </motion.div>
 
