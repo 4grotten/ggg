@@ -1,6 +1,17 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const SplashScreen = () => {
+  const [isReady, setIsReady] = useState(false);
+
+  // Wait for page to be fully ready before starting animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <motion.div 
       initial={{ opacity: 1 }}
@@ -71,11 +82,11 @@ const SplashScreen = () => {
       {/* Floating Card */}
       <motion.div
         initial={{ scale: 0.6, opacity: 0, y: 80 }}
-        animate={{ 
+        animate={isReady ? { 
           scale: 1, 
           opacity: 1,
           y: [0, -15, 0]
-        }}
+        } : { scale: 0.6, opacity: 0, y: 80 }}
         transition={{ 
           scale: { duration: 1, ease: [0.16, 1, 0.3, 1] },
           opacity: { duration: 0.8 },
@@ -109,7 +120,7 @@ const SplashScreen = () => {
           alt="Easy Card"
           className="relative w-full h-auto rounded-2xl"
           initial={{ rotateY: -15, rotateX: 8 }}
-          animate={{ rotateY: 0, rotateX: 0 }}
+          animate={isReady ? { rotateY: 0, rotateX: 0 } : { rotateY: -15, rotateX: 8 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
           style={{ 
             filter: "drop-shadow(0 20px 40px hsla(270, 100%, 50%, 0.5))"
