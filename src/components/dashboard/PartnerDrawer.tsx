@@ -493,16 +493,37 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     const isLastStep = step === 3;
     
     return (
-      <button
-        onClick={isLastStep ? handleGoToPartnerPage : handleContinue}
-        className="w-full py-4 font-semibold rounded-2xl relative overflow-hidden partner-continue-btn"
-        style={{
-          background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
-          boxShadow: "0 8px 24px rgba(127, 255, 0, 0.3)",
-        }}
-      >
-        <span className="text-black font-bold">{t('common.continue')}</span>
-      </button>
+      <div className="relative rounded-2xl p-[3px] overflow-hidden">
+        {/* Animated rainbow border */}
+        <div 
+          className="absolute inset-0 rounded-2xl animate-spin-slow"
+          style={{
+            background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
+          }}
+        />
+        <div 
+          className="absolute inset-[-4px] rounded-2xl opacity-50 blur-md animate-spin-slow"
+          style={{
+            background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
+          }}
+        />
+        <button
+          onClick={isLastStep ? handleGoToPartnerPage : handleContinue}
+          className="relative w-full py-4 font-semibold rounded-[13px] overflow-hidden partner-continue-btn"
+          style={{
+            background: "linear-gradient(135deg, #BFFF00 0%, #7FFF00 100%)",
+          }}
+        >
+          {/* Shimmer overlay */}
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+            style={{
+              animation: "shimmer 2s ease-in-out infinite",
+            }}
+          />
+          <span className="text-black font-bold relative z-10">{t('common.continue')}</span>
+        </button>
+      </div>
     );
   };
 
