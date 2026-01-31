@@ -4,16 +4,48 @@ import { motion } from "framer-motion";
 const SplashScreen = () => {
   const [isReady, setIsReady] = useState(false);
 
+  // Wait for page to be fully ready and painted before starting animation
   useEffect(() => {
-    // Start animation immediately
-    setIsReady(true);
+    let rafId: number;
+    let timeoutId: ReturnType<typeof setTimeout>;
+    
+    const startAnimation = () => {
+      // Triple RAF + small delay ensures the screen is actually visible to user
+      rafId = requestAnimationFrame(() => {
+        rafId = requestAnimationFrame(() => {
+          rafId = requestAnimationFrame(() => {
+            // Additional 150ms delay for PWA/RWA where rendering may be delayed
+            timeoutId = setTimeout(() => {
+              setIsReady(true);
+            }, 150);
+          });
+        });
+      });
+    };
+    
+    // Wait for document to be fully loaded
+    if (document.readyState === 'complete') {
+      startAnimation();
+    } else {
+      window.addEventListener('load', startAnimation);
+      return () => {
+        window.removeEventListener('load', startAnimation);
+        cancelAnimationFrame(rafId);
+        clearTimeout(timeoutId);
+      };
+    }
+    
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   return (
     <motion.div 
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.6, ease: "easeInOut" }}
       className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden"
       style={{
         background: "radial-gradient(ellipse 80% 60% at 50% 50%, hsl(270, 80%, 25%) 0%, hsl(260, 70%, 15%) 40%, hsl(250, 60%, 8%) 70%, hsl(240, 50%, 4%) 100%)"
@@ -76,20 +108,21 @@ const SplashScreen = () => {
         />
       </div>
 
-      {/* Card with flip entrance */}
+      {/* Floating Card */}
       <motion.div
-        initial={{ scale: 0.6, opacity: 0, rotateY: -90 }}
+        initial={{ scale: 0.6, opacity: 0, y: 80 }}
         animate={isReady ? { 
           scale: 1, 
           opacity: 1,
-          rotateY: 0
-        } : { scale: 0.6, opacity: 0, rotateY: -90 }}
+          y: [0, -15, 0]
+        } : { scale: 0.6, opacity: 0, y: 80 }}
         transition={{ 
-          duration: 1.2,
-          ease: [0.16, 1, 0.3, 1]
+          scale: { duration: 1, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 0.8 },
+          y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }
         }}
         className="relative w-[60vw] max-w-[280px]"
-        style={{ perspective: "1000px", transformStyle: "preserve-3d" }}
+        style={{ perspective: "1000px" }}
       >
         {/* Card glow underneath */}
         <motion.div
@@ -112,17 +145,20 @@ const SplashScreen = () => {
         
         {/* Card Image */}
         <div className="relative overflow-hidden" style={{ borderRadius: 18, isolation: "isolate" }}>
-          <img
+          <motion.img
             src="./easy-card-banner.png"
             alt="Easy Card"
             className="relative w-full h-auto block"
+            initial={{ rotateY: -15, rotateX: 8 }}
+            animate={isReady ? { rotateY: 0, rotateX: 0 } : { rotateY: -15, rotateX: 8 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
             style={{ 
               borderRadius: 18,
               filter: "drop-shadow(0 20px 40px hsla(270, 100%, 50%, 0.5))"
             }}
           />
           
-          {/* Glint overlay - starts after card flip completes */}
+          {/* Fantasy glint overlay - pure CSS, starts after card loads */}
           {isReady && (
             <div
               className="absolute overflow-hidden pointer-events-none"
@@ -139,8 +175,9 @@ const SplashScreen = () => {
                 style={{
                   borderRadius: 18,
                   background:
-                    "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.15) 28%, rgba(255,255,255,0.4) 44%, rgba(255,215,160,0.5) 50%, rgba(255,255,255,0.4) 56%, rgba(255,255,255,0.15) 72%, transparent 90%)",
-                  animation: "splash-glint 1.2s ease-in-out 1.3s 2",
+                    "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
+                  animation: "splash-glint 2.2s ease-in-out 1.2s infinite",
+                  opacity: 0,
                 }}
               />
             </div>

@@ -608,9 +608,17 @@
   @keyframes splash-glint {
     0% {
       transform: translateX(-100%) skewX(-15deg);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.8;
+    }
+    85% {
+      opacity: 0.8;
     }
     100% {
       transform: translateX(200%) skewX(-15deg);
+      opacity: 0;
     }
   }
 

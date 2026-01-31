@@ -211,10 +211,9 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 4 seconds total splash screen
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 4000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -224,7 +223,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isLoading ? (
             <SplashScreen key="splash" />
           ) : (
