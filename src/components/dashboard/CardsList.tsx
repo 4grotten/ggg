@@ -142,12 +142,12 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
             {card.balance !== undefined && (
               <div
                 onClick={(e) => toggleBalanceVisibility(e, card.id)}
-                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/50 transition-colors"
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 p-1.5 sm:p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/50 transition-colors"
               >
                 {visibleBalances.has(card.id) ? (
-                  <Eye className="w-4 h-4 text-white" />
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 ) : (
-                  <EyeOff className="w-4 h-4 text-white" />
+                  <EyeOff className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 )}
               </div>
             )}
@@ -168,8 +168,8 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
             
             {/* Balance overlay at bottom */}
             {card.balance !== undefined && (
-              <div className="absolute bottom-0 left-0 right-0 pl-5 pr-3 pb-3 pt-6 bg-gradient-to-t from-black/40 to-transparent rounded-b-2xl">
-                <p className="text-lg font-bold text-white text-left drop-shadow-md">
+              <div className="absolute bottom-0 left-0 right-0 pl-3 pr-2 pb-2 pt-4 sm:pl-5 sm:pr-3 sm:pb-3 sm:pt-6 bg-gradient-to-t from-black/40 to-transparent rounded-b-2xl">
+                <p className="text-sm sm:text-lg font-bold text-white text-left drop-shadow-md">
                   {visibleBalances.has(card.id) 
                     ? <><AnimatedNumber key={animationKeys[card.id] || 0} value={card.balance} /> AED</>
                     : "••••••"
