@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -6,24 +6,63 @@ import { QRCodeSVG } from "qrcode.react";
 import { 
   CreditCard, 
   Wallet, 
-  Bitcoin, 
   ChevronRight, 
   Copy, 
   Share2, 
   Check, 
   User,
   Building2,
-  ArrowLeft
+  ArrowLeft,
+  Phone,
+  Mail,
+  AtSign,
+  Link as LinkIcon,
+  Globe
 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
+import { useAuth } from "@/contexts/AuthContext";
+import { getSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ShareProfileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type ViewType = "main" | "card" | "account" | "crypto" | "asset" | "network";
+type ViewType = "main" | "businessCard" | "card" | "account" | "crypto" | "asset" | "network";
+
+// Social platform detection
+const detectPlatform = (url: string): { name: string; icon: string } => {
+  const lowerUrl = url.toLowerCase();
+  if (lowerUrl.includes('instagram.com')) return { name: 'Instagram', icon: '📸' };
+  if (lowerUrl.includes('telegram.me') || lowerUrl.includes('t.me')) return { name: 'Telegram', icon: '✈️' };
+  if (lowerUrl.includes('whatsapp.com') || lowerUrl.includes('wa.me')) return { name: 'WhatsApp', icon: '💬' };
+  if (lowerUrl.includes('tiktok.com')) return { name: 'TikTok', icon: '🎵' };
+  if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return { name: 'YouTube', icon: '📺' };
+  if (lowerUrl.includes('twitter.com') || lowerUrl.includes('x.com')) return { name: 'X (Twitter)', icon: '🐦' };
+  if (lowerUrl.includes('facebook.com') || lowerUrl.includes('fb.com')) return { name: 'Facebook', icon: '👤' };
+  if (lowerUrl.includes('linkedin.com')) return { name: 'LinkedIn', icon: '💼' };
+  if (lowerUrl.includes('snapchat.com')) return { name: 'Snapchat', icon: '👻' };
+  if (lowerUrl.includes('discord.com') || lowerUrl.includes('discord.gg')) return { name: 'Discord', icon: '🎮' };
+  if (lowerUrl.includes('github.com')) return { name: 'GitHub', icon: '💻' };
+  if (lowerUrl.includes('pinterest.com')) return { name: 'Pinterest', icon: '📌' };
+  if (lowerUrl.includes('reddit.com')) return { name: 'Reddit', icon: '🔴' };
+  if (lowerUrl.includes('twitch.tv')) return { name: 'Twitch', icon: '🎮' };
+  if (lowerUrl.includes('vk.com')) return { name: 'VK', icon: '🔵' };
+  if (lowerUrl.includes('ok.ru')) return { name: 'Одноклассники', icon: '🟠' };
+  if (lowerUrl.includes('weibo.com')) return { name: 'Weibo', icon: '🔴' };
+  if (lowerUrl.includes('wechat.com')) return { name: 'WeChat', icon: '💚' };
+  return { name: 'Website', icon: '🌐' };
+};
+
+interface BusinessCardField {
+  id: string;
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+  checked: boolean;
+}
 
 interface CardData {
   id: string;
@@ -181,12 +220,113 @@ const CryptoIcon = ({ type, className = "w-5 h-5" }: { type: CryptoAsset["iconTy
 export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps) => {
   const { t } = useTranslation();
   const { tap } = useHapticFeedback();
+  const { user } = useAuth();
   const [currentView, setCurrentView] = useState<ViewType>("main");
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<AccountData | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<CryptoAsset | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState<CryptoNetwork | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  
+  // Business card fields state
+  const [businessCardFields, setBusinessCardFields] = useState<BusinessCardField[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialNetworkItem[]>([]);
+  const [socialChecked, setSocialChecked] = useState<Record<number, boolean>>({});
+  const [isLoadingSocial, setIsLoadingSocial] = useState(false);
+  
+  // Load social links when opening business card view
+  useEffect(() => {
+    if (currentView === "businessCard" && user?.id) {
+      loadSocialLinks();
+    }
+  }, [currentView, user?.id]);
+  
+  // Initialize business card fields when opening
+  useEffect(() => {
+    if (currentView === "businessCard" && user) {
+      const fields: BusinessCardField[] = [];
+      
+      if (user.full_name) {
+        fields.push({
+          id: "name",
+          label: t("editProfile.fullName") || "Full Name",
+          value: user.full_name,
+          icon: <User className="w-4 h-4" />,
+          checked: true
+        });
+      }
+      
+      if (user.phone_number) {
+        fields.push({
+          id: "phone",
+          label: t("editProfile.phone") || "Phone",
+          value: user.phone_number,
+          icon: <Phone className="w-4 h-4" />,
+          checked: true
+        });
+      }
+      
+      if (user.email) {
+        fields.push({
+          id: "email",
+          label: t("editProfile.email") || "Email",
+          value: user.email,
+          icon: <Mail className="w-4 h-4" />,
+          checked: true
+        });
+      }
+      
+      if (user.username) {
+        fields.push({
+          id: "username",
+          label: t("editProfile.username") || "Username",
+          value: `@${user.username}`,
+          icon: <AtSign className="w-4 h-4" />,
+          checked: true
+        });
+      }
+      
+      setBusinessCardFields(fields);
+    }
+  }, [currentView, user, t]);
+  
+  const loadSocialLinks = async () => {
+    if (!user?.id) return;
+    setIsLoadingSocial(true);
+    try {
+      const response = await getSocialNetworks(user.id);
+      if (response.data) {
+        setSocialLinks(response.data);
+        // Initially all checked
+        const checked: Record<number, boolean> = {};
+        response.data.forEach(link => {
+          checked[link.id] = true;
+        });
+        setSocialChecked(checked);
+      }
+    } catch (error) {
+      console.error("Failed to load social links:", error);
+    } finally {
+      setIsLoadingSocial(false);
+    }
+  };
+  
+  const toggleField = (fieldId: string) => {
+    tap();
+    setBusinessCardFields(prev => 
+      prev.map(field => 
+        field.id === fieldId ? { ...field, checked: !field.checked } : field
+      )
+    );
+  };
+  
+  const toggleSocialLink = (linkId: number) => {
+    tap();
+    setSocialChecked(prev => ({
+      ...prev,
+      [linkId]: !prev[linkId]
+    }));
+  };
 
   const handleClose = () => {
     setCurrentView("main");
@@ -194,6 +334,9 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     setSelectedAccount(null);
     setSelectedAsset(null);
     setSelectedNetwork(null);
+    setBusinessCardFields([]);
+    setSocialLinks([]);
+    setSocialChecked({});
     onClose();
   };
 
@@ -204,6 +347,9 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     } else if (currentView === "asset") {
       setCurrentView("crypto");
       setSelectedAsset(null);
+    } else if (currentView === "businessCard") {
+      setCurrentView("main");
+      setBusinessCardFields([]);
     } else {
       setCurrentView("main");
       setSelectedCard(null);
@@ -249,16 +395,30 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
 
   const handleShareBusinessCard = () => {
     tap();
-    const businessCardData = `👤 Easy Card - Digital Payment Card
-
-Name: John Doe
-Phone: +971 50 123 4567
-Email: john.doe@example.com
-
-🎁 Referral Code: EASY2024
-
-📲 Download: https://easycarduae.lovable.app`;
-    handleShare(businessCardData, "Easy Card Business Card");
+    
+    // Build business card from selected fields
+    const selectedFields = businessCardFields.filter(f => f.checked);
+    const selectedSocials = socialLinks.filter(link => socialChecked[link.id]);
+    
+    let businessCardData = `👤 Easy Card - Digital Payment Card\n\n`;
+    
+    // Add selected profile fields
+    selectedFields.forEach(field => {
+      businessCardData += `${field.label}: ${field.value}\n`;
+    });
+    
+    // Add social links
+    if (selectedSocials.length > 0) {
+      businessCardData += `\n🔗 ${t("share.socialLinks") || "Social Links"}:\n`;
+      selectedSocials.forEach(link => {
+        const platform = detectPlatform(link.url);
+        businessCardData += `${platform.icon} ${platform.name}: ${link.url}\n`;
+      });
+    }
+    
+    businessCardData += `\n📲 Download: https://easycarduae.lovable.app`;
+    
+    handleShare(businessCardData, t("settings.businessCard") || "Easy Card Business Card");
   };
 
   const handleShareCard = (card: CardData) => {
@@ -297,6 +457,8 @@ Easy Card UAE`;
 
   const getTitle = () => {
     switch (currentView) {
+      case "businessCard":
+        return t("settings.businessCard") || "Business Card";
       case "card":
         return selectedCard?.name || t("share.cardDetails") || "Card Details";
       case "account":
@@ -340,7 +502,10 @@ Easy Card UAE`;
               >
                 {/* Business Card Button */}
                 <button
-                  onClick={handleShareBusinessCard}
+                  onClick={() => {
+                    tap();
+                    setCurrentView("businessCard");
+                  }}
                   className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-2xl hover:opacity-90 transition-opacity"
                 >
                   <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
@@ -350,7 +515,7 @@ Easy Card UAE`;
                     <p className="font-semibold">{t("settings.businessCard") || "Business Card"}</p>
                     <p className="text-sm opacity-80">{t("settings.shareContactInfo") || "Share your contact info"}</p>
                   </div>
-                  <Share2 className="w-5 h-5 opacity-80" />
+                  <ChevronRight className="w-5 h-5 opacity-80" />
                 </button>
 
                 {/* Cards Section */}
@@ -433,13 +598,111 @@ Easy Card UAE`;
                     className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)" }}
                   >
-                    <Bitcoin className="w-5 h-5 text-white" />
+                    <Wallet className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-medium">{t("settings.cryptoWallets") || "Crypto Wallets"}</p>
                     <p className="text-sm text-muted-foreground">{t("settings.selectNetwork") || "Select network to share"}</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </button>
+              </motion.div>
+            )}
+
+            {/* Business Card View with Checkboxes */}
+            {currentView === "businessCard" && (
+              <motion.div
+                key="businessCard"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-4"
+              >
+                {/* Profile Fields */}
+                <div className="bg-muted/50 rounded-2xl overflow-hidden">
+                  <div className="px-4 py-3 border-b border-border/50">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {t("share.profileData") || "Profile Data"}
+                    </p>
+                  </div>
+                  {businessCardFields.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground text-sm">
+                      {t("share.noProfileData") || "No profile data available"}
+                    </div>
+                  ) : (
+                    businessCardFields.map((field) => (
+                      <button
+                        key={field.id}
+                        onClick={() => toggleField(field.id)}
+                        className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                          {field.icon}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="text-sm text-muted-foreground">{field.label}</p>
+                          <p className="font-medium">{field.value}</p>
+                        </div>
+                        <Checkbox 
+                          checked={field.checked} 
+                          onCheckedChange={() => toggleField(field.id)}
+                          className="h-5 w-5"
+                        />
+                      </button>
+                    ))
+                  )}
+                </div>
+
+                {/* Social Links */}
+                <div className="bg-muted/50 rounded-2xl overflow-hidden">
+                  <div className="px-4 py-3 border-b border-border/50">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {t("share.socialLinks") || "Social Links"}
+                    </p>
+                  </div>
+                  {isLoadingSocial ? (
+                    <div className="p-4 text-center text-muted-foreground text-sm">
+                      {t("common.loading") || "Loading..."}
+                    </div>
+                  ) : socialLinks.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground text-sm">
+                      {t("share.noSocialLinks") || "No social links added"}
+                    </div>
+                  ) : (
+                    socialLinks.map((link) => {
+                      const platform = detectPlatform(link.url);
+                      return (
+                        <button
+                          key={link.id}
+                          onClick={() => toggleSocialLink(link.id)}
+                          className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-xl">
+                            {platform.icon}
+                          </div>
+                          <div className="flex-1 text-left min-w-0">
+                            <p className="font-medium">{platform.name}</p>
+                            <p className="text-sm text-muted-foreground truncate">{link.url}</p>
+                          </div>
+                          <Checkbox 
+                            checked={socialChecked[link.id] ?? true} 
+                            onCheckedChange={() => toggleSocialLink(link.id)}
+                            className="h-5 w-5 flex-shrink-0"
+                          />
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Share Button */}
+                <button
+                  onClick={handleShareBusinessCard}
+                  disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
+                  className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Share2 className="w-5 h-5" />
+                  <span>{t("common.share") || "Share"}</span>
                 </button>
               </motion.div>
             )}

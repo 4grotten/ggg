@@ -331,7 +331,11 @@
     "selectNetworkFor": "اختر الشبكة لـ",
     "sendOnly": "أرسل فقط",
     "toThisAddress": "إلى هذا العنوان عبر",
-    "viaNetwork": "عبر"
+    "viaNetwork": "عبر",
+    "profileData": "بيانات الملف الشخصي",
+    "noProfileData": "لا توجد بيانات ملف شخصي",
+    "socialLinks": "الروابط الاجتماعية",
+    "noSocialLinks": "لم تتم إضافة روابط اجتماعية"
   },
   "bank": {
     "name": "اسم البنك"

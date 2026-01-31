@@ -345,7 +345,11 @@
     "selectNetworkFor": "Select network for",
     "sendOnly": "Send only",
     "toThisAddress": "to this address via",
-    "viaNetwork": "via"
+    "viaNetwork": "via",
+    "profileData": "Profile Data",
+    "noProfileData": "No profile data available",
+    "socialLinks": "Social Links",
+    "noSocialLinks": "No social links added"
   },
   "bank": {
     "name": "Bank Name"

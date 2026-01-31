@@ -331,7 +331,11 @@
     "selectNetworkFor": "Seleccionar red para",
     "sendOnly": "Enviar solo",
     "toThisAddress": "a esta dirección vía",
-    "viaNetwork": "vía"
+    "viaNetwork": "vía",
+    "profileData": "Datos del Perfil",
+    "noProfileData": "No hay datos de perfil",
+    "socialLinks": "Enlaces Sociales",
+    "noSocialLinks": "No se han añadido enlaces sociales"
   },
   "bank": {
     "name": "Nombre del Banco"
