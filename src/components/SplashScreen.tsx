@@ -128,21 +128,27 @@ const SplashScreen = () => {
             }}
           />
           
-          {/* Fantasy glint overlay - iOS style rounded corners */}
+          {/* Fantasy glint overlay - contained within card with 4px margin */}
           <div
-            className="absolute pointer-events-none mix-blend-screen animate-[fantasy-glint_2.2s_ease-in-out_infinite] overflow-hidden"
+            className="absolute overflow-hidden pointer-events-none"
             style={{
-              top: 6,
-              left: 6,
-              right: 6,
-              bottom: 6,
-              borderRadius: 14,
-              background:
-                "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
-              opacity: isReady ? 1 : 0,
-              transition: "opacity 200ms ease",
+              top: 4,
+              left: 4,
+              right: 4,
+              bottom: 4,
+              borderRadius: 12,
             }}
-          />
+          >
+            <div
+              className="absolute inset-0 mix-blend-screen animate-[fantasy-glint_2.2s_ease-in-out_infinite]"
+              style={{
+                background:
+                  "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
+                opacity: isReady ? 1 : 0,
+                transition: "opacity 200ms ease",
+              }}
+            />
+          </div>
         </div>
       </motion.div>
     </motion.div>
