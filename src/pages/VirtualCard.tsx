@@ -16,6 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import virtualCardImage from "@/assets/virtual-card.png";
 
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
@@ -156,43 +157,26 @@ const VirtualCard = () => {
         >
         {/* Card Visual */}
         <motion.div 
-          className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden bg-gradient-to-br from-[#c8f542] to-[#a8d535] p-6 flex flex-col justify-between shadow-none"
+          className="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden shadow-none"
           style={{ boxShadow: "none", filter: "none" }}
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          {/* Card pattern overlay */}
-          <div 
-            className="absolute inset-0 opacity-30"
-            style={{
-              backgroundImage: `repeating-radial-gradient(circle at center, transparent 0, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px)`,
-              backgroundSize: '8px 8px',
-            }}
+          <img 
+            src={virtualCardImage} 
+            alt="Virtual Card"
+            className="w-full h-full object-cover rounded-2xl"
           />
           
-          {/* Logo in center */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg width="60" height="40" viewBox="0 0 60 40" fill="none">
-              <path d="M30 5L45 20L30 35L15 20L30 5Z" fill="black" />
-              <path d="M30 12L38 20L30 28L22 20L30 12Z" fill="#c8f542" />
-            </svg>
-          </div>
-          
-          {/* Cardholder name */}
-          <div className="relative mt-auto flex items-center gap-2">
+          {/* Cardholder name overlay */}
+          <div className="absolute bottom-6 left-6 flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
               <span className="text-xs text-white font-medium">RK</span>
             </div>
-            <span className="text-sm font-semibold text-black bg-[#c8f542]/80 px-3 py-1 rounded-full">
+            <span className="text-sm font-semibold text-white bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full">
               {cardData.holderName}
             </span>
-          </div>
-          
-          {/* Visa logo */}
-          <div className="absolute bottom-6 right-6 text-right">
-            <span className="text-2xl font-bold text-[#1a1f71] italic tracking-tight">VISA</span>
-            <p className="text-xs text-[#1a1f71] font-medium">Signature</p>
           </div>
         </motion.div>
 
