@@ -45,7 +45,7 @@ const iconGradients: Record<string, string> = {
   laptop: 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)',
   apofiz: 'linear-gradient(135deg, #18181b 0%, #3f3f46 100%)',
   userplus: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-  lock: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)',
+  lock: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
   admin: 'linear-gradient(135deg, #1e3a5f 0%, #0a0a0a 100%)',
   vibrate: 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)',
 };
