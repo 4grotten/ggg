@@ -129,55 +129,76 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     }
   };
 
-  const handleShare = async (data: string, title: string) => {
+  const handleShare = async (text: string, title: string) => {
     tap();
-    try {
-      if (navigator.share) {
+    
+    // Always try native share first on mobile
+    if (navigator.share) {
+      try {
         await navigator.share({
           title,
-          text: data
+          text
         });
-      } else {
-        await copyToClipboard(data, "share");
+        return; // Success - exit
+      } catch (error: unknown) {
+        // User cancelled or share failed - fallback to copy
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.log("Share cancelled by user");
+          return;
+        }
       }
-    } catch (error) {
-      console.log("Share cancelled:", error);
     }
+    
+    // Fallback: copy to clipboard
+    await copyToClipboard(text, "share");
   };
 
   const handleShareBusinessCard = () => {
     tap();
-    const businessCardData = `
-Easy Card - Digital Payment Card
+    const businessCardData = `👤 Easy Card - Digital Payment Card
 
 Name: John Doe
 Phone: +971 50 123 4567
 Email: john.doe@example.com
 
-Referral Code: EASY2024
-App: https://easycarduae.lovable.app
-    `.trim();
-    handleShare(businessCardData, "My Easy Card Business Card");
+🎁 Referral Code: EASY2024
+
+📲 Download: https://easycarduae.lovable.app`;
+    handleShare(businessCardData, "Easy Card Business Card");
   };
 
   const handleShareCard = (card: CardData) => {
-    const cardData = `
-${card.name}
+    const cardData = `💳 ${card.name}
+
 Card Number: ${card.number}
 Holder: ${card.holder}
 Expiry: ${card.expiry}
-    `.trim();
-    handleShare(cardData, card.name);
+
+Easy Card UAE`;
+    handleShare(cardData, `${card.name} - Easy Card`);
   };
 
   const handleShareAccount = (account: AccountData) => {
-    const accountData = `
-${account.name}
+    const accountData = `🏦 ${account.name}
+
 IBAN: ${account.iban}
-SWIFT: ${account.swift}
+SWIFT/BIC: ${account.swift}
 Bank: ${account.bankName}
-    `.trim();
-    handleShare(accountData, account.name);
+Currency: ${account.currency}
+
+Easy Card UAE`;
+    handleShare(accountData, `${account.name} - Easy Card`);
+  };
+
+  const handleShareCryptoWallet = (network: CryptoNetwork) => {
+    const walletData = `₿ USDT Wallet (${network.name})
+
+Address: ${network.address}
+
+Send only USDT to this address via ${network.name} network.
+
+Easy Card UAE`;
+    handleShare(walletData, `USDT ${network.name} Wallet - Easy Card`);
   };
 
   const getTitle = () => {
@@ -487,7 +508,7 @@ Bank: ${account.bankName}
                     <span>{t("common.copy") || "Copy"}</span>
                   </button>
                   <button
-                    onClick={() => handleShare(selectedNetwork.address, `${selectedNetwork.name} Wallet`)}
+                    onClick={() => handleShareCryptoWallet(selectedNetwork)}
                     className="flex-1 flex items-center justify-center gap-2 py-4 px-4 bg-primary text-primary-foreground rounded-2xl font-medium hover:bg-primary/90 transition-colors"
                   >
                     <Share2 className="w-5 h-5" />
