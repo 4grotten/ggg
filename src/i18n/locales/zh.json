@@ -333,7 +333,11 @@
     "selectNetworkFor": "选择网络用于",
     "sendOnly": "仅发送",
     "toThisAddress": "到此地址通过",
-    "viaNetwork": "通过"
+    "viaNetwork": "通过",
+    "profileData": "个人资料",
+    "noProfileData": "暂无个人资料",
+    "socialLinks": "社交链接",
+    "noSocialLinks": "未添加社交链接"
   },
   "bank": {
     "name": "银行名称"

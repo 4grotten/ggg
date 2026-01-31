@@ -331,7 +331,11 @@
     "selectNetworkFor": "İçin ağ seçin",
     "sendOnly": "Sadece gönderin",
     "toThisAddress": "bu adrese şu yolla",
-    "viaNetwork": "üzerinden"
+    "viaNetwork": "üzerinden",
+    "profileData": "Profil Verileri",
+    "noProfileData": "Profil verisi yok",
+    "socialLinks": "Sosyal Bağlantılar",
+    "noSocialLinks": "Sosyal bağlantı eklenmedi"
   },
   "bank": {
     "name": "Banka Adı"

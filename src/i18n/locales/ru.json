@@ -331,7 +331,11 @@
     "selectNetworkFor": "Выберите сеть для",
     "sendOnly": "Отправляйте только",
     "toThisAddress": "на этот адрес через",
-    "viaNetwork": "через"
+    "viaNetwork": "через",
+    "profileData": "Данные профиля",
+    "noProfileData": "Нет данных профиля",
+    "socialLinks": "Социальные сети",
+    "noSocialLinks": "Соцсети не добавлены"
   },
   "bank": {
     "name": "Название банка"
