@@ -945,17 +945,60 @@ Easy Card UAE`;
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                {/* QR Card with Avatar */}
+                {/* QR Card with Avatar - Animated Purple-Blue Gradient */}
                 <motion.div 
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 300 }}
-                  className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6"
+                  className="relative overflow-hidden rounded-3xl p-6"
+                  style={{
+                    background: "linear-gradient(-45deg, #7c3aed, #3b82f6, #8b5cf6, #2563eb)",
+                    backgroundSize: "400% 400%",
+                    animation: "gradientShift 8s ease infinite"
+                  }}
                 >
-                  {/* Background decorations */}
+                  {/* Animated background decorations */}
                   <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/5 rounded-full blur-3xl" />
-                    <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-black/10 rounded-full blur-3xl" />
+                    <motion.div 
+                      animate={{ 
+                        scale: [1, 1.2, 1],
+                        opacity: [0.3, 0.5, 0.3],
+                        x: [0, 30, 0],
+                        y: [0, -20, 0]
+                      }}
+                      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/10 rounded-full blur-3xl" 
+                    />
+                    <motion.div 
+                      animate={{ 
+                        scale: [1, 1.3, 1],
+                        opacity: [0.2, 0.4, 0.2],
+                        x: [0, -20, 0],
+                        y: [0, 30, 0]
+                      }}
+                      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                      className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-purple-500/20 rounded-full blur-3xl" 
+                    />
+                    <motion.div 
+                      animate={{ 
+                        rotate: [0, 360],
+                        scale: [1, 1.1, 1]
+                      }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute top-4 right-4"
+                    >
+                      <Sparkles className="w-6 h-6 text-white/40" />
+                    </motion.div>
+                    <motion.div 
+                      animate={{ 
+                        rotate: [360, 0],
+                        scale: [1, 1.2, 1]
+                      }}
+                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                      className="absolute bottom-4 left-4"
+                    >
+                      <Sparkles className="w-4 h-4 text-white/30" />
+                    </motion.div>
                   </div>
                   
                   <div className="relative z-10 flex flex-col items-center">
