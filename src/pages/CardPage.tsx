@@ -231,7 +231,19 @@ const CardPage = () => {
   };
 
   const renderCardVisual = () => {
-    return <CardMiniature type={currentCardType} />;
+    return (
+      <div className="relative overflow-hidden rounded-2xl">
+        <CardMiniature type={currentCardType} />
+        
+        {/* Fantasy glint overlay */}
+        <div 
+          className="absolute inset-0 animate-fantasy-glint pointer-events-none"
+          style={{
+            background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 35%, rgba(200,180,255,0.25) 42%, rgba(180,220,255,0.3) 50%, rgba(255,200,255,0.25) 58%, rgba(255,255,255,0.1) 65%, transparent 80%)",
+          }}
+        />
+      </div>
+    );
   };
 
   return (
