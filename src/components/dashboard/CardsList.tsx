@@ -160,7 +160,7 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
               <div 
                 className="absolute top-0 left-0 right-0 bottom-0 animate-fantasy-glint pointer-events-none rounded-2xl"
                 style={{
-                  background: "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.15) 30%, rgba(200,180,255,0.3) 40%, rgba(180,220,255,0.4) 50%, rgba(255,200,255,0.3) 60%, rgba(255,255,255,0.15) 70%, transparent 90%)",
+                  background: "linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.15) 22%, rgba(200,180,255,0.3) 36%, rgba(180,220,255,0.4) 50%, rgba(255,200,255,0.3) 64%, rgba(255,255,255,0.15) 78%, transparent 100%)",
                   animationDelay: `${Math.random() * 2}s`,
                 }}
               />
