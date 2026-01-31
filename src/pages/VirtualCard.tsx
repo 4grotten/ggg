@@ -16,7 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import virtualCardImage from "@/assets/virtual-card.png";
+import { CardMiniature } from "@/components/dashboard/CardMiniature";
 
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
@@ -162,11 +162,7 @@ const VirtualCard = () => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          <img 
-            src={virtualCardImage} 
-            alt="Virtual Card"
-            className="absolute inset-0 w-full h-full object-contain"
-          />
+          <CardMiniature type="virtual" />
           
           {/* Eye icon in top right corner */}
           <button
