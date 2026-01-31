@@ -335,9 +335,7 @@ const CardPage = () => {
               </div>
               <span className="text-sm font-medium">{t("card.addToApplePay")}</span>
             </div>
-            <button className="p-1 hover:bg-muted rounded-full transition-colors">
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </motion.div>
 
           {/* Card Details */}
