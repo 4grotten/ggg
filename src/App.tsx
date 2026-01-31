@@ -211,10 +211,10 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Card appears + 3s still + 2s sway = ~5.5s total (plus entry animation)
+    // 4 seconds total splash screen
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 6000);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, []);
