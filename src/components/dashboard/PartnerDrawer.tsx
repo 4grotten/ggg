@@ -135,14 +135,29 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* GlassDuck TGS animation with green glow and orbiting users */}
-            <div className="relative w-[162px] h-[162px] flex items-center justify-center mb-6">
-              {/* Pulsing green background glow */}
-              <div
-                className="absolute -inset-4 rounded-full partner-pulse-glow"
-                style={{ 
-                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+            <div className="relative w-[170px] h-[170px] flex items-center justify-center mb-6">
+              {/* Animated rainbow border */}
+              <div 
+                className="absolute inset-0 rounded-full blur-[1px] animate-spin-slow"
+                style={{
+                  background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
                 }}
               />
+              <div 
+                className="absolute inset-[-4px] rounded-full opacity-40 blur-md animate-spin-slow"
+                style={{
+                  background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
+                }}
+              />
+              {/* Inner content container */}
+              <div className="relative w-[158px] h-[158px] rounded-full bg-background flex items-center justify-center">
+                {/* Pulsing green background glow */}
+                <div
+                  className="absolute -inset-2 rounded-full partner-pulse-glow"
+                  style={{ 
+                    background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+                  }}
+                />
               
               {/* Orbiting users container */}
               <div className="absolute inset-0 partner-orbit-container">
@@ -163,10 +178,11 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 ))}
               </div>
               
-              <TgsPlayer 
-                src="./animations/GlassDuck.tgs" 
-                className="w-full h-full relative z-10"
-              />
+                <TgsPlayer 
+                  src="./animations/GlassDuck.tgs" 
+                  className="w-[140px] h-[140px] relative z-10"
+                />
+              </div>
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
@@ -188,14 +204,29 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* TGS Lottie animation with green glow */}
-            <div className="relative w-[162px] h-[162px] flex items-center justify-center mb-6">
-              {/* Pulsing green background glow */}
-              <div
-                className="absolute -inset-4 rounded-full partner-pulse-glow"
-                style={{ 
-                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+            <div className="relative w-[170px] h-[170px] flex items-center justify-center mb-6">
+              {/* Animated rainbow border */}
+              <div 
+                className="absolute inset-0 rounded-full blur-[1px] animate-spin-slow"
+                style={{
+                  background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
                 }}
               />
+              <div 
+                className="absolute inset-[-4px] rounded-full opacity-40 blur-md animate-spin-slow"
+                style={{
+                  background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
+                }}
+              />
+              {/* Inner content container */}
+              <div className="relative w-[158px] h-[158px] rounded-full bg-background flex items-center justify-center">
+                {/* Pulsing green background glow */}
+                <div
+                  className="absolute -inset-2 rounded-full partner-pulse-glow"
+                  style={{ 
+                    background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+                  }}
+                />
               
               {/* Blinking users around the animation - continuous circle */}
               <div className="absolute -inset-12 z-0">
@@ -217,10 +248,11 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 ))}
               </div>
               
-              <TgsPlayer 
-                src="./animations/money-coins.tgs" 
-                className="w-full h-full relative z-10"
-              />
+                <TgsPlayer 
+                  src="./animations/money-coins.tgs" 
+                  className="w-[140px] h-[140px] relative z-10"
+                />
+              </div>
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
@@ -245,14 +277,29 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* Duck animation with glow */}
-            <div className="relative w-[138px] h-[138px] flex items-center justify-center mb-6">
-              {/* Pulsing green background glow */}
-              <div
-                className="absolute -inset-4 rounded-full partner-pulse-glow"
-                style={{ 
-                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+            <div className="relative w-[150px] h-[150px] flex items-center justify-center mb-6">
+              {/* Animated rainbow border */}
+              <div 
+                className="absolute inset-0 rounded-full blur-[1px] animate-spin-slow"
+                style={{
+                  background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
                 }}
               />
+              <div 
+                className="absolute inset-[-4px] rounded-full opacity-40 blur-md animate-spin-slow"
+                style={{
+                  background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
+                }}
+              />
+              {/* Inner content container */}
+              <div className="relative w-[138px] h-[138px] rounded-full bg-background flex items-center justify-center">
+                {/* Pulsing green background glow */}
+                <div
+                  className="absolute -inset-2 rounded-full partner-pulse-glow"
+                  style={{ 
+                    background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+                  }}
+                />
               
               {/* Exploding users animation */}
               <div className="absolute inset-0">
@@ -275,10 +322,11 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 ))}
               </div>
               
-              <TgsPlayer 
-                src="./animations/wowduck.tgs" 
-                className="w-full h-full relative z-10"
-              />
+                <TgsPlayer 
+                  src="./animations/wowduck.tgs" 
+                  className="w-[120px] h-[120px] relative z-10"
+                />
+              </div>
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
@@ -331,14 +379,29 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
             className={`flex flex-col items-center px-6 ${stepAnimationClass}`}
           >
             {/* WonDuck animation with glow */}
-            <div className="relative w-[138px] h-[138px] flex items-center justify-center mb-6">
-              {/* Pulsing green background glow */}
-              <div
-                className="absolute -inset-4 rounded-full partner-pulse-glow"
-                style={{ 
-                  background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+            <div className="relative w-[150px] h-[150px] flex items-center justify-center mb-6">
+              {/* Animated rainbow border */}
+              <div 
+                className="absolute inset-0 rounded-full blur-[1px] animate-spin-slow"
+                style={{
+                  background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
                 }}
               />
+              <div 
+                className="absolute inset-[-4px] rounded-full opacity-40 blur-md animate-spin-slow"
+                style={{
+                  background: "conic-gradient(from 0deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #ff6b6b)",
+                }}
+              />
+              {/* Inner content container */}
+              <div className="relative w-[138px] h-[138px] rounded-full bg-background flex items-center justify-center">
+                {/* Pulsing green background glow */}
+                <div
+                  className="absolute -inset-2 rounded-full partner-pulse-glow"
+                  style={{ 
+                    background: "radial-gradient(circle, rgba(34, 197, 94, 0.8) 0%, rgba(16, 185, 129, 0.5) 35%, rgba(52, 211, 153, 0.3) 55%, transparent 75%)",
+                  }}
+                />
               
               {/* Floating users animation - around the animation */}
               <div className="absolute -inset-4 z-0">
@@ -366,10 +429,11 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
                 ))}
               </div>
               
-              <TgsPlayer 
-                src="./animations/WonDuck.tgs" 
-                className="w-full h-full relative z-10"
-              />
+                <TgsPlayer 
+                  src="./animations/WonDuck.tgs" 
+                  className="w-[120px] h-[120px] relative z-10"
+                />
+              </div>
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-2">
