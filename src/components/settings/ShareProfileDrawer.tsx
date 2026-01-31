@@ -861,27 +861,39 @@ Easy Card UAE`;
                     </div>
                   ) : (
                     businessCardFields.map((field, index) => (
-                      <motion.button
+                      <motion.div
                         key={field.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.35 + index * 0.05 }}
                         onClick={() => toggleField(field.id)}
-                        className="w-full flex items-center gap-4 p-4 hover:bg-primary/5 transition-colors"
+                        className="w-full flex items-center gap-4 p-4 hover:bg-primary/5 transition-colors cursor-pointer active:bg-primary/10"
                       >
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary shadow-sm">
+                        <motion.div 
+                          animate={{ scale: field.checked ? 1 : 0.95, opacity: field.checked ? 1 : 0.7 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                          className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary shadow-sm"
+                        >
                           {field.icon}
-                        </div>
-                        <div className="flex-1 text-left">
+                        </motion.div>
+                        <motion.div 
+                          animate={{ opacity: field.checked ? 1 : 0.6 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex-1 text-left"
+                        >
                           <p className="text-xs text-muted-foreground font-medium">{field.label}</p>
                           <p className="font-semibold text-foreground">{field.value}</p>
-                        </div>
-                        <Checkbox 
-                          checked={field.checked} 
-                          onCheckedChange={() => toggleField(field.id)}
-                          className="h-5 w-5"
-                        />
-                      </motion.button>
+                        </motion.div>
+                        <motion.div
+                          animate={{ scale: field.checked ? [1, 1.2, 1] : 1 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Checkbox 
+                            checked={field.checked} 
+                            className="h-5 w-5 pointer-events-none"
+                          />
+                        </motion.div>
+                      </motion.div>
                     ))
                   )}
                 </motion.div>
@@ -910,31 +922,44 @@ Easy Card UAE`;
                     socialLinks.map((link, index) => {
                       const platform = detectPlatform(link.url);
                       const IconComponent = platform.icon;
+                      const isChecked = socialChecked[link.id] ?? true;
                       return (
-                        <motion.button
+                        <motion.div
                           key={link.id}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.45 + index * 0.05 }}
                           onClick={() => toggleSocialLink(link.id)}
-                          className="w-full flex items-center gap-4 p-4 hover:bg-primary/5 transition-colors"
+                          className="w-full flex items-center gap-4 p-4 hover:bg-primary/5 transition-colors cursor-pointer active:bg-primary/10"
                         >
-                          <div className={cn(
-                            "w-11 h-11 rounded-xl flex items-center justify-center shadow-lg",
-                            platform.bgColor
-                          )}>
+                          <motion.div 
+                            animate={{ scale: isChecked ? 1 : 0.95, opacity: isChecked ? 1 : 0.7 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                            className={cn(
+                              "w-11 h-11 rounded-xl flex items-center justify-center shadow-lg",
+                              platform.bgColor
+                            )}
+                          >
                             <IconComponent className="w-5 h-5 text-white" />
-                          </div>
-                          <div className="flex-1 text-left min-w-0">
+                          </motion.div>
+                          <motion.div 
+                            animate={{ opacity: isChecked ? 1 : 0.6 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex-1 text-left min-w-0"
+                          >
                             <p className="font-semibold">{platform.name}</p>
                             <p className="text-sm text-muted-foreground truncate">{link.url}</p>
-                          </div>
-                          <Checkbox 
-                            checked={socialChecked[link.id] ?? true} 
-                            onCheckedChange={() => toggleSocialLink(link.id)}
-                            className="h-5 w-5 flex-shrink-0"
-                          />
-                        </motion.button>
+                          </motion.div>
+                          <motion.div
+                            animate={{ scale: isChecked ? [1, 1.2, 1] : 1 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <Checkbox 
+                              checked={isChecked} 
+                              className="h-5 w-5 flex-shrink-0 pointer-events-none"
+                            />
+                          </motion.div>
+                        </motion.div>
                       );
                     })
                   )}
