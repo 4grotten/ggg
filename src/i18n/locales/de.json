@@ -1020,6 +1020,7 @@
     "fullName": "Vollständiger Name",
     "fullNamePlaceholder": "Geben Sie Ihren vollständigen Namen ein",
     "fullNameDescription": "Ihr Name wie im Reisepass. Wird zur Identifikation und Profilanzeige verwendet.",
+    "phone": "Telefon",
     "username": "Benutzername",
     "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
     "usernameDescription": "Eindeutige Kennung für Überweisungen zwischen Benutzern. Nur Buchstaben, Zahlen und Unterstriche erlaubt.",

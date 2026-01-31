@@ -483,6 +483,7 @@
     "fullName": "Full Name",
     "fullNamePlaceholder": "Enter your full name",
     "fullNameDescription": "Your name as it appears on your passport. Used for identification and profile display.",
+    "phone": "Phone",
     "username": "Username",
     "usernamePlaceholder": "Enter your username",
     "usernameDescription": "Unique identifier for transfers between users. Only letters, numbers, and underscores allowed.",
