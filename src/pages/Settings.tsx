@@ -46,7 +46,7 @@ const iconGradients: Record<string, string> = {
   apofiz: 'linear-gradient(135deg, #18181b 0%, #3f3f46 100%)',
   userplus: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
   lock: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)',
-  admin: 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)',
+  admin: 'linear-gradient(135deg, #1e3a5f 0%, #0a0a0a 100%)',
   vibrate: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
 };
 
