@@ -671,50 +671,95 @@ const Settings = () => {
       </div>
 
       <div className="space-y-3 px-4 pb-28">
-        {/* Edit Profile - only for authenticated users */}
-        {isAuthenticated && (() => {
-          // Count unfilled important fields (including username)
-          const unfilledFieldsCount = [
-            !user?.full_name,
-            !user?.username,
-            !user?.email,
-            !user?.date_of_birth,
-            !user?.gender
-          ].filter(Boolean).length;
+        {/* Profile Section - Edit Profile, Personal Details, Referral Partner, Limits Settings in one block */}
+        {isAuthenticated && (
+          <AnimatedMenuSection index={0}>
+            {/* Edit Profile */}
+            {(() => {
+              const unfilledFieldsCount = [
+                !user?.full_name,
+                !user?.username,
+                !user?.email,
+                !user?.date_of_birth,
+                !user?.gender
+              ].filter(Boolean).length;
 
-          return (
-            <AnimatedMenuSection index={0}>
-              <button
-                onClick={() => navigate("/settings/edit-profile")}
-                className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <ColoredIcon colorKey="user"><User className="w-4 h-4" /></ColoredIcon>
-                  <span className="text-foreground font-medium">{t("settings.editProfile") || "Edit Profile"}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {/* Unfilled fields indicators - red dots when incomplete, green dot when complete */}
-                  {unfilledFieldsCount > 0 ? (
-                    <div className="flex items-center gap-1 mr-1">
-                      {Array.from({ length: unfilledFieldsCount }).map((_, index) => (
-                        <motion.span
-                          key={index}
-                          className="w-2 h-2 rounded-full bg-destructive"
-                          animate={{ opacity: [1, 0.3, 1] }}
-                          transition={{ 
-                            duration: 1.2, 
-                            repeat: Infinity, 
-                            ease: "easeInOut",
-                            delay: index * 0.15
+              return (
+                <button
+                  onClick={() => navigate("/settings/edit-profile")}
+                  className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <ColoredIcon colorKey="user"><User className="w-4 h-4" /></ColoredIcon>
+                    <span className="text-foreground font-medium">{t("settings.editProfile") || "Edit Profile"}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {unfilledFieldsCount > 0 ? (
+                      <div className="flex items-center gap-1 mr-1">
+                        {Array.from({ length: unfilledFieldsCount }).map((_, index) => (
+                          <motion.span
+                            key={index}
+                            className="w-2 h-2 rounded-full bg-destructive"
+                            animate={{ opacity: [1, 0.3, 1] }}
+                            transition={{ 
+                              duration: 1.2, 
+                              repeat: Infinity, 
+                              ease: "easeInOut",
+                              delay: index * 0.15
+                            }}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-2.5 h-2.5 rounded-full mr-1"
+                      >
+                        <motion.div
+                          animate={{ 
+                            opacity: [1, 0.4, 1],
+                            scale: [1, 1.05, 1]
                           }}
+                          transition={{ 
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                          className="w-full h-full rounded-full bg-green-500"
                         />
-                      ))}
-                    </div>
-                  ) : (
+                      </motion.div>
+                    )}
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </button>
+              );
+            })()}
+
+            {/* Personal Details / Verification */}
+            {(() => {
+              const completedSteps = getCompletedSteps();
+              const isVerified = completedSteps >= 3;
+              return (
+                <button
+                  onClick={() => {
+                    if (isVerified) {
+                      setIsVerificationDialogOpen(true);
+                    } else {
+                      navigate("/profile-verification");
+                    }
+                  }}
+                  className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <ColoredIcon colorKey="briefcase"><Briefcase className="w-4 h-4" /></ColoredIcon>
+                    <span className="text-foreground font-medium">{t("settings.personalDetails")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="w-2.5 h-2.5 rounded-full mr-1"
+                      className="w-2.5 h-2.5 rounded-full"
                     >
                       <motion.div
                         animate={{ 
@@ -726,113 +771,60 @@ const Settings = () => {
                           repeat: Infinity,
                           ease: "easeInOut"
                         }}
-                        className="w-full h-full rounded-full bg-green-500"
+                        className={`w-full h-full rounded-full ${isVerified ? 'bg-green-500' : 'bg-red-500'}`}
                       />
                     </motion.div>
-                  )}
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </div>
-              </button>
-            </AnimatedMenuSection>
-          );
-        })()}
+                    <span className={isVerified ? "text-sm font-medium text-green-500" : "text-sm font-medium text-red-500"}>
+                      {isVerified ? t("settings.verified") : t("settings.notVerified")}
+                    </span>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </button>
+              );
+            })()}
 
-        {/* Personal Details / Verification */}
-        {(() => {
-          const completedSteps = getCompletedSteps();
-          const isVerified = completedSteps >= 3;
-          return (
-            <AnimatedMenuSection index={1}>
-              <button
-                onClick={() => {
-                  // If verified, ask for confirmation
-                  if (isVerified) {
-                    setIsVerificationDialogOpen(true);
-                  } else {
-                    navigate("/profile-verification");
+            {/* Referral Partner */}
+            {(() => {
+              const uniqueUsers = new Set(MOCK_TRANSACTIONS.map(tx => tx.userName)).size;
+              const getCurrentLevel = () => {
+                for (let i = LEVELS.length - 1; i >= 0; i--) {
+                  if (uniqueUsers >= LEVELS[i].minFriends) {
+                    return LEVELS[i];
                   }
-                }}
-                className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <ColoredIcon colorKey="briefcase"><Briefcase className="w-4 h-4" /></ColoredIcon>
-                  <span className="text-foreground font-medium">{t("settings.personalDetails")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {/* Verification status indicator */}
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="w-2.5 h-2.5 rounded-full"
-                  >
-                    <motion.div
-                      animate={{ 
-                        opacity: [1, 0.4, 1],
-                        scale: [1, 1.05, 1]
-                      }}
-                      transition={{ 
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      className={`w-full h-full rounded-full ${isVerified ? 'bg-green-500' : 'bg-red-500'}`}
-                    />
-                  </motion.div>
-                  <span className={isVerified ? "text-sm font-medium text-green-500" : "text-sm font-medium text-red-500"}>
-                    {isVerified ? t("settings.verified") : t("settings.notVerified")}
-                  </span>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </div>
-              </button>
-            </AnimatedMenuSection>
-          );
-        })()}
+                }
+                return LEVELS[0];
+              };
+              const currentLevel = getCurrentLevel();
+              
+              return (
+                <button
+                  onClick={() => navigate("/partner")}
+                  className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <ColoredIcon colorKey="users"><Users className="w-4 h-4" /></ColoredIcon>
+                    <span className="text-foreground font-medium">{t("settings.referralPartner") || "Referral Partner"}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{currentLevel.icon}</span>
+                    <span className="text-sm font-medium text-primary">{currentLevel.id}</span>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </button>
+              );
+            })()}
 
-        {/* Referral Partner */}
-        {(() => {
-          // Calculate partner level from referrals
-          const uniqueUsers = new Set(MOCK_TRANSACTIONS.map(tx => tx.userName)).size;
-          const getCurrentLevel = () => {
-            for (let i = LEVELS.length - 1; i >= 0; i--) {
-              if (uniqueUsers >= LEVELS[i].minFriends) {
-                return LEVELS[i];
-              }
-            }
-            return LEVELS[0];
-          };
-          const currentLevel = getCurrentLevel();
-          
-          return (
-            <AnimatedMenuSection index={2}>
-              <button
-                onClick={() => navigate("/partner")}
-                className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <ColoredIcon colorKey="users"><Users className="w-4 h-4" /></ColoredIcon>
-                  <span className="text-foreground font-medium">{t("settings.referralPartner") || "Referral Partner"}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{currentLevel.icon}</span>
-                  <span className="text-sm font-medium text-primary">{currentLevel.id}</span>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </div>
-              </button>
-            </AnimatedMenuSection>
-          );
-        })()}
-
-        {/* Limits Settings */}
-        <AnimatedMenuSection index={3}>
-          <SettingsItem
-            icon={<ColoredIcon colorKey="sliders"><SlidersHorizontal className="w-4 h-4" /></ColoredIcon>}
-            label={t("settings.limitsSettings") || "Limits Settings"}
-            onClick={() => navigate("/limits-settings")}
-          />
-        </AnimatedMenuSection>
+            {/* Limits Settings */}
+            <SettingsItem
+              icon={<ColoredIcon colorKey="sliders"><SlidersHorizontal className="w-4 h-4" /></ColoredIcon>}
+              label={t("settings.limitsSettings") || "Limits Settings"}
+              onClick={() => navigate("/limits-settings")}
+            />
+          </AnimatedMenuSection>
+        )}
 
         {/* Language & Appearance */}
-        <AnimatedMenuSection index={4}>
+        <AnimatedMenuSection index={1}>
           <SettingsItem
             icon={<ColoredIcon colorKey="globe"><Globe className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.language")}
@@ -887,7 +879,7 @@ const Settings = () => {
         </AnimatedMenuSection>
 
         {/* Limits and Fees */}
-        <AnimatedMenuSection index={5}>
+        <AnimatedMenuSection index={2}>
           <SettingsItem
             icon={<ColoredIcon colorKey="receipt"><Receipt className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.limitsAndFees")}
@@ -908,7 +900,7 @@ const Settings = () => {
         </AnimatedMenuSection>
 
         {/* Support & Legal */}
-        <AnimatedMenuSection index={6}>
+        <AnimatedMenuSection index={3}>
           <SettingsItem
             icon={<ColoredIcon colorKey="privacy"><Briefcase className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.privacyPolicy")}
@@ -929,7 +921,7 @@ const Settings = () => {
 
         {/* Active Devices - only for authenticated users */}
         {isAuthenticated && (
-          <AnimatedMenuSection index={7}>
+          <AnimatedMenuSection index={4}>
             <SettingsItem
               icon={<ColoredIcon colorKey="laptop"><Laptop className="w-4 h-4" /></ColoredIcon>}
               label={t("settings.devices.title")}
@@ -939,7 +931,7 @@ const Settings = () => {
         )}
 
         {/* Apofiz Social Network */}
-        <AnimatedMenuSection index={8}>
+        <AnimatedMenuSection index={5}>
           <SettingsItem
             icon={<ColoredIcon colorKey="apofiz"><ApofizLogo className="w-4 h-4" forceLight /></ColoredIcon>}
             label={t("settings.apofizNetwork")}
@@ -948,7 +940,7 @@ const Settings = () => {
         </AnimatedMenuSection>
 
         {/* Add Account Button */}
-        <AnimatedMenuSection index={9}>
+        <AnimatedMenuSection index={6}>
           <SettingsItem
             icon={<ColoredIcon colorKey="userplus"><UserPlus className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.addAccount") || "Add Account"}
