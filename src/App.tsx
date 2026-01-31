@@ -213,7 +213,7 @@ const App = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 3200); // 2 sec delay + animation time
+    }, 1200);
 
     return () => clearTimeout(timer);
   }, []);
