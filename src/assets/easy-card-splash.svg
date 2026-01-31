@@ -1,29 +1,23 @@
-<svg width="1226" height="783" viewBox="0 0 1226 783" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g filter="url(#filter0_di_367_2162)">
-<rect x="8" y="8" width="1210" height="767" rx="40" fill="url(#pattern0_367_2162)" shape-rendering="crispEdges"/>
-<rect x="13" y="13" width="1200" height="757" rx="35" stroke="url(#paint0_radial_367_2162)" stroke-width="10" shape-rendering="crispEdges"/>
+<svg width="1210" height="767" viewBox="0 0 1210 767" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g filter="url(#filter0_i_367_2162)">
+<rect width="1210" height="767" rx="40" fill="url(#pattern0_367_2162)"/>
 </g>
+<rect x="5" y="5" width="1200" height="757" rx="35" stroke="url(#paint0_radial_367_2162)" stroke-width="10"/>
 <defs>
-<filter id="filter0_di_367_2162" x="0" y="0" width="1226" height="783" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter0_i_367_2162" x="0" y="0" width="1210" height="767" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset/>
-<feGaussianBlur stdDeviation="4"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0.113725 0 0 0 0 0.160784 0 0 0 0 0.368627 0 0 0 0.3 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_367_2162"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_367_2162" result="shape"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
 <feOffset/>
 <feGaussianBlur stdDeviation="20"/>
 <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
 <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-<feBlend mode="normal" in2="shape" result="effect2_innerShadow_367_2162"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_367_2162"/>
 </filter>
 <pattern id="pattern0_367_2162" patternContentUnits="objectBoundingBox" width="1" height="1">
 <use xlink:href="#image0_367_2162" transform="scale(0.000826446 0.00130378)"/>
 </pattern>
-<radialGradient id="paint0_radial_367_2162" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(613 391.5) rotate(90) scale(383.5)">
+<radialGradient id="paint0_radial_367_2162" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(605 383.5) rotate(90) scale(383.5)">
 <stop stop-color="#007AFF"/>
 <stop offset="1" stop-color="#462375"/>
 </radialGradient>
