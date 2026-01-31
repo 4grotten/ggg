@@ -4,29 +4,13 @@ import { motion } from "framer-motion";
 const SplashScreen = () => {
   const [isReady, setIsReady] = useState(false);
 
-  // Wait for page to be fully ready and add 3 second delay before starting animation
+  // Start animation immediately when component mounts
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    
-    const startAnimation = () => {
-      // Add 3 second delay before starting the animation
-      timeoutId = setTimeout(() => {
-        setIsReady(true);
-      }, 3000);
-    };
-    
-    // Wait for document to be fully interactive
-    if (document.readyState === 'complete') {
-      startAnimation();
-    } else {
-      window.addEventListener('load', startAnimation);
-      return () => {
-        window.removeEventListener('load', startAnimation);
-        clearTimeout(timeoutId);
-      };
-    }
-    
-    return () => clearTimeout(timeoutId);
+    // Use requestAnimationFrame to ensure DOM is ready
+    const rafId = requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   return (
