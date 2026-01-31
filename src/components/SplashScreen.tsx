@@ -128,15 +128,15 @@ const SplashScreen = () => {
             }}
           />
           
-          {/* Fantasy glint overlay - 4px inset from card edges */}
+          {/* Fantasy glint overlay - iOS style rounded corners */}
           <div
             className="absolute pointer-events-none mix-blend-screen animate-[fantasy-glint_2.2s_ease-in-out_infinite] overflow-hidden"
             style={{
-              top: 4,
-              left: 4,
-              right: 4,
-              bottom: 4,
-              borderRadius: 20,
+              top: 6,
+              left: 6,
+              right: 6,
+              bottom: 6,
+              borderRadius: 14,
               background:
                 "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
               opacity: isReady ? 1 : 0,
