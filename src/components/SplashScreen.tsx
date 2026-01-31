@@ -159,14 +159,14 @@ const SplashScreen = () => {
           
           {/* Fantasy glint overlay - pure CSS, starts after card loads */}
           {isReady && (
-            <div
+          <div
               className="absolute overflow-hidden pointer-events-none"
               style={{
                 top: 4,
                 left: 4,
                 right: 4,
                 bottom: 4,
-                borderRadius: 12,
+                borderRadius: 22,
               }}
             >
               <div
