@@ -156,11 +156,11 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
             <div className="relative overflow-hidden rounded-2xl">
               <CardMiniature type={card.type} />
               
-              {/* Fantasy glint overlay */}
+              {/* Fantasy glint overlay - full card coverage */}
               <div 
-                className="absolute inset-0 animate-fantasy-glint pointer-events-none"
+                className="absolute top-0 left-0 right-0 bottom-0 animate-fantasy-glint pointer-events-none rounded-2xl"
                 style={{
-                  background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 35%, rgba(200,180,255,0.25) 42%, rgba(180,220,255,0.3) 50%, rgba(255,200,255,0.25) 58%, rgba(255,255,255,0.1) 65%, transparent 80%)",
+                  background: "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.15) 30%, rgba(200,180,255,0.3) 40%, rgba(180,220,255,0.4) 50%, rgba(255,200,255,0.3) 60%, rgba(255,255,255,0.15) 70%, transparent 90%)",
                   animationDelay: `${Math.random() * 2}s`,
                 }}
               />
