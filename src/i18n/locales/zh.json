@@ -31,7 +31,9 @@
     "usdt": "USDT",
     "authorize": "登录",
     "next": "下一步",
-    "apply": "应用"
+    "apply": "应用",
+    "share": "分享",
+    "copy": "复制"
   },
   "dashboard": {
     "welcome": "欢迎，{{name}}！",
@@ -335,6 +337,16 @@
     "limitsSettings": "限额设置",
     "askQuestion": "提问",
     "share": "分享",
+    "businessCard": "名片",
+    "shareContactInfo": "分享联系信息",
+    "cards": "卡片",
+    "accounts": "账户",
+    "cryptoWallets": "加密钱包",
+    "selectNetwork": "选择网络分享",
+    "selectNetworkDesc": "选择网络查看钱包地址",
+    "shareCard": "卡片详情",
+    "shareAccount": "账户详情",
+    "shareCrypto": "加密钱包",
     "addToHomeScreen": "添加到主屏幕",
     "shareApp": "分享应用",
     "installStep1": "点击分享按钮",

@@ -24,6 +24,7 @@ import { saveCurrentAccount, useMultiAccount, type SavedAccount } from "@/hooks/
 import { LEVELS } from "@/components/partner/LevelCarousel";
 import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 import { ScreenLockDrawer } from "@/components/settings/ScreenLockDrawer";
+import { ShareProfileDrawer } from "@/components/settings/ShareProfileDrawer";
 import { PasswordVerifyDialog } from "@/components/settings/PasswordVerifyDialog";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -297,6 +298,7 @@ const Settings = () => {
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
   const [isScreenLockOpen, setIsScreenLockOpen] = useState(false);
   const [isAdminPasswordDialogOpen, setIsAdminPasswordDialogOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused } = useScreenLockContext();
   const { isAdmin } = useUserRole();
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
@@ -683,8 +685,7 @@ const Settings = () => {
             }}
             onClick={() => {
               tap();
-              // TODO: Implement share functionality
-              toast.success(t("toast.linkCopied") || "Link copied!");
+              setIsShareOpen(true);
             }}
             className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/25"
           >
@@ -1294,6 +1295,12 @@ const Settings = () => {
         onSuccess={() => navigate("/settings/admin")}
         title={t("settings.adminPanel") || "Административная панель"}
         description={t("auth.enterPasswordToAccess", "Введите пароль аккаунта для доступа")}
+      />
+
+      {/* Share Profile Drawer */}
+      <ShareProfileDrawer
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
       />
     </MobileLayout>
   );

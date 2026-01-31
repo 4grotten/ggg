@@ -29,7 +29,9 @@
     "yes": "Evet",
     "aed": "AED",
     "usdt": "USDT",
-    "authorize": "Giriş Yap"
+    "authorize": "Giriş Yap",
+    "share": "Paylaş",
+    "copy": "Kopyala"
   },
   "dashboard": {
     "welcome": "Hoş geldiniz, {{name}}!",
@@ -335,6 +337,16 @@
     "addToHomeScreen": "Ana Ekrana Ekle",
     "installApp": "Uygulamayı Yükle",
     "share": "Paylaş",
+    "businessCard": "Kartvizit",
+    "shareContactInfo": "İletişim bilgilerini paylaş",
+    "cards": "Kartlar",
+    "accounts": "Hesaplar",
+    "cryptoWallets": "Kripto Cüzdanlar",
+    "selectNetwork": "Paylaşmak için ağ seçin",
+    "selectNetworkDesc": "Cüzdan adresini görüntülemek için ağ seçin",
+    "shareCard": "Kart Detayları",
+    "shareAccount": "Hesap Detayları",
+    "shareCrypto": "Kripto Cüzdan",
     "shareApp": "Uygulamayı Paylaş",
     "installStep1Desc": "Tarayıcınızda paylaş simgesini bulun",
     "installStep2": "'Ana Ekrana Ekle' seçeneğini seçin",

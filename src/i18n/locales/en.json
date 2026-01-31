@@ -35,7 +35,9 @@
     "authorize": "Sign In",
     "next": "Next",
     "apply": "Apply",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "share": "Share",
+    "copy": "Copy"
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",
@@ -336,6 +338,16 @@
   },
   "settings": {
     "share": "Share",
+    "businessCard": "Business Card",
+    "shareContactInfo": "Share your contact info",
+    "cards": "Cards",
+    "accounts": "Accounts",
+    "cryptoWallets": "Crypto Wallets",
+    "selectNetwork": "Select network to share",
+    "selectNetworkDesc": "Select a network to view wallet address",
+    "shareCard": "Card Details",
+    "shareAccount": "Account Details",
+    "shareCrypto": "Crypto Wallet",
     "profile": "Profile",
     "personalDetails": "Personal Details",
     "notVerified": "Not verified",
