@@ -32,13 +32,16 @@ import {
   Hash,
   Users,
   Video,
-  LucideIcon
+  LucideIcon,
+  Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAvatar } from "@/contexts/AvatarContext";
 import { getSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 interface ShareProfileDrawerProps {
@@ -256,6 +259,7 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
   const { t } = useTranslation();
   const { tap } = useHapticFeedback();
   const { user } = useAuth();
+  const { avatarUrl } = useAvatar();
   const [currentView, setCurrentView] = useState<ViewType>("main");
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<AccountData | null>(null);
@@ -710,24 +714,90 @@ Easy Card UAE`;
               </motion.div>
             )}
 
-            {/* Business Card View with Checkboxes */}
+            {/* Business Card View with Checkboxes - Fantastic Design */}
             {currentView === "businessCard" && (
               <motion.div
                 key="businessCard"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="space-y-4"
+                className="space-y-5"
               >
-                {/* Action Buttons at Top */}
-                <div className="flex gap-3">
+                {/* Hero Card with Avatar and Name */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
+                  className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-primary via-primary/90 to-primary/70"
+                >
+                  {/* Background decoration */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/5 rounded-full blur-3xl" />
+                    <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-black/10 rounded-full blur-3xl" />
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute top-4 right-4"
+                    >
+                      <Sparkles className="w-5 h-5 text-white/30" />
+                    </motion.div>
+                  </div>
+                  
+                  <div className="relative z-10 flex items-center gap-4">
+                    {/* Avatar with glow effect */}
+                    <motion.div 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 400 }}
+                      className="relative"
+                    >
+                      <div className="absolute inset-0 bg-white/30 rounded-full blur-xl scale-110" />
+                      <Avatar className="w-20 h-20 border-4 border-white/30 shadow-2xl relative">
+                        <AvatarImage src={avatarUrl} alt={user?.full_name || "User"} />
+                        <AvatarFallback className="bg-white/20 text-white text-2xl font-bold">
+                          {user?.full_name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </motion.div>
+                    
+                    {/* Name and Username */}
+                    <div className="flex-1 min-w-0">
+                      <motion.h3 
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-xl font-bold text-white truncate"
+                      >
+                        {user?.full_name || t("share.noName")}
+                      </motion.h3>
+                      {user?.username && (
+                        <motion.p 
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.4 }}
+                          className="text-white/70 text-sm"
+                        >
+                          @{user.username}
+                        </motion.p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Action Buttons */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="flex gap-3"
+                >
                   <button
                     onClick={handleShareBusinessCard}
                     disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
-                    className="flex-1 flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-3 py-4 px-6 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-2xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100"
                   >
                     <Share2 className="w-5 h-5" />
-                    <span>{t("common.share") || "Share"}</span>
+                    <span>{t("common.share")}</span>
                   </button>
                   <button
                     onClick={() => {
@@ -735,81 +805,97 @@ Easy Card UAE`;
                       setCurrentView("businessCardQR");
                     }}
                     disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
-                    className="flex items-center justify-center gap-2 py-4 px-5 bg-muted rounded-2xl font-semibold hover:bg-muted/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center justify-center gap-2 py-4 px-5 bg-gradient-to-br from-muted to-muted/80 rounded-2xl font-semibold hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     <QrCode className="w-5 h-5" />
-                    <span className="text-sm">{t("share.qr") || "QR"}</span>
+                    <span className="text-sm">{t("share.qr")}</span>
                   </button>
-                </div>
+                </motion.div>
                 
                 {/* Profile Fields */}
-                <div className="bg-muted/50 rounded-2xl overflow-hidden">
-                  <div className="px-4 py-3 border-b border-border/50">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-gradient-to-b from-muted/60 to-muted/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/50"
+                >
+                  <div className="px-4 py-3 border-b border-border/30">
                     <p className="text-sm font-medium text-muted-foreground">
-                      {t("share.profileData") || "Profile Data"}
+                      {t("share.profileData")}
                     </p>
                   </div>
                   {businessCardFields.length === 0 ? (
                     <div className="p-4 text-center text-muted-foreground text-sm">
-                      {t("share.noProfileData") || "No profile data available"}
+                      {t("share.noProfileData")}
                     </div>
                   ) : (
-                    businessCardFields.map((field) => (
-                      <button
+                    businessCardFields.map((field, index) => (
+                      <motion.button
                         key={field.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.35 + index * 0.05 }}
                         onClick={() => toggleField(field.id)}
-                        className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors"
+                        className="w-full flex items-center gap-4 p-4 hover:bg-primary/5 transition-colors"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary shadow-sm">
                           {field.icon}
                         </div>
                         <div className="flex-1 text-left">
-                          <p className="text-sm text-muted-foreground">{field.label}</p>
-                          <p className="font-medium">{field.value}</p>
+                          <p className="text-xs text-muted-foreground font-medium">{field.label}</p>
+                          <p className="font-semibold text-foreground">{field.value}</p>
                         </div>
                         <Checkbox 
                           checked={field.checked} 
                           onCheckedChange={() => toggleField(field.id)}
                           className="h-5 w-5"
                         />
-                      </button>
+                      </motion.button>
                     ))
                   )}
-                </div>
+                </motion.div>
 
                 {/* Social Links */}
-                <div className="bg-muted/50 rounded-2xl overflow-hidden">
-                  <div className="px-4 py-3 border-b border-border/50">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-gradient-to-b from-muted/60 to-muted/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/50"
+                >
+                  <div className="px-4 py-3 border-b border-border/30">
                     <p className="text-sm font-medium text-muted-foreground">
-                      {t("share.socialLinks") || "Social Links"}
+                      {t("share.socialLinks")}
                     </p>
                   </div>
                   {isLoadingSocial ? (
                     <div className="p-4 text-center text-muted-foreground text-sm">
-                      {t("common.loading") || "Loading..."}
+                      {t("common.loading")}
                     </div>
                   ) : socialLinks.length === 0 ? (
                     <div className="p-4 text-center text-muted-foreground text-sm">
-                      {t("share.noSocialLinks") || "No social links added"}
+                      {t("share.noSocialLinks")}
                     </div>
                   ) : (
-                    socialLinks.map((link) => {
+                    socialLinks.map((link, index) => {
                       const platform = detectPlatform(link.url);
                       const IconComponent = platform.icon;
                       return (
-                        <button
+                        <motion.button
                           key={link.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.45 + index * 0.05 }}
                           onClick={() => toggleSocialLink(link.id)}
-                          className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors"
+                          className="w-full flex items-center gap-4 p-4 hover:bg-primary/5 transition-colors"
                         >
                           <div className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center",
+                            "w-11 h-11 rounded-xl flex items-center justify-center shadow-lg",
                             platform.bgColor
                           )}>
                             <IconComponent className="w-5 h-5 text-white" />
                           </div>
                           <div className="flex-1 text-left min-w-0">
-                            <p className="font-medium">{platform.name}</p>
+                            <p className="font-semibold">{platform.name}</p>
                             <p className="text-sm text-muted-foreground truncate">{link.url}</p>
                           </div>
                           <Checkbox 
@@ -817,15 +903,15 @@ Easy Card UAE`;
                             onCheckedChange={() => toggleSocialLink(link.id)}
                             className="h-5 w-5 flex-shrink-0"
                           />
-                        </button>
+                        </motion.button>
                       );
                     })
                   )}
-                </div>
+                </motion.div>
               </motion.div>
             )}
             
-            {/* Business Card QR View */}
+            {/* Business Card QR View - Fantastic Design */}
             {currentView === "businessCardQR" && (
               <motion.div
                 key="businessCardQR"
@@ -834,49 +920,130 @@ Easy Card UAE`;
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                <div className="flex flex-col items-center">
-                  <div className="bg-white p-6 rounded-3xl shadow-lg">
-                    <QRCodeSVG 
-                      value={buildVCardData()} 
-                      size={200}
-                      level="M"
-                      includeMargin={false}
-                    />
+                {/* QR Card with Avatar */}
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                  className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6"
+                >
+                  {/* Background decorations */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/5 rounded-full blur-3xl" />
+                    <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-black/10 rounded-full blur-3xl" />
                   </div>
-                  <p className="mt-4 text-sm text-muted-foreground text-center">
-                    {t("share.scanQRToGetContact") || "Scan QR to get contact info"}
-                  </p>
-                </div>
+                  
+                  <div className="relative z-10 flex flex-col items-center">
+                    {/* Avatar with glow */}
+                    <motion.div 
+                      initial={{ scale: 0, y: 20 }}
+                      animate={{ scale: 1, y: 0 }}
+                      transition={{ delay: 0.1, type: "spring" }}
+                      className="relative mb-4"
+                    >
+                      <div className="absolute inset-0 bg-white/30 rounded-full blur-xl scale-125" />
+                      <Avatar className="w-16 h-16 border-4 border-white/30 shadow-2xl relative">
+                        <AvatarImage src={avatarUrl} alt={user?.full_name || "User"} />
+                        <AvatarFallback className="bg-white/20 text-white text-xl font-bold">
+                          {user?.full_name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </motion.div>
+                    
+                    {/* Name */}
+                    <motion.h3 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-lg font-bold text-white mb-4"
+                    >
+                      {user?.full_name || t("share.noName")}
+                    </motion.h3>
+                    
+                    {/* QR Code */}
+                    <motion.div 
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.3, type: "spring" }}
+                      className="bg-white p-4 rounded-2xl shadow-2xl"
+                    >
+                      <QRCodeSVG 
+                        value={buildVCardData()} 
+                        size={180}
+                        level="M"
+                        includeMargin={false}
+                      />
+                    </motion.div>
+                    
+                    <motion.p 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="mt-4 text-sm text-white/70 text-center"
+                    >
+                      {t("share.scanQRToGetContact")}
+                    </motion.p>
+                  </div>
+                </motion.div>
                 
                 {/* Selected items summary */}
-                <div className="bg-muted/50 rounded-2xl p-4 space-y-2">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-gradient-to-b from-muted/60 to-muted/40 backdrop-blur-sm rounded-2xl p-4 space-y-2 border border-border/50"
+                >
                   <p className="text-sm font-medium text-muted-foreground mb-3">
-                    {t("share.includedInQR") || "Included in QR"}:
+                    {t("share.includedInQR")}:
                   </p>
-                  {businessCardFields.filter(f => f.checked).map(field => (
-                    <div key={field.id} className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-primary" />
-                      <span>{field.label}: {field.value}</span>
-                    </div>
-                  ))}
-                  {socialLinks.filter(link => socialChecked[link.id]).map(link => {
-                    const platform = detectPlatform(link.url);
-                    return (
-                      <div key={link.id} className="flex items-center gap-2 text-sm">
-                        <Check className="w-4 h-4 text-primary" />
-                        <span>{platform.name}</span>
+                  {businessCardFields.filter(f => f.checked).map((field, index) => (
+                    <motion.div 
+                      key={field.id} 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.35 + index * 0.05 }}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-primary" />
                       </div>
+                      <span className="font-medium">{field.label}:</span>
+                      <span className="text-muted-foreground truncate">{field.value}</span>
+                    </motion.div>
+                  ))}
+                  {socialLinks.filter(link => socialChecked[link.id]).map((link, index) => {
+                    const platform = detectPlatform(link.url);
+                    const IconComponent = platform.icon;
+                    return (
+                      <motion.div 
+                        key={link.id} 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 + index * 0.05 }}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <div className={cn(
+                          "w-5 h-5 rounded-full flex items-center justify-center",
+                          platform.bgColor
+                        )}>
+                          <IconComponent className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="font-medium">{platform.name}</span>
+                      </motion.div>
                     );
                   })}
-                </div>
+                </motion.div>
                 
-                <button
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
                   onClick={handleShareBusinessCard}
-                  className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors"
+                  className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-2xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] transition-all duration-200"
                 >
                   <Share2 className="w-5 h-5" />
-                  <span>{t("common.share") || "Share"}</span>
-                </button>
+                  <span>{t("common.share")}</span>
+                </motion.button>
               </motion.div>
             )}
 

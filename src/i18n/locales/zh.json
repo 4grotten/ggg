@@ -1027,6 +1027,7 @@
     "fullName": "全名",
     "fullNamePlaceholder": "输入您的全名",
     "fullNameDescription": "护照上显示的姓名。用于身份识别和个人资料显示。",
+    "phone": "电话",
     "username": "用户名",
     "usernamePlaceholder": "输入您的用户名",
     "usernameDescription": "用户间转账的唯一标识符。只允许字母、数字和下划线。",
