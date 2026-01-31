@@ -432,32 +432,57 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     await copyToClipboard(text, "share");
   };
 
-  const handleShareBusinessCard = () => {
+  const handleShareBusinessCard = async () => {
     tap();
     
-    // Build business card from selected fields
+    // Build vCard data for sharing (same as QR code)
+    const vCardData = buildVCardData();
+    
+    // Always try native share first on mobile with vCard file
+    if (navigator.share) {
+      try {
+        // Create a vCard blob file for sharing
+        const vCardBlob = new Blob([vCardData], { type: 'text/vcard' });
+        const vCardFile = new File([vCardBlob], `${user?.full_name || 'contact'}.vcf`, { type: 'text/vcard' });
+        
+        // Check if sharing files is supported
+        if (navigator.canShare && navigator.canShare({ files: [vCardFile] })) {
+          await navigator.share({
+            files: [vCardFile],
+            title: t("settings.businessCard") || "Business Card"
+          });
+          return;
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.log("Share cancelled by user");
+          return;
+        }
+        // Fall through to text sharing
+      }
+    }
+    
+    // Fallback: share as text
     const selectedFields = businessCardFields.filter(f => f.checked);
     const selectedSocials = socialLinks.filter(link => socialChecked[link.id]);
     
-    let businessCardData = `👤 Easy Card - ${t("share.digitalPaymentCard") || "Digital Payment Card"}\n\n`;
+    let businessCardText = `👤 ${user?.full_name || ""}\n\n`;
     
     // Add selected profile fields
     selectedFields.forEach(field => {
-      businessCardData += `${field.label}: ${field.value}\n`;
+      businessCardText += `${field.label}: ${field.value}\n`;
     });
     
     // Add social links
     if (selectedSocials.length > 0) {
-      businessCardData += `\n🔗 ${t("share.socialLinks") || "Social Links"}:\n`;
+      businessCardText += `\n🔗 ${t("share.socialLinks") || "Social Links"}:\n`;
       selectedSocials.forEach(link => {
         const platform = detectPlatform(link.url);
-        businessCardData += `${platform.name}: ${link.url}\n`;
+        businessCardText += `${platform.name}: ${link.url}\n`;
       });
     }
     
-    businessCardData += `\n📲 Download: https://easycarduae.lovable.app`;
-    
-    handleShare(businessCardData, t("settings.businessCard") || "Easy Card Business Card");
+    handleShare(businessCardText, t("settings.businessCard") || "Business Card");
   };
 
   const handleShareCard = (card: CardData) => {
@@ -723,23 +748,23 @@ Easy Card UAE`;
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-5"
               >
-                {/* Hero Card with Avatar and Name */}
+                {/* Hero Card with Avatar and Name - Transparent glassmorphism */}
                 <motion.div 
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
-                  className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-primary via-primary/90 to-primary/70"
+                  className="relative overflow-hidden rounded-3xl p-6 bg-primary/20 backdrop-blur-xl border border-primary/30"
                 >
-                  {/* Background decoration */}
+                  {/* Background decoration - subtle glow */}
                   <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/5 rounded-full blur-3xl" />
-                    <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-black/10 rounded-full blur-3xl" />
+                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-primary/10 rounded-full blur-3xl" />
+                    <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-primary/5 rounded-full blur-3xl" />
                     <motion.div 
                       animate={{ rotate: 360 }}
                       transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                       className="absolute top-4 right-4"
                     >
-                      <Sparkles className="w-5 h-5 text-white/30" />
+                      <Sparkles className="w-5 h-5 text-primary/40" />
                     </motion.div>
                   </div>
                   
@@ -751,10 +776,10 @@ Easy Card UAE`;
                       transition={{ delay: 0.2, type: "spring", stiffness: 400 }}
                       className="relative"
                     >
-                      <div className="absolute inset-0 bg-white/30 rounded-full blur-xl scale-110" />
-                      <Avatar className="w-20 h-20 border-4 border-white/30 shadow-2xl relative">
+                      <div className="absolute inset-0 bg-primary/30 rounded-full blur-xl scale-110" />
+                      <Avatar className="w-20 h-20 border-4 border-primary/30 shadow-2xl relative">
                         <AvatarImage src={avatarUrl} alt={user?.full_name || "User"} />
-                        <AvatarFallback className="bg-white/20 text-white text-2xl font-bold">
+                        <AvatarFallback className="bg-primary/30 text-primary text-2xl font-bold">
                           {user?.full_name?.charAt(0) || "U"}
                         </AvatarFallback>
                       </Avatar>
@@ -766,7 +791,7 @@ Easy Card UAE`;
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="text-xl font-bold text-white truncate"
+                        className="text-xl font-bold text-foreground truncate"
                       >
                         {user?.full_name || t("share.noName")}
                       </motion.h3>
@@ -775,7 +800,7 @@ Easy Card UAE`;
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.4 }}
-                          className="text-white/70 text-sm"
+                          className="text-muted-foreground text-sm"
                         >
                           @{user.username}
                         </motion.p>
