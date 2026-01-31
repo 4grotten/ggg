@@ -15,7 +15,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -671,9 +671,31 @@ const Settings = () => {
       </div>
 
       <div className="space-y-3 px-4 pb-28">
+        {/* Share Button */}
+        {isAuthenticated && (
+          <motion.button
+            initial={{ opacity: 0, y: -30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              duration: 0.5,
+              delay: 0,
+              ease: [0.23, 1, 0.32, 1],
+            }}
+            onClick={() => {
+              tap();
+              // TODO: Implement share functionality
+              toast.success(t("toast.linkCopied") || "Link copied!");
+            }}
+            className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/25"
+          >
+            <QrCode className="w-5 h-5" />
+            <span>{t("settings.share") || "Поделиться"}</span>
+          </motion.button>
+        )}
+
         {/* Profile Section - Edit Profile, Personal Details, Referral Partner, Limits Settings in one block */}
         {isAuthenticated && (
-          <AnimatedMenuSection index={0}>
+          <AnimatedMenuSection index={1}>
             {/* Edit Profile */}
             {(() => {
               const unfilledFieldsCount = [
@@ -824,7 +846,7 @@ const Settings = () => {
         )}
 
         {/* Language & Appearance */}
-        <AnimatedMenuSection index={1}>
+        <AnimatedMenuSection index={2}>
           <SettingsItem
             icon={<ColoredIcon colorKey="globe"><Globe className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.language")}
@@ -879,7 +901,7 @@ const Settings = () => {
         </AnimatedMenuSection>
 
         {/* Limits and Fees */}
-        <AnimatedMenuSection index={2}>
+        <AnimatedMenuSection index={3}>
           <SettingsItem
             icon={<ColoredIcon colorKey="receipt"><Receipt className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.limitsAndFees")}
@@ -900,7 +922,7 @@ const Settings = () => {
         </AnimatedMenuSection>
 
         {/* Support & Legal */}
-        <AnimatedMenuSection index={3}>
+        <AnimatedMenuSection index={4}>
           <SettingsItem
             icon={<ColoredIcon colorKey="privacy"><Briefcase className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.privacyPolicy")}
@@ -921,7 +943,7 @@ const Settings = () => {
 
         {/* Active Devices - only for authenticated users */}
         {isAuthenticated && (
-          <AnimatedMenuSection index={4}>
+          <AnimatedMenuSection index={5}>
             <SettingsItem
               icon={<ColoredIcon colorKey="laptop"><Laptop className="w-4 h-4" /></ColoredIcon>}
               label={t("settings.devices.title")}
@@ -931,7 +953,7 @@ const Settings = () => {
         )}
 
         {/* Apofiz Social Network */}
-        <AnimatedMenuSection index={5}>
+        <AnimatedMenuSection index={6}>
           <SettingsItem
             icon={<ColoredIcon colorKey="apofiz"><ApofizLogo className="w-4 h-4" forceLight /></ColoredIcon>}
             label={t("settings.apofizNetwork")}
@@ -940,7 +962,7 @@ const Settings = () => {
         </AnimatedMenuSection>
 
         {/* Add Account Button */}
-        <AnimatedMenuSection index={6}>
+        <AnimatedMenuSection index={7}>
           <SettingsItem
             icon={<ColoredIcon colorKey="userplus"><UserPlus className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.addAccount") || "Add Account"}
@@ -960,7 +982,7 @@ const Settings = () => {
 
         {/* Saved Accounts List - Collapsible */}
         {accounts.length > 0 && (
-          <AnimatedMenuSection index={10}>
+          <AnimatedMenuSection index={8}>
             <button
               onClick={() => setIsAccountsExpanded(!isAccountsExpanded)}
               className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
