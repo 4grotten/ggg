@@ -129,10 +129,13 @@ const SplashScreen = () => {
           />
           
           {/* Fantasy glint overlay */}
-          <div 
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={isReady ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ delay: 1.2, duration: 0.5 }}
             className="absolute inset-0 animate-fantasy-glint pointer-events-none"
             style={{
-              background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 35%, rgba(200,180,255,0.25) 42%, rgba(180,220,255,0.3) 50%, rgba(255,200,255,0.25) 58%, rgba(255,255,255,0.1) 65%, transparent 80%)",
+              background: "linear-gradient(105deg, transparent 15%, rgba(255,255,255,0.15) 30%, rgba(255,255,255,0.4) 45%, rgba(255,220,180,0.5) 50%, rgba(255,255,255,0.4) 55%, rgba(255,255,255,0.15) 70%, transparent 85%)",
             }}
           />
         </div>
