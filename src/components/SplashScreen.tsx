@@ -129,13 +129,14 @@ const SplashScreen = () => {
           />
           
           {/* Fantasy glint overlay */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={isReady ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ delay: 1.2, duration: 0.5 }}
-            className="absolute inset-0 animate-fantasy-glint pointer-events-none"
+          <div
+            className="absolute inset-0 pointer-events-none mix-blend-screen animate-[fantasy-glint_2.2s_ease-in-out_infinite]"
             style={{
-              background: "linear-gradient(105deg, transparent 15%, rgba(255,255,255,0.15) 30%, rgba(255,255,255,0.4) 45%, rgba(255,220,180,0.5) 50%, rgba(255,255,255,0.4) 55%, rgba(255,255,255,0.15) 70%, transparent 85%)",
+              // Brighter + warmer glare so it's visible even during the short splash lifetime
+              background:
+                "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.18) 28%, rgba(255,255,255,0.55) 44%, rgba(255,215,160,0.65) 50%, rgba(255,255,255,0.55) 56%, rgba(255,255,255,0.18) 72%, transparent 90%)",
+              opacity: isReady ? 1 : 0,
+              transition: "opacity 200ms ease",
             }}
           />
         </div>
