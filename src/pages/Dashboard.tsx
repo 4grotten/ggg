@@ -47,7 +47,6 @@ import { useVerificationProgress } from "@/hooks/useVerificationProgress";
 import { useTransactionFilters, FilterType } from "@/hooks/useTransactionFilters";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { preloadTgs } from "@/components/ui/TgsPlayer";
-import partnerNetworkHero from "@/assets/partner-network-hero.png";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -98,10 +97,6 @@ const Dashboard = () => {
     preloadTgs("./animations/money-coins.tgs");
     preloadTgs("./animations/wowduck.tgs");
     preloadTgs("./animations/WonDuck.tgs");
-    
-    // Preload partner banner image
-    const img = new Image();
-    img.src = partnerNetworkHero;
   }, []);
 
   // Save current account to multi-account storage
