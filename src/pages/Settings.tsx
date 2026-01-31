@@ -37,7 +37,7 @@ const iconGradients: Record<string, string> = {
   sliders: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
   globe: 'linear-gradient(135deg, #a855f7 0%, #c084fc 100%)',
   palette: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
-  receipt: 'linear-gradient(135deg, #22c55e 0%, #4ade80 100%)',
+  receipt: 'linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%)',
   code: 'linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%)',
   privacy: 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)',
   message: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
