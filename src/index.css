@@ -645,7 +645,7 @@
     }
   }
 
-  /* Animated gradient shift for QR card */
+  /* Animated gradient shift for cards */
   @keyframes gradientShift {
     0% {
       background-position: 0% 50%;
@@ -656,6 +656,101 @@
     100% {
       background-position: 0% 50%;
     }
+  }
+
+  /* Glow pulse animation */
+  @keyframes glowPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.2;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes glowPulseAlt {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.15;
+    }
+    50% {
+      transform: scale(1.3);
+      opacity: 0.3;
+    }
+  }
+
+  /* Sparkle rotation */
+  @keyframes sparkleRotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes sparkleRotateReverse {
+    from {
+      transform: rotate(360deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+
+  /* Floating glow */
+  @keyframes floatingGlow {
+    0%, 100% {
+      transform: scale(1) translate(0, 0);
+      opacity: 0.3;
+    }
+    50% {
+      transform: scale(1.2) translate(30px, -20px);
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes floatingGlowAlt {
+    0%, 100% {
+      transform: scale(1) translate(0, 0);
+      opacity: 0.2;
+    }
+    50% {
+      transform: scale(1.3) translate(-20px, 30px);
+      opacity: 0.4;
+    }
+  }
+
+  /* Utility classes for animations */
+  .animate-gradient-shift {
+    background-size: 300% 300%;
+    animation: gradientShift 6s ease infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glowPulse 4s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse-alt {
+    animation: glowPulseAlt 5s ease-in-out infinite 0.5s;
+  }
+
+  .animate-sparkle-rotate {
+    animation: sparkleRotate 20s linear infinite;
+  }
+
+  .animate-sparkle-rotate-reverse {
+    animation: sparkleRotateReverse 15s linear infinite;
+  }
+
+  .animate-floating-glow {
+    animation: floatingGlow 6s ease-in-out infinite;
+  }
+
+  .animate-floating-glow-alt {
+    animation: floatingGlowAlt 5s ease-in-out infinite 0.5s;
   }
 
 /* Sonner toast positioning under header */
