@@ -3,20 +3,10 @@ import { motion } from "framer-motion";
 
 const SplashScreen = () => {
   const [isReady, setIsReady] = useState(false);
-  const [isSwaying, setIsSwaying] = useState(false);
 
   useEffect(() => {
-    // Start animation immediately, no delays
+    // Start animation immediately
     setIsReady(true);
-    
-    // After 3 seconds of card being still, start swaying with glints
-    const swayTimer = setTimeout(() => {
-      setIsSwaying(true);
-    }, 3000);
-    
-    return () => {
-      clearTimeout(swayTimer);
-    };
   }, []);
 
   return (
@@ -86,23 +76,20 @@ const SplashScreen = () => {
         />
       </div>
 
-      {/* Floating Card */}
+      {/* Card with flip entrance */}
       <motion.div
-        initial={{ scale: 0.6, opacity: 0, y: 80 }}
+        initial={{ scale: 0.6, opacity: 0, rotateY: -90 }}
         animate={isReady ? { 
           scale: 1, 
           opacity: 1,
-          y: 0,
-          rotate: isSwaying ? [0, -3, 3, -2, 2, 0] : 0
-        } : { scale: 0.6, opacity: 0, y: 80 }}
+          rotateY: 0
+        } : { scale: 0.6, opacity: 0, rotateY: -90 }}
         transition={{ 
-          scale: { duration: 1, ease: [0.16, 1, 0.3, 1] },
-          opacity: { duration: 0.8 },
-          y: { duration: 1, ease: [0.16, 1, 0.3, 1] },
-          rotate: isSwaying ? { duration: 2, ease: "easeInOut" } : { duration: 0 }
+          duration: 1.2,
+          ease: [0.16, 1, 0.3, 1]
         }}
         className="relative w-[60vw] max-w-[280px]"
-        style={{ perspective: "1000px" }}
+        style={{ perspective: "1000px", transformStyle: "preserve-3d" }}
       >
         {/* Card glow underneath */}
         <motion.div
@@ -125,21 +112,18 @@ const SplashScreen = () => {
         
         {/* Card Image */}
         <div className="relative overflow-hidden" style={{ borderRadius: 18, isolation: "isolate" }}>
-          <motion.img
+          <img
             src="./easy-card-banner.png"
             alt="Easy Card"
             className="relative w-full h-auto block"
-            initial={{ rotateY: -15, rotateX: 8 }}
-            animate={isReady ? { rotateY: 0, rotateX: 0 } : { rotateY: -15, rotateX: 8 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
             style={{ 
               borderRadius: 18,
               filter: "drop-shadow(0 20px 40px hsla(270, 100%, 50%, 0.5))"
             }}
           />
           
-          {/* Fantasy glint overlay - starts only when swaying */}
-          {isSwaying && (
+          {/* Glint overlay - starts after card flip completes */}
+          {isReady && (
             <div
               className="absolute overflow-hidden pointer-events-none"
               style={{
@@ -155,8 +139,8 @@ const SplashScreen = () => {
                 style={{
                   borderRadius: 18,
                   background:
-                    "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.1) 28%, rgba(255,255,255,0.3) 44%, rgba(255,215,160,0.4) 50%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0.1) 72%, transparent 90%)",
-                  animation: "splash-glint 0.8s ease-in-out 3",
+                    "linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.15) 28%, rgba(255,255,255,0.4) 44%, rgba(255,215,160,0.5) 50%, rgba(255,255,255,0.4) 56%, rgba(255,255,255,0.15) 72%, transparent 90%)",
+                  animation: "splash-glint 1.2s ease-in-out 1.3s 2",
                 }}
               />
             </div>
