@@ -6,18 +6,24 @@ const SplashScreen = () => {
 
   // Wait for page to be fully ready and painted before starting animation
   useEffect(() => {
-    // Use requestAnimationFrame to ensure the DOM is painted
     let rafId: number;
+    let timeoutId: ReturnType<typeof setTimeout>;
+    
     const startAnimation = () => {
+      // Triple RAF + small delay ensures the screen is actually visible to user
       rafId = requestAnimationFrame(() => {
-        // Double RAF ensures paint is complete
         rafId = requestAnimationFrame(() => {
-          setIsReady(true);
+          rafId = requestAnimationFrame(() => {
+            // Additional 150ms delay for PWA/RWA where rendering may be delayed
+            timeoutId = setTimeout(() => {
+              setIsReady(true);
+            }, 150);
+          });
         });
       });
     };
     
-    // Wait for document to be fully interactive
+    // Wait for document to be fully loaded
     if (document.readyState === 'complete') {
       startAnimation();
     } else {
@@ -25,10 +31,14 @@ const SplashScreen = () => {
       return () => {
         window.removeEventListener('load', startAnimation);
         cancelAnimationFrame(rafId);
+        clearTimeout(timeoutId);
       };
     }
     
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   return (
