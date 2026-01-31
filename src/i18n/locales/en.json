@@ -349,7 +349,12 @@
     "profileData": "Profile Data",
     "noProfileData": "No profile data available",
     "socialLinks": "Social Links",
-    "noSocialLinks": "No social links added"
+    "noSocialLinks": "No social links added",
+    "qrBusinessCard": "QR Business Card",
+    "qr": "QR",
+    "digitalPaymentCard": "Digital Payment Card",
+    "scanQRToGetContact": "Scan QR to get contact info",
+    "includedInQR": "Included in QR"
   },
   "bank": {
     "name": "Bank Name"

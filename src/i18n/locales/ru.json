@@ -335,7 +335,12 @@
     "profileData": "Данные профиля",
     "noProfileData": "Нет данных профиля",
     "socialLinks": "Социальные сети",
-    "noSocialLinks": "Соцсети не добавлены"
+    "noSocialLinks": "Соцсети не добавлены",
+    "qrBusinessCard": "QR-визитка",
+    "qr": "QR",
+    "digitalPaymentCard": "Цифровая платёжная карта",
+    "scanQRToGetContact": "Сканируйте QR для получения контакта",
+    "includedInQR": "Включено в QR"
   },
   "bank": {
     "name": "Название банка"

@@ -335,7 +335,12 @@
     "profileData": "Datos del Perfil",
     "noProfileData": "No hay datos de perfil",
     "socialLinks": "Enlaces Sociales",
-    "noSocialLinks": "No se han añadido enlaces sociales"
+    "noSocialLinks": "No se han añadido enlaces sociales",
+    "qrBusinessCard": "Tarjeta QR",
+    "qr": "QR",
+    "digitalPaymentCard": "Tarjeta de Pago Digital",
+    "scanQRToGetContact": "Escanea el QR para obtener la información de contacto",
+    "includedInQR": "Incluido en el QR"
   },
   "bank": {
     "name": "Nombre del Banco"

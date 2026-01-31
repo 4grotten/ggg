@@ -16,44 +16,79 @@ import {
   Phone,
   Mail,
   AtSign,
-  Link as LinkIcon,
-  Globe
+  Globe,
+  QrCode,
+  Instagram,
+  Send,
+  Youtube,
+  Twitter,
+  Facebook,
+  Linkedin,
+  Github,
+  Music2,
+  MessageCircle,
+  Gamepad2,
+  Camera,
+  Hash,
+  Users,
+  Video,
+  LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import { getSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
 import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 interface ShareProfileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type ViewType = "main" | "businessCard" | "card" | "account" | "crypto" | "asset" | "network";
+type ViewType = "main" | "businessCard" | "businessCardQR" | "card" | "account" | "crypto" | "asset" | "network";
 
-// Social platform detection
-const detectPlatform = (url: string): { name: string; icon: string } => {
+// Social network detection with icons (same as SocialLinksInput)
+interface SocialNetwork {
+  id: string;
+  name: string;
+  patterns: string[];
+  icon: LucideIcon;
+  color: string;
+  bgColor: string;
+}
+
+const socialNetworks: SocialNetwork[] = [
+  { id: "instagram", name: "Instagram", patterns: ["instagram.com", "instagr.am"], icon: Instagram, color: "text-pink-500", bgColor: "bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400" },
+  { id: "telegram", name: "Telegram", patterns: ["t.me", "telegram.me", "telegram.org"], icon: Send, color: "text-blue-500", bgColor: "bg-blue-500" },
+  { id: "tiktok", name: "TikTok", patterns: ["tiktok.com", "vm.tiktok.com"], icon: Music2, color: "text-foreground", bgColor: "bg-gradient-to-br from-cyan-400 via-black to-pink-500" },
+  { id: "youtube", name: "YouTube", patterns: ["youtube.com", "youtu.be", "youtube.co"], icon: Youtube, color: "text-red-500", bgColor: "bg-red-500" },
+  { id: "twitter", name: "X (Twitter)", patterns: ["twitter.com", "x.com"], icon: Twitter, color: "text-foreground", bgColor: "bg-black dark:bg-white" },
+  { id: "facebook", name: "Facebook", patterns: ["facebook.com", "fb.com", "fb.me", "m.facebook.com"], icon: Facebook, color: "text-blue-600", bgColor: "bg-blue-600" },
+  { id: "linkedin", name: "LinkedIn", patterns: ["linkedin.com", "lnkd.in"], icon: Linkedin, color: "text-blue-700", bgColor: "bg-blue-700" },
+  { id: "github", name: "GitHub", patterns: ["github.com", "github.io"], icon: Github, color: "text-foreground", bgColor: "bg-gray-800 dark:bg-gray-200" },
+  { id: "whatsapp", name: "WhatsApp", patterns: ["wa.me", "whatsapp.com", "api.whatsapp.com"], icon: MessageCircle, color: "text-green-500", bgColor: "bg-green-500" },
+  { id: "snapchat", name: "Snapchat", patterns: ["snapchat.com", "snap.com"], icon: Camera, color: "text-yellow-400", bgColor: "bg-yellow-400" },
+  { id: "discord", name: "Discord", patterns: ["discord.gg", "discord.com", "discordapp.com"], icon: Gamepad2, color: "text-indigo-500", bgColor: "bg-indigo-500" },
+  { id: "twitch", name: "Twitch", patterns: ["twitch.tv", "twitch.com"], icon: Video, color: "text-purple-500", bgColor: "bg-purple-500" },
+  { id: "reddit", name: "Reddit", patterns: ["reddit.com", "redd.it"], icon: Hash, color: "text-orange-500", bgColor: "bg-orange-500" },
+  { id: "pinterest", name: "Pinterest", patterns: ["pinterest.com", "pin.it"], icon: Camera, color: "text-red-600", bgColor: "bg-red-600" },
+  { id: "vk", name: "VK", patterns: ["vk.com", "vk.ru"], icon: Users, color: "text-blue-500", bgColor: "bg-blue-500" },
+  { id: "ok", name: "OK", patterns: ["ok.ru", "odnoklassniki.ru"], icon: Users, color: "text-orange-500", bgColor: "bg-orange-500" },
+  { id: "spotify", name: "Spotify", patterns: ["spotify.com", "open.spotify.com"], icon: Music2, color: "text-green-500", bgColor: "bg-green-500" },
+];
+
+// Social platform detection returning network info
+const detectPlatform = (url: string): SocialNetwork => {
   const lowerUrl = url.toLowerCase();
-  if (lowerUrl.includes('instagram.com')) return { name: 'Instagram', icon: '📸' };
-  if (lowerUrl.includes('telegram.me') || lowerUrl.includes('t.me')) return { name: 'Telegram', icon: '✈️' };
-  if (lowerUrl.includes('whatsapp.com') || lowerUrl.includes('wa.me')) return { name: 'WhatsApp', icon: '💬' };
-  if (lowerUrl.includes('tiktok.com')) return { name: 'TikTok', icon: '🎵' };
-  if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return { name: 'YouTube', icon: '📺' };
-  if (lowerUrl.includes('twitter.com') || lowerUrl.includes('x.com')) return { name: 'X (Twitter)', icon: '🐦' };
-  if (lowerUrl.includes('facebook.com') || lowerUrl.includes('fb.com')) return { name: 'Facebook', icon: '👤' };
-  if (lowerUrl.includes('linkedin.com')) return { name: 'LinkedIn', icon: '💼' };
-  if (lowerUrl.includes('snapchat.com')) return { name: 'Snapchat', icon: '👻' };
-  if (lowerUrl.includes('discord.com') || lowerUrl.includes('discord.gg')) return { name: 'Discord', icon: '🎮' };
-  if (lowerUrl.includes('github.com')) return { name: 'GitHub', icon: '💻' };
-  if (lowerUrl.includes('pinterest.com')) return { name: 'Pinterest', icon: '📌' };
-  if (lowerUrl.includes('reddit.com')) return { name: 'Reddit', icon: '🔴' };
-  if (lowerUrl.includes('twitch.tv')) return { name: 'Twitch', icon: '🎮' };
-  if (lowerUrl.includes('vk.com')) return { name: 'VK', icon: '🔵' };
-  if (lowerUrl.includes('ok.ru')) return { name: 'Одноклассники', icon: '🟠' };
-  if (lowerUrl.includes('weibo.com')) return { name: 'Weibo', icon: '🔴' };
-  if (lowerUrl.includes('wechat.com')) return { name: 'WeChat', icon: '💚' };
-  return { name: 'Website', icon: '🌐' };
+  for (const network of socialNetworks) {
+    for (const pattern of network.patterns) {
+      if (lowerUrl.includes(pattern)) {
+        return network;
+      }
+    }
+  }
+  return { id: "website", name: "Website", patterns: [], icon: Globe, color: "text-green-500", bgColor: "bg-green-500" };
 };
 
 interface BusinessCardField {
@@ -347,7 +382,7 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     } else if (currentView === "asset") {
       setCurrentView("crypto");
       setSelectedAsset(null);
-    } else if (currentView === "businessCard") {
+    } else if (currentView === "businessCard" || currentView === "businessCardQR") {
       setCurrentView("main");
       setBusinessCardFields([]);
     } else {
@@ -400,7 +435,7 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     const selectedFields = businessCardFields.filter(f => f.checked);
     const selectedSocials = socialLinks.filter(link => socialChecked[link.id]);
     
-    let businessCardData = `👤 Easy Card - Digital Payment Card\n\n`;
+    let businessCardData = `👤 Easy Card - ${t("share.digitalPaymentCard") || "Digital Payment Card"}\n\n`;
     
     // Add selected profile fields
     selectedFields.forEach(field => {
@@ -412,7 +447,7 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
       businessCardData += `\n🔗 ${t("share.socialLinks") || "Social Links"}:\n`;
       selectedSocials.forEach(link => {
         const platform = detectPlatform(link.url);
-        businessCardData += `${platform.icon} ${platform.name}: ${link.url}\n`;
+        businessCardData += `${platform.name}: ${link.url}\n`;
       });
     }
     
@@ -459,6 +494,8 @@ Easy Card UAE`;
     switch (currentView) {
       case "businessCard":
         return t("settings.businessCard") || "Business Card";
+      case "businessCardQR":
+        return t("share.qrBusinessCard") || "QR Business Card";
       case "card":
         return selectedCard?.name || t("share.cardDetails") || "Card Details";
       case "account":
@@ -472,6 +509,21 @@ Easy Card UAE`;
       default:
         return t("settings.share") || "Share";
     }
+  };
+  
+  // Build business card data for QR
+  const buildBusinessCardData = () => {
+    const selectedFields = businessCardFields.filter(f => f.checked);
+    const selectedSocials = socialLinks.filter(link => socialChecked[link.id]);
+    
+    let data = `Easy Card\n`;
+    selectedFields.forEach(field => {
+      data += `${field.value}\n`;
+    });
+    selectedSocials.forEach(link => {
+      data += `${link.url}\n`;
+    });
+    return data.trim();
   };
 
   return (
@@ -618,6 +670,29 @@ Easy Card UAE`;
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
+                {/* Action Buttons at Top */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleShareBusinessCard}
+                    disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
+                    className="flex-1 flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Share2 className="w-5 h-5" />
+                    <span>{t("common.share") || "Share"}</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      tap();
+                      setCurrentView("businessCardQR");
+                    }}
+                    disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
+                    className="flex items-center justify-center gap-2 py-4 px-5 bg-muted rounded-2xl font-semibold hover:bg-muted/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <QrCode className="w-5 h-5" />
+                    <span className="text-sm">{t("share.qr") || "QR"}</span>
+                  </button>
+                </div>
+                
                 {/* Profile Fields */}
                 <div className="bg-muted/50 rounded-2xl overflow-hidden">
                   <div className="px-4 py-3 border-b border-border/50">
@@ -671,14 +746,18 @@ Easy Card UAE`;
                   ) : (
                     socialLinks.map((link) => {
                       const platform = detectPlatform(link.url);
+                      const IconComponent = platform.icon;
                       return (
                         <button
                           key={link.id}
                           onClick={() => toggleSocialLink(link.id)}
                           className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors"
                         >
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-xl">
-                            {platform.icon}
+                          <div className={cn(
+                            "w-10 h-10 rounded-xl flex items-center justify-center",
+                            platform.bgColor
+                          )}>
+                            <IconComponent className="w-5 h-5 text-white" />
                           </div>
                           <div className="flex-1 text-left min-w-0">
                             <p className="font-medium">{platform.name}</p>
@@ -694,12 +773,57 @@ Easy Card UAE`;
                     })
                   )}
                 </div>
-
-                {/* Share Button */}
+              </motion.div>
+            )}
+            
+            {/* Business Card QR View */}
+            {currentView === "businessCardQR" && (
+              <motion.div
+                key="businessCardQR"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <div className="flex flex-col items-center">
+                  <div className="bg-white p-6 rounded-3xl shadow-lg">
+                    <QRCodeSVG 
+                      value={buildBusinessCardData()} 
+                      size={200}
+                      level="M"
+                      includeMargin={false}
+                    />
+                  </div>
+                  <p className="mt-4 text-sm text-muted-foreground text-center">
+                    {t("share.scanQRToGetContact") || "Scan QR to get contact info"}
+                  </p>
+                </div>
+                
+                {/* Selected items summary */}
+                <div className="bg-muted/50 rounded-2xl p-4 space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground mb-3">
+                    {t("share.includedInQR") || "Included in QR"}:
+                  </p>
+                  {businessCardFields.filter(f => f.checked).map(field => (
+                    <div key={field.id} className="flex items-center gap-2 text-sm">
+                      <Check className="w-4 h-4 text-primary" />
+                      <span>{field.label}: {field.value}</span>
+                    </div>
+                  ))}
+                  {socialLinks.filter(link => socialChecked[link.id]).map(link => {
+                    const platform = detectPlatform(link.url);
+                    return (
+                      <div key={link.id} className="flex items-center gap-2 text-sm">
+                        <Check className="w-4 h-4 text-primary" />
+                        <span>{platform.name}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                
                 <button
                   onClick={handleShareBusinessCard}
-                  disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
-                  className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors"
                 >
                   <Share2 className="w-5 h-5" />
                   <span>{t("common.share") || "Share"}</span>
