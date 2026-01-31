@@ -127,12 +127,12 @@ export const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 px-4 max-w-[800px] mx-auto">
-      <div className="bg-white/50 dark:bg-card/70 backdrop-blur-2xl rounded-3xl shadow-lg border border-border/50 px-2 py-1.5 max-w-[400px] mx-auto">
+      <div className="bg-white/50 dark:bg-card/70 backdrop-blur-2xl rounded-[22px] shadow-lg border border-border/50 px-2 py-1.5 max-w-[400px] mx-auto">
         <div className="flex items-center justify-around relative">
           {/* iOS 26 liquid glass selector */}
           {selectorStyle && (
             <motion.div
-              className="absolute overflow-hidden backdrop-blur-xl rounded-[22px] pointer-events-none z-0 bg-gradient-to-br from-black/10 via-black/5 to-black/10 dark:from-white/35 dark:via-white/15 dark:to-white/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_0_8px_rgba(255,255,255,0.05)]"
+              className="absolute overflow-hidden backdrop-blur-xl rounded-[20px] pointer-events-none z-0 bg-gradient-to-br from-black/10 via-black/5 to-black/10 dark:from-white/35 dark:via-white/15 dark:to-white/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_0_8px_rgba(255,255,255,0.05)]"
               initial={false}
               animate={{
                 left: selectorStyle.left,
@@ -144,7 +144,7 @@ export const BottomNavigation = () => {
                 top: 0,
               }}
             >
-              <div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/15 rounded-[22px]" />
+              <div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/15 rounded-[20px]" />
             </motion.div>
           )}
           
