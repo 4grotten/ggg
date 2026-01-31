@@ -645,6 +645,19 @@
     }
   }
 
+  /* Animated gradient shift for QR card */
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
 /* Sonner toast positioning under header */
 [data-sonner-toaster] {
   top: 56px !important; /* Header height */
