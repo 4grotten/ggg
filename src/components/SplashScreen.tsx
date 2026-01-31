@@ -4,17 +4,15 @@ import { motion } from "framer-motion";
 const SplashScreen = () => {
   const [isReady, setIsReady] = useState(false);
 
-  // Wait for page to be fully ready and painted before starting animation
+  // Wait for page to be fully ready and add 3 second delay before starting animation
   useEffect(() => {
-    // Use requestAnimationFrame to ensure the DOM is painted
-    let rafId: number;
+    let timeoutId: ReturnType<typeof setTimeout>;
+    
     const startAnimation = () => {
-      rafId = requestAnimationFrame(() => {
-        // Double RAF ensures paint is complete
-        rafId = requestAnimationFrame(() => {
-          setIsReady(true);
-        });
-      });
+      // Add 3 second delay before starting the animation
+      timeoutId = setTimeout(() => {
+        setIsReady(true);
+      }, 3000);
     };
     
     // Wait for document to be fully interactive
@@ -24,11 +22,11 @@ const SplashScreen = () => {
       window.addEventListener('load', startAnimation);
       return () => {
         window.removeEventListener('load', startAnimation);
-        cancelAnimationFrame(rafId);
+        clearTimeout(timeoutId);
       };
     }
     
-    return () => cancelAnimationFrame(rafId);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
