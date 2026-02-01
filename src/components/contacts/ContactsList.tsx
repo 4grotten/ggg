@@ -268,13 +268,9 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
         />
         <div className="relative flex items-center justify-between py-5 px-5">
           <div className="flex items-center gap-4">
-            <motion.div 
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
-              className="w-14 h-14 rounded-2xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30"
-            >
+            <div className="w-14 h-14 rounded-2xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30">
               <UserPlus className="w-7 h-7 text-white drop-shadow" />
-            </motion.div>
+            </div>
             <div className="text-left">
               <span className="text-white font-bold text-lg drop-shadow">{t("contacts.addContact")}</span>
               <p className="text-white/80 text-sm font-medium">{t("settings.scanBusinessCardDescription")}</p>
