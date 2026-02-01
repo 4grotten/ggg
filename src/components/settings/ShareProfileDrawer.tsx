@@ -659,52 +659,6 @@ Easy Card UAE`;
                   <ChevronRight className="w-5 h-5 opacity-80" />
                 </button>
 
-                {/* Saved Contacts Section */}
-                <div className="bg-muted/50 rounded-2xl overflow-hidden">
-                  <div className="px-4 py-3 border-b border-border/50">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {t("settings.savedContacts") || "Saved Contacts"}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      tap();
-                      setEditingContact(null);
-                      setIsAddContactOpen(true);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors"
-                  >
-                    <div 
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #10b981 0%, #34d399 100%)" }}
-                    >
-                      <Contact className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-medium">{t("settings.addContact") || "Add Contact"}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      tap();
-                      setCurrentView("contacts");
-                    }}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors border-t border-border/30"
-                  >
-                    <div 
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #6366f1 0%, #a78bfa 100%)" }}
-                    >
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-medium">{t("contacts.viewContacts") || "View Contacts"}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                  </button>
-                </div>
-
                 {/* Cards Section */}
                 <div className="bg-muted/50 rounded-2xl overflow-hidden">
                   <div className="px-4 py-3 border-b border-border/50">
