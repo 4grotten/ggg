@@ -1621,6 +1621,14 @@
     "rateLimitError": "Слишком много запросов. Попробуйте позже.",
     "creditsError": "Закончились кредиты AI. Пополните баланс.",
     "supportedFormats": "JPG, PNG, HEIC • Визитки, скриншоты, QR-коды",
-    "name": "Имя"
+    "name": "Имя",
+    "shareContact": "Поделиться контактом",
+    "selectToShare": "Выберите что поделиться",
+    "showQrCode": "Показать QR-код",
+    "qrCode": "QR-код",
+    "scanToSave": "Отсканируйте чтобы сохранить контакт",
+    "download": "Скачать",
+    "vcardDownloaded": "Контакт скачан",
+    "contact": "Контакт"
   }
 }
