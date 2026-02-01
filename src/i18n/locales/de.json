@@ -1425,6 +1425,33 @@
       "loading": "Einstellungen laden...",
       "new": "neu",
       "save": "Speichern"
+    },
+    "ai": {
+      "title": "KI-Einstellungen",
+      "description": "KI-Modelle konfigurieren",
+      "apiKey": "API-Schlüssel",
+      "apiKeyPlaceholder": "sk-...",
+      "verify": "Prüfen",
+      "verifying": "Wird geprüft...",
+      "apiKeyHint": "Verwenden Sie Projekt-Secrets, um den Schlüssel zu speichern",
+      "modelSelection": "Analysemodell",
+      "selectModel": "Modell auswählen",
+      "saving": "Wird gespeichert...",
+      "keyValid": "Schlüssel ist gültig",
+      "keyInvalid": "Schlüssel ist ungültig"
+    },
+    "integrations": {
+      "title": "API & Integrationen",
+      "description": "Externe Dienste",
+      "publicApi": "Öffentliche API",
+      "publicApiDesc": "REST-API-Zugang",
+      "webhooks": "Webhooks",
+      "webhooksDesc": "Ereignisse an externe URLs senden",
+      "rateLimiting": "Rate Limiting",
+      "rateLimitingDesc": "API-Anfragelimits",
+      "active": "Aktiv",
+      "activeMultiple": "Aktiv",
+      "perMinute": "/Min"
     }
   },
   "contacts": {

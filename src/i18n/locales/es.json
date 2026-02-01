@@ -1425,6 +1425,33 @@
       "loading": "Cargando configuración...",
       "new": "nuevo",
       "save": "Guardar"
+    },
+    "ai": {
+      "title": "Configuración de IA",
+      "description": "Configurar modelos de inteligencia artificial",
+      "apiKey": "Clave API",
+      "apiKeyPlaceholder": "sk-...",
+      "verify": "Verificar",
+      "verifying": "Verificando...",
+      "apiKeyHint": "Use la configuración de secretos del proyecto para guardar la clave",
+      "modelSelection": "Modelo de análisis",
+      "selectModel": "Seleccionar modelo",
+      "saving": "Guardando...",
+      "keyValid": "Clave válida",
+      "keyInvalid": "Clave inválida"
+    },
+    "integrations": {
+      "title": "API e Integraciones",
+      "description": "Configuración de servicios externos",
+      "publicApi": "API Pública",
+      "publicApiDesc": "Acceso a REST API",
+      "webhooks": "Webhooks",
+      "webhooksDesc": "Enviar eventos a URLs externas",
+      "rateLimiting": "Rate Limiting",
+      "rateLimitingDesc": "Límites de solicitudes API",
+      "active": "Activo",
+      "activeMultiple": "Activos",
+      "perMinute": "/min"
     }
   },
   "contacts": {

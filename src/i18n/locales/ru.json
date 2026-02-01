@@ -1483,6 +1483,33 @@
       "loading": "Загрузка настроек...",
       "new": "новое",
       "save": "Сохранить"
+    },
+    "ai": {
+      "title": "AI Настройки",
+      "description": "Настройка моделей искусственного интеллекта",
+      "apiKey": "API Ключ",
+      "apiKeyPlaceholder": "sk-...",
+      "verify": "Проверить",
+      "verifying": "Проверка...",
+      "apiKeyHint": "Для сохранения ключа используйте настройки секретов проекта",
+      "modelSelection": "Модель для анализа",
+      "selectModel": "Выберите модель",
+      "saving": "Сохранение...",
+      "keyValid": "Ключ действителен",
+      "keyInvalid": "Ключ недействителен"
+    },
+    "integrations": {
+      "title": "API и интеграции",
+      "description": "Настройки внешних сервисов",
+      "publicApi": "Публичный API",
+      "publicApiDesc": "Доступ к REST API",
+      "webhooks": "Webhooks",
+      "webhooksDesc": "Отправка событий на внешние URL",
+      "rateLimiting": "Rate Limiting",
+      "rateLimitingDesc": "Ограничение запросов API",
+      "active": "Активен",
+      "activeMultiple": "Активны",
+      "perMinute": "/мин"
     }
   },
   "contacts": {

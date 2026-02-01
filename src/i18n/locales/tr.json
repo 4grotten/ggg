@@ -1425,6 +1425,33 @@
       "loading": "Ayarlar yükleniyor...",
       "new": "yeni",
       "save": "Kaydet"
+    },
+    "ai": {
+      "title": "AI Ayarları",
+      "description": "Yapay zeka modellerini yapılandır",
+      "apiKey": "API Anahtarı",
+      "apiKeyPlaceholder": "sk-...",
+      "verify": "Doğrula",
+      "verifying": "Doğrulanıyor...",
+      "apiKeyHint": "Anahtarı kaydetmek için proje gizli ayarlarını kullanın",
+      "modelSelection": "Analiz Modeli",
+      "selectModel": "Model seçin",
+      "saving": "Kaydediliyor...",
+      "keyValid": "Anahtar geçerli",
+      "keyInvalid": "Anahtar geçersiz"
+    },
+    "integrations": {
+      "title": "API ve Entegrasyonlar",
+      "description": "Harici servis ayarları",
+      "publicApi": "Genel API",
+      "publicApiDesc": "REST API erişimi",
+      "webhooks": "Webhooks",
+      "webhooksDesc": "Olayları harici URL'lere gönder",
+      "rateLimiting": "Rate Limiting",
+      "rateLimitingDesc": "API istek limitleri",
+      "active": "Aktif",
+      "activeMultiple": "Aktif",
+      "perMinute": "/dk"
     }
   },
   "contacts": {
