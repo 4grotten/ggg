@@ -529,21 +529,19 @@ export const AddContactDrawer = ({
         </button>
       )}
 
-      {/* Save Button - only show for new contacts */}
-      {!editContact && (
-        <Button
-          onClick={handleSave}
-          disabled={isSaving || !fullName.trim()}
-          className="w-full h-14 rounded-2xl text-lg font-semibold"
-        >
-          {isSaving ? (
-            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-          ) : showSuccess ? (
-            <Check className="w-5 h-5 mr-2" />
-          ) : null}
-          {t("contacts.addContact")}
-        </Button>
-      )}
+      {/* Save Button */}
+      <Button
+        onClick={handleSave}
+        disabled={isSaving || !fullName.trim()}
+        className="w-full h-14 rounded-2xl text-lg font-semibold"
+      >
+        {isSaving ? (
+          <Loader2 className="w-5 h-5 animate-spin mr-2" />
+        ) : showSuccess ? (
+          <Check className="w-5 h-5 mr-2" />
+        ) : null}
+        {editContact ? t("common.save") : t("contacts.addContact")}
+      </Button>
     </motion.div>
   );
 
@@ -635,27 +633,12 @@ export const AddContactDrawer = ({
                 </button>
               )}
               <DrawerTitle className="flex-1">{getTitle()}</DrawerTitle>
-              {/* Show blue "Save" button when there are changes in edit mode, otherwise show X */}
-              {editContact && hasChanges ? (
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving || !fullName.trim()}
-                  className="px-4 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary font-medium text-sm transition-colors disabled:opacity-50"
-                >
-                  {isSaving ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    t("common.save")
-                  )}
-                </button>
-              ) : (
-                <button
-                  onClick={handleClose}
-                  className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
+              <button
+                onClick={handleClose}
+                className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </DrawerHeader>
 
