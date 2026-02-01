@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -85,6 +86,30 @@ serve(async (req) => {
       );
     }
 
+    // Get model from admin_settings
+    let modelToUse = "gpt-4o"; // default
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      const { data: modelSetting } = await supabase
+        .from("admin_settings")
+        .select("value")
+        .eq("category", "integrations")
+        .eq("key", "openai_model")
+        .single();
+      
+      if (modelSetting?.value !== undefined) {
+        const AVAILABLE_MODELS = ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4-vision-preview"];
+        const modelIndex = typeof modelSetting.value === 'number' ? modelSetting.value : 0;
+        modelToUse = AVAILABLE_MODELS[modelIndex] || "gpt-4o";
+      }
+      console.log(`Using OpenAI model: ${modelToUse}`);
+    } catch (err) {
+      console.log("Failed to fetch model setting, using default:", err);
+    }
+
     console.log(`Processing ${images.length} images for contact extraction`);
 
     // Build content array with all images
@@ -138,7 +163,7 @@ Return ONLY valid JSON, no markdown code blocks.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: modelToUse,
         messages: [
           { role: "system", content: systemPrompt },
           {

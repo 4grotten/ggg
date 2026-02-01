@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.extract-contact-from-images]
 verify_jwt = false
+
+[functions.admin-openai-settings]
+verify_jwt = false
