@@ -26,6 +26,7 @@ import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 import { ScreenLockDrawer } from "@/components/settings/ScreenLockDrawer";
 import { ShareProfileDrawer } from "@/components/settings/ShareProfileDrawer";
 import { PasswordVerifyDialog } from "@/components/settings/PasswordVerifyDialog";
+import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { isHapticEnabled, setHapticEnabled, useHapticFeedback } from "@/hooks/useHapticFeedback";
@@ -299,7 +300,8 @@ const Settings = () => {
   const [isScreenLockOpen, setIsScreenLockOpen] = useState(false);
   const [isAdminPasswordDialogOpen, setIsAdminPasswordDialogOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused } = useScreenLockContext();
+  const [isShareUnlockDialogOpen, setIsShareUnlockDialogOpen] = useState(false);
+  const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused, isHideDataEnabled } = useScreenLockContext();
   const { isAdmin } = useUserRole();
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
   const { tap } = useHapticFeedback();
@@ -685,7 +687,11 @@ const Settings = () => {
             }}
             onClick={() => {
               tap();
-              setIsShareOpen(true);
+              if (isHideDataEnabled) {
+                setIsShareUnlockDialogOpen(true);
+              } else {
+                setIsShareOpen(true);
+              }
             }}
             className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/25"
           >
@@ -1301,6 +1307,16 @@ const Settings = () => {
       <ShareProfileDrawer
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
+      />
+
+      {/* Data Unlock Dialog for Share */}
+      <DataUnlockDialog
+        isOpen={isShareUnlockDialogOpen}
+        onClose={() => setIsShareUnlockDialogOpen(false)}
+        onSuccess={() => {
+          setIsShareUnlockDialogOpen(false);
+          setIsShareOpen(true);
+        }}
       />
     </MobileLayout>
   );
