@@ -1465,6 +1465,22 @@
     "updateError": "فشل في تحديث جهة الاتصال",
     "deleteError": "فشل في حذف جهة الاتصال",
     "avatarUploadError": "فشل في رفع الصورة",
-    "saveError": "فشل في حفظ جهة الاتصال"
+    "saveError": "فشل في حفظ جهة الاتصال",
+    "smartScan": "المسح الذكي",
+    "smartScanDescription": "ارفع لقطات شاشة للملفات الشخصية أو بطاقات العمل أو صور بيانات الاتصال. سيستخرج الذكاء الاصطناعي تلقائياً الأسماء وأرقام البطاقات ومحافظ العملات المشفرة وروابط التواصل.",
+    "uploadImages": "رفع صور",
+    "takePhoto": "التقاط صورة",
+    "uploadedImages": "تم الرفع: {{count}}",
+    "noImagesSelected": "اختر صوراً",
+    "analyzing": "جاري التحليل...",
+    "extracting": "جاري استخراج البيانات...",
+    "extractData": "استخراج البيانات",
+    "extractionSuccess": "تم العثور على {{count}} حقول: {{fields}}",
+    "extractionError": "فشل في معالجة الصور",
+    "noDataExtracted": "لم يتم العثور على بيانات اتصال",
+    "rateLimitError": "طلبات كثيرة جداً. حاول لاحقاً.",
+    "creditsError": "نفدت رصيد الذكاء الاصطناعي. يرجى إعادة الشحن.",
+    "supportedFormats": "JPG، PNG، HEIC • بطاقات العمل، لقطات الشاشة، رموز QR",
+    "name": "الاسم"
   }
 }

@@ -1472,6 +1472,22 @@
     "updateError": "更新联系人失败",
     "deleteError": "删除联系人失败",
     "avatarUploadError": "上传照片失败",
-    "saveError": "保存联系人失败"
+    "saveError": "保存联系人失败",
+    "smartScan": "智能扫描",
+    "smartScanDescription": "上传个人资料截图、名片或包含联系信息的图片。AI将自动提取姓名、卡号、加密钱包和社交链接。",
+    "uploadImages": "上传照片",
+    "takePhoto": "拍照",
+    "uploadedImages": "已上传: {{count}}",
+    "noImagesSelected": "选择图片",
+    "analyzing": "分析中...",
+    "extracting": "提取数据中...",
+    "extractData": "提取数据",
+    "extractionSuccess": "找到 {{count}} 个字段: {{fields}}",
+    "extractionError": "处理图片失败",
+    "noDataExtracted": "未找到联系人数据",
+    "rateLimitError": "请求过多。请稍后再试。",
+    "creditsError": "AI积分已用完。请充值。",
+    "supportedFormats": "JPG、PNG、HEIC • 名片、截图、二维码",
+    "name": "姓名"
   }
 }

@@ -38,7 +38,9 @@
     "dismiss": "Dismiss",
     "share": "Share",
     "copy": "Copy",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "addMore": "Add more",
+    "save": "Save"
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",
@@ -1550,6 +1552,22 @@
       "walletValue": "user@email.com",
       "paypalLabel": "e.g., My PayPal",
       "paypalValue": "email@example.com"
-    }
+    },
+    "smartScan": "Smart Scan",
+    "smartScanDescription": "Upload screenshots of profiles, business cards, or any images with contact info. AI will automatically extract names, card numbers, crypto wallets, and social links.",
+    "uploadImages": "Upload Photos",
+    "takePhoto": "Take Photo",
+    "uploadedImages": "Uploaded: {{count}}",
+    "noImagesSelected": "Select images",
+    "analyzing": "Analyzing...",
+    "extracting": "Extracting data...",
+    "extractData": "Extract Data",
+    "extractionSuccess": "Found {{count}} fields: {{fields}}",
+    "extractionError": "Failed to process images",
+    "noDataExtracted": "No contact data found",
+    "rateLimitError": "Too many requests. Try again later.",
+    "creditsError": "AI credits exhausted. Please add funds.",
+    "supportedFormats": "JPG, PNG, HEIC • Business cards, screenshots, QR codes",
+    "name": "Name"
   }
 }

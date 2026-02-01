@@ -1465,6 +1465,22 @@
     "updateError": "Kontakt konnte nicht aktualisiert werden",
     "deleteError": "Kontakt konnte nicht gelöscht werden",
     "avatarUploadError": "Foto konnte nicht hochgeladen werden",
-    "saveError": "Kontakt konnte nicht gespeichert werden"
+    "saveError": "Kontakt konnte nicht gespeichert werden",
+    "smartScan": "Smart-Scan",
+    "smartScanDescription": "Laden Sie Screenshots von Profilen, Visitenkarten oder Bildern mit Kontaktdaten hoch. KI extrahiert automatisch Namen, Kartennummern, Krypto-Wallets und Social Links.",
+    "uploadImages": "Fotos auswählen",
+    "takePhoto": "Foto aufnehmen",
+    "uploadedImages": "Hochgeladen: {{count}}",
+    "noImagesSelected": "Bilder auswählen",
+    "analyzing": "Analysiere...",
+    "extracting": "Daten extrahieren...",
+    "extractData": "Daten extrahieren",
+    "extractionSuccess": "{{count}} Felder gefunden: {{fields}}",
+    "extractionError": "Bilder konnten nicht verarbeitet werden",
+    "noDataExtracted": "Keine Kontaktdaten gefunden",
+    "rateLimitError": "Zu viele Anfragen. Versuchen Sie es später erneut.",
+    "creditsError": "KI-Credits aufgebraucht. Bitte aufladen.",
+    "supportedFormats": "JPG, PNG, HEIC • Visitenkarten, Screenshots, QR-Codes",
+    "name": "Name"
   }
 }
