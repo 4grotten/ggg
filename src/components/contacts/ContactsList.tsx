@@ -167,12 +167,38 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
         </div>
       </motion.div>
 
+      {/* Add contact button - Premium style */}
+      <motion.button
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={onAddClick}
+        className="w-full relative overflow-hidden group"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-90 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+        <div className="relative flex items-center justify-between py-4 px-5">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
+              <UserPlus className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-left">
+              <span className="text-white font-semibold text-lg">{t("contacts.addContact")}</span>
+              <p className="text-white/70 text-sm">{t("settings.scanBusinessCardDescription")}</p>
+            </div>
+          </div>
+          <ChevronRight className="w-6 h-6 text-white/80" />
+        </div>
+      </motion.button>
+
       {/* Search - Glassmorphism style */}
       {contacts.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.15 }}
           className="relative"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 rounded-2xl blur-xl" />
@@ -201,32 +227,6 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
           </div>
         </motion.div>
       )}
-
-      {/* Add contact button - Premium style */}
-      <motion.button
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={onAddClick}
-        className="w-full relative overflow-hidden group"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-90 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-        <div className="relative flex items-center justify-between py-4 px-5">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <UserPlus className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-left">
-              <span className="text-white font-semibold text-lg">{t("contacts.addContact")}</span>
-              <p className="text-white/70 text-sm">{t("settings.scanBusinessCardDescription")}</p>
-            </div>
-          </div>
-          <ChevronRight className="w-6 h-6 text-white/80" />
-        </div>
-      </motion.button>
 
       {/* Empty state */}
       {contacts.length === 0 && (
