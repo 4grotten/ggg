@@ -845,6 +845,22 @@ const Settings = () => {
               );
             })()}
 
+            {/* Screen Lock / Data Lock */}
+            <SettingsItem
+              icon={<ColoredIcon colorKey="lock"><ScanFace className="w-4 h-4" /></ColoredIcon>}
+              label={t("screenLock.title")}
+              value={isScreenLockEnabled ? t("settings.enabled") || "On" : t("settings.disabled") || "Off"}
+              valueIcon={isScreenLockPaused ? (
+                <motion.span
+                  className="w-2 h-2 rounded-full bg-orange-500"
+                  animate={{ opacity: [1, 0.4, 1], scale: [1, 0.9, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                />
+              ) : undefined}
+              valueClassName={isScreenLockEnabled ? "text-sm font-medium text-green-500" : "text-muted-foreground text-sm"}
+              onClick={() => setIsScreenLockOpen(true)}
+            />
+
             {/* Referral Partner */}
             {(() => {
               const uniqueUsers = new Set(MOCK_TRANSACTIONS.map(tx => tx.userName)).size;
@@ -904,21 +920,6 @@ const Settings = () => {
             )}
             value={currentTheme.name}
             onClick={() => setIsAppearanceOpen(true)}
-          />
-          {/* Screen Lock */}
-          <SettingsItem
-            icon={<ColoredIcon colorKey="lock"><ScanFace className="w-4 h-4" /></ColoredIcon>}
-            label={t("screenLock.title")}
-            value={isScreenLockEnabled ? t("settings.enabled") || "On" : t("settings.disabled") || "Off"}
-            valueIcon={isScreenLockPaused ? (
-              <motion.span
-                className="w-2 h-2 rounded-full bg-orange-500"
-                animate={{ opacity: [1, 0.4, 1], scale: [1, 0.9, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              />
-            ) : undefined}
-            valueClassName={isScreenLockEnabled ? "text-sm font-medium text-green-500" : "text-muted-foreground text-sm"}
-            onClick={() => setIsScreenLockOpen(true)}
           />
           {/* Haptic Feedback */}
           <div className="w-full flex items-center justify-between py-4 px-4">
