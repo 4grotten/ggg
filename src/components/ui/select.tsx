@@ -107,7 +107,8 @@ const SelectItem = React.forwardRef<
     className={cn(
       "relative flex w-full cursor-pointer select-none items-center rounded-xl px-4 py-4 text-sm outline-none transition-colors",
       "hover:bg-muted focus:bg-muted",
-      "data-[state=checked]:bg-primary data-[state=checked]:text-white",
+      // When selected, force ALL nested text (including custom description spans) to be white
+      "data-[state=checked]:bg-primary data-[state=checked]:text-white data-[state=checked]:[&_*]:text-white",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,
     )}
@@ -116,7 +117,7 @@ const SelectItem = React.forwardRef<
     <SelectPrimitive.ItemIndicator className="mr-3 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white">
       <Check className="h-3 w-3 text-primary" strokeWidth={3} />
     </SelectPrimitive.ItemIndicator>
-    <span className="flex-1 data-[state=checked]:text-white">
+    <span className="flex-1">
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </span>
   </SelectPrimitive.Item>
