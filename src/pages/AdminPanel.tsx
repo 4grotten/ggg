@@ -1,4 +1,4 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -519,6 +519,7 @@ export default function AdminPanel() {
     { value: "limits", label: "Лимиты", icon: Wallet },
     { value: "clients", label: "Клиенты", icon: UsersRound },
     { value: "admins", label: "Админы", icon: Users },
+    { value: "system", label: "Система", icon: Settings },
   ];
 
   return (
@@ -599,41 +600,45 @@ export default function AdminPanel() {
             </div>
           ) : (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              {/* Custom Tab Switcher with sliding indicator - scrolls with content */}
-              <div className="relative h-14 p-1.5 bg-muted/50 rounded-2xl mb-6 mt-4">
-                {/* Animated sliding background - centered on each tab */}
-                <motion.div
-                  className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg"
-                  initial={false}
-                  animate={{
-                    left: `calc(${tabConfig.findIndex(t => t.value === activeTab) * 20}% + 10% - calc(20% - 12px) / 2)`,
-                    width: 'calc(20% - 12px)',
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 400,
-                    damping: 30,
-                  }}
-                />
-                
-                {/* Tab buttons */}
-                <div className="relative grid grid-cols-5 h-full">
-                  {tabConfig.map((tab) => (
-                    <button
-                      key={tab.value}
-                      onClick={() => setActiveTab(tab.value)}
-                      className={cn(
-                        "relative z-10 flex flex-col items-center justify-center gap-0.5 h-full rounded-xl transition-colors",
-                        activeTab === tab.value ? "text-foreground" : "text-muted-foreground"
-                      )}
-                    >
-                      <tab.icon className={cn(
-                        "w-4 h-4 transition-colors",
-                        activeTab === tab.value ? "text-primary" : "text-muted-foreground"
-                      )} />
-                      <span className="text-[10px] font-medium">{tab.label}</span>
-                    </button>
-                  ))}
+              {/* Custom Tab Switcher with sliding indicator and horizontal scroll */}
+              <div className="relative mb-6 mt-4">
+                <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+                  <div className="relative h-16 p-1.5 bg-muted/50 rounded-2xl min-w-max">
+                    {/* Animated sliding background */}
+                    <motion.div
+                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg"
+                      initial={false}
+                      animate={{
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 80px + 6px)`,
+                        width: '74px',
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
+                    
+                    {/* Tab buttons */}
+                    <div className="relative flex h-full">
+                      {tabConfig.map((tab) => (
+                        <button
+                          key={tab.value}
+                          onClick={() => setActiveTab(tab.value)}
+                          className={cn(
+                            "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors w-20 shrink-0",
+                            activeTab === tab.value ? "text-foreground" : "text-muted-foreground"
+                          )}
+                        >
+                          <tab.icon className={cn(
+                            "w-5 h-5 transition-colors",
+                            activeTab === tab.value ? "text-primary" : "text-muted-foreground"
+                          )} />
+                          <span className="text-[11px] font-medium">{tab.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1126,6 +1131,166 @@ export default function AdminPanel() {
                     </motion.div>
                   )}
                 </AnimatePresence>
+              </TabsContent>
+
+              {/* System Settings Tab */}
+              <TabsContent value="system" className="mt-0 space-y-4">
+                <GlassCard
+                  title="Системные настройки"
+                  description="Общие параметры системы"
+                  icon={Settings}
+                  iconColor="text-slate-500"
+                >
+                  <div className="space-y-4">
+                    {/* Maintenance Mode */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Режим обслуживания</p>
+                          <p className="text-xs text-muted-foreground">Временно отключить доступ пользователей</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
+                          Выключен
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Registration */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Регистрация новых пользователей</p>
+                          <p className="text-xs text-muted-foreground">Разрешить создание новых аккаунтов</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
+                          Включена
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* KYC Requirement */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Обязательная верификация (KYC)</p>
+                          <p className="text-xs text-muted-foreground">Требовать KYC для всех операций</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
+                          Включена
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2FA Requirement */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Двухфакторная аутентификация</p>
+                          <p className="text-xs text-muted-foreground">Требовать 2FA для всех пользователей</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-500 text-xs font-medium">
+                          Опционально
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </GlassCard>
+
+                <GlassCard
+                  title="Уведомления"
+                  description="Настройки системных уведомлений"
+                  icon={Activity}
+                  iconColor="text-blue-500"
+                >
+                  <div className="space-y-4">
+                    {/* Email notifications */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Email-уведомления</p>
+                          <p className="text-xs text-muted-foreground">Отправка уведомлений на почту</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
+                          Включены
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Push notifications */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Push-уведомления</p>
+                          <p className="text-xs text-muted-foreground">Мобильные push-уведомления</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
+                          Включены
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SMS notifications */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">SMS-уведомления</p>
+                          <p className="text-xs text-muted-foreground">Критические уведомления по SMS</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-slate-500/10 text-slate-500 text-xs font-medium">
+                          Выключены
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </GlassCard>
+
+                <GlassCard
+                  title="API и интеграции"
+                  description="Настройки внешних сервисов"
+                  icon={Zap}
+                  iconColor="text-yellow-500"
+                >
+                  <div className="space-y-4">
+                    {/* API Status */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Публичный API</p>
+                          <p className="text-xs text-muted-foreground">Доступ к REST API</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
+                          Активен
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Webhooks */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Webhooks</p>
+                          <p className="text-xs text-muted-foreground">Отправка событий на внешние URL</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
+                          Активны
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Rate limiting */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Rate Limiting</p>
+                          <p className="text-xs text-muted-foreground">Ограничение запросов API</p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-500 text-xs font-medium">
+                          1000/мин
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </GlassCard>
               </TabsContent>
             </Tabs>
           )}
