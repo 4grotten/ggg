@@ -364,12 +364,23 @@ const CardPage = () => {
                 );
               }
             }}
-            className="bg-secondary rounded-xl p-4 flex items-center justify-between hover:bg-secondary/80 active:scale-[0.98] transition-all cursor-pointer"
+            className="relative overflow-hidden rounded-xl p-4 flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer text-white"
+            style={{
+              background: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
+              boxShadow: '0 4px 20px -4px rgba(30, 58, 95, 0.4)',
+            }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex items-center gap-3">
+            {/* Subtle glow overlay */}
+            <div 
+              className="absolute inset-0 opacity-30 pointer-events-none"
+              style={{
+                background: 'radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 60%)',
+              }}
+            />
+            <div className="flex items-center gap-3 relative z-10">
               {detectPlatform() === 'android' ? (
                 <Wallet className="w-5 h-5" />
               ) : (
@@ -389,7 +400,7 @@ const CardPage = () => {
                 {detectPlatform() === 'android' ? t("card.addToGooglePay") : t("card.addToApplePay")}
               </span>
             </div>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            <ChevronRight className="w-5 h-5 text-white/60 relative z-10" />
           </motion.a>
 
           {/* Card Details */}
