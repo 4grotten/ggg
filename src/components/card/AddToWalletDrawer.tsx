@@ -14,9 +14,8 @@ import { toast } from "sonner";
 interface AddToWalletDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  cardholderName?: string;
   cardNumber?: string;
-  expiryDate?: string;
-  cvv?: string;
 }
 
 const steps = [
@@ -53,17 +52,16 @@ const steps = [
 export const AddToWalletDrawer = ({ 
   open, 
   onOpenChange,
+  cardholderName = "",
   cardNumber = "•••• •••• •••• ••••",
-  expiryDate = "••/••",
-  cvv = "•••"
 }: AddToWalletDrawerProps) => {
   const { t } = useTranslation();
   const walletHref = getWalletDeepLink();
   const isAndroid = detectPlatform() === 'android';
 
   const handleCopyAndOpenWallet = async () => {
-    // Format card data for clipboard
-    const cardData = `${t("card.cardNumber", "Номер карты")}: ${cardNumber}\n${t("card.expiry", "Срок")}: ${expiryDate}\n${t("card.cvv", "CVV")}: ${cvv}`;
+    // Format card data for clipboard - only name and card number without labels
+    const cardData = `${cardholderName}\n${cardNumber}`;
     
     try {
       await navigator.clipboard.writeText(cardData);

@@ -664,9 +664,8 @@ const CardPage = () => {
       <AddToWalletDrawer 
         open={walletDrawerOpen} 
         onOpenChange={setWalletDrawerOpen}
+        cardholderName={cardData.holderName}
         cardNumber={cardData.fullNumber}
-        expiryDate={cardData.expiry}
-        cvv={cardData.cvv}
       />
   </>
   );
