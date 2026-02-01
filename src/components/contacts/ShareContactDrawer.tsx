@@ -622,9 +622,10 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
           <Button
             onClick={handleShareContact}
             disabled={!hasAnySelection}
-            className="flex-1 h-12 rounded-xl"
+            variant="outline"
+            className="flex-1 h-12 rounded-xl hover:bg-emerald-500 hover:text-white hover:border-emerald-500 active:bg-emerald-600 transition-all group"
           >
-            <Share2 className="w-5 h-5 mr-2" />
+            <Share2 className="w-5 h-5 mr-2 group-hover:text-white transition-colors" />
             {t("common.share") || "Share"}
           </Button>
         </div>
