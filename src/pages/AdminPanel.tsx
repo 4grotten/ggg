@@ -1403,19 +1403,20 @@ export default function AdminPanel() {
                         disabled={isUpdatingModel}
                       >
                         <SelectTrigger className="w-full h-11 rounded-xl bg-background/50">
-                          <SelectValue placeholder="Выберите модель" />
+                          <SelectValue placeholder="Выберите модель">
+                            {openaiStatus?.availableModels?.find(m => m.id === selectedModel)?.name || selectedModel}
+                          </SelectValue>
                         </SelectTrigger>
-                        <SelectContent>
-                          {(openaiStatus?.availableModels || [
-                            { id: "gpt-4o", name: "GPT-4o", description: "Новейшая мультимодальная модель" },
-                            { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Быстрая и экономичная" },
-                            { id: "gpt-4-turbo", name: "GPT-4 Turbo", description: "Предыдущее поколение" },
-                            { id: "gpt-4-vision-preview", name: "GPT-4 Vision", description: "Специализирована для изображений" },
-                          ]).map((model) => (
-                            <SelectItem key={model.id} value={model.id}>
-                              <div className="flex flex-col">
+                        <SelectContent className="max-h-[400px]">
+                          {(openaiStatus?.availableModels || []).map((model) => (
+                            <SelectItem 
+                              key={model.id} 
+                              value={model.id}
+                              className="py-3 px-4"
+                            >
+                              <div className="flex flex-col gap-0.5">
                                 <span className="font-medium">{model.name}</span>
-                                <span className="text-xs text-muted-foreground">{model.description}</span>
+                                <span className="text-xs text-muted-foreground leading-relaxed">{model.description}</span>
                               </div>
                             </SelectItem>
                           ))}
