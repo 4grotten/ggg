@@ -30,8 +30,18 @@ import {
 import { cn } from "@/lib/utils";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { PaymentMethod, CRYPTO_NETWORKS } from "@/types/contact";
-import { getCryptoIcon } from "@/components/icons/CryptoIcons";
+import { getCryptoIcon, UsdtIcon } from "@/components/icons/CryptoIcons";
 import { toast } from "sonner";
+
+// Custom crypto icon component with wallet + USDT
+const CryptoWalletIcon = () => (
+  <div className="relative w-5 h-5">
+    <Wallet className="w-5 h-5 text-white" />
+    <div className="absolute -bottom-1 -right-1 w-3 h-3">
+      <UsdtIcon size={12} />
+    </div>
+  </div>
+);
 
 interface PaymentMethodDrawerProps {
   isOpen: boolean;
@@ -58,7 +68,8 @@ const PAYMENT_TYPES = [
   },
   {
     id: "crypto" as const,
-    icon: Wallet,
+    icon: null, // Custom render
+    customIcon: true,
     iconBg: "bg-orange-500",
     labelKey: "contacts.paymentTypes.crypto",
     subtitleKey: "contacts.paymentTypes.cryptoSubtitle",
@@ -238,7 +249,11 @@ export const PaymentMethodDrawer = ({
                         )}
                       >
                         <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", type.iconBg)}>
-                          <type.icon className="w-5 h-5 text-white" />
+                          {'customIcon' in type && type.customIcon ? (
+                            <CryptoWalletIcon />
+                          ) : (
+                            type.icon && <type.icon className="w-5 h-5 text-white" />
+                          )}
                         </div>
                         <div className="flex-1 text-left">
                           <p className="text-base font-medium text-foreground">{t(type.labelKey)}</p>
