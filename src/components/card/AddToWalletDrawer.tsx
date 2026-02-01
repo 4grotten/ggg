@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { ChevronRight, Wallet, Smartphone, CreditCard, Plus, CheckCircle2 } from "lucide-react";
+import { ChevronRight, Wallet, Smartphone, CreditCard, Plus, CheckCircle2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -14,6 +14,9 @@ import { toast } from "sonner";
 interface AddToWalletDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  cardNumber?: string;
+  expiryDate?: string;
+  cvv?: string;
 }
 
 const steps = [
@@ -47,12 +50,29 @@ const steps = [
   },
 ];
 
-export const AddToWalletDrawer = ({ open, onOpenChange }: AddToWalletDrawerProps) => {
+export const AddToWalletDrawer = ({ 
+  open, 
+  onOpenChange,
+  cardNumber = "•••• •••• •••• ••••",
+  expiryDate = "••/••",
+  cvv = "•••"
+}: AddToWalletDrawerProps) => {
   const { t } = useTranslation();
   const walletHref = getWalletDeepLink();
   const isAndroid = detectPlatform() === 'android';
 
-  const handleOpenWallet = () => {
+  const handleCopyAndOpenWallet = async () => {
+    // Format card data for clipboard
+    const cardData = `${t("card.cardNumber", "Номер карты")}: ${cardNumber}\n${t("card.expiry", "Срок")}: ${expiryDate}\n${t("card.cvv", "CVV")}: ${cvv}`;
+    
+    try {
+      await navigator.clipboard.writeText(cardData);
+      toast.success(t("card.dataCopied", "Данные карты скопированы"));
+    } catch {
+      toast.error(t("card.copyFailed", "Не удалось скопировать"));
+    }
+
+    // Then open wallet
     const result = openWallet();
     if (!result.success) {
       toast.info(
@@ -101,49 +121,34 @@ export const AddToWalletDrawer = ({ open, onOpenChange }: AddToWalletDrawerProps
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <Button
-              asChild
               className="w-full h-14 rounded-xl text-white relative overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
               }}
+              onClick={handleCopyAndOpenWallet}
             >
-              <a
-                href={walletHref ?? '#'}
-                onClick={(e) => {
-                  if (!walletHref) {
-                    e.preventDefault();
-                    handleOpenWallet();
-                    return;
-                  }
-                  const result = openWallet();
-                  if (!result.success) {
-                    e.preventDefault();
-                    handleOpenWallet();
-                  }
+              {/* Glow effect */}
+              <div 
+                className="absolute inset-0 opacity-40 pointer-events-none"
+                style={{
+                  background: 'radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.4) 0%, transparent 60%)',
                 }}
-              >
-                {/* Glow effect */}
-                <div 
-                  className="absolute inset-0 opacity-40 pointer-events-none"
-                  style={{
-                    background: 'radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.4) 0%, transparent 60%)',
-                  }}
-                />
-                <div className="flex items-center gap-3 relative z-10">
-                  {isAndroid ? (
-                    <Wallet className="w-5 h-5" />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <AppleIcon />
-                      <NfcIcon />
-                    </div>
-                  )}
-                  <span className="font-medium">
-                    {t("card.openWallet", "Открыть Wallet")}
-                  </span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-white/60 relative z-10" />
-              </a>
+              />
+              <div className="flex items-center gap-3 relative z-10">
+                <Copy className="w-5 h-5" />
+                {isAndroid ? (
+                  <Wallet className="w-5 h-5" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <AppleIcon />
+                    <NfcIcon />
+                  </div>
+                )}
+                <span className="font-medium text-sm">
+                  {t("card.copyAndAddToWallet", "Скопировать и добавить в Wallet")}
+                </span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-white/60 relative z-10" />
             </Button>
           </motion.div>
 

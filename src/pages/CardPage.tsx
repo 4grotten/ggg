@@ -653,7 +653,13 @@ const CardPage = () => {
       </PullToRefresh>
     </MobileLayout>
 
-    <AddToWalletDrawer open={walletDrawerOpen} onOpenChange={setWalletDrawerOpen} />
+      <AddToWalletDrawer 
+        open={walletDrawerOpen} 
+        onOpenChange={setWalletDrawerOpen}
+        cardNumber={cardData.fullNumber}
+        expiryDate={cardData.expiry}
+        cvv={cardData.cvv}
+      />
   </>
   );
 };
