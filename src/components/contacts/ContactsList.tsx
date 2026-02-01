@@ -447,10 +447,6 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
                               {getInitials(contact.full_name)}
                             </AvatarFallback>
                           </Avatar>
-                          {/* Online indicator */}
-                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-emerald-400 ring-2 ring-background flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-emerald-200 animate-pulse" />
-                          </div>
                         </div>
 
                         <div className="flex-1 min-w-0">
