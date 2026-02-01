@@ -422,7 +422,8 @@
     "hapticDisabled": "تم إيقاف الاهتزاز",
     "savedContacts": "جهات الاتصال المحفوظة",
     "addContact": "إضافة جهة اتصال",
-    "scanBusinessCard": "مسح بطاقة العمل",
+    "scanBusinessCard": "مسح بطاقة العمل أو تحميل صورة",
+    "scanBusinessCardDescription": "ملء تلقائي من رمز QR أو صورة",
     "devices": {
       "title": "الأجهزة النشطة",
       "noDevices": "لا توجد أجهزة نشطة",

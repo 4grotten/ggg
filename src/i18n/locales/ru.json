@@ -424,7 +424,8 @@
     "hapticDisabled": "Вибрация выключена",
     "savedContacts": "Сохранённые контакты",
     "addContact": "Добавить контакт",
-    "scanBusinessCard": "Сканировать визитку",
+    "scanBusinessCard": "Сканировать визитку или загрузить фото",
+    "scanBusinessCardDescription": "Автозаполнение из QR-кода или изображения",
     "devices": {
       "title": "Активные устройства",
       "noDevices": "Нет активных устройств",

@@ -422,7 +422,8 @@
     "hapticDisabled": "Titreşim kapatıldı",
     "savedContacts": "Kayıtlı Kişiler",
     "addContact": "Kişi Ekle",
-    "scanBusinessCard": "Kartvizit Tara",
+    "scanBusinessCard": "Kartvizit tara veya fotoğraf yükle",
+    "scanBusinessCardDescription": "QR kodu veya görüntüden otomatik doldurma",
     "devices": {
       "title": "Aktif Cihazlar",
       "noDevices": "Aktif cihaz yok",

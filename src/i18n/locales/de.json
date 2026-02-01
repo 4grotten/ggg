@@ -422,7 +422,8 @@
     "hapticDisabled": "Vibration deaktiviert",
     "savedContacts": "Gespeicherte Kontakte",
     "addContact": "Kontakt hinzufügen",
-    "scanBusinessCard": "Visitenkarte scannen",
+    "scanBusinessCard": "Visitenkarte scannen oder Foto hochladen",
+    "scanBusinessCardDescription": "Automatisches Ausfüllen aus QR-Code oder Bild",
     "devices": {
       "title": "Aktive Geräte",
       "noDevices": "Keine aktiven Geräte",

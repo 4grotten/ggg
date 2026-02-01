@@ -424,7 +424,8 @@
     "hapticDisabled": "振动已关闭",
     "savedContacts": "已保存联系人",
     "addContact": "添加联系人",
-    "scanBusinessCard": "扫描名片",
+    "scanBusinessCard": "扫描名片或上传照片",
+    "scanBusinessCardDescription": "从二维码或图片自动填充",
     "devices": {
       "title": "活跃设备",
       "noDevices": "没有活跃设备",
