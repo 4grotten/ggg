@@ -145,9 +145,9 @@ export const ImageUploadDrawer = ({
             </DrawerTitle>
             <button
               onClick={handleClose}
-              className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
+              className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-xl font-light"
             >
-              <X className="w-5 h-5" />
+              ×
             </button>
           </div>
         </DrawerHeader>
