@@ -1538,6 +1538,8 @@
     "supportedFormats": "JPG, PNG, HEIC • Tarjetas de visita, capturas, códigos QR",
     "name": "Nombre",
     "sendMessage": "Enviar mensaje",
-    "viaSms": "por SMS"
+    "viaSms": "por SMS",
+    "shareContact": "Compartir contacto",
+    "shareContactDescription": "Enviar datos del contacto"
   }
 }
