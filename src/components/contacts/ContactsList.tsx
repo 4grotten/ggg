@@ -93,12 +93,18 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
       {/* Add contact button */}
       <button
         onClick={onAddClick}
-        className="w-full flex items-center gap-3 p-4 bg-primary/10 rounded-2xl hover:bg-primary/20 transition-colors"
+        className="w-full flex items-center justify-between py-4 px-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
       >
-        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-          <UserPlus className="w-6 h-6 text-primary-foreground" />
+        <div className="flex items-center gap-3">
+          <div 
+            className="w-10 h-10 rounded-xl text-white flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)' }}
+          >
+            <UserPlus className="w-5 h-5" />
+          </div>
+          <span className="text-foreground font-medium">{t("contacts.addContact")}</span>
         </div>
-        <span className="font-medium text-primary">{t("contacts.addContact")}</span>
+        <ChevronRight className="w-5 h-5 text-muted-foreground" />
       </button>
 
       {/* Empty state */}
