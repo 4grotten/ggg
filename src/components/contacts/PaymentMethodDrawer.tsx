@@ -58,7 +58,7 @@ const PAYMENT_TYPES = [
   },
   {
     id: "crypto" as const,
-    icon: Bitcoin,
+    icon: Wallet,
     iconBg: "bg-orange-500",
     labelKey: "contacts.paymentTypes.crypto",
     subtitleKey: "contacts.paymentTypes.cryptoSubtitle",
