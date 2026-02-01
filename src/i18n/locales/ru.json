@@ -23,7 +23,8 @@
     "apply": "Применить",
     "dismiss": "Отклонить",
     "share": "Поделиться",
-    "copy": "Скопировать"
+    "copy": "Скопировать",
+    "comingSoon": "Скоро будет доступно"
   },
   "dashboard": {
     "greeting": "Привет, {{name}}!",
@@ -421,6 +422,9 @@
     "hapticFeedback": "Вибрация",
     "hapticEnabled": "Вибрация включена",
     "hapticDisabled": "Вибрация выключена",
+    "savedContacts": "Сохранённые контакты",
+    "addContact": "Добавить контакт",
+    "scanBusinessCard": "Сканировать визитку",
     "devices": {
       "title": "Активные устройства",
       "noDevices": "Нет активных устройств",

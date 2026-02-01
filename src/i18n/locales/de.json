@@ -31,7 +31,8 @@
     "usdt": "USDT",
     "authorize": "Anmelden",
     "share": "Teilen",
-    "copy": "Kopieren"
+    "copy": "Kopieren",
+    "comingSoon": "Demnächst verfügbar"
   },
   "dashboard": {
     "welcome": "Willkommen, {{name}}!",
@@ -419,6 +420,9 @@
     "hapticFeedback": "Vibration",
     "hapticEnabled": "Vibration aktiviert",
     "hapticDisabled": "Vibration deaktiviert",
+    "savedContacts": "Gespeicherte Kontakte",
+    "addContact": "Kontakt hinzufügen",
+    "scanBusinessCard": "Visitenkarte scannen",
     "devices": {
       "title": "Aktive Geräte",
       "noDevices": "Keine aktiven Geräte",

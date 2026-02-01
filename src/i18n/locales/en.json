@@ -37,7 +37,8 @@
     "apply": "Apply",
     "dismiss": "Dismiss",
     "share": "Share",
-    "copy": "Copy"
+    "copy": "Copy",
+    "comingSoon": "Coming soon"
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",
@@ -436,6 +437,9 @@
     "hapticFeedback": "Vibration",
     "hapticEnabled": "Vibration enabled",
     "hapticDisabled": "Vibration disabled",
+    "savedContacts": "Saved Contacts",
+    "addContact": "Add Contact",
+    "scanBusinessCard": "Scan Business Card",
     "devices": {
       "title": "Active Devices",
       "noDevices": "No active devices",
