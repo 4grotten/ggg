@@ -1432,6 +1432,33 @@
       "loading": "加载设置中...",
       "new": "新",
       "save": "保存"
+    },
+    "ai": {
+      "title": "AI 设置",
+      "description": "配置人工智能模型",
+      "apiKey": "API 密钥",
+      "apiKeyPlaceholder": "sk-...",
+      "verify": "验证",
+      "verifying": "验证中...",
+      "apiKeyHint": "使用项目密钥设置保存密钥",
+      "modelSelection": "分析模型",
+      "selectModel": "选择模型",
+      "saving": "保存中...",
+      "keyValid": "密钥有效",
+      "keyInvalid": "密钥无效"
+    },
+    "integrations": {
+      "title": "API 与集成",
+      "description": "外部服务设置",
+      "publicApi": "公共 API",
+      "publicApiDesc": "REST API 访问",
+      "webhooks": "Webhooks",
+      "webhooksDesc": "向外部 URL 发送事件",
+      "rateLimiting": "速率限制",
+      "rateLimitingDesc": "API 请求限制",
+      "active": "已激活",
+      "activeMultiple": "已激活",
+      "perMinute": "/分钟"
     }
   },
   "contacts": {

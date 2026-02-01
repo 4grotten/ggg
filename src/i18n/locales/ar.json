@@ -1425,6 +1425,33 @@
       "loading": "جاري تحميل الإعدادات...",
       "new": "جديد",
       "save": "حفظ"
+    },
+    "ai": {
+      "title": "إعدادات الذكاء الاصطناعي",
+      "description": "تكوين نماذج الذكاء الاصطناعي",
+      "apiKey": "مفتاح API",
+      "apiKeyPlaceholder": "sk-...",
+      "verify": "تحقق",
+      "verifying": "جاري التحقق...",
+      "apiKeyHint": "استخدم إعدادات أسرار المشروع لحفظ المفتاح",
+      "modelSelection": "نموذج التحليل",
+      "selectModel": "اختر النموذج",
+      "saving": "جاري الحفظ...",
+      "keyValid": "المفتاح صالح",
+      "keyInvalid": "المفتاح غير صالح"
+    },
+    "integrations": {
+      "title": "API والتكامل",
+      "description": "إعدادات الخدمات الخارجية",
+      "publicApi": "API العام",
+      "publicApiDesc": "الوصول إلى REST API",
+      "webhooks": "Webhooks",
+      "webhooksDesc": "إرسال الأحداث إلى عناوين خارجية",
+      "rateLimiting": "تحديد المعدل",
+      "rateLimitingDesc": "حدود طلبات API",
+      "active": "نشط",
+      "activeMultiple": "نشط",
+      "perMinute": "/دقيقة"
     }
   },
   "contacts": {

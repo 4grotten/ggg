@@ -1485,6 +1485,33 @@
       "loading": "Loading settings...",
       "new": "new",
       "save": "Save"
+    },
+    "ai": {
+      "title": "AI Settings",
+      "description": "Configure artificial intelligence models",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "sk-...",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "apiKeyHint": "Use project secrets settings to save the key",
+      "modelSelection": "Analysis Model",
+      "selectModel": "Select model",
+      "saving": "Saving...",
+      "keyValid": "Key is valid",
+      "keyInvalid": "Key is invalid"
+    },
+    "integrations": {
+      "title": "API & Integrations",
+      "description": "External services settings",
+      "publicApi": "Public API",
+      "publicApiDesc": "REST API access",
+      "webhooks": "Webhooks",
+      "webhooksDesc": "Send events to external URLs",
+      "rateLimiting": "Rate Limiting",
+      "rateLimitingDesc": "API request limits",
+      "active": "Active",
+      "activeMultiple": "Active",
+      "perMinute": "/min"
     }
   },
   "contacts": {

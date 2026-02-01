@@ -1305,10 +1305,9 @@ export default function AdminPanel() {
                   </div>
                 </GlassCard>
 
-                {/* OpenAI Integration */}
                 <GlassCard
-                  title="OpenAI Интеграция"
-                  description="Умное сканирование контактов"
+                  title={t("admin.ai.title")}
+                  description={t("admin.ai.description")}
                   icon={Bot}
                   iconColor="text-emerald-500"
                 >
@@ -1318,7 +1317,7 @@ export default function AdminPanel() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <Key className="w-4 h-4 text-muted-foreground" />
-                          <p className="text-sm font-medium">API Ключ</p>
+                          <p className="text-sm font-medium">{t("admin.ai.apiKey")}</p>
                         </div>
                         <div className={cn(
                           "px-3 py-1.5 rounded-lg text-xs font-medium",
@@ -1326,7 +1325,7 @@ export default function AdminPanel() {
                             ? "bg-emerald-500/10 text-emerald-500" 
                             : "bg-red-500/10 text-red-500"
                         )}>
-                          {openaiLoading ? "..." : openaiStatus?.hasKey ? "Настроен" : "Не настроен"}
+                          {openaiLoading ? "..." : openaiStatus?.hasKey ? t("admin.ai.keyValid") : t("admin.ai.keyInvalid")}
                         </div>
                       </div>
                       
@@ -1362,12 +1361,12 @@ export default function AdminPanel() {
                       {/* New API key input */}
                       <div className="space-y-2">
                         <Label className="text-xs text-muted-foreground">
-                          {openaiStatus?.hasKey ? "Заменить API ключ" : "Добавить API ключ"}
+                          {openaiStatus?.hasKey ? t("admin.ai.apiKey") : t("admin.ai.apiKey")}
                         </Label>
                         <div className="flex gap-2">
                           <Input
                             type="password"
-                            placeholder="sk-..."
+                            placeholder={t("admin.ai.apiKeyPlaceholder")}
                             value={newApiKey}
                             onChange={(e) => setNewApiKey(e.target.value)}
                             className="flex-1 h-10 rounded-lg bg-background/50"
@@ -1380,12 +1379,12 @@ export default function AdminPanel() {
                             {isVerifying ? (
                               <RefreshCw className="w-4 h-4 animate-spin" />
                             ) : (
-                              "Проверить"
+                              t("admin.ai.verify")
                             )}
                           </Button>
                         </div>
                         <p className="text-[10px] text-muted-foreground">
-                          Для сохранения ключа используйте настройки секретов проекта
+                          {t("admin.ai.apiKeyHint")}
                         </p>
                       </div>
                     </div>
@@ -1394,7 +1393,7 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center gap-2 mb-3">
                         <Sparkles className="w-4 h-4 text-muted-foreground" />
-                        <p className="text-sm font-medium">Модель для анализа</p>
+                        <p className="text-sm font-medium">{t("admin.ai.modelSelection")}</p>
                       </div>
                       
                       <Select
@@ -1404,7 +1403,7 @@ export default function AdminPanel() {
                       >
                         <SelectTrigger className="w-full h-11 rounded-xl bg-background/50">
                           <span className="truncate">
-                            {openaiStatus?.availableModels?.find(m => m.id === selectedModel)?.name || "Выберите модель"}
+                            {openaiStatus?.availableModels?.find(m => m.id === selectedModel)?.name || t("admin.ai.selectModel")}
                           </span>
                         </SelectTrigger>
                         <SelectContent className="max-h-[400px]">
@@ -1426,7 +1425,7 @@ export default function AdminPanel() {
                       {isUpdatingModel && (
                         <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
                           <RefreshCw className="w-3 h-3 animate-spin" />
-                          Сохранение...
+                          {t("admin.ai.saving")}
                         </p>
                       )}
                     </div>
@@ -1434,8 +1433,8 @@ export default function AdminPanel() {
                 </GlassCard>
 
                 <GlassCard
-                  title="API и интеграции"
-                  description="Настройки внешних сервисов"
+                  title={t("admin.integrations.title")}
+                  description={t("admin.integrations.description")}
                   icon={Zap}
                   iconColor="text-yellow-500"
                 >
@@ -1444,11 +1443,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Публичный API</p>
-                          <p className="text-xs text-muted-foreground">Доступ к REST API</p>
+                          <p className="text-sm font-medium">{t("admin.integrations.publicApi")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.integrations.publicApiDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
-                          Активен
+                          {t("admin.integrations.active")}
                         </div>
                       </div>
                     </div>
@@ -1457,11 +1456,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Webhooks</p>
-                          <p className="text-xs text-muted-foreground">Отправка событий на внешние URL</p>
+                          <p className="text-sm font-medium">{t("admin.integrations.webhooks")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.integrations.webhooksDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
-                          Активны
+                          {t("admin.integrations.activeMultiple")}
                         </div>
                       </div>
                     </div>
@@ -1470,11 +1469,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Rate Limiting</p>
-                          <p className="text-xs text-muted-foreground">Ограничение запросов API</p>
+                          <p className="text-sm font-medium">{t("admin.integrations.rateLimiting")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.integrations.rateLimitingDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-500 text-xs font-medium">
-                          1000/мин
+                          1000{t("admin.integrations.perMinute")}
                         </div>
                       </div>
                     </div>
