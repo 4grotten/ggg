@@ -10,7 +10,8 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
-import { openWallet, detectPlatform, getWalletDeepLink } from "@/lib/walletDeepLinks";
+import { AddToWalletDrawer } from "@/components/card/AddToWalletDrawer";
+import { detectPlatform } from "@/lib/walletDeepLinks";
 import {
   Collapsible,
   CollapsibleContent,
@@ -152,6 +153,7 @@ const CardPage = () => {
   const [isCardLocked, setIsCardLocked] = useState(false);
   const [showLockDialog, setShowLockDialog] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
+  const [walletDrawerOpen, setWalletDrawerOpen] = useState(false);
 
   const handleUnlock = () => {
     setIsUnlocking(true);
@@ -190,22 +192,6 @@ const CardPage = () => {
     }
     setBalanceVisible(!balanceVisible);
   };
-
-  const handleOpenWallet = () => {
-    const result = openWallet();
-
-    if (!result.success) {
-      toast.info(
-        result.reason === 'embedded'
-          ? t('card.walletPreviewHint')
-          : t('card.walletDesktopHint'),
-        { duration: 4500 }
-      );
-      return;
-    }
-  };
-
-  const walletHref = getWalletDeepLink();
 
   const handleRefresh = useCallback(async () => {
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -264,6 +250,7 @@ const CardPage = () => {
   };
 
   return (
+    <>
     <MobileLayout
       header={
         <button 
@@ -343,28 +330,10 @@ const CardPage = () => {
           </div>
 
           {/* Add to Wallet Button */}
-          <motion.a
+          <motion.button
             key={`wallet-${activeIndex}`}
-            href={walletHref ?? '#'}
-            onClick={(e) => {
-              if (!walletHref) {
-                e.preventDefault();
-                handleOpenWallet();
-                return;
-              }
-
-              const result = openWallet();
-              if (!result.success) {
-                e.preventDefault();
-                toast.info(
-                  result.reason === 'embedded'
-                    ? t('card.walletPreviewHint')
-                    : t('card.walletDesktopHint'),
-                  { duration: 4500 }
-                );
-              }
-            }}
-            className="relative overflow-hidden rounded-xl p-4 flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer text-white"
+            onClick={() => setWalletDrawerOpen(true)}
+            className="w-full relative overflow-hidden rounded-xl p-4 flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer text-white"
             style={{
               background: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
               boxShadow: '0 4px 20px -4px rgba(30, 58, 95, 0.4)',
@@ -401,7 +370,7 @@ const CardPage = () => {
               </span>
             </div>
             <ChevronRight className="w-5 h-5 text-white/60 relative z-10" />
-          </motion.a>
+          </motion.button>
 
           {/* Balance Section */}
           <motion.div 
@@ -683,6 +652,9 @@ const CardPage = () => {
         </div>
       </PullToRefresh>
     </MobileLayout>
+
+    <AddToWalletDrawer open={walletDrawerOpen} onOpenChange={setWalletDrawerOpen} />
+  </>
   );
 };
 
