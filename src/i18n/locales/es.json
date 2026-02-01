@@ -32,7 +32,8 @@
     "authorize": "Iniciar Sesión",
     "share": "Compartir",
     "copy": "Copiar",
-    "comingSoon": "Próximamente"
+    "comingSoon": "Próximamente",
+    "delete": "Eliminar"
   },
   "dashboard": {
     "welcome": "¡Bienvenido, {{name}}!",

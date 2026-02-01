@@ -32,7 +32,8 @@
     "authorize": "Anmelden",
     "share": "Teilen",
     "copy": "Kopieren",
-    "comingSoon": "Demnächst verfügbar"
+    "comingSoon": "Demnächst verfügbar",
+    "delete": "Löschen"
   },
   "dashboard": {
     "welcome": "Willkommen, {{name}}!",

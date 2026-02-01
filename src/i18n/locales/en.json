@@ -40,7 +40,8 @@
     "copy": "Copy",
     "comingSoon": "Coming soon",
     "addMore": "Add more",
-    "save": "Save"
+    "save": "Save",
+    "delete": "Delete"
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",

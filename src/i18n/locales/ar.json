@@ -32,7 +32,8 @@
     "authorize": "تسجيل الدخول",
     "share": "مشاركة",
     "copy": "نسخ",
-    "comingSoon": "قريباً"
+    "comingSoon": "قريباً",
+    "delete": "حذف"
   },
   "dashboard": {
     "welcome": "مرحباً، {{name}}!",

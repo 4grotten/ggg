@@ -32,7 +32,8 @@
     "authorize": "Giriş Yap",
     "share": "Paylaş",
     "copy": "Kopyala",
-    "comingSoon": "Yakında"
+    "comingSoon": "Yakında",
+    "delete": "Sil"
   },
   "dashboard": {
     "welcome": "Hoş geldiniz, {{name}}!",
