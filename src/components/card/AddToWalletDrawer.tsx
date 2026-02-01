@@ -181,9 +181,9 @@ export const AddToWalletDrawer = ({
                   }}
                   className="flex items-start gap-4 p-4 rounded-xl bg-secondary/50"
                 >
-                  {/* Step number with icon */}
+                  {/* Icon without number */}
                   <motion.div 
-                    className="relative flex-shrink-0"
+                    className="flex-shrink-0"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ 
@@ -196,23 +196,23 @@ export const AddToWalletDrawer = ({
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
-                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
-                      {index + 1}
-                    </div>
                   </motion.div>
 
-                  {/* Step content */}
+                  {/* Step content with number */}
                   <div className="flex-1 pt-1">
                     <motion.h4 
-                      className="font-semibold text-foreground mb-0.5"
+                      className="font-semibold text-foreground mb-0.5 flex items-center gap-2"
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.45 + index * 0.1 }}
                     >
+                      <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center flex-shrink-0">
+                        {index + 1}
+                      </span>
                       {t(step.titleKey, step.fallbackTitle)}
                     </motion.h4>
                     <motion.p 
-                      className="text-sm text-muted-foreground"
+                      className="text-sm text-muted-foreground ml-7"
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
