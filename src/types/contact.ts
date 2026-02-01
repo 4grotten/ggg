@@ -68,13 +68,14 @@ export const PAYMENT_METHOD_TYPES = [
   { value: 'other', label: 'Other', icon: 'MoreHorizontal' },
 ] as const;
 
-// Crypto networks
+// Crypto networks with colors for icons
 export const CRYPTO_NETWORKS = [
-  { value: 'trc20', label: 'TRC20 (Tron)' },
-  { value: 'erc20', label: 'ERC20 (Ethereum)' },
-  { value: 'bep20', label: 'BEP20 (BSC)' },
-  { value: 'polygon', label: 'Polygon' },
-  { value: 'solana', label: 'Solana' },
-  { value: 'btc', label: 'Bitcoin' },
-  { value: 'ltc', label: 'Litecoin' },
+  { value: 'trc20', label: 'TRC20', subtitle: 'Tron', color: '#FF0013' },
+  { value: 'erc20', label: 'ERC20', subtitle: 'Ethereum', color: '#627EEA' },
+  { value: 'bep20', label: 'BEP20', subtitle: 'BSC', color: '#F3BA2F' },
+  { value: 'polygon', label: 'Polygon', subtitle: 'MATIC', color: '#8247E5' },
+  { value: 'solana', label: 'Solana', subtitle: 'SOL', color: '#00FFA3' },
+  { value: 'btc', label: 'Bitcoin', subtitle: 'BTC', color: '#F7931A' },
+  { value: 'ltc', label: 'Litecoin', subtitle: 'LTC', color: '#345D9D' },
+  { value: 'ton', label: 'TON', subtitle: 'Toncoin', color: '#0098EA' },
 ] as const;

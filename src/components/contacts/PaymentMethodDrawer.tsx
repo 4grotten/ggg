@@ -30,6 +30,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { PaymentMethod, CRYPTO_NETWORKS } from "@/types/contact";
+import { getCryptoIcon } from "@/components/icons/CryptoIcons";
 import { toast } from "sonner";
 
 interface PaymentMethodDrawerProps {
@@ -269,12 +270,12 @@ export const PaymentMethodDrawer = ({
                           index < CRYPTO_NETWORKS.length - 1 && "border-b border-border/50"
                         )}
                       >
-                        <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
-                          <Bitcoin className="w-5 h-5 text-orange-500" />
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${network.color}20` }}>
+                          {getCryptoIcon(network.value, 24)}
                         </div>
                         <div className="flex-1 text-left">
                           <p className="text-base font-medium text-foreground">{network.label}</p>
-                          <p className="text-sm text-muted-foreground">{network.value}</p>
+                          <p className="text-sm text-muted-foreground">{network.subtitle}</p>
                         </div>
                         <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
                       </button>
