@@ -393,7 +393,7 @@ export const AddContactDrawer = ({
           <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600" />
           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 animate-shimmer" />
           <div className="relative flex items-center gap-4 p-4">
-            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30">
+            <div className="w-12 h-12 flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white animate-spin-slow" />
             </div>
             <div className="flex-1 text-left">
