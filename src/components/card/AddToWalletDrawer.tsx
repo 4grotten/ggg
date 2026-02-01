@@ -104,14 +104,6 @@ export const AddToWalletDrawer = ({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="pb-2">
-          <DrawerTitle className="text-center">
-            {isAndroid 
-              ? t("card.addToGooglePay", "Добавить в Google Pay") 
-              : t("card.addToApplePay", "Добавить в Apple Pay")
-            }
-          </DrawerTitle>
-        </DrawerHeader>
 
         <div className="px-4 pb-8 space-y-5 overflow-y-auto">
           {/* Open Wallet Button */}
