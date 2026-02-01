@@ -1626,6 +1626,7 @@
     "supportedFormats": "JPG, PNG, HEIC • Визитки, скриншоты, QR-коды",
     "name": "Имя",
     "shareContact": "Поделиться контактом",
+    "shareContactDescription": "Отправить данные контакта",
     "selectToShare": "Выберите что поделиться",
     "showQrCode": "Показать QR-код",
     "qrCode": "QR-код",

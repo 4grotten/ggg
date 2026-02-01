@@ -1538,6 +1538,8 @@
     "supportedFormats": "JPG, PNG, HEIC • Kartvizitler, ekran görüntüleri, QR kodları",
     "name": "İsim",
     "sendMessage": "Mesaj Gönder",
-    "viaSms": "SMS ile"
+    "viaSms": "SMS ile",
+    "shareContact": "Kişiyi Paylaş",
+    "shareContactDescription": "Kişi bilgilerini gönder"
   }
 }
