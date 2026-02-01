@@ -392,12 +392,15 @@ export const AddContactDrawer = ({
         >
           <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600" />
           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 animate-shimmer" />
-          <div className="relative flex items-center justify-between p-4">
+          <div className="relative flex items-center gap-4 p-4">
+            <div className="w-12 h-12 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-white animate-spin-slow" />
+            </div>
             <div className="flex-1 text-left">
               <p className="font-bold text-white text-lg drop-shadow">{t("settings.scanBusinessCard")}</p>
               <p className="text-sm text-white/80">{t("settings.scanBusinessCardDescription")}</p>
             </div>
-            <ChevronRight className="w-6 h-6 text-white/80" />
+            <ChevronRight className="w-6 h-6 text-white/80 animate-bounce-x" />
           </div>
         </button>
       )}
