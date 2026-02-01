@@ -602,11 +602,26 @@ export default function AdminPanel() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               {/* Custom Tab Switcher with sliding indicator and horizontal scroll */}
               <div className="relative mb-6 mt-4">
-                <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-                  <div className="relative h-16 p-1.5 bg-muted/50 rounded-2xl min-w-max">
-                    {/* Animated sliding background */}
+                {/* Mobile: scrollable, Desktop: full width */}
+                <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+                  <div className="relative h-16 p-1.5 bg-muted/50 rounded-2xl min-w-max md:min-w-0 md:w-full">
+                    {/* Desktop sliding indicator */}
                     <motion.div
-                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg"
+                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg hidden md:block"
+                      initial={false}
+                      animate={{
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * (100% / ${tabConfig.length}) + 6px)`,
+                        width: `calc(100% / ${tabConfig.length} - 12px)`,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
+                    {/* Mobile sliding indicator */}
+                    <motion.div
+                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg md:hidden"
                       initial={false}
                       animate={{
                         left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 80px + 6px)`,
@@ -619,14 +634,15 @@ export default function AdminPanel() {
                       }}
                     />
                     
-                    {/* Tab buttons */}
-                    <div className="relative flex h-full">
+                    {/* Tab buttons - flex on mobile, grid on desktop */}
+                    <div className="relative flex md:grid md:grid-cols-6 h-full">
                       {tabConfig.map((tab) => (
                         <button
                           key={tab.value}
                           onClick={() => setActiveTab(tab.value)}
                           className={cn(
-                            "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors w-20 shrink-0",
+                            "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors",
+                            "w-20 shrink-0 md:w-auto",
                             activeTab === tab.value ? "text-foreground" : "text-muted-foreground"
                           )}
                         >
