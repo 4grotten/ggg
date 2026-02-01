@@ -1442,7 +1442,7 @@ const Settings = () => {
               
               <div className="relative flex items-center justify-between py-5 px-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 aspect-square shrink-0 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30">
+                  <div className="w-14 h-14 aspect-square shrink-0 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg ring-2 ring-white/30">
                     <UserPlus className="w-7 h-7 text-white drop-shadow-md" />
                   </div>
                   <div className="text-left">
