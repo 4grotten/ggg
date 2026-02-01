@@ -6,20 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Available AI models for vision/multimodal tasks with pricing tiers
+// Available OpenAI models for vision/multimodal tasks with pricing
 const AVAILABLE_MODELS = [
-  // OpenAI Models
-  { id: "openai/gpt-5", name: "GPT-5", description: "Мощный универсал. Отличное рассуждение, длинный контекст, мультимодальность. $15/1M input, $60/1M output" },
-  { id: "openai/gpt-5-mini", name: "GPT-5 Mini", description: "Золотая середина: низкая стоимость при высокой производительности. $3/1M input, $12/1M output" },
-  { id: "openai/gpt-5-nano", name: "GPT-5 Nano", description: "Скорость и экономия. Для простых задач большого объёма. $0.50/1M input, $2/1M output" },
-  { id: "openai/gpt-5.2", name: "GPT-5.2", description: "Новейшая модель OpenAI с улучшенным рассуждением. $20/1M input, $80/1M output" },
-  // Google Gemini Models
-  { id: "google/gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "Топ Gemini: изображения + текст + большой контекст + сложные рассуждения. $7/1M input, $21/1M output" },
-  { id: "google/gemini-3-pro-preview", name: "Gemini 3 Pro Preview", description: "Следующее поколение Gemini Pro. $10/1M input, $30/1M output" },
-  { id: "google/gemini-3-flash-preview", name: "Gemini 3 Flash Preview", description: "Быстрый превью нового поколения. Баланс скорости и качества. $0.15/1M input, $0.60/1M output" },
-  { id: "google/gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Баланс: меньше затрат, хорошая мультимодальность. $0.15/1M input, $0.60/1M output" },
-  { id: "google/gemini-2.5-flash-lite", name: "Gemini 2.5 Flash Lite", description: "Самый быстрый и дешёвый Gemini. Для классификации и суммаризации. $0.075/1M input, $0.30/1M output" },
-  { id: "google/gemini-3-pro-image-preview", name: "Gemini 3 Pro Image", description: "Модель нового поколения для генерации изображений. $5/1M input, $15/1M output" },
+  // GPT-4o Series (Latest)
+  { id: "gpt-4o", name: "GPT-4o", description: "Новейшая флагманская модель. Мультимодальная, быстрая. $2.50/1M input, $10/1M output" },
+  { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Быстрая и экономичная. Отличный баланс. $0.15/1M input, $0.60/1M output" },
+  // GPT-4 Turbo
+  { id: "gpt-4-turbo", name: "GPT-4 Turbo", description: "Мощная модель с vision. $10/1M input, $30/1M output" },
 ];
 
 serve(async (req) => {
