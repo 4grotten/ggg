@@ -1,4 +1,4 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings, Key, Copy, Check, ChevronDown, Bot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,10 +15,11 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useAdminManagement } from "@/hooks/useAdminManagement";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AdminSetting, AppRole } from "@/types/admin";
 import { cn } from "@/lib/utils";
 import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
+import { useOpenAISettings } from "@/hooks/useOpenAISettings";
 
 // Settings field configuration
 const exchangeRateFields = [
@@ -339,6 +340,7 @@ export default function AdminPanel() {
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { settings, isLoading, updateSetting, getSettingsByCategory } = useAdminSettings();
   const { admins, isLoading: adminsLoading, clients, clientsLoading, searchUser, searchClients, addAdmin, removeAdmin } = useAdminManagement();
+  const { status: openaiStatus, isLoading: openaiLoading, isVerifying, isUpdatingModel, fetchStatus: fetchOpenAIStatus, verifyApiKey, updateModel } = useOpenAISettings();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState<{
@@ -366,6 +368,56 @@ export default function AdminPanel() {
     balance: number;
     registrationDate: string;
   } | null>(null);
+  
+  // OpenAI settings state
+  const [newApiKey, setNewApiKey] = useState("");
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("");
+  
+  // Fetch OpenAI status when system tab is active
+  useEffect(() => {
+    if (activeTab === "system" && !openaiStatus && !openaiLoading) {
+      fetchOpenAIStatus();
+    }
+  }, [activeTab, openaiStatus, openaiLoading, fetchOpenAIStatus]);
+  
+  // Sync selected model with status
+  useEffect(() => {
+    if (openaiStatus?.currentModel && !selectedModel) {
+      // currentModel is stored as index, convert to model ID
+      const modelIndex = typeof openaiStatus.currentModel === 'number' 
+        ? openaiStatus.currentModel 
+        : openaiStatus.availableModels?.findIndex(m => m.id === openaiStatus.currentModel) ?? 0;
+      const model = openaiStatus.availableModels?.[modelIndex] || openaiStatus.availableModels?.[0];
+      if (model) {
+        setSelectedModel(model.id);
+      }
+    }
+  }, [openaiStatus, selectedModel]);
+  
+  const handleCopyApiKey = useCallback(() => {
+    if (openaiStatus?.maskedKey) {
+      navigator.clipboard.writeText(openaiStatus.maskedKey);
+      setCopiedKey(true);
+      setTimeout(() => setCopiedKey(false), 2000);
+    }
+  }, [openaiStatus?.maskedKey]);
+  
+  const handleVerifyAndSaveKey = useCallback(async () => {
+    if (!newApiKey.trim()) return;
+    const isValid = await verifyApiKey(newApiKey);
+    if (isValid) {
+      setNewApiKey("");
+      // Note: The key needs to be updated via Lovable secrets management
+      // This just validates the key
+    }
+  }, [newApiKey, verifyApiKey]);
+  
+  const handleModelChange = useCallback((modelId: string) => {
+    setSelectedModel(modelId);
+    updateModel(modelId);
+  }, [updateModel]);
 
   // Mock client data for the card
   const mockClientData = {
@@ -1256,6 +1308,133 @@ export default function AdminPanel() {
                           Выключены
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </GlassCard>
+
+                {/* OpenAI Integration */}
+                <GlassCard
+                  title="OpenAI Интеграция"
+                  description="Умное сканирование контактов"
+                  icon={Bot}
+                  iconColor="text-emerald-500"
+                >
+                  <div className="space-y-4">
+                    {/* API Key Status */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Key className="w-4 h-4 text-muted-foreground" />
+                          <p className="text-sm font-medium">API Ключ</p>
+                        </div>
+                        <div className={cn(
+                          "px-3 py-1.5 rounded-lg text-xs font-medium",
+                          openaiStatus?.hasKey 
+                            ? "bg-emerald-500/10 text-emerald-500" 
+                            : "bg-red-500/10 text-red-500"
+                        )}>
+                          {openaiLoading ? "..." : openaiStatus?.hasKey ? "Настроен" : "Не настроен"}
+                        </div>
+                      </div>
+                      
+                      {/* Current key display */}
+                      {openaiStatus?.hasKey && openaiStatus.maskedKey && (
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="flex-1 px-3 py-2 rounded-lg bg-background/50 font-mono text-sm text-muted-foreground">
+                            {showApiKey ? openaiStatus.maskedKey : "sk-••••••••••••"}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 rounded-lg"
+                            onClick={() => setShowApiKey(!showApiKey)}
+                          >
+                            <Eye className={cn("w-4 h-4", showApiKey && "text-primary")} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 rounded-lg"
+                            onClick={handleCopyApiKey}
+                          >
+                            {copiedKey ? (
+                              <Check className="w-4 h-4 text-emerald-500" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {/* New API key input */}
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">
+                          {openaiStatus?.hasKey ? "Заменить API ключ" : "Добавить API ключ"}
+                        </Label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="password"
+                            placeholder="sk-..."
+                            value={newApiKey}
+                            onChange={(e) => setNewApiKey(e.target.value)}
+                            className="flex-1 h-10 rounded-lg bg-background/50"
+                          />
+                          <Button
+                            onClick={handleVerifyAndSaveKey}
+                            disabled={!newApiKey.trim() || isVerifying}
+                            className="h-10 px-4 rounded-lg"
+                          >
+                            {isVerifying ? (
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                              "Проверить"
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">
+                          Для сохранения ключа используйте настройки секретов проекта
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Model Selection */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Sparkles className="w-4 h-4 text-muted-foreground" />
+                        <p className="text-sm font-medium">Модель для анализа</p>
+                      </div>
+                      
+                      <Select
+                        value={selectedModel}
+                        onValueChange={handleModelChange}
+                        disabled={isUpdatingModel}
+                      >
+                        <SelectTrigger className="w-full h-11 rounded-xl bg-background/50">
+                          <SelectValue placeholder="Выберите модель" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(openaiStatus?.availableModels || [
+                            { id: "gpt-4o", name: "GPT-4o", description: "Новейшая мультимодальная модель" },
+                            { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Быстрая и экономичная" },
+                            { id: "gpt-4-turbo", name: "GPT-4 Turbo", description: "Предыдущее поколение" },
+                            { id: "gpt-4-vision-preview", name: "GPT-4 Vision", description: "Специализирована для изображений" },
+                          ]).map((model) => (
+                            <SelectItem key={model.id} value={model.id}>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{model.name}</span>
+                                <span className="text-xs text-muted-foreground">{model.description}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      {isUpdatingModel && (
+                        <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                          <RefreshCw className="w-3 h-3 animate-spin" />
+                          Сохранение...
+                        </p>
+                      )}
                     </div>
                   </div>
                 </GlassCard>
