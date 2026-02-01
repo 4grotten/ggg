@@ -1356,14 +1356,8 @@ const Settings = () => {
       {/* Saved Contacts Drawer - Premium Design */}
       <Drawer open={isContactsDrawerOpen} onOpenChange={setIsContactsDrawerOpen}>
         <DrawerContent className="max-h-[85vh]">
-          <DrawerHeader className="pb-4 relative overflow-hidden">
-            {/* Animated background glow */}
-            <motion.div 
-              animate={{ opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-pink-500/10 blur-xl"
-            />
-            <div className="relative z-10 flex items-center justify-between px-4">
+          <DrawerHeader className="pb-4">
+            <div className="flex items-center justify-between px-4">
               <DrawerTitle className="text-xl font-bold">
                 {t("settings.savedContacts") || "Сохранённые контакты"}
               </DrawerTitle>
@@ -1390,8 +1384,14 @@ const Settings = () => {
               }}
               className="w-full relative overflow-hidden rounded-2xl group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-muted/80 via-muted/60 to-muted/40 backdrop-blur-xl" />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              {/* Animated background glow */}
+              <motion.div 
+                animate={{ opacity: [0.3, 0.5, 0.3] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute inset-0 bg-gradient-to-br from-primary/20 via-purple-500/15 to-pink-500/20 blur-xl rounded-2xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-muted/80 via-muted/60 to-muted/40 backdrop-blur-xl rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
               <div className="absolute inset-0 ring-1 ring-inset ring-border/50 group-hover:ring-primary/30 rounded-2xl transition-all duration-300" />
               
               {/* Shimmer effect */}
