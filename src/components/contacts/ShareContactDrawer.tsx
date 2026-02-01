@@ -39,7 +39,7 @@ import {
   Hash,
   Users,
   Video,
-  Download,
+  UserPlus,
   MessageSquare,
   LucideIcon
 } from "lucide-react";
@@ -378,20 +378,14 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
     await copyToClipboard(contactText, "share");
   };
 
-  // Download vCard file
-  const handleDownloadVCard = () => {
+  // Add contact to phone contacts via data URI
+  const handleAddToContacts = () => {
     tap();
     const vCardData = buildVCardData();
-    const blob = new Blob([vCardData], { type: 'text/vcard' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${contact?.full_name || 'contact'}.vcf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success(t("contacts.vcardDownloaded") || "Contact downloaded");
+    // Create a data URI for vCard which triggers mobile contact add dialog
+    const dataUri = `data:text/vcard;charset=utf-8,${encodeURIComponent(vCardData)}`;
+    window.location.href = dataUri;
+    toast.success(t("contacts.addedToContacts") || "Contact added");
   };
 
   const getInitials = (name: string) => {
@@ -603,16 +597,16 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
           </span>
         </Button>
 
-        {/* Share and Download buttons */}
+        {/* Add to Contacts and Share buttons */}
         <div className="flex gap-3">
           <Button
-            onClick={handleDownloadVCard}
+            onClick={handleAddToContacts}
             disabled={!hasAnySelection}
             variant="outline"
             className="flex-1 h-12 rounded-xl"
           >
-            <Download className="w-5 h-5 mr-2" />
-            {t("contacts.download") || "Download"}
+            <UserPlus className="w-5 h-5 mr-2" />
+            {t("contacts.addToContacts")}
           </Button>
           <Button
             onClick={handleShareContact}
@@ -658,12 +652,12 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
       {/* Action buttons */}
       <div className="flex gap-3">
         <Button
-          onClick={handleDownloadVCard}
+          onClick={handleAddToContacts}
           variant="outline"
           className="flex-1 h-12 rounded-xl"
         >
-          <Download className="w-5 h-5 mr-2" />
-          {t("contacts.download") || "Download"}
+          <UserPlus className="w-5 h-5 mr-2" />
+          {t("contacts.addToContacts")}
         </Button>
         <Button
           onClick={handleShareContact}

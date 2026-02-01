@@ -1542,6 +1542,8 @@
     "viaSms": "SMS ile",
     "viaEmail": "E-posta ile",
     "shareContact": "Kişiyi Paylaş",
-    "shareContactDescription": "Kişi bilgilerini gönder"
+    "shareContactDescription": "Kişi bilgilerini gönder",
+    "addToContacts": "Kişi Ekle",
+    "addedToContacts": "Kişi eklendi"
   }
 }
