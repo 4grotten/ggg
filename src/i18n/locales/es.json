@@ -1536,6 +1536,8 @@
     "rateLimitError": "Demasiadas solicitudes. Intenta más tarde.",
     "creditsError": "Créditos de IA agotados. Recarga tu saldo.",
     "supportedFormats": "JPG, PNG, HEIC • Tarjetas de visita, capturas, códigos QR",
-    "name": "Nombre"
+    "name": "Nombre",
+    "sendMessage": "Enviar mensaje",
+    "viaSms": "por SMS"
   }
 }

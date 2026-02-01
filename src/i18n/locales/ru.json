@@ -1632,6 +1632,8 @@
     "scanToSave": "Отсканируйте чтобы сохранить контакт",
     "download": "Скачать",
     "vcardDownloaded": "Контакт скачан",
-    "contact": "Контакт"
+    "contact": "Контакт",
+    "sendMessage": "Написать сообщение",
+    "viaSms": "через SMS"
   }
 }
