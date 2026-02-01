@@ -181,13 +181,27 @@ export const AddContactDrawer = ({
   };
 
   // Handle extracted contact data from AI
-  const handleExtractedData = (data: ExtractedContactData) => {
+  const handleExtractedData = async (data: ExtractedContactData) => {
     if (data.full_name) setFullName(data.full_name);
     if (data.phone) setPhone(data.phone);
     if (data.email) setEmail(data.email);
     if (data.company) setCompany(data.company);
     if (data.position) setPosition(data.position);
     if (data.notes) setNotes(data.notes);
+    
+    // Set avatar from extracted image (if found)
+    if (data.avatar_url && data.avatar_url.startsWith('data:')) {
+      setAvatarUrl(data.avatar_url);
+      // Convert base64 to file for upload
+      try {
+        const response = await fetch(data.avatar_url);
+        const blob = await response.blob();
+        const file = new File([blob], 'contact-avatar.jpg', { type: 'image/jpeg' });
+        setAvatarFile(file);
+      } catch (err) {
+        console.error('Failed to convert avatar to file:', err);
+      }
+    }
     
     // Set payment methods
     if (data.payment_methods && data.payment_methods.length > 0) {

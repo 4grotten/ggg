@@ -46,7 +46,8 @@ interface ExtractedContact {
   company?: string;
   position?: string;
   notes?: string;
-  avatar_url?: string;
+  avatar_description?: string;
+  avatar_image_index?: number; // 0-based index of image containing profile photo
   payment_methods?: Array<{
     id: string;
     type: string;
@@ -130,7 +131,8 @@ Extract ALL available information and return a JSON object with these fields:
 - company: Company/organization name
 - position: Job title/position
 - notes: Any additional relevant info
-- avatar_url: If there's a profile photo, describe it (we'll handle separately)
+- avatar_image_index: If any image contains a clear profile photo/avatar of the person, return the 0-based index of that image. If image 1 has the avatar, return 0. If image 2 has the avatar, return 1. Return null if no profile photo is found.
+- avatar_description: Brief description of the person's appearance if visible (optional)
 - payment_methods: Array of payment methods found. Each should have:
   - type: "card" | "iban" | "crypto" | "paypal" | "wallet" | "other"
   - label: A descriptive label (e.g., "USDT TRC20", "Visa Card", "IBAN")

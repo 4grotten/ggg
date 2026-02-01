@@ -15,7 +15,8 @@ export interface ExtractedContactData {
   company?: string;
   position?: string;
   notes?: string;
-  avatar_url?: string;
+  avatar_url?: string; // Will be set to base64 of image if avatar found
+  avatar_image_index?: number; // Index of image with profile photo
   payment_methods?: PaymentMethod[];
   social_links?: ContactSocialLink[];
 }
@@ -87,6 +88,15 @@ export const useContactExtraction = () => {
       setProgress(100);
       
       const contact = data.contact as ExtractedContactData;
+      
+      // If AI detected an avatar image, use the corresponding base64 image
+      if (typeof contact.avatar_image_index === 'number' && 
+          contact.avatar_image_index >= 0 && 
+          contact.avatar_image_index < base64Images.length) {
+        contact.avatar_url = base64Images[contact.avatar_image_index];
+        console.log(`Using image ${contact.avatar_image_index} as avatar`);
+      }
+      
       console.log('Extracted contact:', contact);
 
       // Show success with summary
