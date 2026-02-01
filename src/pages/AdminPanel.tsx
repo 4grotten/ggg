@@ -1403,9 +1403,9 @@ export default function AdminPanel() {
                         disabled={isUpdatingModel}
                       >
                         <SelectTrigger className="w-full h-11 rounded-xl bg-background/50">
-                          <SelectValue placeholder="Выберите модель">
-                            {openaiStatus?.availableModels?.find(m => m.id === selectedModel)?.name || selectedModel}
-                          </SelectValue>
+                          <span className="truncate">
+                            {openaiStatus?.availableModels?.find(m => m.id === selectedModel)?.name || "Выберите модель"}
+                          </span>
                         </SelectTrigger>
                         <SelectContent className="max-h-[400px]">
                           {(openaiStatus?.availableModels || []).map((model) => (
