@@ -1544,8 +1544,10 @@
   },
   "contacts": {
     "addContact": "Add Contact",
+    "addContactDescription": "Create a new contact or scan a business card",
     "editContact": "Edit Contact",
     "viewContacts": "My Contacts",
+    "viewContactsDescription": "View and manage your contacts",
     "fullName": "Full Name",
     "phone": "Phone",
     "email": "Email",

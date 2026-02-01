@@ -1353,55 +1353,118 @@ const Settings = () => {
         }}
       />
 
-      {/* Saved Contacts Drawer */}
+      {/* Saved Contacts Drawer - Premium Design */}
       <Drawer open={isContactsDrawerOpen} onOpenChange={setIsContactsDrawerOpen}>
         <DrawerContent className="max-h-[85vh]">
-          <DrawerHeader className="pb-2">
-            <DrawerTitle className="text-center">{t("settings.savedContacts") || "Сохранённые контакты"}</DrawerTitle>
+          <DrawerHeader className="pb-4 relative overflow-hidden">
+            {/* Animated background glow */}
+            <motion.div 
+              animate={{ opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-pink-500/10 blur-xl"
+            />
+            <DrawerTitle className="text-center text-xl font-bold relative z-10">
+              {t("settings.savedContacts") || "Сохранённые контакты"}
+            </DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-8 space-y-3">
-            {/* My Contacts Button */}
-            <button
+          <div className="px-4 pb-8 space-y-4">
+            {/* My Contacts Button - Premium glassmorphism */}
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => {
                 tap();
                 setIsContactsDrawerOpen(false);
                 setIsContactsListOpen(true);
               }}
-              className="w-full flex items-center justify-between py-4 px-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
+              className="w-full relative overflow-hidden rounded-2xl group"
             >
-              <div className="flex items-center gap-3">
-                <div 
-                  className="w-10 h-10 rounded-xl text-white flex items-center justify-center"
-                  style={{ background: iconGradients.users }}
-                >
-                  <BookUser className="w-5 h-5" />
+              <div className="absolute inset-0 bg-gradient-to-br from-muted/80 via-muted/60 to-muted/40 backdrop-blur-xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 ring-1 ring-inset ring-border/50 group-hover:ring-primary/30 rounded-2xl transition-all duration-300" />
+              
+              {/* Shimmer effect */}
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
+              />
+              
+              <div className="relative flex items-center justify-between py-5 px-4">
+                <div className="flex items-center gap-4">
+                  <motion.div 
+                    whileHover={{ rotate: 10, scale: 1.1 }}
+                    className="w-14 h-14 rounded-2xl text-white flex items-center justify-center shadow-lg ring-2 ring-white/20"
+                    style={{ background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #a855f7 100%)" }}
+                  >
+                    <BookUser className="w-7 h-7" />
+                  </motion.div>
+                  <div className="text-left">
+                    <span className="text-foreground font-bold text-lg block group-hover:text-primary transition-colors">
+                      {t("contacts.viewContacts") || "Мои контакты"}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      {t("contacts.viewContactsDescription") || "Просмотр и управление контактами"}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-foreground font-medium">{t("contacts.viewContacts") || "Мои контакты"}</span>
+                <motion.div
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <ChevronRight className="w-6 h-6 text-primary" />
+                </motion.div>
               </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </button>
+            </motion.button>
 
-            {/* Add Contact Button */}
-            <button
+            {/* Add Contact Button - Premium animated style */}
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => {
                 tap();
                 setIsContactsDrawerOpen(false);
                 setEditingContact(null);
                 setIsAddContactOpen(true);
               }}
-              className="w-full flex items-center justify-between py-4 px-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
+              className="w-full relative overflow-hidden rounded-2xl shadow-lg group"
             >
-              <div className="flex items-center gap-3">
-                <div 
-                  className="w-10 h-10 rounded-xl text-white flex items-center justify-center"
-                  style={{ background: iconGradients.contacts }}
-                >
-                  <UserPlus className="w-5 h-5" />
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 group-hover:from-emerald-400 group-hover:via-teal-400 group-hover:to-cyan-400 transition-all duration-500" />
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0"
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "linear", repeatDelay: 0.5 }}
+              />
+              
+              <div className="relative flex items-center justify-between py-5 px-4">
+                <div className="flex items-center gap-4">
+                  <motion.div 
+                    whileHover={{ rotate: -10, scale: 1.1 }}
+                    className="w-14 h-14 rounded-2xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30"
+                  >
+                    <UserPlus className="w-7 h-7 text-white drop-shadow" />
+                  </motion.div>
+                  <div className="text-left">
+                    <span className="text-white font-bold text-lg block drop-shadow">
+                      {t("contacts.addContact") || "Добавить контакт"}
+                    </span>
+                    <span className="text-white/80 text-sm">
+                      {t("contacts.addContactDescription") || "Создать новый контакт или сканировать визитку"}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-foreground font-medium">{t("contacts.addContact") || "Добавить контакт"}</span>
+                <motion.div
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <ChevronRight className="w-6 h-6 text-white/90" />
+                </motion.div>
               </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </button>
+            </motion.button>
           </div>
         </DrawerContent>
       </Drawer>
