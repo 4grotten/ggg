@@ -394,9 +394,9 @@ const TariffPayBalance = () => {
             key={tariffId}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="p-4 rounded-2xl bg-primary/5 border border-primary/20"
+            className="p-4 rounded-2xl bg-primary/10 border border-primary/30"
           >
-            <p className="text-sm text-primary">
+            <p className="text-sm text-white font-medium">
               {tariffId === 'smart' && t('partner.bonuses.smartDesc', 'Для начинающих партнёров')}
               {tariffId === 'agent' && t('partner.bonuses.agentDesc', 'Для активных партнёров с растущей сетью')}
               {tariffId === 'pro' && t('partner.bonuses.proDesc', 'Для активных и опытных партнёров с большой аудиторией')}
