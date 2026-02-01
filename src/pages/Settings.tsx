@@ -15,7 +15,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode, Contact, BookUser } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -26,6 +26,9 @@ import { MOCK_TRANSACTIONS } from "@/components/partner/ReferralTransactions";
 import { ScreenLockDrawer } from "@/components/settings/ScreenLockDrawer";
 import { ShareProfileDrawer } from "@/components/settings/ShareProfileDrawer";
 import { PasswordVerifyDialog } from "@/components/settings/PasswordVerifyDialog";
+import { AddContactDrawer } from "@/components/contacts/AddContactDrawer";
+import { ContactsList } from "@/components/contacts/ContactsList";
+import { SavedContact } from "@/types/contact";
 import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -50,6 +53,7 @@ const iconGradients: Record<string, string> = {
   lock: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
   admin: 'linear-gradient(135deg, #1e3a5f 0%, #0a0a0a 100%)',
   vibrate: 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)',
+  contacts: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
 };
 
 interface ColoredIconProps {
@@ -301,6 +305,10 @@ const Settings = () => {
   const [isAdminPasswordDialogOpen, setIsAdminPasswordDialogOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isShareUnlockDialogOpen, setIsShareUnlockDialogOpen] = useState(false);
+  const [isContactsDrawerOpen, setIsContactsDrawerOpen] = useState(false);
+  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
+  const [isContactsListOpen, setIsContactsListOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<SavedContact | null>(null);
   const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused, isHideDataEnabled } = useScreenLockContext();
   const { isAdmin } = useUserRole();
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
@@ -697,6 +705,30 @@ const Settings = () => {
           >
             <QrCode className="w-5 h-5" />
             <span>{t("settings.share") || "Поделиться"}</span>
+          </motion.button>
+        )}
+
+        {/* Saved Contacts Button */}
+        {isAuthenticated && (
+          <motion.button
+            initial={{ opacity: 0, y: -30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.05,
+              ease: [0.23, 1, 0.32, 1],
+            }}
+            onClick={() => {
+              tap();
+              setIsContactsDrawerOpen(true);
+            }}
+            className="w-full flex items-center justify-between py-4 px-5 bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl font-medium hover:bg-muted transition-colors border border-border/50"
+          >
+            <div className="flex items-center gap-3">
+              <ColoredIcon colorKey="contacts"><BookUser className="w-4 h-4" /></ColoredIcon>
+              <span className="text-foreground">{t("settings.savedContacts") || "Сохранённые контакты"}</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </motion.button>
         )}
 
@@ -1318,6 +1350,92 @@ const Settings = () => {
           setIsShareUnlockDialogOpen(false);
           setIsShareOpen(true);
         }}
+      />
+
+      {/* Saved Contacts Drawer */}
+      <Drawer open={isContactsDrawerOpen} onOpenChange={setIsContactsDrawerOpen}>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle className="text-center">{t("settings.savedContacts") || "Сохранённые контакты"}</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-8 space-y-3">
+            {/* My Contacts Button */}
+            <button
+              onClick={() => {
+                tap();
+                setIsContactsDrawerOpen(false);
+                setIsContactsListOpen(true);
+              }}
+              className="w-full flex items-center justify-between py-4 px-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-10 h-10 rounded-xl text-white flex items-center justify-center"
+                  style={{ background: iconGradients.users }}
+                >
+                  <Users className="w-5 h-5" />
+                </div>
+                <span className="text-foreground font-medium">{t("contacts.viewContacts") || "Мои контакты"}</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+
+            {/* Add Contact Button */}
+            <button
+              onClick={() => {
+                tap();
+                setIsContactsDrawerOpen(false);
+                setEditingContact(null);
+                setIsAddContactOpen(true);
+              }}
+              className="w-full flex items-center justify-between py-4 px-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-10 h-10 rounded-xl text-white flex items-center justify-center"
+                  style={{ background: iconGradients.contacts }}
+                >
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <span className="text-foreground font-medium">{t("contacts.addContact") || "Добавить контакт"}</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Contacts List Drawer */}
+      <Drawer open={isContactsListOpen} onOpenChange={setIsContactsListOpen}>
+        <DrawerContent className="max-h-[90vh]">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle className="text-center">{t("contacts.viewContacts") || "Мои контакты"}</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-8 overflow-y-auto max-h-[70vh]">
+            <ContactsList
+              onContactClick={(contact) => {
+                setEditingContact(contact);
+                setIsContactsListOpen(false);
+                setIsAddContactOpen(true);
+              }}
+              onAddClick={() => {
+                setEditingContact(null);
+                setIsContactsListOpen(false);
+                setIsAddContactOpen(true);
+              }}
+            />
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Add/Edit Contact Drawer */}
+      <AddContactDrawer
+        isOpen={isAddContactOpen}
+        onClose={() => {
+          setIsAddContactOpen(false);
+          setEditingContact(null);
+        }}
+        editContact={editingContact}
       />
     </MobileLayout>
   );
