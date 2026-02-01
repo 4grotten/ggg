@@ -1542,9 +1542,11 @@
   },
   "contacts": {
     "addContact": "Добавить контакт",
+    "addContactDescription": "Создать новый контакт или сканировать визитку",
     "editContact": "Редактировать контакт",
     "contactSettings": "Настройки контакта",
     "viewContacts": "Мои контакты",
+    "viewContactsDescription": "Просмотр и управление контактами",
     "fullName": "Полное имя",
     "phone": "Телефон",
     "email": "Email",
