@@ -531,13 +531,23 @@ const CardPage = () => {
           >
             <Button 
               variant="outline" 
-              className={`h-12 rounded-xl gap-2 border-none overflow-hidden transition-colors duration-300 ${
+              className={`relative h-12 rounded-xl gap-2 border-none overflow-hidden transition-colors duration-300 text-white ${
                 isUnlocking
-                  ? "bg-primary text-primary-foreground" 
+                  ? "" 
                   : isCardLocked 
-                    ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" 
-                    : "bg-secondary hover:bg-muted"
+                    ? "" 
+                    : ""
               }`}
+              style={{
+                background: isUnlocking 
+                  ? 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)'
+                  : isCardLocked 
+                    ? 'linear-gradient(135deg, #5f1e1e 0%, #2a0f0f 100%)'
+                    : 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
+                boxShadow: isCardLocked 
+                  ? '0 4px 20px -4px rgba(95, 30, 30, 0.5)'
+                  : '0 4px 20px -4px rgba(30, 58, 95, 0.5)',
+              }}
               onClick={() => {
                 if (isCardLocked && !isUnlocking) {
                   handleUnlock();
@@ -547,6 +557,15 @@ const CardPage = () => {
               }}
               disabled={isUnlocking}
             >
+              {/* Bright glow overlay */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: isCardLocked 
+                    ? 'radial-gradient(ellipse at 20% 50%, rgba(239, 68, 68, 0.5) 0%, rgba(220, 38, 38, 0.25) 40%, transparent 70%)'
+                    : 'radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.6) 0%, rgba(99, 102, 241, 0.3) 40%, transparent 70%)',
+                }}
+              />
               <AnimatePresence mode="wait">
                 <motion.div
                   key={isUnlocking ? "unlocking-icon" : isCardLocked ? "locked-icon" : "unlock-icon"}
@@ -554,6 +573,7 @@ const CardPage = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.2 }}
+                  className="relative z-10"
                 >
                   {isCardLocked && !isUnlocking ? <Lock className="w-4 h-4" /> : <LockOpen className="w-4 h-4" />}
                 </motion.div>
@@ -565,6 +585,7 @@ const CardPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
+                  className="relative z-10"
                 >
                   {isUnlocking 
                     ? t("card.cardUnlocked") 
@@ -576,10 +597,21 @@ const CardPage = () => {
             </Button>
             <Button 
               variant="outline"
-              className="h-12 rounded-xl gap-2 bg-secondary border-none hover:bg-muted"
+              className="relative h-12 rounded-xl gap-2 border-none overflow-hidden text-white"
+              style={{
+                background: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
+                boxShadow: '0 4px 20px -4px rgba(30, 58, 95, 0.5)',
+              }}
             >
-              <RefreshCw className="w-4 h-4" />
-              {t("card.replaceCard")}
+              {/* Bright glow overlay */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.6) 0%, rgba(99, 102, 241, 0.3) 40%, transparent 70%)',
+                }}
+              />
+              <RefreshCw className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">{t("card.replaceCard")}</span>
             </Button>
           </motion.div>
 
@@ -651,16 +683,27 @@ const CardPage = () => {
           <motion.button
             key={`history-btn-${activeIndex}`}
             onClick={() => navigate(`/card/${currentCardType}/history`)}
-            className="w-full rounded-2xl p-3 flex items-center gap-3 bg-gradient-to-r from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-200 active:scale-[0.98]"
+            className="relative w-full rounded-2xl p-3 flex items-center gap-3 transition-all duration-200 active:scale-[0.98] overflow-hidden text-white"
+            style={{
+              background: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
+              boxShadow: '0 4px 20px -4px rgba(30, 58, 95, 0.5)',
+            }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.17 }}
           >
-            <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-primary" />
+            {/* Bright glow overlay */}
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: 'radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.6) 0%, rgba(99, 102, 241, 0.3) 40%, transparent 70%)',
+              }}
+            />
+            <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center relative z-10">
+              <Clock className="w-5 h-5 text-white" />
             </div>
-            <span className="flex-1 text-left text-sm font-medium">{t("card.transactionHistory")}</span>
-            <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span className="flex-1 text-left text-sm font-medium relative z-10">{t("card.transactionHistory")}</span>
+            <svg className="w-5 h-5 text-white/60 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
             </svg>
           </motion.button>
