@@ -1384,35 +1384,82 @@ const Settings = () => {
               }}
               className="w-full relative overflow-hidden rounded-2xl group"
             >
-              {/* Animated background glow */}
+              {/* Fantastic animated background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary via-purple-600 to-pink-600 rounded-2xl" />
+              
+              {/* Animated gradient overlay */}
               <motion.div 
-                animate={{ opacity: [0.3, 0.5, 0.3] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute inset-0 bg-gradient-to-br from-primary/20 via-purple-500/15 to-pink-500/20 blur-xl rounded-2xl"
+                animate={{ 
+                  background: [
+                    "linear-gradient(135deg, rgba(59,130,246,0.9) 0%, rgba(139,92,246,0.9) 50%, rgba(236,72,153,0.9) 100%)",
+                    "linear-gradient(225deg, rgba(139,92,246,0.9) 0%, rgba(236,72,153,0.9) 50%, rgba(59,130,246,0.9) 100%)",
+                    "linear-gradient(135deg, rgba(59,130,246,0.9) 0%, rgba(139,92,246,0.9) 50%, rgba(236,72,153,0.9) 100%)"
+                  ]
+                }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-2xl"
               />
-              <div className="absolute inset-0 bg-gradient-to-br from-muted/80 via-muted/60 to-muted/40 backdrop-blur-xl rounded-2xl" />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-              <div className="absolute inset-0 ring-1 ring-inset ring-border/50 group-hover:ring-primary/30 rounded-2xl transition-all duration-300" />
+              
+              {/* Glowing orbs */}
+              <motion.div 
+                animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/20 -translate-y-1/2 translate-x-1/3 blur-2xl" 
+              />
+              <motion.div 
+                animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+                className="absolute bottom-0 left-0 w-28 h-28 rounded-full bg-white/15 translate-y-1/2 -translate-x-1/3 blur-2xl" 
+              />
+              
+              {/* Floating particles */}
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{
+                    y: [-10, -30, -10],
+                    x: [0, 5, 0],
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 2.5 + i * 0.4,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                  }}
+                  className="absolute w-1.5 h-1.5 rounded-full bg-white/50"
+                  style={{
+                    left: `${15 + i * 18}%`,
+                    bottom: `${20 + i * 8}%`,
+                  }}
+                />
+              ))}
+              
+              {/* Glass overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10 rounded-2xl" />
+              
+              {/* Border glow */}
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/30 group-hover:ring-white/50 rounded-2xl transition-all duration-300" />
               
               {/* Shimmer effect */}
               <motion.div 
-                className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
+                className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "linear", repeatDelay: 2 }}
               />
               
               <div className="relative flex items-center justify-between py-5 px-4">
                 <div className="flex items-center gap-4">
                   <motion.div 
                     whileHover={{ rotate: 10, scale: 1.1 }}
-                    className="w-14 h-14 rounded-2xl text-white flex items-center justify-center shadow-lg ring-2 ring-white/20"
-                    style={{ background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #a855f7 100%)" }}
+                    className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm text-white flex items-center justify-center shadow-lg ring-2 ring-white/30"
                   >
-                    <BookUser className="w-7 h-7" />
+                    <BookUser className="w-7 h-7 drop-shadow-md" />
                   </motion.div>
                   <div className="text-left">
-                    <span className="text-foreground font-bold text-lg block group-hover:text-primary transition-colors">
+                    <span className="text-white font-bold text-lg block drop-shadow-md">
                       {t("contacts.viewContacts") || "Мои контакты"}
                     </span>
-                    <span className="text-muted-foreground text-sm">
+                    <span className="text-white/80 text-sm drop-shadow-sm">
                       {t("contacts.viewContactsDescription") || "Просмотр и управление контактами"}
                     </span>
                   </div>
@@ -1421,7 +1468,7 @@ const Settings = () => {
                   animate={{ x: [0, 4, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <ChevronRight className="w-6 h-6 text-primary" />
+                  <ChevronRight className="w-6 h-6 text-white/90 drop-shadow-md" />
                 </motion.div>
               </div>
             </motion.button>
