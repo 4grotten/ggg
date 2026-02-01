@@ -1363,7 +1363,7 @@ const Settings = () => {
               transition={{ duration: 3, repeat: Infinity }}
               className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-pink-500/10 blur-xl"
             />
-            <div className="relative z-10 flex items-center justify-between">
+            <div className="relative z-10 flex items-center justify-between px-4">
               <DrawerTitle className="text-xl font-bold">
                 {t("settings.savedContacts") || "Сохранённые контакты"}
               </DrawerTitle>
