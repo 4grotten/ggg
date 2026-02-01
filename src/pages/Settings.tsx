@@ -984,14 +984,116 @@ const Settings = () => {
           )}
         </AnimatedMenuSection>
 
-        {/* Active Devices - only for authenticated users */}
+        {/* Account Management Block - Active Devices, Add Account, Switch Account */}
         {isAuthenticated && (
           <AnimatedMenuSection index={5}>
+            {/* Active Devices */}
             <SettingsItem
               icon={<ColoredIcon colorKey="laptop"><Laptop className="w-4 h-4" /></ColoredIcon>}
               label={t("settings.devices.title")}
               onClick={() => navigate("/settings/devices")}
             />
+
+            {/* Add Account */}
+            <SettingsItem
+              icon={<ColoredIcon colorKey="userplus"><UserPlus className="w-4 h-4" /></ColoredIcon>}
+              label={t("settings.addAccount") || "Add Account"}
+              onClick={() => {
+                // Save current account before adding new one
+                if (user) {
+                  const currentToken = localStorage.getItem('auth_token');
+                  if (currentToken) {
+                    saveCurrentAccount(user, currentToken);
+                  }
+                }
+                navigate("/auth/phone");
+              }}
+            />
+
+            {/* Switch Account */}
+            {accounts.length > 0 && (
+              <>
+                <button
+                  onClick={() => setIsAccountsExpanded(!isAccountsExpanded)}
+                  className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0">
+                      <ArrowLeftRight className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-foreground font-medium">
+                      {t("settings.switchAccount") || "Switch Account"}
+                    </span>
+                    <span className="h-5 px-1.5 rounded-full bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-1">
+                      <motion.div
+                        className="w-1.5 h-1.5 rounded-full bg-green-400"
+                        animate={{ opacity: [0.5, 1, 0.5], scale: [0.9, 1.1, 0.9] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                      {accounts.length}
+                    </span>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: isAccountsExpanded ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </motion.div>
+                </button>
+                <AnimatePresence initial={false}>
+                  {isAccountsExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                      className="overflow-hidden"
+                    >
+                      {accounts.map((account, index) => {
+                        const isCurrentUser = account.user.id === user?.id;
+                        return (
+                          <button
+                            key={account.id}
+                            onClick={() => {
+                              if (!isCurrentUser) {
+                                switchUser(account.user, account.token);
+                                toast.success(t("settings.switchedTo", { name: account.user.full_name }));
+                                navigate('/');
+                              }
+                            }}
+                            disabled={isCurrentUser}
+                            className={`w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 ${
+                              isCurrentUser ? 'bg-primary/5 cursor-default' : 'hover:bg-muted/50 active:bg-muted/70'
+                            }`}
+                          >
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage 
+                                src={account.user.avatar?.medium || account.user.avatar?.file} 
+                                alt={account.user.full_name} 
+                              />
+                              <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                                {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0 text-left">
+                              <p className="text-sm font-medium text-foreground truncate">
+                                {account.user.full_name}
+                              </p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {account.user.phone_number}
+                              </p>
+                            </div>
+                            {isCurrentUser && (
+                              <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
+            )}
           </AnimatedMenuSection>
         )}
 
@@ -1003,110 +1105,6 @@ const Settings = () => {
             onClick={openApofizWithAuth}
           />
         </AnimatedMenuSection>
-
-        {/* Add Account Button */}
-        <AnimatedMenuSection index={7}>
-          <SettingsItem
-            icon={<ColoredIcon colorKey="userplus"><UserPlus className="w-4 h-4" /></ColoredIcon>}
-            label={t("settings.addAccount") || "Add Account"}
-            onClick={() => {
-              // Save current account before adding new one
-              // Use explicit token to ensure we capture it before any navigation/state changes
-              if (user) {
-                const currentToken = localStorage.getItem('auth_token');
-                if (currentToken) {
-                  saveCurrentAccount(user, currentToken);
-                }
-              }
-              navigate("/auth/phone");
-            }}
-          />
-        </AnimatedMenuSection>
-
-        {/* Saved Accounts List - Collapsible */}
-        {accounts.length > 0 && (
-          <AnimatedMenuSection index={8}>
-            <button
-              onClick={() => setIsAccountsExpanded(!isAccountsExpanded)}
-              className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0">
-                  <ArrowLeftRight className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-foreground font-medium">
-                  {t("settings.switchAccount") || "Switch Account"}
-                </span>
-                <span className="h-5 px-1.5 rounded-full bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-1">
-                  <motion.div
-                    className="w-1.5 h-1.5 rounded-full bg-green-400"
-                    animate={{ opacity: [0.5, 1, 0.5], scale: [0.9, 1.1, 0.9] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  {accounts.length}
-                </span>
-              </div>
-              <motion.div
-                animate={{ rotate: isAccountsExpanded ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </motion.div>
-            </button>
-            <AnimatePresence initial={false}>
-              {isAccountsExpanded && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                  className="overflow-hidden"
-                >
-                  {accounts.map((account, index) => {
-                    const isCurrentUser = account.user.id === user?.id;
-                    return (
-                      <button
-                        key={account.id}
-                        onClick={() => {
-                          if (!isCurrentUser) {
-                            switchUser(account.user, account.token);
-                            toast.success(t("settings.switchedTo", { name: account.user.full_name }));
-                            navigate('/');
-                          }
-                        }}
-                        disabled={isCurrentUser}
-                        className={`w-full flex items-center gap-3 px-4 py-3 transition-colors border-t border-border/30 ${
-                          isCurrentUser ? 'bg-primary/5 cursor-default' : 'hover:bg-muted/50 active:bg-muted/70'
-                        }`}
-                      >
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage 
-                            src={account.user.avatar?.medium || account.user.avatar?.file} 
-                            alt={account.user.full_name} 
-                          />
-                          <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                            {account.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0 text-left">
-                          <p className="text-sm font-medium text-foreground truncate">
-                            {account.user.full_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {account.user.phone_number}
-                          </p>
-                        </div>
-                        {isCurrentUser && (
-                          <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </AnimatedMenuSection>
-        )}
 
         {/* Logout Button */}
         {isAuthenticated && (
