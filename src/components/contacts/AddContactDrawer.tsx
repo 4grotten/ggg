@@ -293,6 +293,30 @@ export const AddContactDrawer = ({
       exit={{ opacity: 0, x: 20 }}
       className="space-y-6 px-4 pb-8"
     >
+      {/* Avatar */}
+      <div className="flex justify-center pt-4">
+        <div className="relative">
+          <button onClick={handleAvatarClick} className="group relative">
+            <Avatar className="w-24 h-24 border-4 border-primary/20">
+              <AvatarImage src={avatarUrl || undefined} />
+              <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-primary/20 to-primary/10">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <Camera className="w-8 h-8 text-white" />
+            </div>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </div>
+      </div>
+
       {/* Scan Business Card Button - only show when adding new contact */}
       {!editContact && (
         <button
@@ -315,30 +339,6 @@ export const AddContactDrawer = ({
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </button>
       )}
-
-      {/* Avatar */}
-      <div className="flex justify-center pt-2">
-        <div className="relative">
-          <button onClick={handleAvatarClick} className="group relative">
-            <Avatar className="w-24 h-24 border-4 border-primary/20">
-              <AvatarImage src={avatarUrl || undefined} />
-              <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-primary/20 to-primary/10">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Camera className="w-8 h-8 text-white" />
-            </div>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </div>
-      </div>
 
       {/* Basic Info */}
       <div className="space-y-4">
