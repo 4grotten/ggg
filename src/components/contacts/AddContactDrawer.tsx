@@ -339,17 +339,21 @@ export const AddContactDrawer = ({
       className="space-y-6 px-4 pb-8"
     >
       {/* Avatar */}
-      <div className="flex justify-center pt-4">
+      <div className="flex justify-center pt-4 pb-2">
         <div className="relative">
-          <button onClick={handleAvatarClick} className="group relative">
-            <Avatar className="w-24 h-24 border-4 border-primary/20">
-              <AvatarImage src={avatarUrl || undefined} />
-              <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-primary/20 to-primary/10">
+          <button onClick={handleAvatarClick} className="relative group">
+            <Avatar className="w-28 h-28 ring-4 ring-background shadow-xl overflow-hidden">
+              <AvatarImage src={avatarUrl || undefined} className="object-cover" />
+              <AvatarFallback className="text-3xl font-bold bg-gradient-to-br from-primary/20 to-primary/10">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera className="w-8 h-8 text-white" />
+            </div>
+            {/* Edit badge */}
+            <div className="absolute bottom-0 right-0 w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background">
+              <Camera className="w-4 h-4 text-primary-foreground" />
             </div>
           </button>
           <input
