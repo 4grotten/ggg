@@ -22,7 +22,8 @@ import {
   Plus,
   ZoomIn,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Trash2
 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
@@ -226,7 +227,7 @@ export const ImageUploadDrawer = ({
                 </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5">
                 <AnimatePresence mode="popLayout">
                   {uploadedImages.map((img, index) => (
                     <motion.div
@@ -234,27 +235,27 @@ export const ImageUploadDrawer = ({
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="relative aspect-square rounded-xl overflow-hidden group cursor-pointer"
+                      className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
                       onClick={() => handleImageClick(index)}
                     >
                       <img
                         src={img.preview}
                         alt="Upload preview"
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform md:group-hover:scale-105"
                       />
-                      {/* Zoom overlay on hover */}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <ZoomIn className="w-6 h-6 text-white" />
+                      {/* Zoom overlay on hover - desktop only */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 md:group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center">
+                        <ZoomIn className="w-5 h-5 text-white" />
                       </div>
-                      {/* Delete button */}
+                      {/* Delete button - always visible on mobile, hover on desktop */}
                       <button
                         onClick={(e) => { e.stopPropagation(); handleRemoveImage(img.id); }}
-                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-red-500/90 flex items-center justify-center md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                       >
-                        <X className="w-4 h-4 text-white" />
+                        <Trash2 className="w-3 h-3 text-white" />
                       </button>
                       {/* Image number badge */}
-                      <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-[10px] font-medium text-white">
+                      <div className="absolute bottom-0.5 left-0.5 px-1 py-0.5 rounded bg-black/60 text-[8px] font-medium text-white">
                         {index + 1}
                       </div>
                     </motion.div>
