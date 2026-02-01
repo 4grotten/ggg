@@ -155,7 +155,7 @@ export const ImageUploadDrawer = ({
         <div className="p-4 space-y-4 overflow-y-auto max-h-[70vh]">
           {/* Instructions */}
           <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-white font-medium">
               {t("contacts.smartScanDescription")}
             </p>
           </div>
