@@ -1416,7 +1416,7 @@ export default function AdminPanel() {
                             >
                               <div className="flex flex-col gap-0.5">
                                 <span className="font-medium">{model.name}</span>
-                                <span className="text-xs leading-relaxed text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]">{model.description}</span>
+                                <span className="text-xs leading-relaxed text-orange-400">{model.description}</span>
                               </div>
                             </SelectItem>
                           ))}
