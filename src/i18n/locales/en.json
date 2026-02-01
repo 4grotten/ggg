@@ -1628,6 +1628,7 @@
     "name": "Name",
     "sendMessage": "Send Message",
     "viaSms": "via SMS",
+    "viaEmail": "via Email",
     "shareContact": "Share Contact",
     "shareContactDescription": "Send contact details"
   }

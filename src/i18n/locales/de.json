@@ -1539,6 +1539,7 @@
     "name": "Name",
     "sendMessage": "Nachricht senden",
     "viaSms": "per SMS",
+    "viaEmail": "per E-Mail",
     "shareContact": "Kontakt teilen",
     "shareContactDescription": "Kontaktdaten senden"
   }
