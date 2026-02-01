@@ -18,9 +18,7 @@ import {
   Share2,
   Sparkles,
   Star,
-  Zap,
-  MessageSquare,
-  X
+  Zap
 } from "lucide-react";
 import { SavedContact } from "@/types/contact";
 import { useSavedContacts } from "@/hooks/useSavedContacts";
@@ -57,38 +55,13 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
   const [searchQuery, setSearchQuery] = useState("");
   const [shareContact, setShareContact] = useState<SavedContact | null>(null);
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const [shareMenuContact, setShareMenuContact] = useState<SavedContact | null>(null);
 
   const handleShareClick = (e: React.MouseEvent, contact: SavedContact) => {
     e.stopPropagation();
     tap();
-    setShareMenuContact(contact);
-  };
-
-  const handleShareContact = () => {
-    tap();
-    if (shareMenuContact) {
-      setShareContact(shareMenuContact);
-      setIsShareOpen(true);
-    }
-    setShareMenuContact(null);
-  };
-
-  const handleSendMessage = () => {
-    tap();
-    if (shareMenuContact?.phone) {
-      // Open SMS or messaging app
-      window.location.href = `sms:${shareMenuContact.phone}`;
-    } else if (shareMenuContact?.email) {
-      // Fallback to email
-      window.location.href = `mailto:${shareMenuContact.email}`;
-    }
-    setShareMenuContact(null);
-  };
-
-  const closeShareMenu = () => {
-    tap();
-    setShareMenuContact(null);
+    // Open ShareContactDrawer directly
+    setShareContact(contact);
+    setIsShareOpen(true);
   };
 
   // Filter contacts by search
@@ -514,102 +487,6 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
             </div>
           </motion.div>
         ))}
-      </AnimatePresence>
-
-      {/* Share Menu Overlay */}
-      <AnimatePresence>
-        {shareMenuContact && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeShareMenu}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
-            />
-            
-            {/* Menu */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="fixed left-4 right-4 bottom-8 z-50 max-w-md mx-auto"
-            >
-              <div className="bg-background/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-border/50 overflow-hidden">
-                {/* Header */}
-                <div className="flex items-center gap-3 p-4 border-b border-border/30">
-                  <Avatar className="w-12 h-12 ring-2 ring-primary/20">
-                    <AvatarImage src={shareMenuContact.avatar_url || undefined} />
-                    <AvatarFallback className={cn(
-                      "text-sm font-bold text-white bg-gradient-to-br",
-                      getGradientByName(shareMenuContact.full_name)
-                    )}>
-                      {shareMenuContact.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold truncate">{shareMenuContact.full_name}</p>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {shareMenuContact.phone || shareMenuContact.email || shareMenuContact.company}
-                    </p>
-                  </div>
-                  <button
-                    onClick={closeShareMenu}
-                    className="p-2 rounded-full hover:bg-muted transition-colors"
-                  >
-                    <X className="w-5 h-5 text-muted-foreground" />
-                  </button>
-                </div>
-
-                {/* Actions */}
-                <div className="p-3 space-y-2">
-                  {/* Share Contact */}
-                  <button
-                    onClick={handleShareContact}
-                    className="w-full flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-purple-500/10 hover:from-primary/20 hover:to-purple-500/20 transition-all group"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
-                      <Share2 className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-semibold group-hover:text-primary transition-colors">
-                        {t("contacts.shareContact") || "Поделиться контактом"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {t("contacts.shareContactDescription") || "QR-код или vCard файл"}
-                      </p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </button>
-
-                  {/* Send Message */}
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={!shareMenuContact.phone && !shareMenuContact.email}
-                    className="w-full flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-green-500/5 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
-                      <MessageSquare className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-semibold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                        {t("contacts.sendMessage") || "Отправить сообщение"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {shareMenuContact.phone 
-                          ? (t("contacts.viaSms") || "Через SMS") 
-                          : (t("contacts.viaEmail") || "По email")}
-                      </p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-emerald-500 transition-colors" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
       </AnimatePresence>
 
       {/* Share Contact Drawer */}
