@@ -1440,7 +1440,7 @@ const Settings = () => {
         onBack={editingContact ? () => {
           setIsAddContactOpen(false);
           setEditingContact(null);
-          setIsContactsDrawerOpen(true);
+          setIsContactsListOpen(true);
         } : undefined}
       />
     </MobileLayout>
