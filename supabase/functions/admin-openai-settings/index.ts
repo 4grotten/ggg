@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // Available OpenAI models for vision/multimodal tasks
@@ -15,31 +15,72 @@ const AVAILABLE_MODELS = [
 ];
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Get authorization header
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
+    const { action, apiKey, model } = await req.json();
+    console.log(`Admin OpenAI settings action: ${action}`);
+
+    // For get-status, we don't need auth - just return public info
+    if (action === "get-status") {
+      const currentKey = Deno.env.get("OPENAI_API_KEY");
+      const hasKey = !!currentKey && currentKey.length > 0;
+      const maskedKey = hasKey ? `sk-...${currentKey.slice(-4)}` : null;
+
+      // Get current model from admin_settings using service role
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const { data: modelSetting } = await supabase
+        .from("admin_settings")
+        .select("value")
+        .eq("category", "integrations")
+        .eq("key", "openai_model")
+        .single();
+
+      // Convert model index to model ID
+      let currentModelId = "gpt-4o"; // default
+      if (modelSetting?.value !== undefined) {
+        const modelIndex = Number(modelSetting.value);
+        if (modelIndex >= 0 && modelIndex < AVAILABLE_MODELS.length) {
+          currentModelId = AVAILABLE_MODELS[modelIndex].id;
+        }
+      }
+
       return new Response(
-        JSON.stringify({ error: "No authorization header" }),
+        JSON.stringify({
+          hasKey,
+          maskedKey,
+          currentModel: currentModelId,
+          availableModels: AVAILABLE_MODELS,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // For other actions, verify admin role
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || authHeader === `Bearer ${supabaseAnonKey}`) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Verify user and check admin role
     const token = authHeader.replace("Bearer ", "");
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Get user from token
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
       return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
+        JSON.stringify({ error: "Invalid token" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -49,7 +90,7 @@ serve(async (req) => {
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
-      .in("role", ["admin"])
+      .eq("role", "admin")
       .single();
 
     if (!roleData) {
@@ -59,35 +100,7 @@ serve(async (req) => {
       );
     }
 
-    const { action, apiKey, model } = await req.json();
-    console.log(`Admin OpenAI settings action: ${action}`);
-
     switch (action) {
-      case "get-status": {
-        // Check if API key is configured
-        const currentKey = Deno.env.get("OPENAI_API_KEY");
-        const hasKey = !!currentKey && currentKey.length > 0;
-        const maskedKey = hasKey ? `sk-...${currentKey.slice(-4)}` : null;
-
-        // Get current model from admin_settings
-        const { data: modelSetting } = await supabase
-          .from("admin_settings")
-          .select("value")
-          .eq("category", "integrations")
-          .eq("key", "openai_model")
-          .single();
-
-        return new Response(
-          JSON.stringify({
-            hasKey,
-            maskedKey,
-            currentModel: modelSetting?.value || "gpt-4o",
-            availableModels: AVAILABLE_MODELS,
-          }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
       case "verify-key": {
         if (!apiKey) {
           return new Response(
@@ -122,6 +135,14 @@ serve(async (req) => {
           );
         }
 
+        const modelIndex = AVAILABLE_MODELS.findIndex(m => m.id === model);
+        if (modelIndex === -1) {
+          return new Response(
+            JSON.stringify({ error: "Invalid model" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
         // Check if setting exists
         const { data: existing } = await supabase
           .from("admin_settings")
@@ -135,25 +156,25 @@ serve(async (req) => {
           await supabase
             .from("admin_settings")
             .update({ 
-              value: AVAILABLE_MODELS.findIndex(m => m.id === model),
+              value: modelIndex,
               updated_by: user.id,
               updated_at: new Date().toISOString()
             })
             .eq("id", existing.id);
         } else {
-          // Insert new - store model index as numeric value
+          // Insert new
           await supabase
             .from("admin_settings")
             .insert({
               category: "integrations",
               key: "openai_model",
-              value: AVAILABLE_MODELS.findIndex(m => m.id === model),
+              value: modelIndex,
               description: "OpenAI model for contact extraction",
               updated_by: user.id,
             });
         }
 
-        console.log(`OpenAI model updated to: ${model}`);
+        console.log(`OpenAI model updated to: ${model} (index: ${modelIndex})`);
 
         return new Response(
           JSON.stringify({ success: true, model }),
