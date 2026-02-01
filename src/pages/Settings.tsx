@@ -1363,9 +1363,17 @@ const Settings = () => {
               transition={{ duration: 3, repeat: Infinity }}
               className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/5 to-pink-500/10 blur-xl"
             />
-            <DrawerTitle className="text-center text-xl font-bold relative z-10">
-              {t("settings.savedContacts") || "Сохранённые контакты"}
-            </DrawerTitle>
+            <div className="relative z-10 flex items-center justify-between">
+              <DrawerTitle className="text-xl font-bold">
+                {t("settings.savedContacts") || "Сохранённые контакты"}
+              </DrawerTitle>
+              <button
+                onClick={() => setIsContactsDrawerOpen(false)}
+                className="p-2 rounded-full hover:bg-muted transition-colors"
+              >
+                <X className="w-5 h-5 text-primary" />
+              </button>
+            </div>
           </DrawerHeader>
           <div className="px-4 pb-8 space-y-4">
             {/* My Contacts Button - Premium glassmorphism */}
