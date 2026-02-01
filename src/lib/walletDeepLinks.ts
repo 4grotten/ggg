@@ -15,6 +15,22 @@ export type WalletOpenResult = {
   reason?: 'embedded' | 'unsupported_platform' | 'failed';
 };
 
+export function getWalletDeepLink(): string | null {
+  const platform = detectPlatform();
+
+  if (platform === 'ios') {
+    // Wallet app
+    return 'shoebox://';
+  }
+
+  if (platform === 'android') {
+    // Prefer intent scheme (works only on Android)
+    return 'intent://pay#Intent;scheme=googlepay;package=com.google.android.apps.walletnfcrel;end';
+  }
+
+  return null;
+}
+
 /**
  * Detect the user's platform
  */
