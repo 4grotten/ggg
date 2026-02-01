@@ -1433,26 +1433,23 @@ const Settings = () => {
               }}
               className="w-full relative overflow-hidden rounded-2xl shadow-lg group"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 group-hover:from-emerald-400 group-hover:via-teal-400 group-hover:to-cyan-400 transition-all duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 group-hover:from-emerald-500 group-hover:via-teal-500 group-hover:to-cyan-500 transition-all duration-500" />
               <motion.div 
-                className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0"
+                className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
                 animate={{ x: ["-100%", "100%"] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "linear", repeatDelay: 0.5 }}
               />
               
               <div className="relative flex items-center justify-between py-5 px-4">
                 <div className="flex items-center gap-4">
-                  <motion.div 
-                    whileHover={{ rotate: -10, scale: 1.1 }}
-                    className="w-14 h-14 rounded-2xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30"
-                  >
-                    <UserPlus className="w-7 h-7 text-white drop-shadow" />
-                  </motion.div>
+                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30">
+                    <UserPlus className="w-7 h-7 text-white drop-shadow-md" />
+                  </div>
                   <div className="text-left">
-                    <span className="text-white font-bold text-lg block drop-shadow">
+                    <span className="text-white font-bold text-lg block" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.3)" }}>
                       {t("contacts.addContact") || "Добавить контакт"}
                     </span>
-                    <span className="text-white/80 text-sm">
+                    <span className="text-white font-medium text-sm" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.25)" }}>
                       {t("contacts.addContactDescription") || "Создать новый контакт или сканировать визитку"}
                     </span>
                   </div>
@@ -1461,7 +1458,7 @@ const Settings = () => {
                   animate={{ x: [0, 5, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <ChevronRight className="w-6 h-6 text-white/90" />
+                  <ChevronRight className="w-6 h-6 text-white" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }} />
                 </motion.div>
               </div>
             </motion.button>
