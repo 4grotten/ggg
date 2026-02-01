@@ -1369,7 +1369,7 @@ const Settings = () => {
               </DrawerTitle>
               <button
                 onClick={() => setIsContactsDrawerOpen(false)}
-                className="p-2 rounded-full hover:bg-muted transition-colors"
+                className="w-9 h-9 rounded-full bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors"
               >
                 <X className="w-5 h-5 text-primary" />
               </button>
