@@ -1627,6 +1627,7 @@
     "supportedFormats": "JPG, PNG, HEIC • Business cards, screenshots, QR codes",
     "name": "Name",
     "sendMessage": "Send Message",
+    "sendDataViaSms": "Send via SMS",
     "viaSms": "via SMS",
     "viaEmail": "via Email",
     "shareContact": "Share Contact",

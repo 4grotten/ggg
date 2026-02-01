@@ -558,29 +558,50 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
           <span className="font-medium">{t("contacts.showQrCode") || "Show QR Code"}</span>
         </button>
 
-        {/* Send Message button */}
-        {(contact?.phone || contact?.email) && (
-          <Button
-            onClick={() => {
-              tap();
-              if (contact?.phone) {
-                window.location.href = `sms:${contact.phone}`;
-              } else if (contact?.email) {
-                window.location.href = `mailto:${contact.email}`;
+        {/* Send data via SMS button */}
+        <Button
+          onClick={() => {
+            tap();
+            // Build contact text from selected fields
+            const selectedFields = shareFields.filter(f => f.checked);
+            const selectedSocials = (contact?.social_links || []).filter(link => socialChecked[link.id]);
+            const selectedPayments = (contact?.payment_methods || []).filter(pm => paymentChecked[pm.id]);
+
+            let contactText = `👤 ${contact?.full_name || ""}\n`;
+
+            selectedFields.forEach(field => {
+              if (field.id !== "name") {
+                contactText += `${field.label}: ${field.value}\n`;
               }
-            }}
-            variant="outline"
-            className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20"
-          >
-            <MessageSquare className="w-5 h-5 mr-2 text-emerald-500" />
-            <span className="flex-1 text-left">
-              {t("contacts.sendMessage")}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {contact?.phone ? t("contacts.viaSms") : t("contacts.viaEmail")}
-            </span>
-          </Button>
-        )}
+            });
+
+            if (selectedSocials.length > 0) {
+              contactText += `\n🔗 ${t("contacts.socialLinks")}:\n`;
+              selectedSocials.forEach(link => {
+                const platform = detectPlatform(link.url);
+                contactText += `${platform.name}: ${link.url}\n`;
+              });
+            }
+
+            if (selectedPayments.length > 0) {
+              contactText += `\n💳 ${t("contacts.paymentMethods")}:\n`;
+              selectedPayments.forEach(pm => {
+                contactText += `${pm.label}: ${pm.value}\n`;
+              });
+            }
+
+            // Open SMS with contact data as body
+            window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
+          }}
+          disabled={!hasAnySelection}
+          variant="outline"
+          className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20"
+        >
+          <MessageSquare className="w-5 h-5 mr-2 text-emerald-500" />
+          <span className="flex-1 text-left">
+            {t("contacts.sendDataViaSms")}
+          </span>
+        </Button>
 
         {/* Share and Download buttons */}
         <div className="flex gap-3">

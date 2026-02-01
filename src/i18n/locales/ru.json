@@ -1635,6 +1635,7 @@
     "vcardDownloaded": "Контакт скачан",
     "contact": "Контакт",
     "sendMessage": "Написать сообщение",
+    "sendDataViaSms": "Отправить сообщением",
     "viaSms": "через SMS",
     "viaEmail": "по Email"
   }

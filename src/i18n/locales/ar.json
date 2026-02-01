@@ -1538,6 +1538,7 @@
     "supportedFormats": "JPG، PNG، HEIC • بطاقات العمل، لقطات الشاشة، رموز QR",
     "name": "الاسم",
     "sendMessage": "إرسال رسالة",
+    "sendDataViaSms": "إرسال عبر الرسائل",
     "viaSms": "عبر الرسائل القصيرة",
     "viaEmail": "عبر البريد الإلكتروني",
     "shareContact": "مشاركة جهة الاتصال",

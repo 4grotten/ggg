@@ -1545,6 +1545,7 @@
     "supportedFormats": "JPG、PNG、HEIC • 名片、截图、二维码",
     "name": "姓名",
     "sendMessage": "发送消息",
+    "sendDataViaSms": "通过短信发送",
     "viaSms": "通过短信",
     "viaEmail": "通过邮件",
     "shareContact": "分享联系人",
