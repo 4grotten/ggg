@@ -5,7 +5,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -349,29 +348,12 @@ export const AddContactDrawer = ({
   };
 
   const renderMainView = () => (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      className="space-y-6 px-4 pb-8"
-    >
-      {/* Avatar - Premium style with animated glow */}
+    <div className="space-y-6 px-4 pb-8 animate-fade-in">
+      {/* Avatar - Premium style with CSS animated glow */}
       <div className="flex justify-center pt-6 pb-4">
-        <motion.div 
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 200 }}
-          className="relative"
-        >
-          {/* Animated glow ring */}
-          <motion.div
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.5, 0.8, 0.5]
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-            className="absolute inset-0 rounded-full bg-gradient-to-br from-primary via-purple-500 to-pink-500 blur-xl"
-          />
+        <div className="relative animate-scale-in">
+          {/* Animated glow ring - CSS animation */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary via-purple-500 to-pink-500 blur-xl animate-pulse-slow" />
           
           <button onClick={handleAvatarClick} className="relative group">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/50 via-purple-500/50 to-pink-500/50 blur-md opacity-60" />
@@ -381,20 +363,13 @@ export const AddContactDrawer = ({
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <motion.div 
-              whileHover={{ opacity: 1 }}
-              initial={{ opacity: 0 }}
-              className="absolute inset-0 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity"
-            >
+            <div className="absolute inset-0 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
               <Camera className="w-10 h-10 text-white drop-shadow-lg" />
-            </motion.div>
+            </div>
             {/* Floating camera badge */}
-            <motion.div 
-              whileHover={{ scale: 1.1, rotate: 10 }}
-              className="absolute -bottom-1 -right-1 w-11 h-11 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center shadow-xl border-3 border-background"
-            >
+            <div className="absolute -bottom-1 -right-1 w-11 h-11 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center shadow-xl border-3 border-background hover:scale-110 hover:rotate-6 transition-transform duration-200">
               <Camera className="w-5 h-5 text-white" />
-            </motion.div>
+            </div>
           </button>
           <input
             ref={fileInputRef}
@@ -403,58 +378,35 @@ export const AddContactDrawer = ({
             className="hidden"
             onChange={handleFileChange}
           />
-        </motion.div>
+        </div>
       </div>
 
-      {/* Smart Scan Button - Premium animated style */}
+      {/* Smart Scan Button - CSS animated style */}
       {!editContact && (
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={() => {
             tap();
             setIsImageUploadOpen(true);
           }}
-          className="w-full relative overflow-hidden rounded-2xl shadow-lg group"
+          className="w-full relative overflow-hidden rounded-2xl shadow-lg group active:scale-[0.98] transition-transform duration-150"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600" />
-          <motion.div 
-            className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0"
-            animate={{ x: ["-100%", "100%"] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "linear", repeatDelay: 0.5 }}
-          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 animate-shimmer" />
           <div className="relative flex items-center gap-4 p-4">
-            <motion.div 
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30"
-            >
-              <Sparkles className="w-6 h-6 text-white" />
-            </motion.div>
+            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30">
+              <Sparkles className="w-6 h-6 text-white animate-spin-slow" />
+            </div>
             <div className="flex-1 text-left">
               <p className="font-bold text-white text-lg drop-shadow">{t("settings.scanBusinessCard")}</p>
               <p className="text-sm text-white/80">{t("settings.scanBusinessCardDescription")}</p>
             </div>
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              <ChevronRight className="w-6 h-6 text-white/80" />
-            </motion.div>
+            <ChevronRight className="w-6 h-6 text-white/80 animate-bounce-x" />
           </div>
-        </motion.button>
+        </button>
       )}
 
       {/* Basic Info - Premium glassmorphism inputs */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="space-y-4"
-      >
+      <div className="space-y-4">
         {/* Form section header */}
         <div className="flex items-center gap-3 px-1">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-purple-500/10 flex items-center justify-center">
@@ -468,12 +420,9 @@ export const AddContactDrawer = ({
         
         <div className="space-y-3">
           {/* Name input */}
-          <motion.div 
-            whileFocus={{ scale: 1.01 }}
-            className="relative group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-purple-500/5 to-pink-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity blur-lg" />
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors overflow-hidden">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-purple-500/5 to-pink-500/10 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 blur-lg" />
+            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-primary/10 to-transparent flex items-center justify-center">
                 <User className="w-5 h-5 text-primary/70" />
               </div>
@@ -484,11 +433,11 @@ export const AddContactDrawer = ({
                 className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base font-medium"
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Phone input */}
           <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors overflow-hidden">
+            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-emerald-500/10 to-transparent flex items-center justify-center">
                 <Phone className="w-5 h-5 text-emerald-600/70" />
               </div>
@@ -504,7 +453,7 @@ export const AddContactDrawer = ({
 
           {/* Email input */}
           <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors overflow-hidden">
+            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-blue-500/10 to-transparent flex items-center justify-center">
                 <Mail className="w-5 h-5 text-blue-600/70" />
               </div>
@@ -520,7 +469,7 @@ export const AddContactDrawer = ({
 
           {/* Company input */}
           <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors overflow-hidden">
+            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-amber-600/70" />
               </div>
@@ -535,7 +484,7 @@ export const AddContactDrawer = ({
 
           {/* Position input */}
           <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors overflow-hidden">
+            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-violet-500/10 to-transparent flex items-center justify-center">
                 <Briefcase className="w-5 h-5 text-violet-600/70" />
               </div>
@@ -550,7 +499,7 @@ export const AddContactDrawer = ({
 
           {/* Notes textarea */}
           <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors overflow-hidden">
+            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
               <div className="absolute left-0 top-0 w-12 h-14 bg-gradient-to-r from-rose-500/10 to-transparent flex items-center justify-center">
                 <StickyNote className="w-5 h-5 text-rose-600/70" />
               </div>
@@ -563,30 +512,22 @@ export const AddContactDrawer = ({
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Social Links Button - Premium style */}
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
+      {/* Social Links Button - CSS optimized */}
+      <button
         onClick={() => { tap(); setCurrentView("socials"); }}
-        className="w-full relative overflow-hidden rounded-2xl group"
+        className="w-full relative overflow-hidden rounded-2xl group active:scale-[0.98] transition-all duration-150"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-muted/80 via-muted/60 to-muted/40 backdrop-blur-xl" />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute inset-0 ring-1 ring-inset ring-border/50 group-hover:ring-primary/30 rounded-2xl transition-all" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 ring-1 ring-inset ring-border/50 group-hover:ring-primary/30 rounded-2xl transition-all duration-200" />
         
         <div className="relative flex items-center justify-between p-4">
           <div className="flex items-center gap-4">
-            <motion.div 
-              whileHover={{ rotate: 10, scale: 1.1 }}
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg"
-            >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-105 group-hover:rotate-3 transition-transform duration-200">
               <Link2 className="w-6 h-6 text-white" />
-            </motion.div>
+            </div>
             <div className="text-left">
               <p className="font-semibold text-foreground">{t("contacts.socialLinks")}</p>
               <p className="text-sm text-muted-foreground">
@@ -596,37 +537,24 @@ export const AddContactDrawer = ({
               </p>
             </div>
           </div>
-          <motion.div
-            animate={{ x: [0, 4, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <ChevronRight className="w-5 h-5 text-primary" />
-          </motion.div>
+          <ChevronRight className="w-5 h-5 text-primary animate-bounce-x" />
         </div>
-      </motion.button>
+      </button>
 
-      {/* Payment Methods Button - Premium style */}
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
+      {/* Payment Methods Button - CSS optimized */}
+      <button
         onClick={() => { tap(); setCurrentView("payments"); }}
-        className="w-full relative overflow-hidden rounded-2xl group"
+        className="w-full relative overflow-hidden rounded-2xl group active:scale-[0.98] transition-all duration-150"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-muted/80 via-muted/60 to-muted/40 backdrop-blur-xl" />
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute inset-0 ring-1 ring-inset ring-border/50 group-hover:ring-emerald-500/30 rounded-2xl transition-all" />
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 ring-1 ring-inset ring-border/50 group-hover:ring-emerald-500/30 rounded-2xl transition-all duration-200" />
         
         <div className="relative flex items-center justify-between p-4">
           <div className="flex items-center gap-4">
-            <motion.div 
-              whileHover={{ rotate: -10, scale: 1.1 }}
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 flex items-center justify-center shadow-lg"
-            >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 flex items-center justify-center shadow-lg group-hover:scale-105 group-hover:-rotate-3 transition-transform duration-200">
               <CreditCard className="w-6 h-6 text-white" />
-            </motion.div>
+            </div>
             <div className="text-left">
               <p className="font-semibold text-foreground">{t("contacts.paymentMethods")}</p>
               <p className="text-sm text-muted-foreground">
@@ -636,29 +564,19 @@ export const AddContactDrawer = ({
               </p>
             </div>
           </div>
-          <motion.div
-            animate={{ x: [0, 4, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-          >
-            <ChevronRight className="w-5 h-5 text-emerald-600" />
-          </motion.div>
+          <ChevronRight className="w-5 h-5 text-emerald-600 animate-bounce-x" />
         </div>
-      </motion.button>
+      </button>
 
-      {/* Delete Button (for edit mode) - Premium style */}
+      {/* Delete Button (for edit mode) - CSS optimized */}
       {editContact && (
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={handleDelete}
           disabled={isDeleting}
-          className="w-full relative overflow-hidden rounded-2xl group"
+          className="w-full relative overflow-hidden rounded-2xl group active:scale-[0.98] transition-all duration-150"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-destructive/10 via-destructive/5 to-transparent" />
-          <div className="absolute inset-0 ring-1 ring-inset ring-destructive/20 group-hover:ring-destructive/40 rounded-2xl transition-all" />
+          <div className="absolute inset-0 ring-1 ring-inset ring-destructive/20 group-hover:ring-destructive/40 rounded-2xl transition-all duration-200" />
           
           <div className="relative flex items-center justify-center gap-3 p-4 text-destructive">
             {isDeleting ? (
@@ -668,25 +586,17 @@ export const AddContactDrawer = ({
             )}
             <span className="font-semibold">{t("contacts.deleteContact")}</span>
           </div>
-        </motion.button>
+        </button>
       )}
 
-      {/* Save Button - Premium gradient style */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-      >
+      {/* Save Button - CSS gradient style */}
+      <div>
         <Button
           onClick={handleSave}
           disabled={isSaving || !fullName.trim()}
           className="w-full h-14 rounded-2xl text-lg font-bold bg-gradient-to-r from-primary via-purple-600 to-primary hover:from-primary/90 hover:via-purple-600/90 hover:to-primary/90 shadow-xl relative overflow-hidden group"
         >
-          <motion.div 
-            className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
-            animate={{ x: ["-100%", "100%"] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
-          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 animate-shimmer" />
           <span className="relative flex items-center gap-2">
             {isSaving ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -696,32 +606,22 @@ export const AddContactDrawer = ({
             {editContact ? t("common.save") : t("contacts.addContact")}
           </span>
         </Button>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 
   const renderSocialsView = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="px-4 pb-8"
-    >
+    <div className="px-4 pb-8 animate-fade-in">
       <SocialLinksInput
         links={socialLinks}
         onChange={setSocialLinks}
         placeholder={t("contacts.pasteSocialLink")}
       />
-    </motion.div>
+    </div>
   );
 
   const renderPaymentsView = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="space-y-4 px-4 pb-8"
-    >
+    <div className="space-y-4 px-4 pb-8 animate-fade-in">
       {/* Section header */}
       <div className="flex items-center gap-3 px-1 mb-2">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center">
@@ -733,27 +633,20 @@ export const AddContactDrawer = ({
         <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
       </div>
       
-      {/* Existing payments - Premium cards */}
-      <AnimatePresence mode="popLayout">
-        {paymentMethods.map((payment, index) => (
-          <motion.div
+      {/* Existing payments - CSS optimized cards */}
+      <div className="space-y-3">
+        {paymentMethods.map((payment) => (
+          <div
             key={payment.id}
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -50, scale: 0.95 }}
-            transition={{ delay: index * 0.05, type: "spring" }}
-            className="relative overflow-hidden rounded-2xl group"
+            className="relative overflow-hidden rounded-2xl group animate-fade-in"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-muted/80 via-muted/60 to-muted/40 backdrop-blur-xl" />
             <div className="absolute inset-0 ring-1 ring-inset ring-border/50 rounded-2xl" />
             
             <div className="relative flex items-center gap-4 p-4">
-              <motion.div 
-                whileHover={{ rotate: 5, scale: 1.1 }}
-                className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg"
-              >
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-lg group-hover:scale-105 group-hover:rotate-3 transition-transform duration-200">
                 {getPaymentIcon(payment.type)}
-              </motion.div>
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-foreground">{payment.label}</p>
                 <p className="text-sm text-muted-foreground truncate">
@@ -765,40 +658,31 @@ export const AddContactDrawer = ({
                   )}
                 </p>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.2, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
+              <button
                 onClick={() => handleRemovePayment(payment.id)}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all opacity-0 group-hover:opacity-100"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-110 hover:rotate-90 transition-all duration-200 opacity-0 group-hover:opacity-100"
               >
                 <X className="w-5 h-5" />
-              </motion.button>
+              </button>
             </div>
-          </motion.div>
+          </div>
         ))}
-      </AnimatePresence>
+      </div>
 
-      {/* Add payment button - Premium dashed style */}
-      <motion.button
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
+      {/* Add payment button - CSS optimized dashed style */}
+      <button
         onClick={() => { tap(); setIsPaymentDrawerOpen(true); }}
-        className="w-full relative overflow-hidden rounded-2xl group"
+        className="w-full relative overflow-hidden rounded-2xl group active:scale-[0.98] transition-all duration-150"
       >
-        <div className="absolute inset-0 border-2 border-dashed border-border group-hover:border-primary/50 rounded-2xl transition-colors" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-0 border-2 border-dashed border-border group-hover:border-primary/50 rounded-2xl transition-colors duration-200" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        <div className="relative flex items-center justify-center gap-3 p-5 text-muted-foreground group-hover:text-primary transition-colors">
-          <motion.div
-            animate={{ rotate: [0, 180, 360] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-          >
-            <Plus className="w-6 h-6" />
-          </motion.div>
+        <div className="relative flex items-center justify-center gap-3 p-5 text-muted-foreground group-hover:text-primary transition-colors duration-200">
+          <Plus className="w-6 h-6 animate-spin-slow" />
           <span className="font-semibold">{t("contacts.addPaymentMethod")}</span>
         </div>
-      </motion.button>
-    </motion.div>
+      </button>
+    </div>
   );
 
   const getTitle = () => {
@@ -835,11 +719,9 @@ export const AddContactDrawer = ({
           </DrawerHeader>
 
           <div className="overflow-y-auto max-h-[80vh]">
-            <AnimatePresence mode="wait">
-              {currentView === "main" && renderMainView()}
-              {currentView === "socials" && renderSocialsView()}
-              {currentView === "payments" && renderPaymentsView()}
-            </AnimatePresence>
+            {currentView === "main" && renderMainView()}
+            {currentView === "socials" && renderSocialsView()}
+            {currentView === "payments" && renderPaymentsView()}
           </div>
         </DrawerContent>
       </Drawer>
