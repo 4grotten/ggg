@@ -439,7 +439,8 @@
     "hapticDisabled": "Vibration disabled",
     "savedContacts": "Saved Contacts",
     "addContact": "Add Contact",
-    "scanBusinessCard": "Scan Business Card",
+    "scanBusinessCard": "Scan Business Card or Upload Photo",
+    "scanBusinessCardDescription": "Auto-fill from QR code or image",
     "devices": {
       "title": "Active Devices",
       "noDevices": "No active devices",

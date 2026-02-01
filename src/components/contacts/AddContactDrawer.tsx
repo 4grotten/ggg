@@ -333,8 +333,8 @@ export const AddContactDrawer = ({
             <ScanLine className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 text-left">
-            <p className="font-medium text-foreground">{t("settings.scanBusinessCard") || "Scan Business Card"}</p>
-            <p className="text-sm text-muted-foreground">{t("contacts.scanDescription") || "Auto-fill from QR code"}</p>
+            <p className="font-medium text-foreground">{t("settings.scanBusinessCard")}</p>
+            <p className="text-sm text-muted-foreground">{t("settings.scanBusinessCardDescription")}</p>
           </div>
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </button>
