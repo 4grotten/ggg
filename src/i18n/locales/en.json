@@ -1625,6 +1625,8 @@
     "rateLimitError": "Too many requests. Try again later.",
     "creditsError": "AI credits exhausted. Please add funds.",
     "supportedFormats": "JPG, PNG, HEIC • Business cards, screenshots, QR codes",
-    "name": "Name"
+    "name": "Name",
+    "sendMessage": "Send Message",
+    "viaSms": "via SMS"
   }
 }

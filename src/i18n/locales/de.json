@@ -1536,6 +1536,8 @@
     "rateLimitError": "Zu viele Anfragen. Versuchen Sie es später erneut.",
     "creditsError": "KI-Credits aufgebraucht. Bitte aufladen.",
     "supportedFormats": "JPG, PNG, HEIC • Visitenkarten, Screenshots, QR-Codes",
-    "name": "Name"
+    "name": "Name",
+    "sendMessage": "Nachricht senden",
+    "viaSms": "per SMS"
   }
 }

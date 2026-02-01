@@ -1536,6 +1536,8 @@
     "rateLimitError": "Çok fazla istek. Daha sonra tekrar deneyin.",
     "creditsError": "Yapay zeka kredileri tükendi. Lütfen bakiye ekleyin.",
     "supportedFormats": "JPG, PNG, HEIC • Kartvizitler, ekran görüntüleri, QR kodları",
-    "name": "İsim"
+    "name": "İsim",
+    "sendMessage": "Mesaj Gönder",
+    "viaSms": "SMS ile"
   }
 }

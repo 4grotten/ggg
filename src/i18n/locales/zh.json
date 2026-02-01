@@ -1543,6 +1543,8 @@
     "rateLimitError": "请求过多。请稍后再试。",
     "creditsError": "AI积分已用完。请充值。",
     "supportedFormats": "JPG、PNG、HEIC • 名片、截图、二维码",
-    "name": "姓名"
+    "name": "姓名",
+    "sendMessage": "发送消息",
+    "viaSms": "通过短信"
   }
 }
