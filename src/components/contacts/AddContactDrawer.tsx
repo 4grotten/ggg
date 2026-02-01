@@ -27,7 +27,8 @@ import {
   Check,
   Trash2,
   Link2,
-  Plus
+  Plus,
+  ScanLine
 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
@@ -292,8 +293,31 @@ export const AddContactDrawer = ({
       exit={{ opacity: 0, x: 20 }}
       className="space-y-6 px-4 pb-8"
     >
+      {/* Scan Business Card Button - only show when adding new contact */}
+      {!editContact && (
+        <button
+          onClick={() => {
+            tap();
+            toast.info(t("common.comingSoon") || "Coming soon");
+          }}
+          className="w-full flex items-center gap-4 p-4 bg-muted/50 rounded-2xl hover:bg-muted/70 transition-colors"
+        >
+          <div 
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)" }}
+          >
+            <ScanLine className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="font-medium text-foreground">{t("settings.scanBusinessCard") || "Scan Business Card"}</p>
+            <p className="text-sm text-muted-foreground">{t("contacts.scanDescription") || "Auto-fill from QR code"}</p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
+      )}
+
       {/* Avatar */}
-      <div className="flex justify-center pt-4">
+      <div className="flex justify-center pt-2">
         <div className="relative">
           <button onClick={handleAvatarClick} className="group relative">
             <Avatar className="w-24 h-24 border-4 border-primary/20">

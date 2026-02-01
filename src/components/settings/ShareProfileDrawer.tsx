@@ -703,24 +703,6 @@ Easy Card UAE`;
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   </button>
-                  <button
-                    onClick={() => {
-                      tap();
-                      toast.info(t("common.comingSoon") || "Coming soon");
-                    }}
-                    className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors border-t border-border/30"
-                  >
-                    <div 
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)" }}
-                    >
-                      <ScanLine className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-medium">{t("settings.scanBusinessCard") || "Scan Business Card"}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                  </button>
                 </div>
 
                 {/* Cards Section */}
