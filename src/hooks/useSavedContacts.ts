@@ -15,6 +15,130 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Json } from '@/integrations/supabase/types';
 
+// Mock contacts for demo purposes
+const MOCK_CONTACTS: SavedContact[] = [
+  {
+    id: 'mock-1',
+    user_id: 'demo',
+    full_name: 'Александр Петров',
+    phone: '+971 50 123 4567',
+    email: 'alex.petrov@gmail.com',
+    company: 'Dubai Tech Solutions',
+    position: 'CEO',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    notes: 'Партнёр по бизнесу, встреча каждый понедельник',
+    payment_methods: [
+      { id: 'pm-1', type: 'card', label: 'Visa Card', value: '4532 8721 4563 7823' },
+      { id: 'pm-2', type: 'crypto', label: 'USDT TRC20', value: 'TJYxBLjN5gKPxTdMjrKPfpXUPe5BYUj9kD', network: 'trc20' }
+    ],
+    social_links: [
+      { id: 'sl-1', networkId: 'telegram', networkName: 'Telegram', url: 'https://t.me/alexpetrov' },
+      { id: 'sl-2', networkId: 'linkedin', networkName: 'LinkedIn', url: 'https://linkedin.com/in/alexpetrov' }
+    ],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'mock-2',
+    user_id: 'demo',
+    full_name: 'Мария Иванова',
+    phone: '+971 55 987 6543',
+    email: 'maria.ivanova@company.ae',
+    company: 'Emirates Finance',
+    position: 'CFO',
+    avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face',
+    notes: 'Финансовый консультант',
+    payment_methods: [
+      { id: 'pm-3', type: 'iban', label: 'UAE IBAN', value: 'AE07 0331 2345 6789 0123 456' }
+    ],
+    social_links: [
+      { id: 'sl-3', networkId: 'instagram', networkName: 'Instagram', url: 'https://instagram.com/maria_ivanova' }
+    ],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'mock-3',
+    user_id: 'demo',
+    full_name: 'Ahmed Al-Rashid',
+    phone: '+971 52 555 8899',
+    email: 'ahmed@rashid-group.ae',
+    company: 'Rashid Investment Group',
+    position: 'Managing Director',
+    avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    notes: 'Инвестор, интересуется криптопроектами',
+    payment_methods: [
+      { id: 'pm-4', type: 'crypto', label: 'BTC', value: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', network: 'btc' },
+      { id: 'pm-5', type: 'crypto', label: 'ETH', value: '0x742d35Cc6634C0532925a3b844Bc9e7595f1B2d1', network: 'erc20' }
+    ],
+    social_links: [
+      { id: 'sl-4', networkId: 'twitter', networkName: 'X (Twitter)', url: 'https://x.com/ahmedrashid' }
+    ],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'mock-4',
+    user_id: 'demo',
+    full_name: 'Елена Смирнова',
+    phone: '+7 925 123 4567',
+    email: 'elena.smirnova@yandex.ru',
+    company: 'Yandex',
+    position: 'Product Manager',
+    avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    notes: 'Контакт из Москвы, работает удалённо',
+    payment_methods: [
+      { id: 'pm-6', type: 'card', label: 'MasterCard', value: '5412 9087 6543 3456' }
+    ],
+    social_links: [
+      { id: 'sl-5', networkId: 'telegram', networkName: 'Telegram', url: 'https://t.me/elena_sm' },
+      { id: 'sl-6', networkId: 'vk', networkName: 'VK', url: 'https://vk.com/elena_smirnova' }
+    ],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'mock-5',
+    user_id: 'demo',
+    full_name: 'John Smith',
+    phone: '+1 555 123 4567',
+    email: 'john.smith@techstartup.io',
+    company: 'TechStartup Inc.',
+    position: 'CTO',
+    avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+    notes: 'Американский партнёр, разница во времени -8 часов',
+    payment_methods: [
+      { id: 'pm-7', type: 'paypal', label: 'PayPal', value: 'john.smith@techstartup.io' },
+      { id: 'pm-8', type: 'crypto', label: 'USDC ERC20', value: '0x852d35Cc6634C0532925a3b844Bc9e7595f1C3e2', network: 'erc20' }
+    ],
+    social_links: [
+      { id: 'sl-7', networkId: 'github', networkName: 'GitHub', url: 'https://github.com/johnsmith' },
+      { id: 'sl-8', networkId: 'linkedin', networkName: 'LinkedIn', url: 'https://linkedin.com/in/johnsmith' }
+    ],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'mock-6',
+    user_id: 'demo',
+    full_name: 'Fatima Hassan',
+    phone: '+971 56 777 8888',
+    email: 'fatima@hassan-law.ae',
+    company: 'Hassan & Partners Law Firm',
+    position: 'Senior Partner',
+    avatar_url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face',
+    notes: 'Юридический консультант по вопросам ОАЭ',
+    payment_methods: [
+      { id: 'pm-9', type: 'iban', label: 'Business IBAN', value: 'AE12 0456 7890 1234 5678 901' }
+    ],
+    social_links: [
+      { id: 'sl-9', networkId: 'whatsapp', networkName: 'WhatsApp', url: 'https://wa.me/971567778888' }
+    ],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
+
 export const useSavedContacts = () => {
   const { t } = useTranslation();
   const [contacts, setContacts] = useState<SavedContact[]>([]);
@@ -59,7 +183,12 @@ export const useSavedContacts = () => {
         social_links: (contact.social_links as unknown as ContactSocialLink[]) || [],
       }));
 
-      setContacts(parsedContacts);
+      // Combine real contacts with mock contacts for demo
+      const allContacts = [...parsedContacts, ...MOCK_CONTACTS].sort((a, b) => 
+        a.full_name.localeCompare(b.full_name)
+      );
+
+      setContacts(allContacts);
     } catch (err: any) {
       console.error('Failed to fetch contacts:', err);
       setError(err.message);
