@@ -46,6 +46,7 @@ interface AddContactDrawerProps {
   onClose: () => void;
   editContact?: SavedContact | null;
   onSaved?: (contact: SavedContact) => void;
+  onBack?: () => void;
 }
 
 type ViewType = "main" | "socials" | "payments";
@@ -54,7 +55,8 @@ export const AddContactDrawer = ({
   isOpen, 
   onClose, 
   editContact,
-  onSaved 
+  onSaved,
+  onBack
 }: AddContactDrawerProps) => {
   const { t } = useTranslation();
   const { tap } = useHapticFeedback();
@@ -606,9 +608,10 @@ export const AddContactDrawer = ({
         <DrawerContent className="max-h-[95vh]">
           <DrawerHeader className="border-b border-border/50">
             <div className="flex items-center">
-              {currentView !== "main" && (
+              {/* Back button - show when in subview OR when editing contact in main view */}
+              {(currentView !== "main" || (currentView === "main" && editContact && onBack)) && (
                 <button
-                  onClick={handleBack}
+                  onClick={currentView !== "main" ? handleBack : onBack}
                   className="mr-3 w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
                 >
                   <ChevronRight className="w-5 h-5 rotate-180" />
