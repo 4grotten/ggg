@@ -373,11 +373,11 @@ const CardPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Subtle glow overlay */}
+            {/* Bright glow overlay */}
             <div 
-              className="absolute inset-0 opacity-30 pointer-events-none"
+              className="absolute inset-0 pointer-events-none"
               style={{
-                background: 'radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 60%)',
+                background: 'radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.6) 0%, rgba(99, 102, 241, 0.3) 40%, transparent 70%)',
               }}
             />
             <div className="flex items-center gap-3 relative z-10">
