@@ -1465,6 +1465,22 @@
     "updateError": "Error al actualizar contacto",
     "deleteError": "Error al eliminar contacto",
     "avatarUploadError": "Error al subir foto",
-    "saveError": "Error al guardar contacto"
+    "saveError": "Error al guardar contacto",
+    "smartScan": "Escaneo inteligente",
+    "smartScanDescription": "Sube capturas de perfiles, tarjetas de visita o imágenes con datos de contacto. La IA extraerá automáticamente nombres, números de tarjeta, billeteras cripto y redes sociales.",
+    "uploadImages": "Subir fotos",
+    "takePhoto": "Tomar foto",
+    "uploadedImages": "Subidas: {{count}}",
+    "noImagesSelected": "Selecciona imágenes",
+    "analyzing": "Analizando...",
+    "extracting": "Extrayendo datos...",
+    "extractData": "Extraer datos",
+    "extractionSuccess": "{{count}} campos encontrados: {{fields}}",
+    "extractionError": "Error al procesar imágenes",
+    "noDataExtracted": "No se encontraron datos de contacto",
+    "rateLimitError": "Demasiadas solicitudes. Intenta más tarde.",
+    "creditsError": "Créditos de IA agotados. Recarga tu saldo.",
+    "supportedFormats": "JPG, PNG, HEIC • Tarjetas de visita, capturas, códigos QR",
+    "name": "Nombre"
   }
 }

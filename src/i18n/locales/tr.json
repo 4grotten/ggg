@@ -1465,6 +1465,22 @@
     "updateError": "Kişi güncellenemedi",
     "deleteError": "Kişi silinemedi",
     "avatarUploadError": "Fotoğraf yüklenemedi",
-    "saveError": "Kişi kaydedilemedi"
+    "saveError": "Kişi kaydedilemedi",
+    "smartScan": "Akıllı Tarama",
+    "smartScanDescription": "Profil ekran görüntüleri, kartvizitler veya iletişim bilgileri içeren resimler yükleyin. Yapay zeka otomatik olarak isimleri, kart numaralarını, kripto cüzdanlarını ve sosyal bağlantıları çıkaracaktır.",
+    "uploadImages": "Fotoğraf Yükle",
+    "takePhoto": "Fotoğraf Çek",
+    "uploadedImages": "Yüklendi: {{count}}",
+    "noImagesSelected": "Resim seçin",
+    "analyzing": "Analiz ediliyor...",
+    "extracting": "Veriler çıkarılıyor...",
+    "extractData": "Verileri Çıkar",
+    "extractionSuccess": "{{count}} alan bulundu: {{fields}}",
+    "extractionError": "Resimler işlenemedi",
+    "noDataExtracted": "İletişim verisi bulunamadı",
+    "rateLimitError": "Çok fazla istek. Daha sonra tekrar deneyin.",
+    "creditsError": "Yapay zeka kredileri tükendi. Lütfen bakiye ekleyin.",
+    "supportedFormats": "JPG, PNG, HEIC • Kartvizitler, ekran görüntüleri, QR kodları",
+    "name": "İsim"
   }
 }

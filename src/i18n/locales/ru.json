@@ -24,7 +24,9 @@
     "dismiss": "Отклонить",
     "share": "Поделиться",
     "copy": "Скопировать",
-    "comingSoon": "Скоро будет доступно"
+    "comingSoon": "Скоро будет доступно",
+    "addMore": "Добавить ещё",
+    "save": "Сохранить"
   },
   "dashboard": {
     "greeting": "Привет, {{name}}!",
@@ -1548,6 +1550,22 @@
       "walletValue": "user@email.com",
       "paypalLabel": "Например: Мой PayPal",
       "paypalValue": "email@example.com"
-    }
+    },
+    "smartScan": "Умное сканирование",
+    "smartScanDescription": "Загрузите скриншоты профилей, визитки или любые изображения с контактными данными. AI автоматически извлечёт имя, номера карт, крипто-кошельки и соцсети.",
+    "uploadImages": "Выбрать фото",
+    "takePhoto": "Сделать фото",
+    "uploadedImages": "Загружено: {{count}}",
+    "noImagesSelected": "Выберите изображения",
+    "analyzing": "Анализируем...",
+    "extracting": "Извлекаем данные...",
+    "extractData": "Извлечь данные",
+    "extractionSuccess": "Найдено {{count}} полей: {{fields}}",
+    "extractionError": "Не удалось обработать изображения",
+    "noDataExtracted": "Не удалось найти контактные данные",
+    "rateLimitError": "Слишком много запросов. Попробуйте позже.",
+    "creditsError": "Закончились кредиты AI. Пополните баланс.",
+    "supportedFormats": "JPG, PNG, HEIC • Визитки, скриншоты, QR-коды",
+    "name": "Имя"
   }
 }

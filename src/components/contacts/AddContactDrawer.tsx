@@ -28,7 +28,7 @@ import {
   Trash2,
   Link2,
   Plus,
-  ScanLine
+  Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
@@ -37,6 +37,8 @@ import { SavedContact, PaymentMethod, ContactSocialLink } from "@/types/contact"
 import { SocialLinksInput, SocialLink } from "@/components/settings/SocialLinksInput";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { PaymentMethodDrawer } from "./PaymentMethodDrawer";
+import { ImageUploadDrawer } from "./ImageUploadDrawer";
+import { ExtractedContactData } from "@/hooks/useContactExtraction";
 import { cn } from "@/lib/utils";
 
 interface AddContactDrawerProps {
@@ -82,6 +84,9 @@ export const AddContactDrawer = ({
 
   // Payment drawer state
   const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
+
+  // Image upload drawer state
+  const [isImageUploadOpen, setIsImageUploadOpen] = useState(false);
 
   // Avatar crop
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
@@ -173,6 +178,32 @@ export const AddContactDrawer = ({
   const handleRemovePayment = (id: string) => {
     tap();
     setPaymentMethods(prev => prev.filter(p => p.id !== id));
+  };
+
+  // Handle extracted contact data from AI
+  const handleExtractedData = (data: ExtractedContactData) => {
+    if (data.full_name) setFullName(data.full_name);
+    if (data.phone) setPhone(data.phone);
+    if (data.email) setEmail(data.email);
+    if (data.company) setCompany(data.company);
+    if (data.position) setPosition(data.position);
+    if (data.notes) setNotes(data.notes);
+    
+    // Set payment methods
+    if (data.payment_methods && data.payment_methods.length > 0) {
+      setPaymentMethods(prev => [...prev, ...data.payment_methods!]);
+    }
+    
+    // Convert and set social links
+    if (data.social_links && data.social_links.length > 0) {
+      const links: SocialLink[] = data.social_links.map(link => ({
+        id: link.id,
+        url: link.url,
+        networkId: link.networkId,
+        networkName: link.networkName,
+      }));
+      setSocialLinks(prev => [...prev, ...links]);
+    }
   };
 
   const handleSave = async () => {
@@ -317,20 +348,20 @@ export const AddContactDrawer = ({
         </div>
       </div>
 
-      {/* Scan Business Card Button - only show when adding new contact */}
+      {/* Smart Scan Button - only show when adding new contact */}
       {!editContact && (
         <button
           onClick={() => {
             tap();
-            toast.info(t("common.comingSoon") || "Coming soon");
+            setIsImageUploadOpen(true);
           }}
-          className="w-full flex items-center gap-4 p-4 bg-muted/50 rounded-2xl hover:bg-muted/70 transition-colors"
+          className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl hover:from-primary/15 hover:to-primary/10 transition-colors border border-primary/20"
         >
           <div 
             className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)" }}
+            style={{ background: "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)" }}
           >
-            <ScanLine className="w-5 h-5 text-white" />
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 text-left">
             <p className="font-medium text-foreground">{t("settings.scanBusinessCard")}</p>
@@ -596,6 +627,12 @@ export const AddContactDrawer = ({
         isOpen={isPaymentDrawerOpen}
         onClose={() => setIsPaymentDrawerOpen(false)}
         onAdd={handleAddPaymentMethod}
+      />
+
+      <ImageUploadDrawer
+        isOpen={isImageUploadOpen}
+        onClose={() => setIsImageUploadOpen(false)}
+        onExtracted={handleExtractedData}
       />
     </>
   );
