@@ -898,6 +898,15 @@ const Settings = () => {
               label={t("settings.limitsSettings") || "Limits Settings"}
               onClick={() => navigate("/limits-settings")}
             />
+
+            {/* Admin Panel - only for admins */}
+            {isAdmin && (
+              <SettingsItem
+                icon={<ColoredIcon colorKey="admin"><ShieldCheck className="w-4 h-4" /></ColoredIcon>}
+                label={t("settings.adminPanel") || "Административная панель"}
+                onClick={() => setIsAdminPasswordDialogOpen(true)}
+              />
+            )}
           </AnimatedMenuSection>
         )}
 
@@ -953,13 +962,6 @@ const Settings = () => {
             label={t("settings.apiDocumentation")}
             onClick={() => navigate("/settings/api")}
           />
-          {isAdmin && (
-            <SettingsItem
-              icon={<ColoredIcon colorKey="admin"><ShieldCheck className="w-4 h-4" /></ColoredIcon>}
-              label={t("settings.adminPanel") || "Административная панель"}
-              onClick={() => setIsAdminPasswordDialogOpen(true)}
-            />
-          )}
         </AnimatedMenuSection>
 
         {/* Support & Legal */}
