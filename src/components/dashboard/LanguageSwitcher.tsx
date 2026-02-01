@@ -10,15 +10,15 @@ import {
 } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 
-const getLanguages = (t: (key: string) => string) => [
-  { code: "system", name: t("settings.languages.system"), flag: "🌐" },
-  { code: "ru", name: t("settings.languages.russian"), flag: "🇷🇺" },
-  { code: "en", name: t("settings.languages.english"), flag: "🇺🇸" },
-  { code: "de", name: t("settings.languages.german"), flag: "🇩🇪" },
-  { code: "tr", name: t("settings.languages.turkish"), flag: "🇹🇷" },
-  { code: "zh", name: t("settings.languages.chinese"), flag: "🇨🇳" },
-  { code: "ar", name: t("settings.languages.arabic"), flag: "🇦🇪" },
-  { code: "es", name: t("settings.languages.spanish"), flag: "🇪🇸" },
+const languages = [
+  { code: "system", name: "System", flag: "🌐" },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "tr", name: "Türkçe", flag: "🇹🇷" },
+  { code: "zh", name: "中文", flag: "🇨🇳" },
+  { code: "ar", name: "العربية", flag: "🇦🇪" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
 ];
 
 export const LanguageSwitcher = () => {
@@ -28,7 +28,7 @@ export const LanguageSwitcher = () => {
     localStorage.getItem("language") || "system"
   );
 
-  const languages = getLanguages(t);
+  
   const currentLang = languages.find((l) => l.code === selectedLanguage) || 
     languages.find((l) => l.code === i18n.language) || 
     languages[2]; // Default to English
