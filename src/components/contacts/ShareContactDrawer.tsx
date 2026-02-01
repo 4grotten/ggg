@@ -584,8 +584,19 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
               });
             }
 
-            // Open SMS with contact data as body
-            window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
+            // Use Web Share API to open system share menu
+            if (navigator.share) {
+              navigator.share({
+                title: contact?.full_name || t("contacts.contactData"),
+                text: contactText,
+              }).catch(() => {
+                // User cancelled or share failed, fallback to SMS
+                window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
+              });
+            } else {
+              // Fallback for browsers without Web Share API
+              window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
+            }
           }}
           disabled={!hasAnySelection}
           variant="outline"
