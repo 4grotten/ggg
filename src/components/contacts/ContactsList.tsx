@@ -14,11 +14,14 @@ import {
   Building2,
   ChevronRight,
   UserPlus,
-  Users
+  Users,
+  Share2
 } from "lucide-react";
 import { SavedContact } from "@/types/contact";
 import { useSavedContacts } from "@/hooks/useSavedContacts";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { cn } from "@/lib/utils";
+import { ShareContactDrawer } from "./ShareContactDrawer";
 
 interface ContactsListProps {
   onContactClick: (contact: SavedContact) => void;
@@ -28,7 +31,17 @@ interface ContactsListProps {
 export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) => {
   const { t } = useTranslation();
   const { contacts, isLoading } = useSavedContacts();
+  const { tap } = useHapticFeedback();
   const [searchQuery, setSearchQuery] = useState("");
+  const [shareContact, setShareContact] = useState<SavedContact | null>(null);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
+  const handleShareClick = (e: React.MouseEvent, contact: SavedContact) => {
+    e.stopPropagation();
+    tap();
+    setShareContact(contact);
+    setIsShareOpen(true);
+  };
 
   // Filter contacts by search
   const filteredContacts = useMemo(() => {
@@ -143,54 +156,74 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
             {/* Contacts in group */}
             <div className="space-y-1">
               {groupContacts.map((contact, index) => (
-                <motion.button
+                <motion.div
                   key={contact.id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.03 }}
-                  onClick={() => onContactClick(contact)}
-                  className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/50 transition-colors text-left"
+                  className="flex items-center gap-2"
                 >
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={contact.avatar_url || undefined} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-sm font-medium">
-                      {getInitials(contact.full_name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <button
+                    onClick={() => onContactClick(contact)}
+                    className="flex-1 flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/50 transition-colors text-left"
+                  >
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={contact.avatar_url || undefined} />
+                      <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-sm font-medium">
+                        {getInitials(contact.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground truncate">
-                      {contact.full_name}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      {contact.company && (
-                        <span className="flex items-center gap-1 truncate">
-                          <Building2 className="w-3 h-3" />
-                          {contact.company}
-                        </span>
-                      )}
-                      {!contact.company && contact.phone && (
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          {contact.phone}
-                        </span>
-                      )}
-                      {!contact.company && !contact.phone && contact.email && (
-                        <span className="flex items-center gap-1 truncate">
-                          <Mail className="w-3 h-3" />
-                          {contact.email}
-                        </span>
-                      )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground truncate">
+                        {contact.full_name}
+                      </p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        {contact.company && (
+                          <span className="flex items-center gap-1 truncate">
+                            <Building2 className="w-3 h-3" />
+                            {contact.company}
+                          </span>
+                        )}
+                        {!contact.company && contact.phone && (
+                          <span className="flex items-center gap-1">
+                            <Phone className="w-3 h-3" />
+                            {contact.phone}
+                          </span>
+                        )}
+                        {!contact.company && !contact.phone && contact.email && (
+                          <span className="flex items-center gap-1 truncate">
+                            <Mail className="w-3 h-3" />
+                            {contact.email}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </motion.button>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </button>
+
+                  {/* Share button */}
+                  <button
+                    onClick={(e) => handleShareClick(e, contact)}
+                    className="p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
+                    title={t("common.share")}
+                  >
+                    <Share2 className="w-5 h-5 text-muted-foreground" />
+                  </button>
+                </motion.div>
               ))}
             </div>
           </motion.div>
         ))}
       </AnimatePresence>
+
+      {/* Share Contact Drawer */}
+      <ShareContactDrawer
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        contact={shareContact}
+      />
     </div>
   );
 };
