@@ -808,7 +808,7 @@ Easy Card UAE`;
                   </div>
                 </motion.div>
 
-                {/* Action Buttons with CSS Animated Gradients */}
+                {/* Action Buttons - Solid Blue with Subtle Glow */}
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -818,10 +818,7 @@ Easy Card UAE`;
                   <button
                     onClick={handleShareBusinessCard}
                     disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
-                    className="flex-1 flex items-center justify-center gap-3 py-4 px-6 text-white rounded-2xl font-semibold shadow-[0_10px_25px_-5px_rgba(59,130,246,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(59,130,246,0.5)] hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100 animate-gradient-shift"
-                    style={{
-                      background: "linear-gradient(-45deg, #3b82f6, #1e40af, #7c3aed, #2563eb)"
-                    }}
+                    className="flex-1 flex items-center justify-center gap-3 py-4 px-6 bg-primary text-primary-foreground rounded-2xl font-semibold shadow-[0_4px_14px_-3px_rgba(59,130,246,0.3)] hover:shadow-[0_6px_20px_-3px_rgba(59,130,246,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100"
                   >
                     <Share2 className="w-5 h-5" />
                     <span>{t("common.share")}</span>
@@ -832,11 +829,7 @@ Easy Card UAE`;
                       setCurrentView("businessCardQR");
                     }}
                     disabled={businessCardFields.filter(f => f.checked).length === 0 && Object.values(socialChecked).filter(Boolean).length === 0}
-                    className="flex items-center justify-center gap-2 py-4 px-5 text-white rounded-2xl font-semibold shadow-[0_8px_20px_-5px_rgba(59,130,246,0.35)] hover:shadow-[0_12px_25px_-5px_rgba(59,130,246,0.45)] hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 animate-gradient-shift"
-                    style={{
-                      background: "linear-gradient(-45deg, #1e40af, #3b82f6, #6366f1, #2563eb)",
-                      animationDelay: "0.5s"
-                    }}
+                    className="flex items-center justify-center gap-2 py-4 px-5 bg-primary text-primary-foreground rounded-2xl font-semibold shadow-[0_4px_14px_-3px_rgba(59,130,246,0.3)] hover:shadow-[0_6px_20px_-3px_rgba(59,130,246,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     <QrCode className="w-5 h-5" />
                     <span className="text-sm">{t("share.qr")}</span>
