@@ -1452,6 +1452,33 @@
       "active": "Aktiv",
       "activeMultiple": "Aktiv",
       "perMinute": "/Min"
+    },
+    "system": {
+      "title": "Systemeinstellungen",
+      "description": "Allgemeine Systemparameter",
+      "maintenance": "Wartungsmodus",
+      "maintenanceDesc": "Benutzerzugang vorübergehend deaktivieren",
+      "registration": "Neue Benutzerregistrierung",
+      "registrationDesc": "Erstellung neuer Konten erlauben",
+      "kyc": "Obligatorische Verifizierung (KYC)",
+      "kycDesc": "KYC für alle Operationen erforderlich",
+      "twoFactor": "Zwei-Faktor-Authentifizierung",
+      "twoFactorDesc": "2FA für alle Benutzer erforderlich",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "optional": "Optional"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Systembenachrichtigungs-Einstellungen",
+      "email": "E-Mail-Benachrichtigungen",
+      "emailDesc": "Benachrichtigungen per E-Mail senden",
+      "push": "Push-Benachrichtigungen",
+      "pushDesc": "Mobile Push-Benachrichtigungen",
+      "sms": "SMS-Benachrichtigungen",
+      "smsDesc": "Kritische SMS-Benachrichtigungen",
+      "enabledMultiple": "Aktiviert",
+      "disabledMultiple": "Deaktiviert"
     }
   },
   "contacts": {

@@ -1459,6 +1459,33 @@
       "active": "已激活",
       "activeMultiple": "已激活",
       "perMinute": "/分钟"
+    },
+    "system": {
+      "title": "系统设置",
+      "description": "通用系统参数",
+      "maintenance": "维护模式",
+      "maintenanceDesc": "临时禁用用户访问",
+      "registration": "新用户注册",
+      "registrationDesc": "允许创建新账户",
+      "kyc": "强制验证 (KYC)",
+      "kycDesc": "所有操作需要 KYC",
+      "twoFactor": "双因素认证",
+      "twoFactorDesc": "所有用户需要 2FA",
+      "enabled": "已启用",
+      "disabled": "已禁用",
+      "optional": "可选"
+    },
+    "notifications": {
+      "title": "通知",
+      "description": "系统通知设置",
+      "email": "邮件通知",
+      "emailDesc": "通过邮件发送通知",
+      "push": "推送通知",
+      "pushDesc": "移动推送通知",
+      "sms": "短信通知",
+      "smsDesc": "关键短信通知",
+      "enabledMultiple": "已启用",
+      "disabledMultiple": "已禁用"
     }
   },
   "contacts": {

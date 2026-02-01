@@ -1452,6 +1452,33 @@
       "active": "نشط",
       "activeMultiple": "نشط",
       "perMinute": "/دقيقة"
+    },
+    "system": {
+      "title": "إعدادات النظام",
+      "description": "معلمات النظام العامة",
+      "maintenance": "وضع الصيانة",
+      "maintenanceDesc": "تعطيل وصول المستخدمين مؤقتاً",
+      "registration": "تسجيل مستخدمين جدد",
+      "registrationDesc": "السماح بإنشاء حسابات جديدة",
+      "kyc": "التحقق الإلزامي (KYC)",
+      "kycDesc": "يتطلب KYC لجميع العمليات",
+      "twoFactor": "المصادقة الثنائية",
+      "twoFactorDesc": "يتطلب 2FA لجميع المستخدمين",
+      "enabled": "مفعل",
+      "disabled": "معطل",
+      "optional": "اختياري"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "description": "إعدادات إشعارات النظام",
+      "email": "إشعارات البريد الإلكتروني",
+      "emailDesc": "إرسال إشعارات عبر البريد",
+      "push": "الإشعارات الفورية",
+      "pushDesc": "إشعارات الجوال الفورية",
+      "sms": "إشعارات SMS",
+      "smsDesc": "إشعارات SMS الحرجة",
+      "enabledMultiple": "مفعلة",
+      "disabledMultiple": "معطلة"
     }
   },
   "contacts": {
