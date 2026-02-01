@@ -41,12 +41,18 @@ export function useOpenAISettings() {
       setStatus({
         hasKey: false,
         maskedKey: null,
-        currentModel: "gpt-4o",
+        currentModel: "google/gemini-3-flash-preview",
         availableModels: [
-          { id: "gpt-4o", name: "GPT-4o", description: "Новейшая мультимодальная модель" },
-          { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Быстрая и экономичная" },
-          { id: "gpt-4-turbo", name: "GPT-4 Turbo", description: "Предыдущее поколение" },
-          { id: "gpt-4-vision-preview", name: "GPT-4 Vision", description: "Специализирована для изображений" },
+          { id: "openai/gpt-5", name: "GPT-5", description: "Мощный универсал. $15/1M input, $60/1M output" },
+          { id: "openai/gpt-5-mini", name: "GPT-5 Mini", description: "Золотая середина. $3/1M input, $12/1M output" },
+          { id: "openai/gpt-5-nano", name: "GPT-5 Nano", description: "Скорость и экономия. $0.50/1M input, $2/1M output" },
+          { id: "openai/gpt-5.2", name: "GPT-5.2", description: "Новейшая модель OpenAI. $20/1M input, $80/1M output" },
+          { id: "google/gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "Топ Gemini. $7/1M input, $21/1M output" },
+          { id: "google/gemini-3-pro-preview", name: "Gemini 3 Pro Preview", description: "Следующее поколение. $10/1M input, $30/1M output" },
+          { id: "google/gemini-3-flash-preview", name: "Gemini 3 Flash Preview", description: "Быстрый и качественный. $0.15/1M input, $0.60/1M output" },
+          { id: "google/gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Баланс цена/качество. $0.15/1M input, $0.60/1M output" },
+          { id: "google/gemini-2.5-flash-lite", name: "Gemini 2.5 Flash Lite", description: "Самый дешёвый. $0.075/1M input, $0.30/1M output" },
+          { id: "google/gemini-3-pro-image-preview", name: "Gemini 3 Pro Image", description: "Генерация изображений. $5/1M input, $15/1M output" },
         ],
       });
     } finally {
