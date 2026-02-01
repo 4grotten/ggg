@@ -1539,6 +1539,7 @@
     "name": "İsim",
     "sendMessage": "Mesaj Gönder",
     "viaSms": "SMS ile",
+    "viaEmail": "E-posta ile",
     "shareContact": "Kişiyi Paylaş",
     "shareContactDescription": "Kişi bilgilerini gönder"
   }

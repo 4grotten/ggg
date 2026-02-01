@@ -1539,6 +1539,7 @@
     "name": "الاسم",
     "sendMessage": "إرسال رسالة",
     "viaSms": "عبر الرسائل القصيرة",
+    "viaEmail": "عبر البريد الإلكتروني",
     "shareContact": "مشاركة جهة الاتصال",
     "shareContactDescription": "إرسال بيانات جهة الاتصال"
   }

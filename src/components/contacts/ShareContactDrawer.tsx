@@ -40,6 +40,7 @@ import {
   Users,
   Video,
   Download,
+  MessageSquare,
   LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
@@ -556,6 +557,30 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
           <QrCode className="w-5 h-5" />
           <span className="font-medium">{t("contacts.showQrCode") || "Show QR Code"}</span>
         </button>
+
+        {/* Send Message button */}
+        {(contact?.phone || contact?.email) && (
+          <Button
+            onClick={() => {
+              tap();
+              if (contact?.phone) {
+                window.location.href = `sms:${contact.phone}`;
+              } else if (contact?.email) {
+                window.location.href = `mailto:${contact.email}`;
+              }
+            }}
+            variant="outline"
+            className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20"
+          >
+            <MessageSquare className="w-5 h-5 mr-2 text-emerald-500" />
+            <span className="flex-1 text-left">
+              {t("contacts.sendMessage")}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {contact?.phone ? t("contacts.viaSms") : t("contacts.viaEmail")}
+            </span>
+          </Button>
+        )}
 
         {/* Share and Download buttons */}
         <div className="flex gap-3">

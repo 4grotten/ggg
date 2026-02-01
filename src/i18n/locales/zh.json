@@ -1546,6 +1546,7 @@
     "name": "姓名",
     "sendMessage": "发送消息",
     "viaSms": "通过短信",
+    "viaEmail": "通过邮件",
     "shareContact": "分享联系人",
     "shareContactDescription": "发送联系人信息"
   }
