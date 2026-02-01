@@ -785,25 +785,8 @@ const EditProfile = () => {
                 )}
               />
 
-              {/* Change Password Button */}
+              {/* Social Links & Password Buttons */}
               <div className="pt-2 space-y-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetPasswordForm();
-                    setIsPasswordDrawerOpen(true);
-                  }}
-                  className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Lock className="w-5 h-5 text-primary" />
-                    </div>
-                    <span className="text-foreground font-medium">{t("editProfile.changePassword.title")}</span>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </button>
-
                 {/* Social Links Button */}
                 <button
                   type="button"
@@ -830,6 +813,24 @@ const EditProfile = () => {
                     )}
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
+                </button>
+
+                {/* Change Password Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetPasswordForm();
+                    setIsPasswordDrawerOpen(true);
+                  }}
+                  className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Lock className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="text-foreground font-medium">{t("editProfile.changePassword.title")}</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </button>
               </div>
             </form>
