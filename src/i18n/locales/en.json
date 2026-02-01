@@ -1522,6 +1522,33 @@
     "updateError": "Failed to update contact",
     "deleteError": "Failed to delete contact",
     "avatarUploadError": "Failed to upload photo",
-    "saveError": "Failed to save contact"
+    "saveError": "Failed to save contact",
+    "selectPaymentType": "Select payment type",
+    "selectNetwork": "Select network",
+    "enterDetails": "Enter details",
+    "paymentTypes": {
+      "card": "Bank Card",
+      "cardSubtitle": "Visa, Mastercard, UnionPay",
+      "iban": "IBAN / Account",
+      "ibanSubtitle": "International transfer",
+      "crypto": "Cryptocurrency",
+      "cryptoSubtitle": "BTC, ETH, USDT...",
+      "wallet": "E-Wallet",
+      "walletSubtitle": "PayPal, Skrill, Payoneer",
+      "paypal": "PayPal",
+      "paypalSubtitle": "Quick transfers"
+    },
+    "placeholders": {
+      "cardLabel": "e.g., My Visa Card",
+      "cardValue": "0000 0000 0000 0000",
+      "ibanLabel": "e.g., My Bank Account",
+      "ibanValue": "AE07 0331 0234 0012 3456 789",
+      "cryptoLabel": "e.g., Bitcoin Wallet",
+      "cryptoValue": "bc1qxy2kgdygjrsq...",
+      "walletLabel": "e.g., Payoneer",
+      "walletValue": "user@email.com",
+      "paypalLabel": "e.g., My PayPal",
+      "paypalValue": "email@example.com"
+    }
   }
 }
