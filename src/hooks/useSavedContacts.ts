@@ -141,7 +141,8 @@ const MOCK_CONTACTS: SavedContact[] = [
 
 export const useSavedContacts = () => {
   const { t } = useTranslation();
-  const [contacts, setContacts] = useState<SavedContact[]>([]);
+  // Initialize with mock contacts so they're always visible
+  const [contacts, setContacts] = useState<SavedContact[]>(MOCK_CONTACTS);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -163,7 +164,11 @@ export const useSavedContacts = () => {
 
   // Fetch all contacts
   const fetchContacts = useCallback(async () => {
-    if (!userId) return;
+    if (!userId) {
+      // Even without auth, show mock contacts
+      setContacts(MOCK_CONTACTS);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
