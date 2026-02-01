@@ -19,7 +19,6 @@ import {
   Building2, 
   Briefcase, 
   StickyNote,
-  Plus,
   X,
   ChevronRight,
   CreditCard,
@@ -27,14 +26,16 @@ import {
   Loader2,
   Check,
   Trash2,
-  Link2
+  Link2,
+  Plus
 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useSavedContacts } from "@/hooks/useSavedContacts";
-import { SavedContact, PaymentMethod, ContactSocialLink, PAYMENT_METHOD_TYPES, CRYPTO_NETWORKS } from "@/types/contact";
+import { SavedContact, PaymentMethod, ContactSocialLink } from "@/types/contact";
 import { SocialLinksInput, SocialLink } from "@/components/settings/SocialLinksInput";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
+import { PaymentMethodDrawer } from "./PaymentMethodDrawer";
 import { cn } from "@/lib/utils";
 
 interface AddContactDrawerProps {
@@ -44,7 +45,7 @@ interface AddContactDrawerProps {
   onSaved?: (contact: SavedContact) => void;
 }
 
-type ViewType = "main" | "socials" | "payments" | "addPayment";
+type ViewType = "main" | "socials" | "payments";
 
 export const AddContactDrawer = ({ 
   isOpen, 
@@ -78,11 +79,8 @@ export const AddContactDrawer = ({
   // Payment methods
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
-  // Add payment form
-  const [newPaymentType, setNewPaymentType] = useState<PaymentMethod["type"]>("card");
-  const [newPaymentLabel, setNewPaymentLabel] = useState("");
-  const [newPaymentValue, setNewPaymentValue] = useState("");
-  const [newPaymentNetwork, setNewPaymentNetwork] = useState("");
+  // Payment drawer state
+  const [isPaymentDrawerOpen, setIsPaymentDrawerOpen] = useState(false);
 
   // Avatar crop
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
@@ -125,14 +123,6 @@ export const AddContactDrawer = ({
     setSocialLinks([]);
     setPaymentMethods([]);
     setCurrentView("main");
-    resetPaymentForm();
-  };
-
-  const resetPaymentForm = () => {
-    setNewPaymentType("card");
-    setNewPaymentLabel("");
-    setNewPaymentValue("");
-    setNewPaymentNetwork("");
   };
 
   const handleClose = () => {
@@ -141,12 +131,11 @@ export const AddContactDrawer = ({
   };
 
   const handleBack = () => {
-    if (currentView === "addPayment") {
-      setCurrentView("payments");
-      resetPaymentForm();
-    } else {
-      setCurrentView("main");
-    }
+    setCurrentView("main");
+  };
+
+  const handleAddPaymentMethod = (payment: PaymentMethod) => {
+    setPaymentMethods(prev => [...prev, payment]);
   };
 
   const handleAvatarClick = () => {
@@ -178,27 +167,6 @@ export const AddContactDrawer = ({
     const blob = await response.blob();
     const croppedFile = new File([blob], 'contact-avatar.jpg', { type: 'image/jpeg' });
     setAvatarFile(croppedFile);
-  };
-
-  const handleAddPayment = () => {
-    tap();
-    if (!newPaymentLabel.trim() || !newPaymentValue.trim()) {
-      toast.error(t("contacts.paymentFieldsRequired"));
-      return;
-    }
-
-    const newPayment: PaymentMethod = {
-      id: `payment-${Date.now()}`,
-      type: newPaymentType,
-      label: newPaymentLabel.trim(),
-      value: newPaymentValue.trim(),
-      network: newPaymentType === "crypto" ? newPaymentNetwork : undefined,
-    };
-
-    setPaymentMethods(prev => [...prev, newPayment]);
-    setCurrentView("payments");
-    resetPaymentForm();
-    toast.success(t("contacts.paymentAdded"));
   };
 
   const handleRemovePayment = (id: string) => {
@@ -542,7 +510,7 @@ export const AddContactDrawer = ({
 
       {/* Add payment button */}
       <button
-        onClick={() => { tap(); setCurrentView("addPayment"); }}
+        onClick={() => { tap(); setIsPaymentDrawerOpen(true); }}
         className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-2xl hover:bg-muted/50 transition-colors text-muted-foreground"
       >
         <Plus className="w-5 h-5" />
@@ -551,96 +519,10 @@ export const AddContactDrawer = ({
     </motion.div>
   );
 
-  const renderAddPaymentView = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="space-y-4 px-4 pb-8"
-    >
-      {/* Payment type selector */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">{t("contacts.paymentType")}</label>
-        <div className="grid grid-cols-3 gap-2">
-          {PAYMENT_METHOD_TYPES.map(type => (
-            <button
-              key={type.value}
-              onClick={() => { tap(); setNewPaymentType(type.value as PaymentMethod["type"]); }}
-              className={cn(
-                "p-3 rounded-xl border-2 transition-all text-sm font-medium",
-                newPaymentType === type.value
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border hover:border-primary/50"
-              )}
-            >
-              {type.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Crypto network selector */}
-      {newPaymentType === "crypto" && (
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">{t("contacts.network")}</label>
-          <div className="grid grid-cols-2 gap-2">
-            {CRYPTO_NETWORKS.map(network => (
-              <button
-                key={network.value}
-                onClick={() => { tap(); setNewPaymentNetwork(network.value); }}
-                className={cn(
-                  "p-3 rounded-xl border-2 transition-all text-sm",
-                  newPaymentNetwork === network.value
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border hover:border-primary/50"
-                )}
-              >
-                {network.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Label input */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">{t("contacts.paymentLabel")}</label>
-        <Input
-          value={newPaymentLabel}
-          onChange={e => setNewPaymentLabel(e.target.value)}
-          placeholder={t("contacts.paymentLabelPlaceholder")}
-          className="h-12 rounded-xl"
-        />
-      </div>
-
-      {/* Value input */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">{t("contacts.paymentValue")}</label>
-        <Input
-          value={newPaymentValue}
-          onChange={e => setNewPaymentValue(e.target.value)}
-          placeholder={t("contacts.paymentValuePlaceholder")}
-          className="h-12 rounded-xl"
-        />
-      </div>
-
-      {/* Add button */}
-      <Button
-        onClick={handleAddPayment}
-        disabled={!newPaymentLabel.trim() || !newPaymentValue.trim()}
-        className="w-full h-12 rounded-xl"
-      >
-        <Plus className="w-5 h-5 mr-2" />
-        {t("contacts.addPaymentMethod")}
-      </Button>
-    </motion.div>
-  );
-
   const getTitle = () => {
     switch (currentView) {
       case "socials": return t("contacts.socialLinks");
       case "payments": return t("contacts.paymentMethods");
-      case "addPayment": return t("contacts.addPaymentMethod");
       default: return editContact ? t("contacts.editContact") : t("contacts.addContact");
     }
   };
@@ -674,7 +556,6 @@ export const AddContactDrawer = ({
               {currentView === "main" && renderMainView()}
               {currentView === "socials" && renderSocialsView()}
               {currentView === "payments" && renderPaymentsView()}
-              {currentView === "addPayment" && renderAddPaymentView()}
             </AnimatePresence>
           </div>
         </DrawerContent>
@@ -685,6 +566,12 @@ export const AddContactDrawer = ({
         onOpenChange={setIsCropDialogOpen}
         imageSrc={cropImageSrc || ""}
         onCropComplete={handleCropComplete}
+      />
+
+      <PaymentMethodDrawer
+        isOpen={isPaymentDrawerOpen}
+        onClose={() => setIsPaymentDrawerOpen(false)}
+        onAdd={handleAddPaymentMethod}
       />
     </>
   );

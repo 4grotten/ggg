@@ -1520,6 +1520,33 @@
     "updateError": "Не удалось обновить контакт",
     "deleteError": "Не удалось удалить контакт",
     "avatarUploadError": "Не удалось загрузить фото",
-    "saveError": "Не удалось сохранить контакт"
+    "saveError": "Не удалось сохранить контакт",
+    "selectPaymentType": "Выберите тип платежа",
+    "selectNetwork": "Выберите сеть",
+    "enterDetails": "Введите данные",
+    "paymentTypes": {
+      "card": "Банковская карта",
+      "cardSubtitle": "Visa, Mastercard, Мир",
+      "iban": "IBAN / Счёт",
+      "ibanSubtitle": "Международный перевод",
+      "crypto": "Криптовалюта",
+      "cryptoSubtitle": "BTC, ETH, USDT...",
+      "wallet": "Электронный кошелёк",
+      "walletSubtitle": "PayPal, Skrill, Payoneer",
+      "paypal": "PayPal",
+      "paypalSubtitle": "Быстрые переводы"
+    },
+    "placeholders": {
+      "cardLabel": "Например: Сбербанк Visa",
+      "cardValue": "0000 0000 0000 0000",
+      "ibanLabel": "Например: Мой счёт в банке",
+      "ibanValue": "AE07 0331 0234 0012 3456 789",
+      "cryptoLabel": "Например: Bitcoin кошелёк",
+      "cryptoValue": "bc1qxy2kgdygjrsq...",
+      "walletLabel": "Например: Payoneer",
+      "walletValue": "user@email.com",
+      "paypalLabel": "Например: Мой PayPal",
+      "paypalValue": "email@example.com"
+    }
   }
 }
