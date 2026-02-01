@@ -542,6 +542,7 @@
     "addToApplePay": "Add to Apple Pay",
     "addToGooglePay": "Add to Google Pay",
     "walletDesktopHint": "Open the app on your phone to add the card to your wallet",
+    "walletPreviewHint": "Deep links may not open in the preview. Open the published app on your phone and try again",
     "number": "Card Number",
     "holder": "Card Holder",
     "expiry": "Expiry",

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
-import { openWallet, detectPlatform, getWalletName, isWalletSupported } from "@/lib/walletDeepLinks";
+import { openWallet, detectPlatform } from "@/lib/walletDeepLinks";
 import {
   Collapsible,
   CollapsibleContent,
@@ -144,12 +144,15 @@ const MetalCard = () => {
 
   const handleOpenWallet = () => {
     const result = openWallet();
-    
+
     if (!result.success) {
-      // Show instruction for desktop users
-      toast.info(t('card.walletDesktopHint'), {
-        duration: 4000,
-      });
+      toast.info(
+        result.reason === 'embedded'
+          ? t('card.walletPreviewHint')
+          : t('card.walletDesktopHint'),
+        { duration: 4500 }
+      );
+      return;
     }
   };
 
