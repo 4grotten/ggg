@@ -15,13 +15,14 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { 
   X, 
-  Upload, 
   Image as ImageIcon, 
   Camera,
-  Trash2,
   Sparkles,
   ScanLine,
-  Plus
+  Plus,
+  ZoomIn,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
@@ -53,6 +54,7 @@ export const ImageUploadDrawer = ({
   const cameraInputRef = useRef<HTMLInputElement>(null);
   
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -103,7 +105,32 @@ export const ImageUploadDrawer = ({
     // Cleanup previews
     uploadedImages.forEach(img => URL.revokeObjectURL(img.preview));
     setUploadedImages([]);
+    setPreviewIndex(null);
     onClose();
+  };
+
+  const handleImageClick = (index: number) => {
+    tap();
+    setPreviewIndex(index);
+  };
+
+  const handlePrevImage = () => {
+    tap();
+    setPreviewIndex(prev => 
+      prev !== null ? (prev - 1 + uploadedImages.length) % uploadedImages.length : null
+    );
+  };
+
+  const handleNextImage = () => {
+    tap();
+    setPreviewIndex(prev => 
+      prev !== null ? (prev + 1) % uploadedImages.length : null
+    );
+  };
+
+  const handleClosePreview = () => {
+    tap();
+    setPreviewIndex(null);
   };
 
   return (
@@ -201,25 +228,35 @@ export const ImageUploadDrawer = ({
 
               <div className="grid grid-cols-3 gap-2">
                 <AnimatePresence mode="popLayout">
-                  {uploadedImages.map((img) => (
+                  {uploadedImages.map((img, index) => (
                     <motion.div
                       key={img.id}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="relative aspect-square rounded-xl overflow-hidden group"
+                      className="relative aspect-square rounded-xl overflow-hidden group cursor-pointer"
+                      onClick={() => handleImageClick(index)}
                     >
                       <img
                         src={img.preview}
                         alt="Upload preview"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
                       />
+                      {/* Zoom overlay on hover */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <ZoomIn className="w-6 h-6 text-white" />
+                      </div>
+                      {/* Delete button */}
                       <button
-                        onClick={() => handleRemoveImage(img.id)}
+                        onClick={(e) => { e.stopPropagation(); handleRemoveImage(img.id); }}
                         className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X className="w-4 h-4 text-white" />
                       </button>
+                      {/* Image number badge */}
+                      <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-[10px] font-medium text-white">
+                        {index + 1}
+                      </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -262,6 +299,80 @@ export const ImageUploadDrawer = ({
             {t("contacts.supportedFormats")}
           </p>
         </div>
+
+        {/* Full-screen image preview */}
+        <AnimatePresence>
+          {previewIndex !== null && uploadedImages[previewIndex] && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center"
+              onClick={handleClosePreview}
+            >
+              {/* Close button */}
+              <button
+                onClick={handleClosePreview}
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors z-10"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+
+              {/* Image counter */}
+              <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-white/10 text-sm font-medium text-white">
+                {previewIndex + 1} / {uploadedImages.length}
+              </div>
+
+              {/* Navigation arrows */}
+              {uploadedImages.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  >
+                    <ChevronLeft className="w-7 h-7 text-white" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  >
+                    <ChevronRight className="w-7 h-7 text-white" />
+                  </button>
+                </>
+              )}
+
+              {/* Main image */}
+              <motion.img
+                key={uploadedImages[previewIndex].id}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                src={uploadedImages[previewIndex].preview}
+                alt="Full preview"
+                className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
+                onClick={(e) => e.stopPropagation()}
+              />
+
+              {/* Delete button at bottom */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const idToRemove = uploadedImages[previewIndex].id;
+                  if (uploadedImages.length === 1) {
+                    handleClosePreview();
+                  } else if (previewIndex >= uploadedImages.length - 1) {
+                    setPreviewIndex(previewIndex - 1);
+                  }
+                  handleRemoveImage(idToRemove);
+                }}
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-400 font-medium flex items-center gap-2 transition-colors"
+              >
+                <X className="w-5 h-5" />
+                {t("common.delete")}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </DrawerContent>
     </Drawer>
   );
