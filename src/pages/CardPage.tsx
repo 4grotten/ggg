@@ -403,6 +403,45 @@ const CardPage = () => {
             <ChevronRight className="w-5 h-5 text-white/60 relative z-10" />
           </motion.a>
 
+          {/* Balance Section */}
+          <motion.div 
+            key={`balance-${activeIndex}`}
+            className="bg-secondary rounded-xl p-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">{t("card.cardBalance")}</p>
+                <AnimatePresence mode="wait">
+                  <motion.p 
+                    key={balanceVisible ? "visible" : "hidden"}
+                    className="text-2xl font-bold"
+                    initial={{ opacity: 0, filter: "blur(8px)" }}
+                    animate={{ opacity: 1, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, filter: "blur(8px)" }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    {balanceVisible ? (
+                      <><AnimatedNumber key={animationKey} value={cardData.balance} /> AED</>
+                    ) : "••••••"}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+              <button
+                onClick={toggleBalanceVisibility}
+                className="p-2 rounded-full hover:bg-muted transition-colors"
+              >
+                {balanceVisible ? (
+                  <Eye className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                  <EyeOff className="w-5 h-5 text-muted-foreground" />
+                )}
+              </button>
+            </div>
+          </motion.div>
+
           {/* Card Details */}
           <motion.div 
             key={`details-${activeIndex}`}
@@ -607,45 +646,6 @@ const CardPage = () => {
               </div>
             </AlertDialogContent>
           </AlertDialog>
-
-          {/* Balance Section */}
-          <motion.div 
-            key={`balance-${activeIndex}`}
-            className="bg-secondary rounded-xl p-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.15 }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">{t("card.cardBalance")}</p>
-                <AnimatePresence mode="wait">
-                  <motion.p 
-                    key={balanceVisible ? "visible" : "hidden"}
-                    className="text-2xl font-bold"
-                    initial={{ opacity: 0, filter: "blur(8px)" }}
-                    animate={{ opacity: 1, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, filter: "blur(8px)" }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    {balanceVisible ? (
-                      <><AnimatedNumber key={animationKey} value={cardData.balance} /> AED</>
-                    ) : "••••••"}
-                  </motion.p>
-                </AnimatePresence>
-              </div>
-              <button
-                onClick={toggleBalanceVisibility}
-                className="p-2 rounded-full hover:bg-muted transition-colors"
-              >
-                {balanceVisible ? (
-                  <Eye className="w-5 h-5 text-muted-foreground" />
-                ) : (
-                  <EyeOff className="w-5 h-5 text-muted-foreground" />
-                )}
-              </button>
-            </div>
-          </motion.div>
 
           {/* Transaction History Button */}
           <motion.button
