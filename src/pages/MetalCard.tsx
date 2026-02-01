@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
-import { openWallet, detectPlatform } from "@/lib/walletDeepLinks";
+import { openWallet, detectPlatform, getWalletDeepLink } from "@/lib/walletDeepLinks";
 import {
   Collapsible,
   CollapsibleContent,
@@ -156,6 +156,8 @@ const MetalCard = () => {
     }
   };
 
+  const walletHref = getWalletDeepLink();
+
   return (
     <MobileLayout
       header={
@@ -215,9 +217,30 @@ const MetalCard = () => {
           </div>
         </motion.div>
 
-        {/* Apple Pay Banner - Clickable */}
-        <motion.button 
-          onClick={handleOpenWallet}
+        {/* Wallet Banner - Clickable */}
+        <motion.a
+          href={walletHref ?? '#'}
+          onClick={(e) => {
+            if (!walletHref) {
+              e.preventDefault();
+              handleOpenWallet();
+              return;
+            }
+
+            // If we're in preview (iframe), prevent navigation and show hint.
+            // Otherwise allow the browser to handle the deep link.
+            const result = openWallet();
+            if (!result.success) {
+              e.preventDefault();
+              toast.info(
+                result.reason === 'embedded'
+                  ? t('card.walletPreviewHint')
+                  : t('card.walletDesktopHint'),
+                { duration: 4500 }
+              );
+            }
+          }}
+          role="button"
           className="w-full bg-secondary rounded-xl p-4 flex items-center justify-between hover:bg-secondary/80 active:scale-[0.98] transition-all"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -245,10 +268,10 @@ const MetalCard = () => {
               {detectPlatform() === 'android' ? t("card.addToGooglePay") : t("card.addToApplePay")}
             </span>
           </div>
-          <div className="p-1 hover:bg-muted rounded-full transition-colors" onClick={(e) => e.stopPropagation()}>
+          <div className="p-1 hover:bg-muted rounded-full transition-colors" onClick={(e) => e.preventDefault()}>
             <X className="w-4 h-4 text-muted-foreground" />
           </div>
-        </motion.button>
+        </motion.a>
 
         {/* Card Details */}
         <motion.div 
