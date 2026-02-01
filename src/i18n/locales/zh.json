@@ -34,7 +34,8 @@
     "apply": "应用",
     "share": "分享",
     "copy": "复制",
-    "comingSoon": "即将推出"
+    "comingSoon": "即将推出",
+    "delete": "删除"
   },
   "dashboard": {
     "welcome": "欢迎，{{name}}！",
