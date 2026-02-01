@@ -539,7 +539,9 @@
   },
   "card": {
     "back": "Back",
-    "addToApplePay": "How to Add Card to Apple Pay?",
+    "addToApplePay": "Add to Apple Pay",
+    "addToGooglePay": "Add to Google Pay",
+    "walletDesktopHint": "Open the app on your phone to add the card to your wallet",
     "number": "Card Number",
     "holder": "Card Holder",
     "expiry": "Expiry",
