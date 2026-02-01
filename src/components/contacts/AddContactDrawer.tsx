@@ -94,6 +94,21 @@ export const AddContactDrawer = ({
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
 
+  // Track if data has changed (for edit mode)
+  const hasChanges = editContact ? (
+    fullName !== editContact.full_name ||
+    phone !== (editContact.phone || "") ||
+    email !== (editContact.email || "") ||
+    company !== (editContact.company || "") ||
+    position !== (editContact.position || "") ||
+    notes !== (editContact.notes || "") ||
+    avatarUrl !== (editContact.avatar_url || null) ||
+    avatarFile !== null ||
+    JSON.stringify(paymentMethods) !== JSON.stringify(editContact.payment_methods || []) ||
+    JSON.stringify(socialLinks.map(l => ({ id: l.id, url: l.url, networkId: l.networkId, networkName: l.networkName }))) !== 
+      JSON.stringify((editContact.social_links || []).map(l => ({ id: l.id, url: l.url, networkId: l.networkId, networkName: l.networkName })))
+  ) : false;
+
   // Initialize form with edit contact data
   useEffect(() => {
     if (editContact) {
@@ -514,19 +529,21 @@ export const AddContactDrawer = ({
         </button>
       )}
 
-      {/* Save Button */}
-      <Button
-        onClick={handleSave}
-        disabled={isSaving || !fullName.trim()}
-        className="w-full h-14 rounded-2xl text-lg font-semibold"
-      >
-        {isSaving ? (
-          <Loader2 className="w-5 h-5 animate-spin mr-2" />
-        ) : showSuccess ? (
-          <Check className="w-5 h-5 mr-2" />
-        ) : null}
-        {editContact ? t("common.save") : t("contacts.addContact")}
-      </Button>
+      {/* Save Button - only show for new contacts */}
+      {!editContact && (
+        <Button
+          onClick={handleSave}
+          disabled={isSaving || !fullName.trim()}
+          className="w-full h-14 rounded-2xl text-lg font-semibold"
+        >
+          {isSaving ? (
+            <Loader2 className="w-5 h-5 animate-spin mr-2" />
+          ) : showSuccess ? (
+            <Check className="w-5 h-5 mr-2" />
+          ) : null}
+          {t("contacts.addContact")}
+        </Button>
+      )}
     </motion.div>
   );
 
@@ -598,7 +615,7 @@ export const AddContactDrawer = ({
     switch (currentView) {
       case "socials": return t("contacts.socialLinks");
       case "payments": return t("contacts.paymentMethods");
-      default: return editContact ? t("contacts.editContact") : t("contacts.addContact");
+      default: return editContact ? t("contacts.contactSettings") : t("contacts.addContact");
     }
   };
 
@@ -618,12 +635,27 @@ export const AddContactDrawer = ({
                 </button>
               )}
               <DrawerTitle className="flex-1">{getTitle()}</DrawerTitle>
-              <button
-                onClick={handleClose}
-                className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              {/* Show blue "Save" button when there are changes in edit mode, otherwise show X */}
+              {editContact && hasChanges ? (
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving || !fullName.trim()}
+                  className="px-4 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary font-medium text-sm transition-colors disabled:opacity-50"
+                >
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    t("common.save")
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={handleClose}
+                  className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </DrawerHeader>
 

@@ -1543,6 +1543,7 @@
   "contacts": {
     "addContact": "Добавить контакт",
     "editContact": "Редактировать контакт",
+    "contactSettings": "Настройки контакта",
     "viewContacts": "Мои контакты",
     "fullName": "Полное имя",
     "phone": "Телефон",
