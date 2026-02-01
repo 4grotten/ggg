@@ -1416,7 +1416,7 @@ export default function AdminPanel() {
                             >
                               <div className="flex flex-col gap-0.5">
                                 <span className="font-medium">{model.name}</span>
-                                <span className="text-xs text-muted-foreground leading-relaxed">{model.description}</span>
+                                <span className="text-xs opacity-80 leading-relaxed">{model.description}</span>
                               </div>
                             </SelectItem>
                           ))}
