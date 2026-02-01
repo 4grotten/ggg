@@ -379,7 +379,7 @@ const MetalCard = () => {
         >
           <Button
             asChild
-            className="w-full h-12 rounded-xl bg-black hover:bg-black/90 text-white gap-2"
+            className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
           >
             <a
               href={walletHref ?? '#'}
