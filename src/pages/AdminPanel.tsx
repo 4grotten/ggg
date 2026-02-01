@@ -385,16 +385,9 @@ export default function AdminPanel() {
   // Sync selected model with status
   useEffect(() => {
     if (openaiStatus?.currentModel && !selectedModel) {
-      // currentModel is stored as index, convert to model ID
-      const modelIndex = typeof openaiStatus.currentModel === 'number' 
-        ? openaiStatus.currentModel 
-        : openaiStatus.availableModels?.findIndex(m => m.id === openaiStatus.currentModel) ?? 0;
-      const model = openaiStatus.availableModels?.[modelIndex] || openaiStatus.availableModels?.[0];
-      if (model) {
-        setSelectedModel(model.id);
-      }
+      setSelectedModel(openaiStatus.currentModel);
     }
-  }, [openaiStatus, selectedModel]);
+  }, [openaiStatus?.currentModel, selectedModel]);
   
   const handleCopyApiKey = useCallback(() => {
     if (openaiStatus?.maskedKey) {

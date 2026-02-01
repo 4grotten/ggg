@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -20,9 +20,14 @@ export function useOpenAISettings() {
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isUpdatingModel, setIsUpdatingModel] = useState(false);
+  const fetchedRef = useRef(false);
 
   const fetchStatus = useCallback(async () => {
+    // Prevent multiple fetches
+    if (fetchedRef.current || isLoading) return;
+    fetchedRef.current = true;
     setIsLoading(true);
+    
     try {
       const { data, error } = await supabase.functions.invoke("admin-openai-settings", {
         body: { action: "get-status" },
@@ -32,11 +37,22 @@ export function useOpenAISettings() {
       setStatus(data);
     } catch (error) {
       console.error("Failed to fetch OpenAI status:", error);
-      toast.error("Не удалось загрузить статус OpenAI");
+      // Set default status on error to prevent retry loop
+      setStatus({
+        hasKey: false,
+        maskedKey: null,
+        currentModel: "gpt-4o",
+        availableModels: [
+          { id: "gpt-4o", name: "GPT-4o", description: "Новейшая мультимодальная модель" },
+          { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Быстрая и экономичная" },
+          { id: "gpt-4-turbo", name: "GPT-4 Turbo", description: "Предыдущее поколение" },
+          { id: "gpt-4-vision-preview", name: "GPT-4 Vision", description: "Специализирована для изображений" },
+        ],
+      });
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isLoading]);
 
   const verifyApiKey = useCallback(async (apiKey: string): Promise<boolean> => {
     setIsVerifying(true);
@@ -74,7 +90,6 @@ export function useOpenAISettings() {
       
       if (data.success) {
         toast.success(`Модель изменена на ${model}`);
-        // Update local status
         setStatus(prev => prev ? { ...prev, currentModel: model } : null);
       }
     } catch (error) {
@@ -85,6 +100,10 @@ export function useOpenAISettings() {
     }
   }, []);
 
+  const resetFetched = useCallback(() => {
+    fetchedRef.current = false;
+  }, []);
+
   return {
     status,
     isLoading,
@@ -93,5 +112,6 @@ export function useOpenAISettings() {
     fetchStatus,
     verifyApiKey,
     updateModel,
+    resetFetched,
   };
 }
