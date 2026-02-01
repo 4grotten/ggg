@@ -15,7 +15,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode, Contact, ScanLine } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -50,6 +50,8 @@ const iconGradients: Record<string, string> = {
   lock: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
   admin: 'linear-gradient(135deg, #1e3a5f 0%, #0a0a0a 100%)',
   vibrate: 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)',
+  contact: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+  scan: 'linear-gradient(135deg, #6366f1 0%, #a78bfa 100%)',
 };
 
 interface ColoredIconProps {
@@ -698,6 +700,27 @@ const Settings = () => {
             <QrCode className="w-5 h-5" />
             <span>{t("settings.share") || "Поделиться"}</span>
           </motion.button>
+        )}
+
+        {/* Saved Contacts Section */}
+        {isAuthenticated && (
+          <AnimatedMenuSection index={0.5}>
+            <div className="px-4 py-3 border-b border-border/50">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                {t("settings.savedContacts") || "Сохранённые контакты"}
+              </span>
+            </div>
+            <SettingsItem
+              icon={<ColoredIcon colorKey="contact"><Contact className="w-4 h-4" /></ColoredIcon>}
+              label={t("settings.addContact") || "Добавить контакт"}
+              onClick={() => toast.info(t("common.comingSoon") || "Скоро будет доступно")}
+            />
+            <SettingsItem
+              icon={<ColoredIcon colorKey="scan"><ScanLine className="w-4 h-4" /></ColoredIcon>}
+              label={t("settings.scanBusinessCard") || "Сканировать визитку"}
+              onClick={() => toast.info(t("common.comingSoon") || "Скоро будет доступно")}
+            />
+          </AnimatedMenuSection>
         )}
 
         {/* Profile Section - Edit Profile, Personal Details, Referral Partner, Limits Settings in one block */}

@@ -31,7 +31,8 @@
     "usdt": "USDT",
     "authorize": "Giriş Yap",
     "share": "Paylaş",
-    "copy": "Kopyala"
+    "copy": "Kopyala",
+    "comingSoon": "Yakında"
   },
   "dashboard": {
     "welcome": "Hoş geldiniz, {{name}}!",
@@ -419,6 +420,9 @@
     "hapticFeedback": "Titreşim",
     "hapticEnabled": "Titreşim açıldı",
     "hapticDisabled": "Titreşim kapatıldı",
+    "savedContacts": "Kayıtlı Kişiler",
+    "addContact": "Kişi Ekle",
+    "scanBusinessCard": "Kartvizit Tara",
     "devices": {
       "title": "Aktif Cihazlar",
       "noDevices": "Aktif cihaz yok",

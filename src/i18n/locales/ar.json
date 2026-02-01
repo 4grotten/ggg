@@ -31,7 +31,8 @@
     "usdt": "USDT",
     "authorize": "تسجيل الدخول",
     "share": "مشاركة",
-    "copy": "نسخ"
+    "copy": "نسخ",
+    "comingSoon": "قريباً"
   },
   "dashboard": {
     "welcome": "مرحباً، {{name}}!",
@@ -419,6 +420,9 @@
     "hapticFeedback": "الاهتزاز",
     "hapticEnabled": "تم تفعيل الاهتزاز",
     "hapticDisabled": "تم إيقاف الاهتزاز",
+    "savedContacts": "جهات الاتصال المحفوظة",
+    "addContact": "إضافة جهة اتصال",
+    "scanBusinessCard": "مسح بطاقة العمل",
     "devices": {
       "title": "الأجهزة النشطة",
       "noDevices": "لا توجد أجهزة نشطة",
