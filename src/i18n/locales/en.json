@@ -1631,6 +1631,8 @@
     "viaSms": "via SMS",
     "viaEmail": "via Email",
     "shareContact": "Share Contact",
-    "shareContactDescription": "Send contact details"
+    "shareContactDescription": "Send contact details",
+    "addToContacts": "Add Contact",
+    "addedToContacts": "Contact added"
   }
 }

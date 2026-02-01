@@ -1633,6 +1633,8 @@
     "scanToSave": "Отсканируйте чтобы сохранить контакт",
     "download": "Скачать",
     "vcardDownloaded": "Контакт скачан",
+    "addToContacts": "Добавить контакт",
+    "addedToContacts": "Контакт добавлен",
     "contact": "Контакт",
     "sendMessage": "Написать сообщение",
     "sendDataViaSms": "Отправить сообщением",

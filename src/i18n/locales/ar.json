@@ -1542,6 +1542,8 @@
     "viaSms": "عبر الرسائل القصيرة",
     "viaEmail": "عبر البريد الإلكتروني",
     "shareContact": "مشاركة جهة الاتصال",
-    "shareContactDescription": "إرسال بيانات جهة الاتصال"
+    "shareContactDescription": "إرسال بيانات جهة الاتصال",
+    "addToContacts": "إضافة جهة اتصال",
+    "addedToContacts": "تمت إضافة جهة الاتصال"
   }
 }

@@ -1542,6 +1542,8 @@
     "viaSms": "per SMS",
     "viaEmail": "per E-Mail",
     "shareContact": "Kontakt teilen",
-    "shareContactDescription": "Kontaktdaten senden"
+    "shareContactDescription": "Kontaktdaten senden",
+    "addToContacts": "Kontakt hinzufügen",
+    "addedToContacts": "Kontakt hinzugefügt"
   }
 }

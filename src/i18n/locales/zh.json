@@ -1549,6 +1549,8 @@
     "viaSms": "通过短信",
     "viaEmail": "通过邮件",
     "shareContact": "分享联系人",
-    "shareContactDescription": "发送联系人信息"
+    "shareContactDescription": "发送联系人信息",
+    "addToContacts": "添加联系人",
+    "addedToContacts": "联系人已添加"
   }
 }
