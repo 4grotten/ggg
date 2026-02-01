@@ -1374,7 +1374,7 @@ const Settings = () => {
                   className="w-10 h-10 rounded-xl text-white flex items-center justify-center"
                   style={{ background: iconGradients.users }}
                 >
-                  <Users className="w-5 h-5" />
+                  <BookUser className="w-5 h-5" />
                 </div>
                 <span className="text-foreground font-medium">{t("contacts.viewContacts") || "Мои контакты"}</span>
               </div>
