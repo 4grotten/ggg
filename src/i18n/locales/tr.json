@@ -1452,6 +1452,33 @@
       "active": "Aktif",
       "activeMultiple": "Aktif",
       "perMinute": "/dk"
+    },
+    "system": {
+      "title": "Sistem Ayarları",
+      "description": "Genel sistem parametreleri",
+      "maintenance": "Bakım Modu",
+      "maintenanceDesc": "Kullanıcı erişimini geçici olarak devre dışı bırak",
+      "registration": "Yeni Kullanıcı Kaydı",
+      "registrationDesc": "Yeni hesap oluşturmaya izin ver",
+      "kyc": "Zorunlu Doğrulama (KYC)",
+      "kycDesc": "Tüm işlemler için KYC gerekli",
+      "twoFactor": "İki Faktörlü Kimlik Doğrulama",
+      "twoFactorDesc": "Tüm kullanıcılar için 2FA gerekli",
+      "enabled": "Etkin",
+      "disabled": "Devre Dışı",
+      "optional": "İsteğe Bağlı"
+    },
+    "notifications": {
+      "title": "Bildirimler",
+      "description": "Sistem bildirim ayarları",
+      "email": "E-posta Bildirimleri",
+      "emailDesc": "E-posta ile bildirim gönder",
+      "push": "Push Bildirimleri",
+      "pushDesc": "Mobil push bildirimleri",
+      "sms": "SMS Bildirimleri",
+      "smsDesc": "Kritik SMS bildirimleri",
+      "enabledMultiple": "Etkin",
+      "disabledMultiple": "Devre Dışı"
     }
   },
   "contacts": {

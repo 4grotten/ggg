@@ -1512,6 +1512,33 @@
       "active": "Active",
       "activeMultiple": "Active",
       "perMinute": "/min"
+    },
+    "system": {
+      "title": "System Settings",
+      "description": "General system parameters",
+      "maintenance": "Maintenance Mode",
+      "maintenanceDesc": "Temporarily disable user access",
+      "registration": "New User Registration",
+      "registrationDesc": "Allow new account creation",
+      "kyc": "Mandatory Verification (KYC)",
+      "kycDesc": "Require KYC for all operations",
+      "twoFactor": "Two-Factor Authentication",
+      "twoFactorDesc": "Require 2FA for all users",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "optional": "Optional"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "System notification settings",
+      "email": "Email Notifications",
+      "emailDesc": "Send notifications via email",
+      "push": "Push Notifications",
+      "pushDesc": "Mobile push notifications",
+      "sms": "SMS Notifications",
+      "smsDesc": "Critical SMS notifications",
+      "enabledMultiple": "Enabled",
+      "disabledMultiple": "Disabled"
     }
   },
   "contacts": {

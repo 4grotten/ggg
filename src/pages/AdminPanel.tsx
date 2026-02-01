@@ -469,9 +469,9 @@ export default function AdminPanel() {
 
   const getRoleLabel = (role: AppRole) => {
     switch (role) {
-      case "admin": return "Администратор";
-      case "moderator": return "Модератор";
-      default: return "Пользователь";
+      case "admin": return t("admin.roles.admin");
+      case "moderator": return t("admin.roles.moderator");
+      default: return t("admin.roles.user");
     }
   };
 
@@ -488,12 +488,12 @@ export default function AdminPanel() {
           >
             <Shield className="w-12 h-12 text-destructive" />
           </motion.div>
-          <h1 className="text-xl font-semibold text-center mb-2">Доступ запрещён</h1>
+          <h1 className="text-xl font-semibold text-center mb-2">{t("admin.accessDenied")}</h1>
           <p className="text-muted-foreground text-center mb-6">
-            У вас нет прав для доступа к административной панели
+            {t("admin.accessDeniedDesc")}
           </p>
           <Button onClick={() => navigate("/settings")} className="rounded-xl">
-            Вернуться в настройки
+            {t("admin.backToSettings")}
           </Button>
         </div>
       </MobileLayout>
@@ -510,7 +510,7 @@ export default function AdminPanel() {
       return (
         <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
           <RefreshCw className="w-8 h-8 animate-spin mb-2 opacity-50" />
-          <p className="text-sm">Загрузка настроек...</p>
+          <p className="text-sm">{t("admin.common.loading")}</p>
         </div>
       );
     }
@@ -559,12 +559,12 @@ export default function AdminPanel() {
   const displayedClients = filteredClients !== undefined ? filteredClients : clients;
 
   const tabConfig = [
-    { value: "rates", label: "Курсы", icon: TrendingUp },
-    { value: "fees", label: "Комиссии", icon: Percent },
-    { value: "limits", label: "Лимиты", icon: Wallet },
-    { value: "clients", label: "Клиенты", icon: UsersRound },
-    { value: "admins", label: "Админы", icon: Users },
-    { value: "system", label: "Система", icon: Settings },
+    { value: "rates", label: t("admin.tabs.rates"), icon: TrendingUp },
+    { value: "fees", label: t("admin.tabs.fees"), icon: Percent },
+    { value: "limits", label: t("admin.tabs.limits"), icon: Wallet },
+    { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound },
+    { value: "admins", label: t("admin.tabs.admins"), icon: Users },
+    { value: "system", label: t("admin.system.title", "Система"), icon: Settings },
   ];
 
   return (
@@ -588,15 +588,15 @@ export default function AdminPanel() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               
-              <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <h1 className="text-lg font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    Админ-панель
+                    {t("admin.title")}
                   </h1>
                   <Sparkles className="w-4 h-4 text-primary animate-pulse" />
                 </div>
                 <p className="text-xs text-muted-foreground truncate">
-                  Управление системой
+                  {t("admin.subtitle")}
                 </p>
               </div>
               
@@ -618,11 +618,11 @@ export default function AdminPanel() {
             className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide"
           >
             {[
-              { label: "Курсов", value: exchangeRateFields.length, icon: Activity, color: "text-emerald-500" },
-              { label: "Комиссий", value: feeFields.length, icon: CreditCard, color: "text-violet-500" },
-              { label: "Лимитов", value: limitFields.length, icon: Wallet, color: "text-orange-500" },
-              { label: "Клиентов", value: clients?.length || 0, icon: UsersRound, color: "text-cyan-500" },
-              { label: "Админов", value: admins?.length || 0, icon: Shield, color: "text-blue-500" },
+              { label: t("admin.stats.rates"), value: exchangeRateFields.length, icon: Activity, color: "text-emerald-500" },
+              { label: t("admin.stats.fees"), value: feeFields.length, icon: CreditCard, color: "text-violet-500" },
+              { label: t("admin.stats.limits"), value: limitFields.length, icon: Wallet, color: "text-orange-500" },
+              { label: t("admin.stats.clients"), value: clients?.length || 0, icon: UsersRound, color: "text-cyan-500" },
+              { label: t("admin.stats.admins"), value: admins?.length || 0, icon: Shield, color: "text-blue-500" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -705,11 +705,10 @@ export default function AdminPanel() {
 
               {/* Tab content without layout animations */}
 
-              {/* Exchange Rates Tab */}
               <TabsContent value="rates" className="mt-0">
                 <GlassCard
-                  title="Курсы валют"
-                  description="Курсы покупки и продажи"
+                  title={t("admin.exchangeRates.title")}
+                  description={t("admin.exchangeRates.description")}
                   icon={TrendingUp}
                   iconColor="text-emerald-500"
                 >
@@ -717,11 +716,10 @@ export default function AdminPanel() {
                 </GlassCard>
               </TabsContent>
 
-              {/* Fees Tab */}
               <TabsContent value="fees" className="mt-0">
                 <GlassCard
-                  title="Комиссии"
-                  description="Все типы комиссий"
+                  title={t("admin.fees.title")}
+                  description={t("admin.fees.description")}
                   icon={Percent}
                   iconColor="text-violet-500"
                 >
@@ -729,30 +727,28 @@ export default function AdminPanel() {
                 </GlassCard>
               </TabsContent>
 
-              {/* Limits Tab */}
               <TabsContent value="limits" className="mt-0 space-y-4">
-                <GlassCard title="Минимальные суммы" icon={Wallet} iconColor="text-orange-500">
+                <GlassCard title={t("admin.limits.minLimits")} icon={Wallet} iconColor="text-orange-500">
                   {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "min"))}
                 </GlassCard>
                 
-                <GlassCard title="Максимальные суммы" icon={Wallet} iconColor="text-orange-500">
+                <GlassCard title={t("admin.limits.maxLimits")} icon={Wallet} iconColor="text-orange-500">
                   {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "max"))}
                 </GlassCard>
                 
-                <GlassCard title="Дневные лимиты" icon={Activity} iconColor="text-amber-500">
+                <GlassCard title={t("admin.limits.dailyLimits")} icon={Activity} iconColor="text-amber-500">
                   {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "daily"))}
                 </GlassCard>
                 
-                <GlassCard title="Месячные лимиты" icon={Activity} iconColor="text-amber-500">
+                <GlassCard title={t("admin.limits.monthlyLimits")} icon={Activity} iconColor="text-amber-500">
                   {renderSettingsGroup("limits", limitFields.filter((f) => f.group === "monthly"))}
                 </GlassCard>
               </TabsContent>
 
-              {/* Clients Tab */}
               <TabsContent value="clients" className="mt-0 space-y-4">
                 <GlassCard
-                  title="Клиенты"
-                  description={`${displayedClients?.length || 0} пользователей`}
+                  title={t("admin.clients.title")}
+                  description={`${displayedClients?.length || 0} ${t("admin.roles.usersWithRoles", "пользователей")}`}
                   icon={UsersRound}
                   iconColor="text-cyan-500"
                 >
@@ -761,7 +757,7 @@ export default function AdminPanel() {
                     <div className="relative flex-1">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
-                        placeholder="Поиск по имени или телефону..."
+                        placeholder={t("admin.clients.searchPlaceholder")}
                         value={clientSearchQuery}
                         onChange={(e) => {
                           setClientSearchQuery(e.target.value);
@@ -868,7 +864,7 @@ export default function AdminPanel() {
                             <p className="font-medium text-sm truncate">
                               {client.first_name || client.last_name
                                 ? `${client.first_name || ""} ${client.last_name || ""}`.trim()
-                                : "Без имени"}
+                                : t("admin.roles.noName")}
                             </p>
                             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                               {client.phone && (
@@ -897,7 +893,7 @@ export default function AdminPanel() {
                     <div className="flex flex-col items-center py-8 text-muted-foreground">
                       <UsersRound className="w-12 h-12 mb-2 opacity-30" />
                       <p className="text-sm">
-                        {clientSearchQuery ? "Клиенты не найдены" : "Нет зарегистрированных клиентов"}
+                        {clientSearchQuery ? t("admin.clients.notFound") : t("admin.clients.noClients")}
                       </p>
                     </div>
                   )}
@@ -918,7 +914,7 @@ export default function AdminPanel() {
                     )}
                   >
                     <Users className="w-4 h-4" />
-                    Админы
+                    {t("admin.subtabs.admins")}
                   </button>
                   <button
                     onClick={() => setActiveAdminsSubTab("history")}
@@ -930,7 +926,7 @@ export default function AdminPanel() {
                     )}
                   >
                     <History className="w-4 h-4" />
-                    История
+                    {t("admin.subtabs.history")}
                   </button>
                 </div>
 
@@ -944,10 +940,9 @@ export default function AdminPanel() {
                       transition={{ duration: 0.2 }}
                       className="space-y-4"
                     >
-                      {/* Add Admin Card */}
                       <GlassCard
-                        title="Добавить роль"
-                        description="Поиск по телефону или ID"
+                        title={t("admin.roles.addRole")}
+                        description={t("admin.roles.searchByPhoneOrId")}
                         icon={UserPlus}
                         iconColor="text-blue-500"
                       >
@@ -955,7 +950,7 @@ export default function AdminPanel() {
                           <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
-                              placeholder="+971... или UUID"
+                              placeholder={t("admin.roles.searchPlaceholder")}
                               value={searchQuery}
                               onChange={(e) => setSearchQuery(e.target.value)}
                               onKeyDown={(e) => e.key === "Enter" && handleSearchUser()}
@@ -993,7 +988,7 @@ export default function AdminPanel() {
                                     <p className="font-medium truncate">
                                       {searchResult.first_name || searchResult.last_name
                                         ? `${searchResult.first_name || ""} ${searchResult.last_name || ""}`.trim()
-                                        : "Без имени"}
+                                        : t("admin.roles.noName")}
                                     </p>
                                     {searchResult.phone && (
                                       <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -1010,8 +1005,8 @@ export default function AdminPanel() {
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="admin">Администратор</SelectItem>
-                                      <SelectItem value="moderator">Модератор</SelectItem>
+                                      <SelectItem value="admin">{t("admin.roles.admin")}</SelectItem>
+                                      <SelectItem value="moderator">{t("admin.roles.moderator")}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <Button
@@ -1022,7 +1017,7 @@ export default function AdminPanel() {
                                     {addAdmin.isPending ? (
                                       <RefreshCw className="w-4 h-4 animate-spin" />
                                     ) : (
-                                      "Добавить"
+                                      t("admin.roles.add")
                                     )}
                                   </Button>
                                 </div>
@@ -1037,15 +1032,14 @@ export default function AdminPanel() {
                             animate={{ opacity: 1 }}
                             className="text-sm text-muted-foreground text-center py-2"
                           >
-                            Пользователь не найден
+                            {t("admin.roles.userNotFound")}
                           </motion.p>
                         )}
                       </GlassCard>
 
-                      {/* Current Admins List */}
                       <GlassCard
-                        title="Текущие роли"
-                        description={`${admins?.length || 0} пользователей с ролями`}
+                        title={t("admin.roles.currentRoles")}
+                        description={`${admins?.length || 0} ${t("admin.roles.usersWithRoles")}`}
                         icon={Shield}
                         iconColor="text-blue-500"
                       >
@@ -1072,7 +1066,7 @@ export default function AdminPanel() {
                                   <p className="font-medium text-sm truncate">
                                     {admin.first_name || admin.last_name
                                       ? `${admin.first_name || ""} ${admin.last_name || ""}`.trim()
-                                      : "Без имени"}
+                                      : t("admin.roles.noName")}
                                   </p>
                                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                     {admin.phone && (
@@ -1108,7 +1102,7 @@ export default function AdminPanel() {
                         ) : (
                           <div className="flex flex-col items-center py-8 text-muted-foreground">
                             <Users className="w-12 h-12 mb-2 opacity-30" />
-                            <p className="text-sm">Нет пользователей с ролями</p>
+                            <p className="text-sm">{t("admin.roles.noUsersWithRoles")}</p>
                           </div>
                         )}
                       </GlassCard>
@@ -1122,10 +1116,9 @@ export default function AdminPanel() {
                       transition={{ duration: 0.2 }}
                       className="space-y-4"
                     >
-                      {/* History Card */}
                       <GlassCard
-                        title="История изменений"
-                        description={`${MOCK_ADMIN_HISTORY.length} действий`}
+                        title={t("admin.history.title")}
+                        description={`${MOCK_ADMIN_HISTORY.length} ${t("admin.history.actions")}`}
                         icon={History}
                         iconColor="text-violet-500"
                       >
@@ -1194,11 +1187,10 @@ export default function AdminPanel() {
                 </AnimatePresence>
               </TabsContent>
 
-              {/* System Settings Tab */}
               <TabsContent value="system" className="mt-0 space-y-4">
                 <GlassCard
-                  title="Системные настройки"
-                  description="Общие параметры системы"
+                  title={t("admin.system.title")}
+                  description={t("admin.system.description")}
                   icon={Settings}
                   iconColor="text-slate-500"
                 >
@@ -1207,11 +1199,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Режим обслуживания</p>
-                          <p className="text-xs text-muted-foreground">Временно отключить доступ пользователей</p>
+                          <p className="text-sm font-medium">{t("admin.system.maintenance")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.system.maintenanceDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
-                          Выключен
+                          {t("admin.system.disabled")}
                         </div>
                       </div>
                     </div>
@@ -1220,11 +1212,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Регистрация новых пользователей</p>
-                          <p className="text-xs text-muted-foreground">Разрешить создание новых аккаунтов</p>
+                          <p className="text-sm font-medium">{t("admin.system.registration")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.system.registrationDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
-                          Включена
+                          {t("admin.system.enabled")}
                         </div>
                       </div>
                     </div>
@@ -1233,11 +1225,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Обязательная верификация (KYC)</p>
-                          <p className="text-xs text-muted-foreground">Требовать KYC для всех операций</p>
+                          <p className="text-sm font-medium">{t("admin.system.kyc")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.system.kycDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
-                          Включена
+                          {t("admin.system.enabled")}
                         </div>
                       </div>
                     </div>
@@ -1246,11 +1238,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Двухфакторная аутентификация</p>
-                          <p className="text-xs text-muted-foreground">Требовать 2FA для всех пользователей</p>
+                          <p className="text-sm font-medium">{t("admin.system.twoFactor")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.system.twoFactorDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-500 text-xs font-medium">
-                          Опционально
+                          {t("admin.system.optional")}
                         </div>
                       </div>
                     </div>
@@ -1258,8 +1250,8 @@ export default function AdminPanel() {
                 </GlassCard>
 
                 <GlassCard
-                  title="Уведомления"
-                  description="Настройки системных уведомлений"
+                  title={t("admin.notifications.title")}
+                  description={t("admin.notifications.description")}
                   icon={Activity}
                   iconColor="text-blue-500"
                 >
@@ -1268,11 +1260,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Email-уведомления</p>
-                          <p className="text-xs text-muted-foreground">Отправка уведомлений на почту</p>
+                          <p className="text-sm font-medium">{t("admin.notifications.email")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.notifications.emailDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
-                          Включены
+                          {t("admin.notifications.enabledMultiple")}
                         </div>
                       </div>
                     </div>
@@ -1281,11 +1273,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">Push-уведомления</p>
-                          <p className="text-xs text-muted-foreground">Мобильные push-уведомления</p>
+                          <p className="text-sm font-medium">{t("admin.notifications.push")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.notifications.pushDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium">
-                          Включены
+                          {t("admin.notifications.enabledMultiple")}
                         </div>
                       </div>
                     </div>
@@ -1294,11 +1286,11 @@ export default function AdminPanel() {
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">SMS-уведомления</p>
-                          <p className="text-xs text-muted-foreground">Критические уведомления по SMS</p>
+                          <p className="text-sm font-medium">{t("admin.notifications.sms")}</p>
+                          <p className="text-xs text-muted-foreground">{t("admin.notifications.smsDesc")}</p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-slate-500/10 text-slate-500 text-xs font-medium">
-                          Выключены
+                          {t("admin.notifications.disabledMultiple")}
                         </div>
                       </div>
                     </div>
