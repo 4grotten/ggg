@@ -45,13 +45,16 @@ import { getSocialNetworks, type SocialNetworkItem } from "@/services/api/authAp
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { SavedContact } from "@/types/contact";
+import { AddContactDrawer } from "@/components/contacts/AddContactDrawer";
+import { ContactsList } from "@/components/contacts/ContactsList";
 
 interface ShareProfileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type ViewType = "main" | "businessCard" | "businessCardQR" | "card" | "account" | "crypto" | "asset" | "network";
+type ViewType = "main" | "businessCard" | "businessCardQR" | "card" | "account" | "crypto" | "asset" | "network" | "contacts";
 
 // Social network detection with icons (same as SocialLinksInput)
 interface SocialNetwork {
@@ -269,6 +272,10 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
   const [selectedNetwork, setSelectedNetwork] = useState<CryptoNetwork | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   
+  // Contacts state
+  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<SavedContact | null>(null);
+  
   // Business card fields state
   const [businessCardFields, setBusinessCardFields] = useState<BusinessCardField[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialNetworkItem[]>([]);
@@ -391,6 +398,8 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     } else if (currentView === "businessCard" || currentView === "businessCardQR") {
       setCurrentView("main");
       setBusinessCardFields([]);
+    } else if (currentView === "contacts") {
+      setCurrentView("main");
     } else {
       setCurrentView("main");
       setSelectedCard(null);
@@ -660,7 +669,8 @@ Easy Card UAE`;
                   <button
                     onClick={() => {
                       tap();
-                      toast.info(t("common.comingSoon") || "Coming soon");
+                      setEditingContact(null);
+                      setIsAddContactOpen(true);
                     }}
                     className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors"
                   >
@@ -678,13 +688,31 @@ Easy Card UAE`;
                   <button
                     onClick={() => {
                       tap();
-                      toast.info(t("common.comingSoon") || "Coming soon");
+                      setCurrentView("contacts");
                     }}
                     className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors border-t border-border/30"
                   >
                     <div 
                       className="w-10 h-10 rounded-xl flex items-center justify-center"
                       style={{ background: "linear-gradient(135deg, #6366f1 0%, #a78bfa 100%)" }}
+                    >
+                      <Users className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium">{t("contacts.viewContacts") || "View Contacts"}</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      tap();
+                      toast.info(t("common.comingSoon") || "Coming soon");
+                    }}
+                    className="w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors border-t border-border/30"
+                  >
+                    <div 
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)" }}
                     >
                       <ScanLine className="w-5 h-5 text-white" />
                     </div>
@@ -1377,9 +1405,44 @@ Easy Card UAE`;
                 </div>
               </motion.div>
             )}
+
+            {/* Contacts List View */}
+            {currentView === "contacts" && (
+              <motion.div
+                key="contacts"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <ContactsList
+                  onContactClick={(contact) => {
+                    setEditingContact(contact);
+                    setIsAddContactOpen(true);
+                  }}
+                  onAddClick={() => {
+                    setEditingContact(null);
+                    setIsAddContactOpen(true);
+                  }}
+                />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </DrawerContent>
+
+      {/* Add/Edit Contact Drawer */}
+      <AddContactDrawer
+        isOpen={isAddContactOpen}
+        onClose={() => {
+          setIsAddContactOpen(false);
+          setEditingContact(null);
+        }}
+        editContact={editingContact}
+        onSaved={() => {
+          setIsAddContactOpen(false);
+          setEditingContact(null);
+        }}
+      />
     </Drawer>
   );
 };
