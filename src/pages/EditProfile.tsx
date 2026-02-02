@@ -22,7 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
-import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, getPhoneNumbers, addPhoneNumber, deletePhoneNumber, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
+import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, getPhoneNumbers, updatePhoneNumbers, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 import { SocialLinksInput, SocialLink, migrateSocialLinks } from "@/components/settings/SocialLinksInput";
 
@@ -1189,19 +1189,13 @@ const EditProfile = () => {
             {/* Existing phone numbers list */}
             {!isLoadingPhones && phoneNumbers.length > 0 && (
               <div className="space-y-2">
-                {phoneNumbers.map((phone) => (
-                  <div key={phone.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+                {phoneNumbers.map((phone, index) => (
+                  <div key={phone.id || index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
                     <Phone className="w-5 h-5 text-muted-foreground" />
                     <span className="flex-1 font-medium">{phone.phone_number}</span>
                     <button
-                      onClick={async () => {
-                        try {
-                          await deletePhoneNumber(phone.id);
-                          setPhoneNumbers(prev => prev.filter(p => p.id !== phone.id));
-                          toast.success(t("contacts.deleted") || "Phone number deleted");
-                        } catch (error) {
-                          toast.error(t("contacts.deleteError") || "Failed to delete");
-                        }
+                      onClick={() => {
+                        setPhoneNumbers(prev => prev.filter((_, i) => i !== index));
                       }}
                       className="w-8 h-8 rounded-full hover:bg-destructive/10 flex items-center justify-center transition-colors"
                     >
@@ -1240,34 +1234,54 @@ const EditProfile = () => {
                   className="pl-12 h-14 rounded-2xl text-lg"
                 />
               </div>
+              
+              {/* Add to list button */}
               <Button
-                onClick={async () => {
+                variant="outline"
+                onClick={() => {
                   if (newPhoneNumber.length > 3) {
-                    setIsSavingPhone(true);
-                    try {
-                      const response = await addPhoneNumber(newPhoneNumber);
-                      if (response.data) {
-                        setPhoneNumbers(prev => [...prev, response.data!]);
-                        setNewPhoneNumber("+");
-                        toast.success(t("contacts.created") || "Phone number added");
-                      }
-                    } catch (error) {
-                      toast.error(t("contacts.createError") || "Failed to add phone number");
-                    } finally {
-                      setIsSavingPhone(false);
+                    // Check for duplicates
+                    if (phoneNumbers.some(p => p.phone_number === newPhoneNumber)) {
+                      toast.error(t("contacts.duplicateError") || "This number already exists");
+                      return;
                     }
+                    setPhoneNumbers(prev => [...prev, { phone_number: newPhoneNumber }]);
+                    setNewPhoneNumber("+");
                   }
                 }}
-                disabled={newPhoneNumber.length <= 3 || isSavingPhone}
+                disabled={newPhoneNumber.length <= 3}
+                className="w-full h-12 rounded-xl"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                {t("contacts.addToList") || "Add to List"}
+              </Button>
+
+              {/* Save all button */}
+              <Button
+                onClick={async () => {
+                  setIsSavingPhone(true);
+                  try {
+                    const allNumbers = phoneNumbers.map(p => p.phone_number);
+                    const response = await updatePhoneNumbers(allNumbers);
+                    if (response.data) {
+                      // Update with response data
+                      setPhoneNumbers(response.data.numbers);
+                      toast.success(t("contacts.saved") || "Phone numbers saved");
+                      setIsPhoneContactsDrawerOpen(false);
+                    }
+                  } catch (error) {
+                    toast.error(t("contacts.saveError") || "Failed to save phone numbers");
+                  } finally {
+                    setIsSavingPhone(false);
+                  }
+                }}
+                disabled={isSavingPhone}
                 className="w-full h-12 rounded-xl"
               >
                 {isSavingPhone ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  <>
-                    <Plus className="w-5 h-5 mr-2" />
-                    {t("contacts.addContact") || "Add Contact"}
-                  </>
+                  t("common.save") || "Save"
                 )}
               </Button>
             </div>
