@@ -387,8 +387,13 @@ export async function setSocialNetworks(urls: string[]) {
 // ============ Phone Numbers API ============
 
 export interface PhoneNumberItem {
-  id: number;
+  id?: number;
   phone_number: string;
+}
+
+export interface SetPhoneNumbersResponse {
+  message: string;
+  numbers: PhoneNumberItem[];
 }
 
 /**
@@ -400,19 +405,9 @@ export async function getPhoneNumbers(userId: number) {
 }
 
 /**
- * Add user phone number
+ * Set user phone numbers (replaces all)
  * POST /users/phone_numbers/
  */
-export async function addPhoneNumber(phone_number: string) {
-  return apiPost<PhoneNumberItem>('/users/phone_numbers/', { phone_number });
-}
-
-/**
- * Delete user phone number
- * DELETE /users/phone_numbers/<id>/
- */
-export async function deletePhoneNumber(phoneId: number) {
-  return apiRequest<{ message: string }>(`/users/phone_numbers/${phoneId}/`, {
-    method: 'DELETE',
-  });
+export async function updatePhoneNumbers(phoneNumbers: string[]) {
+  return apiPost<SetPhoneNumbersResponse>('/users/phone_numbers/', { phone_numbers: phoneNumbers });
 }
