@@ -1577,6 +1577,8 @@
     "updateError": "فشل في تحديث جهة الاتصال",
     "deleteError": "فشل في حذف جهة الاتصال",
     "avatarUploadError": "فشل في رفع الصورة",
+    "loadInfoWithAI": "تحميل المعلومات بالذكاء الاصطناعي",
+    "loadInfoWithAIDescription": "تحليل الصور لاستخراج بيانات جهة الاتصال",
     "saveError": "فشل في حفظ جهة الاتصال",
     "addToList": "إضافة إلى القائمة",
     "saved": "تم حفظ التغييرات",

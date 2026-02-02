@@ -1639,6 +1639,8 @@
     "updateError": "Failed to update contact",
     "deleteError": "Failed to delete contact",
     "avatarUploadError": "Failed to upload photo",
+    "loadInfoWithAI": "Load Info with AI",
+    "loadInfoWithAIDescription": "Analyze photos to extract contact data",
     "saveError": "Failed to save contact",
     "addToList": "Add to list",
     "saved": "Changes saved",

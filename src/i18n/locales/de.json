@@ -1577,6 +1577,8 @@
     "updateError": "Kontakt konnte nicht aktualisiert werden",
     "deleteError": "Kontakt konnte nicht gelöscht werden",
     "avatarUploadError": "Foto konnte nicht hochgeladen werden",
+    "loadInfoWithAI": "Info mit KI laden",
+    "loadInfoWithAIDescription": "Fotos analysieren, um Kontaktdaten zu extrahieren",
     "saveError": "Kontakt konnte nicht gespeichert werden",
     "addToList": "Zur Liste hinzufügen",
     "saved": "Änderungen gespeichert",
