@@ -515,6 +515,62 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
         <span className="font-medium">{t("contacts.showQrCode") || "Show QR Code"}</span>
       </button>
 
+      {/* Send via app button */}
+      <Button
+        onClick={() => {
+          tap();
+          // Build contact text from selected fields
+          const selectedFields = shareFields.filter(f => f.checked);
+          const selectedSocials = (contact?.social_links || []).filter(link => socialChecked[link.id]);
+          const selectedPayments = (contact?.payment_methods || []).filter(pm => paymentChecked[pm.id]);
+
+          let contactText = `👤 ${contact?.full_name || ""}\n`;
+
+          selectedFields.forEach(field => {
+            if (field.id !== "name") {
+              contactText += `${field.label}: ${field.value}\n`;
+            }
+          });
+
+          if (selectedSocials.length > 0) {
+            contactText += `\n🔗 ${t("contacts.socialLinks")}:\n`;
+            selectedSocials.forEach(link => {
+              const platform = detectPlatform(link.url);
+              contactText += `${platform.name}: ${link.url}\n`;
+            });
+          }
+
+          if (selectedPayments.length > 0) {
+            contactText += `\n💳 ${t("contacts.paymentMethods")}:\n`;
+            selectedPayments.forEach(pm => {
+              contactText += `${pm.label}: ${pm.value}\n`;
+            });
+          }
+
+          // Use Web Share API to open system share menu
+          if (navigator.share) {
+            navigator.share({
+              title: contact?.full_name || t("contacts.contactData"),
+              text: contactText,
+            }).catch(() => {
+              // User cancelled or share failed, fallback to SMS
+              window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
+            });
+          } else {
+            // Fallback for browsers without Web Share API
+            window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
+          }
+        }}
+        disabled={!hasAnySelection}
+        variant="outline"
+        className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/20 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 active:bg-emerald-600 transition-all group"
+      >
+        <MessageSquare className="w-5 h-5 mr-2 text-emerald-500 group-hover:text-white transition-colors" />
+        <span className="flex-1 text-left">
+          {t("contacts.sendViaApp") || "Отправить через..."}
+        </span>
+      </Button>
+
       {/* Select what to share */}
       <div className="space-y-3">
         <p className="text-sm font-medium text-muted-foreground px-1">
@@ -612,64 +668,6 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
         )}
       </div>
 
-      {/* Action buttons */}
-      <div className="space-y-3 pt-2">
-        {/* Send data via SMS button */}
-        <Button
-          onClick={() => {
-            tap();
-            // Build contact text from selected fields
-            const selectedFields = shareFields.filter(f => f.checked);
-            const selectedSocials = (contact?.social_links || []).filter(link => socialChecked[link.id]);
-            const selectedPayments = (contact?.payment_methods || []).filter(pm => paymentChecked[pm.id]);
-
-            let contactText = `👤 ${contact?.full_name || ""}\n`;
-
-            selectedFields.forEach(field => {
-              if (field.id !== "name") {
-                contactText += `${field.label}: ${field.value}\n`;
-              }
-            });
-
-            if (selectedSocials.length > 0) {
-              contactText += `\n🔗 ${t("contacts.socialLinks")}:\n`;
-              selectedSocials.forEach(link => {
-                const platform = detectPlatform(link.url);
-                contactText += `${platform.name}: ${link.url}\n`;
-              });
-            }
-
-            if (selectedPayments.length > 0) {
-              contactText += `\n💳 ${t("contacts.paymentMethods")}:\n`;
-              selectedPayments.forEach(pm => {
-                contactText += `${pm.label}: ${pm.value}\n`;
-              });
-            }
-
-            // Use Web Share API to open system share menu
-            if (navigator.share) {
-              navigator.share({
-                title: contact?.full_name || t("contacts.contactData"),
-                text: contactText,
-              }).catch(() => {
-                // User cancelled or share failed, fallback to SMS
-                window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
-              });
-            } else {
-              // Fallback for browsers without Web Share API
-              window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
-            }
-          }}
-          disabled={!hasAnySelection}
-          variant="outline"
-          className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/20 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 active:bg-emerald-600 transition-all group"
-        >
-          <MessageSquare className="w-5 h-5 mr-2 text-emerald-500 group-hover:text-white transition-colors" />
-          <span className="flex-1 text-left">
-            {t("contacts.sendViaApp") || "Отправить через..."}
-          </span>
-        </Button>
-      </div>
     </motion.div>
   );
 
