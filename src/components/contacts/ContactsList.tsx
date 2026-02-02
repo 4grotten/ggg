@@ -233,9 +233,9 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
         onClick={onAddClick}
         className="w-full relative overflow-hidden group rounded-2xl shadow-lg"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 group-hover:from-emerald-400 group-hover:via-teal-400 group-hover:to-cyan-400 transition-all duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 group-hover:from-emerald-500 group-hover:via-teal-500 group-hover:to-cyan-500 transition-all duration-500" />
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0"
+          className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0"
           animate={{ x: ["-100%", "100%"] }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
         />
