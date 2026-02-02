@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Phone, User, CreditCard, TrendingUp, Percent, Shield, Award, ChevronRight, Save, Wallet, ArrowUpDown, Calendar, CheckCircle, XCircle, Crown, Sparkles } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
@@ -30,22 +31,24 @@ interface ClientDetailsDrawerProps {
 
 // Referral levels configuration - matching the real partner levels
 const REFERRAL_LEVELS = [
-  { id: "R1", name: "R1", icon: "🌱", color: "from-gray-400 to-gray-500", cardPercent: 15, txPercent: 0.05, minFriends: 0, maxFriends: 10, description: "Начальный уровень для новых партнёров" },
-  { id: "R2", name: "R2", icon: "🌿", color: "from-lime-400 to-lime-500", cardPercent: 20, txPercent: 0.1, minFriends: 10, maxFriends: 30, description: "Растущий партнёр с активной сетью" },
-  { id: "R3", name: "R3", icon: "💎", color: "from-blue-400 to-blue-500", cardPercent: 25, txPercent: 0.2, minFriends: 30, maxFriends: 50, description: "Опытный партнёр с премиум-бонусами" },
-  { id: "R4", name: "R4", icon: "👑", color: "from-purple-400 to-purple-500", cardPercent: 30, txPercent: 0.3, minFriends: 50, maxFriends: 100, description: "Элитный партнёр с максимальными привилегиями" },
-  { id: "Partner", name: "Partner", icon: "🚀", color: "from-amber-400 to-amber-500", cardPercent: 35, txPercent: 0.5, minFriends: 100, maxFriends: Infinity, description: "Официальный партнёр компании" },
+  { id: "R1", name: "R1", icon: "🌱", color: "from-gray-400 to-gray-500", cardPercent: 15, txPercent: 0.05, minFriends: 0, maxFriends: 10, descKey: "r1Desc" },
+  { id: "R2", name: "R2", icon: "🌿", color: "from-lime-400 to-lime-500", cardPercent: 20, txPercent: 0.1, minFriends: 10, maxFriends: 30, descKey: "r2Desc" },
+  { id: "R3", name: "R3", icon: "💎", color: "from-blue-400 to-blue-500", cardPercent: 25, txPercent: 0.2, minFriends: 30, maxFriends: 50, descKey: "r3Desc" },
+  { id: "R4", name: "R4", icon: "👑", color: "from-purple-400 to-purple-500", cardPercent: 30, txPercent: 0.3, minFriends: 50, maxFriends: 100, descKey: "r4Desc" },
+  { id: "Partner", name: "Partner", icon: "🚀", color: "from-amber-400 to-amber-500", cardPercent: 35, txPercent: 0.5, minFriends: 100, maxFriends: Infinity, descKey: "partnerDesc" },
 ];
 
 // Subscription types configuration
 const SUBSCRIPTION_TYPES = [
-  { id: "free", name: "Бесплатная", icon: "🆓", color: "from-gray-400 to-gray-500", description: "Базовый функционал без дополнительных преимуществ" },
-  { id: "standard", name: "Стандартная", icon: "⭐", color: "from-blue-400 to-blue-500", description: "Расширенные лимиты и сниженные комиссии" },
-  { id: "premium", name: "Премиум", icon: "💎", color: "from-purple-400 to-purple-500", description: "Максимальные лимиты, приоритетная поддержка" },
-  { id: "vip", name: "VIP", icon: "👑", color: "from-amber-400 to-amber-500", description: "Эксклюзивные условия и персональный менеджер" },
+  { id: "free", icon: "🆓", color: "from-gray-400 to-gray-500", nameKey: "free", descKey: "freeDesc" },
+  { id: "standard", icon: "⭐", color: "from-blue-400 to-blue-500", nameKey: "standard", descKey: "standardDesc" },
+  { id: "premium", icon: "💎", color: "from-purple-400 to-purple-500", nameKey: "premium", descKey: "premiumDesc" },
+  { id: "vip", icon: "👑", color: "from-amber-400 to-amber-500", nameKey: "vip", descKey: "vipDesc" },
 ];
 
 export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetailsDrawerProps) {
+  const { t } = useTranslation();
+  
   // Local state for editable fields
   const [selectedLevel, setSelectedLevel] = useState(client?.referralLevel || "R1");
   const [selectedSubscription, setSelectedSubscription] = useState("free");
@@ -72,7 +75,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
   });
 
   const handleSave = () => {
-    toast.success("Настройки клиента сохранены");
+    toast.success(t("admin.clients.settingsSaved"));
     onOpenChange(false);
   };
 
@@ -84,7 +87,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[95vh]">
         <DrawerHeader className="border-b border-border/50 pb-4">
-          <DrawerTitle className="text-lg font-bold">Настройки клиента</DrawerTitle>
+          <DrawerTitle className="text-lg font-bold">{t("admin.clients.settingsTitle")}</DrawerTitle>
         </DrawerHeader>
         
         <div className="overflow-y-auto px-4 pb-8 pt-4 space-y-6">
@@ -127,7 +130,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                   )}
                   {isBlocked && (
                     <Badge variant="destructive" className="text-[10px] px-2 py-0.5">
-                      Заблокирован
+                      {t("admin.clients.blocked")}
                     </Badge>
                   )}
                 </div>
@@ -135,7 +138,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
               
               {/* Balance */}
               <div className="text-right shrink-0">
-                <p className="text-xs text-muted-foreground">Баланс</p>
+                <p className="text-xs text-muted-foreground">{t("admin.clients.balance")}</p>
                 <p className="text-lg font-bold text-emerald-500">{client.balance.toLocaleString()} AED</p>
               </div>
             </div>
@@ -146,24 +149,23 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
             <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border/50">
               <div className="flex items-center gap-2">
                 <Crown className="w-4 h-4 text-amber-500" />
-                <span className="text-sm font-medium">VIP статус</span>
+                <span className="text-sm font-medium">{t("admin.clients.vipStatus")}</span>
               </div>
               <Switch checked={isVIP} onCheckedChange={setIsVIP} />
             </div>
             <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border/50">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-destructive" />
-                <span className="text-sm font-medium">Блокировка</span>
+                <span className="text-sm font-medium">{t("admin.clients.blockStatus")}</span>
               </div>
               <Switch checked={isBlocked} onCheckedChange={setIsBlocked} />
             </div>
           </div>
 
-          {/* Subscription Type Section */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">Вид подписки</h4>
+              <h4 className="font-semibold">{t("admin.clients.subscriptionType")}</h4>
             </div>
             
             <div className="grid grid-cols-2 gap-2">
@@ -187,12 +189,12 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-sm">{sub.name}</span>
+                        <span className="font-semibold text-sm">{t(`admin.clients.subscriptions.${sub.nameKey}`)}</span>
                         {selectedSubscription === sub.id && (
                           <CheckCircle className="w-3.5 h-3.5 text-primary" />
                         )}
                       </div>
-                      <p className="text-[10px] text-muted-foreground line-clamp-1">{sub.description}</p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1">{t(`admin.clients.subscriptions.${sub.descKey}`)}</p>
                     </div>
                   </div>
                 </button>
@@ -204,7 +206,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Award className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">Реферальный уровень</h4>
+              <h4 className="font-semibold">{t("admin.clients.referralLevel")}</h4>
             </div>
             
             <div className="space-y-2">
@@ -234,11 +236,11 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                         <span className="font-bold text-sm">{level.name}</span>
                         {selectedLevel === level.id && (
                           <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0">
-                            Текущий
+                            {t("admin.clients.current")}
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-1">{level.description}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{t(`admin.clients.levels.${level.descKey}`)}</p>
                     </div>
                     
                     {/* Stats */}
@@ -263,24 +265,23 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                   
                   {/* Friends requirement */}
                   <div className="mt-2 pt-2 border-t border-border/30 flex items-center justify-between text-[10px] text-muted-foreground">
-                    <span>Требуется друзей: {level.minFriends}{level.maxFriends !== Infinity ? `–${level.maxFriends}` : '+'}</span>
-                    <span>Карта {level.cardPercent}% · TX {level.txPercent}%</span>
+                    <span>{t("admin.clients.friendsRequired")}: {level.minFriends}{level.maxFriends !== Infinity ? `–${level.maxFriends}` : '+'}</span>
+                    <span>Card {level.cardPercent}% · TX {level.txPercent}%</span>
                   </div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Personal Fees Section */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Percent className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">Персональные комиссии</h4>
+              <h4 className="font-semibold">{t("admin.clients.personalFees")}</h4>
             </div>
             
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Пополнение</Label>
+                <Label className="text-xs text-muted-foreground">{t("admin.clients.topUp")}</Label>
                 <div className="relative">
                   <Input
                     type="number"
@@ -292,7 +293,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Переводы</Label>
+                <Label className="text-xs text-muted-foreground">{t("admin.clients.transfers")}</Label>
                 <div className="relative">
                   <Input
                     type="number"
@@ -304,7 +305,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Вывод</Label>
+                <Label className="text-xs text-muted-foreground">{t("admin.clients.withdrawal")}</Label>
                 <div className="relative">
                   <Input
                     type="number"
@@ -316,7 +317,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Конвертация</Label>
+                <Label className="text-xs text-muted-foreground">{t("admin.clients.conversion")}</Label>
                 <div className="relative">
                   <Input
                     type="number"
@@ -330,19 +331,18 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
             </div>
           </div>
 
-          {/* Limits Section */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <ArrowUpDown className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">Персональные лимиты</h4>
+              <h4 className="font-semibold">{t("admin.clients.personalLimits")}</h4>
             </div>
             
             {/* Daily Limits */}
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Дневные лимиты</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("admin.clients.dailyLimits")}</p>
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground">Пополнение</Label>
+                  <Label className="text-[10px] text-muted-foreground">{t("admin.clients.topUp")}</Label>
                   <div className="relative">
                     <Input
                       type="number"
@@ -354,7 +354,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground">Переводы</Label>
+                  <Label className="text-[10px] text-muted-foreground">{t("admin.clients.transfers")}</Label>
                   <div className="relative">
                     <Input
                       type="number"
@@ -366,7 +366,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground">Вывод</Label>
+                  <Label className="text-[10px] text-muted-foreground">{t("admin.clients.withdrawal")}</Label>
                   <div className="relative">
                     <Input
                       type="number"
@@ -382,10 +382,10 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
             
             {/* Monthly Limits */}
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Месячные лимиты</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("admin.clients.monthlyLimits")}</p>
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground">Пополнение</Label>
+                  <Label className="text-[10px] text-muted-foreground">{t("admin.clients.topUp")}</Label>
                   <div className="relative">
                     <Input
                       type="number"
@@ -397,7 +397,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground">Переводы</Label>
+                  <Label className="text-[10px] text-muted-foreground">{t("admin.clients.transfers")}</Label>
                   <div className="relative">
                     <Input
                       type="number"
@@ -409,7 +409,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground">Вывод</Label>
+                  <Label className="text-[10px] text-muted-foreground">{t("admin.clients.withdrawal")}</Label>
                   <div className="relative">
                     <Input
                       type="number"
@@ -425,7 +425,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
             
             {/* Single Transaction Limit */}
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Лимит на транзакцию</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("admin.clients.transactionLimit")}</p>
               <div className="relative">
                 <Input
                   type="number"
@@ -444,7 +444,7 @@ export function ClientDetailsDrawer({ open, onOpenChange, client }: ClientDetail
             className="w-full h-12 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold"
           >
             <Save className="w-5 h-5 mr-2" />
-            Сохранить изменения
+            {t("admin.clients.saveChanges")}
           </Button>
         </div>
       </DrawerContent>
