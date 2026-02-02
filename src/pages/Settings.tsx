@@ -1525,7 +1525,7 @@ const Settings = () => {
       <Drawer open={isContactsListOpen} onOpenChange={setIsContactsListOpen}>
         <DrawerContent className="max-h-[90vh]">
           <DrawerHeader className="px-4 pb-2 border-b border-border/50">
-            <div className="grid grid-cols-[1fr,auto] items-center gap-2">
+            <div className="flex items-center justify-between">
               <DrawerTitle className="text-left">{t("contacts.viewContacts") || "Мои контакты"}</DrawerTitle>
               <button
                 onClick={() => setIsContactsListOpen(false)}
