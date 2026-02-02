@@ -515,7 +515,7 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
         <span className="font-medium">{t("contacts.showQrCode") || "Show QR Code"}</span>
       </button>
 
-      {/* Send via app button */}
+      {/* Share data button */}
       <Button
         onClick={() => {
           tap();
@@ -547,18 +547,18 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
             });
           }
 
-          // Use Web Share API to open system share menu
+          // Use Web Share API only
           if (navigator.share) {
             navigator.share({
               title: contact?.full_name || t("contacts.contactData"),
               text: contactText,
             }).catch(() => {
-              // User cancelled or share failed, fallback to SMS
-              window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
+              // User cancelled - do nothing
             });
           } else {
-            // Fallback for browsers without Web Share API
-            window.location.href = `sms:?body=${encodeURIComponent(contactText)}`;
+            // Copy to clipboard as fallback
+            navigator.clipboard.writeText(contactText);
+            toast.success(t("common.copied") || "Скопировано");
           }
         }}
         disabled={!hasAnySelection}
@@ -567,7 +567,7 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
       >
         <Share2 className="w-5 h-5 mr-2 text-emerald-500 group-hover:text-white transition-colors" />
         <span className="flex-1 text-left">
-          {t("common.share") || "Поделиться"}
+          {t("contacts.shareData") || "Поделиться данными"}
         </span>
       </Button>
 
