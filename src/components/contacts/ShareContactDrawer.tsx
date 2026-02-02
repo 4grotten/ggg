@@ -505,6 +505,16 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
         </div>
       </motion.div>
 
+      {/* QR Code button - right after contact card */}
+      <button
+        onClick={() => { tap(); setCurrentView("qr"); }}
+        disabled={!hasAnySelection}
+        className="w-full flex items-center justify-center gap-3 p-4 bg-muted/50 rounded-2xl hover:bg-muted/70 transition-colors disabled:opacity-50"
+      >
+        <QrCode className="w-5 h-5" />
+        <span className="font-medium">{t("contacts.showQrCode") || "Show QR Code"}</span>
+      </button>
+
       {/* Select what to share */}
       <div className="space-y-3">
         <p className="text-sm font-medium text-muted-foreground px-1">
@@ -604,16 +614,6 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
 
       {/* Action buttons */}
       <div className="space-y-3 pt-2">
-        {/* QR Code button */}
-        <button
-          onClick={() => { tap(); setCurrentView("qr"); }}
-          disabled={!hasAnySelection}
-          className="w-full flex items-center justify-center gap-3 p-4 bg-muted/50 rounded-2xl hover:bg-muted/70 transition-colors disabled:opacity-50"
-        >
-          <QrCode className="w-5 h-5" />
-          <span className="font-medium">{t("contacts.showQrCode") || "Show QR Code"}</span>
-        </button>
-
         {/* Send data via SMS button */}
         <Button
           onClick={() => {
