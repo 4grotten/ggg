@@ -12,7 +12,7 @@ import {
   Phone, 
   Mail, 
   Building2,
-  ChevronRight,
+  Settings,
   UserPlus,
   Users,
   Share2,
@@ -444,11 +444,11 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
                         </div>
 
                         <motion.div
-                          animate={{ x: [0, 4, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
+                          whileHover={{ rotate: 90 }}
+                          transition={{ duration: 0.3 }}
                           className="opacity-50 group-hover:opacity-100 transition-opacity"
                         >
-                          <ChevronRight className="w-5 h-5 text-primary" />
+                          <Settings className="w-5 h-5 text-primary" />
                         </motion.div>
                       </div>
                     </motion.button>
