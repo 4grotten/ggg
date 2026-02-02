@@ -1206,6 +1206,24 @@
           "2": "Tüm aktif oturumlar sonlandırılacaktır"
         }
       },
+      "get-phone-numbers": {
+        "title": "Telefon Numaralarını Al",
+        "description": "Kullanıcı hesabıyla ilişkili tüm telefon numaralarını alın.",
+        "notes": {
+          "0": "Kullanıcıyla ilişkili telefon numaralarını bir dizi olarak döndürür",
+          "1": "Her telefon numarasının güncelleme/silme işlemleri için benzersiz bir ID'si vardır",
+          "2": "Kullanıcı yalnızca kendi telefon numaralarını alabilir"
+        }
+      },
+      "update-phone-numbers": {
+        "title": "Telefon Numaralarını Güncelle",
+        "description": "Mevcut kullanıcının tüm telefon numaralarını ayarlayın veya güncelleyin. Mevcut listeyi yenisiyle değiştirir.",
+        "notes": {
+          "0": "Bu uç nokta tüm mevcut telefon numaralarını yeni listeyle değiştirir",
+          "1": "Telefon numaraları uluslararası formatta olmalıdır (+ ile başlayan)",
+          "2": "phone_numbers alanı eksik veya geçersiz değerler içeriyorsa 406 döndürür"
+        }
+      },
       "upload-avatar": {
         "title": "Avatar Yükle",
         "description": "Profil için avatar resmi yükleyin. Farklı boyut varyantlarıyla dosya verileri döndürür.",
