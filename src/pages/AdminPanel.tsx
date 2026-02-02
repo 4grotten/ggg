@@ -21,45 +21,45 @@ import { cn } from "@/lib/utils";
 import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
 import { useOpenAISettings } from "@/hooks/useOpenAISettings";
 
-// Settings field configuration
+// Settings field configuration with i18n keys
 const exchangeRateFields = [
-  { key: "usdt_to_aed_buy", label: "USDT → AED (покупка)", suffix: "AED", icon: TrendingUp },
-  { key: "usdt_to_aed_sell", label: "USDT → AED (продажа)", suffix: "AED", icon: TrendingUp },
-  { key: "usd_to_aed_buy", label: "USD → AED (покупка)", suffix: "AED", icon: DollarSign },
-  { key: "usd_to_aed_sell", label: "USD → AED (продажа)", suffix: "AED", icon: DollarSign },
-  { key: "aed_to_usd_buy", label: "AED → USD (покупка)", suffix: "USD", icon: DollarSign },
-  { key: "aed_to_usd_sell", label: "AED → USD (продажа)", suffix: "USD", icon: DollarSign },
+  { key: "usdt_to_aed_buy", labelKey: "usdtToAedBuy", suffix: "AED", icon: TrendingUp },
+  { key: "usdt_to_aed_sell", labelKey: "usdtToAedSell", suffix: "AED", icon: TrendingUp },
+  { key: "usd_to_aed_buy", labelKey: "usdToAedBuy", suffix: "AED", icon: DollarSign },
+  { key: "usd_to_aed_sell", labelKey: "usdToAedSell", suffix: "AED", icon: DollarSign },
+  { key: "aed_to_usd_buy", labelKey: "aedToUsdBuy", suffix: "USD", icon: DollarSign },
+  { key: "aed_to_usd_sell", labelKey: "aedToUsdSell", suffix: "USD", icon: DollarSign },
 ];
 
 const feeFields = [
-  { key: "top_up_crypto_flat", label: "Крипто пополнение (фикс)", suffix: "USDT" },
-  { key: "top_up_bank_percent", label: "Банковское пополнение", suffix: "%" },
-  { key: "card_to_card_percent", label: "Перевод карта → карта", suffix: "%" },
-  { key: "bank_transfer_percent", label: "Банковский перевод", suffix: "%" },
-  { key: "network_fee_percent", label: "Сетевая комиссия", suffix: "%" },
-  { key: "currency_conversion_percent", label: "Конвертация валюты", suffix: "%" },
-  { key: "virtual_card_annual", label: "Виртуальная карта (год)", suffix: "AED" },
-  { key: "virtual_card_replacement", label: "Замена виртуальной карты", suffix: "AED" },
-  { key: "metal_card_annual", label: "Металлическая карта (год)", suffix: "AED" },
-  { key: "metal_card_replacement", label: "Замена металлической карты", suffix: "AED" },
-  { key: "virtual_account_opening", label: "Открытие виртуального счёта", suffix: "AED" },
+  { key: "top_up_crypto_flat", labelKey: "topUpCryptoFlat", suffix: "USDT" },
+  { key: "top_up_bank_percent", labelKey: "topUpBankPercent", suffix: "%" },
+  { key: "card_to_card_percent", labelKey: "cardToCardPercent", suffix: "%" },
+  { key: "bank_transfer_percent", labelKey: "bankTransferPercent", suffix: "%" },
+  { key: "network_fee_percent", labelKey: "networkFeePercent", suffix: "%" },
+  { key: "currency_conversion_percent", labelKey: "currencyConversionPercent", suffix: "%" },
+  { key: "virtual_card_annual", labelKey: "virtualCardAnnual", suffix: "AED" },
+  { key: "virtual_card_replacement", labelKey: "virtualCardReplacement", suffix: "AED" },
+  { key: "metal_card_annual", labelKey: "metalCardAnnual", suffix: "AED" },
+  { key: "metal_card_replacement", labelKey: "metalCardReplacement", suffix: "AED" },
+  { key: "virtual_account_opening", labelKey: "virtualAccountOpening", suffix: "AED" },
 ];
 
 const limitFields = [
-  { key: "top_up_crypto_min", label: "Мин. крипто пополнение", suffix: "USDT", group: "min" },
-  { key: "top_up_bank_min", label: "Мин. банковское пополнение", suffix: "AED", group: "min" },
-  { key: "transfer_min", label: "Мин. перевод", suffix: "AED", group: "min" },
-  { key: "withdrawal_min", label: "Мин. вывод", suffix: "AED", group: "min" },
-  { key: "top_up_crypto_max", label: "Макс. крипто пополнение", suffix: "USDT", group: "max" },
-  { key: "top_up_bank_max", label: "Макс. банковское пополнение", suffix: "AED", group: "max" },
-  { key: "transfer_max", label: "Макс. перевод", suffix: "AED", group: "max" },
-  { key: "withdrawal_max", label: "Макс. вывод", suffix: "AED", group: "max" },
-  { key: "daily_top_up_limit", label: "Дневной лимит пополнения", suffix: "AED", group: "daily" },
-  { key: "daily_transfer_limit", label: "Дневной лимит переводов", suffix: "AED", group: "daily" },
-  { key: "daily_withdrawal_limit", label: "Дневной лимит вывода", suffix: "AED", group: "daily" },
-  { key: "monthly_top_up_limit", label: "Месячный лимит пополнения", suffix: "AED", group: "monthly" },
-  { key: "monthly_transfer_limit", label: "Месячный лимит переводов", suffix: "AED", group: "monthly" },
-  { key: "monthly_withdrawal_limit", label: "Месячный лимит вывода", suffix: "AED", group: "monthly" },
+  { key: "top_up_crypto_min", labelKey: "topUpCryptoMin", suffix: "USDT", group: "min" },
+  { key: "top_up_bank_min", labelKey: "topUpBankMin", suffix: "AED", group: "min" },
+  { key: "transfer_min", labelKey: "transferMin", suffix: "AED", group: "min" },
+  { key: "withdrawal_min", labelKey: "withdrawalMin", suffix: "AED", group: "min" },
+  { key: "top_up_crypto_max", labelKey: "topUpCryptoMax", suffix: "USDT", group: "max" },
+  { key: "top_up_bank_max", labelKey: "topUpBankMax", suffix: "AED", group: "max" },
+  { key: "transfer_max", labelKey: "transferMax", suffix: "AED", group: "max" },
+  { key: "withdrawal_max", labelKey: "withdrawalMax", suffix: "AED", group: "max" },
+  { key: "daily_top_up_limit", labelKey: "dailyTopUp", suffix: "AED", group: "daily" },
+  { key: "daily_transfer_limit", labelKey: "dailyTransfer", suffix: "AED", group: "daily" },
+  { key: "daily_withdrawal_limit", labelKey: "dailyWithdrawal", suffix: "AED", group: "daily" },
+  { key: "monthly_top_up_limit", labelKey: "monthlyTopUp", suffix: "AED", group: "monthly" },
+  { key: "monthly_transfer_limit", labelKey: "monthlyTransfer", suffix: "AED", group: "monthly" },
+  { key: "monthly_withdrawal_limit", labelKey: "monthlyWithdrawal", suffix: "AED", group: "monthly" },
 ];
 
 // Mock admin action history
@@ -502,9 +502,12 @@ export default function AdminPanel() {
 
   const renderSettingsGroup = (
     category: string,
-    fields: { key: string; label: string; suffix: string }[]
+    fields: { key: string; labelKey: string; suffix: string }[]
   ) => {
     const categorySettings = getSettingsByCategory(category);
+    
+    // Map category to translation namespace
+    const translationNs = category === 'exchange_rates' ? 'exchangeRates' : category;
     
     if (categorySettings.length === 0) {
       return (
@@ -527,11 +530,14 @@ export default function AdminPanel() {
         updated_by: null,
       };
 
+      // Get translated label
+      const label = t(`admin.${translationNs}.${field.labelKey}`);
+
       return (
         <SettingsField
           key={field.key}
           setting={settingToUse}
-          label={field.label}
+          label={label}
           suffix={field.suffix}
           onUpdate={handleUpdate(category)}
           isPending={updateSetting.isPending}
