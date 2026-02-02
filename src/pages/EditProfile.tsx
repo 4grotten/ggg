@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2 } from "lucide-react";
+import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2, BookUser } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { toast } from "sonner";
@@ -25,6 +25,8 @@ import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 import { SocialLinksInput, SocialLink, migrateSocialLinks } from "@/components/settings/SocialLinksInput";
+import { AddContactDrawer } from "@/components/contacts/AddContactDrawer";
+import { useSavedContacts } from "@/hooks/useSavedContacts";
 
 const profileSchemaBase = z.object({
   full_name: z.string().min(1).min(2).max(100),
@@ -77,6 +79,10 @@ const EditProfile = () => {
   const [isSavingSocial, setIsSavingSocial] = useState(false);
   const [isLoadingSocial, setIsLoadingSocial] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  
+  // Contacts state
+  const [isContactsDrawerOpen, setIsContactsDrawerOpen] = useState(false);
+  const { contacts } = useSavedContacts();
 
   // Create schema with localized messages
   const profileSchema = z.object({
@@ -785,8 +791,35 @@ const EditProfile = () => {
                 )}
               />
 
-              {/* Social Links & Password Buttons */}
+              {/* Contacts, Social Links & Password Buttons */}
               <div className="pt-2 space-y-3">
+                {/* Contacts Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsContactsDrawerOpen(true)}
+                  className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                      <BookUser className="w-5 h-5 text-purple-500" />
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <span className="text-foreground font-medium">{t("contacts.title") || "Contacts"}</span>
+                      {contacts.length > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          {t("contacts.contactsCount", { count: contacts.length }) || `${contacts.length} contacts`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {contacts.length > 0 && (
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                    )}
+                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </div>
+                </button>
+
                 {/* Social Links Button */}
                 <button
                   type="button"
@@ -1109,6 +1142,12 @@ const EditProfile = () => {
         onOpenChange={setIsCropDialogOpen}
         imageSrc={cropImageSrc}
         onCropComplete={handleCropComplete}
+      />
+
+      {/* Add Contact Drawer */}
+      <AddContactDrawer
+        isOpen={isContactsDrawerOpen}
+        onClose={() => setIsContactsDrawerOpen(false)}
       />
     </>
   );
