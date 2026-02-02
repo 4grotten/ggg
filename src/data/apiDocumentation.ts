@@ -678,6 +678,105 @@ export const apiCategories: ApiCategory[] = [
           'Account can be reactivated by logging in again',
           'All active sessions will be terminated'
         ]
+      },
+      {
+        id: 'get-phone-numbers',
+        method: 'GET',
+        path: '/users/{user_id}/phone_numbers/',
+        title: 'Get User Phone Numbers',
+        description: 'Retrieve all phone numbers associated with a user account.',
+        category: 'profile',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'user_id', type: 'number', required: true, description: 'User ID to get phone numbers for' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${API_BASE_URL}/users/12345/phone_numbers/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "id": 58,
+    "phone_number": "+996777123123"
+  },
+  {
+    "id": 59,
+    "phone_number": "+996312700002"
+  }
+]`
+        },
+        responseParams: [
+          { name: 'id', type: 'number', required: true, description: 'Phone number record ID' },
+          { name: 'phone_number', type: 'string', required: true, description: 'Phone number in international format' }
+        ],
+        notes: [
+          'Returns an array of phone numbers associated with the user',
+          'Each phone number has a unique ID for update/delete operations',
+          'User can only retrieve their own phone numbers'
+        ]
+      },
+      {
+        id: 'update-phone-numbers',
+        method: 'POST',
+        path: '/users/phone_numbers/',
+        title: 'Update User Phone Numbers',
+        description: 'Set or update all phone numbers for the current user. Replaces the existing list with the new one.',
+        category: 'profile',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'phone_numbers', type: 'array', required: true, description: 'Array of phone numbers in international format' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/users/phone_numbers/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+  "phone_numbers": [
+    "+996777123123",
+    "+996312700001"
+  ]
+}'`,
+          json: `{
+  "phone_numbers": [
+    "+996777123123",
+    "+996312700001"
+  ]
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Successfully updated",
+  "numbers": [
+    {
+      "phone_number": "+996777123123"
+    },
+    {
+      "phone_number": "+996312700002"
+    }
+  ]
+}`
+        },
+        responseParams: [
+          { name: 'message', type: 'string', required: true, description: 'Status message' },
+          { name: 'numbers', type: 'array', required: true, description: 'Array of saved phone numbers' }
+        ],
+        notes: [
+          'This endpoint replaces all existing phone numbers with the new list',
+          'Phone numbers must be in international format (starting with +)',
+          'Returns 406 if phone_numbers field is missing or contains invalid values'
+        ]
       }
     ]
   },
