@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { 
-  ArrowLeft,
+  ChevronRight,
   Copy, 
   Share2, 
   Check, 
@@ -686,24 +686,26 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="relative px-4 flex items-center gap-3">
-          <button
-            onClick={currentView !== "main" ? handleBack : onClose}
-            className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <DrawerTitle className="text-left flex-1">
-            {currentView === "qr"
-              ? (t("contacts.qrCode") || "QR Code")
-              : (t("contacts.shareContact") || "Share Contact")}
-          </DrawerTitle>
-          <button
-            onClick={onClose}
-            className="p-2 -mr-2 rounded-full hover:bg-blue-500/10 transition-colors"
-          >
-            <X className="w-5 h-5 text-blue-500" />
-          </button>
+        <DrawerHeader className="border-b border-border/50">
+          <div className="flex items-center">
+            <button
+              onClick={currentView !== "main" ? handleBack : onClose}
+              className="mr-3 w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
+            >
+              <ChevronRight className="w-5 h-5 rotate-180" />
+            </button>
+            <DrawerTitle className="flex-1">
+              {currentView === "qr"
+                ? (t("contacts.qrCode") || "QR Code")
+                : (t("contacts.shareContact") || "Share Contact")}
+            </DrawerTitle>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </DrawerHeader>
 
         <div className="px-4 pb-8 overflow-y-auto max-h-[70vh]">
