@@ -1633,6 +1633,7 @@
     "shareContact": "Share Contact",
     "shareContactDescription": "Send contact details",
     "addToContacts": "Add Contact",
-    "addedToContacts": "Contact added"
+    "addedToContacts": "Contact added",
+    "shareData": "Share Data"
   }
 }

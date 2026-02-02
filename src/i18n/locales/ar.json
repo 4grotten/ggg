@@ -1544,6 +1544,7 @@
     "shareContact": "مشاركة جهة الاتصال",
     "shareContactDescription": "إرسال بيانات جهة الاتصال",
     "addToContacts": "إضافة جهة اتصال",
-    "addedToContacts": "تمت إضافة جهة الاتصال"
+    "addedToContacts": "تمت إضافة جهة الاتصال",
+    "shareData": "مشاركة البيانات"
   }
 }

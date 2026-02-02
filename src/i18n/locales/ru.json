@@ -1640,6 +1640,7 @@
     "sendDataViaSms": "Отправить сообщением",
     "sendViaApp": "Отправить через...",
     "viaSms": "через SMS",
-    "viaEmail": "по Email"
+    "viaEmail": "по Email",
+    "shareData": "Поделиться данными"
   }
 }

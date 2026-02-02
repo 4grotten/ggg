@@ -1551,6 +1551,7 @@
     "shareContact": "分享联系人",
     "shareContactDescription": "发送联系人信息",
     "addToContacts": "添加联系人",
-    "addedToContacts": "联系人已添加"
+    "addedToContacts": "联系人已添加",
+    "shareData": "分享数据"
   }
 }
