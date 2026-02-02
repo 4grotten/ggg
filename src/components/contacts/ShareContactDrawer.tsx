@@ -565,9 +565,9 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
         variant="outline"
         className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/20 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 active:bg-emerald-600 transition-all group"
       >
-        <MessageSquare className="w-5 h-5 mr-2 text-emerald-500 group-hover:text-white transition-colors" />
+        <Share2 className="w-5 h-5 mr-2 text-emerald-500 group-hover:text-white transition-colors" />
         <span className="flex-1 text-left">
-          {t("contacts.sendViaApp") || "Отправить через..."}
+          {t("common.share") || "Поделиться"}
         </span>
       </Button>
 
