@@ -799,8 +799,8 @@ const EditProfile = () => {
                   className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
-                      <Phone className="w-5 h-5 text-purple-500" />
+                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                      <Phone className="w-5 h-5 text-blue-500" />
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="text-foreground font-medium">{t("contacts.title") || "Contacts"}</span>
