@@ -1544,6 +1544,7 @@
     "shareContact": "Compartir contacto",
     "shareContactDescription": "Enviar datos del contacto",
     "addToContacts": "Añadir contacto",
-    "addedToContacts": "Contacto añadido"
+    "addedToContacts": "Contacto añadido",
+    "shareData": "Compartir datos"
   }
 }
