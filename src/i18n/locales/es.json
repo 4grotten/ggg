@@ -1206,6 +1206,24 @@
           "2": "Todas las sesiones activas serán terminadas"
         }
       },
+      "get-phone-numbers": {
+        "title": "Obtener Números de Teléfono",
+        "description": "Obtener todos los números de teléfono asociados con una cuenta de usuario.",
+        "notes": {
+          "0": "Devuelve un array de números de teléfono asociados con el usuario",
+          "1": "Cada número de teléfono tiene un ID único para operaciones de actualización/eliminación",
+          "2": "El usuario solo puede obtener sus propios números de teléfono"
+        }
+      },
+      "update-phone-numbers": {
+        "title": "Actualizar Números de Teléfono",
+        "description": "Establecer o actualizar todos los números de teléfono del usuario actual. Reemplaza la lista existente con la nueva.",
+        "notes": {
+          "0": "Este endpoint reemplaza todos los números de teléfono existentes con la nueva lista",
+          "1": "Los números de teléfono deben estar en formato internacional (comenzando con +)",
+          "2": "Devuelve 406 si el campo phone_numbers falta o contiene valores inválidos"
+        }
+      },
       "upload-avatar": {
         "title": "Subir Avatar",
         "description": "Subir imagen de avatar para el perfil. Devuelve datos del archivo con variantes de diferentes tamaños.",

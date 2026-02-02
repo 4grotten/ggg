@@ -1206,6 +1206,24 @@
           "2": "Alle aktiven Sitzungen werden beendet"
         }
       },
+      "get-phone-numbers": {
+        "title": "Telefonnummern abrufen",
+        "description": "Alle mit einem Benutzerkonto verknüpften Telefonnummern abrufen.",
+        "notes": {
+          "0": "Gibt ein Array von Telefonnummern des Benutzers zurück",
+          "1": "Jede Telefonnummer hat eine eindeutige ID für Aktualisierungs-/Löschvorgänge",
+          "2": "Benutzer können nur ihre eigenen Telefonnummern abrufen"
+        }
+      },
+      "update-phone-numbers": {
+        "title": "Telefonnummern aktualisieren",
+        "description": "Alle Telefonnummern des aktuellen Benutzers festlegen oder aktualisieren. Ersetzt die bestehende Liste durch die neue.",
+        "notes": {
+          "0": "Dieser Endpunkt ersetzt alle bestehenden Telefonnummern durch die neue Liste",
+          "1": "Telefonnummern müssen im internationalen Format sein (beginnend mit +)",
+          "2": "Gibt 406 zurück, wenn das Feld phone_numbers fehlt oder ungültige Werte enthält"
+        }
+      },
       "upload-avatar": {
         "title": "Avatar hochladen",
         "description": "Avatar-Bild für das Profil hochladen. Gibt Dateidaten mit verschiedenen Größenvarianten zurück.",

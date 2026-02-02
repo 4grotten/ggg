@@ -1266,6 +1266,24 @@
           "2": "All active sessions will be terminated"
         }
       },
+      "get-phone-numbers": {
+        "title": "Get User Phone Numbers",
+        "description": "Retrieve all phone numbers associated with a user account.",
+        "notes": {
+          "0": "Returns an array of phone numbers associated with the user",
+          "1": "Each phone number has a unique ID for update/delete operations",
+          "2": "User can only retrieve their own phone numbers"
+        }
+      },
+      "update-phone-numbers": {
+        "title": "Update User Phone Numbers",
+        "description": "Set or update all phone numbers for the current user. Replaces the existing list with the new one.",
+        "notes": {
+          "0": "This endpoint replaces all existing phone numbers with the new list",
+          "1": "Phone numbers must be in international format (starting with +)",
+          "2": "Returns 406 if phone_numbers field is missing or contains invalid values"
+        }
+      },
       "upload-avatar": {
         "title": "Upload Avatar Image",
         "description": "Upload an avatar image for user profile. Returns file data with multiple size variants.",
