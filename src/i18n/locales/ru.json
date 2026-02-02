@@ -1541,6 +1541,8 @@
     }
   },
   "contacts": {
+    "title": "Контакты",
+    "contactsCount": "{{count}} контактов",
     "addContact": "Добавить контакт",
     "addContactDescription": "Создать новый контакт или сканировать визитку",
     "editContact": "Редактировать контакт",

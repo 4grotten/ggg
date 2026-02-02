@@ -1483,6 +1483,8 @@
     }
   },
   "contacts": {
+    "title": "Contactos",
+    "contactsCount": "{{count}} contactos",
     "addContact": "Añadir contacto",
     "editContact": "Editar contacto",
     "viewContacts": "Mis contactos",

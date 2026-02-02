@@ -1483,6 +1483,8 @@
     }
   },
   "contacts": {
+    "title": "جهات الاتصال",
+    "contactsCount": "{{count}} جهات اتصال",
     "addContact": "إضافة جهة اتصال",
     "editContact": "تعديل جهة الاتصال",
     "viewContacts": "جهات الاتصال",
