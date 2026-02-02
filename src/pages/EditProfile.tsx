@@ -22,7 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
-import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
+import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, getPhoneNumbers, addPhoneNumber, deletePhoneNumber, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 import { SocialLinksInput, SocialLink, migrateSocialLinks } from "@/components/settings/SocialLinksInput";
 
@@ -80,8 +80,10 @@ const EditProfile = () => {
   
   // Phone contacts state
   const [isPhoneContactsDrawerOpen, setIsPhoneContactsDrawerOpen] = useState(false);
-  const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberItem[]>([]);
   const [newPhoneNumber, setNewPhoneNumber] = useState("+");
+  const [isLoadingPhones, setIsLoadingPhones] = useState(false);
+  const [isSavingPhone, setIsSavingPhone] = useState(false);
 
   // Create schema with localized messages
   const profileSchema = z.object({
@@ -397,6 +399,25 @@ const EditProfile = () => {
       toast.error(t("editProfile.socialLinks.error") || "Failed to save");
     } finally {
       setIsSavingSocial(false);
+    }
+  };
+
+  // Load phone numbers from API when drawer opens
+  const handlePhoneContactsDrawerOpen = async (open: boolean) => {
+    setIsPhoneContactsDrawerOpen(open);
+    if (open && user?.id) {
+      setIsLoadingPhones(true);
+      try {
+        const response = await getPhoneNumbers(user.id);
+        if (response.data) {
+          setPhoneNumbers(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to load phone numbers:', error);
+        toast.error(t("contacts.loadError") || "Failed to load phone numbers");
+      } finally {
+        setIsLoadingPhones(false);
+      }
     }
   };
 
@@ -795,7 +816,7 @@ const EditProfile = () => {
                 {/* Phone Contacts Button */}
                 <button
                   type="button"
-                  onClick={() => setIsPhoneContactsDrawerOpen(true)}
+                  onClick={() => handlePhoneContactsDrawerOpen(true)}
                   className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
                 >
                   <div className="flex items-center gap-3">
@@ -1158,21 +1179,43 @@ const EditProfile = () => {
             </div>
           </DrawerHeader>
           <div className="p-4 space-y-4">
+            {/* Loading state */}
+            {isLoadingPhones && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            )}
+
             {/* Existing phone numbers list */}
-            {phoneNumbers.length > 0 && (
+            {!isLoadingPhones && phoneNumbers.length > 0 && (
               <div className="space-y-2">
-                {phoneNumbers.map((phone, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+                {phoneNumbers.map((phone) => (
+                  <div key={phone.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
                     <Phone className="w-5 h-5 text-muted-foreground" />
-                    <span className="flex-1 font-medium">{phone}</span>
+                    <span className="flex-1 font-medium">{phone.phone_number}</span>
                     <button
-                      onClick={() => setPhoneNumbers(prev => prev.filter((_, i) => i !== index))}
+                      onClick={async () => {
+                        try {
+                          await deletePhoneNumber(phone.id);
+                          setPhoneNumbers(prev => prev.filter(p => p.id !== phone.id));
+                          toast.success(t("contacts.deleted") || "Phone number deleted");
+                        } catch (error) {
+                          toast.error(t("contacts.deleteError") || "Failed to delete");
+                        }
+                      }}
                       className="w-8 h-8 rounded-full hover:bg-destructive/10 flex items-center justify-center transition-colors"
                     >
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </button>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Empty state */}
+            {!isLoadingPhones && phoneNumbers.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                {t("contacts.noContacts") || "No phone numbers added yet"}
               </div>
             )}
 
@@ -1198,18 +1241,34 @@ const EditProfile = () => {
                 />
               </div>
               <Button
-                onClick={() => {
+                onClick={async () => {
                   if (newPhoneNumber.length > 3) {
-                    setPhoneNumbers(prev => [...prev, newPhoneNumber]);
-                    setNewPhoneNumber("+");
-                    toast.success(t("contacts.created") || "Phone number added");
+                    setIsSavingPhone(true);
+                    try {
+                      const response = await addPhoneNumber(newPhoneNumber);
+                      if (response.data) {
+                        setPhoneNumbers(prev => [...prev, response.data!]);
+                        setNewPhoneNumber("+");
+                        toast.success(t("contacts.created") || "Phone number added");
+                      }
+                    } catch (error) {
+                      toast.error(t("contacts.createError") || "Failed to add phone number");
+                    } finally {
+                      setIsSavingPhone(false);
+                    }
                   }
                 }}
-                disabled={newPhoneNumber.length <= 3}
+                disabled={newPhoneNumber.length <= 3 || isSavingPhone}
                 className="w-full h-12 rounded-xl"
               >
-                <Plus className="w-5 h-5 mr-2" />
-                {t("contacts.addContact") || "Add Contact"}
+                {isSavingPhone ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Plus className="w-5 h-5 mr-2" />
+                    {t("contacts.addContact") || "Add Contact"}
+                  </>
+                )}
               </Button>
             </div>
           </div>
