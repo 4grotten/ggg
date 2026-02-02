@@ -1543,6 +1543,8 @@
     }
   },
   "contacts": {
+    "title": "Contacts",
+    "contactsCount": "{{count}} contacts",
     "addContact": "Add Contact",
     "addContactDescription": "Create a new contact or scan a business card",
     "editContact": "Edit Contact",

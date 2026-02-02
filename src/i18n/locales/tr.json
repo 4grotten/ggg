@@ -1483,6 +1483,8 @@
     }
   },
   "contacts": {
+    "title": "Kişiler",
+    "contactsCount": "{{count}} kişi",
     "addContact": "Kişi ekle",
     "editContact": "Kişiyi düzenle",
     "viewContacts": "Kişilerim",

@@ -1490,6 +1490,8 @@
     }
   },
   "contacts": {
+    "title": "联系人",
+    "contactsCount": "{{count}} 个联系人",
     "addContact": "添加联系人",
     "editContact": "编辑联系人",
     "viewContacts": "我的联系人",
