@@ -183,7 +183,7 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
               </p>
             </div>
             
-            {/* Stacked avatars with glow */}
+            {/* Stacked avatars with glow + Add button */}
             <div className="flex -space-x-4 items-center">
               {contacts.slice(0, 3).map((contact, i) => (
                 <motion.div
@@ -218,26 +218,24 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
                   <span className="text-sm font-bold text-white">+{contacts.length - 3}</span>
                 </motion.div>
               )}
+              {/* Add contact button */}
+              <motion.button
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4, type: "spring" }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  tap();
+                  onAddClick();
+                }}
+                className="relative w-12 h-12 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center ring-3 ring-white/50 shadow-xl ml-2 hover:bg-white/40 transition-colors"
+              >
+                <UserPlus className="w-5 h-5 text-white drop-shadow" />
+              </motion.button>
             </div>
           </div>
-          
-          {/* Add contact button - Bottom right corner */}
-          <motion.button
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, type: "spring" }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              tap();
-              onAddClick();
-            }}
-            className="absolute bottom-4 right-4 w-12 h-12 rounded-full flex items-center justify-center shadow-xl ring-2 ring-white/30 overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600" />
-            <UserPlus className="relative w-5 h-5 text-white drop-shadow" />
-          </motion.button>
         </div>
       </motion.div>
 
