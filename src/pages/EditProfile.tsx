@@ -1190,9 +1190,23 @@ const EditProfile = () => {
             {!isLoadingPhones && phoneNumbers.length > 0 && (
               <div className="space-y-2">
                 {phoneNumbers.map((phone, index) => (
-                  <div key={phone.id || index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
-                    <Phone className="w-5 h-5 text-muted-foreground" />
-                    <span className="flex-1 font-medium">{phone.phone_number}</span>
+                  <div key={phone.id || index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-xl">
+                    <Phone className="w-5 h-5 text-muted-foreground ml-2" />
+                    <Input
+                      value={phone.phone_number}
+                      onChange={(e) => {
+                        let value = e.target.value;
+                        if (!value.startsWith('+')) {
+                          value = '+' + value.replace(/^\+*/, '');
+                        }
+                        value = '+' + value.slice(1).replace(/\D/g, '');
+                        setPhoneNumbers(prev => prev.map((p, i) => 
+                          i === index ? { ...p, phone_number: value } : p
+                        ));
+                      }}
+                      type="tel"
+                      className="flex-1 h-10 border-0 bg-transparent focus-visible:ring-0 text-base font-medium"
+                    />
                     <button
                       onClick={() => {
                         setPhoneNumbers(prev => prev.filter((_, i) => i !== index));
