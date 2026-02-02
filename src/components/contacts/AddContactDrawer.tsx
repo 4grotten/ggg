@@ -698,22 +698,24 @@ export const AddContactDrawer = ({
       <Drawer open={isOpen} onOpenChange={(open) => !open && handleClose()}>
         <DrawerContent className="max-h-[95vh]">
           <DrawerHeader className="border-b border-border/50">
-            <div className="flex items-center">
+            <div className="grid grid-cols-[auto,1fr,auto] items-center gap-2">
               {/* Back button - show when in subview OR when editing contact in main view */}
-              {(currentView !== "main" || (currentView === "main" && editContact && onBack)) && (
-                <button
-                  onClick={currentView !== "main" ? handleBack : onBack}
-                  className="mr-3 w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
-                >
-                  <ChevronRight className="w-5 h-5 rotate-180" />
-                </button>
-              )}
-              <DrawerTitle className="flex-1">{getTitle()}</DrawerTitle>
+              <div className="flex items-center">
+                {(currentView !== "main" || (currentView === "main" && editContact && onBack)) && (
+                  <button
+                    onClick={currentView !== "main" ? handleBack : onBack}
+                    className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
+                  >
+                    <ChevronRight className="w-5 h-5 rotate-180" />
+                  </button>
+                )}
+              </div>
+              <DrawerTitle className="text-left">{getTitle()}</DrawerTitle>
               <button
                 onClick={handleClose}
-                className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center"
+                className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
               >
-                <X className="w-5 h-5" />
+                <Plus className="w-5 h-5 text-primary rotate-45" />
               </button>
             </div>
           </DrawerHeader>
