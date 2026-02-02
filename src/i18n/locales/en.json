@@ -1174,7 +1174,7 @@
     "categories": {
       "authentication": "Authentication",
       "password": "Password Management",
-      "profile": "User Profile",
+      "profile": "Profile",
       "files": "File Uploads",
       "social": "Social Networks",
       "devices": "Devices & Sessions"

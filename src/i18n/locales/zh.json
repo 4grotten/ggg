@@ -1121,7 +1121,7 @@
     "categories": {
       "authentication": "身份验证",
       "password": "密码管理",
-      "profile": "用户资料",
+      "profile": "个人资料",
       "files": "文件上传",
       "social": "社交网络",
       "devices": "设备与会话"
