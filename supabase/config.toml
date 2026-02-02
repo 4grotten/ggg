@@ -1,0 +1,22 @@
+project_id = "uefgvthkwhpvpayteyif"
+
+[functions.ai-chat]
+verify_jwt = false
+
+[functions.elevenlabs-tts]
+verify_jwt = false
+
+[functions.elevenlabs-stt]
+verify_jwt = false
+
+[functions.get-transactions]
+verify_jwt = false
+
+[functions.ip-geolocation]
+verify_jwt = false
+
+[functions.extract-contact-from-images]
+verify_jwt = false
+
+[functions.admin-openai-settings]
+verify_jwt = false

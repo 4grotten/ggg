@@ -1,0 +1,179 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+// Available OpenAI models for vision/multimodal tasks with pricing
+const AVAILABLE_MODELS = [
+  // GPT-4o Series (Latest)
+  { id: "gpt-4o", name: "GPT-4o", description: "Новейшая флагманская модель. Мультимодальная, быстрая. $2.50/1M input, $10/1M output" },
+  { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Быстрая и экономичная. Отличный баланс. $0.15/1M input, $0.60/1M output" },
+  // GPT-4 Turbo
+  { id: "gpt-4-turbo", name: "GPT-4 Turbo", description: "Мощная модель с vision. $10/1M input, $30/1M output" },
+];
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+    const { action, apiKey, model } = await req.json();
+    console.log(`Admin OpenAI settings action: ${action}`);
+
+    // For get-status, we don't need auth - just return public info
+    if (action === "get-status") {
+      const currentKey = Deno.env.get("OPENAI_API_KEY");
+      const hasKey = !!currentKey && currentKey.length > 0;
+      const maskedKey = hasKey ? `sk-...${currentKey.slice(-4)}` : null;
+
+      // Get current model from admin_settings using service role
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const { data: modelSetting } = await supabase
+        .from("admin_settings")
+        .select("value")
+        .eq("category", "integrations")
+        .eq("key", "openai_model")
+        .single();
+
+      // Convert model index to model ID
+      let currentModelId = "gpt-4o"; // default
+      if (modelSetting?.value !== undefined) {
+        const modelIndex = Number(modelSetting.value);
+        if (modelIndex >= 0 && modelIndex < AVAILABLE_MODELS.length) {
+          currentModelId = AVAILABLE_MODELS[modelIndex].id;
+        }
+      }
+
+      return new Response(
+        JSON.stringify({
+          hasKey,
+          maskedKey,
+          currentModel: currentModelId,
+          availableModels: AVAILABLE_MODELS,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Use service role for all admin operations (app-level auth is handled by the frontend)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    switch (action) {
+      case "verify-key": {
+        if (!apiKey) {
+          return new Response(
+            JSON.stringify({ error: "API key required" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Test the API key with a simple request
+        const testResponse = await fetch("https://api.openai.com/v1/models", {
+          headers: { Authorization: `Bearer ${apiKey}` },
+        });
+
+        if (!testResponse.ok) {
+          return new Response(
+            JSON.stringify({ error: "Invalid API key", valid: false }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        return new Response(
+          JSON.stringify({ valid: true, message: "API key is valid" }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      case "update-model": {
+        if (!model) {
+          return new Response(
+            JSON.stringify({ error: "Model ID required" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const modelIndex = AVAILABLE_MODELS.findIndex(m => m.id === model);
+        if (modelIndex === -1) {
+          return new Response(
+            JSON.stringify({ error: "Invalid model" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Check if setting exists
+        const { data: existing } = await supabase
+          .from("admin_settings")
+          .select("id")
+          .eq("category", "integrations")
+          .eq("key", "openai_model")
+          .single();
+
+        if (existing) {
+          // Update existing
+          const { error: updateError } = await supabase
+            .from("admin_settings")
+            .update({ 
+              value: modelIndex,
+              updated_at: new Date().toISOString()
+            })
+            .eq("id", existing.id);
+            
+          if (updateError) {
+            console.error("Error updating model:", updateError);
+            return new Response(
+              JSON.stringify({ error: "Failed to update model" }),
+              { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        } else {
+          // Insert new
+          const { error: insertError } = await supabase
+            .from("admin_settings")
+            .insert({
+              category: "integrations",
+              key: "openai_model",
+              value: modelIndex,
+              description: "OpenAI model for contact extraction",
+            });
+            
+          if (insertError) {
+            console.error("Error inserting model:", insertError);
+            return new Response(
+              JSON.stringify({ error: "Failed to save model" }),
+              { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+
+        console.log(`OpenAI model updated to: ${model} (index: ${modelIndex})`);
+
+        return new Response(
+          JSON.stringify({ success: true, model }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      default:
+        return new Response(
+          JSON.stringify({ error: "Unknown action" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+    }
+  } catch (error) {
+    console.error("Error in admin-openai-settings:", error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});

@@ -1,0 +1,88 @@
+import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { MobileLayout } from "@/components/layout/MobileLayout";
+import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { StepIndicator } from "@/components/verification/StepIndicator";
+import { VerificationStepsList } from "@/components/verification/VerificationStepsList";
+import { FileText, Camera, Smile } from "lucide-react";
+
+const VerificationSteps = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t } = useTranslation();
+
+  // Check if we're returning after completing questionnaire
+  const completedSteps = (location.state as { completedSteps?: number[] })?.completedSteps || [];
+  const isReturning = completedSteps.length > 0;
+
+  const steps = [
+    {
+      id: "questionnaire",
+      title: t('verify.steps.questionnaire'),
+      icon: <FileText className="w-5 h-5" />,
+      status: completedSteps.includes(0) ? "completed" as const : "current" as const,
+    },
+    {
+      id: "document",
+      title: t('verify.steps.document'),
+      icon: <Camera className="w-5 h-5" />,
+      status: completedSteps.includes(0) ? "current" as const : "pending" as const,
+    },
+    {
+      id: "liveness",
+      title: t('verify.steps.liveness'),
+      icon: <Smile className="w-5 h-5" />,
+      status: "pending" as const,
+    },
+  ];
+
+
+  return (
+    <MobileLayout
+      showBackButton
+      onBack={() => navigate("/verify/terms")}
+      rightAction={<LanguageSwitcher />}
+    >
+      <div className="flex flex-col h-[calc(100vh-56px)]">
+        {/* Progress - show step 5 (document + liveness) when returning */}
+        <div className="px-6 py-4">
+          <StepIndicator currentStep={isReturning ? 4 : 0} totalSteps={6} />
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <h1 className="text-2xl font-bold mb-2">
+            {isReturning ? t('verify.steps.titleKyc') : t('verify.steps.title')}
+          </h1>
+          <p className="text-muted-foreground mb-8">
+            {t('verify.steps.description')}
+          </p>
+
+          <VerificationStepsList 
+            steps={steps} 
+            startFromStep={isReturning ? 1 : undefined}
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="karta-footer-actions">
+          <PoweredByFooter className="mb-4" />
+          <button
+            onClick={() => navigate(isReturning ? "/verify/document-type" : "/verify/personal-info")}
+            className="karta-btn-primary"
+          >
+            {isReturning ? t('verify.steps.buttonKyc') : t('verify.steps.button')}
+          </button>
+          <button
+            onClick={() => navigate("/")}
+            className="w-full py-3 text-[15px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t('verify.steps.doLater')}
+          </button>
+        </div>
+      </div>
+    </MobileLayout>
+  );
+};
+
+export default VerificationSteps;
