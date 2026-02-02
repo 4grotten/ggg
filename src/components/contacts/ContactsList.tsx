@@ -233,7 +233,7 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
                   tap();
                   onAddClick();
                 }}
-                className="relative w-12 h-12 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center ring-3 ring-white/50 shadow-xl ml-2 hover:bg-white/40 transition-colors"
+                className="relative w-12 h-12 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center ring-3 ring-white/50 shadow-xl ml-2 hover:bg-blue-500 hover:ring-blue-400 transition-colors"
               >
                 <UserPlus className="w-5 h-5 text-white drop-shadow" />
               </motion.button>
