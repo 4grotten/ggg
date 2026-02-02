@@ -41,6 +41,7 @@ import {
   Video,
   UserPlus,
   MessageSquare,
+  X,
   LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
@@ -694,11 +695,17 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
               <ArrowLeft className="w-5 h-5" />
             </button>
           )}
-          <DrawerTitle className="text-center">
+          <DrawerTitle className="text-left flex-1">
             {currentView === "qr"
               ? (t("contacts.qrCode") || "QR Code")
               : (t("contacts.shareContact") || "Share Contact")}
           </DrawerTitle>
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-muted transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </DrawerHeader>
 
         <div className="px-4 pb-8 overflow-y-auto max-h-[70vh]">
