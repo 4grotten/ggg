@@ -183,9 +183,9 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
               </p>
             </div>
             
-            {/* Stacked avatars with glow */}
-            <div className="flex -space-x-4">
-              {contacts.slice(0, 4).map((contact, i) => (
+            {/* Stacked avatars with glow + Add button */}
+            <div className="flex -space-x-4 items-center">
+              {contacts.slice(0, 3).map((contact, i) => (
                 <motion.div
                   key={contact.id}
                   initial={{ opacity: 0, scale: 0, x: 30 }}
@@ -208,55 +208,36 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
                   </Avatar>
                 </motion.div>
               ))}
-              {contacts.length > 4 && (
+              {contacts.length > 3 && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.4 }}
+                  transition={{ delay: 0.3 }}
                   className="relative w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center ring-3 ring-white/40 shadow-xl"
                 >
-                  <span className="text-sm font-bold text-white">+{contacts.length - 4}</span>
+                  <span className="text-sm font-bold text-white">+{contacts.length - 3}</span>
                 </motion.div>
               )}
+              {/* Add contact button */}
+              <motion.button
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4, type: "spring" }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  tap();
+                  onAddClick();
+                }}
+                className="relative w-12 h-12 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center ring-3 ring-white/50 shadow-xl ml-2 hover:bg-white/40 transition-colors"
+              >
+                <UserPlus className="w-5 h-5 text-white drop-shadow" />
+              </motion.button>
             </div>
           </div>
         </div>
       </motion.div>
-
-      {/* Add contact button - Animated premium style */}
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, type: "spring" }}
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={onAddClick}
-        className="w-full relative overflow-hidden group rounded-2xl shadow-lg"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 group-hover:from-emerald-500 group-hover:via-teal-500 group-hover:to-cyan-500 transition-all duration-500" />
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0"
-          animate={{ x: ["-100%", "100%"] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
-        />
-        <div className="relative flex items-center justify-between py-5 px-5">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-lg ring-1 ring-white/30">
-              <UserPlus className="w-7 h-7 text-white drop-shadow" />
-            </div>
-            <div className="text-left">
-              <span className="text-white font-bold text-lg drop-shadow">{t("contacts.addContact")}</span>
-              <p className="text-white/80 text-sm font-medium">{t("settings.scanBusinessCardDescription")}</p>
-            </div>
-          </div>
-          <motion.div
-            animate={{ x: [0, 5, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <ChevronRight className="w-6 h-6 text-white/90" />
-          </motion.div>
-        </div>
-      </motion.button>
 
       {/* Search - Premium glassmorphism */}
       {contacts.length > 0 && (
