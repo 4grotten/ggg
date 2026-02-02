@@ -1434,8 +1434,8 @@ const Settings = () => {
                 />
               ))}
               
-              {/* Glass overlay for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10 rounded-2xl" />
+              {/* Dark overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/20 to-black/30 rounded-2xl" />
               
               {/* Border glow */}
               <div className="absolute inset-0 ring-1 ring-inset ring-white/30 group-hover:ring-white/50 rounded-2xl transition-all duration-300" />
@@ -1456,10 +1456,10 @@ const Settings = () => {
                     <BookUser className="w-7 h-7 drop-shadow-md" />
                   </motion.div>
                   <div className="text-left">
-                    <span className="text-white font-bold text-lg block drop-shadow-md">
+                    <span className="text-white font-bold text-lg block" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                       {t("contacts.viewContacts") || "Мои контакты"}
                     </span>
-                    <span className="text-white/80 text-sm drop-shadow-sm">
+                    <span className="text-white/90 text-sm" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
                       {t("contacts.viewContactsDescription") || "Просмотр и управление контактами"}
                     </span>
                   </div>
