@@ -1577,6 +1577,8 @@
     "updateError": "Kişi güncellenemedi",
     "deleteError": "Kişi silinemedi",
     "avatarUploadError": "Fotoğraf yüklenemedi",
+    "loadInfoWithAI": "AI ile Bilgi Yükle",
+    "loadInfoWithAIDescription": "İletişim verilerini çıkarmak için fotoğrafları analiz edin",
     "saveError": "Kişi kaydedilemedi",
     "addToList": "Listeye ekle",
     "saved": "Değişiklikler kaydedildi",

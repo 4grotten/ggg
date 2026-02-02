@@ -1584,6 +1584,8 @@
     "updateError": "更新联系人失败",
     "deleteError": "删除联系人失败",
     "avatarUploadError": "上传照片失败",
+    "loadInfoWithAI": "用AI加载信息",
+    "loadInfoWithAIDescription": "分析照片提取联系人数据",
     "saveError": "保存联系人失败",
     "addToList": "添加到列表",
     "saved": "更改已保存",

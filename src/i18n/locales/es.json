@@ -1577,6 +1577,8 @@
     "updateError": "Error al actualizar contacto",
     "deleteError": "Error al eliminar contacto",
     "avatarUploadError": "Error al subir foto",
+    "loadInfoWithAI": "Cargar Info con IA",
+    "loadInfoWithAIDescription": "Analizar fotos para extraer datos de contacto",
     "saveError": "Error al guardar contacto",
     "addToList": "Añadir a la lista",
     "saved": "Cambios guardados",
