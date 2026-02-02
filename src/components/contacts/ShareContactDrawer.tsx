@@ -424,22 +424,67 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
       className="space-y-4"
     >
       {/* Contact Card Preview */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-6 shadow-xl">
+      {/* Hero Card with Avatar and Name - CSS Animated Blue Gradient */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
+        className="relative overflow-hidden rounded-3xl p-6 animate-gradient-shift"
+        style={{
+          background: "linear-gradient(-45deg, #3b82f6, #1e40af, #7c3aed, #2563eb)"
+        }}
+      >
+        {/* Background decoration - CSS animated glow */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-white/10 rounded-full blur-3xl animate-glow-pulse" />
+          <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-purple-400/20 rounded-full blur-3xl animate-glow-pulse-alt" />
+        </div>
+        
         <div className="relative z-10 flex flex-col items-center gap-4">
-          <Avatar className="w-20 h-20 ring-4 ring-white/20 shadow-lg">
-            <AvatarImage src={contact?.avatar_url || undefined} />
-            <AvatarFallback className="text-2xl font-bold bg-white/10 text-white">
-              {contact ? getInitials(contact.full_name) : "?"}
-            </AvatarFallback>
-          </Avatar>
+          {/* Avatar with glow effect */}
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 400 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-white/30 rounded-full blur-xl scale-110" />
+            <Avatar className="w-20 h-20 border-4 border-white/30 shadow-2xl relative">
+              <AvatarImage src={contact?.avatar_url || undefined} />
+              <AvatarFallback className="bg-white/20 text-white text-2xl font-bold">
+                {contact ? getInitials(contact.full_name) : "?"}
+              </AvatarFallback>
+            </Avatar>
+          </motion.div>
+          
           <div className="text-center">
-            <h3 className="text-xl font-bold text-white">{contact?.full_name}</h3>
+            <motion.h3 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-xl font-bold text-white"
+            >
+              {contact?.full_name}
+            </motion.h3>
             {contact?.position && contact?.company && (
-              <p className="text-white/70 text-sm">{contact.position} • {contact.company}</p>
+              <motion.p 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-white/70 text-sm"
+              >
+                {contact.position} • {contact.company}
+              </motion.p>
             )}
           </div>
+          
           {/* Add to Contacts and Share buttons */}
-          <div className="flex gap-3 w-full mt-2">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex gap-3 w-full mt-2"
+          >
             <Button
               onClick={handleAddToContacts}
               disabled={!hasAnySelection}
@@ -458,12 +503,9 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
               <Share2 className="w-4 h-4 mr-2" />
               {t("common.share") || "Share"}
             </Button>
-          </div>
+          </motion.div>
         </div>
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white/5 translate-y-1/2 -translate-x-1/2" />
-      </div>
+      </motion.div>
 
       {/* Select what to share */}
       <div className="space-y-3">
