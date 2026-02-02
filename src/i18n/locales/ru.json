@@ -1638,6 +1638,7 @@
     "contact": "Контакт",
     "sendMessage": "Написать сообщение",
     "sendDataViaSms": "Отправить сообщением",
+    "sendViaApp": "Отправить через...",
     "viaSms": "через SMS",
     "viaEmail": "по Email"
   }
