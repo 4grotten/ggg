@@ -488,7 +488,7 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
             <Button
               onClick={handleAddToContacts}
               disabled={!hasAnySelection}
-              className="flex-1 h-10 rounded-xl bg-blue-500 border-blue-600 text-white hover:bg-blue-600"
+              className="flex-1 h-10 rounded-xl bg-blue-500 border-blue-600 text-white hover:bg-blue-600 shadow-[0_4px_20px_rgba(59,130,246,0.5)] hover:shadow-[0_6px_25px_rgba(59,130,246,0.6)]"
             >
               <UserPlus className="w-4 h-4 mr-2" />
               {t("contacts.addToContacts")}
@@ -496,7 +496,7 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
             <Button
               onClick={handleShareContact}
               disabled={!hasAnySelection}
-              className="flex-1 h-10 rounded-xl bg-blue-500 border-blue-600 text-white hover:bg-blue-600"
+              className="flex-1 h-10 rounded-xl bg-blue-500 border-blue-600 text-white hover:bg-blue-600 shadow-[0_4px_20px_rgba(59,130,246,0.5)] hover:shadow-[0_6px_25px_rgba(59,130,246,0.6)]"
             >
               <Share2 className="w-4 h-4 mr-2" />
               {t("common.share") || "Share"}
