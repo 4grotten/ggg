@@ -687,15 +687,21 @@ export const ShareContactDrawer = ({ isOpen, onClose, contact }: ShareContactDra
     <Drawer open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DrawerContent className="max-h-[90vh]">
         <DrawerHeader className="relative px-4">
+          <button
+            onClick={onClose}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-muted transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           {currentView !== "main" && (
             <button
               onClick={handleBack}
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-muted transition-colors"
+              className="absolute left-12 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-muted transition-colors"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 text-blue-500" />
             </button>
           )}
-          <DrawerTitle className="text-left flex-1 pl-0">
+          <DrawerTitle className="text-left flex-1 pl-8">
             {currentView === "qr"
               ? (t("contacts.qrCode") || "QR Code")
               : (t("contacts.shareContact") || "Share Contact")}
