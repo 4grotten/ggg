@@ -1,9 +1,14 @@
 /**
  * Apofiz configuration
- * Uses environment to determine production vs test URLs
+ * Uses VITE_APP_ENV to determine production vs test URLs
+ *
+ * Environments:
+ * - npm run dev         → development (test.apofiz.com)
+ * - npm run build:test  → test (test.apofiz.com)
+ * - npm run build       → production (apofiz.com)
  */
 
-const isProduction = import.meta.env.PROD;
+const isProduction = import.meta.env.VITE_APP_ENV === 'production';
 
 // Base URLs
 export const APOFIZ_BASE_URL = isProduction
