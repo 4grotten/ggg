@@ -99,6 +99,18 @@ services:
         config:
           hide_credentials: false
 
+  ## Edge Functions
+  - name: functions-v1
+    _comment: "Edge Functions: /functions/v1/* -> http://supabase-functions:9000/*"
+    url: http://supabase-functions:9000/
+    routes:
+      - name: functions-v1-all
+        strip_path: true
+        paths:
+          - /functions/v1/
+    plugins:
+      - name: cors
+
   ## Meta (pg-meta for Studio)
   - name: meta
     _comment: "pg-meta: /pg/* -> http://supabase-meta:8080/*"

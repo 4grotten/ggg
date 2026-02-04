@@ -15,6 +15,7 @@ services:
     depends_on:
       - pgadmin
       - redis-commander
+      - supabase-kong
     command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
 
   # Certbot for SSL certificates
@@ -206,6 +207,31 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - default
+
+  # Edge Functions (Deno runtime)
+  supabase-functions:
+    image: supabase/edge-runtime:v1.67.4
+    container_name: easycard_functions
+    restart: unless-stopped
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_KEY}
+      LOVABLE_API_KEY: ${LOVABLE_API_KEY}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
+      VERIFY_JWT: "false"
+    volumes:
+      - ../supabase/functions:/home/deno/functions:ro
+    command:
+      - start
+      - --main-service
+      - /home/deno/functions
+    expose:
+      - "9000"
+    depends_on:
+      - supabase-kong
     networks:
       - default
 
