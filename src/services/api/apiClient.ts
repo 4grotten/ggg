@@ -1,10 +1,12 @@
 /**
  * API Client для Apofiz Backend
- * Base URL: https://test.apofiz.com/api/v1/
+ * Uses production URL in production, test URL in development
  * Формат токена: Token <40-символьный-hex-ключ>
  */
 
-const API_BASE_URL = 'https://test.apofiz.com/api/v1';
+import { APOFIZ_API_URL } from '@/config/apofiz';
+
+const API_BASE_URL = APOFIZ_API_URL;
 
 // Ключ для хранения токена в localStorage
 export const AUTH_TOKEN_KEY = 'auth_token';

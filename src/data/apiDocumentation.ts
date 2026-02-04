@@ -45,8 +45,9 @@ export interface ApiCategory {
   endpoints: ApiEndpoint[];
 }
 
-// Base API URL
-export const API_BASE_URL = 'https://test.apofiz.com/api/v1';
+// Base API URL - use centralized config
+import { APOFIZ_API_URL } from '@/config/apofiz';
+export const API_BASE_URL = APOFIZ_API_URL;
 
 // API Categories and Endpoints
 export const apiCategories: ApiCategory[] = [

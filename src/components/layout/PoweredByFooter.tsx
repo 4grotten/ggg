@@ -1,22 +1,18 @@
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { getAuthToken } from "@/services/api/apiClient";
+import { getApofizUrl } from "@/config/apofiz";
 
 interface PoweredByFooterProps {
   className?: string;
 }
 
 /**
- * Opens test.apofiz.com with automatic authentication via token
+ * Opens apofiz.com with automatic authentication via token
+ * Uses production URL in production, test URL in development
  */
 export const openApofizWithAuth = () => {
   const token = getAuthToken();
-  const ts = Date.now();
-  
-  // Open with token as query parameter for SSO authentication
-  const url = token 
-    ? `https://test.apofiz.com/?token=${encodeURIComponent(token)}&ts=${ts}`
-    : `https://test.apofiz.com/?ts=${ts}`;
-  
+  const url = getApofizUrl(token);
   window.open(url, '_blank', 'noopener,noreferrer');
 };
 

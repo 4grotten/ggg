@@ -8,6 +8,7 @@ import partnerStep2Image from "@/assets/partner-step2-gift.png";
 import partnerStep3Image from "@/assets/partner-step3-camel.png";
 import TgsPlayer, { preloadTgs } from "@/components/ui/TgsPlayer";
 import { useAuth } from "@/contexts/AuthContext";
+import { EASYCARD_APP_URL } from "@/config/apofiz";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -79,7 +80,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     return false;
   };
 
-  const appLink = "https://test.apofiz.com/EasyCard/";
+  const appLink = EASYCARD_APP_URL;
 
   const handleCopyLink = () => {
     if (handleGuestShareAction()) return;
