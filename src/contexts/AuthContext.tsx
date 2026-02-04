@@ -96,19 +96,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (hasCheckedRef.current) return;
     hasCheckedRef.current = true;
 
+    // 0. SSO: Проверить токен в URL fragment (переход из Apofiz)
+    // Fragment (#token=xxx) безопаснее чем query (?token=xxx):
+    // - Не отправляется на сервер
+    // - Не логируется в access logs
+    // - Не передаётся в Referer header
+    const hash = window.location.hash.substring(1); // убираем #
+    const hashParams = new URLSearchParams(hash);
+    const ssoToken = hashParams.get('token');
+
+    if (ssoToken) {
+      // Установить токен из URL (приоритет над cookie/localStorage)
+      setAuthToken(ssoToken);
+
+      // Очистить URL от токена (безопасность)
+      window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+    }
+
     // 1. Попробовать прочитать токен из куки state (от Apofiz)
-    // Это обеспечивает синхронизацию Apofiz → EasyCard
+    // Это обеспечивает синхронизацию Apofiz → EasyCard (на одном домене)
     const stateCookie = Cookies.get('state');
     if (stateCookie && !getAuthToken()) {
       try {
         const parsed = JSON.parse(stateCookie);
         const cookieToken = parsed?.userStore?.token;
         const cookieUser = parsed?.userStore?.user;
-        
+
         if (cookieToken) {
           // Сохранить токен в localStorage EasyCard
           setAuthToken(cookieToken);
-          
+
           // Если есть user в куке — сразу установить (будет перезаписан после валидации)
           if (cookieUser) {
             setUser(cookieUser);

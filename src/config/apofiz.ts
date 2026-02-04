@@ -26,11 +26,15 @@ export const EASYCARD_APP_URL = isProduction
 
 /**
  * Get Apofiz URL with optional token for SSO
+ * Uses fragment (#) instead of query (?) for security:
+ * - Fragment is not sent to server
+ * - Fragment is not logged in access logs
+ * - Fragment is not passed in Referer header
  */
 export const getApofizUrl = (token?: string | null): string => {
   const ts = Date.now();
   if (token) {
-    return `${APOFIZ_BASE_URL}/?token=${encodeURIComponent(token)}&ts=${ts}`;
+    return `${APOFIZ_BASE_URL}/#token=${encodeURIComponent(token)}&ts=${ts}`;
   }
-  return `${APOFIZ_BASE_URL}/?ts=${ts}`;
+  return APOFIZ_BASE_URL;
 };
