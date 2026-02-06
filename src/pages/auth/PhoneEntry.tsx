@@ -1127,7 +1127,21 @@ const PhoneEntry = () => {
                     if (matchedCountry) {
                       foundDialCode = testCode;
                       remainingDigits = digitsOnly.slice(len);
-                      setSelectedCountry(matchedCountry);
+                      
+                      // Special handling for +7: detect Russia vs Kazakhstan
+                      if (testCode === "+7" && remainingDigits.length >= 2) {
+                        const prefix2 = remainingDigits.slice(0, 2);
+                        const kzPrefixes = ["70", "71", "75", "76", "77"];
+                        if (kzPrefixes.includes(prefix2)) {
+                          setSelectedCountry(countries.find(c => c.code === "KZ") || matchedCountry);
+                        } else {
+                          setSelectedCountry(countries.find(c => c.code === "RU") || matchedCountry);
+                        }
+                      } else if (testCode === "+7" && remainingDigits.length === 1 && remainingDigits[0] === "9") {
+                        setSelectedCountry(countries.find(c => c.code === "RU") || matchedCountry);
+                      } else {
+                        setSelectedCountry(matchedCountry);
+                      }
                       break;
                     }
                   }
