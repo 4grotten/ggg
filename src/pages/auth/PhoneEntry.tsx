@@ -331,6 +331,22 @@ const PhoneEntry = () => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value);
     setPhoneNumber(formatted);
+
+    // Auto-detect Russia vs Kazakhstan for +7 based on first digit of local number
+    if (dialCode === "+7") {
+      const digits = e.target.value.replace(/\D/g, "");
+      if (digits.length > 0) {
+        const firstDigit = digits[0];
+        // Kazakhstan local numbers start with 7, Russia with 9 (and other digits)
+        if (firstDigit === "7") {
+          const kz = countries.find(c => c.code === "KZ");
+          if (kz && selectedCountry?.code !== "KZ") setSelectedCountry(kz);
+        } else {
+          const ru = countries.find(c => c.code === "RU");
+          if (ru && selectedCountry?.code !== "RU") setSelectedCountry(ru);
+        }
+      }
+    }
   };
 
   // Handle dial code input change
