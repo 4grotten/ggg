@@ -332,19 +332,24 @@ const PhoneEntry = () => {
     const formatted = formatPhoneNumber(e.target.value);
     setPhoneNumber(formatted);
 
-    // Auto-detect Russia vs Kazakhstan for +7 based on first digit of local number
+    // Auto-detect Russia vs Kazakhstan for +7 based on local number prefix
     if (dialCode === "+7") {
       const digits = e.target.value.replace(/\D/g, "");
-      if (digits.length > 0) {
-        const firstDigit = digits[0];
-        // Kazakhstan local numbers start with 7, Russia with 9 (and other digits)
-        if (firstDigit === "7") {
+      if (digits.length >= 2) {
+        const prefix2 = digits.slice(0, 2);
+        // Kazakhstan prefixes: 70, 71, 75, 76, 77
+        const kzPrefixes = ["70", "71", "75", "76", "77"];
+        if (kzPrefixes.includes(prefix2)) {
           const kz = countries.find(c => c.code === "KZ");
           if (kz && selectedCountry?.code !== "KZ") setSelectedCountry(kz);
         } else {
           const ru = countries.find(c => c.code === "RU");
           if (ru && selectedCountry?.code !== "RU") setSelectedCountry(ru);
         }
+      } else if (digits.length === 1 && digits[0] === "9") {
+        // 9xx is definitely Russia
+        const ru = countries.find(c => c.code === "RU");
+        if (ru && selectedCountry?.code !== "RU") setSelectedCountry(ru);
       }
     }
   };
