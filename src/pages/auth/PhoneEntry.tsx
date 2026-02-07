@@ -1250,29 +1250,7 @@ const PhoneEntry = () => {
               {t('auth.phone.support')}
             </button>
             
-            {/* DEV: Register without OTP for testing - only visible when phone is valid */}
-            {isPhoneValid && (
-              <motion.button
-                type="button"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={() => {
-                  const fullPhone = getFullPhoneNumber();
-                  sessionStorage.setItem("registerPhone", fullPhone);
-                  navigate("/auth/profile", { 
-                    state: { 
-                      isNewUser: true, 
-                      phoneNumber: fullPhone,
-                      otpVerified: true
-                    } 
-                  });
-                }}
-                className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-2"
-              >
-                <KeyRound className="w-4 h-4" />
-                {t('auth.phone.registerWithoutOtp') || 'Register without OTP (test)'}
-              </motion.button>
-            )}
+            {/* DEV: Register without OTP removed - was causing 401 errors in production */}
           </motion.div>
 
           <PoweredByFooter />
