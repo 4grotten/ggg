@@ -21,7 +21,7 @@ export const APOFIZ_CDN_URL = 'https://cdn.apofiz.com';
 
 // EasyCard app link (for sharing)
 export const EASYCARD_APP_URL = isProduction
-  ? 'https://easycarduae.com'
+  ? 'https://ueasycard.com'
   : `${APOFIZ_BASE_URL}/EasyCard/`;
 
 /**

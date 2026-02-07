@@ -1,7 +1,7 @@
 #!/bin/bash
 # ================================================
 # EasyCard Supabase Self-Hosted Deployment Script
-# Server: 164.92.160.160 (easycarduae.com)
+# Server: 164.92.160.160 (ueasycard.com)
 # ================================================
 
 set -e
@@ -58,15 +58,15 @@ docker compose ps
 echo ""
 echo "=== Setting up SSL with Let's Encrypt ==="
 # Initialize SSL certificates
-if [ ! -f "./certbot/conf/live/easycarduae.com/fullchain.pem" ]; then
+if [ ! -f "./certbot/conf/live/ueasycard.com/fullchain.pem" ]; then
     echo "Obtaining SSL certificate..."
     docker compose run --rm certbot certonly \
         --webroot \
         --webroot-path=/var/www/certbot \
-        -d easycarduae.com \
-        -d www.easycarduae.com \
-        -d api.easycarduae.com \
-        --email admin@easycarduae.com \
+        -d ueasycard.com \
+        -d www.ueasycard.com \
+        -d api.ueasycard.com \
+        --email admin@ueasycard.com \
         --agree-tos \
         --no-eff-email \
         --force-renewal || echo "SSL setup will need to be done manually"
@@ -94,11 +94,11 @@ echo ""
 echo "=== Deployment Complete ==="
 echo ""
 echo "Services available at:"
-echo "  - Frontend: https://easycarduae.com"
-echo "  - API: https://api.easycarduae.com/rest/v1/"
-echo "  - Auth: https://api.easycarduae.com/auth/v1/"
-echo "  - Studio: https://api.easycarduae.com/studio/"
-echo "  - pgAdmin: https://easycarduae.com/pgadmin/"
+echo "  - Frontend: https://ueasycard.com"
+echo "  - API: https://api.ueasycard.com/rest/v1/"
+echo "  - Auth: https://api.ueasycard.com/auth/v1/"
+echo "  - Studio: https://api.ueasycard.com/studio/"
+echo "  - pgAdmin: https://ueasycard.com/pgadmin/"
 echo ""
 echo "PostgreSQL credentials:"
 echo "  - Host: 164.92.160.160"
