@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { 
   User, 
   Camera, 
@@ -1203,8 +1204,7 @@ const ProfileSteps = () => {
 
             {/* Title with animation */}
             <motion.h1 
-              className="text-2xl font-bold mb-1 text-center"
-              style={{ color: '#333333' }}
+              className="text-2xl font-bold mb-1 text-center text-foreground"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
@@ -1212,8 +1212,7 @@ const ProfileSteps = () => {
               🎉 {t('auth.steps.complete.congratulations') || 'Поздравляем!'}
             </motion.h1>
             <motion.p 
-              className="text-base text-center mb-6"
-              style={{ color: '#333333' }}
+              className="text-base text-center mb-6 text-muted-foreground"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -1336,7 +1335,7 @@ const ProfileSteps = () => {
     <MobileLayout
       showBackButton={true}
       onBack={goBack}
-      rightAction={<LanguageSwitcher />}
+      rightAction={<div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>}
     >
       <div className="flex flex-col h-[calc(100vh-56px)]">
         {/* Progress */}
