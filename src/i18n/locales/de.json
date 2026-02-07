@@ -33,7 +33,8 @@
     "share": "Teilen",
     "copy": "Kopieren",
     "comingSoon": "Demnächst verfügbar",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "authRequired": "Anmeldung erforderlich"
   },
   "dashboard": {
     "welcome": "Willkommen, {{name}}!",

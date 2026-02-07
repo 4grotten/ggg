@@ -27,7 +27,8 @@
     "comingSoon": "Скоро будет доступно",
     "addMore": "Добавить ещё",
     "save": "Сохранить",
-    "delete": "Удалить"
+    "delete": "Удалить",
+    "authRequired": "Требуется авторизация"
   },
   "dashboard": {
     "greeting": "Привет, {{name}}!",

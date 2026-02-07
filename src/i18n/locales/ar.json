@@ -33,7 +33,8 @@
     "share": "مشاركة",
     "copy": "نسخ",
     "comingSoon": "قريباً",
-    "delete": "حذف"
+    "delete": "حذف",
+    "authRequired": "مطلوب تسجيل الدخول"
   },
   "dashboard": {
     "welcome": "مرحباً، {{name}}!",

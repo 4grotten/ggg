@@ -35,7 +35,8 @@
     "share": "分享",
     "copy": "复制",
     "comingSoon": "即将推出",
-    "delete": "删除"
+    "delete": "删除",
+    "authRequired": "需要登录"
   },
   "dashboard": {
     "welcome": "欢迎，{{name}}！",

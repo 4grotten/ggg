@@ -33,7 +33,8 @@
     "share": "Paylaş",
     "copy": "Kopyala",
     "comingSoon": "Yakında",
-    "delete": "Sil"
+    "delete": "Sil",
+    "authRequired": "Giriş Gerekli"
   },
   "dashboard": {
     "welcome": "Hoş geldiniz, {{name}}!",
