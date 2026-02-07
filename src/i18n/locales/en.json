@@ -939,7 +939,8 @@
       "passwordHint": "Password must be at least 6 characters",
       "save": "Save",
       "success": "Registration completed successfully!",
-      "invalidImage": "Please select a valid image file"
+      "invalidImage": "Please select a valid image file",
+      "error": "Failed to save profile. Please try again."
     },
     "steps": {
       "name": {
