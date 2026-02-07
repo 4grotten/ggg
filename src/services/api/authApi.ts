@@ -4,6 +4,7 @@
 
 import { apiPost, apiGet, apiRequest, setAuthToken, getAuthToken, AUTH_USER_KEY } from './apiClient';
 import { saveCurrentAccount } from '@/hooks/useMultiAccount';
+import { APOFIZ_API_URL } from '@/config/apofiz';
 
 // ============ Types ============
 
@@ -313,7 +314,7 @@ export async function uploadAvatar(file: File): Promise<AvatarData> {
   const formData = new FormData();
   formData.append('file', file);
   
-  const url = 'https://test.apofiz.com/api/v1/files/';
+  const url = `${APOFIZ_API_URL}/files/`;
   const token = getAuthToken();
   
   const response = await fetch(url, {

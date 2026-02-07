@@ -1,0 +1,218 @@
+# HTTP - Redirect to HTTPS (except ACME challenge)
+server {
+    listen 80;
+    listen [::]:80;
+    server_name easycard.ae www.easycard.ae api.easycard.ae;
+
+    # ACME challenge for Let's Encrypt
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # Redirect all other traffic to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# HTTPS - Main Frontend (easycard.ae)
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name easycard.ae www.easycard.ae;
+
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/easycard.ae/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/easycard.ae/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+
+    # HSTS
+    add_header Strict-Transport-Security "max-age=63072000" always;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # SPA routing - all paths go to index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+        limit_req zone=general burst=20 nodelay;
+    }
+
+    # Static assets caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|tgs|lottie)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # Health check endpoint
+    location /health {
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+
+    # pgAdmin (admin only)
+    location /pgadmin/ {
+        proxy_pass http://pgadmin:80/;
+        proxy_set_header X-Script-Name /pgadmin;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
+    }
+
+    # Redis Commander (admin only)
+    location /redis/ {
+        proxy_pass http://redis-commander:8081/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
+    }
+}
+
+# HTTPS - Supabase API (api.easycard.ae)
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name api.easycard.ae;
+
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/easycard.ae/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/easycard.ae/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+
+    # HSTS
+    add_header Strict-Transport-Security "max-age=63072000" always;
+
+    # Rate limiting for API
+    limit_req zone=api burst=50 nodelay;
+
+    # PostgREST API
+    location /rest/v1/ {
+        proxy_pass http://supabase-kong:8000/rest/v1/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+
+        # CORS headers
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type, apikey, X-Client-Info, Prefer" always;
+
+        # Handle preflight
+        if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "Authorization, Content-Type, apikey, X-Client-Info, Prefer";
+            add_header Access-Control-Max-Age 1728000;
+            add_header Content-Type "text/plain charset=UTF-8";
+            add_header Content-Length 0;
+            return 204;
+        }
+    }
+
+    # GoTrue Auth API
+    location /auth/v1/ {
+        proxy_pass http://supabase-kong:8000/auth/v1/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+
+        # CORS headers
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type, apikey, X-Client-Info" always;
+
+        if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "Authorization, Content-Type, apikey, X-Client-Info";
+            add_header Access-Control-Max-Age 1728000;
+            add_header Content-Type "text/plain charset=UTF-8";
+            add_header Content-Length 0;
+            return 204;
+        }
+    }
+
+    # Realtime WebSocket
+    location /realtime/v1/ {
+        proxy_pass http://supabase-kong:8000/realtime/v1/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+    }
+
+    # Supabase Studio (admin only - protect with auth!)
+    location /studio/ {
+        # Basic auth protection for admin
+        # auth_basic "Restricted Access";
+        # auth_basic_user_file /etc/nginx/.htpasswd;
+
+        proxy_pass http://supabase-studio:3000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
+    }
+
+    # Edge Functions
+    location /functions/v1/ {
+        proxy_pass http://supabase-kong:8000/functions/v1/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300;
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+
+        # CORS headers
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type, apikey, X-Client-Info" always;
+
+        # Streaming support for SSE
+        proxy_buffering off;
+        proxy_cache off;
+        chunked_transfer_encoding on;
+
+        if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "Authorization, Content-Type, apikey, X-Client-Info";
+            add_header Access-Control-Max-Age 1728000;
+            add_header Content-Type "text/plain charset=UTF-8";
+            add_header Content-Length 0;
+            return 204;
+        }
+    }
+
+    # Health check
+    location /health {
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+}
