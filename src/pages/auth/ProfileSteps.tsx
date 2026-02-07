@@ -1285,8 +1285,7 @@ const ProfileSteps = () => {
             
             {/* Edit hint - below card */}
             <motion.p 
-              className="text-center mt-4 max-w-[280px]"
-              style={{ color: '#333333', opacity: 0.7, fontSize: '14px' }}
+              className="text-center mt-4 max-w-[280px] text-muted-foreground text-sm opacity-70"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.7 }}
               transition={{ delay: 0.7 }}
