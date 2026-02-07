@@ -1250,7 +1250,38 @@ const PhoneEntry = () => {
               {t('auth.phone.support')}
             </button>
             
-            {/* DEV: Register without OTP removed - was causing 401 errors in production */}
+            {/* Register without OTP — backend issues token via registerAuth */}
+            {isPhoneValid && (
+              <motion.button
+                type="button"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={async () => {
+                  const fullPhone = getFullPhoneNumber();
+                  try {
+                    const response = await registerAuth(fullPhone);
+                    if (response.data?.token) {
+                      setAuthToken(response.data.token);
+                    }
+                    sessionStorage.setItem("registerPhone", fullPhone);
+                    navigate("/auth/profile", { 
+                      state: { 
+                        isNewUser: true, 
+                        phoneNumber: fullPhone,
+                        otpVerified: true
+                      } 
+                    });
+                  } catch (error) {
+                    console.error("Register without OTP failed:", error);
+                    toast.error(t('auth.phone.registerFailed') || 'Registration failed');
+                  }
+                }}
+                className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-2"
+              >
+                <KeyRound className="w-4 h-4" />
+                {t('auth.phone.registerWithoutOtp') || 'Register without OTP'}
+              </motion.button>
+            )}
           </motion.div>
 
           <PoweredByFooter />
