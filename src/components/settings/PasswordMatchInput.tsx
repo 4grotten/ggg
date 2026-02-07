@@ -139,7 +139,7 @@ export const PasswordMatchInput = ({
                       }}
                       className="relative flex items-center justify-center w-4 h-6"
                     >
-                      {showConfirmPassword ? (
+                      {(showConfirmPassword || allMatch) ? (
                         // Show actual characters with color
                         <motion.span
                           animate={item.match ? {
