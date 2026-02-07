@@ -124,7 +124,7 @@ export const PasswordMatchInput = ({
                 <AnimatePresence mode="popLayout">
                   {charComparison.map((item, index) => (
                     <motion.span
-                      key={`${index}-${item.char}`}
+                      key={`${index}-${item.char}-${allMatch ? 'text' : 'dot'}`}
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ 
                         scale: 1, 
