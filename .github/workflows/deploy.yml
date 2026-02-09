@@ -36,6 +36,7 @@ jobs:
 
             # Rebuild and restart only the frontend app
             echo "Rebuilding frontend..."
+            cd docker
             docker compose build easycard-app
 
             # Restart only affected services
