@@ -6,7 +6,8 @@ dist
 .idea
 *.log
 *.md
-.env*
+.env.local
+.env.*.local
 .dockerignore
 Dockerfile
 docker/
