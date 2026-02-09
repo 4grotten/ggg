@@ -21,7 +21,6 @@ import { OpenCardButton } from "@/components/dashboard/OpenCardButton";
 import { OpenCardDrawer } from "@/components/dashboard/OpenCardDrawer";
 import { AccountSwitcher } from "@/components/account/AccountSwitcher";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { InstallButton } from "@/components/dashboard/InstallButton";
 import { AnimatedSection } from "@/components/dashboard/AnimatedSection";
 import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 
@@ -160,7 +159,6 @@ const Dashboard = () => {
         }
         rightAction={
           <div className="flex items-center gap-2">
-            <InstallButton />
             <ThemeSwitcher />
             <LanguageSwitcher />
             <DashboardHeader
