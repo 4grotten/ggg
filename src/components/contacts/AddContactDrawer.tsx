@@ -263,12 +263,12 @@ export const AddContactDrawer = ({
       }));
 
       const contactData = {
-        full_name: fullName.trim(),
-        phone: phone.trim() || undefined,
-        email: email.trim() || undefined,
-        company: company.trim() || undefined,
-        position: position.trim() || undefined,
-        notes: notes.trim() || undefined,
+        full_name: (fullName || '').trim(),
+        phone: (phone || '').trim() || undefined,
+        email: (email || '').trim() || undefined,
+        company: (company || '').trim() || undefined,
+        position: (position || '').trim() || undefined,
+        notes: (notes || '').trim() || undefined,
         avatar_url: finalAvatarUrl || undefined,
         payment_methods: paymentMethods,
         social_links: contactSocialLinks,
