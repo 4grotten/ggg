@@ -242,16 +242,18 @@ export const AddContactDrawer = ({
     });
     
     // Set avatar from extracted image (if found)
-    if (data.avatar_url && data.avatar_url.startsWith('data:')) {
+    if (data.avatar_url) {
       setAvatarUrl(data.avatar_url);
-      // Convert base64 to file for upload
-      try {
-        const response = await fetch(data.avatar_url);
-        const blob = await response.blob();
-        const file = new File([blob], 'contact-avatar.jpg', { type: 'image/jpeg' });
-        setAvatarFile(file);
-      } catch (err) {
-        console.error('Failed to convert avatar to file:', err);
+      // Convert to file for upload if it's a data URL
+      if (data.avatar_url.startsWith('data:')) {
+        try {
+          const response = await fetch(data.avatar_url);
+          const blob = await response.blob();
+          const file = new File([blob], 'contact-avatar.jpg', { type: 'image/jpeg' });
+          setAvatarFile(file);
+        } catch (err) {
+          console.error('Failed to convert avatar to file:', err);
+        }
       }
     }
     
