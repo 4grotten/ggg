@@ -1560,6 +1560,11 @@ const Settings = () => {
           setEditingContact(null);
         }}
         editContact={editingContact}
+        onSaved={() => {
+          setIsAddContactOpen(false);
+          setEditingContact(null);
+          setIsContactsListOpen(true);
+        }}
         onBack={editingContact ? () => {
           setIsAddContactOpen(false);
           setEditingContact(null);
