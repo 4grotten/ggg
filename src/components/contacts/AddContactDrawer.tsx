@@ -218,6 +218,39 @@ export const AddContactDrawer = ({
     setPaymentMethods(prev => prev.filter(p => p.id !== id));
   };
 
+  // Generate a nickname from extracted data when no name is found
+  const generateNickname = (data: ExtractedContactData): string | null => {
+    const toArr = (val: string | string[] | undefined): string[] => {
+      if (!val) return [];
+      return Array.isArray(val) ? val : [val];
+    };
+
+    // Try email username
+    const emailList = toArr(data.email);
+    if (emailList.length > 0) {
+      const username = emailList[0].split('@')[0];
+      if (username) return username.charAt(0).toUpperCase() + username.slice(1);
+    }
+
+    // Try social link handle
+    if (data.social_links?.length) {
+      const link = data.social_links[0];
+      const url = link.url || '';
+      const handle = url.replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '').split('/')[0];
+      if (handle) return handle.charAt(0).toUpperCase() + handle.slice(1);
+    }
+
+    // Try phone number
+    const phoneList = toArr(data.phone);
+    if (phoneList.length > 0) return phoneList[0];
+
+    // Try company
+    const companyList = toArr(data.company);
+    if (companyList.length > 0) return companyList[0];
+
+    return null;
+  };
+
   // Handle extracted contact data from AI
   const handleExtractedData = async (data: ExtractedContactData) => {
     // Helper: normalize string | string[] into string[]
@@ -226,7 +259,13 @@ export const AddContactDrawer = ({
       return Array.isArray(val) ? val : [val];
     };
 
-    if (data.full_name) setFullName(data.full_name);
+    if (data.full_name) {
+      setFullName(data.full_name);
+    } else {
+      // Generate a nickname from available data
+      const nick = generateNickname(data);
+      if (nick) setFullName(nick);
+    }
 
     const extractedPhones = toArray(data.phone);
     if (extractedPhones.length) {
