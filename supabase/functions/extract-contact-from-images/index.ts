@@ -41,11 +41,11 @@ function detectCryptoNetwork(address: string): string | null {
 
 interface ExtractedContact {
   full_name?: string;
-  phone?: string;
-  email?: string;
-  company?: string;
-  position?: string;
-  notes?: string;
+  phone?: string[];
+  email?: string[];
+  company?: string[];
+  position?: string[];
+  notes?: string[];
   avatar_description?: string;
   avatar_image_index?: number; // 0-based index of image containing profile photo
   payment_methods?: Array<{
@@ -125,12 +125,12 @@ serve(async (req) => {
 Analyze the provided images which may be business cards, screenshots of contact profiles, messenger screenshots, or any other source containing contact data.
 
 Extract ALL available information and return a JSON object with these fields:
-- full_name: Person's full name
-- phone: Phone number(s) - include country code if visible
-- email: Email address(es)
-- company: Company/organization name
-- position: Job title/position
-- notes: Any additional relevant info
+- full_name: Person's full name (single string)
+- phone: Array of phone numbers found - include country code if visible. ALWAYS return as array, even for single number.
+- email: Array of email addresses found. ALWAYS return as array, even for single email.
+- company: Array of company/organization names. ALWAYS return as array.
+- position: Array of job titles/positions. ALWAYS return as array.
+- notes: Array of additional relevant info. ALWAYS return as array.
 - avatar_image_index: If any image contains a clear profile photo/avatar of the person, return the 0-based index of that image. If image 1 has the avatar, return 0. If image 2 has the avatar, return 1. Return null if no profile photo is found.
 - avatar_description: Brief description of the person's appearance if visible (optional)
 - payment_methods: Array of payment methods found. Each should have:

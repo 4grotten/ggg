@@ -219,27 +219,53 @@ export const AddContactDrawer = ({
 
   // Handle extracted contact data from AI
   const handleExtractedData = async (data: ExtractedContactData) => {
+    // Helper: normalize string | string[] into string[]
+    const toArray = (val: string | string[] | undefined): string[] => {
+      if (!val) return [];
+      return Array.isArray(val) ? val : [val];
+    };
+
     if (data.full_name) setFullName(data.full_name);
-    if (data.phone) setPhones(prev => {
-      const cleaned = prev.filter(p => p.trim());
-      return cleaned.length ? [...cleaned, data.phone!] : [data.phone!];
-    });
-    if (data.email) setEmails(prev => {
-      const cleaned = prev.filter(e => e.trim());
-      return cleaned.length ? [...cleaned, data.email!] : [data.email!];
-    });
-    if (data.company) setCompanies(prev => {
-      const cleaned = prev.filter(c => c.trim());
-      return cleaned.length ? [...cleaned, data.company!] : [data.company!];
-    });
-    if (data.position) setPositions(prev => {
-      const cleaned = prev.filter(p => p.trim());
-      return cleaned.length ? [...cleaned, data.position!] : [data.position!];
-    });
-    if (data.notes) setNotesList(prev => {
-      const cleaned = prev.filter(n => n.trim());
-      return cleaned.length ? [...cleaned, data.notes!] : [data.notes!];
-    });
+
+    const extractedPhones = toArray(data.phone);
+    if (extractedPhones.length) {
+      setPhones(prev => {
+        const cleaned = prev.filter(p => p.trim());
+        return cleaned.length ? [...cleaned, ...extractedPhones] : extractedPhones;
+      });
+    }
+
+    const extractedEmails = toArray(data.email);
+    if (extractedEmails.length) {
+      setEmails(prev => {
+        const cleaned = prev.filter(e => e.trim());
+        return cleaned.length ? [...cleaned, ...extractedEmails] : extractedEmails;
+      });
+    }
+
+    const extractedCompanies = toArray(data.company);
+    if (extractedCompanies.length) {
+      setCompanies(prev => {
+        const cleaned = prev.filter(c => c.trim());
+        return cleaned.length ? [...cleaned, ...extractedCompanies] : extractedCompanies;
+      });
+    }
+
+    const extractedPositions = toArray(data.position);
+    if (extractedPositions.length) {
+      setPositions(prev => {
+        const cleaned = prev.filter(p => p.trim());
+        return cleaned.length ? [...cleaned, ...extractedPositions] : extractedPositions;
+      });
+    }
+
+    const extractedNotes = toArray(data.notes);
+    if (extractedNotes.length) {
+      setNotesList(prev => {
+        const cleaned = prev.filter(n => n.trim());
+        return cleaned.length ? [...cleaned, ...extractedNotes] : extractedNotes;
+      });
+    }
     
     // Set avatar from extracted image (if found)
     if (data.avatar_url) {

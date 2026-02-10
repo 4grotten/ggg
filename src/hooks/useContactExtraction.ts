@@ -10,11 +10,11 @@ import { useTranslation } from 'react-i18next';
 
 export interface ExtractedContactData {
   full_name?: string;
-  phone?: string;
-  email?: string;
-  company?: string;
-  position?: string;
-  notes?: string;
+  phone?: string | string[];
+  email?: string | string[];
+  company?: string | string[];
+  position?: string | string[];
+  notes?: string | string[];
   avatar_url?: string; // Will be set to base64 of image if avatar found
   avatar_image_index?: number; // Index of image with profile photo
   payment_methods?: PaymentMethod[];
@@ -48,23 +48,37 @@ export const useContactExtraction = () => {
     }
 
     setIsExtracting(true);
-    setProgress(10);
+    setProgress(5);
 
     try {
-      // Convert files to base64
-      setProgress(20);
-      const imagePromises = files.map(file => fileToBase64(file));
-      const base64Images = await Promise.all(imagePromises);
-      
-      setProgress(40);
+      // Step 1: Converting images (5% → 25%)
+      const base64Images: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const b64 = await fileToBase64(files[i]);
+        base64Images.push(b64);
+        setProgress(5 + Math.round((20 * (i + 1)) / files.length));
+      }
+
+      // Step 2: Sending to AI (25% → 35%)
+      setProgress(30);
       console.log(`Sending ${base64Images.length} images for extraction`);
 
-      // Call edge function
+      // Step 3: AI processing (35% → 85%) — simulate gradual progress while waiting
+      let progressInterval: ReturnType<typeof setInterval> | null = null;
+      let currentProgress = 35;
+      progressInterval = setInterval(() => {
+        currentProgress = Math.min(currentProgress + 2, 85);
+        setProgress(currentProgress);
+      }, 500);
+
       const { data, error } = await supabase.functions.invoke('extract-contact-from-images', {
         body: { images: base64Images }
       });
 
-      setProgress(80);
+      if (progressInterval) clearInterval(progressInterval);
+
+      // Step 4: Processing result (85% → 95%)
+      setProgress(90);
 
       if (error) {
         console.error('Extraction error:', error);
@@ -85,7 +99,7 @@ export const useContactExtraction = () => {
         return null;
       }
 
-      setProgress(100);
+      setProgress(95);
       
       const contact = data.contact as ExtractedContactData;
       
@@ -97,6 +111,7 @@ export const useContactExtraction = () => {
         console.log(`Using image ${contact.avatar_image_index} as avatar`);
       }
       
+      setProgress(100);
       console.log('Extracted contact:', contact);
 
       // Show success with summary
@@ -122,7 +137,8 @@ export const useContactExtraction = () => {
       return null;
     } finally {
       setIsExtracting(false);
-      setProgress(0);
+      // Keep 100% visible briefly before reset
+      setTimeout(() => setProgress(0), 500);
     }
   }, [fileToBase64, t]);
 
