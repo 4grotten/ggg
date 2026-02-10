@@ -69,11 +69,11 @@ export const AddContactDrawer = ({
 
   // Form fields
   const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [company, setCompany] = useState("");
-  const [position, setPosition] = useState("");
-  const [notes, setNotes] = useState("");
+  const [phones, setPhones] = useState<string[]>([""]);
+  const [emails, setEmails] = useState<string[]>([""]);
+  const [companies, setCompanies] = useState<string[]>([""]);
+  const [positions, setPositions] = useState<string[]>([""]);
+  const [notesList, setNotesList] = useState<string[]>([""]);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
@@ -93,14 +93,21 @@ export const AddContactDrawer = ({
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
 
+  // Helper: split stored single string into array
+  const splitField = (val: string | undefined) => {
+    if (!val) return [""];
+    const parts = val.split('\n').filter(Boolean);
+    return parts.length ? parts : [""];
+  };
+
   // Track if data has changed (for edit mode)
   const hasChanges = editContact ? (
     fullName !== editContact.full_name ||
-    phone !== (editContact.phone || "") ||
-    email !== (editContact.email || "") ||
-    company !== (editContact.company || "") ||
-    position !== (editContact.position || "") ||
-    notes !== (editContact.notes || "") ||
+    phones.join('\n') !== (editContact.phone || "") ||
+    emails.join('\n') !== (editContact.email || "") ||
+    companies.join('\n') !== (editContact.company || "") ||
+    positions.join('\n') !== (editContact.position || "") ||
+    notesList.join('\n') !== (editContact.notes || "") ||
     avatarUrl !== (editContact.avatar_url || null) ||
     avatarFile !== null ||
     JSON.stringify(paymentMethods) !== JSON.stringify(editContact.payment_methods || []) ||
@@ -112,11 +119,11 @@ export const AddContactDrawer = ({
   useEffect(() => {
     if (editContact) {
       setFullName(editContact.full_name);
-      setPhone(editContact.phone || "");
-      setEmail(editContact.email || "");
-      setCompany(editContact.company || "");
-      setPosition(editContact.position || "");
-      setNotes(editContact.notes || "");
+      setPhones(splitField(editContact.phone));
+      setEmails(splitField(editContact.email));
+      setCompanies(splitField(editContact.company));
+      setPositions(splitField(editContact.position));
+      setNotesList(splitField(editContact.notes));
       setAvatarUrl(editContact.avatar_url || null);
       setPaymentMethods(editContact.payment_methods || []);
       
@@ -135,17 +142,31 @@ export const AddContactDrawer = ({
 
   const resetForm = () => {
     setFullName("");
-    setPhone("");
-    setEmail("");
-    setCompany("");
-    setPosition("");
-    setNotes("");
+    setPhones([""]);
+    setEmails([""]);
+    setCompanies([""]);
+    setPositions([""]);
+    setNotesList([""]);
     setAvatarUrl(null);
     setAvatarFile(null);
     setSocialLinks([]);
     setPaymentMethods([]);
     setCurrentView("main");
   };
+
+  // Multi-value helpers
+  const updateArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>, index: number, value: string) => {
+    setter(prev => prev.map((v, i) => i === index ? value : v));
+  };
+  const addArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>) => {
+    tap();
+    setter(prev => [...prev, ""]);
+  };
+  const removeArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>, index: number) => {
+    tap();
+    setter(prev => prev.length > 1 ? prev.filter((_, i) => i !== index) : [""]);
+  };
+  const joinNonEmpty = (arr: string[]) => arr.map(s => (s || '').trim()).filter(Boolean).join('\n') || undefined;
 
   const handleClose = () => {
     resetForm();
@@ -199,11 +220,26 @@ export const AddContactDrawer = ({
   // Handle extracted contact data from AI
   const handleExtractedData = async (data: ExtractedContactData) => {
     if (data.full_name) setFullName(data.full_name);
-    if (data.phone) setPhone(data.phone);
-    if (data.email) setEmail(data.email);
-    if (data.company) setCompany(data.company);
-    if (data.position) setPosition(data.position);
-    if (data.notes) setNotes(data.notes);
+    if (data.phone) setPhones(prev => {
+      const cleaned = prev.filter(p => p.trim());
+      return cleaned.length ? [...cleaned, data.phone!] : [data.phone!];
+    });
+    if (data.email) setEmails(prev => {
+      const cleaned = prev.filter(e => e.trim());
+      return cleaned.length ? [...cleaned, data.email!] : [data.email!];
+    });
+    if (data.company) setCompanies(prev => {
+      const cleaned = prev.filter(c => c.trim());
+      return cleaned.length ? [...cleaned, data.company!] : [data.company!];
+    });
+    if (data.position) setPositions(prev => {
+      const cleaned = prev.filter(p => p.trim());
+      return cleaned.length ? [...cleaned, data.position!] : [data.position!];
+    });
+    if (data.notes) setNotesList(prev => {
+      const cleaned = prev.filter(n => n.trim());
+      return cleaned.length ? [...cleaned, data.notes!] : [data.notes!];
+    });
     
     // Set avatar from extracted image (if found)
     if (data.avatar_url && data.avatar_url.startsWith('data:')) {
@@ -264,11 +300,11 @@ export const AddContactDrawer = ({
 
       const contactData = {
         full_name: (fullName || '').trim(),
-        phone: (phone || '').trim() || undefined,
-        email: (email || '').trim() || undefined,
-        company: (company || '').trim() || undefined,
-        position: (position || '').trim() || undefined,
-        notes: (notes || '').trim() || undefined,
+        phone: joinNonEmpty(phones),
+        email: joinNonEmpty(emails),
+        company: joinNonEmpty(companies),
+        position: joinNonEmpty(positions),
+        notes: joinNonEmpty(notesList),
         avatar_url: finalAvatarUrl || undefined,
         payment_methods: paymentMethods,
         social_links: contactSocialLinks,
@@ -437,82 +473,142 @@ export const AddContactDrawer = ({
             </div>
           </div>
 
-          {/* Phone input */}
-          <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-emerald-500/10 to-transparent flex items-center justify-center">
-                <Phone className="w-5 h-5 text-emerald-600/70" />
+          {/* Phone inputs */}
+          {phones.map((phoneVal, idx) => (
+            <div key={`phone-${idx}`} className="relative group flex items-center gap-2">
+              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-emerald-500/10 to-transparent flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-emerald-600/70" />
+                </div>
+                <Input
+                  value={phoneVal}
+                  onChange={e => updateArrayItem(setPhones, idx, e.target.value)}
+                  placeholder={t("contacts.phone")}
+                  type="tel"
+                  className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                />
               </div>
-              <Input
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                placeholder={t("contacts.phone")}
-                type="tel"
-                className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
-              />
+              {phones.length > 1 && (
+                <button onClick={() => removeArrayItem(setPhones, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+              {idx === phones.length - 1 && (
+                <button onClick={() => addArrayItem(setPhones)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
+                  <Plus className="w-5 h-5" />
+                </button>
+              )}
             </div>
-          </div>
+          ))}
 
-          {/* Email input */}
-          <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-blue-500/10 to-transparent flex items-center justify-center">
-                <Mail className="w-5 h-5 text-blue-600/70" />
+          {/* Email inputs */}
+          {emails.map((emailVal, idx) => (
+            <div key={`email-${idx}`} className="relative group flex items-center gap-2">
+              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-blue-500/10 to-transparent flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-blue-600/70" />
+                </div>
+                <Input
+                  value={emailVal}
+                  onChange={e => updateArrayItem(setEmails, idx, e.target.value)}
+                  placeholder={t("contacts.email")}
+                  type="email"
+                  className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                />
               </div>
-              <Input
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder={t("contacts.email")}
-                type="email"
-                className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
-              />
+              {emails.length > 1 && (
+                <button onClick={() => removeArrayItem(setEmails, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+              {idx === emails.length - 1 && (
+                <button onClick={() => addArrayItem(setEmails)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
+                  <Plus className="w-5 h-5" />
+                </button>
+              )}
             </div>
-          </div>
+          ))}
 
-          {/* Company input */}
-          <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-amber-600/70" />
+          {/* Company inputs */}
+          {companies.map((companyVal, idx) => (
+            <div key={`company-${idx}`} className="relative group flex items-center gap-2">
+              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-amber-600/70" />
+                </div>
+                <Input
+                  value={companyVal}
+                  onChange={e => updateArrayItem(setCompanies, idx, e.target.value)}
+                  placeholder={t("contacts.company")}
+                  className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                />
               </div>
-              <Input
-                value={company}
-                onChange={e => setCompany(e.target.value)}
-                placeholder={t("contacts.company")}
-                className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
-              />
+              {companies.length > 1 && (
+                <button onClick={() => removeArrayItem(setCompanies, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+              {idx === companies.length - 1 && (
+                <button onClick={() => addArrayItem(setCompanies)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
+                  <Plus className="w-5 h-5" />
+                </button>
+              )}
             </div>
-          </div>
+          ))}
 
-          {/* Position input */}
-          <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-violet-500/10 to-transparent flex items-center justify-center">
-                <Briefcase className="w-5 h-5 text-violet-600/70" />
+          {/* Position inputs */}
+          {positions.map((positionVal, idx) => (
+            <div key={`position-${idx}`} className="relative group flex items-center gap-2">
+              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-violet-500/10 to-transparent flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-violet-600/70" />
+                </div>
+                <Input
+                  value={positionVal}
+                  onChange={e => updateArrayItem(setPositions, idx, e.target.value)}
+                  placeholder={t("contacts.position")}
+                  className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                />
               </div>
-              <Input
-                value={position}
-                onChange={e => setPosition(e.target.value)}
-                placeholder={t("contacts.position")}
-                className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
-              />
+              {positions.length > 1 && (
+                <button onClick={() => removeArrayItem(setPositions, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+              {idx === positions.length - 1 && (
+                <button onClick={() => addArrayItem(setPositions)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
+                  <Plus className="w-5 h-5" />
+                </button>
+              )}
             </div>
-          </div>
+          ))}
 
-          {/* Notes textarea */}
-          <div className="relative group">
-            <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
-              <div className="absolute left-0 top-0 w-12 h-14 bg-gradient-to-r from-rose-500/10 to-transparent flex items-center justify-center">
-                <StickyNote className="w-5 h-5 text-rose-600/70" />
+          {/* Notes inputs */}
+          {notesList.map((noteVal, idx) => (
+            <div key={`note-${idx}`} className="relative group flex items-center gap-2">
+              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+                <div className="absolute left-0 top-0 w-12 h-14 bg-gradient-to-r from-rose-500/10 to-transparent flex items-center justify-center">
+                  <StickyNote className="w-5 h-5 text-rose-600/70" />
+                </div>
+                <Textarea
+                  value={noteVal}
+                  onChange={e => updateArrayItem(setNotesList, idx, e.target.value)}
+                  placeholder={t("contacts.notes")}
+                  className="pl-14 pt-4 min-h-[100px] rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base resize-none"
+                />
               </div>
-              <Textarea
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder={t("contacts.notes")}
-                className="pl-14 pt-4 min-h-[100px] rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base resize-none"
-              />
+              {notesList.length > 1 && (
+                <button onClick={() => removeArrayItem(setNotesList, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+              {idx === notesList.length - 1 && (
+                <button onClick={() => addArrayItem(setNotesList)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
+                  <Plus className="w-5 h-5" />
+                </button>
+              )}
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
