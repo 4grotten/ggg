@@ -166,7 +166,8 @@ export const AddContactDrawer = ({
     tap();
     setter(prev => prev.length > 1 ? prev.filter((_, i) => i !== index) : [""]);
   };
-  const joinNonEmpty = (arr: string[]) => arr.map(s => (s || '').trim()).filter(Boolean).join('\n') || undefined;
+  const firstNonEmpty = (arr: string[]) => arr.map(s => (s || '').trim()).find(Boolean) || undefined;
+  const allNonEmpty = (arr: string[]) => arr.map(s => (s || '').trim()).filter(Boolean);
 
   const handleClose = () => {
     resetForm();
@@ -318,21 +319,61 @@ export const AddContactDrawer = ({
         if (uploadedUrl) finalAvatarUrl = uploadedUrl;
       }
 
-      // Convert SocialLink to ContactSocialLink
-      const contactSocialLinks: ContactSocialLink[] = socialLinks.map(link => ({
-        id: link.id,
-        networkId: link.networkId,
-        networkName: link.networkName,
-        url: link.url,
-      }));
+      // Convert SocialLink to ContactSocialLink, fix invalid URLs
+      const contactSocialLinks: ContactSocialLink[] = socialLinks
+        .filter(link => link.url && link.url.trim())
+        .map(link => {
+          let url = link.url.trim();
+          // Ensure URLs have a protocol
+          if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('tel:') && !url.startsWith('mailto:')) {
+            // Skip obviously invalid URLs like "@username"
+            if (url.startsWith('@') || (!url.includes('.') && !url.includes('/'))) {
+              url = `https://${link.networkId}.com/${url.replace('@', '')}`;
+            } else {
+              url = `https://${url}`;
+            }
+          }
+          return {
+            id: link.id,
+            networkId: link.networkId,
+            networkName: link.networkName,
+            url,
+          };
+        });
+
+      // API accepts single string per field — send first value, extras go to notes
+      const phoneValues = allNonEmpty(phones);
+      const emailValues = allNonEmpty(emails);
+      const companyValues = allNonEmpty(companies);
+      const positionValues = allNonEmpty(positions);
+      const notesValues = allNonEmpty(notesList);
+
+      // Collect extra values into notes
+      const extraParts: string[] = [];
+      if (phoneValues.length > 1) {
+        extraParts.push(`📱 ${phoneValues.slice(1).join(', ')}`);
+      }
+      if (emailValues.length > 1) {
+        extraParts.push(`📧 ${emailValues.slice(1).join(', ')}`);
+      }
+      if (companyValues.length > 1) {
+        extraParts.push(`🏢 ${companyValues.slice(1).join(', ')}`);
+      }
+      if (positionValues.length > 1) {
+        extraParts.push(`💼 ${positionValues.slice(1).join(', ')}`);
+      }
+
+      const mainNotes = notesValues.join('\n');
+      const extraNotes = extraParts.length > 0 ? extraParts.join('\n') : '';
+      const combinedNotes = [mainNotes, extraNotes].filter(Boolean).join('\n---\n') || undefined;
 
       const contactData = {
         full_name: (fullName || '').trim(),
-        phone: joinNonEmpty(phones),
-        email: joinNonEmpty(emails),
-        company: joinNonEmpty(companies),
-        position: joinNonEmpty(positions),
-        notes: joinNonEmpty(notesList),
+        phone: phoneValues[0] || undefined,
+        email: emailValues[0] || undefined,
+        company: companyValues[0] || undefined,
+        position: positionValues[0] || undefined,
+        notes: combinedNotes,
         avatar_url: finalAvatarUrl || undefined,
         payment_methods: paymentMethods,
         social_links: contactSocialLinks,
