@@ -314,7 +314,6 @@ const Settings = () => {
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
   const { tap } = useHapticFeedback();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const appIconInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
     if (isInstalled) {
@@ -324,19 +323,26 @@ const Settings = () => {
     setIsInstallOpen(true);
   };
 
-  const handleAppIconChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    event.target.value = '';
+  const [isAppIconDrawerOpen, setIsAppIconDrawerOpen] = useState(false);
+  const [selectedAppIcon, setSelectedAppIcon] = useState<string>(
+    localStorage.getItem('selected-app-icon') || 'default'
+  );
 
-    if (!file.type.startsWith('image/')) {
-      toast.error(t("toast.selectImageFile"));
-      return;
-    }
+  const appIconOptions = [
+    { key: 'default', label: 'Default', src: '/app-icon-512.png' },
+    { key: 'dark-blue', label: 'Dark Blue', src: '/app-icons/icon-dark-blue.png' },
+    { key: 'black-green', label: 'Neon', src: '/app-icons/icon-black-green.png' },
+    { key: 'white-silver', label: 'Silver', src: '/app-icons/icon-white-silver.png' },
+    { key: 'purple', label: 'Purple', src: '/app-icons/icon-purple.png' },
+    { key: 'gold', label: 'Gold', src: '/app-icons/icon-gold.png' },
+  ];
+
+  const handleSelectAppIcon = async (iconKey: string, iconSrc: string) => {
+    setSelectedAppIcon(iconKey);
+    localStorage.setItem('selected-app-icon', iconKey);
 
     try {
-      // Create 192 and 512 versions
-      const createIcon = (size: number): Promise<string> =>
+      const createIcon = (src: string, size: number): Promise<string> =>
         new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => {
@@ -349,12 +355,14 @@ const Settings = () => {
             resolve(canvas.toDataURL('image/png'));
           };
           img.onerror = reject;
-          img.src = URL.createObjectURL(file);
+          img.src = src;
         });
 
-      const [icon192, icon512] = await Promise.all([createIcon(192), createIcon(512)]);
+      const [icon192, icon512] = await Promise.all([
+        createIcon(iconSrc, 192),
+        createIcon(iconSrc, 512),
+      ]);
 
-      // Update manifest dynamically
       const link = document.querySelector('link[rel="manifest"]');
       if (link) {
         const manifestResp = await fetch((link as HTMLLinkElement).href);
@@ -367,11 +375,11 @@ const Settings = () => {
         (link as HTMLLinkElement).href = URL.createObjectURL(blob);
       }
 
-      // Save to localStorage for persistence
       localStorage.setItem('custom-app-icon-192', icon192);
       localStorage.setItem('custom-app-icon-512', icon512);
 
       toast.success(t("toast.appIconChanged") || "Иконка приложения обновлена");
+      setIsAppIconDrawerOpen(false);
     } catch (error) {
       console.error('Failed to change app icon:', error);
       toast.error("Не удалось сменить иконку");
@@ -1040,14 +1048,7 @@ const Settings = () => {
           <SettingsItem
             icon={<ColoredIcon colorKey="palette"><Smartphone className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.changeAppIcon") || "Сменить иконку приложения"}
-            onClick={() => appIconInputRef.current?.click()}
-          />
-          <input
-            ref={appIconInputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="hidden"
-            onChange={handleAppIconChange}
+            onClick={() => setIsAppIconDrawerOpen(true)}
           />
         </AnimatedMenuSection>
 
@@ -1638,6 +1639,50 @@ const Settings = () => {
           setIsContactsListOpen(true);
         } : undefined}
       />
+      {/* App Icon Picker Drawer */}
+      <Drawer open={isAppIconDrawerOpen} onOpenChange={setIsAppIconDrawerOpen} shouldScaleBackground={false}>
+        <DrawerContent className="bg-background/95 backdrop-blur-xl">
+          <DrawerHeader className="relative flex items-center justify-center py-4">
+            <DrawerTitle className="text-center text-base font-semibold">
+              {t("settings.changeAppIcon") || "Сменить иконку приложения"}
+            </DrawerTitle>
+            <button
+              onClick={() => setIsAppIconDrawerOpen(false)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-muted/80"
+            >
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </DrawerHeader>
+          <div className="px-6 pb-8">
+            <div className="grid grid-cols-3 gap-4">
+              {appIconOptions.map((icon) => (
+                <button
+                  key={icon.key}
+                  onClick={() => handleSelectAppIcon(icon.key, icon.src)}
+                  className={`relative flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${
+                    selectedAppIcon === icon.key
+                      ? 'bg-primary/10 ring-2 ring-primary'
+                      : 'bg-muted/50 hover:bg-muted'
+                  }`}
+                >
+                  <img 
+                    src={icon.src} 
+                    alt={icon.label} 
+                    className="w-16 h-16 rounded-2xl object-cover"
+                  />
+                  <span className="text-xs font-medium text-foreground">{icon.label}</span>
+                  {selectedAppIcon === icon.key && (
+                    <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                      <Check className="w-3 h-3 text-primary-foreground" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
     </MobileLayout>
   );
 };
