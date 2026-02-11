@@ -35,7 +35,8 @@
     "comingSoon": "قريباً",
     "addMore": "إضافة المزيد",
     "save": "حفظ",
-    "delete": "حذف"
+    "delete": "حذف",
+    "goTo": "فتح"
   },
   "dashboard": {
     "welcome": "مرحباً، {{name}}!",

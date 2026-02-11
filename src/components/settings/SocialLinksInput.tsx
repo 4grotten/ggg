@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -273,6 +274,7 @@ export const SocialLinksInput = ({
   onChange,
   placeholder = "Paste a link..."
 }: SocialLinksInputProps) => {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
   const [detectedNetwork, setDetectedNetwork] = useState<typeof socialNetworks[0] | null>(null);
 
@@ -404,7 +406,7 @@ export const SocialLinksInput = ({
                     toast.success("Ссылка скопирована");
                   }}>
                     <Copy className="w-4 h-4 mr-2" />
-                    Скопировать
+                    {t("common.copy")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => {
                     let url = link.url.trim();
@@ -412,14 +414,14 @@ export const SocialLinksInput = ({
                     window.open(url, '_blank');
                   }}>
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    Перейти
+                    {t("common.goTo")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleRemoveLink(link.id)}
                     className="text-red-500 focus:text-red-500"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Удалить
+                    {t("common.delete")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -41,7 +41,8 @@
     "comingSoon": "Coming soon",
     "addMore": "Add more",
     "save": "Save",
-    "delete": "Delete"
+    "delete": "Delete",
+    "goTo": "Open"
   },
   "dashboard": {
     "greeting": "Hello, {{name}}!",

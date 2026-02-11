@@ -35,7 +35,8 @@
     "comingSoon": "Yakında",
     "addMore": "Daha fazla ekle",
     "save": "Kaydet",
-    "delete": "Sil"
+    "delete": "Sil",
+    "goTo": "Aç"
   },
   "dashboard": {
     "welcome": "Hoş geldiniz, {{name}}!",
