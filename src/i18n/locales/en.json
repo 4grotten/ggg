@@ -338,7 +338,9 @@
     "dataUpdated": "Data updated",
     "appInstalled": "App installed to home screen",
     "appAlreadyInstalled": "App is already installed",
-    "installInstructions": "Tap Share → Add to Home Screen to install"
+    "installInstructions": "Tap Share → Add to Home Screen to install",
+    "appIconChanged": "App icon updated",
+    "reinstallForIcon": "Reinstall the app to apply the new icon"
   },
   "share": {
     "cardDetails": "Card Details",
