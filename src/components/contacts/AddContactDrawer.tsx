@@ -583,8 +583,8 @@ export const AddContactDrawer = ({
 
           {/* Phone inputs */}
           {phones.map((phoneVal, idx) => (
-            <div key={`phone-${idx}`} className="relative group flex items-center gap-2">
-              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+            <div key={`phone-${idx}`} className="relative group">
+              <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden flex items-center">
                 <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-emerald-500/10 to-transparent flex items-center justify-center">
                   <Phone className="w-5 h-5 text-emerald-600/70" />
                 </div>
@@ -593,26 +593,28 @@ export const AddContactDrawer = ({
                   onChange={e => updateArrayItem(setPhones, idx, e.target.value)}
                   placeholder={t("contacts.phone")}
                   type="tel"
-                  className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                  className="pl-14 pr-24 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-1"
                 />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {phones.length > 1 && (
+                    <button onClick={() => removeArrayItem(setPhones, idx)} className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/20 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  {idx === phones.length - 1 && (
+                    <button onClick={() => addArrayItem(setPhones)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
-              {phones.length > 1 && (
-                <button onClick={() => removeArrayItem(setPhones, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-              {idx === phones.length - 1 && (
-                <button onClick={() => addArrayItem(setPhones)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
-                  <Plus className="w-5 h-5" />
-                </button>
-              )}
             </div>
           ))}
 
           {/* Email inputs */}
           {emails.map((emailVal, idx) => (
-            <div key={`email-${idx}`} className="relative group flex items-center gap-2">
-              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+            <div key={`email-${idx}`} className="relative group">
+              <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden flex items-center">
                 <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-blue-500/10 to-transparent flex items-center justify-center">
                   <Mail className="w-5 h-5 text-blue-600/70" />
                 </div>
@@ -621,26 +623,28 @@ export const AddContactDrawer = ({
                   onChange={e => updateArrayItem(setEmails, idx, e.target.value)}
                   placeholder={t("contacts.email")}
                   type="email"
-                  className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                  className="pl-14 pr-24 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-1"
                 />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {emails.length > 1 && (
+                    <button onClick={() => removeArrayItem(setEmails, idx)} className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/20 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  {idx === emails.length - 1 && (
+                    <button onClick={() => addArrayItem(setEmails)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
-              {emails.length > 1 && (
-                <button onClick={() => removeArrayItem(setEmails, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-              {idx === emails.length - 1 && (
-                <button onClick={() => addArrayItem(setEmails)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
-                  <Plus className="w-5 h-5" />
-                </button>
-              )}
             </div>
           ))}
 
           {/* Company inputs */}
           {companies.map((companyVal, idx) => (
-            <div key={`company-${idx}`} className="relative group flex items-center gap-2">
-              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+            <div key={`company-${idx}`} className="relative group">
+              <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden flex items-center">
                 <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-center">
                   <Building2 className="w-5 h-5 text-amber-600/70" />
                 </div>
@@ -648,26 +652,28 @@ export const AddContactDrawer = ({
                   value={companyVal}
                   onChange={e => updateArrayItem(setCompanies, idx, e.target.value)}
                   placeholder={t("contacts.company")}
-                  className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                  className="pl-14 pr-24 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-1"
                 />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {companies.length > 1 && (
+                    <button onClick={() => removeArrayItem(setCompanies, idx)} className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/20 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  {idx === companies.length - 1 && (
+                    <button onClick={() => addArrayItem(setCompanies)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
-              {companies.length > 1 && (
-                <button onClick={() => removeArrayItem(setCompanies, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-              {idx === companies.length - 1 && (
-                <button onClick={() => addArrayItem(setCompanies)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
-                  <Plus className="w-5 h-5" />
-                </button>
-              )}
             </div>
           ))}
 
           {/* Position inputs */}
           {positions.map((positionVal, idx) => (
-            <div key={`position-${idx}`} className="relative group flex items-center gap-2">
-              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+            <div key={`position-${idx}`} className="relative group">
+              <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden flex items-center">
                 <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-violet-500/10 to-transparent flex items-center justify-center">
                   <Briefcase className="w-5 h-5 text-violet-600/70" />
                 </div>
@@ -675,26 +681,28 @@ export const AddContactDrawer = ({
                   value={positionVal}
                   onChange={e => updateArrayItem(setPositions, idx, e.target.value)}
                   placeholder={t("contacts.position")}
-                  className="pl-14 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                  className="pl-14 pr-24 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-1"
                 />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {positions.length > 1 && (
+                    <button onClick={() => removeArrayItem(setPositions, idx)} className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/20 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  {idx === positions.length - 1 && (
+                    <button onClick={() => addArrayItem(setPositions)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
-              {positions.length > 1 && (
-                <button onClick={() => removeArrayItem(setPositions, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-              {idx === positions.length - 1 && (
-                <button onClick={() => addArrayItem(setPositions)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
-                  <Plus className="w-5 h-5" />
-                </button>
-              )}
             </div>
           ))}
 
           {/* Notes inputs */}
           {notesList.map((noteVal, idx) => (
-            <div key={`note-${idx}`} className="relative group flex items-center gap-2">
-              <div className="flex-1 relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
+            <div key={`note-${idx}`} className="relative group">
+              <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
                 <div className="absolute left-0 top-0 w-12 h-14 bg-gradient-to-r from-rose-500/10 to-transparent flex items-center justify-center">
                   <StickyNote className="w-5 h-5 text-rose-600/70" />
                 </div>
@@ -702,19 +710,21 @@ export const AddContactDrawer = ({
                   value={noteVal}
                   onChange={e => updateArrayItem(setNotesList, idx, e.target.value)}
                   placeholder={t("contacts.notes")}
-                  className="pl-14 pt-4 min-h-[100px] rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base resize-none"
+                  className="pl-14 pr-24 pt-4 min-h-[100px] rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base resize-none"
                 />
+                <div className="absolute right-2 top-3 flex items-center gap-1">
+                  {notesList.length > 1 && (
+                    <button onClick={() => removeArrayItem(setNotesList, idx)} className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/20 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  {idx === notesList.length - 1 && (
+                    <button onClick={() => addArrayItem(setNotesList)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
-              {notesList.length > 1 && (
-                <button onClick={() => removeArrayItem(setNotesList, idx)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-              {idx === notesList.length - 1 && (
-                <button onClick={() => addArrayItem(setNotesList)} className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors">
-                  <Plus className="w-5 h-5" />
-                </button>
-              )}
             </div>
           ))}
         </div>
