@@ -314,6 +314,7 @@ const Settings = () => {
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
   const { tap } = useHapticFeedback();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const appIconInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstallClick = () => {
     if (isInstalled) {
@@ -321,6 +322,60 @@ const Settings = () => {
       return;
     }
     setIsInstallOpen(true);
+  };
+
+  const handleAppIconChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    event.target.value = '';
+
+    if (!file.type.startsWith('image/')) {
+      toast.error(t("toast.selectImageFile"));
+      return;
+    }
+
+    try {
+      // Create 192 and 512 versions
+      const createIcon = (size: number): Promise<string> =>
+        new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return reject('No canvas context');
+            ctx.drawImage(img, 0, 0, size, size);
+            resolve(canvas.toDataURL('image/png'));
+          };
+          img.onerror = reject;
+          img.src = URL.createObjectURL(file);
+        });
+
+      const [icon192, icon512] = await Promise.all([createIcon(192), createIcon(512)]);
+
+      // Update manifest dynamically
+      const link = document.querySelector('link[rel="manifest"]');
+      if (link) {
+        const manifestResp = await fetch((link as HTMLLinkElement).href);
+        const manifest = await manifestResp.json();
+        manifest.icons = [
+          { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+        ];
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        (link as HTMLLinkElement).href = URL.createObjectURL(blob);
+      }
+
+      // Save to localStorage for persistence
+      localStorage.setItem('custom-app-icon-192', icon192);
+      localStorage.setItem('custom-app-icon-512', icon512);
+
+      toast.success(t("toast.appIconChanged") || "Иконка приложения обновлена");
+    } catch (error) {
+      console.error('Failed to change app icon:', error);
+      toast.error("Не удалось сменить иконку");
+    }
   };
 
   const handleShareForInstall = async () => {
@@ -982,6 +1037,18 @@ const Settings = () => {
               onClick={handleInstallClick}
             />
           )}
+          <SettingsItem
+            icon={<ColoredIcon colorKey="palette"><Smartphone className="w-4 h-4" /></ColoredIcon>}
+            label={t("settings.changeAppIcon") || "Сменить иконку приложения"}
+            onClick={() => appIconInputRef.current?.click()}
+          />
+          <input
+            ref={appIconInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="hidden"
+            onChange={handleAppIconChange}
+          />
         </AnimatedMenuSection>
 
         {/* Account Management Block - Active Devices, Add Account, Switch Account */}
