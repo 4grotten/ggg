@@ -33,6 +33,7 @@
     "share": "Teilen",
     "copy": "Kopieren",
     "comingSoon": "Demnächst verfügbar",
+    "addMore": "Weitere hinzufügen",
     "delete": "Löschen"
   },
   "dashboard": {
@@ -1546,6 +1547,7 @@
     "addContact": "Kontakt hinzufügen",
     "addContactDescription": "Neuen Kontakt erstellen oder Visitenkarte scannen",
     "editContact": "Kontakt bearbeiten",
+    "contactSettings": "Kontakteinstellungen",
     "viewContacts": "Meine Kontakte",
     "viewContactsDescription": "Kontakte anzeigen und verwalten",
     "fullName": "Vollständiger Name",

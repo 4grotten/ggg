@@ -35,6 +35,7 @@
     "share": "分享",
     "copy": "复制",
     "comingSoon": "即将推出",
+    "addMore": "添加更多",
     "delete": "删除"
   },
   "dashboard": {
@@ -1553,6 +1554,7 @@
     "addContact": "添加联系人",
     "addContactDescription": "创建新联系人或扫描名片",
     "editContact": "编辑联系人",
+    "contactSettings": "联系人设置",
     "viewContacts": "我的联系人",
     "viewContactsDescription": "查看和管理您的联系人",
     "fullName": "全名",

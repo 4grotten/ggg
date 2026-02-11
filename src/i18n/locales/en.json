@@ -1607,6 +1607,7 @@
     "addContact": "Add Contact",
     "addContactDescription": "Create a new contact or scan a business card",
     "editContact": "Edit Contact",
+    "contactSettings": "Contact Settings",
     "viewContacts": "My Contacts",
     "viewContactsDescription": "View and manage your contacts",
     "fullName": "Full Name",
