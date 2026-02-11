@@ -226,28 +226,32 @@ interface SocialLinksInputProps {
 // Small component for website favicon with fallback
 const WebsiteFavicon = ({ url }: { url: string }) => {
   const [failed, setFailed] = useState(false);
-  const faviconUrl = (() => {
+  
+  const domainInfo = (() => {
     try {
       let cleanUrl = url.trim();
       if (!cleanUrl.startsWith('http')) cleanUrl = `https://${cleanUrl}`;
-      const domain = new URL(cleanUrl).hostname;
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+      const domain = new URL(cleanUrl).hostname.replace('www.', '');
+      const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+      const letter = domain.charAt(0).toUpperCase();
+      return { faviconUrl, letter, domain };
     } catch {
       return null;
     }
   })();
 
-  if (!faviconUrl || failed) {
+  if (!domainInfo || failed) {
+    const letter = domainInfo?.letter || '?';
     return (
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-green-500">
-        <Globe className="w-5 h-5 text-white" />
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-primary/80 to-primary shadow-sm">
+        <span className="text-sm font-bold text-primary-foreground">{letter}</span>
       </div>
     );
   }
 
   return (
     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-muted overflow-hidden">
-      <img src={faviconUrl} alt="" className="w-6 h-6" onError={() => setFailed(true)} />
+      <img src={domainInfo.faviconUrl} alt="" className="w-6 h-6" onError={() => setFailed(true)} />
     </div>
   );
 };
