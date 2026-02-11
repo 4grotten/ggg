@@ -585,8 +585,8 @@ export const AddContactDrawer = ({
           {phones.map((phoneVal, idx) => (
             <div key={`phone-${idx}`} className="relative group">
               <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden flex items-center">
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-emerald-500/10 to-transparent flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-emerald-600/70" />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center">
+                  <Phone className="w-4 h-4 text-emerald-500" />
                 </div>
                 <Input
                   value={phoneVal}
@@ -615,8 +615,8 @@ export const AddContactDrawer = ({
           {emails.map((emailVal, idx) => (
             <div key={`email-${idx}`} className="relative group">
               <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden flex items-center">
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-blue-500/10 to-transparent flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-blue-600/70" />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-blue-500/15 flex items-center justify-center">
+                  <Mail className="w-4 h-4 text-blue-500" />
                 </div>
                 <Input
                   value={emailVal}
@@ -645,8 +645,8 @@ export const AddContactDrawer = ({
           {companies.map((companyVal, idx) => (
             <div key={`company-${idx}`} className="relative group">
               <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden flex items-center">
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-amber-600/70" />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center">
+                  <Building2 className="w-4 h-4 text-amber-500" />
                 </div>
                 <Input
                   value={companyVal}
@@ -674,8 +674,8 @@ export const AddContactDrawer = ({
           {positions.map((positionVal, idx) => (
             <div key={`position-${idx}`} className="relative group">
               <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden flex items-center">
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-violet-500/10 to-transparent flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-violet-600/70" />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-violet-500/15 flex items-center justify-center">
+                  <Briefcase className="w-4 h-4 text-violet-500" />
                 </div>
                 <Input
                   value={positionVal}
@@ -703,8 +703,8 @@ export const AddContactDrawer = ({
           {notesList.map((noteVal, idx) => (
             <div key={`note-${idx}`} className="relative group">
               <div className="relative bg-muted/50 rounded-2xl border border-border/50 group-focus-within:border-primary/50 transition-colors duration-200 overflow-hidden">
-                <div className="absolute left-0 top-0 w-12 h-14 bg-gradient-to-r from-rose-500/10 to-transparent flex items-center justify-center">
-                  <StickyNote className="w-5 h-5 text-rose-600/70" />
+                <div className="absolute left-3 top-4 w-8 h-8 rounded-full bg-rose-500/15 flex items-center justify-center">
+                  <StickyNote className="w-4 h-4 text-rose-500" />
                 </div>
                 <Textarea
                   value={noteVal}
