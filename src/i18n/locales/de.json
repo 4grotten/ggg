@@ -322,7 +322,9 @@
     "dataUpdated": "Daten aktualisiert",
     "appInstalled": "App zum Startbildschirm hinzugefügt",
     "appAlreadyInstalled": "App ist bereits installiert",
-    "installInstructions": "Tippen Sie auf Teilen → Zum Home-Bildschirm zur Installation"
+    "installInstructions": "Tippen Sie auf Teilen → Zum Home-Bildschirm zur Installation",
+    "appIconChanged": "App-Symbol aktualisiert",
+    "reinstallForIcon": "Installieren Sie die App neu, um das neue Symbol anzuwenden"
   },
   "share": {
     "cardDetails": "Kartendetails",

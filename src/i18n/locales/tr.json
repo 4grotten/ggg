@@ -322,7 +322,9 @@
     "dataUpdated": "Veriler güncellendi",
     "appInstalled": "Uygulama ana ekrana yüklendi",
     "appAlreadyInstalled": "Uygulama zaten yüklü",
-    "installInstructions": "Yüklemek için Paylaş → Ana Ekrana Ekle'ye dokunun"
+    "installInstructions": "Yüklemek için Paylaş → Ana Ekrana Ekle'ye dokunun",
+    "appIconChanged": "Uygulama simgesi güncellendi",
+    "reinstallForIcon": "Yeni simgeyi uygulamak için uygulamayı yeniden yükleyin"
   },
   "share": {
     "cardDetails": "Kart Bilgileri",
