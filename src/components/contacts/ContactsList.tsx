@@ -182,7 +182,7 @@ export const ContactsList = ({ onContactClick, onAddClick }: ContactsListProps) 
                 {t("contacts.viewContacts")}
               </h2>
               <p className="text-white/80 text-sm font-medium">
-                {contacts.length} {contacts.length === 1 ? "контакт" : "контактов"}
+                {t("contacts.contactsCount", { count: contacts.length })}
               </p>
             </div>
             
