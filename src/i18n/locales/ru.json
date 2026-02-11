@@ -27,7 +27,8 @@
     "comingSoon": "Скоро будет доступно",
     "addMore": "Добавить ещё",
     "save": "Сохранить",
-    "delete": "Удалить"
+    "delete": "Удалить",
+    "copied": "Скопировано"
   },
   "dashboard": {
     "greeting": "Привет, {{name}}!",
