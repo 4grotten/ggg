@@ -648,32 +648,33 @@ export const AddContactDrawer = ({
                   className="pl-14 pr-24 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-1"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  {phoneVal.trim() && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[160px]">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[160px]">
+                      {phoneVal.trim() && (
                         <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(phoneVal); toast.success(t("common.copied")); }}>
                           <Copy className="w-4 h-4 mr-2" />
                           {t("common.copy")}
                         </DropdownMenuItem>
-                        {phones.length > 1 && (
-                          <DropdownMenuItem onClick={() => removeArrayItem(setPhones, idx)} className="text-destructive focus:text-destructive">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {t("common.delete")}
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                  {idx === phones.length - 1 && (
-                    <button onClick={() => addArrayItem(setPhones)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  )}
+                      )}
+                      {idx === phones.length - 1 && (
+                        <DropdownMenuItem onClick={() => addArrayItem(setPhones)}>
+                          <Plus className="w-4 h-4 mr-2" />
+                          {t("common.addMore")}
+                        </DropdownMenuItem>
+                      )}
+                      {phones.length > 1 && (
+                        <DropdownMenuItem onClick={() => removeArrayItem(setPhones, idx)} className="text-red-500 focus:text-red-500">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          {t("common.delete")}
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -694,32 +695,33 @@ export const AddContactDrawer = ({
                   className="pl-14 pr-24 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-1"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  {emailVal.trim() && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[160px]">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[160px]">
+                      {emailVal.trim() && (
                         <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(emailVal); toast.success(t("common.copied")); }}>
                           <Copy className="w-4 h-4 mr-2" />
                           {t("common.copy")}
                         </DropdownMenuItem>
-                        {emails.length > 1 && (
-                          <DropdownMenuItem onClick={() => removeArrayItem(setEmails, idx)} className="text-destructive focus:text-destructive">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {t("common.delete")}
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                  {idx === emails.length - 1 && (
-                    <button onClick={() => addArrayItem(setEmails)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  )}
+                      )}
+                      {idx === emails.length - 1 && (
+                        <DropdownMenuItem onClick={() => addArrayItem(setEmails)}>
+                          <Plus className="w-4 h-4 mr-2" />
+                          {t("common.addMore")}
+                        </DropdownMenuItem>
+                      )}
+                      {emails.length > 1 && (
+                        <DropdownMenuItem onClick={() => removeArrayItem(setEmails, idx)} className="text-red-500 focus:text-red-500">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          {t("common.delete")}
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -739,32 +741,33 @@ export const AddContactDrawer = ({
                   className="pl-14 pr-24 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-1"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  {companyVal.trim() && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[160px]">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[160px]">
+                      {companyVal.trim() && (
                         <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(companyVal); toast.success(t("common.copied")); }}>
                           <Copy className="w-4 h-4 mr-2" />
                           {t("common.copy")}
                         </DropdownMenuItem>
-                        {companies.length > 1 && (
-                          <DropdownMenuItem onClick={() => removeArrayItem(setCompanies, idx)} className="text-destructive focus:text-destructive">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {t("common.delete")}
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                  {idx === companies.length - 1 && (
-                    <button onClick={() => addArrayItem(setCompanies)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  )}
+                      )}
+                      {idx === companies.length - 1 && (
+                        <DropdownMenuItem onClick={() => addArrayItem(setCompanies)}>
+                          <Plus className="w-4 h-4 mr-2" />
+                          {t("common.addMore")}
+                        </DropdownMenuItem>
+                      )}
+                      {companies.length > 1 && (
+                        <DropdownMenuItem onClick={() => removeArrayItem(setCompanies, idx)} className="text-red-500 focus:text-red-500">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          {t("common.delete")}
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -784,32 +787,33 @@ export const AddContactDrawer = ({
                   className="pl-14 pr-24 h-14 rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-1"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  {positionVal.trim() && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[160px]">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[160px]">
+                      {positionVal.trim() && (
                         <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(positionVal); toast.success(t("common.copied")); }}>
                           <Copy className="w-4 h-4 mr-2" />
                           {t("common.copy")}
                         </DropdownMenuItem>
-                        {positions.length > 1 && (
-                          <DropdownMenuItem onClick={() => removeArrayItem(setPositions, idx)} className="text-destructive focus:text-destructive">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {t("common.delete")}
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                  {idx === positions.length - 1 && (
-                    <button onClick={() => addArrayItem(setPositions)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  )}
+                      )}
+                      {idx === positions.length - 1 && (
+                        <DropdownMenuItem onClick={() => addArrayItem(setPositions)}>
+                          <Plus className="w-4 h-4 mr-2" />
+                          {t("common.addMore")}
+                        </DropdownMenuItem>
+                      )}
+                      {positions.length > 1 && (
+                        <DropdownMenuItem onClick={() => removeArrayItem(setPositions, idx)} className="text-red-500 focus:text-red-500">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          {t("common.delete")}
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -829,32 +833,33 @@ export const AddContactDrawer = ({
                   className="pl-14 pr-24 pt-4 min-h-[100px] rounded-2xl bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base resize-none"
                 />
                 <div className="absolute right-2 top-3 flex items-center gap-1">
-                  {noteVal.trim() && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[160px]">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="min-w-[160px]">
+                      {noteVal.trim() && (
                         <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(noteVal); toast.success(t("common.copied")); }}>
                           <Copy className="w-4 h-4 mr-2" />
                           {t("common.copy")}
                         </DropdownMenuItem>
-                        {notesList.length > 1 && (
-                          <DropdownMenuItem onClick={() => removeArrayItem(setNotesList, idx)} className="text-destructive focus:text-destructive">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {t("common.delete")}
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                  {idx === notesList.length - 1 && (
-                    <button onClick={() => addArrayItem(setNotesList)} className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary/70 hover:text-primary hover:bg-primary/20 transition-colors">
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  )}
+                      )}
+                      {idx === notesList.length - 1 && (
+                        <DropdownMenuItem onClick={() => addArrayItem(setNotesList)}>
+                          <Plus className="w-4 h-4 mr-2" />
+                          {t("common.addMore")}
+                        </DropdownMenuItem>
+                      )}
+                      {notesList.length > 1 && (
+                        <DropdownMenuItem onClick={() => removeArrayItem(setNotesList, idx)} className="text-red-500 focus:text-red-500">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          {t("common.delete")}
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
