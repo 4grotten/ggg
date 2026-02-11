@@ -223,22 +223,91 @@ interface SocialLinksInputProps {
   placeholder?: string;
 }
 
-// Nice branded fallback for website links - shows first letter of domain on gradient
+// Website favicon with letter-based fallback for sites without one
 const WebsiteFavicon = ({ url }: { url: string }) => {
-  const letter = (() => {
+  const [showFallback, setShowFallback] = useState(false);
+  
+  const domainInfo = (() => {
     try {
       let cleanUrl = url.trim();
       if (!cleanUrl.startsWith('http')) cleanUrl = `https://${cleanUrl}`;
       const domain = new URL(cleanUrl).hostname.replace('www.', '');
-      return domain.charAt(0).toUpperCase();
+      const letter = domain.charAt(0).toUpperCase();
+      return { domain, letter };
     } catch {
-      return '?';
+      return null;
     }
   })();
 
+  const letter = domainInfo?.letter || '?';
+
+  // Fallback: gradient with first letter
+  if (!domainInfo || showFallback) {
+    return (
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-primary/80 to-primary shadow-sm">
+        <span className="text-sm font-bold text-primary-foreground">{letter}</span>
+      </div>
+    );
+  }
+
+  // Try to load real favicon via Google API (always returns an image)
+  // We use a canvas to detect the default "globe" placeholder
   return (
-    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-primary/80 to-primary shadow-sm">
-      <span className="text-sm font-bold text-primary-foreground">{letter}</span>
+    <FaviconWithDetection domain={domainInfo.domain} letter={letter} />
+  );
+};
+
+// Loads favicon and detects if it's Google's default globe placeholder
+const FaviconWithDetection = ({ domain, letter }: { domain: string; letter: string }) => {
+  const [state, setState] = useState<'loading' | 'real' | 'fallback'>('loading');
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // Check if image is the Google default globe by sampling pixels
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          // Sample center pixel — Google's default globe has a specific blue/green
+          const center = ctx.getImageData(Math.floor(canvas.width / 2), Math.floor(canvas.height / 2), 1, 1).data;
+          const corner = ctx.getImageData(0, 0, 1, 1).data;
+          // Default globe: semi-transparent or very light grey background with blue-ish globe
+          // Real favicons typically have solid colors
+          const isLikelyDefault = corner[3] < 10 && (center[0] > 100 && center[1] > 100 && center[2] > 100 && center[3] < 200);
+          setState(isLikelyDefault ? 'fallback' : 'real');
+        } else {
+          setState('real');
+        }
+      } catch {
+        // CORS or canvas error — just show the image
+        setState('real');
+      }
+    };
+    img.onerror = () => setState('fallback');
+    img.src = faviconUrl;
+  }, [domain]);
+
+  if (state === 'loading') {
+    return <div className="w-10 h-10 rounded-xl shrink-0 bg-muted animate-pulse" />;
+  }
+
+  if (state === 'fallback') {
+    return (
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-primary/80 to-primary shadow-sm">
+        <span className="text-sm font-bold text-primary-foreground">{letter}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-muted overflow-hidden">
+      <img src={faviconUrl} alt="" className="w-7 h-7 rounded" onError={() => {}} />
     </div>
   );
 };
