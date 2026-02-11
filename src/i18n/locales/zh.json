@@ -37,7 +37,8 @@
     "comingSoon": "即将推出",
     "addMore": "添加更多",
     "save": "保存",
-    "delete": "删除"
+    "delete": "删除",
+    "goTo": "打开"
   },
   "dashboard": {
     "welcome": "欢迎，{{name}}！",
