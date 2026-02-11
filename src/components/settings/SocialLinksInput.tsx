@@ -416,7 +416,7 @@ export const SocialLinksInput = ({
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleRemoveLink(link.id)}
-                    className="text-destructive focus:text-destructive"
+                    className="text-red-500 focus:text-red-500"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
                     Удалить
