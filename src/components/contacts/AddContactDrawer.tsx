@@ -12,7 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   Camera, 
-  User, 
+  User,
+  ContactRound,
   Phone, 
   Mail, 
   Building2, 
@@ -556,7 +557,7 @@ export const AddContactDrawer = ({
         {/* Form section header */}
         <div className="flex items-center gap-3 px-1">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-purple-500/10 flex items-center justify-center">
-            <User className="w-4 h-4 text-primary" />
+            <ContactRound className="w-4 h-4 text-primary" />
           </div>
           <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
             {t("settings.personalDetails")}
