@@ -225,23 +225,33 @@ interface SocialLinksInputProps {
 
 // Small component for website favicon with fallback
 const WebsiteFavicon = ({ url }: { url: string }) => {
-  const [failed, setFailed] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'ok' | 'failed'>('loading');
   
   const domainInfo = (() => {
     try {
       let cleanUrl = url.trim();
       if (!cleanUrl.startsWith('http')) cleanUrl = `https://${cleanUrl}`;
       const domain = new URL(cleanUrl).hostname.replace('www.', '');
-      const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
       const letter = domain.charAt(0).toUpperCase();
-      return { faviconUrl, letter, domain };
+      return { domain, letter };
     } catch {
       return null;
     }
   })();
 
-  if (!domainInfo || failed) {
-    const letter = domainInfo?.letter || '?';
+  // Try loading favicon directly from the site
+  useEffect(() => {
+    if (!domainInfo) { setStatus('failed'); return; }
+    setStatus('loading');
+    const img = new Image();
+    img.onload = () => setStatus('ok');
+    img.onerror = () => setStatus('failed');
+    img.src = `https://icons.duckduckgo.com/ip3/${domainInfo.domain}.ico`;
+  }, [domainInfo?.domain]);
+
+  const letter = domainInfo?.letter || '?';
+
+  if (!domainInfo || status === 'failed') {
     return (
       <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-primary/80 to-primary shadow-sm">
         <span className="text-sm font-bold text-primary-foreground">{letter}</span>
@@ -249,9 +259,20 @@ const WebsiteFavicon = ({ url }: { url: string }) => {
     );
   }
 
+  if (status === 'loading') {
+    return (
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-muted animate-pulse" />
+    );
+  }
+
   return (
     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-muted overflow-hidden">
-      <img src={domainInfo.faviconUrl} alt="" className="w-6 h-6" onError={() => setFailed(true)} />
+      <img 
+        src={`https://icons.duckduckgo.com/ip3/${domainInfo.domain}.ico`} 
+        alt="" 
+        className="w-6 h-6" 
+        onError={() => setStatus('failed')} 
+      />
     </div>
   );
 };
