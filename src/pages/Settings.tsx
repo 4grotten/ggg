@@ -385,7 +385,7 @@ const Settings = () => {
         setTimeout(() => {
           toast.info(
             t("toast.reinstallForIcon") || "Переустановите приложение для смены иконки",
-            { duration: 6000 }
+            { duration: 3000 }
           );
         }, 1500);
       }
