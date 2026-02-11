@@ -1007,7 +1007,7 @@ const Settings = () => {
           {/* Change App Icon */}
           <SettingsItem
             icon={<ColoredIcon colorKey="palette"><Smartphone className="w-4 h-4" /></ColoredIcon>}
-            label={t("settings.changeAppIcon") || "Сменить иконку приложения"}
+            label={t("settings.changeAppIcon") || "Сменить иконку"}
             valueIcon={
               <img 
                 src={appIconOptions.find(i => i.key === selectedAppIcon)?.src || '/app-icon-512.png'} 
