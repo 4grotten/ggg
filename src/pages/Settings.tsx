@@ -329,7 +329,7 @@ const Settings = () => {
   );
 
   const appIconOptions = [
-    { key: 'default', label: 'Default', src: '/app-icon-512.png' },
+    { key: 'default', label: 'Green Boom', src: '/app-icon-512.png' },
     { key: 'dark-blue', label: 'Dark Blue', src: '/app-icons/icon-dark-blue.png' },
     { key: 'black-green', label: 'Neon', src: '/app-icons/icon-black-green.png' },
     { key: 'white-silver', label: 'Silver', src: '/app-icons/icon-white-silver.png' },
