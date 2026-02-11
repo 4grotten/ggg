@@ -18,12 +18,37 @@
     <link rel="alternate" hreflang="es" href="https://easycarduae.lovable.app" />
     <link rel="alternate" hreflang="x-default" href="https://easycarduae.lovable.app" />
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/app-icon-192.png">
-    <link rel="apple-touch-icon" href="/app-icon-192.png" />
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <!-- Favicon + PWA icons: patched synchronously before manifest is read -->
+    <script>
+      (function() {
+        var icon192 = localStorage.getItem('custom-app-icon-192');
+        var icon512 = localStorage.getItem('custom-app-icon-512');
+        if (icon192) {
+          document.write('<link rel="icon" type="image/png" href="' + icon192 + '">');
+          document.write('<link rel="apple-touch-icon" href="' + icon192 + '">');
+        } else {
+          document.write('<link rel="icon" type="image/png" href="/app-icon-192.png">');
+          document.write('<link rel="apple-touch-icon" href="/app-icon-192.png">');
+        }
+        if (icon192 && icon512) {
+          var m = {
+            name: "Easy Card", short_name: "Easy Card",
+            description: "Global payment card powered by Apofiz",
+            start_url: "/", display: "standalone",
+            background_color: "#0a0a1a", theme_color: "#1a1a3e",
+            orientation: "portrait",
+            icons: [
+              { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+              { src: icon512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+            ]
+          };
+          var blob = new Blob([JSON.stringify(m)], { type: 'application/json' });
+          document.write('<link rel="manifest" href="' + URL.createObjectURL(blob) + '">');
+        } else {
+          document.write('<link rel="manifest" href="/manifest.json">');
+        }
+      })();
+    </script>
     <meta name="theme-color" content="#050510" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
