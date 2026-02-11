@@ -379,6 +379,17 @@ const Settings = () => {
       localStorage.setItem('custom-app-icon-512', icon512);
 
       toast.success(t("toast.appIconChanged") || "Иконка приложения обновлена");
+      
+      // If app is already installed as PWA, notify user to reinstall
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        setTimeout(() => {
+          toast.info(
+            t("toast.reinstallForIcon") || "Для обновления иконки удалите приложение и установите заново",
+            { duration: 6000 }
+          );
+        }, 1500);
+      }
+      
       setIsAppIconDrawerOpen(false);
     } catch (error) {
       console.error('Failed to change app icon:', error);
