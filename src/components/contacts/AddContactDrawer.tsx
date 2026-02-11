@@ -665,7 +665,7 @@ export const AddContactDrawer = ({
                         <Plus className="w-4 h-4 mr-2" />
                         {t("common.addMore")}
                       </DropdownMenuItem>
-                      {phones.length > 1 && (
+                      {phoneVal.trim() && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setPhones, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
                           {t("common.delete")}
@@ -710,7 +710,7 @@ export const AddContactDrawer = ({
                         <Plus className="w-4 h-4 mr-2" />
                         {t("common.addMore")}
                       </DropdownMenuItem>
-                      {emails.length > 1 && (
+                      {emailVal.trim() && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setEmails, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
                           {t("common.delete")}
@@ -754,7 +754,7 @@ export const AddContactDrawer = ({
                         <Plus className="w-4 h-4 mr-2" />
                         {t("common.addMore")}
                       </DropdownMenuItem>
-                      {companies.length > 1 && (
+                      {companyVal.trim() && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setCompanies, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
                           {t("common.delete")}
@@ -798,7 +798,7 @@ export const AddContactDrawer = ({
                         <Plus className="w-4 h-4 mr-2" />
                         {t("common.addMore")}
                       </DropdownMenuItem>
-                      {positions.length > 1 && (
+                      {positionVal.trim() && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setPositions, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
                           {t("common.delete")}
@@ -842,7 +842,7 @@ export const AddContactDrawer = ({
                         <Plus className="w-4 h-4 mr-2" />
                         {t("common.addMore")}
                       </DropdownMenuItem>
-                      {notesList.length > 1 && (
+                      {noteVal.trim() && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setNotesList, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
                           {t("common.delete")}
