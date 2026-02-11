@@ -25,8 +25,11 @@ import {
   Hash,
   Users,
   Video,
-  Link2
+  Link2,
+  Copy,
+  ExternalLink
 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 // Social network detection patterns
@@ -385,13 +388,34 @@ export const SocialLinksInput = ({
                 <p className="text-xs text-muted-foreground truncate">{link.url}</p>
               </div>
               
-              {/* Remove button */}
-              <button
-                onClick={() => handleRemoveLink(link.id)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
-              >
-                <XIcon className="w-4 h-4" />
-              </button>
+              {/* Action buttons */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(link.url);
+                    toast.success("Ссылка скопирована");
+                  }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => {
+                    let url = link.url.trim();
+                    if (!url.startsWith('http')) url = `https://${url}`;
+                    window.open(url, '_blank');
+                  }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleRemoveLink(link.id)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <XIcon className="w-4 h-4" />
+                </button>
+              </div>
             </motion.div>
           );
         })}
