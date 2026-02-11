@@ -116,15 +116,63 @@ export const AddContactDrawer = ({
       JSON.stringify((editContact.social_links || []).map(l => ({ id: l.id, url: l.url, networkId: l.networkId, networkName: l.networkName })))
   ) : false;
 
+  // Parse notes field to extract extra values that were merged on save
+  const parseNotesField = (notes: string | undefined | null) => {
+    if (!notes) return { phones: [] as string[], emails: [] as string[], companies: [] as string[], positions: [] as string[], cleanNotes: "" };
+    
+    const extraPhones: string[] = [];
+    const extraEmails: string[] = [];
+    const extraCompanies: string[] = [];
+    const extraPositions: string[] = [];
+    const cleanLines: string[] = [];
+
+    // Split by --- separator first
+    const sections = notes.split('\n---\n');
+    
+    for (const section of sections) {
+      const lines = section.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        if (trimmed.startsWith('📱 ')) {
+          extraPhones.push(...trimmed.slice(2).trim().split(', ').filter(Boolean));
+        } else if (trimmed.startsWith('📧 ')) {
+          extraEmails.push(...trimmed.slice(2).trim().split(', ').filter(Boolean));
+        } else if (trimmed.startsWith('🏢 ')) {
+          extraCompanies.push(...trimmed.slice(2).trim().split(', ').filter(Boolean));
+        } else if (trimmed.startsWith('💼 ')) {
+          extraPositions.push(...trimmed.slice(2).trim().split(', ').filter(Boolean));
+        } else {
+          cleanLines.push(trimmed);
+        }
+      }
+    }
+
+    return { phones: extraPhones, emails: extraEmails, companies: extraCompanies, positions: extraPositions, cleanNotes: cleanLines.join('\n') };
+  };
+
   // Initialize form with edit contact data
   useEffect(() => {
     if (editContact) {
       setFullName(editContact.full_name);
-      setPhones(splitField(editContact.phone));
-      setEmails(splitField(editContact.email));
-      setCompanies(splitField(editContact.company));
-      setPositions(splitField(editContact.position));
-      setNotesList(splitField(editContact.notes));
+      
+      // Parse notes to extract extra values
+      const parsed = parseNotesField(editContact.notes);
+      
+      const mainPhones = splitField(editContact.phone);
+      setPhones([...mainPhones, ...parsed.phones].filter(Boolean).length ? [...mainPhones.filter(p => p.trim()), ...parsed.phones] : [""]);
+      
+      const mainEmails = splitField(editContact.email);
+      setEmails([...mainEmails, ...parsed.emails].filter(Boolean).length ? [...mainEmails.filter(e => e.trim()), ...parsed.emails] : [""]);
+      
+      const mainCompanies = splitField(editContact.company);
+      setCompanies([...mainCompanies, ...parsed.companies].filter(Boolean).length ? [...mainCompanies.filter(c => c.trim()), ...parsed.companies] : [""]);
+      
+      const mainPositions = splitField(editContact.position);
+      setPositions([...mainPositions, ...parsed.positions].filter(Boolean).length ? [...mainPositions.filter(p => p.trim()), ...parsed.positions] : [""]);
+      
+      setNotesList(parsed.cleanNotes ? splitField(parsed.cleanNotes) : [""]);
+      
       setAvatarUrl(editContact.avatar_url || null);
       setPaymentMethods(editContact.payment_methods || []);
       
