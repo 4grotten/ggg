@@ -993,6 +993,12 @@ const Settings = () => {
             value={currentTheme.name}
             onClick={() => setIsAppearanceOpen(true)}
           />
+          {/* Change App Icon */}
+          <SettingsItem
+            icon={<ColoredIcon colorKey="palette"><Smartphone className="w-4 h-4" /></ColoredIcon>}
+            label={t("settings.changeAppIcon") || "Сменить иконку приложения"}
+            onClick={() => setIsAppIconDrawerOpen(true)}
+          />
           {/* Haptic Feedback */}
           <div className="w-full flex items-center justify-between py-4 px-4">
             <div className="flex items-center gap-3">
@@ -1045,11 +1051,6 @@ const Settings = () => {
               onClick={handleInstallClick}
             />
           )}
-          <SettingsItem
-            icon={<ColoredIcon colorKey="palette"><Smartphone className="w-4 h-4" /></ColoredIcon>}
-            label={t("settings.changeAppIcon") || "Сменить иконку приложения"}
-            onClick={() => setIsAppIconDrawerOpen(true)}
-          />
         </AnimatedMenuSection>
 
         {/* Account Management Block - Active Devices, Add Account, Switch Account */}
