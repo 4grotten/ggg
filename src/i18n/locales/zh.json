@@ -324,7 +324,9 @@
     "dataUpdated": "数据已更新",
     "appInstalled": "应用已添加到主屏幕",
     "appAlreadyInstalled": "应用已安装",
-    "installInstructions": "点击分享 → 添加到主屏幕进行安装"
+    "installInstructions": "点击分享 → 添加到主屏幕进行安装",
+    "appIconChanged": "应用图标已更新",
+    "reinstallForIcon": "重新安装应用以应用新图标"
   },
   "share": {
     "cardDetails": "卡片详情",

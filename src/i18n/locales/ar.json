@@ -322,7 +322,9 @@
     "dataUpdated": "تم تحديث البيانات",
     "appInstalled": "تم تثبيت التطبيق على الشاشة الرئيسية",
     "appAlreadyInstalled": "التطبيق مثبت بالفعل",
-    "installInstructions": "اضغط على مشاركة → إضافة إلى الشاشة الرئيسية للتثبيت"
+    "installInstructions": "اضغط على مشاركة → إضافة إلى الشاشة الرئيسية للتثبيت",
+    "appIconChanged": "تم تحديث أيقونة التطبيق",
+    "reinstallForIcon": "أعد تثبيت التطبيق لتطبيق الأيقونة الجديدة"
   },
   "share": {
     "cardDetails": "تفاصيل البطاقة",

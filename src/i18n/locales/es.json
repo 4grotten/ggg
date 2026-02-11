@@ -322,7 +322,9 @@
     "dataUpdated": "Datos actualizados",
     "appInstalled": "App instalada en la pantalla de inicio",
     "appAlreadyInstalled": "La app ya está instalada",
-    "installInstructions": "Toca Compartir → Añadir a pantalla de inicio para instalar"
+    "installInstructions": "Toca Compartir → Añadir a pantalla de inicio para instalar",
+    "appIconChanged": "Icono de la app actualizado",
+    "reinstallForIcon": "Reinstala la app para aplicar el nuevo icono"
   },
   "share": {
     "cardDetails": "Detalles de Tarjeta",
