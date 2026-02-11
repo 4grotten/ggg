@@ -997,6 +997,14 @@ const Settings = () => {
           <SettingsItem
             icon={<ColoredIcon colorKey="palette"><Smartphone className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.changeAppIcon") || "Сменить иконку приложения"}
+            valueIcon={
+              <img 
+                src={appIconOptions.find(i => i.key === selectedAppIcon)?.src || '/app-icon-512.png'} 
+                alt="" 
+                className="w-7 h-7 rounded-lg object-cover"
+              />
+            }
+            value={appIconOptions.find(i => i.key === selectedAppIcon)?.label || 'Default'}
             onClick={() => setIsAppIconDrawerOpen(true)}
           />
           {/* Haptic Feedback */}
