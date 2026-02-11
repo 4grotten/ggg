@@ -384,7 +384,7 @@ const Settings = () => {
       if (window.matchMedia('(display-mode: standalone)').matches) {
         setTimeout(() => {
           toast.info(
-            t("toast.reinstallForIcon") || "Для обновления иконки удалите приложение и установите заново",
+            t("toast.reinstallForIcon") || "Переустановите приложение для смены иконки",
             { duration: 6000 }
           );
         }, 1500);
