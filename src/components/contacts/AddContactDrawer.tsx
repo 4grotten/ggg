@@ -650,7 +650,7 @@ export const AddContactDrawer = ({
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                      <button className="w-8 h-8 rounded-full bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                     </DropdownMenuTrigger>
@@ -697,7 +697,7 @@ export const AddContactDrawer = ({
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                      <button className="w-8 h-8 rounded-full bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                     </DropdownMenuTrigger>
@@ -743,7 +743,7 @@ export const AddContactDrawer = ({
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                      <button className="w-8 h-8 rounded-full bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                     </DropdownMenuTrigger>
@@ -789,7 +789,7 @@ export const AddContactDrawer = ({
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                      <button className="w-8 h-8 rounded-full bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                     </DropdownMenuTrigger>
@@ -835,7 +835,7 @@ export const AddContactDrawer = ({
                 <div className="absolute right-2 top-3 flex items-center gap-1">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                      <button className="w-8 h-8 rounded-full bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                     </DropdownMenuTrigger>
