@@ -394,7 +394,7 @@ export const SocialLinksInput = ({
               {/* Action buttons */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <button className="w-8 h-8 rounded-full bg-muted/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                     <MoreVertical className="w-4 h-4" />
                   </button>
                 </DropdownMenuTrigger>
