@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   Instagram, 
   Send, 
@@ -28,7 +28,9 @@ import {
   Video,
   Link2,
   Copy,
-  ExternalLink
+  ExternalLink,
+  MoreVertical,
+  Trash2
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -390,50 +392,37 @@ export const SocialLinksInput = ({
               </div>
               
               {/* Action buttons */}
-              <TooltipProvider delayDuration={300}>
-                <div className="flex items-center gap-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(link.url);
-                          toast.success("Ссылка скопирована");
-                        }}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>Скопировать</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => {
-                          let url = link.url.trim();
-                          if (!url.startsWith('http')) url = `https://${url}`;
-                          window.open(url, '_blank');
-                        }}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>Перейти</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => handleRemoveLink(link.id)}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                      >
-                        <XIcon className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>Удалить</p></TooltipContent>
-                  </Tooltip>
-                </div>
-              </TooltipProvider>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[160px]">
+                  <DropdownMenuItem onClick={() => {
+                    navigator.clipboard.writeText(link.url);
+                    toast.success("Ссылка скопирована");
+                  }}>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Скопировать
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    let url = link.url.trim();
+                    if (!url.startsWith('http')) url = `https://${url}`;
+                    window.open(url, '_blank');
+                  }}>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Перейти
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleRemoveLink(link.id)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Удалить
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </motion.div>
           );
         })}
