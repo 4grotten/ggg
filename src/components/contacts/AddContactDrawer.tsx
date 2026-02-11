@@ -661,12 +661,10 @@ export const AddContactDrawer = ({
                           {t("common.copy")}
                         </DropdownMenuItem>
                       )}
-                      {idx === phones.length - 1 && (
-                        <DropdownMenuItem onClick={() => addArrayItem(setPhones)}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          {t("common.addMore")}
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem onClick={() => addArrayItem(setPhones)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t("common.addMore")}
+                      </DropdownMenuItem>
                       {phones.length > 1 && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setPhones, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -708,12 +706,10 @@ export const AddContactDrawer = ({
                           {t("common.copy")}
                         </DropdownMenuItem>
                       )}
-                      {idx === emails.length - 1 && (
-                        <DropdownMenuItem onClick={() => addArrayItem(setEmails)}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          {t("common.addMore")}
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem onClick={() => addArrayItem(setEmails)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t("common.addMore")}
+                      </DropdownMenuItem>
                       {emails.length > 1 && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setEmails, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -754,12 +750,10 @@ export const AddContactDrawer = ({
                           {t("common.copy")}
                         </DropdownMenuItem>
                       )}
-                      {idx === companies.length - 1 && (
-                        <DropdownMenuItem onClick={() => addArrayItem(setCompanies)}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          {t("common.addMore")}
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem onClick={() => addArrayItem(setCompanies)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t("common.addMore")}
+                      </DropdownMenuItem>
                       {companies.length > 1 && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setCompanies, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -800,12 +794,10 @@ export const AddContactDrawer = ({
                           {t("common.copy")}
                         </DropdownMenuItem>
                       )}
-                      {idx === positions.length - 1 && (
-                        <DropdownMenuItem onClick={() => addArrayItem(setPositions)}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          {t("common.addMore")}
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem onClick={() => addArrayItem(setPositions)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t("common.addMore")}
+                      </DropdownMenuItem>
                       {positions.length > 1 && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setPositions, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -846,12 +838,10 @@ export const AddContactDrawer = ({
                           {t("common.copy")}
                         </DropdownMenuItem>
                       )}
-                      {idx === notesList.length - 1 && (
-                        <DropdownMenuItem onClick={() => addArrayItem(setNotesList)}>
-                          <Plus className="w-4 h-4 mr-2" />
-                          {t("common.addMore")}
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem onClick={() => addArrayItem(setNotesList)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t("common.addMore")}
+                      </DropdownMenuItem>
                       {notesList.length > 1 && (
                         <DropdownMenuItem onClick={() => removeArrayItem(setNotesList, idx)} className="text-red-500 focus:text-red-500">
                           <Trash2 className="w-4 h-4 mr-2" />
