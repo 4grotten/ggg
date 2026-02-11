@@ -33,6 +33,7 @@
     "share": "Paylaş",
     "copy": "Kopyala",
     "comingSoon": "Yakında",
+    "addMore": "Daha fazla ekle",
     "delete": "Sil"
   },
   "dashboard": {
@@ -1546,6 +1547,7 @@
     "addContact": "Kişi ekle",
     "addContactDescription": "Yeni kişi oluştur veya kartvizit tara",
     "editContact": "Kişiyi düzenle",
+    "contactSettings": "Kişi ayarları",
     "viewContacts": "Kişilerim",
     "viewContactsDescription": "Kişilerinizi görüntüleyin ve yönetin",
     "fullName": "Tam ad",

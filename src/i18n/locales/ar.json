@@ -33,6 +33,7 @@
     "share": "مشاركة",
     "copy": "نسخ",
     "comingSoon": "قريباً",
+    "addMore": "إضافة المزيد",
     "delete": "حذف"
   },
   "dashboard": {
@@ -1546,6 +1547,7 @@
     "addContact": "إضافة جهة اتصال",
     "addContactDescription": "إنشاء جهة اتصال جديدة أو مسح بطاقة العمل",
     "editContact": "تعديل جهة الاتصال",
+    "contactSettings": "إعدادات جهة الاتصال",
     "viewContacts": "جهات الاتصال",
     "viewContactsDescription": "عرض وإدارة جهات الاتصال",
     "fullName": "الاسم الكامل",
