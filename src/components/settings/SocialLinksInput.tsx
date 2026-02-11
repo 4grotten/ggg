@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { 
   Instagram, 
   Send, 
@@ -389,33 +390,50 @@ export const SocialLinksInput = ({
               </div>
               
               {/* Action buttons */}
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(link.url);
-                    toast.success("Ссылка скопирована");
-                  }}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    let url = link.url.trim();
-                    if (!url.startsWith('http')) url = `https://${url}`;
-                    window.open(url, '_blank');
-                  }}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleRemoveLink(link.id)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                >
-                  <XIcon className="w-4 h-4" />
-                </button>
-              </div>
+              <TooltipProvider delayDuration={300}>
+                <div className="flex items-center gap-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(link.url);
+                          toast.success("Ссылка скопирована");
+                        }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom"><p>Скопировать</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => {
+                          let url = link.url.trim();
+                          if (!url.startsWith('http')) url = `https://${url}`;
+                          window.open(url, '_blank');
+                        }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom"><p>Перейти</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => handleRemoveLink(link.id)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <XIcon className="w-4 h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom"><p>Удалить</p></TooltipContent>
+                  </Tooltip>
+                </div>
+              </TooltipProvider>
             </motion.div>
           );
         })}
