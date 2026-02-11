@@ -223,6 +223,35 @@ interface SocialLinksInputProps {
   placeholder?: string;
 }
 
+// Small component for website favicon with fallback
+const WebsiteFavicon = ({ url }: { url: string }) => {
+  const [failed, setFailed] = useState(false);
+  const faviconUrl = (() => {
+    try {
+      let cleanUrl = url.trim();
+      if (!cleanUrl.startsWith('http')) cleanUrl = `https://${cleanUrl}`;
+      const domain = new URL(cleanUrl).hostname;
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    } catch {
+      return null;
+    }
+  })();
+
+  if (!faviconUrl || failed) {
+    return (
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-green-500">
+        <Globe className="w-5 h-5 text-white" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-muted overflow-hidden">
+      <img src={faviconUrl} alt="" className="w-6 h-6" onError={() => setFailed(true)} />
+    </div>
+  );
+};
+
 export const SocialLinksInput = ({ 
   links, 
   onChange,
@@ -289,6 +318,18 @@ export const SocialLinksInput = ({
     }
   };
 
+  // Extract domain from URL for favicon
+  const getFaviconUrl = (url: string) => {
+    try {
+      let cleanUrl = url.trim();
+      if (!cleanUrl.startsWith('http')) cleanUrl = `https://${cleanUrl}`;
+      const domain = new URL(cleanUrl).hostname;
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    } catch {
+      return null;
+    }
+  };
+
   const getNetworkInfo = (networkId: string) => {
     return socialNetworks.find(n => n.id === networkId) || {
       id: "website",
@@ -317,12 +358,16 @@ export const SocialLinksInput = ({
               className="flex items-center gap-3 p-3 rounded-2xl bg-muted/50 border border-border group"
             >
               {/* Network icon */}
-              <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                network.bgColor
-              )}>
-                <Icon className="w-5 h-5 text-white" />
-              </div>
+              {network.id === "website" ? (
+                <WebsiteFavicon url={link.url} />
+              ) : (
+                <div className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                  network.bgColor
+                )}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+              )}
               
               {/* Link info */}
               <div className="flex-1 min-w-0">
