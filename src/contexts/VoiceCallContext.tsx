@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Agent IDs
 export const AGENTS = {
   EVA: "agent_5801kfp8shb2fv48yefns7hvkh5a",      // Main chat assistant
-  ANGIE: "agent_9701kfya7rw9fxhs981fh1wvky6x",   // Partner support & sales
+  ANGIE: "agent_0001kh4tvy5heggtprck92at50fn",   // Partner support & sales
 } as const;
 
 export type AgentType = keyof typeof AGENTS;
