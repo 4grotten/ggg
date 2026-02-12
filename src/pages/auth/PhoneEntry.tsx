@@ -740,19 +740,34 @@ const PhoneEntry = () => {
                     ? 'bg-destructive/10 ring-2 ring-destructive' 
                     : 'bg-primary/10'
                 }`}
-                initial={{ scale: 0.8 }}
+                initial={{ scale: 0, opacity: 0, rotateY: 90 }}
                 animate={{ 
-                  scale: 1,
+                  scale: passwordError ? [1, 1.1, 1] : [0, 1.2, 0.9, 1.05, 1],
+                  opacity: 1,
+                  rotateY: 0,
                   rotate: passwordError ? [0, -5, 5, -5, 5, -3, 3, 0] : 0,
                   x: passwordError ? [0, -8, 8, -8, 8, -4, 4, 0] : 0
                 }}
                 transition={{ 
-                  scale: { duration: 0.3, delay: 0.2 },
+                  scale: { duration: 0.6, delay: 0.15, ease: "easeOut" },
+                  opacity: { duration: 0.3, delay: 0.15 },
+                  rotateY: { duration: 0.5, delay: 0.15, ease: "easeOut" },
                   rotate: { duration: 0.5 },
                   x: { duration: 0.5 }
                 }}
               >
-                <Lock className={`w-12 h-12 transition-colors duration-300 ${passwordError ? 'text-destructive' : 'text-primary'}`} />
+                <motion.div
+                  animate={passwordError ? {} : { 
+                    boxShadow: [
+                      "0 0 0 0 hsl(var(--primary) / 0.4)",
+                      "0 0 0 12px hsl(var(--primary) / 0)",
+                    ]
+                  }}
+                  transition={{ duration: 1.2, delay: 0.6, ease: "easeOut" }}
+                  className="rounded-full"
+                >
+                  <Lock className={`w-12 h-12 transition-colors duration-300 ${passwordError ? 'text-destructive' : 'text-primary'}`} />
+                </motion.div>
               </motion.div>
               <h1 className="text-2xl font-bold">{t('auth.login.title')}</h1>
               <p className="text-muted-foreground mt-2">
