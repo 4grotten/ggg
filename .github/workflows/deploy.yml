@@ -1,7 +1,9 @@
 name: Deploy EasyCard
 
 on:
-  workflow_dispatch:  # Only manual trigger
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
