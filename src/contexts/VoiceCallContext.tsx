@@ -8,7 +8,7 @@ import { fetchCards } from "@/services/api/cards";
 import { supabase } from "@/integrations/supabase/client";
 // Agent IDs
 export const AGENTS = {
-  EVA: "agent_5801kfp8shb2fv48yefns7hvkh5a",      // Main chat assistant
+  EVA: "agent_2601khm8sswzemb9v7tgg9s62yry",      // Main chat assistant (Edward)
   ANGIE: "agent_0001kh4tvy5heggtprck92at50fn",   // Partner support & sales
 } as const;
 
