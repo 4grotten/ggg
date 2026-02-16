@@ -88,7 +88,7 @@ export const BalanceCard = ({ balance, currency = "AED" }: BalanceCardProps) => 
               >
                 {isVisible ? (
                   <>
-                    <img src={aedCurrency} alt="AED" className="w-9 h-9" />
+                    <img src={aedCurrency} alt="AED" className="w-9 h-9 dark:invert dark:brightness-200" />
                     <AnimatedNumber key={animationKey} value={balance} duration={800} /> AED
                   </>
                 ) : "••••••"}
