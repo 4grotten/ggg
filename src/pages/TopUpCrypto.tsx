@@ -122,7 +122,7 @@ const TopUpCrypto = () => {
               includeMargin={false}
             />
             <div className="flex items-center justify-center gap-2 mt-4">
-              <p className="text-foreground font-medium">
+              <p className="text-primary font-medium">
                 {truncateAddress(walletAddress)}
               </p>
               <button
