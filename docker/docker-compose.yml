@@ -139,6 +139,8 @@ services:
     image: supabase/gotrue:v2.132.3
     container_name: easycard_auth
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:9999:9999"
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
@@ -236,13 +238,16 @@ services:
       ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
       VERIFY_JWT: "false"
     volumes:
-      - ../supabase/functions:/home/deno/functions:ro
+      - ../supabase/functions:/home/deno/functions
+      - ../supabase/functions/ai-chat.eszip:/home/deno/main.eszip:ro
     command:
       - start
       - --main-service
-      - /home/deno/functions
+      - /home/deno/main.eszip
     expose:
       - "9000"
+    ports:
+      - "9000:9000"
     depends_on:
       - supabase-kong
     networks:
