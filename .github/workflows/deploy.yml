@@ -40,12 +40,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/deployer/easycard
-            
+            git config --global --add safe.directory /home/deployer/easycard
             git fetch origin
             git reset --hard origin/main
-            
             cd docker
-            
             docker compose up -d --remove-orphans
-            
             docker image prune -f
+
