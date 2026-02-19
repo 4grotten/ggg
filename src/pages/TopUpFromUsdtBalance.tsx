@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, CreditCard, Wallet, ChevronRight, ArrowRightLeft } from "lucide-react";
+import { ArrowLeft, CreditCard, Wallet, ChevronRight, ArrowRightLeft, Check, Landmark } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -9,6 +9,8 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { useSettings } from "@/contexts/SettingsContext";
 import { UsdtIcon } from "@/components/icons/CryptoIcons";
+import { useCards } from "@/hooks/useCards";
+import { Card } from "@/types/card";
 
 type Destination = "card" | "account";
 
@@ -18,10 +20,13 @@ const TopUpFromUsdtBalance = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const settings = useSettings();
+  const { data: cardsData } = useCards();
 
   const [destination, setDestination] = useState<Destination | null>(null);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [amount, setAmount] = useState("");
 
+  const cards = cardsData?.data ?? [];
   const amountNum = parseFloat(amount) || 0;
 
   const calculation = useMemo(() => {
@@ -44,11 +49,26 @@ const TopUpFromUsdtBalance = () => {
 
   const quickAmounts = [10, 25, 50, 100];
 
+  const isReadyToConfirm =
+    destination &&
+    amountNum > 0 &&
+    calculation &&
+    !calculation.insufficientBalance &&
+    (destination === "account" || selectedCard);
+
   const handleConfirm = () => {
-    if (!calculation || calculation.insufficientBalance) return;
+    if (!isReadyToConfirm) return;
     toast.success(t("topUpUsdt.transferInitiated", "Перевод инициирован"));
     navigate("/");
   };
+
+  const handleSelectDestination = (dest: Destination) => {
+    setDestination(dest);
+    setSelectedCard(null);
+    setAmount("");
+  };
+
+  const showAmountInput = destination === "account" || (destination === "card" && selectedCard);
 
   return (
     <MobileLayout
@@ -78,7 +98,7 @@ const TopUpFromUsdtBalance = () => {
           </div>
           <p className="text-2xl font-bold">
             <span className="text-[#26A17B]">$</span>
-            {USDT_BALANCE.toFixed(2)}{" "}
+            {USDT_BALANCE.toLocaleString("en-US", { minimumFractionDigits: 2 })}{" "}
             <span className="text-sm text-muted-foreground">USDT</span>
           </p>
         </div>
@@ -90,25 +110,19 @@ const TopUpFromUsdtBalance = () => {
           </p>
           <div className="bg-muted/50 rounded-xl overflow-hidden border border-border/50">
             <button
-              onClick={() => setDestination("card")}
+              onClick={() => handleSelectDestination("card")}
               className={`w-full flex items-center gap-3 px-4 py-4 transition-colors border-b border-border/50 ${
-                destination === "card"
-                  ? "bg-primary/10"
-                  : "hover:bg-muted/80"
+                destination === "card" ? "bg-primary/10" : "hover:bg-muted/80"
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  destination === "card"
-                    ? "bg-primary"
-                    : "bg-muted"
+                  destination === "card" ? "bg-primary" : "bg-muted"
                 }`}
               >
                 <CreditCard
                   className={`w-5 h-5 ${
-                    destination === "card"
-                      ? "text-primary-foreground"
-                      : "text-muted-foreground"
+                    destination === "card" ? "text-primary-foreground" : "text-muted-foreground"
                   }`}
                 />
               </div>
@@ -120,29 +134,27 @@ const TopUpFromUsdtBalance = () => {
                   {t("topUpUsdt.toCardDesc", "Пополнить баланс карты")}
                 </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
+              {destination === "card" ? (
+                <Check className="w-5 h-5 text-primary" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
+              )}
             </button>
 
             <button
-              onClick={() => setDestination("account")}
+              onClick={() => handleSelectDestination("account")}
               className={`w-full flex items-center gap-3 px-4 py-4 transition-colors ${
-                destination === "account"
-                  ? "bg-primary/10"
-                  : "hover:bg-muted/80"
+                destination === "account" ? "bg-primary/10" : "hover:bg-muted/80"
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  destination === "account"
-                    ? "bg-primary"
-                    : "bg-muted"
+                  destination === "account" ? "bg-primary" : "bg-muted"
                 }`}
               >
                 <Wallet
                   className={`w-5 h-5 ${
-                    destination === "account"
-                      ? "text-primary-foreground"
-                      : "text-muted-foreground"
+                    destination === "account" ? "text-primary-foreground" : "text-muted-foreground"
                   }`}
                 />
               </div>
@@ -154,14 +166,102 @@ const TopUpFromUsdtBalance = () => {
                   {t("topUpUsdt.toAccountDesc", "Зачислить на основной счёт")}
                 </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
+              {destination === "account" ? (
+                <Check className="w-5 h-5 text-primary" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
+              )}
             </button>
           </div>
         </div>
 
-        {/* Amount input */}
+        {/* Card selector - shown when "На карту" is selected */}
         <AnimatePresence>
-          {destination && (
+          {destination === "card" && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-2 overflow-hidden"
+            >
+              <p className="text-sm font-medium text-muted-foreground px-1">
+                {t("topUpUsdt.selectCard", "Выберите карту")}
+              </p>
+              <div className="bg-muted/50 rounded-xl overflow-hidden border border-border/50">
+                {cards.map((card, index) => (
+                  <button
+                    key={card.id}
+                    onClick={() => setSelectedCard(card)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
+                      index < cards.length - 1 ? "border-b border-border/50" : ""
+                    } ${selectedCard?.id === card.id ? "bg-primary/10" : "hover:bg-muted/80"}`}
+                  >
+                    <div className="w-12 shrink-0">
+                      <CardMiniature type={card.type} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-medium text-foreground">{card.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        •••• {card.lastFourDigits} · {card.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })} AED
+                      </p>
+                    </div>
+                    {selectedCard?.id === card.id && (
+                      <Check className="w-5 h-5 text-primary" />
+                    )}
+                  </button>
+                ))}
+                {cards.length === 0 && (
+                  <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                    {t("topUpUsdt.noCards", "Нет активных карт")}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Account bank details - shown when "На счёт" is selected */}
+        <AnimatePresence>
+          {destination === "account" && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <Landmark className="w-4 h-4 text-primary" />
+                  <p className="text-sm font-semibold">
+                    {t("topUpUsdt.accountDetails", "Реквизиты счёта")}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t("topUpUsdt.accountName", "Наименование")}</span>
+                    <span className="font-medium text-foreground">Easy Card LLC</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">IBAN</span>
+                    <span className="font-mono text-xs font-medium text-foreground">AE07 0331 2345 6789 0123 456</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">SWIFT</span>
+                    <span className="font-mono font-medium text-foreground">BOMLAEAD</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t("topUpUsdt.currency", "Валюта")}</span>
+                    <span className="font-medium text-foreground">AED</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Amount input - shown after destination + card (if card) are selected */}
+        <AnimatePresence>
+          {showAmountInput && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -246,6 +346,16 @@ const TopUpFromUsdtBalance = () => {
                         {calculation.totalUsdt.toFixed(2)} USDT
                       </span>
                     </div>
+                    {destination === "card" && selectedCard && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          {t("topUpUsdt.destinationCard", "Карта зачисления")}
+                        </span>
+                        <span className="font-medium">
+                          {selectedCard.name} •••• {selectedCard.lastFourDigits}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-base pt-2 border-t border-border/50">
                       <span className="font-semibold">
                         {t("topUpUsdt.youReceive", "Вы получите")}
@@ -272,11 +382,11 @@ const TopUpFromUsdtBalance = () => {
       </div>
 
       {/* Fixed Bottom Button */}
-      {destination && amountNum > 0 && calculation && (
+      {isReadyToConfirm && amountNum > 0 && (
         <div className="fixed bottom-0 left-0 right-0 p-4 max-w-[800px] mx-auto">
           <button
             onClick={handleConfirm}
-            disabled={calculation.insufficientBalance}
+            disabled={calculation?.insufficientBalance}
             className="w-full py-4 rounded-2xl font-semibold text-base transition-all backdrop-blur-2xl disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-primary-foreground active:scale-[0.98]"
           >
             {t("topUpUsdt.confirm", "Подтвердить перевод")}
