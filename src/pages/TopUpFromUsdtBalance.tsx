@@ -12,7 +12,7 @@ import { UsdtIcon } from "@/components/icons/CryptoIcons";
 
 type Destination = "card" | "account";
 
-const USDT_BALANCE = 0; // TODO: fetch from real source
+const USDT_BALANCE = 112000;
 
 const TopUpFromUsdtBalance = () => {
   const navigate = useNavigate();
