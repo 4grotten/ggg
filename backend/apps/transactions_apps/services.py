@@ -1,6 +1,8 @@
 from django.db import transaction
 from django.utils import timezone
 import uuid
+from decimal import Decimal  # <--- ИМПОРТИРУЕМ DECIMAL
+
 from apps.transactions_apps.models import (
     Transactions, TopupsBank, BankDepositAccounts, 
     TopupsCrypto, CardTransfers, BalanceMovements, 
@@ -18,8 +20,11 @@ class TransactionService:
         reference = f"REF-{user_id.hex[:6]}-{uuid.uuid4().hex[:4]}".upper()
         with transaction.atomic():
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), user_id=user_id, type='bank_topup', status='pending',
-                amount=0, currency='AED', created_at=timezone.now(), updated_at=timezone.now()
+                id=uuid.uuid4(), 
+                user_id=user_id, 
+                type='top_up',
+                status='pending',
+                amount=Decimal('0.00'), currency='AED', created_at=timezone.now(), updated_at=timezone.now()
             )
             topup = TopupsBank.objects.create(
                 transaction=txn, user_id=user_id, transfer_rail=transfer_rail,
@@ -36,23 +41,26 @@ class TransactionService:
     #TASK 2
     @staticmethod
     def initiate_crypto_topup(user_id: uuid.UUID, card_id: uuid.UUID, token: str, network: str):
-        deposit_address = f"0x{uuid.uuid4().hex}" # Заглушка, тут вызов провайдера (Tatum/Fireblocks)
+        deposit_address = f"0x{uuid.uuid4().hex}"
         with transaction.atomic():
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), user_id=user_id, type='crypto_topup', status='pending',
-                amount=0, currency='AED', created_at=timezone.now(), updated_at=timezone.now()
+                id=uuid.uuid4(), 
+                user_id=user_id, 
+                type='top_up',
+                status='pending',
+                amount=Decimal('0.00'), currency='AED', created_at=timezone.now(), updated_at=timezone.now()
             )
             topup = TopupsCrypto.objects.create(
                 transaction=txn, user_id=user_id, card_id=card_id, token=token,
                 network=network, deposit_address=deposit_address, address_provider='internal',
-                qr_payload=f"{token}:{deposit_address}", min_amount=10.00, fee_percent=1.50
+                qr_payload=f"{token}:{deposit_address}", min_amount=Decimal('10.00'), fee_percent=Decimal('1.50')
             )
         return topup
 
     #TASK 3
     @staticmethod
-    def execute_card_transfer(sender_id: uuid.UUID, sender_card_id: uuid.UUID, receiver_card_number: str, amount: float):
-        fee_amount = 0.00
+    def execute_card_transfer(sender_id: uuid.UUID, sender_card_id: uuid.UUID, receiver_card_number: str, amount: Decimal):
+        fee_amount = Decimal('0.00')
         total_deduction = amount + fee_amount
         with transaction.atomic():
             sender_card = Cards.objects.select_for_update().get(id=sender_card_id)
@@ -60,7 +68,10 @@ class TransactionService:
             if sender_card.balance < total_deduction:
                 raise ValueError("Недостаточно средств на карте")
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), user_id=sender_id, type='card_transfer', status='completed',
+                id=uuid.uuid4(), 
+                user_id=sender_id, 
+                type='transfer_out',
+                status='completed',
                 amount=amount, currency='AED', created_at=timezone.now(), updated_at=timezone.now()
             )
             CardTransfers.objects.create(
@@ -78,12 +89,11 @@ class TransactionService:
 
     #TASK 4
     @staticmethod
-    def execute_crypto_withdrawal(user_id: uuid.UUID, card_id: uuid.UUID, token: str, network: str, to_address: str, amount_crypto: float):
-        network_fee_crypto = 1.5 
+    def execute_crypto_withdrawal(user_id: uuid.UUID, card_id: uuid.UUID, token: str, network: str, to_address: str, amount_crypto: Decimal):
+        network_fee_crypto = Decimal('1.50')
         total_crypto = amount_crypto + network_fee_crypto
-        exchange_rate = 3.67
+        exchange_rate = Decimal('3.67')
         total_aed = total_crypto * exchange_rate
-
         with transaction.atomic():
             card = Cards.objects.select_for_update().get(id=card_id)
             if card.balance < total_aed:
@@ -91,7 +101,10 @@ class TransactionService:
             card.balance -= total_aed
             card.save(update_fields=['balance'])
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), user_id=user_id, type='crypto_withdrawal', status='processing',
+                id=uuid.uuid4(), 
+                user_id=user_id, 
+                type='withdrawal',
+                status='pending',
                 amount=total_aed, currency='AED', created_at=timezone.now(), updated_at=timezone.now()
             )
             withdrawal = CryptoWithdrawals.objects.create(
@@ -103,9 +116,9 @@ class TransactionService:
 
     #TASK 5
     @staticmethod
-    def execute_bank_withdrawal(user_id: uuid.UUID, card_id: uuid.UUID, iban: str, beneficiary_name: str, bank_name: str, amount_aed: float):
-        fee_percent = 2.00
-        fee_amount = amount_aed * (fee_percent / 100)
+    def execute_bank_withdrawal(user_id: uuid.UUID, card_id: uuid.UUID, iban: str, beneficiary_name: str, bank_name: str, amount_aed: Decimal):
+        fee_percent = Decimal('2.00')
+        fee_amount = amount_aed * (fee_percent / Decimal('100.00'))
         total_debit = amount_aed + fee_amount
         with transaction.atomic():
             card = Cards.objects.select_for_update().get(id=card_id)
@@ -114,7 +127,10 @@ class TransactionService:
             card.balance -= total_debit
             card.save(update_fields=['balance'])
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), user_id=user_id, type='bank_withdrawal', status='processing',
+                id=uuid.uuid4(), 
+                user_id=user_id, 
+                type='withdrawal',
+                status='pending',
                 amount=amount_aed, currency='AED', created_at=timezone.now(), updated_at=timezone.now()
             )
             withdrawal = BankWithdrawals.objects.create(
