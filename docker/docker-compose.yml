@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   # # EasyCard PWA Application
   easycard-app:
