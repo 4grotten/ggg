@@ -9,6 +9,7 @@ import { useVoiceCall } from "@/contexts/VoiceCallContext";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
+import { AccountSwitcher } from "@/components/account/AccountSwitcher";
 
 const navItems = [
   { icon: Home, labelKey: "nav.home", path: "/" },
@@ -36,7 +37,9 @@ export const BottomNavigation = () => {
   const tabRefs = useRef<(HTMLElement | null)[]>([]);
   const [selectorStyle, setSelectorStyle] = useState<{ left: number; width: number } | null>(null);
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
-
+  const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const longPressTriggered = useRef(false);
   const isActive = (path: string) => {
     if (path === "/") {
       return location.pathname === "/";
@@ -183,14 +186,40 @@ export const BottomNavigation = () => {
                 <div
                   key={item.path}
                   ref={(el) => { tabRefs.current[index] = el; }}
-                  onPointerDown={() => handleTabPress(index, item.path)}
-                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation cursor-pointer"
+                  onPointerDown={() => {
+                    longPressTriggered.current = false;
+                    longPressTimer.current = setTimeout(() => {
+                      longPressTriggered.current = true;
+                      setAccountSwitcherOpen(true);
+                      selection();
+                    }, 500);
+                    handleTabPress(index, item.path);
+                  }}
+                  onPointerUp={() => {
+                    if (longPressTimer.current) {
+                      clearTimeout(longPressTimer.current);
+                      longPressTimer.current = null;
+                    }
+                  }}
+                  onPointerLeave={() => {
+                    if (longPressTimer.current) {
+                      clearTimeout(longPressTimer.current);
+                      longPressTimer.current = null;
+                    }
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setAccountSwitcherOpen(true);
+                    selection();
+                  }}
+                  className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-3xl transition-all relative z-10 touch-manipulation cursor-pointer select-none"
+                  style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
                 >
                   <Avatar className={cn(
-                    "w-6 h-6 transition-all",
+                    "w-6 h-6 transition-all pointer-events-none",
                     active ? "ring-2 ring-primary" : ""
                   )}>
-                    <AvatarImage src={displayAvatar} alt="Profile" />
+                    <AvatarImage src={displayAvatar} alt="Profile" draggable={false} />
                     <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <span
@@ -246,6 +275,7 @@ export const BottomNavigation = () => {
           })}
         </div>
       </div>
+      <AccountSwitcher open={accountSwitcherOpen} onOpenChange={setAccountSwitcherOpen} />
     </nav>
   );
 };

@@ -1,9 +1,9 @@
+version: "3.9"
+
 services:
   # # EasyCard PWA Application
   easycard-app:
-    build:
-      context: ..
-      dockerfile: Dockerfile
+    image: ghcr.io/blobus01/easycard-app:latest
     container_name: easycard_app
     restart: unless-stopped
     expose:
@@ -11,7 +11,6 @@ services:
     networks:
       - default
 
-  # Nginx Reverse Proxy with SSL
   nginx:
     image: nginx:alpine
     container_name: easycard_nginx
@@ -34,7 +33,6 @@ services:
       - backend-api
     command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
 
-  # Certbot for SSL certificates
   certbot:
     image: certbot/certbot
     container_name: easycard_certbot
@@ -42,9 +40,11 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    entrypoint: >
+      /bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'
+    networks:
+      - default
 
-  # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
     container_name: easycard_db
@@ -63,6 +63,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - default
 
   
   backend-api:
@@ -99,8 +101,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - default
 
-  # Redis Commander - Web UI for Redis (behind Nginx)
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: easycard_redis_ui
@@ -114,8 +117,9 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+    networks:
+      - default
 
-  # pgAdmin for database management (behind Nginx)
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: easycard_pgadmin
@@ -132,6 +136,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - default
 
  
 
@@ -157,7 +163,6 @@ services:
     networks:
       - default
 
-  # GoTrue Auth Service
   supabase-auth:
     image: supabase/gotrue:v2.132.3
     container_name: easycard_auth
@@ -189,7 +194,6 @@ services:
     networks:
       - default
 
-  # PostgREST API
   supabase-rest:
     image: postgrest/postgrest:v11.2.2
     container_name: easycard_rest
@@ -208,7 +212,6 @@ services:
     networks:
       - default
 
-  # Supabase Studio (Admin UI)
   supabase-studio:
     image: supabase/studio:latest
     container_name: easycard_studio
@@ -230,7 +233,6 @@ services:
     networks:
       - default
 
-  # Postgres Meta (for Studio)
   supabase-meta:
     image: supabase/postgres-meta:v0.68.0
     container_name: easycard_meta
@@ -306,9 +308,7 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
   redis_data:
-    driver: local
   pgadmin_data:
     driver: local
   static_volume:
