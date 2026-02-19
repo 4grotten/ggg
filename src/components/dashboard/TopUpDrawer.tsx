@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, QrCode, Landmark, Wallet, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import {
   Drawer,
   DrawerContent,
@@ -63,8 +62,8 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     
     onOpenChange(false);
     if (optionId === "usdt-balance") {
-      // TODO: navigate to USDT balance top-up page
-      toast.info(t("drawer.usdtBalanceComingSoon", "Скоро будет доступно"));
+      navigate("/top-up/usdt-balance");
+    } else if (optionId === "stablecoins") {
     } else if (optionId === "stablecoins") {
       navigate("/top-up/crypto");
     } else if (optionId === "bank") {
