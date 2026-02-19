@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.utils import timezone
+from decimal import Decimal
 import uuid
-from decimal import Decimal  # <--- ИМПОРТИРУЕМ DECIMAL
 
 from apps.transactions_apps.models import (
     Transactions, TopupsBank, BankDepositAccounts, 
@@ -11,6 +11,7 @@ from apps.transactions_apps.models import (
 from apps.cards_apps.models import Cards
 
 class TransactionService:
+    
     #TASK 1
     @staticmethod
     def initiate_bank_topup(user_id: uuid.UUID, transfer_rail: str):
@@ -63,10 +64,16 @@ class TransactionService:
         fee_amount = Decimal('0.00')
         total_deduction = amount + fee_amount
         with transaction.atomic():
-            sender_card = Cards.objects.select_for_update().get(id=sender_card_id)
-            receiver_card = Cards.objects.select_for_update().get(card_number_encrypted=receiver_card_number, status='active')
+            try:
+                sender_card = Cards.objects.select_for_update().get(id=sender_card_id)
+            except Cards.DoesNotExist:
+                raise ValueError("Карта отправителя не найдена в системе.")
+            try:
+                receiver_card = Cards.objects.select_for_update().get(card_number_encrypted=receiver_card_number, status='active')
+            except Cards.DoesNotExist:
+                raise ValueError("Активная карта получателя с таким номером не найдена.")
             if sender_card.balance < total_deduction:
-                raise ValueError("Недостаточно средств на карте")
+                raise ValueError("Недостаточно средств на карте для перевода.")
             txn = Transactions.objects.create(
                 id=uuid.uuid4(), 
                 user_id=sender_id, 
@@ -95,11 +102,15 @@ class TransactionService:
         exchange_rate = Decimal('3.67')
         total_aed = total_crypto * exchange_rate
         with transaction.atomic():
-            card = Cards.objects.select_for_update().get(id=card_id)
+            try:
+                card = Cards.objects.select_for_update().get(id=card_id)
+            except Cards.DoesNotExist:
+                raise ValueError("Указанная карта для списания не найдена.")
             if card.balance < total_aed:
-                raise ValueError("Недостаточно средств")
+                raise ValueError(f"Недостаточно средств. Необходимо: {total_aed} AED (включая комиссию сети).")
             card.balance -= total_aed
             card.save(update_fields=['balance'])
+
             txn = Transactions.objects.create(
                 id=uuid.uuid4(), 
                 user_id=user_id, 
@@ -121,9 +132,12 @@ class TransactionService:
         fee_amount = amount_aed * (fee_percent / Decimal('100.00'))
         total_debit = amount_aed + fee_amount
         with transaction.atomic():
-            card = Cards.objects.select_for_update().get(id=card_id)
+            try:
+                card = Cards.objects.select_for_update().get(id=card_id)
+            except Cards.DoesNotExist:
+                raise ValueError("Указанная карта для списания не найдена.")
             if card.balance < total_debit:
-                raise ValueError("Недостаточно средств")
+                raise ValueError("Недостаточно средств для банковского перевода (с учетом комиссии 2%).")
             card.balance -= total_debit
             card.save(update_fields=['balance'])
             txn = Transactions.objects.create(
