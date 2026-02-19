@@ -34,9 +34,9 @@ echo "Docker version: $(docker --version)"
 echo "Docker Compose version: $(docker compose version)"
 
 # Create app directory
-APP_DIR="/opt/easycard"
+APP_DIR="/home/deployer/easycarduae"
 mkdir -p $APP_DIR
-cd $APP_DIR
+cd $APP_DIR/docker
 
 echo ""
 echo "=== Stopping existing containers (if any) ==="
