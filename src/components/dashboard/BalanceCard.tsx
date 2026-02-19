@@ -45,7 +45,7 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
 };
 
 export const BalanceCard = ({ balance, currency = "AED", cards = [] }: BalanceCardProps) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   
