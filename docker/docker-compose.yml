@@ -1,15 +1,14 @@
 services:
  # # EasyCard PWA Application
   easycard-app:
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    container_name: easycard_app
-    restart: unless-stopped
-    expose:
-      - "80"
-    networks:
-      - default
+      image: ghcr.io/blobus01/easycard-app:latest
+      container_name: easycard_app
+      restart: unless-stopped
+  expose:
+    - "80"
+  networks:
+    - default
+
 
   # Nginx Reverse Proxy with SSL
   nginx:
