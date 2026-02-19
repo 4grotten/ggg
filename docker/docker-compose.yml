@@ -224,11 +224,20 @@ services:
       - default
 
   supabase-functions:
-    image: supabase/functions:latest
-    container_name: easycard_functions
-    restart: unless-stopped
-    networks:
-      - default
+  image: supabase/edge-runtime:v1.66.5
+  container_name: easycard_functions
+  restart: unless-stopped
+  volumes:
+    - ./supabase/volumes/functions:/home/deno/functions
+  environment:
+    JWT_SECRET: ${JWT_SECRET}
+    SUPABASE_URL: http://supabase-kong:8000
+    SUPABASE_ANON_KEY: ${ANON_KEY}
+    SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_KEY}
+  command: [ "start", "--main-service", "/home/deno/functions/main" ]
+  networks:
+    - default
+
 
 volumes:
   postgres_data:
