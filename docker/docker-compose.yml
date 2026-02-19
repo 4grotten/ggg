@@ -27,7 +27,8 @@ services:
       - pgadmin
       - redis-commander
       - supabase-kong
-    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+    command: >
+      /bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'
     networks:
       - default
 
@@ -38,7 +39,8 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    entrypoint: >
+      /bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'
     networks:
       - default
 
@@ -222,26 +224,6 @@ services:
         condition: service_healthy
     networks:
       - default
-
-supabase-functions:
-  image: supabase/edge-runtime:v1.66.5
-  container_name: easycard_functions
-  restart: unless-stopped   
-  volumes:
-    - ./supabase/volumes/functions:/home/deno/functions
-  environment:
-    JWT_SECRET: ${JWT_SECRET}
-    SUPABASE_URL: http://supabase-kong:8000
-    SUPABASE_ANON_KEY: ${ANON_KEY}
-    SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_KEY}
-  command:
-    - start
-    - --main-service
-    - /home/deno/functions/main
-  networks:
-    - default
-
-
 
 volumes:
   postgres_data:
