@@ -1,5 +1,5 @@
 services:
- # # EasyCard PWA Application
+  # # EasyCard PWA Application
   easycard-app:
     build:
       context: ..
@@ -24,11 +24,15 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./certbot/conf:/etc/letsencrypt:ro
       - ./certbot/www:/var/www/certbot:ro
+      # Добавили общие папки со статикой бэкенда
+      - static_volume:/var/www/backend/static:ro
+      - media_volume:/var/www/backend/media:ro
     depends_on:
       - easycard-app
       - pgadmin
       - redis-commander
       - supabase-kong
+      - backend-api # Указали зависимость от нашего Django
     command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
 
   # Certbot for SSL certificates
@@ -60,6 +64,27 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  
+  backend-api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: easycard_django_api
+    restart: unless-stopped
+    env_file:
+      - ../backend/.env
+    expose:
+      - "8000" # Открываем только внутри сети Docker для Nginx
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Прокидываем папки наружу для Nginx
+      - static_volume:/app/static-root
+      - media_volume:/app/media
+    networks:
+      - default
 
   # Redis for caching exchange rates and sessions
   redis:
@@ -110,7 +135,7 @@ services:
       postgres:
         condition: service_healthy
 
-  # === SUPABASE STACK ===
+ 
 
   # Kong API Gateway
   supabase-kong:
@@ -280,6 +305,7 @@ services:
     networks:
       - default
 
+
 volumes:
   postgres_data:
     driver: local
@@ -287,23 +313,11 @@ volumes:
     driver: local
   pgadmin_data:
     driver: local
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
 
 networks:
   default:
     name: easycard_network
-
-backend-api:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: easycard_django_api
-    restart: unless-stopped
-    env_file:
-      - ./backend/.env
-    ports:
-      - "8000:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - default
