@@ -41,6 +41,7 @@ import OpenCardPayment from "./pages/OpenCardPayment";
 import OpenCardPayBalance from "./pages/OpenCardPayBalance";
 import TariffPayBalance from "./pages/TariffPayBalance";
 import TariffPayCrypto from "./pages/TariffPayCrypto";
+import TopUpFromUsdtBalance from "./pages/TopUpFromUsdtBalance";
 import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
 import PhoneEntry from "./pages/auth/PhoneEntry";
@@ -149,6 +150,7 @@ const AppContent = () => {
             <Route path="/send-to-card" element={<SendToCard />} />
             <Route path="/top-up/crypto" element={<TopUpCrypto />} />
             <Route path="/top-up/bank" element={<TopUpBank />} />
+            <Route path="/top-up/usdt-balance" element={<TopUpFromUsdtBalance />} />
             <Route path="/top-up/bank/details" element={<TopUpBankDetails />} />
             <Route path="/send/crypto" element={<SendCrypto />} />
             <Route path="/send/bank" element={<SendBank />} />
