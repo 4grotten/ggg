@@ -1,4 +1,4 @@
-version: "3.9"
+# EasyCard Docker Stack
 
 services:
   # # EasyCard PWA Application
@@ -75,6 +75,7 @@ services:
     restart: unless-stopped
     env_file:
       - ../backend/.env
+      - .env
     expose:
       - "8000"
     depends_on:
