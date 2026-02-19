@@ -154,3 +154,101 @@ class TransactionService:
             )
             BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='sender', amount=total_debit, type='debit')
         return withdrawal
+    
+
+    @staticmethod
+    def get_transaction_receipt(transaction_id: uuid.UUID) -> dict:
+        try:
+            txn = Transactions.objects.select_related(
+                'bank_topup', 'crypto_topup', 'card_transfer', 
+                'crypto_withdrawal', 'bank_withdrawal'
+            ).get(id=transaction_id)
+        except Transactions.DoesNotExist:
+            raise ValueError("Транзакция не найдена")
+
+        base_receipt = {
+            "transaction_id": txn.id,
+            "status": txn.status,
+            "date_time": txn.created_at,
+            "type": txn.type
+        }
+        if hasattr(txn, 'bank_topup'):
+            topup = txn.bank_topup
+            base_receipt.update({
+                "operation": "Bank Topup",
+                "amount": txn.amount,
+                "sender_name": topup.sender_name,
+                "sender_bank": topup.sender_bank,
+                "sender_iban": topup.sender_iban,
+                "credited_card_id": topup.credited_card_id
+            })
+            return base_receipt
+        if hasattr(txn, 'crypto_topup'):
+            topup = txn.crypto_topup
+            base_receipt.update({
+                "operation": "Crypto Topup",
+                "credited_amount_aed": txn.amount,
+                "network": topup.network,
+                "token": topup.token,
+                "sender_address": topup.from_address,
+                "credited_card_id": topup.card_id,
+                "exchange_rate": topup.exchange_rate,
+                "fee_amount": topup.fee_amount
+            })
+            return base_receipt
+        if hasattr(txn, 'card_transfer'):
+            transfer = txn.card_transfer
+            sender_mask = "Неизвестно"
+            receiver_mask = "Неизвестно"
+            try:
+                s_card = Cards.objects.get(id=transfer.sender_card_id)
+                sender_mask = f"**** {s_card.last_four_digits}" if s_card.last_four_digits else "****"
+                
+                r_card = Cards.objects.get(id=transfer.receiver_card_id)
+                receiver_mask = f"**** {r_card.last_four_digits}" if r_card.last_four_digits else "****"
+            except Cards.DoesNotExist:
+                pass
+            base_receipt.update({
+                "operation": "Internal Card Transfer",
+                "amount": transfer.amount,
+                "fee": transfer.fee_amount,
+                "sender_card_mask": sender_mask,
+                "receiver_card_mask": receiver_mask,
+                "recipient_name": "EasyCard User",
+            })
+            return base_receipt
+        if hasattr(txn, 'crypto_withdrawal'):
+            withdrawal = txn.crypto_withdrawal
+            addr = withdrawal.to_address
+            address_mask = f"{addr[:6]}...{addr[-4:]}" if addr and len(addr) > 10 else addr
+            base_receipt.update({
+                "operation": "Crypto Withdrawal",
+                "to_address_mask": address_mask,
+                "network_and_token": f"{withdrawal.token} ({withdrawal.network})",
+                "amount_crypto": withdrawal.amount_crypto,
+                "fee": withdrawal.fee_amount,
+                "tx_hash": withdrawal.tx_hash
+            })
+            return base_receipt
+        if hasattr(txn, 'bank_withdrawal'):
+            withdrawal = txn.bank_withdrawal
+            iban = withdrawal.beneficiary_iban
+            iban_mask = f"{iban[:4]}...{iban[-4:]}" if iban and len(iban) > 8 else iban
+            card_mask = "****"
+            try:
+                c = Cards.objects.get(id=withdrawal.from_card_id)
+                card_mask = f"**** {c.last_four_digits}" if c.last_four_digits else "****"
+            except Cards.DoesNotExist:
+                pass
+            base_receipt.update({
+                "operation": "Bank Wire Withdrawal",
+                "recipient_name": withdrawal.beneficiary_name,
+                "iban_mask": iban_mask,
+                "bank_name": withdrawal.beneficiary_bank_name,
+                "from_card_mask": card_mask,
+                "amount": withdrawal.amount_aed,
+                "fee": withdrawal.fee_amount,
+                "total_debit": withdrawal.total_debit
+            })
+            return base_receipt
+        return base_receipt

@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     BankTopupView, CryptoTopupView, 
     CardTransferView, CryptoWithdrawalView, 
-    BankWithdrawalView
+    BankWithdrawalView, TransactionReceiptView
 )
 
 
@@ -17,4 +17,6 @@ urlpatterns = [
     
     path('withdrawal/crypto/', CryptoWithdrawalView.as_view(), name='crypto_withdrawal'),
     path('withdrawal/bank/', BankWithdrawalView.as_view(), name='bank_withdrawal'),
+
+    path('<uuid:transaction_id>/receipt/', TransactionReceiptView.as_view(), name='transaction_receipt'),
 ]

@@ -189,3 +189,47 @@ class BankWithdrawalView(APIView):
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TransactionReceiptView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Получить детали транзакции (Квитанция)",
+        operation_description=(
+            "Возвращает детальную информацию (квитанцию) по конкретной транзакции.\n\n"
+            "Формат ответа **динамический** и зависит от типа операции:\n"
+            "- **Bank Topup**: возвращает `sender_name`, `sender_bank`, `sender_iban`.\n"
+            "- **Crypto Topup**: возвращает `network`, `token`, `sender_address`, `exchange_rate`.\n"
+            "- **Card Transfer**: возвращает `sender_card_mask`, `receiver_card_mask`, `recipient_name`.\n"
+            "- **Crypto Withdrawal**: возвращает `to_address_mask`, `tx_hash`, `amount_crypto`.\n"
+            "- **Bank Withdrawal**: возвращает `recipient_name`, `iban_mask`, `bank_name`, `total_debit`."
+        ),
+        responses={
+            200: openapi.Response(
+                description="Детали транзакции",
+                examples={
+                    "application/json": {
+                        "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+                        "status": "completed",
+                        "date_time": "2026-02-19T20:00:00Z",
+                        "operation": "Internal Card Transfer",
+                        "amount": "100.00",
+                        "fee": "0.00",
+                        "sender_card_mask": "**** 1234",
+                        "receiver_card_mask": "**** 5678",
+                        "recipient_name": "EasyCard User"
+                    }
+                }
+            ),
+            400: ErrorResponseSerializer,
+            404: openapi.Response(description="Транзакция не найдена")
+        },
+        tags=["Receipts (Квитанции)"]
+    )
+    def get(self, request, transaction_id):
+        try:
+            receipt_data = TransactionService.get_transaction_receipt(transaction_id=transaction_id)
+            return Response(receipt_data, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": f"Внутренняя ошибка: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
