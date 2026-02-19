@@ -224,4 +224,16 @@ services:
       - default
 
   supabase-functions:
-    image
+    image: supabase/functions:latest
+    container_name: easycard_functions
+    restart: unless-stopped
+    networks:
+      - default
+
+volumes:
+  postgres_data:
+  redis_data:
+  pgadmin_data:
+
+networks:
+  default:
