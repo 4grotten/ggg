@@ -1,9 +1,11 @@
-# EasyCard Docker Stack
+version: "3.9"
 
 services:
   # # EasyCard PWA Application
   easycard-app:
-    image: ghcr.io/ahrensov/easycard-app:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
     container_name: easycard_app
     restart: unless-stopped
     expose:
@@ -75,7 +77,6 @@ services:
     restart: unless-stopped
     env_file:
       - ../backend/.env
-      - .env
     expose:
       - "8000"
     depends_on:

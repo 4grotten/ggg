@@ -45,8 +45,7 @@ jobs:
             git reset --hard origin/main
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
             cd docker
-            docker compose pull --ignore-pull-failures
-            docker compose up -d --force-recreate --remove-orphans
-            docker image prune -af
-            echo "Deploy completed at $(date)"
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker image prune -f
 
