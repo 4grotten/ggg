@@ -1,7 +1,6 @@
 version: "3.9"
 
 services:
-  # EasyCard PWA Application
   easycard-app:
     image: ghcr.io/blobus01/easycard-app:latest
     container_name: easycard_app
@@ -11,7 +10,6 @@ services:
     networks:
       - default
 
-  # Nginx Reverse Proxy with SSL 
   nginx:
     image: nginx:alpine
     container_name: easycard_nginx
@@ -226,4 +224,4 @@ services:
       - default
 
   supabase-functions:
-    image: supabase/edge-runtime:v
+    image
