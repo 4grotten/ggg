@@ -98,7 +98,7 @@ const TopUpFromUsdtBalance = () => {
           </div>
           <p className="text-2xl font-bold">
             <span className="text-[#26A17B]">$</span>
-            {USDT_BALANCE.toLocaleString("en-US", { minimumFractionDigits: 2 })}{" "}
+            {USDT_BALANCE.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
             <span className="text-sm text-muted-foreground">USDT</span>
           </p>
         </div>
