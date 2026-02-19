@@ -39,10 +39,13 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /opt/easycard/docker
+            cd /home/deployer/easycard
             
-            docker compose pull easycard-app
+            git fetch origin
+            git reset --hard origin/main
             
-            docker compose up -d
+            cd docker
+            
+            docker compose up -d --remove-orphans
             
             docker image prune -f
