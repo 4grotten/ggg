@@ -5,11 +5,13 @@ import aedCurrency from "@/assets/aed-currency.png";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 import { Card } from "@/types/card";
+import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
 
 interface BalanceCardProps {
   balance: number;
   currency?: string;
   cards?: Card[];
+  usdtBalance?: number;
 }
 
 const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: number }) => {
@@ -44,7 +46,7 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
   return <>{formatBalance(displayValue)}</>;
 };
 
-export const BalanceCard = ({ balance, currency = "AED", cards = [] }: BalanceCardProps) => {
+export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0 }: BalanceCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
@@ -99,6 +101,35 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [] }: BalanceCa
             ))}
           </div>
         )}
+
+        {/* USDT TRC20 Balance */}
+        <div className="rounded-xl bg-secondary/50 p-3">
+          <div className="flex items-center gap-1.5 mb-1">
+            <UsdtIcon size={14} />
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+              USDT TRC20
+            </p>
+            <TronIcon size={10} className="opacity-50" />
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={isVisible ? "usdt-visible" : "usdt-hidden"}
+              className="text-sm font-semibold flex items-center gap-1"
+              initial={{ opacity: 0, filter: "blur(6px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(6px)" }}
+              transition={{ duration: 0.3 }}
+            >
+              {isVisible ? (
+                <>
+                  <span className="text-[#26A17B]">$</span>
+                  <AnimatedNumber key={`${animationKey}-usdt`} value={usdtBalance} duration={800} />
+                  <span className="text-xs text-muted-foreground ml-1">USDT</span>
+                </>
+              ) : "••••••"}
+            </motion.span>
+          </AnimatePresence>
+        </div>
 
         {/* Total balance */}
         <div className="flex items-center justify-between">
