@@ -73,7 +73,7 @@ export const BalanceCard = ({ balance, currency = "AED" }: BalanceCardProps) => 
     <>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">
             Card Balance ({currency})
           </p>
           <div className="flex items-center gap-3">
