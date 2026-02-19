@@ -1,5 +1,5 @@
 services:
-  # EasyCard PWA Application
+ # # EasyCard PWA Application
   easycard-app:
     build:
       context: ..
