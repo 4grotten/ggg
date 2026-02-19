@@ -223,10 +223,10 @@ services:
     networks:
       - default
 
-  supabase-functions:
+supabase-functions:
   image: supabase/edge-runtime:v1.66.5
   container_name: easycard_functions
-  restart: unless-stopped
+  restart: unless-stopped   
   volumes:
     - ./supabase/volumes/functions:/home/deno/functions
   environment:
@@ -234,9 +234,13 @@ services:
     SUPABASE_URL: http://supabase-kong:8000
     SUPABASE_ANON_KEY: ${ANON_KEY}
     SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_KEY}
-  command: [ "start", "--main-service", "/home/deno/functions/main" ]
+  command:
+    - start
+    - --main-service
+    - /home/deno/functions/main
   networks:
     - default
+
 
 
 volumes:
