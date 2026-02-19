@@ -291,3 +291,19 @@ volumes:
 networks:
   default:
     name: easycard_network
+
+backend-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: easycard_django_api
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
