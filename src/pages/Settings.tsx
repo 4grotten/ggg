@@ -93,7 +93,7 @@ const AnimatedMenuSection = ({ children, index }: AnimatedMenuSectionProps) => (
       initial={{ filter: "blur(10px)" }}
       animate={{ filter: "blur(0px)" }}
       transition={{ duration: 0.4, delay: index * 0.08 }}
-      className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50"
+      className="bg-card dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50"
     >
       {children}
     </motion.div>
@@ -796,7 +796,7 @@ const Settings = () => {
               tap();
               setIsContactsDrawerOpen(true);
             }}
-            className="w-full flex items-center justify-between py-4 px-5 bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl font-medium hover:bg-muted transition-colors border border-border/50"
+            className="w-full flex items-center justify-between py-4 px-5 bg-card dark:bg-card/70 backdrop-blur-xl rounded-2xl font-medium hover:bg-muted transition-colors border border-border/50"
           >
             <div className="flex items-center gap-3">
               <ColoredIcon colorKey="contacts"><BookUser className="w-4 h-4" /></ColoredIcon>
