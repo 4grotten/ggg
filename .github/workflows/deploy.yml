@@ -43,6 +43,7 @@ jobs:
             git config --global --add safe.directory /home/deployer/easycard
             git fetch origin
             git reset --hard origin/main
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
             cd docker
             docker compose pull
             docker compose up -d --remove-orphans
