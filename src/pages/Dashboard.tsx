@@ -176,7 +176,7 @@ const Dashboard = () => {
           {/* Balance - only for authenticated users */}
           {isAuthenticated && !balanceLoading && (
             <AnimatedSection delay={0.1} preset="fadeUpScale">
-              <BalanceCard balance={totalBalance} />
+              <BalanceCard balance={totalBalance} cards={cards} />
             </AnimatedSection>
           )}
           {isAuthenticated && balanceLoading && (
