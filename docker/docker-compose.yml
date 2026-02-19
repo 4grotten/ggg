@@ -10,7 +10,7 @@ services:
     - default
 
 
-  # Nginx Reverse Proxy with SSL
+  # Nginx Reverse Proxy with SSL 
   nginx:
     image: nginx:alpine
     container_name: easycard_nginx
