@@ -3,9 +3,7 @@ version: "3.9"
 services:
   # # EasyCard PWA Application
   easycard-app:
-    build:
-      context: ..
-      dockerfile: Dockerfile
+    image: ghcr.io/ahrensov/easycard-app:latest
     container_name: easycard_app
     restart: unless-stopped
     expose:
