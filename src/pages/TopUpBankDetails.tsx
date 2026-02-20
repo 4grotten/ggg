@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Share2, AlertTriangle } from "lucide-react";
+import { Copy, Share2, AlertTriangle, Check } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
@@ -18,6 +18,7 @@ const TopUpBankDetails = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [copied, setCopied] = useState(false);
 
   // Get user ID for the reference field
   const userId = user?.id ? String(user.id) : "—";
@@ -154,12 +155,27 @@ const TopUpBankDetails = () => {
           onClick={() => {
             const allText = bankDetails.map(d => `${d.label}: ${d.value}`).join("\n");
             navigator.clipboard.writeText(allText);
+            setCopied(true);
             toast.success(t("toast.accountDetailsCopied"));
+            setTimeout(() => setCopied(false), 2000);
           }}
-          className="flex-1 bg-muted/80 text-foreground font-semibold py-4 rounded-xl hover:bg-muted transition-all flex items-center justify-center gap-2 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg"
+          className={`flex-1 flex items-center justify-center gap-2 font-semibold py-4 rounded-xl transition-all duration-300 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg ${
+            copied
+              ? "bg-green-500/90 text-white"
+              : "bg-muted/80 text-foreground hover:bg-muted"
+          }`}
         >
-          <Copy className="w-5 h-5" />
-          {t("topUp.copy", "Скопировать")}
+          <div className="relative w-5 h-5">
+            <Copy className={`w-5 h-5 absolute inset-0 transition-all duration-300 ${
+              copied ? "opacity-0 scale-50 rotate-90" : "opacity-100 scale-100 rotate-0"
+            }`} />
+            <Check className={`w-5 h-5 absolute inset-0 transition-all duration-300 ${
+              copied ? "opacity-100 scale-100 rotate-0" : "opacity-0 scale-50 -rotate-90"
+            }`} />
+          </div>
+          <span className="transition-all duration-300">
+            {copied ? t("topUp.copied", "Скопировано") : t("topUp.copy", "Скопировать")}
+          </span>
         </button>
         <button
           onClick={handleShare}
