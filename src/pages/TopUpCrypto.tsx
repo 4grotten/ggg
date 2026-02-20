@@ -29,6 +29,13 @@ const destinations: Destination[] = [
   { id: "bank", type: "bank", name: "Банковский счёт AED", subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
 ];
 
+const networkAddresses: Record<string, string> = {
+  trc20: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc",
+  erc20: "0x4A8b2e1F7cD9E3a6B5f0C2d8E9F1a3B4c5D6e7F8",
+  bep20: "0x7F2c9A3d5E8b1C4f6D0a2B9e7F3c5A8d1E4b6C9D",
+  sol: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgHkv",
+};
+
 const networks = [
   { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20" },
   { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20" },
@@ -52,8 +59,8 @@ const TopUpCrypto = () => {
     window.scrollTo(0, 0);
   }, []);
   
-  // Mock wallet address
-  const walletAddress = "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc";
+  // Wallet address based on selected network
+  const walletAddress = networkAddresses[selectedNetwork.id] || networkAddresses.trc20;
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
