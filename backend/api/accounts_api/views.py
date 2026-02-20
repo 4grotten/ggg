@@ -58,13 +58,11 @@ class RegisterAuthView(APIView):
 
 class SendOtpView(APIView):
     permission_classes = [permissions.AllowAny]
-
     @swagger_auto_schema(
-        operation_summary="2. Отправка OTP кода",
+        operation_summary="2. Отправка OTP кода (Mock)",
         operation_description=(
             "**[Локальный метод - Заглушка]**\n\n"
-            "Генерирует 6-значный код и сохраняет его локально. В официальной документации Apofiz "
-            "отсутствует эндпоинт отправки SMS, поэтому на данный момент код генерируется и выводится в консоль бэкенда."
+            "Генерирует 6-значный код. ДЛЯ ТЕСТИРОВАНИЯ: код возвращается прямо в теле ответа."
         ),
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -82,7 +80,10 @@ class SendOtpView(APIView):
         code = str(random.randint(100000, 999999))
         OTPRecord.objects.create(phone_number=phone_number, code=code)
         print(f"[MOCK OTP] Код для {phone_number}: {code}")
-        return Response({"message": f"Code sent via {otp_type}"}, status=status.HTTP_200_OK)
+        return Response({
+            "message": f"Code sent via {otp_type}",
+            "mock_code": code
+        }, status=status.HTTP_200_OK)
 
 
 class VerifyOtpView(APIView):
