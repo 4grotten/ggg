@@ -131,28 +131,6 @@ const TopUpBankDetails = () => {
             ))}
           </div>
 
-          {/* User ID Card with Warning */}
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 mt-4">
-            <div className="flex items-start gap-3 mb-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-amber-700 dark:text-amber-400">
-                {t("topUp.idWarning")}
-              </p>
-            </div>
-            <div className="flex items-center justify-between gap-3 bg-background/50 rounded-xl p-3">
-              <div className="flex-1">
-                <p className="text-sm text-muted-foreground">{t("topUp.yourId")}</p>
-                <p className="font-bold text-foreground text-lg">{userId}</p>
-              </div>
-              <button
-                onClick={() => handleCopy(userId, t("topUp.yourId"))}
-                className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
-              >
-                <Copy className="w-5 h-5 text-muted-foreground" />
-              </button>
-            </div>
-          </div>
-
           {/* Fee Details Card */}
           <div className="bg-muted rounded-2xl p-5 mt-4 space-y-3">
             {feeDetails.map((detail, index) => (
