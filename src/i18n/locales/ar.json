@@ -654,8 +654,6 @@
     "easyCardToEasyCard": "من Easy Card إلى Easy Card",
     "toBankAccount": "إلى حساب بنكي",
     "bankAccountAed": "حساب بنكي AED",
-    "fromSource": "من",
-    "selectSource": "التحويل من",
     "networkFee": "رسوم الشبكة",
     "transactionsSection": "المعاملات",
     "currencyConversion": "تحويل العملات",
@@ -740,7 +738,10 @@
     "exchangeRate": "سعر الصرف",
     "selectCoin": "اختر العملة",
     "selectNetwork": "اختر الشبكة",
-    "cryptoWarning": "تأكد من أن عنوان المحفظة والشبكة صحيحان. الإرسال إلى عنوان أو شبكة خاطئة قد يؤدي إلى خسارة الأموال بشكل دائم."
+    "cryptoWarning": "تأكد من أن عنوان المحفظة والشبكة صحيحان. الإرسال إلى عنوان أو شبكة خاطئة قد يؤدي إلى خسارة الأموال بشكل دائم.",
+    "fromSource": "من",
+    "selectSource": "التحويل من",
+    "willBeDebited": "سيتم خصم"
   },
   "drawer": {
     "addMoneyWith": "الشحن عبر",

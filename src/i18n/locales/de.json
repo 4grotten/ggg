@@ -654,8 +654,6 @@
     "easyCardToEasyCard": "Easy Card zu Easy Card",
     "toBankAccount": "Auf Bankkonto",
     "bankAccountAed": "Bankkonto AED",
-    "fromSource": "Von",
-    "selectSource": "Überweisen von",
     "networkFee": "Netzwerkgebühr",
     "transactionsSection": "Transaktionen",
     "currencyConversion": "Währungsumrechnung",
@@ -740,7 +738,10 @@
     "exchangeRate": "Wechselkurs",
     "selectCoin": "Coin auswählen",
     "selectNetwork": "Netzwerk auswählen",
-    "cryptoWarning": "Stellen Sie sicher, dass Wallet-Adresse und Netzwerk korrekt sind. Das Senden an eine falsche Adresse oder ein falsches Netzwerk kann zu einem dauerhaften Verlust der Mittel führen."
+    "cryptoWarning": "Stellen Sie sicher, dass Wallet-Adresse und Netzwerk korrekt sind. Das Senden an eine falsche Adresse oder ein falsches Netzwerk kann zu einem dauerhaften Verlust der Mittel führen.",
+    "fromSource": "Von",
+    "selectSource": "Überweisen von",
+    "willBeDebited": "Wird abgebucht"
   },
   "drawer": {
     "addMoneyWith": "Aufladen mit",
