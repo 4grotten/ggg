@@ -4,8 +4,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ApofizClient:
-    BASE_URL = "https://test.apofiz.com/api/v1"
-    
+    BASE_URL = "https://apofiz.com/api/v1"
+
     @classmethod
     def _make_request(cls, method, endpoint, data=None, params=None, token=None):
         url = f"{cls.BASE_URL}{endpoint}"
