@@ -46,7 +46,7 @@ export interface ApiCategory {
 }
 
 // Base API URL
-export const API_BASE_URL = 'https://test.apofiz.com/api/v1';
+export const API_BASE_URL = 'https://apofiz.com/api/v1';
 
 // API Categories and Endpoints
 export const apiCategories: ApiCategory[] = [
