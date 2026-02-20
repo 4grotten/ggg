@@ -1212,6 +1212,365 @@ export const apiCategories: ApiCategory[] = [
         ]
       }
     ]
+  },
+  // ============ TOPUPS (ПОПОЛНЕНИЯ) ============
+  {
+    id: 'topups',
+    title: 'Topups (Пополнения)',
+    titleKey: 'api.categories.topups',
+    icon: '💰',
+    endpoints: [
+      {
+        id: 'bank-topup',
+        method: 'POST',
+        path: '/transactions/topup/bank/',
+        title: 'Bank Wire Topup',
+        description: 'Инициирует заявку на банковское пополнение в статусе pending. Возвращает реквизиты компании для осуществления перевода. Завершение транзакции происходит асинхронно после Webhook от банка.',
+        category: 'topups',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'transfer_rail', type: 'enum', required: true, description: 'Тип банковского перевода', enum: ['UAE_LOCAL_AED', 'SWIFT_INTL'] }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/transactions/topup/bank/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "transfer_rail": "UAE_LOCAL_AED"
+  }'`,
+          json: `{
+  "transfer_rail": "UAE_LOCAL_AED"
+}`
+        },
+        responseExample: {
+          status: 201,
+          json: `{
+  "message": "Topup initiated",
+  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "instructions": {
+    "bank_name": "Emirates NBD",
+    "account_name": "EasyCard FZE",
+    "iban": "AE070331234567890123456",
+    "swift_code": "EABORAEAXXX",
+    "reference": "EC-TXN-123456"
+  }
+}`
+        },
+        responseParams: [
+          { name: 'message', type: 'string', required: true, description: 'Сообщение об успешном создании заявки' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID созданной транзакции пополнения' },
+          { name: 'instructions', type: 'object', required: true, description: 'Банковские реквизиты для перевода (IBAN, SWIFT, наименование банка, reference)' }
+        ],
+        notes: [
+          'UAE_LOCAL_AED — локальный перевод внутри ОАЭ (быстрее, дешевле)',
+          'SWIFT_INTL — международный SWIFT-перевод (для клиентов за пределами ОАЭ)',
+          'Транзакция создаётся в статусе pending до подтверждения банком',
+          'Квитанция содержит: transaction_id, status, дату, тип операции, реквизиты банка, reference'
+        ]
+      },
+      {
+        id: 'crypto-topup',
+        method: 'POST',
+        path: '/transactions/topup/crypto/',
+        title: 'Crypto Topup',
+        description: 'Генерирует уникальный криптографический адрес для пополнения баланса карты в выбранной сети и токене. На текущем этапе адрес эмулируется.',
+        category: 'topups',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'card_id', type: 'uuid', required: true, description: 'ID карты, на которую зачислятся средства после конвертации' },
+          { name: 'token', type: 'enum', required: true, description: 'Стейблкоин для пополнения', enum: ['USDT', 'USDC'] },
+          { name: 'network', type: 'enum', required: true, description: 'Блокчейн-сеть для получения средств', enum: ['TRC20', 'ERC20', 'BEP20', 'SOL'] }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/transactions/topup/crypto/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "card_id": "550e8400-e29b-41d4-a716-446655440000",
+    "token": "USDT",
+    "network": "TRC20"
+  }'`,
+          json: `{
+  "card_id": "550e8400-e29b-41d4-a716-446655440000",
+  "token": "USDT",
+  "network": "TRC20"
+}`
+        },
+        responseExample: {
+          status: 201,
+          json: `{
+  "message": "Crypto address generated",
+  "deposit_address": "TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R",
+  "qr_payload": "tron:TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R?amount=0&token=USDT"
+}`
+        },
+        responseParams: [
+          { name: 'message', type: 'string', required: true, description: 'Сообщение об успешной генерации адреса' },
+          { name: 'deposit_address', type: 'string', required: true, description: 'Сгенерированный крипто-адрес для депозита' },
+          { name: 'qr_payload', type: 'string', required: true, description: 'Строка для генерации QR-кода на фронтенде' }
+        ],
+        notes: [
+          'Адрес уникален для каждого запроса',
+          'Поддерживаемые токены: USDT, USDC',
+          'Поддерживаемые сети: TRC20 (Tron), ERC20 (Ethereum), BEP20 (BSC), SOL (Solana)',
+          'Квитанция содержит: transaction_id, status, дату, токен, сеть, deposit_address, сумму зачисления'
+        ]
+      }
+    ]
+  },
+  // ============ TRANSFERS (ПЕРЕВОДЫ) ============
+  {
+    id: 'transfers',
+    title: 'Transfers (Переводы)',
+    titleKey: 'api.categories.transfers',
+    icon: '🔄',
+    endpoints: [
+      {
+        id: 'card-transfer',
+        method: 'POST',
+        path: '/transactions/transfer/card/',
+        title: 'Card to Card Transfer',
+        description: 'Моментальный перевод средств между расчётными счетами внутри закрытого контура платформы. Применяется строгая транзакционная блокировка (select_for_update) для исключения race condition.',
+        category: 'transfers',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'sender_card_id', type: 'uuid', required: true, description: 'ID карты отправителя (ваша карта)' },
+          { name: 'receiver_card_number', type: 'string', required: true, description: '16-значный номер карты получателя' },
+          { name: 'amount', type: 'decimal', required: true, description: 'Сумма перевода в AED (минимум 1.00)' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/transactions/transfer/card/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "sender_card_id": "550e8400-e29b-41d4-a716-446655440000",
+    "receiver_card_number": "4111111111111234",
+    "amount": 100.00
+  }'`,
+          json: `{
+  "sender_card_id": "550e8400-e29b-41d4-a716-446655440000",
+  "receiver_card_number": "4111111111111234",
+  "amount": 100.00
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Transfer successful",
+  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "amount": "100.00"
+}`
+        },
+        responseParams: [
+          { name: 'message', type: 'string', required: true, description: 'Сообщение об успешном переводе' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID выполненной транзакции' },
+          { name: 'amount', type: 'decimal', required: true, description: 'Фактически переведённая сумма в AED' }
+        ],
+        notes: [
+          'Перевод моментальный, средства зачисляются мгновенно',
+          'Комиссия: 1% от суммы перевода',
+          'Минимальная сумма: 1.00 AED',
+          'Квитанция содержит: transaction_id, status, дату, сумму, комиссию, маску карты отправителя (**** 1234), маску карты получателя (**** 5678), имя получателя'
+        ]
+      }
+    ]
+  },
+  // ============ WITHDRAWALS (ВЫВОДЫ) ============
+  {
+    id: 'withdrawals',
+    title: 'Withdrawals (Выводы)',
+    titleKey: 'api.categories.withdrawals',
+    icon: '📤',
+    endpoints: [
+      {
+        id: 'crypto-withdrawal',
+        method: 'POST',
+        path: '/transactions/withdrawal/crypto/',
+        title: 'Crypto Withdrawal',
+        description: 'Регистрирует дебетовую операцию по фиатному счёту (AED) и инициирует заявку на отправку эквивалента в цифровых активах на внешний кошелёк. Передача в блокчейн делегируется асинхронным процессам.',
+        category: 'withdrawals',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_card_id', type: 'uuid', required: true, description: 'ID карты, с которой спишутся AED' },
+          { name: 'token', type: 'enum', required: true, description: 'Токен для вывода', enum: ['USDT', 'USDC'] },
+          { name: 'network', type: 'enum', required: true, description: 'Сеть получателя', enum: ['TRC20', 'ERC20', 'BEP20', 'SOL'] },
+          { name: 'to_address', type: 'string', required: true, description: 'Крипто-адрес получателя' },
+          { name: 'amount_crypto', type: 'decimal', required: true, description: 'Сумма к получению в крипте (минимум 1.00)' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/transactions/withdrawal/crypto/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_card_id": "550e8400-e29b-41d4-a716-446655440000",
+    "token": "USDT",
+    "network": "TRC20",
+    "to_address": "TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R",
+    "amount_crypto": 50.00
+  }'`,
+          json: `{
+  "from_card_id": "550e8400-e29b-41d4-a716-446655440000",
+  "token": "USDT",
+  "network": "TRC20",
+  "to_address": "TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R",
+  "amount_crypto": 50.00
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Withdrawal processing",
+  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "total_debit_crypto": "50.500000"
+}`
+        },
+        responseParams: [
+          { name: 'message', type: 'string', required: true, description: 'Статус обработки вывода' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции списания' },
+          { name: 'total_debit_crypto', type: 'decimal', required: true, description: 'Общая сумма списания в крипте (включая network fee)' }
+        ],
+        notes: [
+          'Комиссия сети (network fee) включена в total_debit_crypto',
+          'Комиссия платформы: 1% от суммы',
+          'Фактическая отправка в блокчейн происходит асинхронно',
+          'Квитанция содержит: transaction_id, status, дату, токен, сеть, адрес получателя, сумму отправки, network fee, общее списание, курс конвертации AED → крипто'
+        ]
+      },
+      {
+        id: 'bank-withdrawal',
+        method: 'POST',
+        path: '/transactions/withdrawal/bank/',
+        title: 'Bank Wire Withdrawal',
+        description: 'Формирует поручение на банковский перевод (SWIFT или локальный клиринг) с удержанием средств с баланса карты. Маршрутизация платёжных поручений находится в стадии интеграции.',
+        category: 'withdrawals',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_card_id', type: 'uuid', required: true, description: 'ID карты для списания средств' },
+          { name: 'iban', type: 'string', required: true, description: 'IBAN номер счёта в ОАЭ (начинается с AE, 23 символа)' },
+          { name: 'beneficiary_name', type: 'string', required: true, description: 'Полное имя получателя' },
+          { name: 'bank_name', type: 'string', required: true, description: 'Название банка получателя' },
+          { name: 'amount_aed', type: 'decimal', required: true, description: 'Сумма перевода в AED (минимум 1.00)' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/transactions/withdrawal/bank/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_card_id": "550e8400-e29b-41d4-a716-446655440000",
+    "iban": "AE070331234567890123456",
+    "beneficiary_name": "John Doe",
+    "bank_name": "Emirates NBD",
+    "amount_aed": 500.00
+  }'`,
+          json: `{
+  "from_card_id": "550e8400-e29b-41d4-a716-446655440000",
+  "iban": "AE070331234567890123456",
+  "beneficiary_name": "John Doe",
+  "bank_name": "Emirates NBD",
+  "amount_aed": 500.00
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Bank wire processing",
+  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "fee_amount": "10.00",
+  "total_debit_aed": "510.00"
+}`
+        },
+        responseParams: [
+          { name: 'message', type: 'string', required: true, description: 'Статус обработки перевода' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции' },
+          { name: 'fee_amount', type: 'decimal', required: true, description: 'Комиссия за перевод (2%)' },
+          { name: 'total_debit_aed', type: 'decimal', required: true, description: 'Общая сумма списания (сумма + комиссия)' }
+        ],
+        notes: [
+          'IBAN должен начинаться с AE и содержать 23 символа',
+          'Комиссия: 2% от суммы перевода',
+          'Обработка занимает 1–3 рабочих дня',
+          'Квитанция содержит: transaction_id, status, дату, сумму перевода, комиссию (2%), общее списание, IBAN получателя, имя получателя, название банка, reference'
+        ]
+      }
+    ]
+  },
+  // ============ RECEIPTS (КВИТАНЦИИ) ============
+  {
+    id: 'receipts',
+    title: 'Receipts (Квитанции)',
+    titleKey: 'api.categories.receipts',
+    icon: '🧾',
+    endpoints: [
+      {
+        id: 'transaction-receipt',
+        method: 'GET',
+        path: '/transactions/{transaction_id}/receipt/',
+        title: 'Get Transaction Receipt',
+        description: 'Возвращает структурированный отчёт (квитанцию) по конкретной транзакции. Формат ответа адаптируется под тип операции. Проверяет права доступа пользователя.',
+        category: 'receipts',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции для получения квитанции' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${API_BASE_URL}/transactions/123e4567-e89b-12d3-a456-426614174000/receipt/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "completed",
+  "date_time": "2026-02-20T12:00:00Z",
+  "operation": "Internal Card Transfer",
+  "amount": "100.00",
+  "fee": "1.00",
+  "sender_card_mask": "**** 1234",
+  "receiver_card_mask": "**** 5678",
+  "recipient_name": "EasyCard User"
+}`
+        },
+        responseParams: [
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции' },
+          { name: 'status', type: 'string', required: true, description: 'Статус: pending, processing, completed, failed, cancelled' },
+          { name: 'date_time', type: 'string', required: true, description: 'Дата и время операции (ISO 8601)' },
+          { name: 'operation', type: 'string', required: true, description: 'Тип операции (человекочитаемый)' },
+          { name: 'amount', type: 'decimal', required: true, description: 'Сумма операции' },
+          { name: 'fee', type: 'decimal', required: false, description: 'Комиссия (если применимо)' }
+        ],
+        notes: [
+          '**Bank Topup** — квитанция содержит: transaction_id, status, date_time, operation ("Bank Wire Topup"), transfer_rail (UAE_LOCAL_AED / SWIFT_INTL), bank_instructions (IBAN, SWIFT, bank_name, account_name, reference)',
+          '**Crypto Topup** — квитанция содержит: transaction_id, status, date_time, operation ("Crypto Topup"), token (USDT/USDC), network (TRC20/ERC20/BEP20/SOL), deposit_address, qr_payload, amount_received',
+          '**Card Transfer** — квитанция содержит: transaction_id, status, date_time, operation ("Internal Card Transfer"), amount, fee (1%), sender_card_mask (**** XXXX), receiver_card_mask (**** XXXX), recipient_name',
+          '**Crypto Withdrawal** — квитанция содержит: transaction_id, status, date_time, operation ("Crypto Withdrawal"), token, network, to_address, amount_crypto, network_fee, total_debit_crypto, exchange_rate_aed',
+          '**Bank Withdrawal** — квитанция содержит: transaction_id, status, date_time, operation ("Bank Wire Withdrawal"), amount_aed, fee_amount (2%), total_debit_aed, iban, beneficiary_name, bank_name, reference'
+        ]
+      }
+    ]
   }
 ];
 
