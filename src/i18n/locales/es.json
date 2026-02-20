@@ -1123,7 +1123,11 @@
       "profile": "Perfil",
       "files": "Carga de Archivos",
       "social": "Redes Sociales",
-      "devices": "Dispositivos y Sesiones"
+      "devices": "Dispositivos y Sesiones",
+      "topups": "Recargas",
+      "transfers": "Transferencias",
+      "withdrawals": "Retiros",
+      "receipts": "Recibos"
     },
     "notes": {
       "title": "Notas"

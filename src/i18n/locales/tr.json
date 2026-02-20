@@ -1123,7 +1123,11 @@
       "profile": "Profil",
       "files": "Dosya Yüklemeleri",
       "social": "Sosyal Ağlar",
-      "devices": "Cihazlar ve Oturumlar"
+      "devices": "Cihazlar ve Oturumlar",
+      "topups": "Yüklemeler",
+      "transfers": "Transferler",
+      "withdrawals": "Çekimler",
+      "receipts": "Makbuzlar"
     },
     "notes": {
       "title": "Notlar"

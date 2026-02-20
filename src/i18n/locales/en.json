@@ -1182,7 +1182,11 @@
       "profile": "Profile",
       "files": "File Uploads",
       "social": "Social Networks",
-      "devices": "Devices & Sessions"
+      "devices": "Devices & Sessions",
+      "topups": "Topups",
+      "transfers": "Transfers",
+      "withdrawals": "Withdrawals",
+      "receipts": "Receipts"
     },
     "notes": {
       "title": "Notes"
