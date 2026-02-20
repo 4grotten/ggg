@@ -64,7 +64,6 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     if (optionId === "usdt-balance") {
       navigate("/top-up/usdt-balance");
     } else if (optionId === "stablecoins") {
-    } else if (optionId === "stablecoins") {
       navigate("/top-up/crypto");
     } else if (optionId === "bank") {
       navigate("/top-up/bank");
