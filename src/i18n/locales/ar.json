@@ -745,7 +745,9 @@
     "sendMoneyWith": "الإرسال عبر",
     "stablecoins": "العملات المستقرة",
     "bankTransfer": "تحويل بنكي",
-    "sendToCard": "إرسال إلى بطاقة"
+    "sendToCard": "إرسال إلى بطاقة",
+    "usdtBalance": "محفظة USDT TRC20",
+    "usdtBalanceDesc": "من رصيدك"
   },
   "auth": {
     "resetPassword": {

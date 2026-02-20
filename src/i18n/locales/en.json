@@ -831,7 +831,9 @@
     "sendMoneyWith": "Send Money with",
     "stablecoins": "Stablecoins",
     "bankTransfer": "Bank Transfer",
-    "sendToCard": "Send to card"
+    "sendToCard": "Send to card",
+    "usdtBalance": "USDT TRC20 Wallet",
+    "usdtBalanceDesc": "From your balance"
   },
   "auth": {
     "resetPassword": {

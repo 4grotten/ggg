@@ -817,7 +817,9 @@
     "sendMoneyWith": "Отправить через",
     "stablecoins": "Стейблкоины",
     "bankTransfer": "Банковский перевод",
-    "sendToCard": "Перевод на карту"
+    "sendToCard": "Перевод на карту",
+    "usdtBalance": "USDT TRC20 Кошелек",
+    "usdtBalanceDesc": "С вашего баланса"
   },
   "auth": {
     "resetPassword": {
