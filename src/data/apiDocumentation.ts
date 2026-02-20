@@ -1590,11 +1590,16 @@ export const apiCategories: ApiCategory[] = [
         ],
         notes: [
           'user_id присутствует во ВСЕХ квитанциях — определяет владельца транзакции',
-          '**Bank Topup** — квитанция: transaction_id, user_id, status, date_time, operation ("Bank Wire Topup"), transfer_rail, bank_instructions (IBAN, SWIFT, bank_name, account_name, reference с user_id)',
-          '**Crypto Topup** — квитанция: transaction_id, user_id, status, date_time, operation ("Crypto Topup"), token, network, deposit_address, qr_payload, amount_received',
-          '**Card Transfer** — квитанция: transaction_id, user_id, sender_user_id, receiver_user_id, status, date_time, operation ("Internal Card Transfer"), amount, fee (1%), sender_card_mask, receiver_card_mask, recipient_name',
-          '**Crypto Withdrawal** — квитанция: transaction_id, user_id, status, date_time, operation ("Crypto Withdrawal"), token, network, to_address, amount_crypto, network_fee, total_debit_crypto, exchange_rate_aed',
-          '**Bank Withdrawal** — квитанция: transaction_id, user_id, status, date_time, operation ("Bank Wire Withdrawal"), amount_aed, fee_amount (2%), total_debit_aed, iban, beneficiary_name, bank_name, reference'
+          '**Bank Topup** (top_up) — квитанция: transaction_id, user_id, status, date_time, operation ("Bank Wire Topup"), transfer_rail, bank_instructions (IBAN, SWIFT, bank_name, account_name, reference с user_id)',
+          '**Crypto Topup** (top_up) — квитанция: transaction_id, user_id, status, date_time, operation ("Crypto Topup"), token, network, deposit_address, qr_payload, amount_received, exchange_rate, fee_amount',
+          '**Card Transfer** (transfer_out / transfer_in) — квитанция: transaction_id, user_id, sender_user_id, receiver_user_id, status, date_time, operation ("Internal Card Transfer"), amount, fee, sender_card_mask, receiver_card_mask, recipient_name',
+          '**Crypto Withdrawal** (withdrawal) — квитанция: transaction_id, user_id, status, date_time, operation ("Crypto Withdrawal"), token, network, to_address_mask, amount_crypto, fee, tx_hash',
+          '**Bank Withdrawal** (withdrawal) — квитанция: transaction_id, user_id, status, date_time, operation ("Bank Wire Withdrawal"), amount_aed, fee_amount (2%), total_debit, iban_mask, beneficiary_name, bank_name, from_card_mask',
+          '**Card Activation** (card_activation) — квитанция: transaction_id, user_id, status, date_time, operation ("Card Activation"), card_type (virtual/metal), card_mask (**** XXXX), annual_fee (183 AED), activated_at',
+          '**Card Payment** (card_payment) — квитанция: transaction_id, user_id, status, date_time, operation ("Card Payment"), merchant_name, merchant_category, amount, currency, card_mask, exchange_rate (если конвертация), original_amount, original_currency',
+          '**Fee** (fee) — квитанция: transaction_id, user_id, status, date_time, operation ("Service Fee"), fee_type (annual_fee / replacement_fee / account_opening_fee), amount, card_id, description',
+          '**Refund** (refund) — квитанция: transaction_id, user_id, status, date_time, operation ("Refund"), original_transaction_id, amount, merchant_name, card_mask, refund_reason',
+          '**Cashback** (cashback) — квитанция: transaction_id, user_id, status, date_time, operation ("Cashback"), original_transaction_id, cashback_amount, cashback_percent, merchant_name, credited_card_mask'
         ]
       }
     ]
