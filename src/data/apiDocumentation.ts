@@ -1251,25 +1251,29 @@ export const apiCategories: ApiCategory[] = [
           json: `{
   "message": "Topup initiated",
   "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": 12345,
   "instructions": {
     "bank_name": "Emirates NBD",
     "account_name": "EasyCard FZE",
     "iban": "AE070331234567890123456",
     "swift_code": "EABORAEAXXX",
-    "reference": "EC-TXN-123456"
+    "reference": "EC-12345-TXN-123456"
   }
 }`
         },
         responseParams: [
           { name: 'message', type: 'string', required: true, description: 'Сообщение об успешном создании заявки' },
           { name: 'transaction_id', type: 'uuid', required: true, description: 'ID созданной транзакции пополнения' },
-          { name: 'instructions', type: 'object', required: true, description: 'Банковские реквизиты для перевода (IBAN, SWIFT, наименование банка, reference)' }
+          { name: 'user_id', type: 'number', required: true, description: 'Числовой ID пользователя — обязательно указывается в назначении банковского перевода' },
+          { name: 'instructions', type: 'object', required: true, description: 'Банковские реквизиты для перевода (IBAN, SWIFT, наименование банка, reference с user_id)' }
         ],
         notes: [
+          'user_id извлекается из токена авторизации и привязывает транзакцию к конкретному пользователю',
+          '⚠️ ОБЯЗАТЕЛЬНО укажите user_id в назначении платежа (reference) при банковском переводе — без этого средства не будут идентифицированы',
           'UAE_LOCAL_AED — локальный перевод внутри ОАЭ (быстрее, дешевле)',
           'SWIFT_INTL — международный SWIFT-перевод (для клиентов за пределами ОАЭ)',
           'Транзакция создаётся в статусе pending до подтверждения банком',
-          'Квитанция содержит: transaction_id, status, дату, тип операции, реквизиты банка, reference'
+          'Квитанция содержит: transaction_id, user_id, status, дату, тип операции, реквизиты банка, reference'
         ]
       },
       {
