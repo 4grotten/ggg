@@ -14,7 +14,7 @@ class ApofizTokenAuthentication(TokenAuthentication):
             token = Token.objects.select_related('user').get(key=key)
             return (token.user, token)
         except Token.DoesNotExist:
-            apofiz_profile_url = "https://test.apofiz.com/api/v1/users/me/" 
+            apofiz_profile_url = "https://apofiz.com/api/v1/users/me/" 
             headers = {"Authorization": f"Token {key}"}
             try:
                 response = requests.get(apofiz_profile_url, headers=headers, timeout=5)
