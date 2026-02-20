@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -352,7 +353,7 @@ const SendToCard = () => {
           <span className="text-sm">{t('send.back')}</span>
         </button>
       }
-      rightAction={<LanguageSwitcher />}
+      rightAction={<div className="flex items-center gap-2"><ThemeSwitcher /><LanguageSwitcher /></div>}
     >
       <div className="px-4 py-6 pb-32 space-y-6">
         {/* Header */}
