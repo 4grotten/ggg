@@ -26,10 +26,10 @@ interface Destination {
 }
 
 const getDestinations = (bankLabel: string, walletLabel: string, walletAddress: string): Destination[] => [
-  { id: "wallet", type: "wallet", name: walletLabel, subtitle: `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`, fullNumber: walletAddress },
   { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
   { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
   { id: "bank", type: "bank", name: bankLabel, subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
+  { id: "wallet", type: "wallet", name: walletLabel, subtitle: `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`, fullNumber: walletAddress },
 ];
 
 const networkAddresses: Record<string, string> = {
