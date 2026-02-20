@@ -18,6 +18,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
+import { useCards } from "@/hooks/useCards";
 
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
@@ -89,13 +90,17 @@ const VirtualCard = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Fetch real balance from API
+  const { data: cardsData } = useCards({ type: 'virtual' });
+  const apiCard = cardsData?.data?.[0];
+
   const cardData = {
     holderName: "RINAT KAMIEV",
-    lastFour: "7617",
+    lastFour: apiCard?.lastFourDigits || "7617",
     fullNumber: "4532 8901 2345 7617",
     expiry: "12/28",
     cvv: "123",
-    balance: 213757.49,
+    balance: apiCard?.balance ?? 0,
   };
 
   const requiresAuth = isHideDataEnabled && isScreenLockEnabled;

@@ -18,6 +18,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useCards } from "@/hooks/useCards";
 
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
@@ -95,13 +96,17 @@ const MetalCard = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Fetch real balance from API
+  const { data: cardsData } = useCards({ type: 'metal' });
+  const apiCard = cardsData?.data?.[0];
+
   const cardData = {
     holderName: "RINAT KAMIEV",
-    lastFour: "4521",
+    lastFour: apiCard?.lastFourDigits || "4521",
     fullNumber: "4532 8901 2345 4521",
     expiry: "12/29",
     cvv: "456",
-    balance: 256508.98,
+    balance: apiCard?.balance ?? 0,
   };
 
   const requiresAuth = isHideDataEnabled && isScreenLockEnabled;

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { AddToWalletDrawer } from "@/components/card/AddToWalletDrawer";
+import { useCards } from "@/hooks/useCards";
 import { detectPlatform } from "@/lib/walletDeepLinks";
 import {
   Collapsible,
@@ -157,6 +158,10 @@ const CardPage = () => {
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [walletDrawerOpen, setWalletDrawerOpen] = useState(false);
 
+  // Fetch real balances from API
+  const { data: allCardsData } = useCards();
+  const apiCards = allCardsData?.data || [];
+
   const handleUnlock = () => {
     setIsUnlocking(true);
     setTimeout(() => {
@@ -166,7 +171,13 @@ const CardPage = () => {
   };
 
   const currentCardType = cardTypes[activeIndex];
-  const cardData = cardsData[currentCardType];
+  const cardData = {
+    ...cardsData[currentCardType],
+    balance: (() => {
+      const apiCard = apiCards.find(c => c.type === currentCardType);
+      return apiCard?.balance ?? cardsData[currentCardType].balance;
+    })(),
+  };
 
   // Update URL when card changes
   useEffect(() => {
