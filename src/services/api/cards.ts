@@ -7,7 +7,31 @@ import {
   CardBalanceResponse,
   FetchCardsParams 
 } from '@/types/card';
-import { apiGet } from './apiClient';
+import { apiGet, getAuthToken } from './apiClient';
+
+const CARDS_API_BASE = 'https://ueasycard.com/api/v1';
+
+/**
+ * Cards-specific API GET request (uses ueasycard.com backend)
+ */
+async function cardsApiGet<T>(endpoint: string): Promise<{ data: T | null; error: { message: string } | null }> {
+  const url = `${CARDS_API_BASE}${endpoint}`;
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  const token = getAuthToken();
+  if (token) {
+    headers['Authorization'] = `Token ${token}`;
+  }
+  try {
+    const response = await fetch(url, { method: 'GET', headers });
+    if (!response.ok) {
+      return { data: null, error: { message: `HTTP Error: ${response.status}` } };
+    }
+    const data = await response.json();
+    return { data: data as T, error: null };
+  } catch (err) {
+    return { data: null, error: { message: err instanceof Error ? err.message : 'Network error' } };
+  }
+}
 
 // Response type from GET /cards/balances/
 interface BalancesApiResponse {
@@ -26,7 +50,7 @@ interface BalancesApiResponse {
  * Fetch all cards and balances from GET /cards/balances/
  */
 const fetchBalancesFromApi = async (): Promise<BalancesApiResponse | null> => {
-  const response = await apiGet<BalancesApiResponse>('/cards/balances/');
+  const response = await cardsApiGet<BalancesApiResponse>('/cards/balances/');
   if (response.error || !response.data) {
     console.error('Error fetching balances:', response.error);
     return null;
