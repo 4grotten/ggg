@@ -25,10 +25,10 @@ interface Destination {
   fullNumber: string;
 }
 
-const destinations: Destination[] = [
+const getDestinations = (bankLabel: string): Destination[] => [
   { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
   { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
-  { id: "bank", type: "bank", name: "Банковский счёт AED", subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
+  { id: "bank", type: "bank", name: bankLabel, subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
 ];
 
 const networkAddresses: Record<string, string> = {
@@ -48,9 +48,10 @@ const networks = [
 const TopUpCrypto = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const destinations = getDestinations(t("topUp.bankAccountAed", "Bank Account AED"));
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedDest, setSelectedDest] = useState<Destination>(destinations[0]);
+  const [selectedDest, setSelectedDest] = useState<Destination>(() => getDestinations(t("topUp.bankAccountAed", "Bank Account AED"))[0]);
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
   const [destDrawerOpen, setDestDrawerOpen] = useState(false);
   const [revealedId, setRevealedId] = useState<string | null>(null);

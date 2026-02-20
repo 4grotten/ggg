@@ -741,6 +741,7 @@
     "send": "Send",
     "easyCardToEasyCard": "Easy Card to Easy Card",
     "toBankAccount": "To Bank Account",
+    "bankAccountAed": "Bank Account AED",
     "networkFee": "Network fee",
     "transactionsSection": "Transactions",
     "currencyConversion": "Currency Conversion",

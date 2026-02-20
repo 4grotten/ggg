@@ -727,6 +727,7 @@
     "send": "Отправка",
     "easyCardToEasyCard": "Easy Card на Easy Card",
     "toBankAccount": "На банковский счёт",
+    "bankAccountAed": "Банковский счёт AED",
     "networkFee": "Сетевая комиссия",
     "transactionsSection": "Транзакции",
     "currencyConversion": "Конвертация валют",
