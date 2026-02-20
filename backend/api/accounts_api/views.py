@@ -111,6 +111,8 @@ class ResendCodeView(APIView):
 
 
 class LoginView(APIView):
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(
         operation_summary="Вход по паролю (Apofiz + EasyCard SSO)",
