@@ -835,6 +835,33 @@
     "usdtBalance": "USDT TRC20 Wallet",
     "usdtBalanceDesc": "From your balance"
   },
+  "topUpUsdt": {
+    "title": "Top Up from USDT",
+    "availableBalance": "Available balance",
+    "selectDestination": "Transfer to",
+    "toCard": "To card",
+    "toCardDesc": "Top up card balance",
+    "toAccount": "To account",
+    "toAccountDesc": "Credit to main account",
+    "selectCard": "Select card",
+    "noCards": "No active cards",
+    "accountDetails": "Account details",
+    "beneficiary": "Beneficiary",
+    "accountNumber": "Account number",
+    "bank": "Bank",
+    "currency": "Currency",
+    "enterAmount": "Transfer amount (USDT)",
+    "calculation": "Calculation",
+    "transferAmount": "Transfer amount",
+    "exchangeRate": "Exchange rate",
+    "networkFee": "Network fee",
+    "totalDeducted": "Total deducted",
+    "destinationCard": "Destination card",
+    "youReceive": "You receive",
+    "insufficientBalance": "Insufficient USDT balance",
+    "confirm": "Confirm transfer",
+    "transferInitiated": "Transfer initiated"
+  },
   "auth": {
     "resetPassword": {
       "title": "Forgot password?",

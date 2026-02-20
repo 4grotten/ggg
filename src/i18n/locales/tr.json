@@ -749,6 +749,33 @@
     "usdtBalance": "USDT TRC20 Cüzdan",
     "usdtBalanceDesc": "Bakiyenizden"
   },
+  "topUpUsdt": {
+    "title": "USDT'den Yükle",
+    "availableBalance": "Kullanılabilir bakiye",
+    "selectDestination": "Transfer yeri",
+    "toCard": "Karta",
+    "toCardDesc": "Kart bakiyesini yükle",
+    "toAccount": "Hesaba",
+    "toAccountDesc": "Ana hesaba aktar",
+    "selectCard": "Kart seçin",
+    "noCards": "Aktif kart yok",
+    "accountDetails": "Hesap bilgileri",
+    "beneficiary": "Alıcı",
+    "accountNumber": "Hesap numarası",
+    "bank": "Banka",
+    "currency": "Para birimi",
+    "enterAmount": "Transfer tutarı (USDT)",
+    "calculation": "Hesaplama",
+    "transferAmount": "Transfer tutarı",
+    "exchangeRate": "Döviz kuru",
+    "networkFee": "Ağ ücreti",
+    "totalDeducted": "Toplam düşülen",
+    "destinationCard": "Hedef kart",
+    "youReceive": "Alacağınız",
+    "insufficientBalance": "Yetersiz USDT bakiyesi",
+    "confirm": "Transferi onayla",
+    "transferInitiated": "Transfer başlatıldı"
+  },
   "auth": {
     "resetPassword": {
       "title": "Şifrenizi mi unuttunuz?",

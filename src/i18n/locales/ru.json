@@ -821,6 +821,33 @@
     "usdtBalance": "USDT TRC20 Кошелек",
     "usdtBalanceDesc": "С вашего баланса"
   },
+  "topUpUsdt": {
+    "title": "Пополнение с USDT",
+    "availableBalance": "Доступный баланс",
+    "selectDestination": "Куда перевести",
+    "toCard": "На карту",
+    "toCardDesc": "Пополнить баланс карты",
+    "toAccount": "На счёт",
+    "toAccountDesc": "Зачислить на основной счёт",
+    "selectCard": "Выберите карту",
+    "noCards": "Нет активных карт",
+    "accountDetails": "Реквизиты счёта",
+    "beneficiary": "Получатель",
+    "accountNumber": "Номер счёта",
+    "bank": "Банк",
+    "currency": "Валюта",
+    "enterAmount": "Сумма перевода (USDT)",
+    "calculation": "Калькуляция",
+    "transferAmount": "Сумма перевода",
+    "exchangeRate": "Курс обмена",
+    "networkFee": "Сбор сети",
+    "totalDeducted": "Итого списано",
+    "destinationCard": "Карта зачисления",
+    "youReceive": "Вы получите",
+    "insufficientBalance": "Недостаточно средств на USDT балансе",
+    "confirm": "Подтвердить перевод",
+    "transferInitiated": "Перевод инициирован"
+  },
   "auth": {
     "resetPassword": {
       "title": "Забыли пароль?",
