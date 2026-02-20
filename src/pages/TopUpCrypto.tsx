@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X } from "lucide-react";
+import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
@@ -14,25 +14,21 @@ import {
 } from "@/components/ui/drawer";
 import { TOP_UP_CRYPTO_FEE, TOP_UP_CRYPTO_MIN_AMOUNT } from "@/lib/fees";
 
-interface Card {
+interface Destination {
   id: string;
-  type: "virtual" | "metal";
+  type: "card" | "bank";
+  cardType?: "virtual" | "metal";
   name: string;
-  lastFour: string;
+  subtitle: string;
 }
 
-interface Network {
-  id: string;
-  name: string;
-  shortName: string;
-}
-
-const cards: Card[] = [
-  { id: "1", type: "virtual", name: "Visa Virtual", lastFour: "4532" },
-  { id: "2", type: "metal", name: "Visa Metal", lastFour: "8901" },
+const destinations: Destination[] = [
+  { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532" },
+  { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901" },
+  { id: "bank", type: "bank", name: "Банковский счёт", subtitle: "AED Account" },
 ];
 
-const networks: Network[] = [
+const networks = [
   { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20" },
   { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20" },
   { id: "bep20", name: "BNB Chain (BEP20)", shortName: "BEP20" },
@@ -44,9 +40,9 @@ const TopUpCrypto = () => {
   const { t } = useTranslation();
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<Card>(cards[0]);
-  const [selectedNetwork, setSelectedNetwork] = useState<Network>(networks[0]);
-  const [cardDrawerOpen, setCardDrawerOpen] = useState(false);
+  const [selectedDest, setSelectedDest] = useState<Destination>(destinations[0]);
+  const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
+  const [destDrawerOpen, setDestDrawerOpen] = useState(false);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
   
   // Scroll to top on mount
@@ -142,21 +138,26 @@ const TopUpCrypto = () => {
 
         {/* Info Cards */}
         <div className="px-6 space-y-3 flex-1">
-          {/* Select Card */}
+          {/* Select Destination */}
           <button 
-            onClick={() => setCardDrawerOpen(true)}
+            onClick={() => setDestDrawerOpen(true)}
             className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between"
           >
             <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
             <div className="flex items-center gap-2">
               <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                selectedCard.type === "metal" 
-                  ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                  : "bg-primary"
+                selectedDest.type === "bank"
+                  ? "bg-purple-500"
+                  : selectedDest.cardType === "metal" 
+                    ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                    : "bg-primary"
               }`}>
-                <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
+                {selectedDest.type === "bank" 
+                  ? <Landmark className="w-3.5 h-3.5 text-primary-foreground" />
+                  : <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
+                }
               </div>
-              <span className="font-semibold text-foreground">{selectedCard.name}</span>
+              <span className="font-semibold text-foreground">{selectedDest.name}</span>
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </div>
           </button>
@@ -244,12 +245,12 @@ const TopUpCrypto = () => {
         </button>
       </div>
 
-      {/* Card Selection Drawer */}
-      <Drawer open={cardDrawerOpen} onOpenChange={setCardDrawerOpen}>
+      {/* Destination Selection Drawer */}
+      <Drawer open={destDrawerOpen} onOpenChange={setDestDrawerOpen}>
         <DrawerContent className="bg-background/95 backdrop-blur-xl">
           <DrawerHeader className="relative flex items-center justify-center py-4">
             <DrawerTitle className="text-center text-base font-semibold">
-              {t("topUp.selectCard")}
+              {t("topUp.topUpTo")}
             </DrawerTitle>
             <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
               <X className="w-3.5 h-3.5 text-primary" />
@@ -258,29 +259,34 @@ const TopUpCrypto = () => {
           
           <div className="px-4 pb-6">
             <div className="bg-muted/50 rounded-xl overflow-hidden">
-              {cards.map((card, index) => (
+              {destinations.map((dest, index) => (
                 <button
-                  key={card.id}
+                  key={dest.id}
                   onClick={() => {
-                    setSelectedCard(card);
-                    setCardDrawerOpen(false);
+                    setSelectedDest(dest);
+                    setDestDrawerOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
-                    index < cards.length - 1 ? 'border-b border-border/50' : ''
+                    index < destinations.length - 1 ? 'border-b border-border/50' : ''
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    card.type === "metal" 
-                      ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                      : "bg-primary"
+                    dest.type === "bank"
+                      ? "bg-purple-500"
+                      : dest.cardType === "metal" 
+                        ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                        : "bg-primary"
                   }`}>
-                    <CreditCard className="w-5 h-5 text-primary-foreground" />
+                    {dest.type === "bank" 
+                      ? <Landmark className="w-5 h-5 text-primary-foreground" />
+                      : <CreditCard className="w-5 h-5 text-primary-foreground" />
+                    }
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="text-base font-medium text-foreground">{card.name}</p>
-                    <p className="text-sm text-muted-foreground">•••• {card.lastFour}</p>
+                    <p className="text-base font-medium text-foreground">{dest.name}</p>
+                    <p className="text-sm text-muted-foreground">{dest.subtitle}</p>
                   </div>
-                  {selectedCard.id === card.id && (
+                  {selectedDest.id === dest.id && (
                     <Check className="w-5 h-5 text-primary" />
                   )}
                 </button>
