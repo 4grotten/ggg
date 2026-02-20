@@ -1312,20 +1312,23 @@ export const apiCategories: ApiCategory[] = [
           status: 201,
           json: `{
   "message": "Crypto address generated",
+  "user_id": 12345,
   "deposit_address": "TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R",
   "qr_payload": "tron:TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R?amount=0&token=USDT"
 }`
         },
         responseParams: [
           { name: 'message', type: 'string', required: true, description: 'Сообщение об успешной генерации адреса' },
+          { name: 'user_id', type: 'number', required: true, description: 'Числовой ID пользователя, к которому привязан депозитный адрес' },
           { name: 'deposit_address', type: 'string', required: true, description: 'Сгенерированный крипто-адрес для депозита' },
           { name: 'qr_payload', type: 'string', required: true, description: 'Строка для генерации QR-кода на фронтенде' }
         ],
         notes: [
+          'user_id извлекается из токена авторизации — привязывает адрес к конкретному пользователю и его карте',
           'Адрес уникален для каждого запроса',
           'Поддерживаемые токены: USDT, USDC',
           'Поддерживаемые сети: TRC20 (Tron), ERC20 (Ethereum), BEP20 (BSC), SOL (Solana)',
-          'Квитанция содержит: transaction_id, status, дату, токен, сеть, deposit_address, сумму зачисления'
+          'Квитанция содержит: transaction_id, user_id, status, дату, токен, сеть, deposit_address, сумму зачисления'
         ]
       }
     ]
@@ -1374,19 +1377,26 @@ export const apiCategories: ApiCategory[] = [
           json: `{
   "message": "Transfer successful",
   "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": 12345,
+  "sender_user_id": 12345,
+  "receiver_user_id": 67890,
   "amount": "100.00"
 }`
         },
         responseParams: [
           { name: 'message', type: 'string', required: true, description: 'Сообщение об успешном переводе' },
           { name: 'transaction_id', type: 'uuid', required: true, description: 'ID выполненной транзакции' },
+          { name: 'user_id', type: 'number', required: true, description: 'ID пользователя-инициатора (отправитель)' },
+          { name: 'sender_user_id', type: 'number', required: true, description: 'ID пользователя-отправителя (владелец sender_card_id)' },
+          { name: 'receiver_user_id', type: 'number', required: true, description: 'ID пользователя-получателя (владелец receiver_card_number)' },
           { name: 'amount', type: 'decimal', required: true, description: 'Фактически переведённая сумма в AED' }
         ],
         notes: [
+          'user_id, sender_user_id, receiver_user_id — идентифицируют участников перевода; карты привязаны к конкретным пользователям',
           'Перевод моментальный, средства зачисляются мгновенно',
           'Комиссия: 1% от суммы перевода',
           'Минимальная сумма: 1.00 AED',
-          'Квитанция содержит: transaction_id, status, дату, сумму, комиссию, маску карты отправителя (**** 1234), маску карты получателя (**** 5678), имя получателя'
+          'Квитанция содержит: transaction_id, user_id, sender_user_id, receiver_user_id, status, дату, сумму, комиссию, маску карты отправителя (**** 1234), маску карты получателя (**** 5678), имя получателя'
         ]
       }
     ]
@@ -1441,19 +1451,22 @@ export const apiCategories: ApiCategory[] = [
           json: `{
   "message": "Withdrawal processing",
   "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": 12345,
   "total_debit_crypto": "50.500000"
 }`
         },
         responseParams: [
           { name: 'message', type: 'string', required: true, description: 'Статус обработки вывода' },
           { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции списания' },
+          { name: 'user_id', type: 'number', required: true, description: 'ID пользователя, инициировавшего вывод (владелец карты)' },
           { name: 'total_debit_crypto', type: 'decimal', required: true, description: 'Общая сумма списания в крипте (включая network fee)' }
         ],
         notes: [
+          'user_id привязывает вывод к конкретному пользователю и его карте (from_card_id)',
           'Комиссия сети (network fee) включена в total_debit_crypto',
           'Комиссия платформы: 1% от суммы',
           'Фактическая отправка в блокчейн происходит асинхронно',
-          'Квитанция содержит: transaction_id, status, дату, токен, сеть, адрес получателя, сумму отправки, network fee, общее списание, курс конвертации AED → крипто'
+          'Квитанция содержит: transaction_id, user_id, status, дату, токен, сеть, адрес получателя, сумму отправки, network fee, общее списание, курс конвертации AED → крипто'
         ]
       },
       {
@@ -1499,6 +1512,7 @@ export const apiCategories: ApiCategory[] = [
           json: `{
   "message": "Bank wire processing",
   "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": 12345,
   "fee_amount": "10.00",
   "total_debit_aed": "510.00"
 }`
@@ -1506,14 +1520,16 @@ export const apiCategories: ApiCategory[] = [
         responseParams: [
           { name: 'message', type: 'string', required: true, description: 'Статус обработки перевода' },
           { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции' },
+          { name: 'user_id', type: 'number', required: true, description: 'ID пользователя-отправителя (владелец карты from_card_id)' },
           { name: 'fee_amount', type: 'decimal', required: true, description: 'Комиссия за перевод (2%)' },
           { name: 'total_debit_aed', type: 'decimal', required: true, description: 'Общая сумма списания (сумма + комиссия)' }
         ],
         notes: [
+          'user_id привязывает банковский перевод к конкретному пользователю и его карте',
           'IBAN должен начинаться с AE и содержать 23 символа',
           'Комиссия: 2% от суммы перевода',
           'Обработка занимает 1–3 рабочих дня',
-          'Квитанция содержит: transaction_id, status, дату, сумму перевода, комиссию (2%), общее списание, IBAN получателя, имя получателя, название банка, reference'
+          'Квитанция содержит: transaction_id, user_id, status, дату, сумму перевода, комиссию (2%), общее списание, IBAN получателя, имя получателя, название банка, reference'
         ]
       }
     ]
@@ -1548,30 +1564,37 @@ export const apiCategories: ApiCategory[] = [
           status: 200,
           json: `{
   "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "user_id": 12345,
   "status": "completed",
   "date_time": "2026-02-20T12:00:00Z",
   "operation": "Internal Card Transfer",
   "amount": "100.00",
   "fee": "1.00",
+  "sender_user_id": 12345,
   "sender_card_mask": "**** 1234",
+  "receiver_user_id": 67890,
   "receiver_card_mask": "**** 5678",
   "recipient_name": "EasyCard User"
 }`
         },
         responseParams: [
           { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции' },
+          { name: 'user_id', type: 'number', required: true, description: 'ID пользователя-владельца транзакции' },
           { name: 'status', type: 'string', required: true, description: 'Статус: pending, processing, completed, failed, cancelled' },
           { name: 'date_time', type: 'string', required: true, description: 'Дата и время операции (ISO 8601)' },
           { name: 'operation', type: 'string', required: true, description: 'Тип операции (человекочитаемый)' },
           { name: 'amount', type: 'decimal', required: true, description: 'Сумма операции' },
-          { name: 'fee', type: 'decimal', required: false, description: 'Комиссия (если применимо)' }
+          { name: 'fee', type: 'decimal', required: false, description: 'Комиссия (если применимо)' },
+          { name: 'sender_user_id', type: 'number', required: false, description: 'ID отправителя (для переводов)' },
+          { name: 'receiver_user_id', type: 'number', required: false, description: 'ID получателя (для переводов)' }
         ],
         notes: [
-          '**Bank Topup** — квитанция содержит: transaction_id, status, date_time, operation ("Bank Wire Topup"), transfer_rail (UAE_LOCAL_AED / SWIFT_INTL), bank_instructions (IBAN, SWIFT, bank_name, account_name, reference)',
-          '**Crypto Topup** — квитанция содержит: transaction_id, status, date_time, operation ("Crypto Topup"), token (USDT/USDC), network (TRC20/ERC20/BEP20/SOL), deposit_address, qr_payload, amount_received',
-          '**Card Transfer** — квитанция содержит: transaction_id, status, date_time, operation ("Internal Card Transfer"), amount, fee (1%), sender_card_mask (**** XXXX), receiver_card_mask (**** XXXX), recipient_name',
-          '**Crypto Withdrawal** — квитанция содержит: transaction_id, status, date_time, operation ("Crypto Withdrawal"), token, network, to_address, amount_crypto, network_fee, total_debit_crypto, exchange_rate_aed',
-          '**Bank Withdrawal** — квитанция содержит: transaction_id, status, date_time, operation ("Bank Wire Withdrawal"), amount_aed, fee_amount (2%), total_debit_aed, iban, beneficiary_name, bank_name, reference'
+          'user_id присутствует во ВСЕХ квитанциях — определяет владельца транзакции',
+          '**Bank Topup** — квитанция: transaction_id, user_id, status, date_time, operation ("Bank Wire Topup"), transfer_rail, bank_instructions (IBAN, SWIFT, bank_name, account_name, reference с user_id)',
+          '**Crypto Topup** — квитанция: transaction_id, user_id, status, date_time, operation ("Crypto Topup"), token, network, deposit_address, qr_payload, amount_received',
+          '**Card Transfer** — квитанция: transaction_id, user_id, sender_user_id, receiver_user_id, status, date_time, operation ("Internal Card Transfer"), amount, fee (1%), sender_card_mask, receiver_card_mask, recipient_name',
+          '**Crypto Withdrawal** — квитанция: transaction_id, user_id, status, date_time, operation ("Crypto Withdrawal"), token, network, to_address, amount_crypto, network_fee, total_debit_crypto, exchange_rate_aed',
+          '**Bank Withdrawal** — квитанция: transaction_id, user_id, status, date_time, operation ("Bank Wire Withdrawal"), amount_aed, fee_amount (2%), total_debit_aed, iban, beneficiary_name, bank_name, reference'
         ]
       }
     ]
