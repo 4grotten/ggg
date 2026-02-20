@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/drawer";
 import { BANK_TRANSFER_FEE_PERCENT } from "@/lib/fees";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface SourceOption {
   id: string;
@@ -40,6 +41,7 @@ const SendBank = () => {
   const { t } = useTranslation();
   
   const { user } = useAuth();
+  const { USDT_TO_AED_SELL } = useSettings();
   const userId = user?.id?.toString() ?? "000";
   const userFullName = user?.full_name || "—";
 
@@ -54,7 +56,9 @@ const SendBank = () => {
   const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
   
   // Use referral balance or source balance
+  const isWalletSource = selectedSource.type === "wallet";
   const availableBalance = isReferralWithdrawal ? referralBalance : selectedSource.balance;
+  const availableBalanceAed = isWalletSource ? availableBalance * USDT_TO_AED_SELL : availableBalance;
 
   // Scroll to top on mount
   useEffect(() => {
@@ -111,7 +115,7 @@ const SendBank = () => {
 
   const isStep1Valid = iban.replace(/\s/g, "").length >= 15;
   const isStep2Valid = recipientName.trim().length >= 2 && bankName.trim().length >= 2;
-  const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= availableBalance;
+  const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= availableBalanceAed;
 
   const handleNext = () => {
     if (step < 3) {
@@ -321,7 +325,12 @@ const SendBank = () => {
                     {t("send.amount")}
                   </label>
                   <span className="text-sm text-muted-foreground">
-                    {t("send.available")}: <span className="font-medium text-foreground">{availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
+                    {t("send.available")}: <span className="font-medium text-foreground">
+                      {isWalletSource 
+                        ? `${availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} USDT`
+                        : `${availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
+                      }
+                    </span>
                   </span>
                 </div>
                 <div className="relative">
@@ -335,7 +344,7 @@ const SendBank = () => {
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <button
                       onClick={() => {
-                      const maxAmount = availableBalance / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
+                      const maxAmount = availableBalanceAed / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
                       setAmountAED(maxAmount.toFixed(2));
                       }}
                       className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
@@ -365,7 +374,21 @@ const SendBank = () => {
                 </div>
               </div>
 
-              {parseFloat(totalAmount) > availableBalance && (
+              {/* USDT Conversion Info */}
+              {isWalletSource && parseFloat(amountAED || "0") > 0 && (
+                <div className="bg-primary/5 rounded-2xl p-4 space-y-2 border border-primary/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("send.exchangeRate", "Курс")}</span>
+                    <span className="font-medium">1 USDT = {USDT_TO_AED_SELL} AED</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("send.willBeDebited", "Будет списано")}</span>
+                    <span className="font-semibold text-lg">{(parseFloat(totalAmount) / USDT_TO_AED_SELL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                </div>
+              )}
+
+              {parseFloat(totalAmount) > availableBalanceAed && (
                 <div className="bg-red-500/10 rounded-2xl p-4">
                   <p className="text-sm text-red-500">
                     ⚠️ {t("send.insufficientBalanceWarning")}
