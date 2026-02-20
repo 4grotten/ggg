@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark } from "lucide-react";
+import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark, Eye, EyeOff } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
@@ -20,12 +20,13 @@ interface Destination {
   cardType?: "virtual" | "metal";
   name: string;
   subtitle: string;
+  fullNumber: string;
 }
 
 const destinations: Destination[] = [
-  { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532" },
-  { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901" },
-  { id: "bank", type: "bank", name: "Банковский счёт", subtitle: "AED Account" },
+  { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
+  { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
+  { id: "bank", type: "bank", name: "Банковский счёт", subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
 ];
 
 const networks = [
@@ -43,6 +44,7 @@ const TopUpCrypto = () => {
   const [selectedDest, setSelectedDest] = useState<Destination>(destinations[0]);
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
   const [destDrawerOpen, setDestDrawerOpen] = useState(false);
+  const [showFullNumbers, setShowFullNumbers] = useState(false);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
   
   // Scroll to top on mount
@@ -284,8 +286,22 @@ const TopUpCrypto = () => {
                   </div>
                   <div className="flex-1 text-left">
                     <p className="text-base font-medium text-foreground">{dest.name}</p>
-                    <p className="text-sm text-muted-foreground">{dest.subtitle}</p>
+                    <p className="text-sm text-muted-foreground font-mono">
+                      {showFullNumbers ? dest.fullNumber : dest.subtitle}
+                    </p>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowFullNumbers(!showFullNumbers);
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                  >
+                    {showFullNumbers 
+                      ? <EyeOff className="w-4 h-4 text-muted-foreground" />
+                      : <Eye className="w-4 h-4 text-muted-foreground" />
+                    }
+                  </button>
                   {selectedDest.id === dest.id && (
                     <Check className="w-5 h-5 text-primary" />
                   )}
