@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.admin-openai-settings]
 verify_jwt = false
+
+[functions.cards-proxy]
+verify_jwt = false

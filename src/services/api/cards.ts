@@ -7,19 +7,22 @@ import {
   CardBalanceResponse,
   FetchCardsParams 
 } from '@/types/card';
-import { apiGet, getAuthToken } from './apiClient';
+import { getAuthToken } from './apiClient';
 
-const CARDS_API_BASE = 'https://ueasycard.com/api/v1';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 /**
- * Cards-specific API GET request (uses ueasycard.com backend)
+ * Cards API GET via edge function proxy (bypasses CORS)
  */
 async function cardsApiGet<T>(endpoint: string): Promise<{ data: T | null; error: { message: string } | null }> {
-  const url = `${CARDS_API_BASE}${endpoint}`;
-  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent(endpoint)}`;
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  };
   const token = getAuthToken();
   if (token) {
-    headers['Authorization'] = `Token ${token}`;
+    headers['x-backend-token'] = token;
   }
   try {
     const response = await fetch(url, { method: 'GET', headers });
