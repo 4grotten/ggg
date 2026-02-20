@@ -745,7 +745,9 @@
     "sendMoneyWith": "Enviar con",
     "stablecoins": "Stablecoins",
     "bankTransfer": "Transferencia Bancaria",
-    "sendToCard": "Enviar a tarjeta"
+    "sendToCard": "Enviar a tarjeta",
+    "usdtBalance": "Billetera USDT TRC20",
+    "usdtBalanceDesc": "Desde su saldo"
   },
   "auth": {
     "resetPassword": {
