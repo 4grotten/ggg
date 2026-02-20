@@ -41,7 +41,7 @@ const SendBank = () => {
   const { t } = useTranslation();
   
   const { user } = useAuth();
-  const { USDT_TO_AED_SELL } = useSettings();
+  const { USDT_TO_AED_BUY } = useSettings();
   const userId = user?.id?.toString() ?? "000";
   const userFullName = user?.full_name || "—";
 
@@ -58,7 +58,7 @@ const SendBank = () => {
   // Use referral balance or source balance
   const isWalletSource = selectedSource.type === "wallet";
   const availableBalance = isReferralWithdrawal ? referralBalance : selectedSource.balance;
-  const availableBalanceAed = isWalletSource ? availableBalance * USDT_TO_AED_SELL : availableBalance;
+  const availableBalanceAed = isWalletSource ? availableBalance * USDT_TO_AED_BUY : availableBalance;
 
   // Scroll to top on mount
   useEffect(() => {
@@ -379,11 +379,11 @@ const SendBank = () => {
                 <div className="bg-primary/5 rounded-2xl p-4 space-y-2 border border-primary/10">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("send.exchangeRate", "Курс")}</span>
-                    <span className="font-medium">1 USDT = {USDT_TO_AED_SELL} AED</span>
+                    <span className="font-medium">1 USDT = {USDT_TO_AED_BUY} AED</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("send.willBeDebited", "Будет списано")}</span>
-                    <span className="font-semibold text-lg">{(parseFloat(totalAmount) / USDT_TO_AED_SELL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                    <span className="font-semibold text-lg">{(parseFloat(totalAmount) / USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                   </div>
                 </div>
               )}
