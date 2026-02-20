@@ -92,7 +92,7 @@ const TopUpBankDetails = () => {
   };
 
   return (
-    <MobileLayout showBackButton onBack={() => navigate(-1)} rightAction={<><ThemeSwitcher /><LanguageSwitcher /></>}>
+    <MobileLayout showBackButton onBack={() => navigate(-1)} rightAction={<div className="flex items-center gap-2"><ThemeSwitcher /><LanguageSwitcher /></div>}>
       <div className="flex flex-col min-h-[calc(100vh-56px)] pb-28">
         {/* Title */}
         <div className="pt-4 pb-4 px-6">
@@ -148,14 +148,25 @@ const TopUpBankDetails = () => {
         </div>
       </div>
 
-      {/* Fixed Share Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
+      {/* Fixed Bottom Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 flex gap-3 max-w-[800px] mx-auto">
+        <button
+          onClick={() => {
+            const allText = bankDetails.map(d => `${d.label}: ${d.value}`).join("\n");
+            navigator.clipboard.writeText(allText);
+            toast.success(t("toast.accountDetailsCopied"));
+          }}
+          className="flex-1 bg-muted/80 text-foreground font-semibold py-4 rounded-xl hover:bg-muted transition-all flex items-center justify-center gap-2 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg"
+        >
+          <Copy className="w-5 h-5" />
+          {t("topUp.copy", "Скопировать")}
+        </button>
         <button
           onClick={handleShare}
-          className="w-full bg-primary/90 text-white font-semibold py-4 rounded-xl hover:bg-primary transition-all flex items-center justify-center gap-2 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg"
+          className="flex-1 bg-primary/90 text-white font-semibold py-4 rounded-xl hover:bg-primary transition-all flex items-center justify-center gap-2 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg"
         >
           <Share2 className="w-5 h-5" />
-          {t("topUp.shareAedDetails")}
+          {t("topUp.share", "Поделиться")}
         </button>
       </div>
     </MobileLayout>

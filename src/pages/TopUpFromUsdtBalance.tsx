@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { useSettings } from "@/contexts/SettingsContext";
 import { UsdtIcon } from "@/components/icons/CryptoIcons";
@@ -92,7 +93,7 @@ const TopUpFromUsdtBalance = () => {
           </h1>
         </div>
       }
-      rightAction={<LanguageSwitcher />}
+      rightAction={<div className="flex items-center gap-2"><ThemeSwitcher /><LanguageSwitcher /></div>}
     >
       <div className="px-4 py-6 space-y-4 pb-32">
         {/* Available USDT Balance */}
