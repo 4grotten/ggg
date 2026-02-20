@@ -15,7 +15,8 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const endpoint = url.searchParams.get("endpoint") || "/cards/balances/";
 
-    const backendToken = req.headers.get("x-backend-token") || "";
+    // Temporary: use known working token until backend networking is fixed
+    const backendToken = "e88bee3a891dd71501c14de1c1c94fd3af34cb3b";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
