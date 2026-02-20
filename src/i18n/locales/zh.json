@@ -659,6 +659,7 @@
     "send": "发送",
     "easyCardToEasyCard": "Easy Card 到 Easy Card",
     "toBankAccount": "到银行账户",
+    "bankAccountAed": "银行账户 AED",
     "networkFee": "网络费用",
     "transactionsSection": "交易",
     "currencyConversion": "货币兑换",
