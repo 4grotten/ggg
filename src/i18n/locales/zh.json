@@ -660,8 +660,6 @@
     "easyCardToEasyCard": "Easy Card 到 Easy Card",
     "toBankAccount": "到银行账户",
     "bankAccountAed": "银行账户 AED",
-    "fromSource": "来源",
-    "selectSource": "从哪里转账",
     "networkFee": "网络费用",
     "transactionsSection": "交易",
     "currencyConversion": "货币兑换",
@@ -746,7 +744,10 @@
     "exchangeRate": "汇率",
     "selectCoin": "选择币种",
     "selectNetwork": "选择网络",
-    "cryptoWarning": "请确保钱包地址和网络正确无误。发送到错误的地址或网络可能导致资金永久丢失。"
+    "cryptoWarning": "请确保钱包地址和网络正确无误。发送到错误的地址或网络可能导致资金永久丢失。",
+    "fromSource": "来源",
+    "selectSource": "从哪里转账",
+    "willBeDebited": "将被扣除"
   },
   "drawer": {
     "addMoneyWith": "充值方式",

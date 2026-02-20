@@ -654,8 +654,6 @@
     "easyCardToEasyCard": "Easy Card a Easy Card",
     "toBankAccount": "A Cuenta Bancaria",
     "bankAccountAed": "Cuenta Bancaria AED",
-    "fromSource": "Desde",
-    "selectSource": "Transferir desde",
     "networkFee": "Tarifa de red",
     "transactionsSection": "Transacciones",
     "currencyConversion": "Conversión de Moneda",
@@ -740,7 +738,10 @@
     "exchangeRate": "Tipo de cambio",
     "selectCoin": "Seleccionar Moneda",
     "selectNetwork": "Seleccionar Red",
-    "cryptoWarning": "Asegúrate de que la dirección de la billetera y la red sean correctas. Enviar a una dirección o red incorrecta puede resultar en la pérdida permanente de fondos."
+    "cryptoWarning": "Asegúrate de que la dirección de la billetera y la red sean correctas. Enviar a una dirección o red incorrecta puede resultar en la pérdida permanente de fondos.",
+    "fromSource": "Desde",
+    "selectSource": "Transferir desde",
+    "willBeDebited": "Se debitará"
   },
   "drawer": {
     "addMoneyWith": "Recargar con",
