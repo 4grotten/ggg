@@ -1,4 +1,4 @@
-// Cards API Service
+// Cards API Service — connected to real backend
 
 import { 
   Card, 
@@ -7,65 +7,96 @@ import {
   CardBalanceResponse,
   FetchCardsParams 
 } from '@/types/card';
-import { TransactionsResponse } from '@/types/transaction';
-import { buildApiUrl, ENDPOINTS } from './config';
+import { getAuthToken } from './apiClient';
 
-// Mock data - will be replaced with actual API calls
-const mockCards: Card[] = [
-  { 
-    id: "1", 
-    type: "virtual", 
-    name: "Visa Virtual", 
-    isActive: true, 
-    balance: 213757.49,
-    status: "active",
-    lastFourDigits: "4521",
-  },
-  { 
-    id: "2", 
-    type: "metal", 
-    name: "Visa Metal", 
-    isActive: true, 
-    balance: 256508.98,
-    status: "active",
-    lastFourDigits: "8834",
-  },
-];
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
-// Simulate API delay
-const simulateApiDelay = (ms: number = 500) => 
-  new Promise(resolve => setTimeout(resolve, ms));
+/**
+ * Cards API GET via edge function proxy (bypasses CORS)
+ */
+async function cardsApiGet<T>(endpoint: string): Promise<{ data: T | null; error: { message: string } | null }> {
+  const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent(endpoint)}`;
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  };
+  const token = getAuthToken();
+  if (token) {
+    headers['x-backend-token'] = token;
+  }
+  try {
+    const response = await fetch(url, { method: 'GET', headers });
+    if (!response.ok) {
+      return { data: null, error: { message: `HTTP Error: ${response.status}` } };
+    }
+    const data = await response.json();
+    return { data: data as T, error: null };
+  } catch (err) {
+    return { data: null, error: { message: err instanceof Error ? err.message : 'Network error' } };
+  }
+}
+
+// Response type from GET /cards/balances/
+interface BalancesApiResponse {
+  user_id: number;
+  total_balance_aed: number;
+  cards: Array<{
+    card_id: number;
+    type: string;
+    balance: number;
+    last_four_digits: string;
+    status: string;
+  }>;
+}
+
+/**
+ * Fetch all cards and balances from GET /cards/balances/
+ */
+const fetchBalancesFromApi = async (): Promise<BalancesApiResponse | null> => {
+  const response = await cardsApiGet<BalancesApiResponse>('/cards/balances/');
+  if (response.error || !response.data) {
+    console.error('Error fetching balances:', response.error);
+    return null;
+  }
+  return response.data;
+};
+
+/**
+ * Map API card to frontend Card type
+ */
+const mapApiCard = (apiCard: BalancesApiResponse['cards'][number]): Card => ({
+  id: String(apiCard.card_id),
+  type: (apiCard.type === 'metal' ? 'metal' : 'virtual') as Card['type'],
+  name: apiCard.type === 'metal' ? 'Visa Metal' : 'Visa Virtual',
+  isActive: apiCard.status === 'active',
+  balance: apiCard.balance,
+  status: apiCard.status as Card['status'],
+  lastFourDigits: apiCard.last_four_digits,
+});
 
 /**
  * Fetch all cards for user
- * Replace mock implementation with actual API call when backend is ready
  */
 export const fetchCards = async (
   params?: FetchCardsParams
 ): Promise<CardsResponse> => {
   try {
-    // TODO: Replace with actual API call
-    // const response = await fetch(buildApiUrl(ENDPOINTS.cards.list), {
-    //   method: 'GET',
-    //   headers: API_CONFIG.headers,
-    // });
-    // return await response.json();
-
-    await simulateApiDelay();
+    const data = await fetchBalancesFromApi();
     
-    let filteredCards = [...mockCards];
+    if (!data) {
+      return { success: false, data: [], error: 'Failed to fetch cards' };
+    }
+
+    let cards = data.cards.map(mapApiCard);
     
     if (params?.type) {
-      filteredCards = filteredCards.filter(c => c.type === params.type);
+      cards = cards.filter(c => c.type === params.type);
     }
     if (params?.status) {
-      filteredCards = filteredCards.filter(c => c.status === params.status);
+      cards = cards.filter(c => c.status === params.status);
     }
     
-    return {
-      success: true,
-      data: filteredCards,
-    };
+    return { success: true, data: cards };
   } catch (error) {
     console.error('Error fetching cards:', error);
     return {
@@ -78,27 +109,22 @@ export const fetchCards = async (
 
 /**
  * Fetch single card details
- * Replace mock implementation with actual API call when backend is ready
  */
 export const fetchCardById = async (
   id: string
 ): Promise<CardDetailsResponse> => {
   try {
-    // TODO: Replace with actual API call
-    // const response = await fetch(buildApiUrl(ENDPOINTS.cards.details(id)), {
-    //   method: 'GET',
-    //   headers: API_CONFIG.headers,
-    // });
-    // return await response.json();
-
-    await simulateApiDelay();
+    const data = await fetchBalancesFromApi();
+    if (!data) {
+      return { success: false, data: null, error: 'Failed to fetch card' };
+    }
     
-    const card = mockCards.find(c => c.id === id);
+    const apiCard = data.cards.find(c => String(c.card_id) === id);
     
     return {
-      success: !!card,
-      data: card || null,
-      error: card ? undefined : 'Card not found',
+      success: !!apiCard,
+      data: apiCard ? mapApiCard(apiCard) : null,
+      error: apiCard ? undefined : 'Card not found',
     };
   } catch (error) {
     console.error('Error fetching card:', error);
@@ -112,28 +138,23 @@ export const fetchCardById = async (
 
 /**
  * Fetch card balance
- * Replace mock implementation with actual API call when backend is ready
  */
 export const fetchCardBalance = async (
   id: string
 ): Promise<CardBalanceResponse> => {
   try {
-    // TODO: Replace with actual API call
-    // const response = await fetch(buildApiUrl(ENDPOINTS.cards.balance(id)), {
-    //   method: 'GET',
-    //   headers: API_CONFIG.headers,
-    // });
-    // return await response.json();
-
-    await simulateApiDelay(300);
+    const data = await fetchBalancesFromApi();
+    if (!data) {
+      return { success: false, balance: 0, currency: 'AED', error: 'Failed to fetch balance' };
+    }
     
-    const card = mockCards.find(c => c.id === id);
+    const apiCard = data.cards.find(c => String(c.card_id) === id);
     
     return {
-      success: !!card,
-      balance: card?.balance || 0,
+      success: !!apiCard,
+      balance: apiCard?.balance || 0,
       currency: 'AED',
-      error: card ? undefined : 'Card not found',
+      error: apiCard ? undefined : 'Card not found',
     };
   } catch (error) {
     console.error('Error fetching card balance:', error);
@@ -151,22 +172,15 @@ export const fetchCardBalance = async (
  */
 export const fetchTotalBalance = async (): Promise<CardBalanceResponse> => {
   try {
-    const cardsResponse = await fetchCards();
+    const data = await fetchBalancesFromApi();
     
-    if (!cardsResponse.success) {
-      return {
-        success: false,
-        balance: 0,
-        currency: 'AED',
-        error: cardsResponse.error,
-      };
+    if (!data) {
+      return { success: false, balance: 0, currency: 'AED', error: 'Failed to fetch total balance' };
     }
-    
-    const totalBalance = cardsResponse.data.reduce((sum, card) => sum + card.balance, 0);
     
     return {
       success: true,
-      balance: totalBalance,
+      balance: data.total_balance_aed,
       currency: 'AED',
     };
   } catch (error) {
