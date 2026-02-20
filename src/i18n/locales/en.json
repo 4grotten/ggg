@@ -742,6 +742,8 @@
     "easyCardToEasyCard": "Easy Card to Easy Card",
     "toBankAccount": "To Bank Account",
     "bankAccountAed": "Bank Account AED",
+    "fromSource": "From",
+    "selectSource": "Transfer from",
     "networkFee": "Network fee",
     "transactionsSection": "Transactions",
     "currencyConversion": "Currency Conversion",

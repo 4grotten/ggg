@@ -728,6 +728,8 @@
     "easyCardToEasyCard": "Easy Card на Easy Card",
     "toBankAccount": "На банковский счёт",
     "bankAccountAed": "Банковский счёт AED",
+    "fromSource": "Откуда",
+    "selectSource": "Откуда перевести",
     "networkFee": "Сетевая комиссия",
     "transactionsSection": "Транзакции",
     "currencyConversion": "Конвертация валют",
