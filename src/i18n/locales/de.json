@@ -654,6 +654,8 @@
     "easyCardToEasyCard": "Easy Card zu Easy Card",
     "toBankAccount": "Auf Bankkonto",
     "bankAccountAed": "Bankkonto AED",
+    "fromSource": "Von",
+    "selectSource": "Überweisen von",
     "networkFee": "Netzwerkgebühr",
     "transactionsSection": "Transaktionen",
     "currencyConversion": "Währungsumrechnung",

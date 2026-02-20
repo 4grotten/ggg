@@ -654,6 +654,8 @@
     "easyCardToEasyCard": "Easy Card'dan Easy Card'a",
     "toBankAccount": "Banka Hesabına",
     "bankAccountAed": "Banka Hesabı AED",
+    "fromSource": "Nereden",
+    "selectSource": "Nereden transfer edilecek",
     "networkFee": "Ağ ücreti",
     "transactionsSection": "İşlemler",
     "currencyConversion": "Para Birimi Dönüştürme",

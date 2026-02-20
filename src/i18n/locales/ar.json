@@ -654,6 +654,8 @@
     "easyCardToEasyCard": "من Easy Card إلى Easy Card",
     "toBankAccount": "إلى حساب بنكي",
     "bankAccountAed": "حساب بنكي AED",
+    "fromSource": "من",
+    "selectSource": "التحويل من",
     "networkFee": "رسوم الشبكة",
     "transactionsSection": "المعاملات",
     "currencyConversion": "تحويل العملات",
