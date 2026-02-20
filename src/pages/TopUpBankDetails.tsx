@@ -20,6 +20,25 @@ const TopUpBankDetails = () => {
 
   // Get user ID for the reference field
   const userId = user?.id ? String(user.id) : "—";
+  const userFullName = user?.full_name || "—";
+
+  // Generate user-specific account number and IBAN
+  // Account number: fixed prefix, last digits replaced with UID (always 13 digits)
+  const generateAccountNumber = (uid: string): string => {
+    const prefix = "1234567890";
+    const padded = uid.padStart(3, "0");
+    return (prefix + padded).slice(0, 13);
+  };
+
+  // IBAN: AE + fixed prefix, last digits replaced with UID (always 23 chars)
+  const generateIban = (uid: string): string => {
+    const prefix = "AE07033123456789012";
+    const padded = uid.padStart(4, "0");
+    return (prefix + padded).slice(0, 23);
+  };
+
+  const accountNumber = userId !== "—" ? generateAccountNumber(userId) : "—";
+  const iban = userId !== "—" ? generateIban(userId) : "—";
 
   // Scroll to top on mount
   useEffect(() => {
@@ -27,9 +46,9 @@ const TopUpBankDetails = () => {
   }, []);
 
   const bankDetails: BankDetail[] = [
-    { label: t("topUp.beneficiary"), value: "Easy Card LLC" },
-    { label: t("topUp.accountNumber"), value: "1234567890123" },
-    { label: t("topUp.iban"), value: "AE070331234567890123456" },
+    { label: t("topUp.beneficiary"), value: userFullName },
+    { label: t("topUp.accountNumber"), value: accountNumber },
+    { label: t("topUp.iban"), value: iban },
     { label: t("topUp.bankName"), value: "Emirates NBD" },
     { label: t("topUp.bankAddress"), value: "Dubai, United Arab Emirates" },
   ];
