@@ -11,6 +11,7 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { useCards } from "@/hooks/useCards";
 import { Card } from "@/types/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Destination = "card" | "account";
 
@@ -21,6 +22,12 @@ const TopUpFromUsdtBalance = () => {
   const { t } = useTranslation();
   const settings = useSettings();
   const { data: cardsData } = useCards();
+  const { user } = useAuth();
+
+  const uid = user?.id?.toString() ?? "000";
+  const beneficiaryName = user?.full_name || "—";
+  const accountNumber = `1234567890${uid}`;
+  const iban = `AE07033123456789012${uid}`;
 
   const [destination, setDestination] = useState<Destination | null>(null);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -238,16 +245,20 @@ const TopUpFromUsdtBalance = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{t("topUpUsdt.accountName", "Наименование")}</span>
-                    <span className="font-medium text-foreground">Easy Card LLC</span>
+                    <span className="text-muted-foreground">{t("topUpUsdt.beneficiary", "Получатель")}</span>
+                    <span className="font-medium text-foreground">{beneficiaryName}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t("topUpUsdt.accountNumber", "Номер счёта")}</span>
+                    <span className="font-mono text-xs font-medium text-foreground">{accountNumber}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">IBAN</span>
-                    <span className="font-mono text-xs font-medium text-foreground">AE07 0331 2345 6789 0123 456</span>
+                    <span className="font-mono text-xs font-medium text-foreground">{iban}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">SWIFT</span>
-                    <span className="font-mono font-medium text-foreground">BOMLAEAD</span>
+                    <span className="text-muted-foreground">{t("topUpUsdt.bank", "Банк")}</span>
+                    <span className="font-medium text-foreground">Emirates NBD</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{t("topUpUsdt.currency", "Валюта")}</span>
