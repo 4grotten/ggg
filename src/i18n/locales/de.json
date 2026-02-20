@@ -1123,7 +1123,11 @@
       "profile": "Profil",
       "files": "Datei-Uploads",
       "social": "Soziale Netzwerke",
-      "devices": "Geräte & Sitzungen"
+      "devices": "Geräte & Sitzungen",
+      "topups": "Aufladungen",
+      "transfers": "Überweisungen",
+      "withdrawals": "Auszahlungen",
+      "receipts": "Quittungen"
     },
     "notes": {
       "title": "Hinweise"
