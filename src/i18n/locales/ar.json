@@ -749,6 +749,33 @@
     "usdtBalance": "محفظة USDT TRC20",
     "usdtBalanceDesc": "من رصيدك"
   },
+  "topUpUsdt": {
+    "title": "شحن من USDT",
+    "availableBalance": "الرصيد المتاح",
+    "selectDestination": "التحويل إلى",
+    "toCard": "إلى البطاقة",
+    "toCardDesc": "شحن رصيد البطاقة",
+    "toAccount": "إلى الحساب",
+    "toAccountDesc": "إيداع في الحساب الرئيسي",
+    "selectCard": "اختر البطاقة",
+    "noCards": "لا توجد بطاقات نشطة",
+    "accountDetails": "تفاصيل الحساب",
+    "beneficiary": "المستفيد",
+    "accountNumber": "رقم الحساب",
+    "bank": "البنك",
+    "currency": "العملة",
+    "enterAmount": "مبلغ التحويل (USDT)",
+    "calculation": "الحساب",
+    "transferAmount": "مبلغ التحويل",
+    "exchangeRate": "سعر الصرف",
+    "networkFee": "رسوم الشبكة",
+    "totalDeducted": "إجمالي المخصوم",
+    "destinationCard": "بطاقة الإيداع",
+    "youReceive": "ستتلقى",
+    "insufficientBalance": "رصيد USDT غير كافٍ",
+    "confirm": "تأكيد التحويل",
+    "transferInitiated": "تم بدء التحويل"
+  },
   "auth": {
     "resetPassword": {
       "title": "نسيت كلمة المرور؟",

@@ -755,6 +755,33 @@
     "usdtBalance": "USDT TRC20 钱包",
     "usdtBalanceDesc": "从您的余额"
   },
+  "topUpUsdt": {
+    "title": "从USDT充值",
+    "availableBalance": "可用余额",
+    "selectDestination": "转账至",
+    "toCard": "到卡",
+    "toCardDesc": "充值卡余额",
+    "toAccount": "到账户",
+    "toAccountDesc": "存入主账户",
+    "selectCard": "选择卡",
+    "noCards": "没有活跃的卡",
+    "accountDetails": "账户详情",
+    "beneficiary": "收款人",
+    "accountNumber": "账号",
+    "bank": "银行",
+    "currency": "货币",
+    "enterAmount": "转账金额 (USDT)",
+    "calculation": "计算",
+    "transferAmount": "转账金额",
+    "exchangeRate": "汇率",
+    "networkFee": "网络费",
+    "totalDeducted": "总扣款",
+    "destinationCard": "入账卡",
+    "youReceive": "您将收到",
+    "insufficientBalance": "USDT余额不足",
+    "confirm": "确认转账",
+    "transferInitiated": "转账已发起"
+  },
   "auth": {
     "resetPassword": {
       "title": "忘记密码？",
