@@ -747,7 +747,8 @@
     "cryptoWarning": "请确保钱包地址和网络正确无误。发送到错误的地址或网络可能导致资金永久丢失。",
     "fromSource": "来源",
     "selectSource": "从哪里转账",
-    "willBeDebited": "将被扣除"
+    "willBeDebited": "将被扣除",
+    "bankAccountAed": "银行账户 AED"
   },
   "drawer": {
     "addMoneyWith": "充值方式",

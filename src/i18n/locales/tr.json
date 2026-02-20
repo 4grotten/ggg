@@ -741,7 +741,8 @@
     "cryptoWarning": "Cüzdan adresi ve ağın doğru olduğundan emin olun. Yanlış adrese veya ağa göndermek, fonların kalıcı olarak kaybedilmesine neden olabilir.",
     "fromSource": "Nereden",
     "selectSource": "Nereden transfer edilecek",
-    "willBeDebited": "Tahsil edilecek"
+    "willBeDebited": "Tahsil edilecek",
+    "bankAccountAed": "Banka Hesabı AED"
   },
   "drawer": {
     "addMoneyWith": "Şununla Yükle",

@@ -741,7 +741,8 @@
     "cryptoWarning": "تأكد من أن عنوان المحفظة والشبكة صحيحان. الإرسال إلى عنوان أو شبكة خاطئة قد يؤدي إلى خسارة الأموال بشكل دائم.",
     "fromSource": "من",
     "selectSource": "التحويل من",
-    "willBeDebited": "سيتم خصم"
+    "willBeDebited": "سيتم خصم",
+    "bankAccountAed": "حساب بنكي AED"
   },
   "drawer": {
     "addMoneyWith": "الشحن عبر",
