@@ -13,6 +13,8 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { TOP_UP_CRYPTO_FEE, TOP_UP_CRYPTO_MIN_AMOUNT } from "@/lib/fees";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 
 interface Destination {
   id: string;
@@ -108,6 +110,7 @@ const TopUpCrypto = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
+      rightAction={<><ThemeSwitcher /><LanguageSwitcher /></>}
     >
       <div className="flex flex-col min-h-[calc(100vh-56px)] pb-28">
         {/* Title */}
