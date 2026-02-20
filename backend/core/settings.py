@@ -36,7 +36,7 @@ CORS_ALLOW_HEADERS = default_headers + (
     "Access-Control-Allow-Credentials",
 )
 
-CSRF_TRUSTED_ORIGINS = ['https://ueasycard.com', 'https://www.ueasycard.com']
+CSRF_TRUSTED_ORIGINS = ['https://ueasycard.com', 'https://www.ueasycard.com', 'https://dced9e95-c6f0-4f31-ac4c-9e0c31ea7407.lovableproject.com']
 
 # Application definition
 
@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework.authtoken',
     'simple_history',
     'core'
 ]
@@ -90,7 +91,7 @@ SIMPLE_JWT = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'api.accounts_api.authentication.ApofizTokenAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
