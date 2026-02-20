@@ -741,7 +741,8 @@
     "cryptoWarning": "Asegúrate de que la dirección de la billetera y la red sean correctas. Enviar a una dirección o red incorrecta puede resultar en la pérdida permanente de fondos.",
     "fromSource": "Desde",
     "selectSource": "Transferir desde",
-    "willBeDebited": "Se debitará"
+    "willBeDebited": "Se debitará",
+    "bankAccountAed": "Cuenta Bancaria AED"
   },
   "drawer": {
     "addMoneyWith": "Recargar con",

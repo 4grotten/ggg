@@ -827,7 +827,8 @@
     "cryptoWarning": "Make sure the wallet address and network are correct. Sending to a wrong address or network may result in permanent loss of funds.",
     "fromSource": "From",
     "selectSource": "Transfer from",
-    "willBeDebited": "Will be debited"
+    "willBeDebited": "Will be debited",
+    "bankAccountAed": "Bank Account AED"
   },
   "drawer": {
     "addMoneyWith": "Add Money with",
