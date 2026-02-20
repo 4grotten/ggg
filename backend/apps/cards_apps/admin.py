@@ -4,20 +4,19 @@ from .models import Cards
 
 @admin.register(Cards)
 class CardsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'card_type', 'last_four_digits', 'balance', 'status_colored')
-    list_filter = ('card_type', 'status', 'currency', 'created_at')
-    search_fields = ('user__username', 'user__email', 'last_four_digits', 'id')
-    readonly_fields = ('card_number', 'cvv', 'expiry_date', 'created_at', 'updated_at')
-    
+    list_display = ('id', 'user_id', 'type', 'name', 'balance', 'last_four_digits', 'status_colored')
+    list_filter = ('type', 'status', 'created_at')
+    search_fields = ('user_id', 'name', 'last_four_digits', 'id')
+    readonly_fields = ('card_number_encrypted', 'cvv_encrypted', 'created_at', 'updated_at')
     fieldsets = (
         ('Владелец и Баланс', {
-            'fields': ('user', 'balance', 'currency')
+            'fields': ('user_id', 'balance')
         }),
         ('Детали карты (Только чтение)', {
-            'fields': ('card_type', 'card_number', 'last_four_digits', 'expiry_date', 'cvv')
+            'fields': ('type', 'name', 'last_four_digits', 'expiry_date', 'card_number_encrypted', 'cvv_encrypted')
         }),
-        ('Управление', {
-            'fields': ('status', 'is_virtual', 'pin_code') 
+        ('Управление и Статус', {
+            'fields': ('status', 'annual_fee', 'activated_at')
         }),
     )
     def status_colored(self, obj):

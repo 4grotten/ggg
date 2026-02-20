@@ -3,16 +3,17 @@ from .models import Profiles
 
 @admin.register(Profiles)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'phone_number', 'verification_status', 'created_at')
-    list_filter = ('verification_status', 'created_at')
-    search_fields = ('user__username', 'user__email', 'phone_number', 'id')
+    list_display = ('id', 'user_id', 'phone', 'first_name', 'last_name', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user_id', 'phone', 'first_name', 'last_name', 'id')
     readonly_fields = ('created_at', 'updated_at')
+    
     fieldsets = (
-        ('Привязка к пользователю', {
-            'fields': ('user', 'phone_number')
+        ('Основная информация', {
+            'fields': ('user_id', 'phone', 'first_name', 'last_name', 'gender', 'language')
         }),
-        ('Статус и KYC', {
-            'fields': ('verification_status', 'country', 'address')
+        ('Медиа', {
+            'fields': ('avatar_url',)
         }),
         ('Системная информация', {
             'fields': ('created_at', 'updated_at'),
