@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark, Eye, EyeOff } from "lucide-react";
+import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark, Eye, EyeOff, Wallet } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
@@ -18,14 +18,15 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 
 interface Destination {
   id: string;
-  type: "card" | "bank";
+  type: "card" | "bank" | "wallet";
   cardType?: "virtual" | "metal";
   name: string;
   subtitle: string;
   fullNumber: string;
 }
 
-const getDestinations = (bankLabel: string): Destination[] => [
+const getDestinations = (bankLabel: string, walletLabel: string, walletAddress: string): Destination[] => [
+  { id: "wallet", type: "wallet", name: walletLabel, subtitle: `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`, fullNumber: walletAddress },
   { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
   { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
   { id: "bank", type: "bank", name: bankLabel, subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
@@ -48,10 +49,12 @@ const networks = [
 const TopUpCrypto = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const destinations = getDestinations(t("topUp.bankAccountAed", "Bank Account AED"));
+  const userWalletAddress = networkAddresses.trc20;
+  const walletLabel = t("drawer.usdtBalance", "USDT TRC20 Кошелек");
+  const destinations = getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress);
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedDest, setSelectedDest] = useState<Destination>(() => getDestinations(t("topUp.bankAccountAed", "Bank Account AED"))[0]);
+  const [selectedDest, setSelectedDest] = useState<Destination>(() => getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress)[0]);
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
   const [destDrawerOpen, setDestDrawerOpen] = useState(false);
   const [revealedId, setRevealedId] = useState<string | null>(null);
@@ -161,13 +164,17 @@ const TopUpCrypto = () => {
               <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                 selectedDest.type === "bank"
                   ? "bg-purple-500"
-                  : selectedDest.cardType === "metal" 
-                    ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                    : "bg-primary"
+                  : selectedDest.type === "wallet"
+                    ? "bg-[#26A17B]"
+                    : selectedDest.cardType === "metal" 
+                      ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                      : "bg-primary"
               }`}>
                 {selectedDest.type === "bank" 
                   ? <Landmark className="w-3.5 h-3.5 text-primary-foreground" />
-                  : <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
+                  : selectedDest.type === "wallet"
+                    ? <Wallet className="w-3.5 h-3.5 text-white" />
+                    : <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
                 }
               </div>
               <span className="font-semibold text-foreground">{selectedDest.name}</span>
@@ -286,13 +293,17 @@ const TopUpCrypto = () => {
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     dest.type === "bank"
                       ? "bg-purple-500"
-                      : dest.cardType === "metal" 
-                        ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                        : "bg-primary"
+                      : dest.type === "wallet"
+                        ? "bg-[#26A17B]"
+                        : dest.cardType === "metal" 
+                          ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                          : "bg-primary"
                   }`}>
                     {dest.type === "bank" 
                       ? <Landmark className="w-5 h-5 text-primary-foreground" />
-                      : <CreditCard className="w-5 h-5 text-primary-foreground" />
+                      : dest.type === "wallet"
+                        ? <Wallet className="w-5 h-5 text-white" />
+                        : <CreditCard className="w-5 h-5 text-primary-foreground" />
                     }
                   </div>
                   <div className="flex-1 text-left">
