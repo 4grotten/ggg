@@ -11,7 +11,9 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 
-const APP_LINK = "https://test.apofiz.com/EasyCard/";
+import { EASYCARD_APP_URL } from "@/config/apofiz";
+
+const APP_LINK = EASYCARD_APP_URL;
 
 interface ShareDrawerProps {
   open: boolean;

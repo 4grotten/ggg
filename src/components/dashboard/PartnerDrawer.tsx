@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { EASYCARD_APP_URL } from "@/config/apofiz";
 import { useNavigate } from "react-router-dom";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { ArrowLeft, Users, Percent, ClipboardCheck, Send, Copy, Share2, X } from "lucide-react";
@@ -79,7 +80,7 @@ export const PartnerDrawer = ({ open, onOpenChange }: PartnerDrawerProps) => {
     return false;
   };
 
-  const appLink = "https://test.apofiz.com/EasyCard/";
+  const appLink = EASYCARD_APP_URL;
 
   const handleCopyLink = () => {
     if (handleGuestShareAction()) return;

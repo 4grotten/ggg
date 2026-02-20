@@ -3,7 +3,9 @@ import { Send, Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-const APP_LINK = "https://test.apofiz.com/EasyCard/";
+import { EASYCARD_APP_URL } from "@/config/apofiz";
+
+const APP_LINK = EASYCARD_APP_URL;
 
 interface ShareButtonProps {
   onClick: () => void;
