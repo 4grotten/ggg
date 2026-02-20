@@ -114,7 +114,7 @@ const TopUpCrypto = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
-      rightAction={<><ThemeSwitcher /><LanguageSwitcher /></>}
+      rightAction={<div className="flex items-center gap-2"><ThemeSwitcher /><LanguageSwitcher /></div>}
     >
       <div className="flex flex-col min-h-[calc(100vh-56px)] pb-28">
         {/* Title */}
