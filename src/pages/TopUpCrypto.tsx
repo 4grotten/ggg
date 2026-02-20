@@ -290,6 +290,9 @@ const TopUpCrypto = () => {
                       {revealedId === dest.id ? dest.fullNumber : dest.subtitle}
                     </p>
                   </div>
+                  {selectedDest.id === dest.id && (
+                    <Check className="w-5 h-5 text-primary" />
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -302,9 +305,6 @@ const TopUpCrypto = () => {
                       : <Eye className="w-4 h-4 text-muted-foreground" />
                     }
                   </button>
-                  {selectedDest.id === dest.id && (
-                    <Check className="w-5 h-5 text-primary" />
-                  )}
                 </button>
               ))}
             </div>
