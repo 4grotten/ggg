@@ -28,7 +28,7 @@ DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
-ORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = default_headers + (
     "cache-control",
@@ -36,7 +36,7 @@ CORS_ALLOW_HEADERS = default_headers + (
     "Access-Control-Allow-Credentials",
 )
 
-
+CSRF_TRUSTED_ORIGINS = ['https://ueasycard.com', 'https://www.ueasycard.com']
 
 # Application definition
 
