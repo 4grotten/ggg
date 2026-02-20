@@ -4,5 +4,6 @@ app_name = 'api'
 
 urlpatterns = [
     path('transactions/', include('api.transactions_api.urls')),
-    path('cards/', include('api.cards_api.urls'))
+    path('cards/', include('api.cards_api.urls')),
+    path('accounts/', include('api.accounts_api.urls'))
 ]

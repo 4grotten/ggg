@@ -35,9 +35,7 @@ urlpatterns = [
       name="schema-swagger-ui",
     ),
     path("redoc/", schema_view.with_ui("redoc",
-                                     cache_timeout=0), name="schema-redoc"),
-    path("api/auth/", include("djoser.urls")),
-    path("api/auth/", include("djoser.urls.jwt"))
+                                     cache_timeout=0), name="schema-redoc")
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 ) + staticfiles_urlpatterns()

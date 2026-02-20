@@ -1,6 +1,7 @@
 
 from django.db import models
-
+from django.utils import timezone
+from datetime import timedelta
 
 class AdminActionHistory(models.Model):
     id = models.UUIDField(primary_key=True)
@@ -61,3 +62,13 @@ class UserRoles(models.Model):
         managed = False
         db_table = 'user_roles'
         unique_together = (('user_id', 'role'),)
+
+
+class OTPRecord(models.Model):
+    phone_number = models.CharField(max_length=20, db_index=True)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_valid(self):
+        return not self.is_used and timezone.now() < self.created_at + timedelta(minutes=5)

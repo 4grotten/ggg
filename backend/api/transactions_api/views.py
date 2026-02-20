@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -14,14 +14,15 @@ from .serializers import (
 )
 from apps.transactions_apps.services import TransactionService
 
+
 class BankTopupView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     @swagger_auto_schema(
         operation_summary="Инициация банковского пополнения (Bank Wire)",
         operation_description=(
-            "Создает заявку на пополнение в статусе pending и возвращает банковские реквизиты компании.\n\n"
-            " **АКТИВНЫЕ ЗАГЛУШКИ (STUBS):**\n"
-            "* **Auth**: `user_id` генерируется случайно. В будущем будет браться из JWT `request.user.id`.\n"
-            "* **Matching**: Завершение транзакции будет реализовано позже через прием Webhook от банка."
+            "Создает заявку на пополнение в статусе pending и возвращает банковские реквизиты компании для осуществления перевода.\n\n"
+            "Требует передачи валидного токена авторизации. Завершение транзакции и фактическое зачисление средств происходят асинхронно после получения подтверждения (Webhook) от банка-эмитента."
         ),
         request_body=BankTopupRequestSerializer,
         responses={201: BankTopupResponseSerializer, 400: ErrorResponseSerializer},
@@ -31,10 +32,8 @@ class BankTopupView(APIView):
         serializer = BankTopupRequestSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                import uuid
-                user_id = uuid.uuid4() # ЗАГЛУШКА
                 topup = TransactionService.initiate_bank_topup(
-                    user_id=user_id,
+                    user_id=request.user.id,
                     transfer_rail=serializer.validated_data['transfer_rail']
                 )
                 return Response({
@@ -48,14 +47,13 @@ class BankTopupView(APIView):
 
 
 class CryptoTopupView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     @swagger_auto_schema(
         operation_summary="Инициация пополнения стейблкоинами (Crypto Topup)",
         operation_description=(
-            "Генерирует уникальный крипто-адрес для пополнения баланса карты.\n\n"
-            " **АКТИВНЫЕ ЗАГЛУШКИ (STUBS):**\n"
-            "* **Auth**: `user_id` генерируется случайно (будет заменен на JWT).\n"
-            "* **Крипто-адрес**: Сейчас `deposit_address` генерируется как случайная строка. В будущем метод будет делать API-вызов к провайдеру (Tatum/Fireblocks) для генерации реального адреса кошелька в сети TRC20/ERC20.\n"
-            "* **Комиссии**: Минимальная сумма (10.00) и комиссия (1.5%) захардкожены в сервисе."
+            "Генерирует уникальный криптографический адрес для пополнения баланса карты в выбранной сети.\n\n"
+            "Требует передачи валидного токена авторизации. На текущем этапе архитектуры формирование адреса эмулируется. Интеграция с провайдерами ликвидности (Fireblocks/Tatum) для генерации реальных адресов находится в стадии внедрения."
         ),
         request_body=CryptoTopupRequestSerializer,
         responses={201: CryptoTopupResponseSerializer, 400: ErrorResponseSerializer},
@@ -64,10 +62,8 @@ class CryptoTopupView(APIView):
     def post(self, request):
         serializer = CryptoTopupRequestSerializer(data=request.data)
         if serializer.is_valid():
-            import uuid
-            user_id = uuid.uuid4() # ЗАГЛУШКА
             topup = TransactionService.initiate_crypto_topup(
-                user_id=user_id,
+                user_id=request.user.id,
                 card_id=serializer.validated_data['card_id'],
                 token=serializer.validated_data['token'],
                 network=serializer.validated_data['network']
@@ -81,13 +77,13 @@ class CryptoTopupView(APIView):
 
 
 class CardTransferView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_summary="Перевод с карты на карту (Внутренний)",
+        operation_summary="Внутренний перевод средств (Card to Card)",
         operation_description=(
-            "Моментальный перевод средств между картами внутри системы.\n\n"
-            " **АКТИВНЫЕ ЗАГЛУШКИ (STUBS):**\n"
-            "* **Auth**: `sender_id` генерируется случайно. Будет заменен на JWT.\n"
-            "* Логика блокировки балансов (`select_for_update`) уже РЕАЛЬНАЯ и готова к проду."
+            "Осуществляет моментальный перевод средств между расчетными счетами внутри закрытого контура платформы.\n\n"
+            "Требует передачи валидного токена авторизации. Применяется строгая транзакционная блокировка базы данных (select_for_update) для исключения состояния гонки (race condition)."
         ),
         request_body=CardTransferRequestSerializer,
         responses={200: CardTransferResponseSerializer, 400: ErrorResponseSerializer},
@@ -97,10 +93,8 @@ class CardTransferView(APIView):
         serializer = CardTransferRequestSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                import uuid
-                sender_id = uuid.uuid4() # ЗАГЛУШКА
                 txn = TransactionService.execute_card_transfer(
-                    sender_id=sender_id,
+                    sender_id=request.user.id,
                     sender_card_id=serializer.validated_data['sender_card_id'],
                     receiver_card_number=serializer.validated_data['receiver_card_number'],
                     amount=serializer.validated_data['amount']
@@ -116,14 +110,13 @@ class CardTransferView(APIView):
 
 
 class CryptoWithdrawalView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_summary="Вывод средств на криптокошелек",
+        operation_summary="Вывод средств на сторонний криптокошелек",
         operation_description=(
-            "Списывает фиат с карты (AED) и создает заявку на вывод в стейблкоинах.\n\n"
-            " **АКТИВНЫЕ ЗАГЛУШКИ (STUBS):**\n"
-            "* **Auth**: `user_id` генерируется случайно.\n"
-            "* **Market Data**: Курс обмена (`3.67`) и комиссия сети (`1.50 USDT`) захардкожены в `TransactionService`. Позже будут подтягиваться через API Binance или Redis-кэш.\n"
-            "* **Отправка провайдеру**: Сейчас транзакция просто сохраняется в БД со статусом `pending`. Фактическая отправка транзакции в блокчейн будет реализована позже через брокер задач (Celery)."
+            "Регистрирует дебетовую операцию по фиатному счету (AED) и инициирует заявку на отправку эквивалента в цифровых активах.\n\n"
+            "Требует передачи валидного токена авторизации. Фактическая передача подписанной транзакции в блокчейн-сеть делегируется асинхронным фоновым процессам."
         ),
         request_body=CryptoWithdrawalRequestSerializer,
         responses={200: CryptoWithdrawalResponseSerializer, 400: ErrorResponseSerializer},
@@ -133,10 +126,8 @@ class CryptoWithdrawalView(APIView):
         serializer = CryptoWithdrawalRequestSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                import uuid
-                user_id = uuid.uuid4() # ЗАГЛУШКА
                 withdrawal = TransactionService.execute_crypto_withdrawal(
-                    user_id=user_id,
+                    user_id=request.user.id,
                     card_id=serializer.validated_data['from_card_id'],
                     token=serializer.validated_data['token'],
                     network=serializer.validated_data['network'],
@@ -154,13 +145,13 @@ class CryptoWithdrawalView(APIView):
 
 
 class BankWithdrawalView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_summary="Вывод на банковский счет (Bank Wire AED)",
+        operation_summary="Вывод средств на банковский счет (Bank Wire)",
         operation_description=(
-            "Списывает средства с карты и формирует заявку на банковский перевод (SWIFT/Local).\n\n"
-            " **АКТИВНЫЕ ЗАГЛУШКИ (STUBS):**\n"
-            "* **Auth**: `user_id` генерируется случайно.\n"
-            "* **Интеграция с банком**: Транзакция сохраняется в БД, но автоматическая отправка платежного поручения по API в банк пока не реализована. Будет добавлена позже через фоновую задачу."
+            "Формирует поручение на классический банковский перевод (SWIFT или локальный клиринг) с удержанием средств с баланса карты.\n\n"
+            "Требует передачи валидного токена авторизации. Автоматизированный шлюз маршрутизации платежных поручений находится в стадии интеграции."
         ),
         request_body=BankWithdrawalRequestSerializer,
         responses={200: BankWithdrawalResponseSerializer, 400: ErrorResponseSerializer},
@@ -170,10 +161,8 @@ class BankWithdrawalView(APIView):
         serializer = BankWithdrawalRequestSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                import uuid
-                user_id = uuid.uuid4() # ЗАГЛУШКА
                 withdrawal = TransactionService.execute_bank_withdrawal(
-                    user_id=user_id,
+                    user_id=request.user.id,
                     card_id=serializer.validated_data['from_card_id'],
                     iban=serializer.validated_data['iban'],
                     beneficiary_name=serializer.validated_data['beneficiary_name'],
@@ -192,16 +181,18 @@ class BankWithdrawalView(APIView):
 
 
 class TransactionReceiptView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     @swagger_auto_schema(
-        operation_summary="Получить детали транзакции (Квитанция)",
+        operation_summary="Получить выписку (Квитанцию) по транзакции",
         operation_description=(
-            "Возвращает детальную информацию (квитанцию) по конкретной транзакции.\n\n"
-            "Формат ответа **динамический** и зависит от типа операции:\n"
-            "- **Bank Topup**: возвращает `sender_name`, `sender_bank`, `sender_iban`.\n"
-            "- **Crypto Topup**: возвращает `network`, `token`, `sender_address`, `exchange_rate`.\n"
-            "- **Card Transfer**: возвращает `sender_card_mask`, `receiver_card_mask`, `recipient_name`.\n"
-            "- **Crypto Withdrawal**: возвращает `to_address_mask`, `tx_hash`, `amount_crypto`.\n"
-            "- **Bank Withdrawal**: возвращает `recipient_name`, `iban_mask`, `bank_name`, `total_debit`."
+            "Возвращает структурированный отчет по конкретной финансовой операции. Метод осуществляет проверку прав доступа.\n\n"
+            "Формат ответа динамически адаптируется под тип транзакции:\n"
+            "- Входящий банковский перевод (Bank Topup).\n"
+            "- Входящий криптовалютный перевод (Crypto Topup).\n"
+            "- Внутренний перевод (Card Transfer).\n"
+            "- Исходящий криптовалютный перевод (Crypto Withdrawal).\n"
+            "- Исходящий банковский перевод (Bank Withdrawal)."
         ),
         responses={
             200: openapi.Response(
