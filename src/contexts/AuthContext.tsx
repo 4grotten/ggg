@@ -159,23 +159,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Проверяем токен через API
     const response = await getCurrentUser();
     
-    // ВАЖНО: Удаляем токен ТОЛЬКО при 401 (невалидный токен)
-    // При других ошибках (сеть, 500) оставляем пользователя залогиненным
     if (response.status === 401) {
-      // Токен точно невалидный — сервер это подтвердил
-      removeAuthToken();
-      setUser(null);
+      // Токен невалидный — Apofiz подтвердил
+      console.warn('[AuthContext] checkAuth: 401 — token invalid, cleaning up');
       
-      // Редирект на страницу входа, если не на публичном роуте
-      const pathname = window.location.pathname;
-      if (!PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
-        navigate('/auth/phone', { replace: true });
+      // Удаляем текущий аккаунт из сохранённых (если знаем id)
+      const cachedUserObj = cachedUser ? JSON.parse(cachedUser) : null;
+      if (cachedUserObj?.id) {
+        removeAccount(cachedUserObj.id);
+      }
+      
+      // Проверяем есть ли другие сохранённые аккаунты
+      const remainingAccounts = getSavedAccounts();
+      if (remainingAccounts.length > 0) {
+        // Переключаемся на следующий аккаунт
+        const next = remainingAccounts[0];
+        setAuthToken(next.token);
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(next.user));
+        setUser(next.user);
+        syncWithApofiz(next.token, next.user);
+        console.log('[AuthContext] Switched to next account:', next.user.id);
+        // Сбрасываем флаг чтобы перепроверить новый токен
+        hasCheckedRef.current = false;
+        setIsLoading(false);
+        return;
+      } else {
+        // Нет аккаунтов — стандартный logout
+        removeAuthToken();
+        clearApofizSync();
+        setUser(null);
+        setIsLoading(false);
+        const pathname = window.location.pathname;
+        if (!PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
+          navigate('/auth/phone', { replace: true });
+        }
+        return;
       }
     } else if (response.data) {
       // Успешный ответ — обновляем данные пользователя
       setUser(response.data);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
     }
-    // При других ошибках (сеть, 500) — оставляем кэшированного пользователя
+    // При сетевых ошибках (status 0, 500) — оставляем кэшированного пользователя
     
     setIsLoading(false);
   }, [navigate]);

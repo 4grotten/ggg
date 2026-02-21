@@ -4,9 +4,9 @@
  */
 
 // Base URLs
-export const APOFIZ_BASE_URL = 'https://apofiz.com';
+export const APOFIZ_BASE_URL = 'https://ueasycard.com';
 
-export const APOFIZ_API_URL = `${APOFIZ_BASE_URL}/api/v1`;
+export const APOFIZ_API_URL = `${APOFIZ_BASE_URL}/api/v1/accounts`;
 
 export const APOFIZ_CDN_URL = 'https://cdn.apofiz.com';
 

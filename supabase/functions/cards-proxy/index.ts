@@ -15,8 +15,7 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const endpoint = url.searchParams.get("endpoint") || "/cards/balances/";
 
-    // Temporary: use known working token until backend networking is fixed
-    const backendToken = "e88bee3a891dd71501c14de1c1c94fd3af34cb3b";
+    const backendToken = req.headers.get("x-backend-token");
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -27,13 +26,26 @@ Deno.serve(async (req) => {
     }
 
     const backendUrl = `${BACKEND_BASE}${endpoint}`;
-    console.log(`[cards-proxy] Proxying to: ${backendUrl}`);
+    console.log(`[cards-proxy] ${req.method} → ${backendUrl}`);
 
-    const response = await fetch(backendUrl, {
-      method: "GET",
+    const fetchOptions: RequestInit = {
+      method: req.method,
       headers,
-    });
+    };
 
+    // Forward body for POST/PUT/PATCH
+    if (["POST", "PUT", "PATCH"].includes(req.method)) {
+      try {
+        const body = await req.text();
+        if (body) {
+          fetchOptions.body = body;
+        }
+      } catch (_) {
+        // no body
+      }
+    }
+
+    const response = await fetch(backendUrl, fetchOptions);
     const data = await response.text();
 
     return new Response(data, {
