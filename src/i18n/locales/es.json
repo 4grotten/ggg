@@ -1682,6 +1682,8 @@
   "accountPage": {
     "title": "Cuenta AED",
     "bankAccount": "Cuenta Bancaria",
+    "beneficiary": "Beneficiario",
+    "bankName": "Banco",
     "share": "Compartir",
     "qrCode": "Código QR",
     "details": "Datos de la cuenta",

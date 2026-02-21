@@ -1767,6 +1767,8 @@
   "accountPage": {
     "title": "AED Account",
     "bankAccount": "Bank Account",
+    "beneficiary": "Beneficiary",
+    "bankName": "Bank",
     "share": "Share",
     "qrCode": "QR Code",
     "details": "Account Details",

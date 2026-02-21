@@ -90,8 +90,8 @@ const AccountPage = () => {
   
   const getAllDetailsText = () => {
     return [
-      `${t('accountPage.beneficiary', 'Beneficiary')}: ${userName}`,
-      `${t('accountPage.bankName', 'Bank')}: ${bankName}`,
+      `${t('accountPage.beneficiary')}: ${userName}`,
+      `${t('accountPage.bankName')}: ${bankName}`,
       `IBAN: ${iban}`,
       `${t('accountPage.accountNumber')}: ${accountNumber}`,
       `${t('accountPage.currency')}: ${currency}`,
@@ -283,7 +283,7 @@ const AccountPage = () => {
                 {account?.beneficiary && (
                   <>
                     <div>
-                      <p className="text-xs text-muted-foreground">{t('accountPage.beneficiary', 'Beneficiary')}</p>
+                      <p className="text-xs text-muted-foreground">{t('accountPage.beneficiary')}</p>
                       <p className="text-sm font-medium">{account.beneficiary}</p>
                     </div>
                     <div className="h-px bg-border/50" />
@@ -293,7 +293,7 @@ const AccountPage = () => {
                 {account?.bank_name && (
                   <>
                     <div>
-                      <p className="text-xs text-muted-foreground">{t('accountPage.bankName', 'Bank')}</p>
+                      <p className="text-xs text-muted-foreground">{t('accountPage.bankName')}</p>
                       <p className="text-sm font-medium">{account.bank_name}</p>
                     </div>
                     <div className="h-px bg-border/50" />
