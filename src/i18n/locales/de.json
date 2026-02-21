@@ -562,7 +562,7 @@
     "networkFeeFlat": "Netzwerkgebühr",
     "debited": "Abgebucht",
     "bankTransfer": "Banküberweisung",
-    "bankTransferIncoming": "Banküberweisung",
+    "bankTransferIncoming": "Banküberweisung Eingang",
     "iban": "IBAN",
     "bankName": "Bankname",
     "bankFee": "Bankgebühr",
@@ -628,7 +628,7 @@
     "annualCardFee": "Jährliche Kartengebühr",
     "stablecoinSend": "Stablecoin Senden",
     "bankTransfer": "Banküberweisung",
-    "bankTransferIncoming": "Banküberweisung",
+    "bankTransferIncoming": "Banküberweisung Eingang",
     "months": {
       "january": "Januar",
       "february": "Februar",
