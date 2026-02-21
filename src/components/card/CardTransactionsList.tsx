@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Plus, Ban, ArrowUpRight, Clock, CheckCircle, Send, Landmark, CreditCard, DollarSign } from "lucide-react";
+import { Plus, Ban, ArrowUpRight, Clock, CheckCircle, Send, Landmark, CreditCard } from "lucide-react";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { useTranslation } from "react-i18next";
 import { Transaction, TransactionGroup } from "@/types/transaction";
 
@@ -196,7 +197,7 @@ const handleClick = (transaction: Transaction) => {
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: "#22C55E" }}
                         >
-                          <DollarSign className="w-5 h-5" />
+                          <UsdtIcon size={22} />
                         </div>
                       ) : walletView && isTopup ? (
                         <div 
