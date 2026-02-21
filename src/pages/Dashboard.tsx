@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, Landmark, ChevronRight } from "lucide-react";
+import { Clock, Landmark, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -49,6 +49,7 @@ import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { preloadTgs } from "@/components/ui/TgsPlayer";
 import partnerNetworkHero from "@/assets/partner-network-hero.png";
 import { UsdtIcon } from "@/components/icons/CryptoIcons";
+import { AccountWalletButtons } from "@/components/dashboard/AccountWalletButtons";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -238,39 +239,13 @@ const Dashboard = () => {
 
           {/* Account & Wallet Buttons */}
           <AnimatedSection delay={0.65} preset="fadeUpScale">
-            <div className="flex gap-3">
-              <button
-                onClick={() => navigate("/account")}
-                className="flex-1 flex items-center justify-between rounded-xl bg-secondary/50 hover:bg-secondary/80 transition-colors p-3 group"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                    <Landmark className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-semibold">Счёт</p>
-                    <p className="text-[10px] text-muted-foreground">AED{physicalAccount?.iban ? ` •${physicalAccount.iban.slice(-4)}` : ''}</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
-              </button>
-
-              <button
-                onClick={() => navigate("/wallet")}
-                className="flex-1 flex items-center justify-between rounded-xl bg-secondary/50 hover:bg-secondary/80 transition-colors p-3 group"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-accent/50 flex items-center justify-center">
-                    <UsdtIcon size={16} />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-semibold">Кошелёк</p>
-                    <p className="text-[10px] text-muted-foreground">USDT •TRC20</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
+            <AccountWalletButtons
+              accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0}
+              accountIbanLast4={physicalAccount?.iban?.slice(-4)}
+              usdtBalance={112000}
+              onAccountClick={() => navigate("/account")}
+              onWalletClick={() => navigate("/wallet")}
+            />
           </AnimatedSection>
 
           {/* Send to Card */}
