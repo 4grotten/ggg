@@ -11,6 +11,7 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { useMergedTransactionGroups } from "@/hooks/useTransactions";
+import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Drawer,
@@ -23,6 +24,12 @@ const WalletPage = () => {
   const { t } = useTranslation();
   const [qrOpen, setQrOpen] = useState(false);
   const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
+  const { data: cryptoWalletsData } = useCryptoWallets();
+  
+  const wallet = cryptoWalletsData?.[0];
+  const usdtBalance = wallet ? parseFloat(wallet.balance) : 0;
+  const walletAddress = wallet?.address || "—";
+
   const transactionGroups = useMemo(() => {
     const groups = transactionsData?.groups || [];
     const cryptoTypes = ["topup", "crypto_withdrawal", "crypto_deposit", "top_up", "withdrawal"];
@@ -40,8 +47,7 @@ const WalletPage = () => {
       .filter(group => group.transactions.length > 0);
   }, [transactionsData]);
 
-  const usdtBalance = 112000; // TODO: replace with real API data
-  const walletAddress = "TXyz...placeholder"; // TODO: replace with real wallet address
+
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
