@@ -251,7 +251,7 @@ const Chat = () => {
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.3 }}
-                  className="absolute -top-11 -left-2 z-20"
+                  className="absolute -top-11 -left-8 z-20"
                 >
                   <motion.div 
                     animate={{ y: [0, -2, 0] }}
