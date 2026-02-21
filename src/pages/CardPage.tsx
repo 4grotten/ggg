@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { AddToWalletDrawer } from "@/components/card/AddToWalletDrawer";
-import { useCards } from "@/hooks/useCards";
+import { useWalletSummary } from "@/hooks/useCards";
 import { detectPlatform } from "@/lib/walletDeepLinks";
 import {
   Collapsible,
@@ -158,9 +158,9 @@ const CardPage = () => {
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [walletDrawerOpen, setWalletDrawerOpen] = useState(false);
 
-  // Fetch real balances from API
-  const { data: allCardsData } = useCards();
-  const apiCards = allCardsData?.data || [];
+  // Fetch real card data from API
+  const { data: walletData } = useWalletSummary();
+  const apiCards = walletData?.data?.cards || [];
 
   const handleUnlock = () => {
     setIsUnlocking(true);
@@ -171,12 +171,17 @@ const CardPage = () => {
   };
 
   const currentCardType = cardTypes[activeIndex];
+  const apiCard = apiCards.find(c => c.type === currentCardType);
+
+  // Format card number with spaces: "4532112233000002" → "4532 1122 3300 0002"
+  const formatCardNumber = (num: string) =>
+    num.replace(/(.{4})/g, '$1 ').trim();
+
   const cardData = {
     ...cardsData[currentCardType],
-    balance: (() => {
-      const apiCard = apiCards.find(c => c.type === currentCardType);
-      return apiCard?.balance ?? cardsData[currentCardType].balance;
-    })(),
+    balance: apiCard ? parseFloat(apiCard.balance) : cardsData[currentCardType].balance,
+    fullNumber: apiCard ? formatCardNumber(apiCard.card_number) : cardsData[currentCardType].fullNumber,
+    lastFour: apiCard ? apiCard.card_number.slice(-4) : cardsData[currentCardType].lastFour,
   };
 
   // Update URL when card changes
