@@ -4,7 +4,6 @@
 
 import { apiPost, apiGet, apiRequest, setAuthToken, getAuthToken, AUTH_USER_KEY } from './apiClient';
 import { saveCurrentAccount } from '@/hooks/useMultiAccount';
-import { APOFIZ_API_URL } from '@/config/apofiz';
 
 // ============ Types ============
 
@@ -315,15 +314,23 @@ export async function uploadAvatar(file: File): Promise<AvatarData> {
   const formData = new FormData();
   formData.append('file', file);
   
-  const url = `${APOFIZ_API_URL}/files/`;
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent('/files/')}`;
   const token = getAuthToken();
+  
+  const headers: Record<string, string> = {
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+  };
+  
+  if (token) {
+    headers['x-backend-token'] = token;
+  }
   
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Authorization': `Token ${token}`
-      // НЕ указывать Content-Type — браузер сам поставит multipart boundary
-    },
+    headers,
     body: formData
   });
   
