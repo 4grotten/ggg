@@ -181,10 +181,13 @@ const Chat = () => {
             <AnimatePresence>
               {messages.map((message, index) => {
                 const isLastAssistant = message.role === 'assistant' && index === messages.length - 1;
-                const hasTransactionData = isLastAssistant && !isLoading && /транзакц|операц|перевод|пополнен|AED/i.test(message.content);
+                // Only show period select if the user asked about transactions/balance/history
+                const prevUserMsg = index > 0 ? messages[index - 1] : null;
+                const userAskedForTransactions = prevUserMsg?.role === 'user' && /транзакц|операц|истори|баланс|отчет|покажи|выписк/i.test(prevUserMsg.content);
+                const showPeriod = isLastAssistant && !isLoading && userAskedForTransactions;
                 return (
                   <div key={index}>
-                    <ChatMessage role={message.role} content={message.content} periodSelect={hasTransactionData ? handleSendMessage : undefined} />
+                    <ChatMessage role={message.role} content={message.content} periodSelect={showPeriod ? handleSendMessage : undefined} />
                   </div>
                 );
               })}
