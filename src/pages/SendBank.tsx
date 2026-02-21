@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X, Wallet, Landmark } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -18,6 +18,7 @@ import {
 import { BANK_TRANSFER_FEE_PERCENT } from "@/lib/fees";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
 
 interface SourceOption {
   id: string;
@@ -28,13 +29,6 @@ interface SourceOption {
   balance: number;
 }
 
-const getSourceOptions = (t: ReturnType<typeof useTranslation>["t"], userFullName: string, userId: string): SourceOption[] => [
-  { id: "card-1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", balance: 213757.49 },
-  { id: "card-2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", balance: 256508.98 },
-  { id: "bank", type: "bank", name: t("send.bankAccountAed", "Банковский счёт AED"), subtitle: `IBAN •••• ${userId.slice(-3)}`, balance: 0 },
-  { id: "wallet", type: "wallet", name: t("drawer.usdtBalance", "USDT TRC20 Кошелек"), subtitle: "TRC20", balance: 112000 },
-];
-
 const SendBank = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,14 +36,59 @@ const SendBank = () => {
   
   const { user } = useAuth();
   const { USDT_TO_AED_BUY } = useSettings();
-  const userId = user?.id?.toString() ?? "000";
-  const userFullName = user?.full_name || "—";
+
+  const { data: cardsData } = useCards();
+  const { data: bankAccountsData } = useBankAccounts();
+  const { data: cryptoWalletsData } = useCryptoWallets();
 
   // Check if this is a referral withdrawal
   const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
   const referralBalance = location.state?.referralBalance || 0;
-  
-  const sourceOptions = getSourceOptions(t, userFullName, userId);
+
+  const sourceOptions = useMemo<SourceOption[]>(() => {
+    const options: SourceOption[] = [];
+
+    // Cards from API
+    const cards = cardsData?.data ?? [];
+    cards.forEach((card) => {
+      const last4 = (card as any).card_number?.slice(-4) || card.lastFourDigits || "****";
+      options.push({
+        id: card.id,
+        type: "card",
+        cardType: card.type as "virtual" | "metal",
+        name: card.type === "metal" ? "Visa Metal" : "Visa Virtual",
+        subtitle: `•••• ${last4}`,
+        balance: typeof card.balance === "string" ? parseFloat(card.balance) : card.balance,
+      });
+    });
+
+    // Bank account from API
+    const bank = bankAccountsData?.data?.[0];
+    if (bank) {
+      const ibanLast = bank.iban?.slice(-4) || "0000";
+      options.push({
+        id: bank.id,
+        type: "bank",
+        name: t("send.bankAccountAed", "Банковский счёт AED"),
+        subtitle: `IBAN •••• ${ibanLast}`,
+        balance: parseFloat(bank.balance || "0"),
+      });
+    }
+
+    // Crypto wallet from API
+    const wallet = cryptoWalletsData?.data?.[0];
+    if (wallet) {
+      options.push({
+        id: wallet.id,
+        type: "wallet",
+        name: t("drawer.usdtBalance", "USDT TRC20 Кошелек"),
+        subtitle: "TRC20",
+        balance: parseFloat(wallet.balance || "0"),
+      });
+    }
+
+    return options;
+  }, [cardsData, bankAccountsData, cryptoWalletsData, t]);
   
   const [step, setStep] = useState(1);
   const [selectedSource, setSelectedSource] = useState<SourceOption>(sourceOptions[0]);
