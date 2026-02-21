@@ -562,7 +562,7 @@
     "networkFeeFlat": "Ağ ücreti",
     "debited": "Borçlandırıldı",
     "bankTransfer": "Banka Havalesi",
-    "bankTransferIncoming": "Banka Havalesi",
+    "bankTransferIncoming": "Gelen Banka Havalesi",
     "iban": "IBAN",
     "bankName": "Banka Adı",
     "bankFee": "Banka ücreti",
@@ -628,7 +628,7 @@
     "annualCardFee": "Yıllık Kart Ücreti",
     "stablecoinSend": "Stablecoin Gönder",
     "bankTransfer": "Banka Havalesi",
-    "bankTransferIncoming": "Banka Havalesi",
+    "bankTransferIncoming": "Gelen Banka Havalesi",
     "months": {
       "january": "Ocak",
       "february": "Şubat",

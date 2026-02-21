@@ -645,7 +645,7 @@
     "networkFeeFlat": "Network fee",
     "debited": "Debited",
     "bankTransfer": "Bank Transfer",
-    "bankTransferIncoming": "Bank Transfer",
+    "bankTransferIncoming": "Bank Transfer Incoming",
     "iban": "IBAN",
     "bankName": "Bank Name",
     "bankFee": "Bank fee",
@@ -711,7 +711,7 @@
     "annualCardFee": "Annual Card fee",
     "stablecoinSend": "Stablecoin Send",
     "bankTransfer": "Bank Transfer",
-    "bankTransferIncoming": "Bank Transfer",
+    "bankTransferIncoming": "Bank Transfer Incoming",
     "months": {
       "january": "January",
       "february": "February",

@@ -568,7 +568,7 @@
     "networkFeeFlat": "网络费用",
     "debited": "已扣款",
     "bankTransfer": "银行转账",
-    "bankTransferIncoming": "银行转账",
+    "bankTransferIncoming": "银行转账收入",
     "iban": "IBAN",
     "bankName": "银行名称",
     "bankFee": "银行手续费",
@@ -634,7 +634,7 @@
     "annualCardFee": "年度卡费",
     "stablecoinSend": "稳定币发送",
     "bankTransfer": "银行转账",
-    "bankTransferIncoming": "银行转账",
+    "bankTransferIncoming": "银行转账收入",
     "months": {
       "january": "一月",
       "february": "二月",

@@ -562,7 +562,7 @@
     "networkFeeFlat": "Comisión de red",
     "debited": "Debitado",
     "bankTransfer": "Transferencia Bancaria",
-    "bankTransferIncoming": "Transferencia Bancaria",
+    "bankTransferIncoming": "Transferencia Bancaria Entrante",
     "iban": "IBAN",
     "bankName": "Nombre del banco",
     "bankFee": "Comisión bancaria",
@@ -628,7 +628,7 @@
     "annualCardFee": "Cuota anual de tarjeta",
     "stablecoinSend": "Envío de Stablecoin",
     "bankTransfer": "Transferencia Bancaria",
-    "bankTransferIncoming": "Transferencia Bancaria",
+    "bankTransferIncoming": "Transferencia Bancaria Entrante",
     "months": {
       "january": "Enero",
       "february": "Febrero",

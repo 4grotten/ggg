@@ -562,7 +562,7 @@
     "networkFeeFlat": "رسوم الشبكة",
     "debited": "تم الخصم",
     "bankTransfer": "تحويل مصرفي",
-    "bankTransferIncoming": "تحويل مصرفي",
+    "bankTransferIncoming": "تحويل مصرفي وارد",
     "iban": "رقم الآيبان",
     "bankName": "اسم البنك",
     "bankFee": "رسوم البنك",
@@ -628,7 +628,7 @@
     "annualCardFee": "رسوم البطاقة السنوية",
     "stablecoinSend": "إرسال عملة مستقرة",
     "bankTransfer": "تحويل مصرفي",
-    "bankTransferIncoming": "تحويل مصرفي",
+    "bankTransferIncoming": "تحويل مصرفي وارد",
     "months": {
       "january": "يناير",
       "february": "فبراير",
