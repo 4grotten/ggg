@@ -58,12 +58,14 @@ export const isAuthenticated = (): boolean => {
  */
 export async function apiRequest<T = unknown>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  /** If true, endpoint is used as-is (no /accounts prefix) */
+  rawEndpoint = false
 ): Promise<ApiResponse<T>> {
   // Build proxy URL: cards-proxy?endpoint=/accounts/login/
   // The endpoint already starts with / (e.g. /login/, /otp/send/)
   // APOFIZ_API_URL was /api/v1/accounts, so we prepend /accounts to the endpoint
-  const proxyEndpoint = `/accounts${endpoint}`;
+  const proxyEndpoint = rawEndpoint ? endpoint : `/accounts${endpoint}`;
   const url = `${PROXY_URL}?endpoint=${encodeURIComponent(proxyEndpoint)}`;
   
   // Подготовка заголовков

@@ -9,6 +9,38 @@ import {
   TransactionType 
 } from '@/types/transaction';
 import { buildApiUrl, ENDPOINTS } from './config';
+import { apiRequest, getAuthToken } from './apiClient';
+
+// === Receipt type returned by GET /transactions/<id>/receipt/ ===
+export interface TransactionReceipt {
+  transaction_id: string;
+  status: string;
+  date_time: string;
+  type: string;
+  operation: string;
+  // Common
+  amount?: number;
+  fee?: number;
+  // Crypto fields
+  to_address_mask?: string;
+  from_address_mask?: string;
+  network_and_token?: string;
+  amount_crypto?: number;
+  tx_hash?: string | null;
+  // Card transfer fields
+  sender_card_mask?: string;
+  receiver_card_mask?: string;
+  recipient_name?: string;
+  // Bank fields
+  iban_mask?: string;
+  beneficiary_name?: string;
+  bank_name?: string;
+  amount_aed?: number;
+  fee_amount?: number;
+  total_debit_aed?: number;
+  // Generic catch-all
+  [key: string]: unknown;
+}
 
 // Mock data - will be replaced with actual API calls
 const mockTransactionGroups: TransactionGroup[] = [
@@ -175,6 +207,36 @@ export const fetchTransactionGroups = async (
       groups: [],
       error: error instanceof Error ? error.message : 'Failed to fetch transactions',
     };
+  }
+};
+
+// =============================================
+// REAL API CALLS (via cards-proxy → ueasycard.com)
+// =============================================
+
+/**
+ * Fetch transaction receipt from backend
+ * GET /api/v1/transactions/<transaction_id>/receipt/
+ */
+export const fetchTransactionReceipt = async (
+  transactionId: string
+): Promise<{ data: TransactionReceipt | null; error: string | null }> => {
+  try {
+    const result = await apiRequest<TransactionReceipt>(
+      `/transactions/${transactionId}/receipt/`,
+      { method: 'GET' },
+      true // rawEndpoint — skip /accounts prefix
+    );
+    
+    if (result.error) {
+      console.warn('[Transactions API] Receipt error:', result.error);
+      return { data: null, error: result.error.detail || result.error.message || 'Failed to fetch receipt' };
+    }
+    
+    return { data: result.data, error: null };
+  } catch (error) {
+    console.error('[Transactions API] Receipt fetch failed:', error);
+    return { data: null, error: error instanceof Error ? error.message : 'Network error' };
   }
 };
 
