@@ -7,6 +7,7 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
+import { useWalletSummary } from "@/hooks/useCards";
 
 // Mock transaction data - in real app would come from API/state
 const mockTransactions: Record<string, {
@@ -75,6 +76,8 @@ const TransactionDetails = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const { data: walletData } = useWalletSummary();
+  const userIban = walletData?.data?.physical_account?.iban || "";
   
   // Scroll to top on mount
   useEffect(() => {
@@ -464,11 +467,36 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.toAccount")}</span>
                 <button 
                   onClick={() => navigate("/account")}
-                  className="font-medium text-[#007AFF] hover:underline transition-colors"
+                  className="font-medium text-[#007AFF] hover:underline transition-colors text-right text-sm"
                 >
-                  AED Account
+                  {userIban ? `AED ••${userIban.slice(-4)}` : "AED Account"}
                 </button>
               </div>
+              {userIban && (
+                <div className="flex items-start justify-between">
+                  <span className="text-muted-foreground">{t("transaction.iban")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-right text-sm">
+                      {showToCard ? userIban : `${userIban.slice(0, 4)}••••${userIban.slice(-4)}`}
+                    </span>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(userIban);
+                        toast.success(t("toast.copied", { label: "IBAN" }));
+                      }}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => setShowToCard(!showToCard)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
             </>
           ) : isBankTransfer ? (
             <>
