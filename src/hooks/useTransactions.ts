@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   fetchTransactions, 
   fetchTransactionGroups, 
-  fetchTransactionById 
+  fetchTransactionById,
+  fetchTransactionReceipt 
 } from '@/services/api/transactions';
 import { FetchTransactionsParams } from '@/types/transaction';
 
@@ -15,6 +16,8 @@ export const transactionKeys = {
   groupsWithParams: (params?: FetchTransactionsParams) => [...transactionKeys.groups(), params] as const,
   details: () => [...transactionKeys.all, 'detail'] as const,
   detail: (id: string) => [...transactionKeys.details(), id] as const,
+  receipts: () => [...transactionKeys.all, 'receipt'] as const,
+  receipt: (id: string) => [...transactionKeys.receipts(), id] as const,
 };
 
 /**
@@ -24,7 +27,7 @@ export const useTransactions = (params?: FetchTransactionsParams) => {
   return useQuery({
     queryKey: transactionKeys.list(params),
     queryFn: () => fetchTransactions(params),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -35,7 +38,7 @@ export const useTransactionGroups = (params?: FetchTransactionsParams) => {
   return useQuery({
     queryKey: transactionKeys.groupsWithParams(params),
     queryFn: () => fetchTransactionGroups(params),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -47,6 +50,19 @@ export const useTransactionDetails = (id: string) => {
     queryKey: transactionKeys.detail(id),
     queryFn: () => fetchTransactionById(id),
     enabled: !!id,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+/**
+ * Hook to fetch transaction receipt from backend API
+ */
+export const useTransactionReceipt = (transactionId: string, enabled = true) => {
+  return useQuery({
+    queryKey: transactionKeys.receipt(transactionId),
+    queryFn: () => fetchTransactionReceipt(transactionId),
+    enabled: !!transactionId && enabled,
+    staleTime: 1000 * 60 * 30, // 30 minutes — receipts rarely change
+    retry: 1,
   });
 };
