@@ -21,7 +21,7 @@ const mockTransactions: Record<string, {
   cardLast4: string;
   exchangeRate: number;
   status: "settled" | "pending" | "failed" | "processing";
-  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "bank_transfer" | "bank_transfer_incoming";
+  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming";
   fromAddress?: string;
   tokenNetwork?: string;
   kartaFee?: number;
@@ -67,6 +67,7 @@ const mockTransactions: Record<string, {
   "21": { id: "21", merchant: "Bank Transfer", time: "07:45 PM", date: "12.01.2026", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "bank_transfer", recipientName: "EMIRATES TRADING LLC", recipientIban: "AE07 0331 2345 6789 0123 456", recipientBankName: "Emirates NBD", bankFee: 37.80, cardType: "Virtual" },
   "22": { id: "22", merchant: "Top up", time: "11:15 AM", date: "17.01.2026", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", cardLast4: "7617", exchangeRate: 3.65, status: "settled", type: "topup", fromAddress: "TFVFktvwmaEnMVh6ZxZq2rvmLePfTxhX9L", tokenNetwork: "USDT, Tron (TRC20)", kartaFee: 5.90, cardType: "Virtual" },
   "23": { id: "23", merchant: "Bank Transfer", time: "02:30 PM", date: "17.01.2026", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "bank_transfer_incoming", senderName: "AL MAJID TRADING LLC", senderIban: "AE21 0331 2345 6789 0654 321", senderBankName: "Abu Dhabi Commercial Bank", cardType: "Virtual" },
+  "24": { id: "24", merchant: "Wallet Deposit", time: "04:00 PM", date: "17.01.2026", amountUSDT: 5000.00, amountLocal: 5000.00, localCurrency: "USDT", color: "#22C55E", cardLast4: "", exchangeRate: 1, status: "settled", type: "crypto_deposit", fromAddress: "TRx8Kp2mN4vD9qL7wE3jF6hY5tR8Wp4mN2", tokenNetwork: "USDT, Tron (TRC20)" },
 };
 
 const TransactionDetails = () => {
@@ -107,6 +108,7 @@ const TransactionDetails = () => {
   const isCardActivation = transaction.type === "card_activation";
   const isCardTransfer = transaction.type === "card_transfer";
   const isCryptoSend = transaction.type === "crypto_send";
+  const isCryptoDeposit = transaction.type === "crypto_deposit";
   const isBankTransfer = transaction.type === "bank_transfer";
   const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
   const isIncomingTransfer = isCardTransfer && !!transaction.senderCard;
@@ -184,7 +186,7 @@ const TransactionDetails = () => {
           ) : isCryptoSend ? (
             <motion.div 
               className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
-              style={{ backgroundColor: "#10B981" }}
+              style={{ backgroundColor: "#007AFF" }}
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
@@ -199,6 +201,29 @@ const TransactionDetails = () => {
                 }}
               >
                 <Send className="w-10 h-10" strokeWidth={2.5} />
+              </motion.div>
+            </motion.div>
+          ) : isCryptoDeposit ? (
+            <motion.div 
+              className="w-20 h-20 rounded-full flex items-center justify-center text-white"
+              style={{ backgroundColor: "#22C55E" }}
+              initial={{ scale: 1 }}
+              animate={{ 
+                scale: [1, 1.1, 1],
+                rotate: [0, 90, 90]
+              }}
+              transition={{
+                duration: 0.6,
+                ease: "easeOut",
+                times: [0, 0.4, 1]
+              }}
+            >
+              <motion.div
+                initial={{ rotate: 0, scale: 0 }}
+                animate={{ rotate: 90, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
+              >
+                <Plus className="w-10 h-10" strokeWidth={2.5} />
               </motion.div>
             </motion.div>
           ) : isCardActivation ? (
@@ -364,11 +389,11 @@ const TransactionDetails = () => {
           )}
           
           <div className="space-y-1">
-            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer ? 'text-[#007AFF]' : ''}`}>
-              {isTopup || isIncomingTransfer || isBankTransferIncoming ? '+' : '-'}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">AED</span>
+            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer ? 'text-[#007AFF]' : ''}`}>
+              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? '+' : '-'}{isCryptoDeposit ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoDeposit ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isBankTransferIncoming ? t('transaction.bankTransferIncoming') : isBankTransfer ? t('transaction.bankTransfer') : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.bankTransferIncoming') : isBankTransfer ? t('transaction.bankTransfer') : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
@@ -524,6 +549,36 @@ const TransactionDetails = () => {
                 >
                   Visa {transaction.cardType} ••{transaction.cardLast4}
                 </button>
+              </div>
+            </>
+          ) : isCryptoDeposit ? (
+            <>
+              <div className="flex items-start justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromAddress")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                    {showFromAddress ? transaction.fromAddress : `${transaction.fromAddress?.slice(0, 6)}...${transaction.fromAddress?.slice(-6)}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(transaction.fromAddress || '');
+                      toast.success(t("toast.addressCopied"));
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setShowFromAddress(!showFromAddress)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                <span className="font-medium">{transaction.tokenNetwork}</span>
               </div>
             </>
           ) : isTopup ? (
@@ -752,6 +807,21 @@ const TransactionDetails = () => {
               <div className="flex items-center justify-between pt-2 border-t border-border">
                 <span className="text-muted-foreground">{t("transaction.debited")}</span>
                 <span className="font-semibold text-[#007AFF]">-{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+            </>
+          ) : isCryptoDeposit ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.received")}</span>
+                <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                <span className="font-medium">{transaction.tokenNetwork}</span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-muted-foreground">{t("transaction.credited")}</span>
+                <span className="font-semibold text-green-500">+{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
             </>
           ) : isTopup ? (
