@@ -37,6 +37,7 @@ const mockTransactions: Record<string, {
   senderCardFull?: string;
   toCardFull?: string;
   toWalletAddress?: string;
+  fromWalletAddress?: string;
   networkFee?: number;
   recipientIban?: string;
   recipientBankName?: string;
@@ -63,7 +64,7 @@ const mockTransactions: Record<string, {
   "17": { id: "17", merchant: "Card Transfer", time: "03:30 PM", date: "12.01.2026", amountUSDT: 250.00, amountLocal: 250.00, localCurrency: "AED", color: "#007AFF", cardLast4: "7617", exchangeRate: 1, status: "processing", type: "card_transfer", recipientCard: "4521", recipientCardFull: "4532 8921 0045 4521", recipientName: "JOHN SMITH", transferFee: 3.75, fromCardFull: "4147 2034 5567 7617", cardType: "Virtual" },
   "18": { id: "18", merchant: "Card Transfer", time: "12:15 PM", date: "12.01.2026", amountUSDT: 100.00, amountLocal: 100.00, localCurrency: "AED", color: "#007AFF", cardLast4: "4521", exchangeRate: 1, status: "settled", type: "card_transfer", recipientCard: "8834", recipientCardFull: "4111 2233 4455 8834", recipientName: "ANNA JOHNSON", transferFee: 1.50, fromCardFull: "4532 8921 0045 4521", cardType: "Metal" },
   "19": { id: "19", merchant: "Card Transfer", time: "04:45 PM", date: "12.01.2026", amountUSDT: 50.00, amountLocal: 50.00, localCurrency: "AED", color: "#22C55E", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "card_transfer", senderName: "ANNA JOHNSON", senderCard: "8834", senderCardFull: "4111 2233 4455 8834", toCardFull: "4147 2034 5567 7617", cardType: "Virtual" },
-  "20": { id: "20", merchant: "Stablecoin Send", time: "06:20 PM", date: "12.01.2026", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", cardLast4: "", exchangeRate: 3.69, status: "settled", type: "crypto_send", toWalletAddress: "TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7", tokenNetwork: "USDT, Tron (TRC20)", networkFee: 5.90, transferFee: 2.80 },
+  "20": { id: "20", merchant: "Stablecoin Send", time: "06:20 PM", date: "12.01.2026", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", cardLast4: "", exchangeRate: 3.69, status: "settled", type: "crypto_send", toWalletAddress: "TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7", fromWalletAddress: "TQn9Y4sBbhMczK8dXgU5dBMkR2YJb3jM5r", tokenNetwork: "USDT, Tron (TRC20)", networkFee: 5.90, transferFee: 2.80 },
   "21": { id: "21", merchant: "Bank Transfer", time: "07:45 PM", date: "12.01.2026", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "bank_transfer", recipientName: "EMIRATES TRADING LLC", recipientIban: "AE07 0331 2345 6789 0123 456", recipientBankName: "Emirates NBD", bankFee: 37.80, cardType: "Virtual" },
   "22": { id: "22", merchant: "Top up", time: "11:15 AM", date: "17.01.2026", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", cardLast4: "7617", exchangeRate: 3.65, status: "settled", type: "topup", fromAddress: "TFVFktvwmaEnMVh6ZxZq2rvmLePfTxhX9L", tokenNetwork: "USDT, Tron (TRC20)", kartaFee: 5.90, cardType: "Virtual" },
   "23": { id: "23", merchant: "Bank Transfer", time: "02:30 PM", date: "17.01.2026", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "bank_transfer_incoming", senderName: "AL MAJID TRADING LLC", senderIban: "AE21 0331 2345 6789 0654 321", senderBankName: "Abu Dhabi Commercial Bank", cardType: "Virtual" },
@@ -541,9 +542,28 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
                 <span className="font-medium">{transaction.tokenNetwork}</span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <span className="text-muted-foreground">{t("transaction.fromWallet")}</span>
-                <span className="font-medium">USDT TRC20 Wallet</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                    {showFromAddress ? transaction.fromWalletAddress : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-6)}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(transaction.fromWalletAddress || '');
+                      toast.success(t("toast.addressCopied"));
+                    }}
+                    className="p-1 rounded-md hover:bg-muted transition-colors"
+                  >
+                    <Copy className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  <button 
+                    onClick={() => setShowFromAddress(!showFromAddress)}
+                    className="p-1 rounded-md hover:bg-muted transition-colors"
+                  >
+                    {showFromAddress ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
+                  </button>
+                </div>
               </div>
             </>
           ) : isCryptoDeposit ? (
