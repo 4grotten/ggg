@@ -12,6 +12,12 @@ interface CardTransactionsListProps {
 
 const getInitial = (name: string) => name.charAt(0).toUpperCase();
 
+const maskMiddle = (value: string): string => {
+  const clean = value.replace(/\s/g, '');
+  if (clean.length <= 8) return value;
+  return `${clean.slice(0, 4)}·····${clean.slice(-4)}`;
+};
+
 const formatDateNumeric = (date: string): string => {
   const monthsMap: { [key: string]: number } = {
     "January": 1,
@@ -238,15 +244,15 @@ const handleClick = (transaction: Transaction) => {
                           : isCardTransfer && transaction.recipientCard
                           ? ` · ${t("transactions.to")} •••• ${transaction.recipientCard}`
                           : isBankTransferIncoming && transaction.senderName
-                          ? ` · ${t("transactions.from")} ${transaction.senderName}`
+                          ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
                           : isBankTransfer && transaction.description
-                          ? ` · ${t("transactions.to")} ${transaction.description}`
+                          ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description)}`
                           : isCryptoSend && transaction.description
-                          ? ` · ${t("transactions.to")} ${transaction.description}`
+                          ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description)}`
                           : isCryptoDeposit && transaction.description
-                          ? ` · ${t("transactions.from")} ${transaction.description}`
+                          ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
                           : isTopup && transaction.description
-                          ? ` · ${t("transactions.from")} ${transaction.description}`
+                          ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
                           : ""
                         }
                       </p>
