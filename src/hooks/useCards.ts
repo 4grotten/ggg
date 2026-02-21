@@ -3,7 +3,10 @@ import {
   fetchCards, 
   fetchCardById, 
   fetchCardBalance,
-  fetchTotalBalance 
+  fetchTotalBalance,
+  fetchWalletSummary,
+  fetchIban,
+  fetchCardsList,
 } from '@/services/api/cards';
 import { getAuthToken } from '@/services/api/apiClient';
 import { FetchCardsParams } from '@/types/card';
@@ -18,6 +21,9 @@ export const cardKeys = {
   balances: () => [...cardKeys.all, 'balance'] as const,
   balance: (id: string) => [...cardKeys.balances(), id] as const,
   totalBalance: () => [...cardKeys.all, 'totalBalance'] as const,
+  walletSummary: () => [...cardKeys.all, 'walletSummary'] as const,
+  iban: () => [...cardKeys.all, 'iban'] as const,
+  cardsList: () => [...cardKeys.all, 'cardsList'] as const,
 };
 
 /**
@@ -67,5 +73,45 @@ export const useTotalBalance = () => {
     enabled: !!getAuthToken(),
     staleTime: 1000 * 30,
     refetchInterval: 1000 * 60,
+  });
+};
+
+/**
+ * Hook to fetch wallet summary (IBAN + cards in one request)
+ * GET /cards/wallet/summary/
+ */
+export const useWalletSummary = () => {
+  return useQuery({
+    queryKey: cardKeys.walletSummary(),
+    queryFn: fetchWalletSummary,
+    enabled: !!getAuthToken(),
+    staleTime: 1000 * 60 * 2,
+    refetchInterval: 1000 * 60 * 2,
+  });
+};
+
+/**
+ * Hook to fetch IBAN bank account
+ * GET /cards/accounts/IBAN_AED/
+ */
+export const useIban = () => {
+  return useQuery({
+    queryKey: cardKeys.iban(),
+    queryFn: fetchIban,
+    enabled: !!getAuthToken(),
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+/**
+ * Hook to fetch cards list (separate from balances)
+ * GET /cards/cards/
+ */
+export const useCardsList = () => {
+  return useQuery({
+    queryKey: cardKeys.cardsList(),
+    queryFn: fetchCardsList,
+    enabled: !!getAuthToken(),
+    staleTime: 1000 * 60 * 5,
   });
 };

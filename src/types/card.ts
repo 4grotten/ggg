@@ -44,3 +44,38 @@ export interface CardBalanceResponse {
   currency: string;
   error?: string;
 }
+
+// IBAN / Bank Account from GET /cards/accounts/IBAN_AED/
+export interface IbanAccount {
+  iban: string;
+  bank_name?: string;
+  account_holder?: string;
+  currency?: string;
+  balance?: number;
+}
+
+export interface IbanResponse {
+  success: boolean;
+  data: IbanAccount | null;
+  error?: string;
+}
+
+// Wallet Summary from GET /cards/wallet/summary/
+export interface WalletSummaryData {
+  bank_account: IbanAccount | null;
+  cards: Array<{
+    card_id: number;
+    type: string;
+    balance: number;
+    last_four_digits: string;
+    status: string;
+    name?: string;
+  }>;
+  total_balance_aed: number;
+}
+
+export interface WalletSummaryResponse {
+  success: boolean;
+  data: WalletSummaryData | null;
+  error?: string;
+}

@@ -5,7 +5,11 @@ import {
   CardsResponse, 
   CardDetailsResponse,
   CardBalanceResponse,
-  FetchCardsParams 
+  FetchCardsParams,
+  IbanAccount,
+  IbanResponse,
+  WalletSummaryData,
+  WalletSummaryResponse,
 } from '@/types/card';
 import { getAuthToken } from './apiClient';
 
@@ -190,6 +194,76 @@ export const fetchTotalBalance = async (): Promise<CardBalanceResponse> => {
       balance: 0,
       currency: 'AED',
       error: error instanceof Error ? error.message : 'Failed to fetch total balance',
+    };
+  }
+};
+
+// ─── NEW: Wallet Summary ────────────────────────────────────────
+
+/**
+ * Fetch wallet summary: IBAN + all cards in one call
+ * GET /cards/wallet/summary/
+ */
+export const fetchWalletSummary = async (): Promise<WalletSummaryResponse> => {
+  try {
+    const response = await cardsApiGet<WalletSummaryData>('/cards/wallet/summary/');
+    if (response.error || !response.data) {
+      return { success: false, data: null, error: response.error?.message || 'Failed to fetch wallet summary' };
+    }
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Error fetching wallet summary:', error);
+    return {
+      success: false,
+      data: null,
+      error: error instanceof Error ? error.message : 'Failed to fetch wallet summary',
+    };
+  }
+};
+
+// ─── NEW: IBAN / Bank Account ───────────────────────────────────
+
+/**
+ * Fetch IBAN bank account details
+ * GET /cards/accounts/IBAN_AED/
+ */
+export const fetchIban = async (): Promise<IbanResponse> => {
+  try {
+    const response = await cardsApiGet<IbanAccount>('/cards/accounts/IBAN_AED/');
+    if (response.error || !response.data) {
+      return { success: false, data: null, error: response.error?.message || 'Failed to fetch IBAN' };
+    }
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Error fetching IBAN:', error);
+    return {
+      success: false,
+      data: null,
+      error: error instanceof Error ? error.message : 'Failed to fetch IBAN',
+    };
+  }
+};
+
+// ─── NEW: Cards List ────────────────────────────────────────────
+
+/**
+ * Fetch cards list (separate endpoint)
+ * GET /cards/cards/
+ */
+export const fetchCardsList = async (): Promise<CardsResponse> => {
+  try {
+    const response = await cardsApiGet<{ cards: BalancesApiResponse['cards'] }>('/cards/cards/');
+    if (response.error || !response.data) {
+      return { success: false, data: [], error: response.error?.message || 'Failed to fetch cards list' };
+    }
+    const cards = (response.data.cards || []).map(mapApiCard);
+    return { success: true, data: cards };
+  } catch (error) {
+    console.error('Error fetching cards list:', error);
+    return {
+      success: false,
+      data: [],
+      error: error instanceof Error ? error.message : 'Failed to fetch cards list',
     };
   }
 };
