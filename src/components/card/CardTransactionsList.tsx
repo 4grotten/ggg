@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Plus, Ban, ArrowUpRight, Clock, CheckCircle, Send, Landmark, CreditCard } from "lucide-react";
+import { Plus, Ban, ArrowUpRight, Clock, CheckCircle, Send, Landmark, CreditCard, DollarSign } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Transaction, TransactionGroup } from "@/types/transaction";
 
@@ -196,7 +196,7 @@ const handleClick = (transaction: Transaction) => {
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: "#22C55E" }}
                         >
-                          <Plus className="w-5 h-5" />
+                          <DollarSign className="w-5 h-5" />
                         </div>
                       ) : walletView && isTopup ? (
                         <div 
@@ -210,7 +210,7 @@ const handleClick = (transaction: Transaction) => {
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: transaction.color }}
                         >
-                          {isTopup ? <Plus className="w-5 h-5" /> : getInitial(transaction.merchant)}
+                          {isTopup ? <CreditCard className="w-5 h-5" /> : getInitial(transaction.merchant)}
                         </div>
                       )}
                       {isDeclined && (
