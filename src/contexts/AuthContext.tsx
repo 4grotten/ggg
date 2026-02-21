@@ -159,23 +159,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Проверяем токен через API
     const response = await getCurrentUser();
     
-    // ВАЖНО: Удаляем токен ТОЛЬКО при 401 (невалидный токен)
-    // При других ошибках (сеть, 500) оставляем пользователя залогиненным
     if (response.status === 401) {
-      // Токен точно невалидный — сервер это подтвердил
-      removeAuthToken();
-      setUser(null);
-      
-      // Редирект на страницу входа, если не на публичном роуте
-      const pathname = window.location.pathname;
-      if (!PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
-        navigate('/auth/phone', { replace: true });
-      }
+      // 401 может быть из-за проблем с сетью между бэкендами
+      // НЕ удаляем токен — оставляем пользователя залогиненным с кэшированными данными
+      console.warn('[AuthContext] checkAuth: 401 from /users/me/ — keeping cached session');
     } else if (response.data) {
       // Успешный ответ — обновляем данные пользователя
       setUser(response.data);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
     }
-    // При других ошибках (сеть, 500) — оставляем кэшированного пользователя
+    // При любых ошибках — оставляем кэшированного пользователя
     
     setIsLoading(false);
   }, [navigate]);
