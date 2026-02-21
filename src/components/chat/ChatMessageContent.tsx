@@ -1,12 +1,12 @@
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
+import { CreditCard, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface ChatMessageContentProps {
   content: string;
 }
 
-// Regex for detecting financial amounts
 const AMOUNT_PATTERN = /([+-]?\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*(AED|дирхам|USDT|USD)/gi;
 
 const formatAmountInText = (text: string): ReactNode[] => {
@@ -29,11 +29,9 @@ const formatAmountInText = (text: string): ReactNode[] => {
         key={match.index}
         className={cn(
           "font-bold px-1 py-0.5 rounded",
-          isPositive
-            ? "text-success bg-success/10"
-            : isNegative
-              ? "text-destructive bg-destructive/10"
-              : "text-primary bg-primary/10"
+          isPositive ? "text-success bg-success/10"
+            : isNegative ? "text-destructive bg-destructive/10"
+            : "text-primary bg-primary/10"
         )}
       >
         {amount} {currency}
@@ -42,16 +40,12 @@ const formatAmountInText = (text: string): ReactNode[] => {
     lastIndex = match.index + match[0].length;
   }
 
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
-  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
   return parts.length > 0 ? parts : [text];
 };
 
 function processChildren(children: ReactNode): ReactNode {
-  if (typeof children === "string") {
-    return formatAmountInText(children);
-  }
+  if (typeof children === "string") return formatAmountInText(children);
   if (Array.isArray(children)) {
     return children.map((child, i) => {
       if (typeof child === "string") {
@@ -64,17 +58,6 @@ function processChildren(children: ReactNode): ReactNode {
   return children;
 }
 
-// Detect if a paragraph is a balance/card line (💳 or 💰)
-function isBalanceLine(children: ReactNode): boolean {
-  const text = extractText(children);
-  return /^(💳|💰)/.test(text.trim());
-}
-
-function isTotalLine(children: ReactNode): boolean {
-  const text = extractText(children);
-  return /^💰/.test(text.trim());
-}
-
 function extractText(children: ReactNode): string {
   if (typeof children === "string") return children;
   if (Array.isArray(children)) return children.map(extractText).join("");
@@ -84,19 +67,54 @@ function extractText(children: ReactNode): string {
   return "";
 }
 
+function isBalanceLine(children: ReactNode): boolean {
+  return /^(💳|💰)/.test(extractText(children).trim());
+}
+
+function isTotalLine(children: ReactNode): boolean {
+  return /^💰/.test(extractText(children).trim());
+}
+
+function isMetalCard(children: ReactNode): boolean {
+  const text = extractText(children).toLowerCase();
+  return /метал|metal/i.test(text);
+}
+
+const BalanceCard = ({ children, isTotal, isMetal }: { children: ReactNode; isTotal: boolean; isMetal: boolean }) => {
+  return (
+    <div className={cn(
+      "my-1.5 px-3 py-3 rounded-xl text-sm leading-relaxed flex items-center gap-3",
+      isTotal
+        ? "bg-primary/15 border border-primary/20"
+        : "bg-muted/80 border border-border/30"
+    )}>
+      <div className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+        isTotal ? "bg-primary/20" : isMetal ? "bg-amber-500/15" : "bg-primary/10"
+      )}>
+        {isTotal ? (
+          <Wallet className={cn("w-5 h-5", "text-primary")} />
+        ) : (
+          <CreditCard className={cn("w-5 h-5", isMetal ? "text-amber-500" : "text-primary")} />
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        {processChildren(children)}
+      </div>
+    </div>
+  );
+};
+
 const markdownComponents = {
   p: ({ children }: { children?: ReactNode }) => {
     if (isBalanceLine(children)) {
-      const isTotal = isTotalLine(children);
       return (
-        <div className={cn(
-          "my-1.5 px-3 py-2.5 rounded-xl text-sm leading-relaxed",
-          isTotal
-            ? "bg-primary/15 border border-primary/20"
-            : "bg-muted/80 border border-border/30"
-        )}>
-          {processChildren(children)}
-        </div>
+        <BalanceCard
+          isTotal={isTotalLine(children)}
+          isMetal={isMetalCard(children)}
+        >
+          {children}
+        </BalanceCard>
       );
     }
     return <p className="my-1.5 text-sm leading-relaxed">{processChildren(children)}</p>;
