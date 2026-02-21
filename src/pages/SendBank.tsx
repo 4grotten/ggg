@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X, Wallet, Landmark } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -19,6 +19,10 @@ import { BANK_TRANSFER_FEE_PERCENT } from "@/lib/fees";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
+import { submitBankWithdrawal } from "@/services/api/transactions";
+import { submitInternalTransfer } from "@/services/api/transactions";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface SourceOption {
   id: string;
@@ -93,10 +97,12 @@ const SendBank = () => {
   const [step, setStep] = useState(1);
   const [selectedSource, setSelectedSource] = useState<SourceOption>(sourceOptions[0]);
   const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
   
   // Use referral balance or source balance
-  const isWalletSource = selectedSource.type === "wallet";
-  const availableBalance = isReferralWithdrawal ? referralBalance : selectedSource.balance;
+  const isWalletSource = selectedSource?.type === "wallet";
+  const availableBalance = isReferralWithdrawal ? referralBalance : (selectedSource?.balance ?? 0);
   const availableBalanceAed = isWalletSource ? availableBalance * USDT_TO_AED_BUY : availableBalance;
 
   // Scroll to top on mount
@@ -156,14 +162,61 @@ const SendBank = () => {
   const isStep2Valid = recipientName.trim().length >= 2 && bankName.trim().length >= 2;
   const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= availableBalanceAed;
 
-  const handleNext = () => {
+  const handleNext = useCallback(async () => {
     if (step < 3) {
       setStep(step + 1);
-    } else {
-      // Submit transfer - redirect to partner page for referral withdrawals
-      navigate(isReferralWithdrawal ? "/partner" : "/");
+      return;
     }
-  };
+
+    // Step 3 — submit the transfer
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      if (selectedSource.type === "card") {
+        // Bank Wire from card
+        const result = await submitBankWithdrawal({
+          from_card_id: selectedSource.id,
+          iban: iban.replace(/\s/g, ""),
+          beneficiary_name: recipientName.trim(),
+          bank_name: bankName.trim(),
+          amount_aed: parseFloat(amountAED).toFixed(2),
+        });
+
+        if (result.success) {
+          toast.success(t("send.transferSuccess", "Перевод отправлен"));
+          queryClient.invalidateQueries({ queryKey: ["cards"] });
+          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          navigate(isReferralWithdrawal ? "/partner" : "/");
+        } else {
+          toast.error(result.error || t("send.transferFailed", "Ошибка перевода"));
+        }
+      } else if (selectedSource.type === "bank" || selectedSource.type === "wallet") {
+        // Internal transfer from bank/wallet → external bank via internal swap first
+        // For now, use the same bank withdrawal endpoint with the source id
+        const result = await submitBankWithdrawal({
+          from_card_id: selectedSource.id,
+          iban: iban.replace(/\s/g, ""),
+          beneficiary_name: recipientName.trim(),
+          bank_name: bankName.trim(),
+          amount_aed: parseFloat(amountAED).toFixed(2),
+        });
+
+        if (result.success) {
+          toast.success(t("send.transferSuccess", "Перевод отправлен"));
+          queryClient.invalidateQueries({ queryKey: ["cards"] });
+          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          navigate(isReferralWithdrawal ? "/partner" : "/");
+        } else {
+          toast.error(result.error || t("send.transferFailed", "Ошибка перевода"));
+        }
+      }
+    } catch (err) {
+      toast.error(t("send.transferFailed", "Ошибка перевода"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [step, isSubmitting, selectedSource, iban, recipientName, bankName, amountAED, isReferralWithdrawal, navigate, queryClient, t]);
 
   const handleBack = () => {
     if (step > 1) {
@@ -446,10 +499,15 @@ const SendBank = () => {
         <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
           <Button
             onClick={handleNext}
-            disabled={!getStepValid()}
+            disabled={!getStepValid() || isSubmitting}
             className="w-full h-14 rounded-2xl text-base font-semibold bg-primary/90 hover:bg-primary active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
           >
-            {step === 3 ? (
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <span className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                {t("send.processing", "Обработка...")}
+              </span>
+            ) : step === 3 ? (
               `${t("send.continue")} ${parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
             ) : (
               <span className="flex items-center gap-2">
