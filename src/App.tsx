@@ -42,6 +42,7 @@ import OpenCardPayBalance from "./pages/OpenCardPayBalance";
 import TariffPayBalance from "./pages/TariffPayBalance";
 import TariffPayCrypto from "./pages/TariffPayCrypto";
 import TopUpFromUsdtBalance from "./pages/TopUpFromUsdtBalance";
+import SendIbanToCard from "./pages/SendIbanToCard";
 import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
 import PhoneEntry from "./pages/auth/PhoneEntry";
@@ -75,6 +76,7 @@ const hiddenNavRoutes = [
   "/verify",
   "/card/",
   "/send-to-card",
+  "/send-IBAN-card",
   "/top-up/",
   "/send/",
   "/transaction/",
@@ -158,6 +160,7 @@ const AppContent = () => {
             <Route path="/top-up/bank/details" element={<TopUpBankDetails />} />
             <Route path="/send/crypto" element={<SendCrypto />} />
             <Route path="/send/bank" element={<SendBank />} />
+            <Route path="/send-IBAN-card" element={<SendIbanToCard />} />
             <Route path="/open-card" element={<OpenCardPayment />} />
             <Route path="/open-card/pay-crypto" element={<OpenCardPayCrypto />} />
             <Route path="/open-card/pay-bank" element={<OpenCardPayBank />} />

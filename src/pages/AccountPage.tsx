@@ -209,7 +209,19 @@ const AccountPage = () => {
                   </DrawerTrigger>
                   <DrawerContent className="pb-8">
                     <div className="px-6 pt-4 pb-2 space-y-2">
-                      <h3 className="text-lg font-semibold text-center mb-4">{t('dashboard.send')}</h3>
+                     <h3 className="text-lg font-semibold text-center mb-4">{t('dashboard.send')}</h3>
+                      <button
+                        onClick={() => { setSendOpen(false); navigate("/send-IBAN-card"); }}
+                        className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-secondary/70 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <CreditCard className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium">{t('send.toMyCard', 'На свою карту')}</p>
+                          <p className="text-xs text-muted-foreground">{t('send.toMyCardDesc', 'Со счёта на карту')}</p>
+                        </div>
+                      </button>
                       <button
                         onClick={() => { setSendOpen(false); navigate("/send-to-card"); }}
                         className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-secondary/70 transition-colors"
