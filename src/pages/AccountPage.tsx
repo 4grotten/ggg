@@ -76,7 +76,7 @@ const AccountPage = () => {
     "VERSION:3.0",
     `N:${lastName};${firstName};;;`,
     `FN:${userName}`,
-    `ORG:${iban}`,
+    `ORG:IBAN ${currency}`,
     `NOTE:IBAN: ${iban}\\nAccount: ${accountNumber}\\nBank: ${bankName}\\nCurrency: ${currency}`,
     `X-IBAN:${iban}`,
     `X-ACCOUNT:${accountNumber}`,
