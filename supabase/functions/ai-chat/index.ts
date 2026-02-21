@@ -165,15 +165,14 @@ serve(async (req) => {
     ]);
     
     // Build dynamic context with real user data
-    let userDataContext = '';
-    if (financialData) {
-      userDataContext = `
+    let userDataContext = `
 
 ## ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (АКТУАЛЬНЫЕ)
-### Баланс:
-- Общий баланс: ${financialData.balance.total} AED
-- Доходы за период: +${financialData.balance.income} AED
-- Расходы за период: -${financialData.balance.expenses} AED
+### Балансы карт:
+${cardBalancesText}`;
+
+    if (financialData) {
+      userDataContext += `
 
 ### Последние транзакции:
 ${financialData.transactions}
@@ -181,15 +180,7 @@ ${financialData.transactions}
 ### Расходы по категориям:
 ${financialData.categories || 'Нет данных по категориям'}
 
-Всего транзакций: ${financialData.transactionCount}
-
-### Балансы карт:
-${cardBalancesText}`;
-    } else {
-      userDataContext = `
-
-## ДАННЫЕ ПОЛЬЗОВАТЕЛЯ
-Данные о транзакциях пользователя недоступны. Предложи пользователю проверить авторизацию или обратиться в поддержку.`;
+Всего транзакций: ${financialData.transactionCount}`;
     }
 
     console.log("Sending request to AI gateway with", messages.length, "messages");
