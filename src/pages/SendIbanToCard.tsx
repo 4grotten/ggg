@@ -73,6 +73,7 @@ const SendIbanToCard = () => {
           description: `${result.data.credited_amount} AED → ${selectedCard.name}`,
         });
         queryClient.invalidateQueries({ queryKey: ["cards"] });
+        queryClient.invalidateQueries({ queryKey: ["transactions"] });
         navigate("/account");
       } else {
         toast.error(t("sendIban.transferFailed", "Ошибка перевода"), {
