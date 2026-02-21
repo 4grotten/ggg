@@ -543,6 +543,7 @@
     "cardType": "卡类型",
     "sender": "发送人",
     "fromCard": "来源卡",
+    "fromWallet": "从钱包",
     "toCard": "目标卡",
     "recipient": "收款人",
     "card": "卡片",

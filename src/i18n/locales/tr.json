@@ -537,6 +537,7 @@
     "cardType": "Kart Türü",
     "sender": "Gönderen",
     "fromCard": "Kaynak Kart",
+    "fromWallet": "Cüzdandan",
     "toCard": "Hedef Kart",
     "recipient": "Alıcı",
     "card": "Kart",

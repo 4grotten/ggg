@@ -537,6 +537,7 @@
     "cardType": "نوع البطاقة",
     "sender": "المرسل",
     "fromCard": "من البطاقة",
+    "fromWallet": "من المحفظة",
     "toCard": "إلى البطاقة",
     "recipient": "المستلم",
     "card": "البطاقة",
