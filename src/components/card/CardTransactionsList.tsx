@@ -244,7 +244,7 @@ const handleClick = (transaction: Transaction) => {
                           : isCardTransfer && transaction.recipientCard
                           ? ` · ${t("transactions.to")} •••• ${transaction.recipientCard}`
                           : isBankTransferIncoming && transaction.senderName
-                          ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
+                          ? ` · ${t("transactions.from")} ${transaction.senderName}`
                           : isBankTransfer && transaction.description
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description)}`
                           : isCryptoSend && transaction.description
