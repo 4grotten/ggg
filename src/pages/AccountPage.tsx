@@ -87,10 +87,13 @@ const AccountPage = () => {
     toast.success(`${label} ${t('accountPage.copied')}`);
   };
 
+  const currency = account?.currency || "AED";
+  
   const handleShare = async () => {
+    const shareText = `${userName}\n${bankName}\nIBAN: ${iban}\n${t('accountPage.currency')}: ${currency}`;
     const shareData = {
       title: t('accountPage.title'),
-      text: t('accountPage.shareMessage', { iban }),
+      text: shareText,
     };
     try {
       if (navigator.share) {
@@ -207,6 +210,10 @@ const AccountPage = () => {
                       <div>
                         <p className="text-xs text-muted-foreground">{t('accountPage.accountNumber')}</p>
                         <p className="text-sm font-mono font-medium">{accountNumber}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t('accountPage.currency')}</p>
+                        <p className="text-sm font-medium">{currency}</p>
                       </div>
                     </div>
 
