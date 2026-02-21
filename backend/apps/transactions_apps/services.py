@@ -75,7 +75,8 @@ class TransactionService:
         card = Cards.objects.select_for_update().get(id=card_id, user_id=str(user_id))
         if card.balance < amount_crypto:
             raise ValueError("Недостаточно средств на выбранной карте")
-        card.balance -= amount_crypto
+        itog = amount_crypto * Decimal('3.67')
+        card.balance -= itog
         card.save()
         txn = Transactions.objects.create(
             user_id=user_id, card=card, type='crypto_withdrawal', 
