@@ -342,9 +342,56 @@ export const fetchApiTransactionGroups = async (): Promise<TransactionGroup[]> =
   const { data, error } = await fetchApiTransactions();
   if (error || !data || data.length === 0) return [];
   
+  return groupApiTransactions(data);
+};
+
+/**
+ * Fetch IBAN-only transactions from backend
+ * GET /api/v1/transactions/iban/
+ */
+export const fetchIbanTransactions = async (): Promise<{
+  data: ApiTransaction[] | null;
+  error: string | null;
+}> => {
+  try {
+    const result = await apiRequest<ApiTransaction[] | { results: ApiTransaction[] }>(
+      `/transactions/iban/`,
+      { method: 'GET' },
+      true
+    );
+    
+    if (result.error) {
+      console.warn('[Transactions API] IBAN list error:', result.error);
+      return { data: null, error: result.error.detail || result.error.message || 'Failed to fetch' };
+    }
+    
+    const transactions = Array.isArray(result.data)
+      ? result.data
+      : (result.data as any)?.results || [];
+    
+    return { data: transactions, error: null };
+  } catch (error) {
+    console.error('[Transactions API] IBAN fetch failed:', error);
+    return { data: null, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
+/**
+ * Fetch IBAN transactions and group by date
+ */
+export const fetchIbanTransactionGroups = async (): Promise<TransactionGroup[]> => {
+  const { data, error } = await fetchIbanTransactions();
+  if (error || !data || data.length === 0) return [];
+  
+  return groupApiTransactions(data);
+};
+
+/**
+ * Helper: group API transactions by date
+ */
+const groupApiTransactions = (data: ApiTransaction[]): TransactionGroup[] => {
   const mapped = data.map(mapApiTransactionToLocal);
   
-  // Group by date
   const groupMap = new Map<string, Transaction[]>();
   for (const tx of mapped) {
     const dateStr = (tx.metadata as any)?.apiDate || 'Unknown';
