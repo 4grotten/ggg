@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark } from "lucide-react";
+import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -9,6 +9,8 @@ import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
 import { useWalletSummary } from "@/hooks/useCards";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTransactionReceipt } from "@/hooks/useTransactions";
+import { getAuthToken } from "@/services/api/apiClient";
 
 // Mock transaction data - in real app would come from API/state
 const mockTransactions: Record<string, {
@@ -80,6 +82,14 @@ const TransactionDetails = () => {
   const { data: walletData } = useWalletSummary();
   const { user } = useAuth();
   const userIban = walletData?.data?.physical_account?.iban || "";
+  const hasToken = !!getAuthToken();
+  
+  // Fetch receipt from real API (only if user is authenticated)
+  const { data: receiptResult, isLoading: receiptLoading } = useTransactionReceipt(
+    id || '',
+    hasToken && !!id
+  );
+  const receipt = receiptResult?.data || null;
   
   // Scroll to top on mount
   useEffect(() => {
@@ -87,26 +97,6 @@ const TransactionDetails = () => {
   }, [id]);
   
   const transaction = id ? mockTransactions[id] : null;
-
-  if (!transaction) {
-    return (
-      <MobileLayout
-        header={
-          <button 
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span className="text-sm">{t("transaction.back")}</span>
-          </button>
-        }
-      >
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">{t("transaction.notFound")}</p>
-        </div>
-      </MobileLayout>
-    );
-  }
 
   const getInitial = (name: string) => name.charAt(0).toUpperCase();
   const isTopup = transaction.type === "topup";
@@ -974,6 +964,104 @@ const TransactionDetails = () => {
               <span className="font-medium">{t("transaction.transactionDetails")}</span>
               <ExternalLink className="w-5 h-5 text-muted-foreground" />
             </button>
+          </div>
+        )}
+
+        {/* Receipt from API */}
+        {hasToken && (
+          <div className="bg-secondary rounded-2xl p-4 space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <FileText className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium text-sm">{t("transaction.receipt", "Чек / Квитанция")}</span>
+            </div>
+            {receiptLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : receipt ? (
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.status")}</span>
+                  <span className="font-medium capitalize">{receipt.status}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.operation", "Операция")}</span>
+                  <span className="font-medium">{receipt.operation}</span>
+                </div>
+                {receipt.amount_crypto != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.amount")}</span>
+                    <span className="font-medium">{receipt.amount_crypto} {receipt.network_and_token || 'USDT'}</span>
+                  </div>
+                )}
+                {receipt.amount != null && !receipt.amount_crypto && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.amount")}</span>
+                    <span className="font-medium">{receipt.amount} AED</span>
+                  </div>
+                )}
+                {receipt.fee != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fee")}</span>
+                    <span className="font-medium">{receipt.fee} {receipt.amount_crypto != null ? 'USDT' : 'AED'}</span>
+                  </div>
+                )}
+                {receipt.to_address_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.toAddress")}</span>
+                    <span className="font-medium">{receipt.to_address_mask}</span>
+                  </div>
+                )}
+                {receipt.from_address_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fromAddress")}</span>
+                    <span className="font-medium">{receipt.from_address_mask}</span>
+                  </div>
+                )}
+                {receipt.network_and_token && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                    <span className="font-medium">{receipt.network_and_token}</span>
+                  </div>
+                )}
+                {receipt.sender_card_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
+                    <span className="font-medium">{receipt.sender_card_mask}</span>
+                  </div>
+                )}
+                {receipt.receiver_card_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.toCard")}</span>
+                    <span className="font-medium">{receipt.receiver_card_mask}</span>
+                  </div>
+                )}
+                {receipt.recipient_name && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                    <span className="font-medium">{receipt.recipient_name}</span>
+                  </div>
+                )}
+                {receipt.iban_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.iban")}</span>
+                    <span className="font-medium">{receipt.iban_mask}</span>
+                  </div>
+                )}
+                {receipt.tx_hash && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">TX Hash</span>
+                    <span className="font-medium text-xs break-all max-w-[180px] text-right">{receipt.tx_hash}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/50">
+                  <span>ID</span>
+                  <span className="font-mono">{receipt.transaction_id?.slice(0, 8)}...</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable", "Чек недоступен")}</p>
+            )}
           </div>
         )}
 
