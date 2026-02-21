@@ -96,6 +96,7 @@ const handleClick = (transaction: Transaction) => {
     const isCardActivation = transaction.type === "card_activation";
     const isCardTransfer = transaction.type === "card_transfer";
     const isCryptoSend = transaction.type === "crypto_withdrawal";
+    const isCryptoDeposit = transaction.type === "crypto_deposit";
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
     const isIncomingTransfer = isCardTransfer && transaction.senderCard;
@@ -103,14 +104,14 @@ const handleClick = (transaction: Transaction) => {
     const isProcessing = transaction.status === "processing";
     // In wallet view, topup = outgoing (wallet → card), so it's negative
     const walletTopupOutgoing = walletView && isTopup;
-    const prefix = (isTopup && !walletView) || isIncomingTransfer || isBankTransferIncoming ? "+" : walletTopupOutgoing || isOutgoingTransfer || isCryptoSend || isBankTransfer ? "-" : "";
+    const prefix = (isTopup && !walletView) || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? "+" : walletTopupOutgoing || isOutgoingTransfer || isCryptoSend || isBankTransfer ? "-" : "";
     
     let colorClass = "";
     if (isProcessing && (isCardTransfer || isBankTransfer || isCryptoSend)) {
       colorClass = "text-[#FFA000]";
     } else if (walletTopupOutgoing) {
       colorClass = "text-[#007AFF]";
-    } else if (isTopup || isIncomingTransfer || isBankTransferIncoming) {
+    } else if (isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit) {
       colorClass = "text-green-500";
     } else if (isDeclined) {
       colorClass = "text-red-500";
@@ -118,7 +119,7 @@ const handleClick = (transaction: Transaction) => {
       colorClass = "text-[#007AFF]";
     }
     
-    return { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isBankTransfer, isBankTransferIncoming };
+    return { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming };
   };
 
   return (
@@ -141,7 +142,7 @@ const handleClick = (transaction: Transaction) => {
           {/* Transactions */}
           <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
             {group.transactions.map((transaction, index) => {
-              const { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isBankTransfer, isBankTransferIncoming } = formatAmount(transaction);
+              const { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming } = formatAmount(transaction);
               const isTopup = transaction.type === "topup";
               const isDeclined = transaction.type === "declined";
 
@@ -190,6 +191,13 @@ const handleClick = (transaction: Transaction) => {
                         >
                           <ArrowUpRight className={`w-5 h-5 ${isIncomingTransfer ? "rotate-180" : ""}`} />
                         </div>
+                      ) : isCryptoDeposit ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#22C55E" }}
+                        >
+                          <Plus className="w-5 h-5" />
+                        </div>
                       ) : walletView && isTopup ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
@@ -215,6 +223,8 @@ const handleClick = (transaction: Transaction) => {
                       <p className="font-medium">
                         {walletView && isTopup 
                           ? t("transactions.cardTopUp") 
+                          : isCryptoDeposit
+                          ? t("transactions.walletDeposit")
                           : translateMerchant(transaction.merchant, transaction.type, t)
                         }
                       </p>
@@ -230,6 +240,8 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.to")} ${transaction.description}`
                           : isCryptoSend && transaction.description
                           ? ` · ${t("transactions.to")} ${transaction.description}`
+                          : isCryptoDeposit && transaction.description
+                          ? ` · ${t("transactions.from")} ${transaction.description}`
                           : isTopup && transaction.description
                           ? ` · ${t("transactions.from")} ${transaction.description}`
                           : ""

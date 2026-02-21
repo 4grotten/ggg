@@ -619,6 +619,7 @@
     "settled": "مكتمل",
     "cardTransfer": "تحويل بطاقة",
     "cardTopUp": "شحن البطاقة",
+    "walletDeposit": "إيداع المحفظة",
     "topUp": "شحن",
     "annualCardFee": "رسوم البطاقة السنوية",
     "stablecoinSend": "إرسال عملة مستقرة",

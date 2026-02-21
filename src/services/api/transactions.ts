@@ -16,6 +16,7 @@ const mockTransactionGroups: TransactionGroup[] = [
     date: "17.01.2026",
     totalSpend: 0,
     transactions: [
+      { id: "24", merchant: "Wallet Deposit", time: "16:00", amountUSDT: 5000.00, amountLocal: 5000.00, localCurrency: "USDT", color: "#22C55E", type: "crypto_deposit" as TransactionType, status: "settled", description: "TRx8K...Wp4mN2" },
       { id: "23", merchant: "Bank Transfer", time: "14:30", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", type: "bank_transfer_incoming" as TransactionType, status: "settled", senderName: "KAMIEV RENAT", description: "AE07 0331 0100 4900 1234 001" },
       { id: "22", merchant: "Top up", time: "11:15", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as TransactionType, status: "settled", description: "TFVFkt...TxhX9L" },
     ],

@@ -25,7 +25,7 @@ const WalletPage = () => {
   const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
   const transactionGroups = useMemo(() => {
     const groups = transactionsData?.groups || [];
-    const cryptoTypes = ["topup", "crypto_withdrawal", "top_up", "withdrawal"];
+    const cryptoTypes = ["topup", "crypto_withdrawal", "crypto_deposit", "top_up", "withdrawal"];
     return groups
       .map(group => ({
         ...group,

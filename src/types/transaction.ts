@@ -8,7 +8,8 @@ export type TransactionType =
   | "card_transfer"
   | "bank_transfer"
   | "bank_transfer_incoming"
-  | "crypto_withdrawal";
+  | "crypto_withdrawal"
+  | "crypto_deposit";
 
 export type TransactionStatus = 
   | "pending" 

@@ -625,6 +625,7 @@
     "settled": "已完成",
     "cardTransfer": "卡片转账",
     "cardTopUp": "卡片充值",
+    "walletDeposit": "钱包存款",
     "topUp": "充值",
     "annualCardFee": "年度卡费",
     "stablecoinSend": "稳定币发送",
