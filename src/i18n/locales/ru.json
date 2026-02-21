@@ -632,6 +632,8 @@
     "debited": "Списано",
     "bankTransfer": "Банковский перевод",
     "bankTransferIncoming": "Банковский перевод поступление",
+    "accountIncoming": "Поступление на счёт",
+    "toAccount": "На счёт",
     "iban": "IBAN",
     "bankName": "Название банка",
     "bankFee": "Комиссия банка",

@@ -563,6 +563,8 @@
     "debited": "Debitado",
     "bankTransfer": "Transferencia Bancaria",
     "bankTransferIncoming": "Transferencia Bancaria Entrante",
+    "accountIncoming": "Depósito en Cuenta",
+    "toAccount": "A Cuenta",
     "iban": "IBAN",
     "bankName": "Nombre del banco",
     "bankFee": "Comisión bancaria",

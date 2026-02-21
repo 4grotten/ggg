@@ -646,6 +646,8 @@
     "debited": "Debited",
     "bankTransfer": "Bank Transfer",
     "bankTransferIncoming": "Bank Transfer Incoming",
+    "accountIncoming": "Account Deposit",
+    "toAccount": "To Account",
     "iban": "IBAN",
     "bankName": "Bank Name",
     "bankFee": "Bank fee",

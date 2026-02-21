@@ -563,6 +563,8 @@
     "debited": "Borçlandırıldı",
     "bankTransfer": "Banka Havalesi",
     "bankTransferIncoming": "Gelen Banka Havalesi",
+    "accountIncoming": "Hesaba Yatırma",
+    "toAccount": "Hesaba",
     "iban": "IBAN",
     "bankName": "Banka Adı",
     "bankFee": "Banka ücreti",

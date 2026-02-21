@@ -563,6 +563,8 @@
     "debited": "Abgebucht",
     "bankTransfer": "Banküberweisung",
     "bankTransferIncoming": "Banküberweisung Eingang",
+    "accountIncoming": "Kontoeingang",
+    "toAccount": "Auf Konto",
     "iban": "IBAN",
     "bankName": "Bankname",
     "bankFee": "Bankgebühr",
