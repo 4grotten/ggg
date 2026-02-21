@@ -125,6 +125,7 @@ const SendToCard = () => {
   const [step, setStep] = useState<Step>("card");
   const [cardNumber, setCardNumber] = useState("");
   const [recipientName, setRecipientName] = useState<string | null>(null);
+  const [recipientCardType, setRecipientCardType] = useState<string | null>(null);
   const [recipientNotFound, setRecipientNotFound] = useState(false);
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -198,19 +199,23 @@ const SendToCard = () => {
       getRecipientName(cardNumber).then((result) => {
         if (result.found && result.name) {
           setRecipientName(result.name);
+          setRecipientCardType(result.cardType || null);
           setRecipientNotFound(false);
         } else {
           setRecipientName(null);
+          setRecipientCardType(null);
           setRecipientNotFound(true);
         }
         setIsLoading(false);
       }).catch(() => {
         setRecipientName(null);
+        setRecipientCardType(null);
         setRecipientNotFound(true);
         setIsLoading(false);
       });
     } else {
       setRecipientName(null);
+      setRecipientCardType(null);
       setRecipientNotFound(false);
     }
   }, [cardNumber, isCardValid]);
@@ -500,12 +505,24 @@ const SendToCard = () => {
 
                 {recipientName && !isLoading && (
                   <div className="bg-secondary rounded-xl p-4 flex items-center gap-3 animate-fade-in">
-                    <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-                      <Check className="w-5 h-5 text-white" />
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-lg font-bold text-foreground uppercase">
+                        {recipientName.charAt(0)}
+                      </div>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center border-2 border-secondary">
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      </div>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">{t('send.recipient')}</p>
-                      <p className="font-semibold">{recipientName}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold">{recipientName}</p>
+                        {recipientCardType && (
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground capitalize">
+                            {recipientCardType}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
