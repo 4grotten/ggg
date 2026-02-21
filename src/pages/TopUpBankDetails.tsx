@@ -4,10 +4,12 @@ import { Copy, Share2, AlertTriangle, Check } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { TOP_UP_BANK_FEE_PERCENT, TOP_UP_BANK_MIN_AMOUNT } from "@/lib/fees";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIban } from "@/hooks/useCards";
 
 interface BankDetail {
   label: string;
@@ -20,27 +22,14 @@ const TopUpBankDetails = () => {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
 
-  // Get user ID for the reference field
-  const userId = user?.id ? String(user.id) : "—";
   const userFullName = user?.full_name || "—";
 
-  // Generate user-specific account number and IBAN
-  // Account number: fixed prefix, last digits replaced with UID (always 13 digits)
-  const generateAccountNumber = (uid: string): string => {
-    const prefix = "1234567890";
-    const padded = uid.padStart(3, "0");
-    return (prefix + padded).slice(0, 13);
-  };
+  // Fetch IBAN from API
+  const { data: ibanData, isLoading: ibanLoading } = useIban();
 
-  // IBAN: AE + fixed prefix, last digits replaced with UID (always 23 chars)
-  const generateIban = (uid: string): string => {
-    const prefix = "AE07033123456789012";
-    const padded = uid.padStart(4, "0");
-    return (prefix + padded).slice(0, 23);
-  };
-
-  const accountNumber = userId !== "—" ? generateAccountNumber(userId) : "—";
-  const iban = userId !== "—" ? generateIban(userId) : "—";
+  const iban = ibanData?.data?.iban || "—";
+  // Derive account number from IBAN (last 13 digits)
+  const accountNumber = iban !== "—" ? iban.slice(-13) : "—";
 
   // Scroll to top on mount
   useEffect(() => {
@@ -74,7 +63,7 @@ const TopUpBankDetails = () => {
 
     const shareData = {
       title: "AED Bank Account Details",
-      text: `AED Wire Transfer Details:\n\n${detailsText}\n\n${t("topUp.yourIdRequired")}: ${userId}`,
+      text: `AED Wire Transfer Details:\n\n${detailsText}`,
     };
 
     try {
@@ -111,6 +100,16 @@ const TopUpBankDetails = () => {
 
         {/* Bank Details Card */}
         <div className="px-6 flex-1">
+          {ibanLoading ? (
+            <div className="bg-muted rounded-2xl p-5 space-y-4">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="space-y-1">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-5 w-full" />
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="bg-muted rounded-2xl p-5 space-y-4">
             {bankDetails.map((detail, index) => (
               <div
@@ -132,6 +131,7 @@ const TopUpBankDetails = () => {
               </div>
             ))}
           </div>
+          )}
 
           {/* Fee Details Card */}
           <div className="bg-muted rounded-2xl p-5 mt-4 space-y-3">
