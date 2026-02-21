@@ -30,6 +30,47 @@ function formatDate(dateStr: string): string {
   return `${day}.${month}.${year}`;
 }
 
+async function fetchCardBalances(): Promise<string> {
+  try {
+    const BACKEND_BASE = "https://ueasycard.com/api/v1";
+    const backendToken = "e88bee3a891dd71501c14de1c1c94fd3af34cb3b";
+
+    const response = await fetch(`${BACKEND_BASE}/cards/balances/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Token ${backendToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Cards API error:", response.status);
+      return "Данные о картах временно недоступны.";
+    }
+
+    const data = await response.json();
+    const lines: string[] = [];
+    
+    if (data.cards && Array.isArray(data.cards)) {
+      data.cards.forEach((card: any) => {
+        const typeName = card.type === 'metal' ? 'Металлическая карта' : 'Виртуальная карта';
+        const last4 = card.last_four_digits ? ` (****${card.last_four_digits})` : '';
+        const status = card.status === 'active' ? '✅' : '⏸️';
+        lines.push(`- ${status} ${typeName}${last4}: ${card.balance} AED`);
+      });
+    }
+
+    if (data.total_balance_aed !== undefined) {
+      lines.push(`\n💰 Общий баланс по картам: ${data.total_balance_aed} AED`);
+    }
+
+    return lines.length > 0 ? lines.join('\n') : 'Карты не найдены.';
+  } catch (err) {
+    console.error("Error fetching card balances:", err);
+    return "Ошибка при получении данных о картах.";
+  }
+}
+
 async function fetchUserFinancialData(supabase: any, userId: string) {
   // Fetch recent transactions
   const { data: transactions, error } = await supabase
@@ -117,8 +158,11 @@ serve(async (req) => {
 
     console.log(`Fetching financial data for user: ${effectiveUserId}`);
     
-    // Fetch user's financial data
-    const financialData = await fetchUserFinancialData(supabase, effectiveUserId);
+    // Fetch user's financial data and card balances in parallel
+    const [financialData, cardBalancesText] = await Promise.all([
+      fetchUserFinancialData(supabase, effectiveUserId),
+      fetchCardBalances(),
+    ]);
     
     // Build dynamic context with real user data
     let userDataContext = '';
@@ -137,7 +181,10 @@ ${financialData.transactions}
 ### Расходы по категориям:
 ${financialData.categories || 'Нет данных по категориям'}
 
-Всего транзакций: ${financialData.transactionCount}`;
+Всего транзакций: ${financialData.transactionCount}
+
+### Балансы карт:
+${cardBalancesText}`;
     } else {
       userDataContext = `
 
