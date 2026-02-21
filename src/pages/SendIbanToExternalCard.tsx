@@ -62,6 +62,7 @@ const submitBankToCardTransfer = async (
       headers,
       body: JSON.stringify({
         from_account_id: bankAccountId,
+        from_account_type: 'bank',
         to_card_number: receiverCardNumber,
         amount,
       }),
