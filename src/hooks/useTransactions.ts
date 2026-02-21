@@ -38,13 +38,13 @@ export const useTransactions = (params?: FetchTransactionsParams) => {
  * Hook to fetch real transactions from API, returns groups
  */
 export const useApiTransactionGroups = () => {
-  const hasToken = !!getAuthToken();
+  // Backend has no GET /transactions/ list endpoint — disabled to avoid 404
   return useQuery({
     queryKey: transactionKeys.apiGroups(),
     queryFn: fetchApiTransactionGroups,
-    enabled: hasToken,
+    enabled: false,
     staleTime: 1000 * 60 * 5,
-    retry: 1,
+    retry: 0,
   });
 };
 
@@ -104,12 +104,16 @@ export const useTransactionDetails = (id: string) => {
 /**
  * Hook to fetch transaction receipt from backend API
  */
+// UUID regex to validate transaction IDs before calling receipt endpoint
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const useTransactionReceipt = (transactionId: string, enabled = true) => {
+  const isUuid = UUID_RE.test(transactionId);
   return useQuery({
     queryKey: transactionKeys.receipt(transactionId),
     queryFn: () => fetchTransactionReceipt(transactionId),
-    enabled: !!transactionId && enabled,
+    enabled: !!transactionId && enabled && isUuid,
     staleTime: 1000 * 60 * 30,
-    retry: 1,
+    retry: 0,
   });
 };
