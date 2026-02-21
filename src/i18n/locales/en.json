@@ -1742,5 +1742,19 @@
     "addToContacts": "Add Contact",
     "addedToContacts": "Contact added",
     "shareData": "Share Data"
+  },
+  "walletPage": {
+    "title": "USDT TRC20 Wallet",
+    "cryptoWallet": "Crypto Wallet",
+    "share": "Share",
+    "qrCode": "QR Code",
+    "walletDetails": "Wallet Details",
+    "network": "Network",
+    "walletAddress": "Wallet Address",
+    "currency": "Currency",
+    "addressCopied": "Address copied",
+    "copiedToClipboard": "Copied to clipboard",
+    "copy": "Copy",
+    "shareMessage": "USDT TRC20 Wallet Address: {{address}}"
   }
 }

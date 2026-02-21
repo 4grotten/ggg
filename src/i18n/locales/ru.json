@@ -1749,5 +1749,19 @@
     "viaSms": "через SMS",
     "viaEmail": "по Email",
     "shareData": "Поделиться данными"
+  },
+  "walletPage": {
+    "title": "USDT TRC20 Кошелёк",
+    "cryptoWallet": "Крипто кошелёк",
+    "share": "Поделиться",
+    "qrCode": "QR Код",
+    "walletDetails": "Данные кошелька",
+    "network": "Сеть",
+    "walletAddress": "Адрес кошелька",
+    "currency": "Валюта",
+    "addressCopied": "Адрес скопирован",
+    "copiedToClipboard": "Скопировано в буфер обмена",
+    "copy": "Копировать",
+    "shareMessage": "Адрес USDT TRC20 кошелька: {{address}}"
   }
 }

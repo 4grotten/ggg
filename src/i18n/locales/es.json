@@ -1656,5 +1656,19 @@
     "addToContacts": "Añadir contacto",
     "addedToContacts": "Contacto añadido",
     "shareData": "Compartir datos"
+  },
+  "walletPage": {
+    "title": "Billetera USDT TRC20",
+    "cryptoWallet": "Billetera Cripto",
+    "share": "Compartir",
+    "qrCode": "Código QR",
+    "walletDetails": "Datos de la billetera",
+    "network": "Red",
+    "walletAddress": "Dirección de billetera",
+    "currency": "Moneda",
+    "addressCopied": "Dirección copiada",
+    "copiedToClipboard": "Copiado al portapapeles",
+    "copy": "Copiar",
+    "shareMessage": "Dirección de billetera USDT TRC20: {{address}}"
   }
 }
