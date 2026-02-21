@@ -299,3 +299,35 @@ export const fetchBankAccounts = async (): Promise<{ success: boolean; data: Ban
     };
   }
 };
+
+// ─── NEW: Crypto Wallets ────────────────────────────────────────
+
+export interface CryptoWallet {
+  id: string;
+  network: string;
+  token: string;
+  address: string;
+  balance: string;
+  is_active: boolean;
+}
+
+/**
+ * Fetch user crypto wallets
+ * GET /transactions/crypto-wallets/
+ */
+export const fetchCryptoWallets = async (): Promise<{ success: boolean; data: CryptoWallet[]; error?: string }> => {
+  try {
+    const response = await cardsApiGet<CryptoWallet[]>('/transactions/crypto-wallets/');
+    if (response.error || !response.data) {
+      return { success: false, data: [], error: response.error?.message || 'Failed to fetch crypto wallets' };
+    }
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Error fetching crypto wallets:', error);
+    return {
+      success: false,
+      data: [],
+      error: error instanceof Error ? error.message : 'Failed to fetch crypto wallets',
+    };
+  }
+};

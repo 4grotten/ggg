@@ -8,6 +8,7 @@ import {
   fetchIban,
   fetchCardsList,
   fetchBankAccounts,
+  fetchCryptoWallets,
 } from '@/services/api/cards';
 import { getAuthToken } from '@/services/api/apiClient';
 import { FetchCardsParams } from '@/types/card';
@@ -26,6 +27,7 @@ export const cardKeys = {
   iban: () => [...cardKeys.all, 'iban'] as const,
   cardsList: () => [...cardKeys.all, 'cardsList'] as const,
   bankAccounts: () => [...cardKeys.all, 'bankAccounts'] as const,
+  cryptoWallets: () => [...cardKeys.all, 'cryptoWallets'] as const,
 };
 
 /**
@@ -126,6 +128,19 @@ export const useBankAccounts = () => {
   return useQuery({
     queryKey: cardKeys.bankAccounts(),
     queryFn: fetchBankAccounts,
+    enabled: !!getAuthToken(),
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+/**
+ * Hook to fetch user crypto wallets
+ * GET /transactions/crypto-wallets/
+ */
+export const useCryptoWallets = () => {
+  return useQuery({
+    queryKey: cardKeys.cryptoWallets(),
+    queryFn: fetchCryptoWallets,
     enabled: !!getAuthToken(),
     staleTime: 1000 * 60 * 5,
   });
