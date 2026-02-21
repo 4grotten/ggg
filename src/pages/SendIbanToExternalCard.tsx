@@ -286,9 +286,14 @@ const SendIbanToExternalCard = () => {
 
               {recipientName && !isCheckingRecipient && (
                 <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/20">
-                  <div className="w-10 h-10 rounded-full bg-[#27AE60]/20 flex items-center justify-center">
-                    <CheckCircle2 className="w-5 h-5 text-[#27AE60]" />
+                  className="flex items-center gap-3 px-4 py-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/20">
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full bg-[#27AE60]/20 flex items-center justify-center text-lg font-bold text-[#27AE60]">
+                      {recipientName.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="absolute -bottom-0.5 -left-0.5 w-5 h-5 rounded-full bg-[#27AE60] flex items-center justify-center border-2 border-[#27AE60]/10">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold">{recipientName}</p>
@@ -324,13 +329,18 @@ const SendIbanToExternalCard = () => {
         {step === "amount" && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             {/* Recipient badge */}
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/20">
-              <div className="w-10 h-10 rounded-full bg-[#27AE60]/20 flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-[#27AE60]" />
+            <div className="flex items-center gap-3 px-4 py-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/20">
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full bg-[#27AE60]/20 flex items-center justify-center text-lg font-bold text-[#27AE60]">
+                  {recipientName?.charAt(0).toUpperCase()}
+                </div>
+                <div className="absolute -bottom-0.5 -left-0.5 w-5 h-5 rounded-full bg-[#27AE60] flex items-center justify-center border-2 border-[#27AE60]/10">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
               </div>
               <div>
                 <p className="text-sm font-semibold">{recipientName}</p>
-                <p className="text-xs text-muted-foreground">•••• {cleanCardNumber.slice(-4)}</p>
+                <p className="text-xs text-muted-foreground">{recipientCardType ? `${recipientCardType} · ` : ""}•••• {cleanCardNumber.slice(-4)}</p>
               </div>
             </div>
 
