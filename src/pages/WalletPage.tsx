@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Copy, Share2, QrCode, X } from "lucide-react";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
@@ -52,6 +54,12 @@ const WalletPage = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-semibold">USDT TRC20 Wallet</h1>
+        </div>
+      }
+      rightAction={
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
         </div>
       }
     >
