@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Share2, QrCode, X } from "lucide-react";
+import { ArrowLeft, Copy, Share2, QrCode, X, Clock } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
+import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { useTransactionGroups } from "@/hooks/useTransactions";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Drawer,
   DrawerContent,
@@ -19,6 +22,8 @@ const WalletPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [qrOpen, setQrOpen] = useState(false);
+  const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
+  const transactionGroups = transactionsData?.groups || [];
 
   const usdtBalance = 112000; // TODO: replace with real API data
   const walletAddress = "TXyz...placeholder"; // TODO: replace with real wallet address
@@ -203,6 +208,33 @@ const WalletPage = () => {
               <p className="text-sm font-medium">Tether (USDT)</p>
             </div>
           </div>
+        </motion.div>
+
+        {/* Transaction History */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold">{t('dashboard.transactions')}</h2>
+            <button
+              onClick={() => navigate("/card/virtual/history")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+            >
+              <Clock className="w-4 h-4" />
+              {t('card.transactionHistory')}
+            </button>
+          </div>
+
+          {transactionsLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-16 w-full rounded-xl" />
+              <Skeleton className="h-32 w-full rounded-xl" />
+            </div>
+          ) : (
+            <CardTransactionsList groups={transactionGroups} />
+          )}
         </motion.div>
       </div>
     </MobileLayout>
