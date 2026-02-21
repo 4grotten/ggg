@@ -5,6 +5,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
@@ -16,27 +17,28 @@ import {
 
 const WalletPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [qrOpen, setQrOpen] = useState(false);
 
   const usdtBalance = 112000; // TODO: replace with real API data
   const walletAddress = "TXyz...placeholder"; // TODO: replace with real wallet address
 
-  const copyToClipboard = (text: string, label: string) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} скопирован`);
+    toast.success(t('walletPage.addressCopied'));
   };
 
   const handleShare = async () => {
     const shareData = {
-      title: "USDT TRC20 Wallet",
-      text: `USDT TRC20 Wallet Address: ${walletAddress}`,
+      title: t('walletPage.title'),
+      text: t('walletPage.shareMessage', { address: walletAddress }),
     };
     try {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(walletAddress);
-        toast.success("Адрес скопирован в буфер обмена");
+        toast.success(t('walletPage.copiedToClipboard'));
       }
     } catch {
       // user cancelled share
@@ -53,7 +55,7 @@ const WalletPage = () => {
           <button onClick={() => navigate(-1)} className="p-1">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold">USDT TRC20 Wallet</h1>
+          <h1 className="text-lg font-semibold">{t('walletPage.title')}</h1>
         </div>
       }
       rightAction={
@@ -76,7 +78,7 @@ const WalletPage = () => {
               <UsdtIcon size={22} />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Крипто кошелёк</p>
+              <p className="text-xs text-muted-foreground">{t('walletPage.cryptoWallet')}</p>
               <div className="flex items-center gap-1">
                 <p className="text-sm font-medium">USDT</p>
                 <TronIcon size={12} className="opacity-60" />
@@ -103,14 +105,14 @@ const WalletPage = () => {
             className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-3 font-medium text-sm hover:bg-primary/90 transition-colors"
           >
             <Share2 className="w-4 h-4" />
-            Поделиться
+            {t('walletPage.share')}
           </button>
 
           <Drawer open={qrOpen} onOpenChange={setQrOpen}>
             <DrawerTrigger asChild>
               <button className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors py-3 font-medium text-sm">
                 <QrCode className="w-4 h-4" />
-                QR Code
+                {t('walletPage.qrCode')}
               </button>
             </DrawerTrigger>
             <DrawerContent className="pb-8">
@@ -133,17 +135,17 @@ const WalletPage = () => {
                 </div>
 
                 <div className="text-center space-y-1">
-                  <p className="text-xs text-muted-foreground">Адрес кошелька</p>
+                  <p className="text-xs text-muted-foreground">{t('walletPage.walletAddress')}</p>
                   <p className="text-sm font-mono font-medium break-all px-4">{walletAddress}</p>
                 </div>
 
                 <div className="flex gap-3 w-full">
                   <button
-                    onClick={() => copyToClipboard(walletAddress, "Адрес")}
+                    onClick={() => copyToClipboard(walletAddress)}
                     className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-3 font-medium text-sm"
                   >
                     <Copy className="w-4 h-4" />
-                    Копировать
+                    {t('walletPage.copy')}
                   </button>
                   <button
                     onClick={() => {
@@ -153,7 +155,7 @@ const WalletPage = () => {
                     className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-secondary text-foreground py-3 font-medium text-sm"
                   >
                     <Share2 className="w-4 h-4" />
-                    Поделиться
+                    {t('walletPage.share')}
                   </button>
                 </div>
               </div>
@@ -168,11 +170,11 @@ const WalletPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Данные кошелька</h3>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('walletPage.walletDetails')}</h3>
 
           <div className="space-y-3">
             <div>
-              <p className="text-xs text-muted-foreground">Сеть</p>
+              <p className="text-xs text-muted-foreground">{t('walletPage.network')}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <TronIcon size={16} />
                 <p className="text-sm font-medium">Tron (TRC20)</p>
@@ -183,11 +185,11 @@ const WalletPage = () => {
 
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">Адрес кошелька</p>
+                <p className="text-xs text-muted-foreground">{t('walletPage.walletAddress')}</p>
                 <p className="text-sm font-mono font-medium break-all mt-0.5">{walletAddress}</p>
               </div>
               <button
-                onClick={() => copyToClipboard(walletAddress, "Адрес")}
+                onClick={() => copyToClipboard(walletAddress)}
                 className="p-2 rounded-lg hover:bg-secondary transition-colors flex-shrink-0"
               >
                 <Copy className="w-4 h-4 text-muted-foreground" />
@@ -197,7 +199,7 @@ const WalletPage = () => {
             <div className="h-px bg-border/50" />
 
             <div>
-              <p className="text-xs text-muted-foreground">Валюта</p>
+              <p className="text-xs text-muted-foreground">{t('walletPage.currency')}</p>
               <p className="text-sm font-medium">Tether (USDT)</p>
             </div>
           </div>

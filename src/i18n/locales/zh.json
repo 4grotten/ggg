@@ -1663,5 +1663,19 @@
     "addToContacts": "添加联系人",
     "addedToContacts": "联系人已添加",
     "shareData": "分享数据"
+  },
+  "walletPage": {
+    "title": "USDT TRC20 钱包",
+    "cryptoWallet": "加密钱包",
+    "share": "分享",
+    "qrCode": "二维码",
+    "walletDetails": "钱包详情",
+    "network": "网络",
+    "walletAddress": "钱包地址",
+    "currency": "货币",
+    "addressCopied": "地址已复制",
+    "copiedToClipboard": "已复制到剪贴板",
+    "copy": "复制",
+    "shareMessage": "USDT TRC20 钱包地址：{{address}}"
   }
 }

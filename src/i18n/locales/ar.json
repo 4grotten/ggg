@@ -1656,5 +1656,19 @@
     "addToContacts": "إضافة جهة اتصال",
     "addedToContacts": "تمت إضافة جهة الاتصال",
     "shareData": "مشاركة البيانات"
+  },
+  "walletPage": {
+    "title": "محفظة USDT TRC20",
+    "cryptoWallet": "محفظة العملات الرقمية",
+    "share": "مشاركة",
+    "qrCode": "رمز QR",
+    "walletDetails": "بيانات المحفظة",
+    "network": "الشبكة",
+    "walletAddress": "عنوان المحفظة",
+    "currency": "العملة",
+    "addressCopied": "تم نسخ العنوان",
+    "copiedToClipboard": "تم النسخ إلى الحافظة",
+    "copy": "نسخ",
+    "shareMessage": "عنوان محفظة USDT TRC20: {{address}}"
   }
 }

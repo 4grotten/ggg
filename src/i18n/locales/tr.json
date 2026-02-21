@@ -1656,5 +1656,19 @@
     "addToContacts": "Kişi Ekle",
     "addedToContacts": "Kişi eklendi",
     "shareData": "Verileri Paylaş"
+  },
+  "walletPage": {
+    "title": "USDT TRC20 Cüzdan",
+    "cryptoWallet": "Kripto Cüzdan",
+    "share": "Paylaş",
+    "qrCode": "QR Kod",
+    "walletDetails": "Cüzdan Bilgileri",
+    "network": "Ağ",
+    "walletAddress": "Cüzdan Adresi",
+    "currency": "Para Birimi",
+    "addressCopied": "Adres kopyalandı",
+    "copiedToClipboard": "Panoya kopyalandı",
+    "copy": "Kopyala",
+    "shareMessage": "USDT TRC20 Cüzdan Adresi: {{address}}"
   }
 }
