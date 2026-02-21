@@ -46,6 +46,7 @@ jobs:
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
             cd docker
             docker compose pull
-            docker compose up -d --remove-orphans
+            docker compose build backend-api
+            docker compose up -d --force-recreate --remove-orphans
             docker image prune -f
 
