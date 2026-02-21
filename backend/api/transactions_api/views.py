@@ -15,6 +15,7 @@ from .serializers import (
     CardTransferRequestSerializer, CardTransferResponseSerializer,
     CryptoWithdrawalRequestSerializer, CryptoWithdrawalResponseSerializer,
     BankWithdrawalRequestSerializer, BankWithdrawalResponseSerializer,
+    BankToCardTransferRequestSerializer, BankToCardTransferResponseSerializer,
     ErrorResponseSerializer
 )
 from apps.transactions_apps.services import TransactionService
@@ -246,3 +247,34 @@ class InternalTransferView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": f"Системная ошибка: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class BankToCardTransferView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @swagger_auto_schema(
+        operation_summary="Перевод с IBAN на карту (включая внешние)",
+        operation_description="Списывает средства с банковского счета (IBAN) пользователя и зачисляет на любую карту по номеру. Комиссия 2%.",
+        request_body=BankToCardTransferRequestSerializer,
+        responses={200: BankToCardTransferResponseSerializer, 400: ErrorResponseSerializer},
+        tags=["Transfers (Переводы)"]
+    )
+    def post(self, request):
+        serializer = BankToCardTransferRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                txn, fee, total_debit = TransactionService.execute_bank_to_card_transfer(
+                    user_id=request.user.id,
+                    from_bank_account_id=serializer.validated_data['from_bank_account_id'],
+                    receiver_card_number=serializer.validated_data['receiver_card_number'],
+                    amount=serializer.validated_data['amount']
+                )
+                return Response({
+                    "message": "Transfer successful",
+                    "transaction_id": txn.id,
+                    "amount": str(txn.amount),
+                    "fee": str(fee),
+                    "total_debit": str(total_debit)
+                }, status=status.HTTP_200_OK)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

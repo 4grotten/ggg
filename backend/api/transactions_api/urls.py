@@ -20,4 +20,5 @@ urlpatterns = [
     path('crypto-wallets/', views.UserCryptoWalletsView.as_view(), name='user_crypto_wallets'),
 
     path('transfer/internal/', views.InternalTransferView.as_view(), name='internal_transfer'),
+    path('transfer/bank-to-card/', views.BankToCardTransferView.as_view(), name='bank_to_card_transfer'),
 ]

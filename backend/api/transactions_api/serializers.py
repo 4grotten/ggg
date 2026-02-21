@@ -71,5 +71,19 @@ class BankWithdrawalResponseSerializer(serializers.Serializer):
     total_debit_aed = serializers.DecimalField(max_digits=15, decimal_places=2, help_text="Общая сумма, списанная с карты (сумма + комиссия)")
 
 
+class BankToCardTransferRequestSerializer(serializers.Serializer):
+    from_bank_account_id = serializers.UUIDField(help_text="ID банковского счета отправителя (IBAN)")
+    receiver_card_number = serializers.CharField(max_length=16, help_text="16-значный номер карты получателя")
+    amount = serializers.DecimalField(max_digits=15, decimal_places=2, min_value=1.00, help_text="Сумма перевода в AED")
+
+
+class BankToCardTransferResponseSerializer(serializers.Serializer):
+    message = serializers.CharField(default="Transfer successful")
+    transaction_id = serializers.UUIDField(help_text="ID выполненной транзакции")
+    amount = serializers.DecimalField(max_digits=15, decimal_places=2, help_text="Переведенная сумма")
+    fee = serializers.DecimalField(max_digits=10, decimal_places=2, help_text="Комиссия за перевод (2%)")
+    total_debit = serializers.DecimalField(max_digits=15, decimal_places=2, help_text="Общая сумма списания")
+
+
 class ErrorResponseSerializer(serializers.Serializer):
     error = serializers.CharField(help_text="Текст ошибки (например, 'Недостаточно средств')")
