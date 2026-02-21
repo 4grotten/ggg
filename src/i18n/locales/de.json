@@ -538,6 +538,7 @@
     "sender": "Absender",
     "fromCard": "Von Karte",
     "fromWallet": "Von Wallet",
+    "toWallet": "Auf Wallet",
     "toCard": "Zur Karte",
     "recipient": "Empfänger",
     "card": "Karte",

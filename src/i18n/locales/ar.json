@@ -538,6 +538,7 @@
     "sender": "المرسل",
     "fromCard": "من البطاقة",
     "fromWallet": "من المحفظة",
+    "toWallet": "إلى المحفظة",
     "toCard": "إلى البطاقة",
     "recipient": "المستلم",
     "card": "البطاقة",

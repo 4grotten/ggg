@@ -621,6 +621,7 @@
     "sender": "Sender",
     "fromCard": "From Card",
     "fromWallet": "From Wallet",
+    "toWallet": "To Wallet",
     "toCard": "To Card",
     "recipient": "Recipient",
     "card": "Card",

@@ -538,6 +538,7 @@
     "sender": "Gönderen",
     "fromCard": "Kaynak Kart",
     "fromWallet": "Cüzdandan",
+    "toWallet": "Cüzdana",
     "toCard": "Hedef Kart",
     "recipient": "Alıcı",
     "card": "Kart",
