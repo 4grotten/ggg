@@ -260,7 +260,7 @@ const AccountPage = () => {
                         </div>
                       </button>
                       <button
-                        onClick={() => { setSendOpen(false); navigate("/send-IBAN-card"); }}
+                        onClick={() => { setSendOpen(false); navigate("/send-IBAN-external"); }}
                         className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-secondary/70 transition-colors"
                       >
                         <div className="w-10 h-10 rounded-full bg-[#007AFF]/10 flex items-center justify-center">
