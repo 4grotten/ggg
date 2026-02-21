@@ -189,14 +189,14 @@ const AccountPage = () => {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={() => navigate("/top-up/bank")}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-2.5 font-medium text-sm hover:bg-primary/90 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-white py-2.5 font-medium text-sm hover:bg-emerald-600 transition-colors"
                 >
                   <ArrowDownLeft className="w-4 h-4" />
                   {t('dashboard.topUp')}
                 </button>
                 <button
                   onClick={() => navigate("/send-to-card")}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-background/50 hover:bg-background/70 transition-colors py-2.5 font-medium text-sm"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-blue-500 text-white py-2.5 font-medium text-sm hover:bg-blue-600 transition-colors"
                 >
                   <ArrowUpRight className="w-4 h-4" />
                   {t('dashboard.send')}
