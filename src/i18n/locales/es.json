@@ -653,6 +653,7 @@
     "send": "Enviar",
     "easyCardToEasyCard": "Easy Card a Easy Card",
     "toBankAccount": "A Cuenta Bancaria",
+    "bankAccountAed": "Cuenta Bancaria AED",
     "networkFee": "Tarifa de red",
     "transactionsSection": "Transacciones",
     "currencyConversion": "Conversión de Moneda",
@@ -737,14 +738,47 @@
     "exchangeRate": "Tipo de cambio",
     "selectCoin": "Seleccionar Moneda",
     "selectNetwork": "Seleccionar Red",
-    "cryptoWarning": "Asegúrate de que la dirección de la billetera y la red sean correctas. Enviar a una dirección o red incorrecta puede resultar en la pérdida permanente de fondos."
+    "cryptoWarning": "Asegúrate de que la dirección de la billetera y la red sean correctas. Enviar a una dirección o red incorrecta puede resultar en la pérdida permanente de fondos.",
+    "fromSource": "Desde",
+    "selectSource": "Transferir desde",
+    "willBeDebited": "Se debitará",
+    "bankAccountAed": "Cuenta Bancaria AED"
   },
   "drawer": {
     "addMoneyWith": "Recargar con",
     "sendMoneyWith": "Enviar con",
     "stablecoins": "Stablecoins",
     "bankTransfer": "Transferencia Bancaria",
-    "sendToCard": "Enviar a tarjeta"
+    "sendToCard": "Enviar a tarjeta",
+    "usdtBalance": "Billetera USDT TRC20",
+    "usdtBalanceDesc": "Desde su saldo"
+  },
+  "topUpUsdt": {
+    "title": "Recargar desde USDT",
+    "availableBalance": "Saldo disponible",
+    "selectDestination": "Transferir a",
+    "toCard": "A tarjeta",
+    "toCardDesc": "Recargar saldo de tarjeta",
+    "toAccount": "A cuenta",
+    "toAccountDesc": "Acreditar en cuenta principal",
+    "selectCard": "Seleccionar tarjeta",
+    "noCards": "No hay tarjetas activas",
+    "accountDetails": "Datos de la cuenta",
+    "beneficiary": "Beneficiario",
+    "accountNumber": "Número de cuenta",
+    "bank": "Banco",
+    "currency": "Moneda",
+    "enterAmount": "Monto de transferencia (USDT)",
+    "calculation": "Cálculo",
+    "transferAmount": "Monto de transferencia",
+    "exchangeRate": "Tipo de cambio",
+    "networkFee": "Tarifa de red",
+    "totalDeducted": "Total deducido",
+    "destinationCard": "Tarjeta de destino",
+    "youReceive": "Recibirá",
+    "insufficientBalance": "Saldo USDT insuficiente",
+    "confirm": "Confirmar transferencia",
+    "transferInitiated": "Transferencia iniciada"
   },
   "auth": {
     "resetPassword": {

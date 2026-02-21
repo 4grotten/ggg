@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Share2, AlertTriangle } from "lucide-react";
+import { Copy, Share2, AlertTriangle, Check } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { TOP_UP_BANK_FEE_PERCENT, TOP_UP_BANK_MIN_AMOUNT } from "@/lib/fees";
@@ -17,9 +18,29 @@ const TopUpBankDetails = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [copied, setCopied] = useState(false);
 
   // Get user ID for the reference field
   const userId = user?.id ? String(user.id) : "—";
+  const userFullName = user?.full_name || "—";
+
+  // Generate user-specific account number and IBAN
+  // Account number: fixed prefix, last digits replaced with UID (always 13 digits)
+  const generateAccountNumber = (uid: string): string => {
+    const prefix = "1234567890";
+    const padded = uid.padStart(3, "0");
+    return (prefix + padded).slice(0, 13);
+  };
+
+  // IBAN: AE + fixed prefix, last digits replaced with UID (always 23 chars)
+  const generateIban = (uid: string): string => {
+    const prefix = "AE07033123456789012";
+    const padded = uid.padStart(4, "0");
+    return (prefix + padded).slice(0, 23);
+  };
+
+  const accountNumber = userId !== "—" ? generateAccountNumber(userId) : "—";
+  const iban = userId !== "—" ? generateIban(userId) : "—";
 
   // Scroll to top on mount
   useEffect(() => {
@@ -27,9 +48,9 @@ const TopUpBankDetails = () => {
   }, []);
 
   const bankDetails: BankDetail[] = [
-    { label: t("topUp.beneficiary"), value: "Easy Card LLC" },
-    { label: t("topUp.accountNumber"), value: "1234567890123" },
-    { label: t("topUp.iban"), value: "AE070331234567890123456" },
+    { label: t("topUp.beneficiary"), value: userFullName },
+    { label: t("topUp.accountNumber"), value: accountNumber },
+    { label: t("topUp.iban"), value: iban },
     { label: t("topUp.bankName"), value: "Emirates NBD" },
     { label: t("topUp.bankAddress"), value: "Dubai, United Arab Emirates" },
   ];
@@ -72,7 +93,7 @@ const TopUpBankDetails = () => {
   };
 
   return (
-    <MobileLayout showBackButton onBack={() => navigate(-1)} rightAction={<LanguageSwitcher />}>
+    <MobileLayout showBackButton onBack={() => navigate(-1)} rightAction={<div className="flex items-center gap-2"><ThemeSwitcher /><LanguageSwitcher /></div>}>
       <div className="flex flex-col min-h-[calc(100vh-56px)] pb-28">
         {/* Title */}
         <div className="pt-4 pb-4 px-6">
@@ -112,28 +133,6 @@ const TopUpBankDetails = () => {
             ))}
           </div>
 
-          {/* User ID Card with Warning */}
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 mt-4">
-            <div className="flex items-start gap-3 mb-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-amber-700 dark:text-amber-400">
-                {t("topUp.idWarning")}
-              </p>
-            </div>
-            <div className="flex items-center justify-between gap-3 bg-background/50 rounded-xl p-3">
-              <div className="flex-1">
-                <p className="text-sm text-muted-foreground">{t("topUp.yourId")}</p>
-                <p className="font-bold text-foreground text-lg">{userId}</p>
-              </div>
-              <button
-                onClick={() => handleCopy(userId, t("topUp.yourId"))}
-                className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
-              >
-                <Copy className="w-5 h-5 text-muted-foreground" />
-              </button>
-            </div>
-          </div>
-
           {/* Fee Details Card */}
           <div className="bg-muted rounded-2xl p-5 mt-4 space-y-3">
             {feeDetails.map((detail, index) => (
@@ -150,14 +149,40 @@ const TopUpBankDetails = () => {
         </div>
       </div>
 
-      {/* Fixed Share Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
+      {/* Fixed Bottom Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 flex gap-3 max-w-[800px] mx-auto">
+        <button
+          onClick={() => {
+            const allText = bankDetails.map(d => `${d.label}: ${d.value}`).join("\n");
+            navigator.clipboard.writeText(allText);
+            setCopied(true);
+            toast.success(t("toast.accountDetailsCopied"));
+            setTimeout(() => setCopied(false), 2000);
+          }}
+          className={`flex-1 flex items-center justify-center gap-2 font-semibold py-4 rounded-xl transition-all duration-300 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg ${
+            copied
+              ? "bg-green-500/90 text-white"
+              : "bg-muted/80 text-foreground hover:bg-muted"
+          }`}
+        >
+          <div className="relative w-5 h-5">
+            <Copy className={`w-5 h-5 absolute inset-0 transition-all duration-300 ${
+              copied ? "opacity-0 scale-50 rotate-90" : "opacity-100 scale-100 rotate-0"
+            }`} />
+            <Check className={`w-5 h-5 absolute inset-0 transition-all duration-300 ${
+              copied ? "opacity-100 scale-100 rotate-0" : "opacity-0 scale-50 -rotate-90"
+            }`} />
+          </div>
+          <span className="transition-all duration-300">
+            {copied ? t("topUp.copied", "Скопировано") : t("topUp.copy", "Скопировать")}
+          </span>
+        </button>
         <button
           onClick={handleShare}
-          className="w-full bg-primary/90 text-white font-semibold py-4 rounded-xl hover:bg-primary transition-all flex items-center justify-center gap-2 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg"
+          className="flex-1 bg-primary/90 text-white font-semibold py-4 rounded-xl hover:bg-primary transition-all flex items-center justify-center gap-2 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg"
         >
           <Share2 className="w-5 h-5" />
-          {t("topUp.shareAedDetails")}
+          {t("topUp.share", "Поделиться")}
         </button>
       </div>
     </MobileLayout>

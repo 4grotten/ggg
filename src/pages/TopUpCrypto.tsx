@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X } from "lucide-react";
+import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark, Eye, EyeOff, Wallet } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
@@ -13,26 +13,33 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { TOP_UP_CRYPTO_FEE, TOP_UP_CRYPTO_MIN_AMOUNT } from "@/lib/fees";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 
-interface Card {
+interface Destination {
   id: string;
-  type: "virtual" | "metal";
+  type: "card" | "bank" | "wallet";
+  cardType?: "virtual" | "metal";
   name: string;
-  lastFour: string;
+  subtitle: string;
+  fullNumber: string;
 }
 
-interface Network {
-  id: string;
-  name: string;
-  shortName: string;
-}
-
-const cards: Card[] = [
-  { id: "1", type: "virtual", name: "Visa Virtual", lastFour: "4532" },
-  { id: "2", type: "metal", name: "Visa Metal", lastFour: "8901" },
+const getDestinations = (bankLabel: string, walletLabel: string, walletAddress: string): Destination[] => [
+  { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
+  { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
+  { id: "bank", type: "bank", name: bankLabel, subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
+  { id: "wallet", type: "wallet", name: walletLabel, subtitle: `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`, fullNumber: walletAddress },
 ];
 
-const networks: Network[] = [
+const networkAddresses: Record<string, string> = {
+  trc20: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc",
+  erc20: "0x4A8b2e1F7cD9E3a6B5f0C2d8E9F1a3B4c5D6e7F8",
+  bep20: "0x7F2c9A3d5E8b1C4f6D0a2B9e7F3c5A8d1E4b6C9D",
+  sol: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgHkv",
+};
+
+const networks = [
   { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20" },
   { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20" },
   { id: "bep20", name: "BNB Chain (BEP20)", shortName: "BEP20" },
@@ -42,11 +49,15 @@ const networks: Network[] = [
 const TopUpCrypto = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const userWalletAddress = networkAddresses.trc20;
+  const walletLabel = t("drawer.usdtBalance", "USDT TRC20 Кошелек");
+  const destinations = getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress);
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<Card>(cards[0]);
-  const [selectedNetwork, setSelectedNetwork] = useState<Network>(networks[0]);
-  const [cardDrawerOpen, setCardDrawerOpen] = useState(false);
+  const [selectedDest, setSelectedDest] = useState<Destination>(() => getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress)[0]);
+  const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
+  const [destDrawerOpen, setDestDrawerOpen] = useState(false);
+  const [revealedId, setRevealedId] = useState<string | null>(null);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
   
   // Scroll to top on mount
@@ -54,8 +65,8 @@ const TopUpCrypto = () => {
     window.scrollTo(0, 0);
   }, []);
   
-  // Mock wallet address
-  const walletAddress = "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc";
+  // Wallet address based on selected network
+  const walletAddress = networkAddresses[selectedNetwork.id] || networkAddresses.trc20;
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
@@ -103,6 +114,7 @@ const TopUpCrypto = () => {
     <MobileLayout
       showBackButton
       onBack={() => navigate(-1)}
+      rightAction={<div className="flex items-center gap-2"><ThemeSwitcher /><LanguageSwitcher /></div>}
     >
       <div className="flex flex-col min-h-[calc(100vh-56px)] pb-28">
         {/* Title */}
@@ -142,21 +154,30 @@ const TopUpCrypto = () => {
 
         {/* Info Cards */}
         <div className="px-6 space-y-3 flex-1">
-          {/* Select Card */}
+          {/* Select Destination */}
           <button 
-            onClick={() => setCardDrawerOpen(true)}
+            onClick={() => setDestDrawerOpen(true)}
             className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between"
           >
             <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
             <div className="flex items-center gap-2">
               <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                selectedCard.type === "metal" 
-                  ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                  : "bg-primary"
+                selectedDest.type === "bank"
+                  ? "bg-purple-500"
+                  : selectedDest.type === "wallet"
+                    ? "bg-[#26A17B]"
+                    : selectedDest.cardType === "metal" 
+                      ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                      : "bg-primary"
               }`}>
-                <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
+                {selectedDest.type === "bank" 
+                  ? <Landmark className="w-3.5 h-3.5 text-primary-foreground" />
+                  : selectedDest.type === "wallet"
+                    ? <Wallet className="w-3.5 h-3.5 text-white" />
+                    : <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
+                }
               </div>
-              <span className="font-semibold text-foreground">{selectedCard.name}</span>
+              <span className="font-semibold text-foreground">{selectedDest.name}</span>
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </div>
           </button>
@@ -244,12 +265,12 @@ const TopUpCrypto = () => {
         </button>
       </div>
 
-      {/* Card Selection Drawer */}
-      <Drawer open={cardDrawerOpen} onOpenChange={setCardDrawerOpen}>
+      {/* Destination Selection Drawer */}
+      <Drawer open={destDrawerOpen} onOpenChange={setDestDrawerOpen}>
         <DrawerContent className="bg-background/95 backdrop-blur-xl">
           <DrawerHeader className="relative flex items-center justify-center py-4">
             <DrawerTitle className="text-center text-base font-semibold">
-              {t("topUp.selectCard")}
+              {t("topUp.topUpTo")}
             </DrawerTitle>
             <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
               <X className="w-3.5 h-3.5 text-primary" />
@@ -258,31 +279,54 @@ const TopUpCrypto = () => {
           
           <div className="px-4 pb-6">
             <div className="bg-muted/50 rounded-xl overflow-hidden">
-              {cards.map((card, index) => (
+              {destinations.map((dest, index) => (
                 <button
-                  key={card.id}
+                  key={dest.id}
                   onClick={() => {
-                    setSelectedCard(card);
-                    setCardDrawerOpen(false);
+                    setSelectedDest(dest);
+                    setDestDrawerOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
-                    index < cards.length - 1 ? 'border-b border-border/50' : ''
+                    index < destinations.length - 1 ? 'border-b border-border/50' : ''
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    card.type === "metal" 
-                      ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                      : "bg-primary"
+                    dest.type === "bank"
+                      ? "bg-purple-500"
+                      : dest.type === "wallet"
+                        ? "bg-[#26A17B]"
+                        : dest.cardType === "metal" 
+                          ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                          : "bg-primary"
                   }`}>
-                    <CreditCard className="w-5 h-5 text-primary-foreground" />
+                    {dest.type === "bank" 
+                      ? <Landmark className="w-5 h-5 text-primary-foreground" />
+                      : dest.type === "wallet"
+                        ? <Wallet className="w-5 h-5 text-white" />
+                        : <CreditCard className="w-5 h-5 text-primary-foreground" />
+                    }
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="text-base font-medium text-foreground">{card.name}</p>
-                    <p className="text-sm text-muted-foreground">•••• {card.lastFour}</p>
+                    <p className="text-base font-medium text-foreground">{dest.name}</p>
+                    <p className="text-sm text-muted-foreground font-mono">
+                      {revealedId === dest.id ? dest.fullNumber : dest.subtitle}
+                    </p>
                   </div>
-                  {selectedCard.id === card.id && (
+                  {selectedDest.id === dest.id && (
                     <Check className="w-5 h-5 text-primary" />
                   )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setRevealedId(revealedId === dest.id ? null : dest.id);
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                  >
+                    {revealedId === dest.id
+                      ? <EyeOff className="w-4 h-4 text-muted-foreground" />
+                      : <Eye className="w-4 h-4 text-muted-foreground" />
+                    }
+                  </button>
                 </button>
               ))}
             </div>

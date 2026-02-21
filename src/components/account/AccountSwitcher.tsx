@@ -5,6 +5,7 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Plus, LogOut, X } from 'lucide-react';
@@ -24,6 +25,7 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
   const { t } = useTranslation();
   const { user, switchUser } = useAuth();
   const { accounts, removeAccountById, refreshAccounts } = useMultiAccount();
+  const queryClient = useQueryClient();
 
   // Ensure we always show the latest saved_accounts when the drawer opens
   useEffect(() => {
@@ -31,12 +33,11 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
   }, [open, refreshAccounts]);
 
   const handleSwitchAccount = (account: SavedAccount) => {
-    // Switch user instantly without page reload
     switchUser(account.user, account.token);
     onOpenChange(false);
-    // Use window.location for full page reload to ensure all state is updated
-    // This is critical for deployed environments with base paths like /easycard
-    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/' : '/');
+    // Invalidate all cached queries so they refetch with new token
+    queryClient.invalidateQueries();
+    navigate('/');
   };
 
   const handleAddAccount = () => {
@@ -50,8 +51,7 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
       }
     }
     onOpenChange(false);
-    // Use window.location for deployed environments with base paths
-    window.location.href = window.location.origin + (window.location.pathname.includes('/easycard') ? '/easycard/auth/phone' : '/auth/phone');
+    navigate('/auth/phone');
   };
 
   const handleRemoveAccount = (e: React.MouseEvent, userId: number) => {

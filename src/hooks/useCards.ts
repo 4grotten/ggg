@@ -5,6 +5,7 @@ import {
   fetchCardBalance,
   fetchTotalBalance 
 } from '@/services/api/cards';
+import { getAuthToken } from '@/services/api/apiClient';
 import { FetchCardsParams } from '@/types/card';
 
 // Query keys for caching
@@ -26,7 +27,8 @@ export const useCards = (params?: FetchCardsParams) => {
   return useQuery({
     queryKey: cardKeys.list(params),
     queryFn: () => fetchCards(params),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: !!getAuthToken(),
+    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -37,8 +39,8 @@ export const useCardDetails = (id: string) => {
   return useQuery({
     queryKey: cardKeys.detail(id),
     queryFn: () => fetchCardById(id),
-    enabled: !!id,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    enabled: !!id && !!getAuthToken(),
+    staleTime: 1000 * 60 * 10,
   });
 };
 
@@ -49,9 +51,9 @@ export const useCardBalance = (id: string) => {
   return useQuery({
     queryKey: cardKeys.balance(id),
     queryFn: () => fetchCardBalance(id),
-    enabled: !!id,
-    staleTime: 1000 * 30, // 30 seconds - balance should refresh more often
-    refetchInterval: 1000 * 60, // Refetch every minute
+    enabled: !!id && !!getAuthToken(),
+    staleTime: 1000 * 30,
+    refetchInterval: 1000 * 60,
   });
 };
 
@@ -62,7 +64,8 @@ export const useTotalBalance = () => {
   return useQuery({
     queryKey: cardKeys.totalBalance(),
     queryFn: fetchTotalBalance,
-    staleTime: 1000 * 30, // 30 seconds
-    refetchInterval: 1000 * 60, // Refetch every minute
+    enabled: !!getAuthToken(),
+    staleTime: 1000 * 30,
+    refetchInterval: 1000 * 60,
   });
 };

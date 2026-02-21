@@ -653,6 +653,7 @@
     "send": "إرسال",
     "easyCardToEasyCard": "من Easy Card إلى Easy Card",
     "toBankAccount": "إلى حساب بنكي",
+    "bankAccountAed": "حساب بنكي AED",
     "networkFee": "رسوم الشبكة",
     "transactionsSection": "المعاملات",
     "currencyConversion": "تحويل العملات",
@@ -737,14 +738,47 @@
     "exchangeRate": "سعر الصرف",
     "selectCoin": "اختر العملة",
     "selectNetwork": "اختر الشبكة",
-    "cryptoWarning": "تأكد من أن عنوان المحفظة والشبكة صحيحان. الإرسال إلى عنوان أو شبكة خاطئة قد يؤدي إلى خسارة الأموال بشكل دائم."
+    "cryptoWarning": "تأكد من أن عنوان المحفظة والشبكة صحيحان. الإرسال إلى عنوان أو شبكة خاطئة قد يؤدي إلى خسارة الأموال بشكل دائم.",
+    "fromSource": "من",
+    "selectSource": "التحويل من",
+    "willBeDebited": "سيتم خصم",
+    "bankAccountAed": "حساب بنكي AED"
   },
   "drawer": {
     "addMoneyWith": "الشحن عبر",
     "sendMoneyWith": "الإرسال عبر",
     "stablecoins": "العملات المستقرة",
     "bankTransfer": "تحويل بنكي",
-    "sendToCard": "إرسال إلى بطاقة"
+    "sendToCard": "إرسال إلى بطاقة",
+    "usdtBalance": "محفظة USDT TRC20",
+    "usdtBalanceDesc": "من رصيدك"
+  },
+  "topUpUsdt": {
+    "title": "شحن من USDT",
+    "availableBalance": "الرصيد المتاح",
+    "selectDestination": "التحويل إلى",
+    "toCard": "إلى البطاقة",
+    "toCardDesc": "شحن رصيد البطاقة",
+    "toAccount": "إلى الحساب",
+    "toAccountDesc": "إيداع في الحساب الرئيسي",
+    "selectCard": "اختر البطاقة",
+    "noCards": "لا توجد بطاقات نشطة",
+    "accountDetails": "تفاصيل الحساب",
+    "beneficiary": "المستفيد",
+    "accountNumber": "رقم الحساب",
+    "bank": "البنك",
+    "currency": "العملة",
+    "enterAmount": "مبلغ التحويل (USDT)",
+    "calculation": "الحساب",
+    "transferAmount": "مبلغ التحويل",
+    "exchangeRate": "سعر الصرف",
+    "networkFee": "رسوم الشبكة",
+    "totalDeducted": "إجمالي المخصوم",
+    "destinationCard": "بطاقة الإيداع",
+    "youReceive": "ستتلقى",
+    "insufficientBalance": "رصيد USDT غير كافٍ",
+    "confirm": "تأكيد التحويل",
+    "transferInitiated": "تم بدء التحويل"
   },
   "auth": {
     "resetPassword": {

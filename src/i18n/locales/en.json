@@ -741,6 +741,7 @@
     "send": "Send",
     "easyCardToEasyCard": "Easy Card to Easy Card",
     "toBankAccount": "To Bank Account",
+    "bankAccountAed": "Bank Account AED",
     "networkFee": "Network fee",
     "transactionsSection": "Transactions",
     "currencyConversion": "Currency Conversion",
@@ -823,14 +824,47 @@
     "exchangeRate": "Exchange rate",
     "selectCoin": "Select Coin",
     "selectNetwork": "Select Network",
-    "cryptoWarning": "Make sure the wallet address and network are correct. Sending to a wrong address or network may result in permanent loss of funds."
+    "cryptoWarning": "Make sure the wallet address and network are correct. Sending to a wrong address or network may result in permanent loss of funds.",
+    "fromSource": "From",
+    "selectSource": "Transfer from",
+    "willBeDebited": "Will be debited",
+    "bankAccountAed": "Bank Account AED"
   },
   "drawer": {
     "addMoneyWith": "Add Money with",
     "sendMoneyWith": "Send Money with",
     "stablecoins": "Stablecoins",
     "bankTransfer": "Bank Transfer",
-    "sendToCard": "Send to card"
+    "sendToCard": "Send to card",
+    "usdtBalance": "USDT TRC20 Wallet",
+    "usdtBalanceDesc": "From your balance"
+  },
+  "topUpUsdt": {
+    "title": "Top Up from USDT",
+    "availableBalance": "Available balance",
+    "selectDestination": "Transfer to",
+    "toCard": "To card",
+    "toCardDesc": "Top up card balance",
+    "toAccount": "To account",
+    "toAccountDesc": "Credit to main account",
+    "selectCard": "Select card",
+    "noCards": "No active cards",
+    "accountDetails": "Account details",
+    "beneficiary": "Beneficiary",
+    "accountNumber": "Account number",
+    "bank": "Bank",
+    "currency": "Currency",
+    "enterAmount": "Transfer amount (USDT)",
+    "calculation": "Calculation",
+    "transferAmount": "Transfer amount",
+    "exchangeRate": "Exchange rate",
+    "networkFee": "Network fee",
+    "totalDeducted": "Total deducted",
+    "destinationCard": "Destination card",
+    "youReceive": "You receive",
+    "insufficientBalance": "Insufficient USDT balance",
+    "confirm": "Confirm transfer",
+    "transferInitiated": "Transfer initiated"
   },
   "auth": {
     "resetPassword": {

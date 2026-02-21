@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X, Wallet } from "lucide-react";
+import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X, Wallet, Landmark } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,18 +16,23 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { BANK_TRANSFER_FEE_PERCENT } from "@/lib/fees";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
-interface Card {
+interface SourceOption {
   id: string;
-  type: "virtual" | "metal";
+  type: "card" | "bank" | "wallet";
+  cardType?: "virtual" | "metal";
   name: string;
-  lastFour: string;
+  subtitle: string;
   balance: number;
 }
 
-const cards: Card[] = [
-  { id: "1", type: "virtual", name: "Visa Virtual", lastFour: "4532", balance: 213757.49 },
-  { id: "2", type: "metal", name: "Visa Metal", lastFour: "8901", balance: 256508.98 },
+const getSourceOptions = (t: ReturnType<typeof useTranslation>["t"], userFullName: string, userId: string): SourceOption[] => [
+  { id: "card-1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", balance: 213757.49 },
+  { id: "card-2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", balance: 256508.98 },
+  { id: "bank", type: "bank", name: t("send.bankAccountAed", "Банковский счёт AED"), subtitle: `IBAN •••• ${userId.slice(-3)}`, balance: 0 },
+  { id: "wallet", type: "wallet", name: t("drawer.usdtBalance", "USDT TRC20 Кошелек"), subtitle: "TRC20", balance: 112000 },
 ];
 
 const SendBank = () => {
@@ -33,17 +40,26 @@ const SendBank = () => {
   const location = useLocation();
   const { t } = useTranslation();
   
+  const { user } = useAuth();
+  const { USDT_TO_AED_BUY } = useSettings();
+  const userId = user?.id?.toString() ?? "000";
+  const userFullName = user?.full_name || "—";
+
   // Check if this is a referral withdrawal
   const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
   const referralBalance = location.state?.referralBalance || 0;
   
+  const sourceOptions = getSourceOptions(t, userFullName, userId);
+  
   const [step, setStep] = useState(1);
-  const [selectedCard, setSelectedCard] = useState<Card>(cards[0]);
-  const [cardDrawerOpen, setCardDrawerOpen] = useState(false);
+  const [selectedSource, setSelectedSource] = useState<SourceOption>(sourceOptions[0]);
+  const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
   
-  // Use referral balance or card balance
-  const availableBalance = isReferralWithdrawal ? referralBalance : selectedCard.balance;
-  
+  // Use referral balance or source balance
+  const isWalletSource = selectedSource.type === "wallet";
+  const availableBalance = isReferralWithdrawal ? referralBalance : selectedSource.balance;
+  const availableBalanceAed = isWalletSource ? availableBalance * USDT_TO_AED_BUY : availableBalance;
+
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -99,7 +115,7 @@ const SendBank = () => {
 
   const isStep1Valid = iban.replace(/\s/g, "").length >= 15;
   const isStep2Valid = recipientName.trim().length >= 2 && bankName.trim().length >= 2;
-  const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= availableBalance;
+  const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= availableBalanceAed;
 
   const handleNext = () => {
     if (step < 3) {
@@ -139,6 +155,7 @@ const SendBank = () => {
             <span className="text-sm">{t("send.back")}</span>
           </button>
         }
+        rightAction={<div className="flex items-center gap-2"><ThemeSwitcher /><LanguageSwitcher /></div>}
       >
         <div className="px-4 py-6 pb-32 space-y-6">
           {/* Header */}
@@ -234,7 +251,7 @@ const SendBank = () => {
               {/* Source Selection - Card or Referral Balance */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">
-                  {isReferralWithdrawal ? t("partner.referralBalance", "Реферальный счёт") : t("send.fromCard")}
+                  {isReferralWithdrawal ? t("partner.referralBalance", "Реферальный счёт") : t("send.fromSource", "Откуда")}
                 </label>
                 {isReferralWithdrawal ? (
                   <div className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20">
@@ -252,21 +269,31 @@ const SendBank = () => {
                   </div>
                 ) : (
                   <button
-                    onClick={() => setCardDrawerOpen(true)}
+                    onClick={() => setSourceDrawerOpen(true)}
                     className="w-full flex items-center justify-between p-4 bg-secondary rounded-2xl hover:bg-muted/80 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        selectedCard.type === "metal" 
-                          ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                          : "bg-primary"
+                        selectedSource.type === "bank"
+                          ? "bg-purple-500"
+                          : selectedSource.type === "wallet"
+                            ? "bg-[#26A17B]"
+                            : selectedSource.cardType === "metal" 
+                              ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                              : "bg-primary"
                       }`}>
-                        <CreditCard className="w-5 h-5 text-primary-foreground" />
+                        {selectedSource.type === "bank" 
+                          ? <Landmark className="w-5 h-5 text-primary-foreground" />
+                          : selectedSource.type === "wallet"
+                            ? <Wallet className="w-5 h-5 text-white" />
+                            : <CreditCard className="w-5 h-5 text-primary-foreground" />
+                        }
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold">{selectedCard.name}</p>
+                        <p className="font-semibold">{selectedSource.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          •••• {selectedCard.lastFour}
+                          {selectedSource.subtitle}
+                          {selectedSource.balance > 0 && ` · ${selectedSource.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} ${selectedSource.type === "wallet" ? "USDT" : "AED"}`}
                         </p>
                       </div>
                     </div>
@@ -298,7 +325,12 @@ const SendBank = () => {
                     {t("send.amount")}
                   </label>
                   <span className="text-sm text-muted-foreground">
-                    {t("send.available")}: <span className="font-medium text-foreground">{availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
+                    {t("send.available")}: <span className="font-medium text-foreground">
+                      {isWalletSource 
+                        ? `${availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} USDT`
+                        : `${availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
+                      }
+                    </span>
                   </span>
                 </div>
                 <div className="relative">
@@ -312,7 +344,7 @@ const SendBank = () => {
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <button
                       onClick={() => {
-                      const maxAmount = availableBalance / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
+                      const maxAmount = availableBalanceAed / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
                       setAmountAED(maxAmount.toFixed(2));
                       }}
                       className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
@@ -342,7 +374,21 @@ const SendBank = () => {
                 </div>
               </div>
 
-              {parseFloat(totalAmount) > availableBalance && (
+              {/* USDT Conversion Info */}
+              {isWalletSource && parseFloat(amountAED || "0") > 0 && (
+                <div className="bg-primary/5 rounded-2xl p-4 space-y-2 border border-primary/10">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("send.exchangeRate", "Курс")}</span>
+                    <span className="font-medium">1 USDT = {USDT_TO_AED_BUY} AED</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("send.willBeDebited", "Будет списано")}</span>
+                    <span className="font-semibold text-lg">{(parseFloat(totalAmount) / USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                </div>
+              )}
+
+              {parseFloat(totalAmount) > availableBalanceAed && (
                 <div className="bg-red-500/10 rounded-2xl p-4">
                   <p className="text-sm text-red-500">
                     ⚠️ {t("send.insufficientBalanceWarning")}
@@ -376,12 +422,12 @@ const SendBank = () => {
         </div>
       </MobileLayout>
 
-      {/* Card Selection Drawer */}
-      <Drawer open={cardDrawerOpen} onOpenChange={setCardDrawerOpen}>
+      {/* Source Selection Drawer */}
+      <Drawer open={sourceDrawerOpen} onOpenChange={setSourceDrawerOpen}>
         <DrawerContent className="bg-background/95 backdrop-blur-xl">
           <DrawerHeader className="relative flex items-center justify-center py-4">
             <DrawerTitle className="text-center text-base font-semibold">
-              {t("send.selectCard")}
+              {t("send.selectSource", "Откуда перевести")}
             </DrawerTitle>
             <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
               <X className="w-3.5 h-3.5 text-primary" />
@@ -390,31 +436,41 @@ const SendBank = () => {
           
           <div className="px-4 pb-6">
             <div className="bg-muted/50 rounded-xl overflow-hidden">
-              {cards.map((card, index) => (
+              {sourceOptions.map((source, index) => (
                 <button
-                  key={card.id}
+                  key={source.id}
                   onClick={() => {
-                    setSelectedCard(card);
-                    setCardDrawerOpen(false);
+                    setSelectedSource(source);
+                    setSourceDrawerOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
-                    index < cards.length - 1 ? 'border-b border-border/50' : ''
+                    index < sourceOptions.length - 1 ? 'border-b border-border/50' : ''
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    card.type === "metal" 
-                      ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                      : "bg-primary"
+                    source.type === "bank"
+                      ? "bg-purple-500"
+                      : source.type === "wallet"
+                        ? "bg-[#26A17B]"
+                        : source.cardType === "metal" 
+                          ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                          : "bg-primary"
                   }`}>
-                    <CreditCard className="w-5 h-5 text-primary-foreground" />
+                    {source.type === "bank" 
+                      ? <Landmark className="w-5 h-5 text-primary-foreground" />
+                      : source.type === "wallet"
+                        ? <Wallet className="w-5 h-5 text-white" />
+                        : <CreditCard className="w-5 h-5 text-primary-foreground" />
+                    }
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="text-base font-medium text-foreground">{card.name}</p>
+                    <p className="text-base font-medium text-foreground">{source.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      •••• {card.lastFour} · {card.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED
+                      {source.subtitle}
+                      {source.balance > 0 && ` · ${source.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} ${source.type === "wallet" ? "USDT" : "AED"}`}
                     </p>
                   </div>
-                  {selectedCard.id === card.id && (
+                  {selectedSource.id === source.id && (
                     <Check className="w-5 h-5 text-primary" />
                   )}
                 </button>

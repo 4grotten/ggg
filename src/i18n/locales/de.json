@@ -653,6 +653,7 @@
     "send": "Senden",
     "easyCardToEasyCard": "Easy Card zu Easy Card",
     "toBankAccount": "Auf Bankkonto",
+    "bankAccountAed": "Bankkonto AED",
     "networkFee": "Netzwerkgebühr",
     "transactionsSection": "Transaktionen",
     "currencyConversion": "Währungsumrechnung",
@@ -737,14 +738,47 @@
     "exchangeRate": "Wechselkurs",
     "selectCoin": "Coin auswählen",
     "selectNetwork": "Netzwerk auswählen",
-    "cryptoWarning": "Stellen Sie sicher, dass Wallet-Adresse und Netzwerk korrekt sind. Das Senden an eine falsche Adresse oder ein falsches Netzwerk kann zu einem dauerhaften Verlust der Mittel führen."
+    "cryptoWarning": "Stellen Sie sicher, dass Wallet-Adresse und Netzwerk korrekt sind. Das Senden an eine falsche Adresse oder ein falsches Netzwerk kann zu einem dauerhaften Verlust der Mittel führen.",
+    "fromSource": "Von",
+    "selectSource": "Überweisen von",
+    "willBeDebited": "Wird abgebucht",
+    "bankAccountAed": "Bankkonto AED"
   },
   "drawer": {
     "addMoneyWith": "Aufladen mit",
     "sendMoneyWith": "Senden mit",
     "stablecoins": "Stablecoins",
     "bankTransfer": "Banküberweisung",
-    "sendToCard": "An Karte senden"
+    "sendToCard": "An Karte senden",
+    "usdtBalance": "USDT TRC20 Wallet",
+    "usdtBalanceDesc": "Von Ihrem Guthaben"
+  },
+  "topUpUsdt": {
+    "title": "Aufladen von USDT",
+    "availableBalance": "Verfügbares Guthaben",
+    "selectDestination": "Überweisen an",
+    "toCard": "Auf Karte",
+    "toCardDesc": "Kartenguthaben aufladen",
+    "toAccount": "Auf Konto",
+    "toAccountDesc": "Auf Hauptkonto gutschreiben",
+    "selectCard": "Karte wählen",
+    "noCards": "Keine aktiven Karten",
+    "accountDetails": "Kontodaten",
+    "beneficiary": "Empfänger",
+    "accountNumber": "Kontonummer",
+    "bank": "Bank",
+    "currency": "Währung",
+    "enterAmount": "Überweisungsbetrag (USDT)",
+    "calculation": "Berechnung",
+    "transferAmount": "Überweisungsbetrag",
+    "exchangeRate": "Wechselkurs",
+    "networkFee": "Netzwerkgebühr",
+    "totalDeducted": "Gesamt abgezogen",
+    "destinationCard": "Zielkarte",
+    "youReceive": "Sie erhalten",
+    "insufficientBalance": "Unzureichendes USDT-Guthaben",
+    "confirm": "Überweisung bestätigen",
+    "transferInitiated": "Überweisung eingeleitet"
   },
   "auth": {
     "resetPassword": {

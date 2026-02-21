@@ -659,6 +659,7 @@
     "send": "发送",
     "easyCardToEasyCard": "Easy Card 到 Easy Card",
     "toBankAccount": "到银行账户",
+    "bankAccountAed": "银行账户 AED",
     "networkFee": "网络费用",
     "transactionsSection": "交易",
     "currencyConversion": "货币兑换",
@@ -743,14 +744,47 @@
     "exchangeRate": "汇率",
     "selectCoin": "选择币种",
     "selectNetwork": "选择网络",
-    "cryptoWarning": "请确保钱包地址和网络正确无误。发送到错误的地址或网络可能导致资金永久丢失。"
+    "cryptoWarning": "请确保钱包地址和网络正确无误。发送到错误的地址或网络可能导致资金永久丢失。",
+    "fromSource": "来源",
+    "selectSource": "从哪里转账",
+    "willBeDebited": "将被扣除",
+    "bankAccountAed": "银行账户 AED"
   },
   "drawer": {
     "addMoneyWith": "充值方式",
     "sendMoneyWith": "发送方式",
     "stablecoins": "稳定币",
     "bankTransfer": "银行转账",
-    "sendToCard": "转账到卡"
+    "sendToCard": "转账到卡",
+    "usdtBalance": "USDT TRC20 钱包",
+    "usdtBalanceDesc": "从您的余额"
+  },
+  "topUpUsdt": {
+    "title": "从USDT充值",
+    "availableBalance": "可用余额",
+    "selectDestination": "转账至",
+    "toCard": "到卡",
+    "toCardDesc": "充值卡余额",
+    "toAccount": "到账户",
+    "toAccountDesc": "存入主账户",
+    "selectCard": "选择卡",
+    "noCards": "没有活跃的卡",
+    "accountDetails": "账户详情",
+    "beneficiary": "收款人",
+    "accountNumber": "账号",
+    "bank": "银行",
+    "currency": "货币",
+    "enterAmount": "转账金额 (USDT)",
+    "calculation": "计算",
+    "transferAmount": "转账金额",
+    "exchangeRate": "汇率",
+    "networkFee": "网络费",
+    "totalDeducted": "总扣款",
+    "destinationCard": "入账卡",
+    "youReceive": "您将收到",
+    "insufficientBalance": "USDT余额不足",
+    "confirm": "确认转账",
+    "transferInitiated": "转账已发起"
   },
   "auth": {
     "resetPassword": {

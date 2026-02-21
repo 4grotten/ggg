@@ -33,7 +33,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     {
       id: "usdt-balance",
       icon: Wallet,
-      title: t("drawer.usdtBalance", "USDT TRC20 баланс"),
+      title: t("drawer.usdtBalance", "USDT TRC20 Кошелек"),
       subtitle: t("drawer.usdtBalanceDesc", "С вашего баланса"),
       iconBg: "bg-[#26A17B]",
     },
@@ -63,7 +63,6 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     onOpenChange(false);
     if (optionId === "usdt-balance") {
       navigate("/top-up/usdt-balance");
-    } else if (optionId === "stablecoins") {
     } else if (optionId === "stablecoins") {
       navigate("/top-up/crypto");
     } else if (optionId === "bank") {

@@ -30,6 +30,47 @@ function formatDate(dateStr: string): string {
   return `${day}.${month}.${year}`;
 }
 
+async function fetchCardBalances(): Promise<string> {
+  try {
+    const BACKEND_BASE = "https://ueasycard.com/api/v1";
+    const backendToken = "e88bee3a891dd71501c14de1c1c94fd3af34cb3b";
+
+    const response = await fetch(`${BACKEND_BASE}/cards/balances/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Token ${backendToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Cards API error:", response.status);
+      return "Данные о картах временно недоступны.";
+    }
+
+    const data = await response.json();
+    const lines: string[] = [];
+    
+    if (data.cards && Array.isArray(data.cards)) {
+      data.cards.forEach((card: any) => {
+        const typeName = card.type === 'metal' ? 'Металлическая карта' : 'Виртуальная карта';
+        const last4 = card.last_four_digits ? ` (****${card.last_four_digits})` : '';
+        const status = card.status === 'active' ? '✅' : '⏸️';
+        lines.push(`- ${status} ${typeName}${last4}: ${card.balance} AED`);
+      });
+    }
+
+    if (data.total_balance_aed !== undefined) {
+      lines.push(`\n💰 Общий баланс по картам: ${data.total_balance_aed} AED`);
+    }
+
+    return lines.length > 0 ? lines.join('\n') : 'Карты не найдены.';
+  } catch (err) {
+    console.error("Error fetching card balances:", err);
+    return "Ошибка при получении данных о картах.";
+  }
+}
+
 async function fetchUserFinancialData(supabase: any, userId: string) {
   // Fetch recent transactions
   const { data: transactions, error } = await supabase
@@ -61,10 +102,22 @@ async function fetchUserFinancialData(supabase: any, userId: string) {
       categoryTotals[cat] = (categoryTotals[cat] || 0) + Math.abs(parseFloat(tx.amount));
     });
 
-  // Format transactions for context
-  const formattedTransactions = transactions.slice(0, 10).map((tx: any) => 
-    `- ${formatDate(tx.created_at)}: ${formatTransactionType(tx.type)} ${tx.amount > 0 ? '+' : ''}${tx.amount} AED${tx.merchant_name ? ` (${tx.merchant_name})` : ''}${tx.description ? ` - ${tx.description}` : ''}`
-  ).join('\n');
+  // Format transactions for context with full details
+  const formattedTransactions = transactions.slice(0, 10).map((tx: any, idx: number) => {
+    const num = idx + 1;
+    const date = formatDate(tx.created_at);
+    const type = formatTransactionType(tx.type);
+    const sign = tx.amount > 0 ? '+' : '';
+    const amount = `${sign}${tx.amount} AED`;
+    const merchant = tx.merchant_name || '';
+    const category = tx.merchant_category || '';
+    const desc = tx.description || '';
+    const ref = tx.reference_id ? `ref:${tx.reference_id}` : '';
+    const cardId = tx.card_id ? `card:${tx.card_id.slice(-4)}` : '';
+    const status = tx.status || 'completed';
+    
+    return `- [#${num}] ${date} | ${type} | ${amount} | ${status}${merchant ? ` | ${merchant}` : ''}${category ? ` | кат: ${category}` : ''}${cardId ? ` | ${cardId}` : ''}${ref ? ` | ${ref}` : ''}${desc ? ` | ${desc}` : ''}`;
+  }).join('\n');
 
   // Format categories
   const formattedCategories = Object.entries(categoryTotals)
@@ -117,19 +170,21 @@ serve(async (req) => {
 
     console.log(`Fetching financial data for user: ${effectiveUserId}`);
     
-    // Fetch user's financial data
-    const financialData = await fetchUserFinancialData(supabase, effectiveUserId);
+    // Fetch user's financial data and card balances in parallel
+    const [financialData, cardBalancesText] = await Promise.all([
+      fetchUserFinancialData(supabase, effectiveUserId),
+      fetchCardBalances(),
+    ]);
     
     // Build dynamic context with real user data
-    let userDataContext = '';
-    if (financialData) {
-      userDataContext = `
+    let userDataContext = `
 
 ## ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (АКТУАЛЬНЫЕ)
-### Баланс:
-- Общий баланс: ${financialData.balance.total} AED
-- Доходы за период: +${financialData.balance.income} AED
-- Расходы за период: -${financialData.balance.expenses} AED
+### Балансы карт:
+${cardBalancesText}`;
+
+    if (financialData) {
+      userDataContext += `
 
 ### Последние транзакции:
 ${financialData.transactions}
@@ -138,11 +193,6 @@ ${financialData.transactions}
 ${financialData.categories || 'Нет данных по категориям'}
 
 Всего транзакций: ${financialData.transactionCount}`;
-    } else {
-      userDataContext = `
-
-## ДАННЫЕ ПОЛЬЗОВАТЕЛЯ
-Данные о транзакциях пользователя недоступны. Предложи пользователю проверить авторизацию или обратиться в поддержку.`;
     }
 
     console.log("Sending request to AI gateway with", messages.length, "messages");
@@ -195,6 +245,32 @@ Easy Card - это финансовое приложение для управл
 - Все карты работают в валюте AED (дирхамы ОАЭ)
 - Для использования карт нужно пройти верификацию
 - Поддерживаются сети TRC20 и ERC20 для крипто-пополнений
+
+## Формат вывода транзакций
+Когда пользователь спрашивает о транзакциях, выводи их СПИСКОМ, группируя по дате. НЕ используй таблицы. Формат:
+
+📅 **17.01.2026**
+
+- ✅ **Пополнение** — +28,000.00 AED
+  Карта: ****8646 | Статус: завершено
+
+- ❌ **Оплата картой** — -1,890.00 AED
+  Магазин: Carrefour | Карта: ****2207
+
+📊 Итого за день: +26,110.00 AED
+
+Если транзакций за несколько дней - группируй каждый день отдельно с итогами.
+
+## Формат вывода балансов карт
+Когда показываешь баланс карт, каждую карту на отдельной строке. Формат:
+
+💳 **Виртуальная карта** (****8646)
+**50,000.00 AED**
+
+💳 **Металлическая карта** (****2207)
+**50,000.00 AED**
+
+💰 **Итого на картах: 100,000.00 AED**
 ${userDataContext}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

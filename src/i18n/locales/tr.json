@@ -653,6 +653,7 @@
     "send": "Gönder",
     "easyCardToEasyCard": "Easy Card'dan Easy Card'a",
     "toBankAccount": "Banka Hesabına",
+    "bankAccountAed": "Banka Hesabı AED",
     "networkFee": "Ağ ücreti",
     "transactionsSection": "İşlemler",
     "currencyConversion": "Para Birimi Dönüştürme",
@@ -737,14 +738,47 @@
     "exchangeRate": "Döviz kuru",
     "selectCoin": "Coin Seç",
     "selectNetwork": "Ağ Seç",
-    "cryptoWarning": "Cüzdan adresi ve ağın doğru olduğundan emin olun. Yanlış adrese veya ağa göndermek, fonların kalıcı olarak kaybedilmesine neden olabilir."
+    "cryptoWarning": "Cüzdan adresi ve ağın doğru olduğundan emin olun. Yanlış adrese veya ağa göndermek, fonların kalıcı olarak kaybedilmesine neden olabilir.",
+    "fromSource": "Nereden",
+    "selectSource": "Nereden transfer edilecek",
+    "willBeDebited": "Tahsil edilecek",
+    "bankAccountAed": "Banka Hesabı AED"
   },
   "drawer": {
     "addMoneyWith": "Şununla Yükle",
     "sendMoneyWith": "Şununla Gönder",
     "stablecoins": "Stablecoin'ler",
     "bankTransfer": "Banka Transferi",
-    "sendToCard": "Karta gönder"
+    "sendToCard": "Karta gönder",
+    "usdtBalance": "USDT TRC20 Cüzdan",
+    "usdtBalanceDesc": "Bakiyenizden"
+  },
+  "topUpUsdt": {
+    "title": "USDT'den Yükle",
+    "availableBalance": "Kullanılabilir bakiye",
+    "selectDestination": "Transfer yeri",
+    "toCard": "Karta",
+    "toCardDesc": "Kart bakiyesini yükle",
+    "toAccount": "Hesaba",
+    "toAccountDesc": "Ana hesaba aktar",
+    "selectCard": "Kart seçin",
+    "noCards": "Aktif kart yok",
+    "accountDetails": "Hesap bilgileri",
+    "beneficiary": "Alıcı",
+    "accountNumber": "Hesap numarası",
+    "bank": "Banka",
+    "currency": "Para birimi",
+    "enterAmount": "Transfer tutarı (USDT)",
+    "calculation": "Hesaplama",
+    "transferAmount": "Transfer tutarı",
+    "exchangeRate": "Döviz kuru",
+    "networkFee": "Ağ ücreti",
+    "totalDeducted": "Toplam düşülen",
+    "destinationCard": "Hedef kart",
+    "youReceive": "Alacağınız",
+    "insufficientBalance": "Yetersiz USDT bakiyesi",
+    "confirm": "Transferi onayla",
+    "transferInitiated": "Transfer başlatıldı"
   },
   "auth": {
     "resetPassword": {

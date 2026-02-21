@@ -1,292 +1,155 @@
-import { ArrowDownLeft, ArrowUpRight, Wallet, CheckCircle2, Building2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
+import { CreditCard, Wallet } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface ChatMessageContentProps {
   content: string;
 }
 
-// Regex patterns for detecting financial data
 const AMOUNT_PATTERN = /([+-]?\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*(AED|дирхам|USDT|USD)/gi;
-const TRANSACTION_LINE_PATTERN = /^[-•]\s*(\d{2}\.\d{2}\.\d{4}):\s*(.*?)\s*([+-]?\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*AED(.*)$/gm;
-const BALANCE_PATTERN = /(Общий баланс|Баланс|Total balance|Balance|Доходы|Income|Расходы|Expenses):\s*([+-]?\d{1,3}(?:[,\s]?\d{3})*(?:\.\d{1,2})?)\s*(AED|дирхам)?/gi;
 
-interface ParsedTransaction {
-  date: string;
-  type: string;
-  amount: number;
-  description: string;
-}
-
-interface ParsedBalance {
-  label: string;
-  amount: string;
-  isIncome: boolean;
-  isExpense: boolean;
-}
-
-// Get icon based on transaction type
-const getTransactionIcon = (type: string) => {
-  const lowerType = type.toLowerCase();
-  if (lowerType.includes('перевод') || lowerType.includes('transfer') || lowerType.includes('банк') || lowerType.includes('bank')) {
-    return Building2;
-  }
-  return null;
-};
-
-const TransactionCard = ({ date, type, amount, description }: ParsedTransaction) => {
-  const isPositive = amount > 0;
-  const IconComponent = getTransactionIcon(type);
-
-  return (
-    <div className="flex items-center gap-3 py-3 my-1">
-      {/* Icon */}
-      <div className={cn(
-        "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
-        isPositive 
-          ? "bg-success" 
-          : "bg-primary"
-      )}>
-        {IconComponent ? (
-          <IconComponent className="w-5 h-5 text-white" />
-        ) : isPositive ? (
-          <ArrowDownLeft className="w-5 h-5 text-white" />
-        ) : (
-          <ArrowUpRight className="w-5 h-5 text-white" />
-        )}
-      </div>
-      
-      {/* Title and time */}
-      <div className="flex-1 min-w-0">
-        <p className="text-[15px] font-medium text-foreground leading-tight">{type}</p>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-sm text-muted-foreground">{date}</span>
-          <div className="flex items-center gap-1 text-success">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span className="text-xs">Завершено</span>
-          </div>
-        </div>
-      </div>
-      
-      {/* Amount */}
-      <div className="text-right flex-shrink-0">
-        <p className={cn(
-          "text-base font-semibold",
-          isPositive ? "text-success" : "text-primary"
-        )}>
-          {isPositive ? '+' : '-'}{Math.abs(amount).toFixed(2)} AED
-        </p>
-      </div>
-    </div>
-  );
-};
-
-const BalanceCard = ({ label, amount, isIncome, isExpense }: ParsedBalance) => {
-  const getIcon = () => {
-    if (isIncome) return <ArrowDownLeft className="w-5 h-5 text-white" />;
-    if (isExpense) return <ArrowUpRight className="w-5 h-5 text-white" />;
-    return <Wallet className="w-5 h-5 text-white" />;
-  };
-
-  return (
-    <div className="flex items-center gap-3 py-3 my-1 px-3 rounded-xl bg-secondary/50">
-      <div className={cn(
-        "w-12 h-12 rounded-full flex items-center justify-center",
-        isIncome 
-          ? "bg-success" 
-          : isExpense 
-            ? "bg-destructive" 
-            : "bg-primary"
-      )}>
-        {getIcon()}
-      </div>
-      <div className="flex-1">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
-        <p className={cn(
-          "text-lg font-bold mt-0.5",
-          isIncome ? "text-success" : isExpense ? "text-destructive" : "text-foreground"
-        )}>
-          {amount} <span className="text-sm font-medium text-muted-foreground">AED</span>
-        </p>
-      </div>
-    </div>
-  );
-};
-
-const formatAmountInText = (text: string): React.ReactNode[] => {
-  const parts: React.ReactNode[] = [];
+const formatAmountInText = (text: string): ReactNode[] => {
+  const parts: ReactNode[] = [];
   let lastIndex = 0;
-  
-  const regex = new RegExp(AMOUNT_PATTERN.source, 'gi');
+  const regex = new RegExp(AMOUNT_PATTERN.source, "gi");
   let match;
-  
+
   while ((match = regex.exec(text)) !== null) {
-    // Add text before match
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
-    
     const amount = match[1];
     const currency = match[2];
-    const isPositive = amount.startsWith('+');
-    const isNegative = amount.startsWith('-');
-    
+    const isPositive = amount.startsWith("+");
+    const isNegative = amount.startsWith("-");
+
     parts.push(
-      <span 
-        key={match.index} 
+      <span
+        key={match.index}
         className={cn(
-          "font-semibold px-1 py-0.5 rounded",
-          isPositive ? "text-success bg-success/10" : 
-          isNegative ? "text-destructive bg-destructive/10" : 
-          "text-primary bg-primary/10"
+          "font-bold px-1 py-0.5 rounded",
+          isPositive ? "text-success bg-success/10"
+            : isNegative ? "text-destructive bg-destructive/10"
+            : "text-primary bg-primary/10"
         )}
       >
         {amount} {currency}
       </span>
     );
-    
     lastIndex = match.index + match[0].length;
   }
-  
-  // Add remaining text
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
-  }
-  
+
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
   return parts.length > 0 ? parts : [text];
 };
 
-export const ChatMessageContent = ({ content }: ChatMessageContentProps) => {
-  // Check for transaction lines
-  const transactionMatches: ParsedTransaction[] = [];
-  let match;
-  const txRegex = new RegExp(TRANSACTION_LINE_PATTERN.source, 'gm');
-  
-  while ((match = txRegex.exec(content)) !== null) {
-    transactionMatches.push({
-      date: match[1],
-      type: match[2].trim(),
-      amount: parseFloat(match[3].replace(/[,\s]/g, '')),
-      description: match[4] || ''
-    });
-  }
-
-  // Check for balance lines
-  const balanceMatches: ParsedBalance[] = [];
-  const balanceRegex = new RegExp(BALANCE_PATTERN.source, 'gi');
-  
-  while ((match = balanceRegex.exec(content)) !== null) {
-    const label = match[1];
-    balanceMatches.push({
-      label,
-      amount: match[2],
-      isIncome: /доход|income/i.test(label),
-      isExpense: /расход|expense/i.test(label)
-    });
-  }
-
-  // If we have transactions, render them specially
-  if (transactionMatches.length > 0) {
-    // Split content by transaction lines and render mixed content
-    const lines = content.split('\n');
-    const elements: React.ReactNode[] = [];
-    let currentTextBlock: string[] = [];
-    
-    lines.forEach((line, idx) => {
-      const isTxLine = /^[-•]\s*\d{2}\.\d{2}\.\d{4}:/.test(line);
-      
-      if (isTxLine) {
-        // Flush text block
-        if (currentTextBlock.length > 0) {
-          elements.push(
-            <p key={`text-${idx}`} className="text-sm whitespace-pre-wrap mb-2">
-              {formatAmountInText(currentTextBlock.join('\n'))}
-            </p>
-          );
-          currentTextBlock = [];
-        }
-        
-        // Find matching transaction
-        const tx = transactionMatches.find(t => line.includes(t.date) && line.includes(t.type));
-        if (tx) {
-          elements.push(
-            <TransactionCard key={`tx-${idx}`} {...tx} />
-          );
-        }
-      } else if (line.trim()) {
-        // Check if it's a balance line
-        const balanceMatch = balanceMatches.find(b => line.includes(b.label));
-        if (balanceMatch && /баланс|balance|доход|income|расход|expense/i.test(line)) {
-          if (currentTextBlock.length > 0) {
-            elements.push(
-              <p key={`text-${idx}`} className="text-sm whitespace-pre-wrap mb-2">
-                {formatAmountInText(currentTextBlock.join('\n'))}
-              </p>
-            );
-            currentTextBlock = [];
-          }
-          elements.push(
-            <BalanceCard key={`balance-${idx}`} {...balanceMatch} />
-          );
-        } else {
-          currentTextBlock.push(line);
-        }
-      } else {
-        currentTextBlock.push(line);
+function processChildren(children: ReactNode): ReactNode {
+  if (typeof children === "string") return formatAmountInText(children);
+  if (Array.isArray(children)) {
+    return children.map((child, i) => {
+      if (typeof child === "string") {
+        const parts = formatAmountInText(child);
+        return parts.length === 1 && parts[0] === child ? child : <span key={i}>{parts}</span>;
       }
+      return child;
     });
-    
-    // Flush remaining text
-    if (currentTextBlock.length > 0) {
-      elements.push(
-        <p key="text-final" className="text-sm whitespace-pre-wrap">
-          {formatAmountInText(currentTextBlock.join('\n'))}
-        </p>
-      );
-    }
-    
-    return <div className="space-y-1">{elements}</div>;
   }
+  return children;
+}
 
-  // If we have balance info but no transactions
-  if (balanceMatches.length > 0) {
-    const lines = content.split('\n');
-    const elements: React.ReactNode[] = [];
-    let currentTextBlock: string[] = [];
-    
-    lines.forEach((line, idx) => {
-      const balanceMatch = balanceMatches.find(b => line.includes(b.label) && line.includes(b.amount));
-      
-      if (balanceMatch) {
-        if (currentTextBlock.length > 0) {
-          elements.push(
-            <p key={`text-${idx}`} className="text-sm whitespace-pre-wrap mb-2">
-              {formatAmountInText(currentTextBlock.join('\n'))}
-            </p>
-          );
-          currentTextBlock = [];
-        }
-        elements.push(
-          <BalanceCard key={`balance-${idx}`} {...balanceMatch} />
-        );
-      } else {
-        currentTextBlock.push(line);
-      }
-    });
-    
-    if (currentTextBlock.length > 0) {
-      elements.push(
-        <p key="text-final" className="text-sm whitespace-pre-wrap">
-          {formatAmountInText(currentTextBlock.join('\n'))}
-        </p>
-      );
-    }
-    
-    return <div className="space-y-1">{elements}</div>;
+function extractText(children: ReactNode): string {
+  if (typeof children === "string") return children;
+  if (Array.isArray(children)) return children.map(extractText).join("");
+  if (children && typeof children === "object" && "props" in children) {
+    return extractText((children as any).props?.children);
   }
+  return "";
+}
 
-  // Default: just highlight amounts in regular text
+function isBalanceLine(children: ReactNode): boolean {
+  return /^(💳|💰)/.test(extractText(children).trim());
+}
+
+function isTotalLine(children: ReactNode): boolean {
+  return /^💰/.test(extractText(children).trim());
+}
+
+function isMetalCard(children: ReactNode): boolean {
+  const text = extractText(children).toLowerCase();
+  return /метал|metal/i.test(text);
+}
+
+const BalanceCard = ({ children, isTotal, isMetal }: { children: ReactNode; isTotal: boolean; isMetal: boolean }) => {
   return (
-    <p className="text-sm whitespace-pre-wrap">
+    <div className={cn(
+      "my-1.5 px-3 py-3 rounded-xl text-sm leading-relaxed flex items-center gap-3",
+      isTotal
+        ? "bg-primary/15 border border-primary/20"
+        : "bg-muted/80 border border-border/30"
+    )}>
+      <div className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+        isTotal ? "bg-primary/20" : isMetal ? "bg-amber-500/15" : "bg-primary/10"
+      )}>
+        {isTotal ? (
+          <Wallet className={cn("w-5 h-5", "text-primary")} />
+        ) : (
+          <CreditCard className={cn("w-5 h-5", isMetal ? "text-amber-500" : "text-primary")} />
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        {processChildren(children)}
+      </div>
+    </div>
+  );
+};
+
+const markdownComponents = {
+  p: ({ children }: { children?: ReactNode }) => {
+    if (isBalanceLine(children)) {
+      return (
+        <BalanceCard
+          isTotal={isTotalLine(children)}
+          isMetal={isMetalCard(children)}
+        >
+          {children}
+        </BalanceCard>
+      );
+    }
+    return <p className="my-1.5 text-sm leading-relaxed">{processChildren(children)}</p>;
+  },
+  strong: ({ children }: { children?: ReactNode }) => {
+    return <strong className="font-bold text-foreground">{processChildren(children)}</strong>;
+  },
+  li: ({ children }: { children?: ReactNode }) => {
+    return <li className="my-1 text-sm leading-relaxed">{processChildren(children)}</li>;
+  },
+  ul: ({ children }: { children?: ReactNode }) => {
+    return <ul className="my-2 space-y-1 list-none pl-0">{children}</ul>;
+  },
+  h2: ({ children }: { children?: ReactNode }) => {
+    return <h2 className="text-base font-bold mt-3 mb-1.5 text-foreground">{children}</h2>;
+  },
+  h3: ({ children }: { children?: ReactNode }) => {
+    return <h3 className="text-sm font-bold mt-2 mb-1 text-foreground">{children}</h3>;
+  },
+  hr: () => <hr className="my-2 border-border/40" />,
+};
+
+export const ChatMessageContent = ({ content }: ChatMessageContentProps) => {
+  const hasMarkdown = /\*\*|#{1,3}\s|^- /m.test(content);
+
+  if (hasMarkdown) {
+    return (
+      <div className="text-sm">
+        <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
+      </div>
+    );
+  }
+
+  return (
+    <p className="text-sm whitespace-pre-wrap leading-relaxed">
       {formatAmountInText(content)}
     </p>
   );
