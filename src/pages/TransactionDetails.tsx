@@ -816,7 +816,7 @@ const TransactionDetails = () => {
                 <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.networkFee")}</span>
+                <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
                 <span className="font-medium">{transaction.networkFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
