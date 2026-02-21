@@ -223,15 +223,15 @@ const AccountPage = () => {
                         </div>
                       </button>
                       <button
-                        onClick={() => { setSendOpen(false); navigate("/send-to-card"); }}
+                        onClick={() => { setSendOpen(false); navigate("/send-IBAN-card"); }}
                         className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-secondary/70 transition-colors"
                       >
                         <div className="w-10 h-10 rounded-full bg-[#007AFF]/10 flex items-center justify-center">
                           <CreditCard className="w-5 h-5 text-[#007AFF]" />
                         </div>
                         <div className="text-left">
-                          <p className="font-medium">{t('send.toCard', 'На карту')}</p>
-                          <p className="text-xs text-muted-foreground">{t('send.toCardDesc', 'Перевод на карту')}</p>
+                          <p className="font-medium">{t('send.toIbanCard', 'IBAN → EasyCard')}</p>
+                          <p className="text-xs text-muted-foreground">{t('send.toIbanCardDesc', 'Со счёта IBAN на карту')}</p>
                         </div>
                       </button>
                       <button
