@@ -631,7 +631,7 @@
     "networkFeeFlat": "Сбор сети",
     "debited": "Списано",
     "bankTransfer": "Банковский перевод",
-    "bankTransferIncoming": "Банковский перевод поступление",
+    "bankTransferIncoming": "Поступление на счёт",
     "accountIncoming": "Поступление на счёт",
     "toAccount": "На счёт",
     "iban": "IBAN",
@@ -699,7 +699,7 @@
     "annualCardFee": "Годовая плата за карту",
     "stablecoinSend": "Отправка стейблкоинов",
     "bankTransfer": "Банковский перевод",
-    "bankTransferIncoming": "Банковский перевод поступление",
+    "bankTransferIncoming": "Поступление на счёт",
     "months": {
       "january": "Январь",
       "february": "Февраль",
