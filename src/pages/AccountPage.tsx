@@ -11,7 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { useWalletSummary } from "@/hooks/useCards";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
-import { useTransactionGroups } from "@/hooks/useTransactions";
+import { useMergedTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Drawer,
@@ -27,7 +27,7 @@ const AccountPage = () => {
   const { data: walletData, isLoading } = useWalletSummary();
   const account = walletData?.data?.physical_account;
   const [qrOpen, setQrOpen] = useState(false);
-  const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
+  const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
 
   const transactionGroups = useMemo(() => {
     const groups = transactionsData?.groups || [];

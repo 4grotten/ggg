@@ -3,9 +3,11 @@ import {
   fetchTransactions, 
   fetchTransactionGroups, 
   fetchTransactionById,
-  fetchTransactionReceipt 
+  fetchTransactionReceipt,
+  fetchApiTransactionGroups
 } from '@/services/api/transactions';
-import { FetchTransactionsParams } from '@/types/transaction';
+import { FetchTransactionsParams, TransactionGroup } from '@/types/transaction';
+import { getAuthToken } from '@/services/api/apiClient';
 
 // Query keys for caching
 export const transactionKeys = {
@@ -14,6 +16,7 @@ export const transactionKeys = {
   list: (params?: FetchTransactionsParams) => [...transactionKeys.lists(), params] as const,
   groups: () => [...transactionKeys.all, 'groups'] as const,
   groupsWithParams: (params?: FetchTransactionsParams) => [...transactionKeys.groups(), params] as const,
+  apiGroups: () => [...transactionKeys.all, 'apiGroups'] as const,
   details: () => [...transactionKeys.all, 'detail'] as const,
   detail: (id: string) => [...transactionKeys.details(), id] as const,
   receipts: () => [...transactionKeys.all, 'receipt'] as const,
@@ -32,7 +35,21 @@ export const useTransactions = (params?: FetchTransactionsParams) => {
 };
 
 /**
- * Hook to fetch transactions grouped by date
+ * Hook to fetch real transactions from API, returns groups
+ */
+export const useApiTransactionGroups = () => {
+  const hasToken = !!getAuthToken();
+  return useQuery({
+    queryKey: transactionKeys.apiGroups(),
+    queryFn: fetchApiTransactionGroups,
+    enabled: hasToken,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });
+};
+
+/**
+ * Hook to fetch transactions grouped by date (mock data)
  */
 export const useTransactionGroups = (params?: FetchTransactionsParams) => {
   return useQuery({
@@ -40,6 +57,36 @@ export const useTransactionGroups = (params?: FetchTransactionsParams) => {
     queryFn: () => fetchTransactionGroups(params),
     staleTime: 1000 * 60 * 5,
   });
+};
+
+/**
+ * Hook to fetch merged transactions: real API groups first, then mock groups
+ */
+export const useMergedTransactionGroups = (params?: FetchTransactionsParams) => {
+  const mockQuery = useTransactionGroups(params);
+  const apiQuery = useApiTransactionGroups();
+  
+  const mergedGroups: TransactionGroup[] = [];
+  
+  // API groups first (real data)
+  if (apiQuery.data && apiQuery.data.length > 0) {
+    mergedGroups.push(...apiQuery.data);
+  }
+  
+  // Then mock groups (existing dates won't overlap since they're different)
+  if (mockQuery.data?.groups) {
+    mergedGroups.push(...mockQuery.data.groups);
+  }
+  
+  return {
+    ...mockQuery,
+    data: {
+      ...mockQuery.data,
+      groups: mergedGroups,
+    },
+    isLoading: mockQuery.isLoading,
+    apiLoading: apiQuery.isLoading,
+  };
 };
 
 /**
@@ -62,7 +109,7 @@ export const useTransactionReceipt = (transactionId: string, enabled = true) => 
     queryKey: transactionKeys.receipt(transactionId),
     queryFn: () => fetchTransactionReceipt(transactionId),
     enabled: !!transactionId && enabled,
-    staleTime: 1000 * 60 * 30, // 30 minutes — receipts rarely change
+    staleTime: 1000 * 60 * 30,
     retry: 1,
   });
 };

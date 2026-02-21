@@ -38,7 +38,7 @@ import {
 
 // API hooks
 import { useWalletSummary } from "@/hooks/useCards";
-import { useTransactionGroups } from "@/hooks/useTransactions";
+import { useMergedTransactionGroups } from "@/hooks/useTransactions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
@@ -80,7 +80,7 @@ const Dashboard = () => {
   // Fetch wallet summary (IBAN + cards in one request)
   const { data: walletData, isLoading: walletLoading } = useWalletSummary();
 
-  const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
+  const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
 
   // Map wallet summary to cards format
   const cards = (walletData?.data?.cards || []).map(c => ({
