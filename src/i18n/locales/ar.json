@@ -621,6 +621,7 @@
     "processing": "قيد المعالجة",
     "settled": "مكتمل",
     "cardTransfer": "تحويل بطاقة",
+    "cardReceived": "استلام على البطاقة",
     "cardTopUp": "شحن البطاقة",
     "walletDeposit": "إيداع محفظة USDT",
     "topUp": "شحن",

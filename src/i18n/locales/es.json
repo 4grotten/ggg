@@ -621,6 +621,7 @@
     "processing": "Procesando",
     "settled": "Completado",
     "cardTransfer": "Transferencia de tarjeta",
+    "cardReceived": "Recepción en tarjeta",
     "cardTopUp": "Recarga de tarjeta",
     "walletDeposit": "Depósito en billetera USDT",
     "topUp": "Recarga",

@@ -621,6 +621,7 @@
     "processing": "In Bearbeitung",
     "settled": "Abgeschlossen",
     "cardTransfer": "Kartenüberweisung",
+    "cardReceived": "Karteneingang",
     "cardTopUp": "Karte aufladen",
     "walletDeposit": "USDT Wallet-Einzahlung",
     "topUp": "Aufladung",

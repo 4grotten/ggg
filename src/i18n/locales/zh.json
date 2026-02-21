@@ -627,6 +627,7 @@
     "processing": "处理中",
     "settled": "已完成",
     "cardTransfer": "卡片转账",
+    "cardReceived": "卡片收款",
     "cardTopUp": "卡片充值",
     "walletDeposit": "USDT 钱包存款",
     "topUp": "充值",
