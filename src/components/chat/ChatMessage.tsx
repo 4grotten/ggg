@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedBotHead } from "./AnimatedBotHead";
 import { ChatMessageContent } from "./ChatMessageContent";
+import { PeriodQuickSelect } from "./PeriodQuickSelect";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -12,9 +13,10 @@ import { toast } from "sonner";
 interface ChatMessageProps {
   role: 'user' | 'assistant';
   content: string;
+  periodSelect?: (message: string) => void;
 }
 
-export const ChatMessage = ({ role, content }: ChatMessageProps) => {
+export const ChatMessage = ({ role, content, periodSelect }: ChatMessageProps) => {
   const isUser = role === 'user';
   const { avatarUrl } = useAvatar();
   const { user, isAuthenticated } = useAuth();
@@ -143,9 +145,14 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
             {isUser ? (
               <p className="text-sm whitespace-pre-wrap">{content}</p>
             ) : (
-              <ChatMessageContent content={content} />
+              <>
+                <ChatMessageContent content={content} />
+                {periodSelect && (
+                  <PeriodQuickSelect onSelect={periodSelect} />
+                )}
+              </>
             )}
-          </div>
+            </div>
           
           {/* TTS Button for assistant messages - on the right */}
           {!isUser && (
