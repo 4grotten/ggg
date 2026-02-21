@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { Plus, Ban, ArrowUpRight, Clock, CheckCircle, Send, Landmark } from "lucide-react";
+import { Plus, Ban, ArrowUpRight, Clock, CheckCircle, Send, Landmark, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Transaction, TransactionGroup } from "@/types/transaction";
 
 interface CardTransactionsListProps {
   groups: TransactionGroup[];
   onTransactionClick?: (transaction: Transaction) => void;
+  walletView?: boolean;
 }
 
 const getInitial = (name: string) => name.charAt(0).toUpperCase();
@@ -63,6 +64,7 @@ const translateMerchant = (merchant: string, type: string | undefined, t: (key: 
 export const CardTransactionsList = ({
   groups,
   onTransactionClick,
+  walletView = false,
 }: CardTransactionsListProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -99,11 +101,15 @@ const handleClick = (transaction: Transaction) => {
     const isIncomingTransfer = isCardTransfer && transaction.senderCard;
     const isOutgoingTransfer = isCardTransfer && transaction.recipientCard;
     const isProcessing = transaction.status === "processing";
-    const prefix = isTopup || isIncomingTransfer || isBankTransferIncoming ? "+" : isOutgoingTransfer || isCryptoSend || isBankTransfer ? "-" : "";
+    // In wallet view, topup = outgoing (wallet → card), so it's negative
+    const walletTopupOutgoing = walletView && isTopup;
+    const prefix = (isTopup && !walletView) || isIncomingTransfer || isBankTransferIncoming ? "+" : walletTopupOutgoing || isOutgoingTransfer || isCryptoSend || isBankTransfer ? "-" : "";
     
     let colorClass = "";
     if (isProcessing && (isCardTransfer || isBankTransfer || isCryptoSend)) {
       colorClass = "text-[#FFA000]";
+    } else if (walletTopupOutgoing) {
+      colorClass = "text-[#007AFF]";
     } else if (isTopup || isIncomingTransfer || isBankTransferIncoming) {
       colorClass = "text-green-500";
     } else if (isDeclined) {
@@ -125,7 +131,7 @@ const handleClick = (transaction: Transaction) => {
           {/* Date Header */}
           <div className="flex items-center justify-between px-4">
             <span className="font-semibold text-base">{formatDateNumeric(group.date)}</span>
-            {group.totalSpend > 0 && (
+            {group.totalSpend > 0 && !walletView && (
               <span className="text-[#007AFF] text-sm font-medium">
                 -{group.totalSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
               </span>
@@ -184,6 +190,13 @@ const handleClick = (transaction: Transaction) => {
                         >
                           <ArrowUpRight className={`w-5 h-5 ${isIncomingTransfer ? "rotate-180" : ""}`} />
                         </div>
+                      ) : walletView && isTopup ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#007AFF" }}
+                        >
+                          <CreditCard className="w-5 h-5" />
+                        </div>
                       ) : (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
@@ -199,7 +212,12 @@ const handleClick = (transaction: Transaction) => {
                       )}
                     </div>
                     <div className="text-left min-w-0 flex-1">
-                      <p className="font-medium">{translateMerchant(transaction.merchant, transaction.type, t)}</p>
+                      <p className="font-medium">
+                        {walletView && isTopup 
+                          ? t("transactions.cardTopUp") 
+                          : translateMerchant(transaction.merchant, transaction.type, t)
+                        }
+                      </p>
                       <p className="text-sm text-muted-foreground truncate">
                         {transaction.time}
                         {isCardTransfer && transaction.senderCard
@@ -219,10 +237,21 @@ const handleClick = (transaction: Transaction) => {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`font-semibold ${colorClass}`}>
-                      {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
-                    </p>
+                  <div className="text-right shrink-0">
+                    {walletView ? (
+                      <>
+                        <p className={`font-semibold ${colorClass}`}>
+                          {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+                        </p>
+                      </>
+                    ) : (
+                      <p className={`font-semibold ${colorClass}`}>
+                        {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+                      </p>
+                    )}
                     {transaction.status === 'processing' && (
                       <p className="flex items-center justify-end gap-0.5 text-[#FFA000] text-xs mt-0.5">
                         <Clock className="w-3 h-3" />

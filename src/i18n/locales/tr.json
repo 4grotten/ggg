@@ -618,6 +618,7 @@
     "processing": "İşleniyor",
     "settled": "Tamamlandı",
     "cardTransfer": "Kart Transferi",
+    "cardTopUp": "Kart Yükleme",
     "topUp": "Yükleme",
     "annualCardFee": "Yıllık Kart Ücreti",
     "stablecoinSend": "Stablecoin Gönder",

@@ -702,6 +702,7 @@
     "processing": "Processing",
     "settled": "Settled",
     "cardTransfer": "Card Transfer",
+    "cardTopUp": "Card Top Up",
     "topUp": "Top up",
     "annualCardFee": "Annual Card fee",
     "stablecoinSend": "Stablecoin Send",

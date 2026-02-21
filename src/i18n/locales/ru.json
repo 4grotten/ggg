@@ -688,6 +688,7 @@
     "processing": "Обработка",
     "settled": "Завершено",
     "cardTransfer": "Перевод на карту",
+    "cardTopUp": "Пополнение карты",
     "topUp": "Пополнение",
     "annualCardFee": "Годовая плата за карту",
     "stablecoinSend": "Отправка стейблкоинов",

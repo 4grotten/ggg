@@ -248,7 +248,7 @@ const WalletPage = () => {
               <Skeleton className="h-32 w-full rounded-xl" />
             </div>
           ) : (
-            <CardTransactionsList groups={transactionGroups} />
+            <CardTransactionsList groups={transactionGroups} walletView />
           )}
         </motion.div>
       </div>
