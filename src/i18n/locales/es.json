@@ -618,6 +618,7 @@
     "processing": "Procesando",
     "settled": "Completado",
     "cardTransfer": "Transferencia de tarjeta",
+    "cardTopUp": "Recarga de tarjeta",
     "topUp": "Recarga",
     "annualCardFee": "Cuota anual de tarjeta",
     "stablecoinSend": "Envío de Stablecoin",

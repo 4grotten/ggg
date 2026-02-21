@@ -618,6 +618,7 @@
     "processing": "In Bearbeitung",
     "settled": "Abgeschlossen",
     "cardTransfer": "Kartenüberweisung",
+    "cardTopUp": "Karte aufladen",
     "topUp": "Aufladung",
     "annualCardFee": "Jährliche Kartengebühr",
     "stablecoinSend": "Stablecoin Senden",
