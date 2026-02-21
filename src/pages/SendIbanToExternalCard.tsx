@@ -49,7 +49,7 @@ const submitBankToCardTransfer = async (
   amount: string
 ): Promise<{ success: boolean; transactionId?: string; error?: string }> => {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-  const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent('/transactions/transfer/bank-to-card/')}`;
+  const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent('/transactions/transfer/internal/')}`;
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
@@ -61,8 +61,8 @@ const submitBankToCardTransfer = async (
       method: 'POST',
       headers,
       body: JSON.stringify({
-        from_bank_account_id: bankAccountId,
-        receiver_card_number: receiverCardNumber,
+        from_account_id: bankAccountId,
+        to_card_number: receiverCardNumber,
         amount,
       }),
     });
