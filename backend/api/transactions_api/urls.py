@@ -18,4 +18,6 @@ urlpatterns = [
     path('recipient-info/', views.RecipientInfoView.as_view(), name='recipient_info'),
     path('bank-accounts/', views.UserBankAccountsView.as_view(), name='user_bank_accounts'),
     path('crypto-wallets/', views.UserCryptoWalletsView.as_view(), name='user_crypto_wallets'),
+
+    path('transfer/internal/', views.InternalTransferView.as_view(), name='internal_transfer'),
 ]

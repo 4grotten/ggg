@@ -13,6 +13,8 @@ class TransactionService:
     def execute_card_transfer(sender_id, sender_card_id, receiver_card_number, amount):
         amount = Decimal(str(amount))
         sender_card = Cards.objects.select_for_update().get(id=sender_card_id, user_id=sender_id)
+        if sender_card.card_number_encrypted == receiver_card_number:
+            raise ValueError("Ошибка: Нельзя перевести средства на ту же самую карту.")
         receiver_card = Cards.objects.select_for_update().get(card_number_encrypted=receiver_card_number)
         if sender_card.balance < amount:
             raise ValueError("Недостаточно средств на карте")
@@ -70,37 +72,108 @@ class TransactionService:
     @transaction.atomic
     def execute_crypto_withdrawal(user_id, card_id, token, network, to_address, amount_crypto):
         amount_crypto = Decimal(str(amount_crypto))
-        wallet = CryptoWallets.objects.select_for_update().get(user_id=str(user_id), token=token, network=network)
-        if wallet.balance < amount_crypto:
-            raise ValueError("Недостаточно средств на USDT кошельке")
-        wallet.balance -= amount_crypto
-        wallet.save()
-        txn = Transactions.objects.create(user_id=user_id, type='crypto_withdrawal', status='processing', amount=amount_crypto, currency=token)
+        card = Cards.objects.select_for_update().get(id=card_id, user_id=str(user_id))
+        if card.balance < amount_crypto:
+            raise ValueError("Недостаточно средств на выбранной карте")
+        card.balance -= amount_crypto
+        card.save()
+        txn = Transactions.objects.create(
+            user_id=user_id, card=card, type='crypto_withdrawal', 
+            status='processing', amount=amount_crypto, currency=token
+        )
         withdrawal = CryptoWithdrawals.objects.create(
             transaction=txn, user_id=user_id, token=token, network=network,
             to_address=to_address, amount_crypto=amount_crypto, fee_amount=Decimal('1.00'),
             fee_type='network', total_debit=amount_crypto + Decimal('1.00')
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='crypto', amount=amount_crypto, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=card.type, amount=amount_crypto, type='debit')
         return withdrawal
 
     @staticmethod
     @transaction.atomic
     def execute_bank_withdrawal(user_id, card_id, iban, beneficiary_name, bank_name, amount_aed):
         amount_aed = Decimal(str(amount_aed))
-        bank_acc = BankDepositAccounts.objects.select_for_update().get(user_id=str(user_id))
-        if bank_acc.balance < amount_aed:
-            raise ValueError("Недостаточно средств на банковском счете")
-        bank_acc.balance -= amount_aed
-        bank_acc.save()
-        txn = Transactions.objects.create(user_id=user_id, type='bank_withdrawal', status='processing', amount=amount_aed, currency='AED')
+        card = Cards.objects.select_for_update().get(id=card_id, user_id=str(user_id))
+
+        if card.balance < amount_aed:
+            raise ValueError("Недостаточно средств на выбранной карте")
+        card.balance -= amount_aed
+        card.save()
+        txn = Transactions.objects.create(
+            user_id=user_id, card=card, type='bank_withdrawal', 
+            status='processing', amount=amount_aed, currency='AED'
+        )
         withdrawal = BankWithdrawals.objects.create(
             transaction=txn, user_id=user_id, beneficiary_iban=iban, beneficiary_name=beneficiary_name,
-            beneficiary_bank_name=bank_name, from_card_id=card_id, amount_aed=amount_aed,
+            beneficiary_bank_name=bank_name, from_card_id=card.id, amount_aed=amount_aed,
             fee_amount=Decimal('0.00'), total_debit=amount_aed
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='bank', amount=amount_aed, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=card.type, amount=amount_aed, type='debit')
         return withdrawal
+
+    @staticmethod
+    @transaction.atomic
+    def execute_internal_transfer(user_id, from_type, from_id, to_type, to_id, amount):
+        amount = Decimal(str(amount))
+        EXCHANGE_RATE_USDT_AED = Decimal('3.67')
+        CRYPTO_FEE_USDT = Decimal('1.00')
+        if from_type == 'card':
+            source = Cards.objects.select_for_update().get(id=from_id, user_id=str(user_id))
+            source_currency = 'AED'
+        elif from_type == 'bank':
+            source = BankDepositAccounts.objects.select_for_update().get(id=from_id, user_id=str(user_id))
+            source_currency = 'AED'
+        elif from_type == 'crypto':
+            source = CryptoWallets.objects.select_for_update().get(id=from_id, user_id=str(user_id))
+            source_currency = 'USDT'
+        else:
+            raise ValueError("Неверный тип счета отправителя. Доступно: card, bank, crypto")
+        if to_type == 'card':
+            dest = Cards.objects.select_for_update().get(id=to_id, user_id=str(user_id))
+            dest_currency = 'AED'
+        elif to_type == 'bank':
+            dest = BankDepositAccounts.objects.select_for_update().get(id=to_id, user_id=str(user_id))
+            dest_currency = 'AED'
+        elif to_type == 'crypto':
+            dest = CryptoWallets.objects.select_for_update().get(id=to_id, user_id=str(user_id))
+            dest_currency = 'USDT'
+        else:
+            raise ValueError("Неверный тип счета получателя. Доступно: card, bank, crypto")
+        if from_id == to_id:
+            raise ValueError("Нельзя перевести деньги на тот же самый счет.")
+        fee = Decimal('0.00')
+        if source_currency == 'USDT':
+            fee = CRYPTO_FEE_USDT
+        total_deduction = amount + fee
+        if source.balance < total_deduction:
+            raise ValueError(f"Недостаточно средств. Нужно: {total_deduction} {source_currency} (включая комиссию {fee})")
+        if source_currency == dest_currency:
+            converted_amount = amount
+            exchange_rate = Decimal('1.00')
+        elif source_currency == 'USDT' and dest_currency == 'AED':
+            converted_amount = amount * EXCHANGE_RATE_USDT_AED
+            exchange_rate = EXCHANGE_RATE_USDT_AED
+        elif source_currency == 'AED' and dest_currency == 'USDT':
+            converted_amount = amount / EXCHANGE_RATE_USDT_AED
+            exchange_rate = Decimal('1.00') / EXCHANGE_RATE_USDT_AED
+            converted_amount = converted_amount.quantize(Decimal('0.000000'))
+        source.balance -= total_deduction
+        source.save()
+        dest.balance += converted_amount
+        dest.save()
+        txn = Transactions.objects.create(
+            user_id=user_id,
+            type='internal_transfer',
+            status='completed',
+            amount=amount,
+            currency=source_currency,
+            fee=fee,
+            exchange_rate=exchange_rate,
+            description=f"Внутренний перевод: {from_type} -> {to_type}"
+        )
+        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=from_type, amount=total_deduction, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=to_type, amount=converted_amount, type='credit')
+        return txn, converted_amount, fee
     @staticmethod
     def get_transaction_receipt(transaction_id):
         txn = Transactions.objects.get(id=transaction_id)

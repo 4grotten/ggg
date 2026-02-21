@@ -203,3 +203,46 @@ class TransactionReceiptView(APIView):
             return Response(receipt_data, status=status.HTTP_200_OK)
         except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e: return Response({"error": f"Внутренняя ошибка: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class InternalTransferView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @swagger_auto_schema(
+        operation_summary="Внутренний перевод (Своп между своими счетами)",
+        operation_description="Позволяет гонять деньги между 4 счетами: card, bank, crypto. Автоматически конвертирует USDT <-> AED (Курс 3.67). Берет комиссию 1 USDT при отправке с крипты.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['from_type', 'from_id', 'to_type', 'to_id', 'amount'],
+            properties={
+                'from_type': openapi.Schema(type=openapi.TYPE_STRING, description="card | bank | crypto"),
+                'from_id': openapi.Schema(type=openapi.TYPE_STRING, description="ID счета-источника (UUID)"),
+                'to_type': openapi.Schema(type=openapi.TYPE_STRING, description="card | bank | crypto"),
+                'to_id': openapi.Schema(type=openapi.TYPE_STRING, description="ID счета-получателя (UUID)"),
+                'amount': openapi.Schema(type=openapi.TYPE_STRING, description="Сумма списания (в валюте источника)"),
+            }
+        ),
+        tags=["Transfers (Переводы)"]
+    )
+    def post(self, request):
+        data = request.data
+        try:
+            txn, converted_amount, fee = TransactionService.execute_internal_transfer(
+                user_id=request.user.id,
+                from_type=data.get('from_type'),
+                from_id=data.get('from_id'),
+                to_type=data.get('to_type'),
+                to_id=data.get('to_id'),
+                amount=data.get('amount')
+            )
+            return Response({
+                "message": "Внутренний перевод успешно выполнен",
+                "transaction_id": txn.id,
+                "deducted_amount": str(data.get('amount')),
+                "fee": str(fee),
+                "credited_amount": str(converted_amount)
+            }, status=status.HTTP_200_OK)
+            
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Системная ошибка: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
