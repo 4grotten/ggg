@@ -11,7 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { useWalletSummary, useBankAccounts } from "@/hooks/useCards";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
-import { useIbanTransactionGroups, useTransactionGroups } from "@/hooks/useTransactions";
+import { useIbanTransactionGroups, useTransactionGroups, useApiTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Drawer,
@@ -45,12 +45,28 @@ const AccountPage = () => {
   const [qrOpen, setQrOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const { data: ibanTxData, isLoading: ibanLoading } = useIbanTransactionGroups();
+  const { data: apiTxData, isLoading: apiLoading } = useApiTransactionGroups();
   const { data: mockData, isLoading: mockLoading } = useTransactionGroups();
-  const transactionsLoading = ibanLoading || mockLoading;
+  const transactionsLoading = ibanLoading || apiLoading || mockLoading;
 
   const transactionGroups = useMemo(() => {
     const realGroups = ibanTxData || [];
-    const bankTypes = ["transfer_in", "transfer_out", "bank_deposit", "bank_withdrawal", "bank_transfer", "bank_transfer_incoming"];
+    
+    // Also include internal_transfer (bank→card, card→bank) from /all/ endpoint
+    const bankRelatedTypes = ["internal_transfer"];
+    const apiBankGroups = (apiTxData || [])
+      .map(group => ({
+        ...group,
+        transactions: group.transactions.filter(tx =>
+          bankRelatedTypes.includes(tx.type || "") && (
+            tx.description?.toLowerCase().includes("bank") ||
+            tx.description?.toLowerCase().includes("iban")
+          )
+        ),
+      }))
+      .filter(group => group.transactions.length > 0);
+
+    const bankTypes = ["transfer_in", "transfer_out", "bank_deposit", "bank_withdrawal", "bank_transfer", "bank_transfer_incoming", "internal_transfer"];
     const mockGroups = (mockData?.groups || [])
       .map(group => ({
         ...group,
@@ -62,8 +78,29 @@ const AccountPage = () => {
         ),
       }))
       .filter(group => group.transactions.length > 0);
-    return [...realGroups, ...mockGroups];
-  }, [ibanTxData, mockData]);
+    
+    // Merge all groups, deduplicating by transaction id
+    const allGroups = [...realGroups, ...apiBankGroups, ...mockGroups];
+    const seenTxIds = new Set<string>();
+    const mergedMap = new Map<string, typeof allGroups[0]>();
+    
+    for (const group of allGroups) {
+      const uniqueTxs = group.transactions.filter(tx => {
+        if (seenTxIds.has(tx.id)) return false;
+        seenTxIds.add(tx.id);
+        return true;
+      });
+      if (uniqueTxs.length === 0) continue;
+      
+      if (mergedMap.has(group.date)) {
+        mergedMap.get(group.date)!.transactions.push(...uniqueTxs);
+      } else {
+        mergedMap.set(group.date, { ...group, transactions: [...uniqueTxs] });
+      }
+    }
+    
+    return Array.from(mergedMap.values());
+  }, [ibanTxData, apiTxData, mockData]);
 
   const iban = account?.iban || "";
   const accountNumber = iban.slice(-13);
