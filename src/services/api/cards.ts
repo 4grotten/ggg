@@ -267,3 +267,35 @@ export const fetchCardsList = async (): Promise<CardsResponse> => {
     };
   }
 };
+
+// ─── NEW: Bank Accounts ─────────────────────────────────────────
+
+export interface BankAccount {
+  id: string;
+  iban: string;
+  bank_name: string;
+  beneficiary: string;
+  balance: string;
+  is_active: boolean;
+}
+
+/**
+ * Fetch user bank accounts
+ * GET /transactions/bank-accounts/
+ */
+export const fetchBankAccounts = async (): Promise<{ success: boolean; data: BankAccount[]; error?: string }> => {
+  try {
+    const response = await cardsApiGet<BankAccount[]>('/transactions/bank-accounts/');
+    if (response.error || !response.data) {
+      return { success: false, data: [], error: response.error?.message || 'Failed to fetch bank accounts' };
+    }
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error('Error fetching bank accounts:', error);
+    return {
+      success: false,
+      data: [],
+      error: error instanceof Error ? error.message : 'Failed to fetch bank accounts',
+    };
+  }
+};

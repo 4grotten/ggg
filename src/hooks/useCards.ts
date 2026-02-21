@@ -7,6 +7,7 @@ import {
   fetchWalletSummary,
   fetchIban,
   fetchCardsList,
+  fetchBankAccounts,
 } from '@/services/api/cards';
 import { getAuthToken } from '@/services/api/apiClient';
 import { FetchCardsParams } from '@/types/card';
@@ -24,6 +25,7 @@ export const cardKeys = {
   walletSummary: () => [...cardKeys.all, 'walletSummary'] as const,
   iban: () => [...cardKeys.all, 'iban'] as const,
   cardsList: () => [...cardKeys.all, 'cardsList'] as const,
+  bankAccounts: () => [...cardKeys.all, 'bankAccounts'] as const,
 };
 
 /**
@@ -111,6 +113,19 @@ export const useCardsList = () => {
   return useQuery({
     queryKey: cardKeys.cardsList(),
     queryFn: fetchCardsList,
+    enabled: !!getAuthToken(),
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+/**
+ * Hook to fetch user bank accounts
+ * GET /transactions/bank-accounts/
+ */
+export const useBankAccounts = () => {
+  return useQuery({
+    queryKey: cardKeys.bankAccounts(),
+    queryFn: fetchBankAccounts,
     enabled: !!getAuthToken(),
     staleTime: 1000 * 60 * 5,
   });

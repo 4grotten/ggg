@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
-import { useWalletSummary } from "@/hooks/useCards";
+import { useWalletSummary, useBankAccounts } from "@/hooks/useCards";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { useMergedTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,8 +24,24 @@ const AccountPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { data: walletData, isLoading } = useWalletSummary();
-  const account = walletData?.data?.physical_account;
+  const { data: walletData, isLoading: walletLoading } = useWalletSummary();
+  const { data: bankAccountsData, isLoading: bankLoading } = useBankAccounts();
+  const isLoading = walletLoading || bankLoading;
+  
+  // Prefer bank-accounts API data, fallback to wallet summary
+  const bankAccount = bankAccountsData?.data?.[0];
+  const walletAccount = walletData?.data?.physical_account;
+  
+  const account = bankAccount || walletAccount ? {
+    iban: bankAccount?.iban || walletAccount?.iban || "",
+    balance: bankAccount?.balance || walletAccount?.balance || "0",
+    currency: walletAccount?.currency || "AED",
+    bank_name: bankAccount?.bank_name,
+    beneficiary: bankAccount?.beneficiary,
+    is_active: bankAccount?.is_active,
+    id: bankAccount?.id,
+  } : null;
+  
   const [qrOpen, setQrOpen] = useState(false);
   const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
 
@@ -47,8 +63,8 @@ const AccountPage = () => {
 
   const iban = account?.iban || "";
   const accountNumber = iban.slice(-13);
-  const bankName = "EasyCard FZE";
-  const userName = user?.full_name || "Account Holder";
+  const bankName = account?.bank_name || "EasyCard FZE";
+  const userName = account?.beneficiary || user?.full_name || "Account Holder";
   const nameParts = userName.trim().split(/\s+/);
   const firstName = nameParts[0] || "";
   const lastName = nameParts.slice(1).join(" ") || "";
@@ -228,6 +244,26 @@ const AccountPage = () => {
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('accountPage.details')}</h3>
               
               <div className="space-y-3">
+                {account?.beneficiary && (
+                  <>
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t('accountPage.beneficiary', 'Beneficiary')}</p>
+                      <p className="text-sm font-medium">{account.beneficiary}</p>
+                    </div>
+                    <div className="h-px bg-border/50" />
+                  </>
+                )}
+
+                {account?.bank_name && (
+                  <>
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t('accountPage.bankName', 'Bank')}</p>
+                      <p className="text-sm font-medium">{account.bank_name}</p>
+                    </div>
+                    <div className="h-px bg-border/50" />
+                  </>
+                )}
+
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">IBAN</p>
