@@ -12,6 +12,7 @@ interface BalanceCardProps {
   currency?: string;
   cards?: Card[];
   usdtBalance?: number;
+  accountBalance?: number;
 }
 
 const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: number }) => {
@@ -46,7 +47,7 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
   return <>{formatBalance(displayValue)}</>;
 };
 
-export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0 }: BalanceCardProps) => {
+export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0 }: BalanceCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
@@ -101,6 +102,34 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
             ))}
           </div>
         )}
+
+        {/* AED Account Balance */}
+        <div className="rounded-xl bg-secondary/50 p-3">
+          <div className="flex items-center gap-1.5 mb-1">
+            <img src={aedCurrency} alt="AED" className="w-3.5 h-3.5 dark:invert dark:brightness-200" />
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+              AED Account
+            </p>
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={isVisible ? "aed-visible" : "aed-hidden"}
+              className="text-sm font-semibold flex items-center gap-1"
+              initial={{ opacity: 0, filter: "blur(6px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(6px)" }}
+              transition={{ duration: 0.3 }}
+            >
+              {isVisible ? (
+                <>
+                  <img src={aedCurrency} alt="AED" className="w-4 h-4 dark:invert dark:brightness-200" />
+                  <AnimatedNumber key={`${animationKey}-aed-account`} value={accountBalance} duration={800} />
+                  <span className="text-xs text-muted-foreground ml-1">AED</span>
+                </>
+              ) : "••••••"}
+            </motion.span>
+          </AnimatePresence>
+        </div>
 
         {/* USDT TRC20 Balance */}
         <div className="rounded-xl bg-secondary/50 p-3">
