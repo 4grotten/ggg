@@ -214,6 +214,155 @@ export const fetchTransactionGroups = async (
 // REAL API CALLS (via cards-proxy → ueasycard.com)
 // =============================================
 
+// Raw transaction from backend GET /transactions/
+export interface ApiTransaction {
+  id: string;
+  type: string;
+  status: string;
+  amount: number;
+  currency: string;
+  created_at: string;
+  description?: string;
+  recipient_name?: string;
+  sender_name?: string;
+  card_mask?: string;
+  to_address_mask?: string;
+  from_address_mask?: string;
+  network_and_token?: string;
+  operation?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Fetch real transactions list from backend
+ * GET /api/v1/transactions/
+ */
+export const fetchApiTransactions = async (): Promise<{
+  data: ApiTransaction[] | null;
+  error: string | null;
+}> => {
+  try {
+    const result = await apiRequest<ApiTransaction[] | { results: ApiTransaction[] }>(
+      `/transactions/`,
+      { method: 'GET' },
+      true
+    );
+    
+    if (result.error) {
+      console.warn('[Transactions API] List error:', result.error);
+      return { data: null, error: result.error.detail || result.error.message || 'Failed to fetch' };
+    }
+    
+    // Handle both array and paginated response formats
+    const transactions = Array.isArray(result.data)
+      ? result.data
+      : (result.data as any)?.results || [];
+    
+    return { data: transactions, error: null };
+  } catch (error) {
+    console.error('[Transactions API] List fetch failed:', error);
+    return { data: null, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
+/**
+ * Convert API transaction to local Transaction format
+ */
+export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
+  const date = new Date(tx.created_at);
+  const time = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  const dateStr = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+  
+  // Map backend type to frontend type
+  const typeMap: Record<string, TransactionType> = {
+    'topup': 'topup',
+    'bank_topup': 'topup',
+    'crypto_topup': 'topup',
+    'card_transfer': 'card_transfer',
+    'withdrawal': 'crypto_withdrawal',
+    'crypto_withdrawal': 'crypto_withdrawal',
+    'bank_withdrawal': 'bank_transfer',
+    'bank_transfer': 'bank_transfer',
+    'bank_transfer_incoming': 'bank_transfer_incoming',
+    'crypto_deposit': 'crypto_deposit',
+    'payment': 'payment',
+    'card_payment': 'payment',
+  };
+  
+  const mappedType = typeMap[tx.type] || 'payment' as TransactionType;
+  const isIncoming = tx.amount > 0;
+  
+  // Color based on type
+  const colorMap: Record<string, string> = {
+    'topup': '#22C55E',
+    'crypto_deposit': '#22C55E',
+    'bank_transfer_incoming': '#22C55E',
+    'card_transfer': isIncoming ? '#22C55E' : '#007AFF',
+    'crypto_withdrawal': '#10B981',
+    'bank_transfer': '#8B5CF6',
+    'payment': '#3B82F6',
+  };
+  
+  // Merchant name based on operation or type
+  const merchantMap: Record<string, string> = {
+    'topup': 'Top up',
+    'bank_topup': 'Top up',
+    'crypto_topup': 'Top up',
+    'card_transfer': 'Card Transfer',
+    'withdrawal': 'Stablecoin Send',
+    'crypto_withdrawal': 'Stablecoin Send',
+    'bank_withdrawal': 'Bank Transfer',
+    'bank_transfer': 'Bank Transfer',
+    'bank_transfer_incoming': 'Bank Transfer',
+    'crypto_deposit': 'Wallet Deposit',
+  };
+  
+  return {
+    id: `api_${tx.id}`,
+    merchant: (tx.operation as string) || merchantMap[tx.type] || tx.type,
+    time,
+    amountUSDT: Math.abs(tx.amount),
+    amountLocal: Math.abs(tx.amount),
+    localCurrency: tx.currency || 'AED',
+    color: colorMap[mappedType] || '#3B82F6',
+    type: mappedType,
+    status: tx.status === 'completed' ? 'settled' : tx.status as any,
+    senderName: tx.sender_name as string,
+    recipientCard: tx.card_mask as string,
+    description: tx.description,
+    createdAt: tx.created_at,
+    metadata: { apiDate: dateStr, fromApi: true },
+  };
+};
+
+/**
+ * Fetch real transactions and group by date
+ */
+export const fetchApiTransactionGroups = async (): Promise<TransactionGroup[]> => {
+  const { data, error } = await fetchApiTransactions();
+  if (error || !data || data.length === 0) return [];
+  
+  const mapped = data.map(mapApiTransactionToLocal);
+  
+  // Group by date
+  const groupMap = new Map<string, Transaction[]>();
+  for (const tx of mapped) {
+    const dateStr = (tx.metadata as any)?.apiDate || 'Unknown';
+    if (!groupMap.has(dateStr)) groupMap.set(dateStr, []);
+    groupMap.get(dateStr)!.push(tx);
+  }
+  
+  const groups: TransactionGroup[] = [];
+  for (const [date, transactions] of groupMap) {
+    const totalSpend = transactions
+      .filter(t => !['topup', 'crypto_deposit', 'bank_transfer_incoming'].includes(t.type || ''))
+      .reduce((sum, t) => sum + t.amountLocal, 0);
+    groups.push({ date, totalSpend, transactions });
+  }
+  
+  return groups;
+};
+
 /**
  * Fetch transaction receipt from backend
  * GET /api/v1/transactions/<transaction_id>/receipt/

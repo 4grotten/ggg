@@ -10,7 +10,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
-import { useTransactionGroups } from "@/hooks/useTransactions";
+import { useMergedTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Drawer,
@@ -22,7 +22,7 @@ const WalletPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [qrOpen, setQrOpen] = useState(false);
-  const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
+  const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
   const transactionGroups = useMemo(() => {
     const groups = transactionsData?.groups || [];
     const cryptoTypes = ["topup", "crypto_withdrawal", "crypto_deposit", "top_up", "withdrawal"];
