@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 
 from apps.cards_apps.models import Cards
+from apps.accounts_apps.models import Profiles
 from apps.transactions_apps.models import Transactions, BankDepositAccounts, CryptoWallets
 
 from .serializers import (
@@ -41,9 +42,15 @@ class RecipientInfoView(APIView):
             return Response({"error": "Card not found"}, status=status.HTTP_404_NOT_FOUND)
         user = User.objects.filter(id=card.user_id).first()
         recipient_name = f"{user.first_name or ''} {user.last_name or ''}".strip() if user else "Unknown User"
+        avatar_url = None
+        if user:
+            profile = Profiles.objects.filter(user_id=str(user.id)).first()
+            if profile:
+                avatar_url = profile.avatar_url
         return Response({
             "recipient_name": recipient_name,
-            "card_type": card.type
+            "card_type": card.type,
+            "avatar_url": avatar_url
         }, status=status.HTTP_200_OK)
 
 class AllTransactionsListView(APIView):
