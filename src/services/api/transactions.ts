@@ -243,7 +243,7 @@ export const fetchApiTransactions = async (): Promise<{
 }> => {
   try {
     const result = await apiRequest<ApiTransaction[] | { results: ApiTransaction[] }>(
-      `/transactions/`,
+      `/transactions/all/`,
       { method: 'GET' },
       true
     );
