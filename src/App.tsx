@@ -56,6 +56,8 @@ import PartnerBonuses from "./pages/PartnerBonuses";
 import DevicesPage from "./pages/DevicesPage";
 import ApiDocumentation from "./pages/ApiDocumentation";
 import AdminPanel from "./pages/AdminPanel";
+import AccountPage from "./pages/AccountPage";
+import WalletPage from "./pages/WalletPage";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
@@ -84,6 +86,8 @@ const hiddenNavRoutes = [
   "/settings/api",
   "/settings/admin",
   "/partner",
+  "/account",
+  "/wallet",
 ];
 
 const AppContent = () => {
@@ -160,6 +164,8 @@ const AppContent = () => {
             <Route path="/open-card/pay-balance" element={<OpenCardPayBalance />} />
             <Route path="/partner/pay-balance" element={<TariffPayBalance />} />
             <Route path="/partner/pay-crypto" element={<TariffPayCrypto />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/wallet" element={<WalletPage />} />
             <Route path="/transaction/:id" element={<TransactionDetails />} />
             <Route path="/verify" element={<PrivacyProtection />} />
             <Route path="/verify/terms" element={<AcceptTerms />} />
