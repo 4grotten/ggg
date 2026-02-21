@@ -205,7 +205,7 @@ class TransactionService:
 
         txn = Transactions.objects.create(
             user_id=user_id,
-            type='bank_to_card_transfer',
+            type='transfer_out',
             status='completed',
             amount=amount,
             currency='AED',
