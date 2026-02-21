@@ -437,6 +437,58 @@ export const fetchTransactionReceipt = async (
 };
 
 // =============================================
+// BANK WITHDRAWAL (Bank Wire to external bank)
+// POST /api/v1/transactions/withdrawal/bank/
+// =============================================
+
+export interface BankWithdrawalRequest {
+  from_card_id: string;
+  iban: string;
+  beneficiary_name: string;
+  bank_name: string;
+  amount_aed: string;
+}
+
+export interface BankWithdrawalResponse {
+  message: string;
+  transaction_id: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Submit bank withdrawal (wire transfer to external bank)
+ * POST /api/v1/transactions/withdrawal/bank/
+ */
+export const submitBankWithdrawal = async (
+  request: BankWithdrawalRequest
+): Promise<{ success: boolean; data?: BankWithdrawalResponse; error?: string }> => {
+  try {
+    const result = await apiRequest<BankWithdrawalResponse>(
+      `/transactions/withdrawal/bank/`,
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+
+    if (result.error) {
+      console.warn('[Transactions API] Bank withdrawal error:', result.error);
+      return { success: false, error: result.error.detail || result.error.message || 'Withdrawal failed' };
+    }
+
+    if (result.data?.transaction_id) {
+      return { success: true, data: result.data };
+    }
+
+    return { success: false, error: 'Unexpected response' };
+  } catch (error) {
+    console.error('[Transactions API] Bank withdrawal failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
+// =============================================
 // INTERNAL TRANSFER (Swap between own accounts)
 // POST /api/v1/transactions/transfer/internal/
 // =============================================
