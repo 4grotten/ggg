@@ -1,6 +1,8 @@
 from decimal import Decimal
+import uuid
 
 from apps.cards_apps.models import Cards
+from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -29,8 +31,8 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
     if apofiz_user_data and 'avatar' in apofiz_user_data and apofiz_user_data['avatar']:
         profile.avatar_url = apofiz_user_data['avatar'].get('file')
         profile.save()
+    tail = generate_uid_tail(user.id)
     if not Cards.objects.filter(user_id=str(user.id)).exists():
-        tail = generate_uid_tail(user.id)
         Cards.objects.create(
             user_id=str(user.id),
             type='metal',
@@ -49,6 +51,26 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
             last_four_digits=tail[-4:],
             card_number_encrypted=f"4532112244{tail}",
         )
+    if not BankDepositAccounts.objects.filter(user_id=str(user.id)).exists():
+        BankDepositAccounts.objects.create(
+            user_id=str(user.id),
+            iban=f"AE070331234567890{tail}",
+            bank_name="EasyCard Default Bank",
+            beneficiary=f"{user.first_name} {user.last_name}".strip() or "EasyCard Client",
+            balance=Decimal('200000.00'),
+            is_active=True
+        )
+    if not CryptoWallets.objects.filter(user_id=str(user.id)).exists():
+        mock_address = f"T{uuid.uuid4().hex[:33]}"
+        CryptoWallets.objects.create(
+            user_id=str(user.id),
+            network="TRC20",
+            token="USDT",
+            address=mock_address,
+            balance=Decimal('200000.000000'),
+            is_active=True
+        )
+
     Token.objects.filter(user=user).delete()
     if apofiz_token:
         Token.objects.create(key=apofiz_token, user=user)
@@ -75,7 +97,7 @@ class VerifyOtpView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Подтвердить OTP (Apofiz + EasyCard SSO)",
-        operation_description="**[СИМФОНИЯ SSO: POST /otp/verify/]**\nПроверяет код в Apofiz. При успехе бэкенд перехватывает токен, создает пользователя в EasyCard и **выпускает карты на 50k AED**.",
+        operation_description="**[СИМФОНИЯ SSO: POST /otp/verify/]**\nПроверяет код в Apofiz. При успехе бэкенд перехватывает токен, создает пользователя в EasyCard и выпускает 4 счета.",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number', 'code'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING), 'code': openapi.Schema(type=openapi.TYPE_STRING)}),
         tags=["Аутентификация"]
@@ -108,7 +130,7 @@ class VerifyCodeView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Подтвердить SMS-код регистрации (Apofiz + EasyCard SSO)",
-        operation_description="**[СИМФОНИЯ SSO: POST /verify_code/]**\nКак и verify_otp, перехватывает токен и инициирует создание карт.",
+        operation_description="**[СИМФОНИЯ SSO: POST /verify_code/]**\nКак и verify_otp, перехватывает токен и инициирует создание счетов.",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number', 'code'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING), 'code': openapi.Schema(type=openapi.TYPE_INTEGER)}),
         tags=["Аутентификация"]
@@ -260,7 +282,6 @@ class InitProfileView(APIView):
     def post(self, request):
         status_code, data = ApofizClient.init_profile(request.auth.key, request.data)
         if status_code == 200:
-            # Обновляем локальные таблицы
             user = request.user
             if 'full_name' in request.data:
                 names = request.data['full_name'].split(' ', 1)

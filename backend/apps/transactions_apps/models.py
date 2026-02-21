@@ -27,17 +27,30 @@ class Transactions(models.Model):
     class Meta:
         db_table = 'transactions'
 
-
 class BankDepositAccounts(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=50, db_index=True, null=True, blank=True) # Добавлено для привязки к юзеру
     iban = models.CharField(max_length=34, unique=True)
     bank_name = models.CharField(max_length=255)
     beneficiary = models.CharField(max_length=255)
+    balance = models.DecimalField(max_digits=15, decimal_places=2, default=0) # Добавлен баланс
     is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'bank_deposit_accounts'
 
+class CryptoWallets(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=50, db_index=True)
+    network = models.CharField(max_length=20, default='TRC20')
+    token = models.CharField(max_length=20, default='USDT')
+    address = models.CharField(max_length=255, unique=True)
+    balance = models.DecimalField(max_digits=20, decimal_places=6, default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'crypto_wallets'
 
 class TopupsBank(models.Model):
     TRANSFER_RAILS = (('UAE_LOCAL_AED', 'UAE Local AED'), ('SWIFT_INTL', 'SWIFT International'),)
@@ -59,7 +72,6 @@ class TopupsBank(models.Model):
     class Meta:
         db_table = 'topups_bank'
 
-
 class BankInboundPayments(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
@@ -73,7 +85,6 @@ class BankInboundPayments(models.Model):
 
     class Meta:
         db_table = 'bank_inbound_payments'
-
 
 class TopupsCrypto(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -98,7 +109,6 @@ class TopupsCrypto(models.Model):
     class Meta:
         db_table = 'topups_crypto'
 
-
 class CryptoInboundTransactions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tx_hash = models.CharField(max_length=255, unique=True)
@@ -114,7 +124,6 @@ class CryptoInboundTransactions(models.Model):
     class Meta:
         db_table = 'crypto_inbound_transactions'
 
-
 class CardTransfers(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.OneToOneField('Transactions', on_delete=models.CASCADE, related_name='card_transfer')
@@ -129,7 +138,6 @@ class CardTransfers(models.Model):
 
     class Meta:
         db_table = 'card_transfers'
-
 
 class CryptoWithdrawals(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -152,7 +160,6 @@ class CryptoWithdrawals(models.Model):
     class Meta:
         db_table = 'crypto_withdrawals'
 
-
 class BankWithdrawals(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.OneToOneField('Transactions', on_delete=models.CASCADE, related_name='bank_withdrawal')
@@ -172,7 +179,6 @@ class BankWithdrawals(models.Model):
 
     class Meta:
         db_table = 'bank_withdrawals'
-
 
 class BalanceMovements(models.Model):
     MOVEMENT_TYPES = (('debit', 'Debit (-)',), ('credit', 'Credit (+)',))
