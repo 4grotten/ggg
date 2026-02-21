@@ -74,34 +74,32 @@ interface UserCard {
   cardNumber: string;
 }
 
-// API-ready function to get recipient name by card number
-// TODO: Replace with actual API call
-const getRecipientName = async (cardNumber: string): Promise<{ found: boolean; name: string | null }> => {
+// Fetch recipient info from real API: GET /transactions/recipient-info/?card_number=...
+const getRecipientName = async (cardNumber: string): Promise<{ found: boolean; name: string | null; cardType?: string }> => {
   const cleanNumber = cardNumber.replace(/\s/g, "");
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  if (cleanNumber.length === 16) {
-    // Card with all zeros - not found example
-    if (cleanNumber === "0000000000000000") {
-      return { found: false, name: null };
+  if (cleanNumber.length !== 16) return { found: false, name: null };
+
+  try {
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    const endpoint = `/transactions/recipient-info/?card_number=${cleanNumber}`;
+    const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent(endpoint)}`;
+    const headers: HeadersInit = {
+      'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    };
+    const token = getAuthToken();
+    if (token) headers['x-backend-token'] = token;
+
+    const res = await fetch(url, { method: 'GET', headers });
+    if (!res.ok) return { found: false, name: null };
+
+    const data = await res.json();
+    if (data.recipient_name) {
+      return { found: true, name: data.recipient_name, cardType: data.card_type };
     }
-    
-    // Mock successful responses for demo
-    const mockNames: Record<string, string> = {
-      "4532890123457890": "JOHN SMITH",
-      "5425233430109903": "ANNA JOHNSON",
-    };
-    
-    // Return found for any valid 16-digit card (simulating real API)
-    return { 
-      found: true, 
-      name: mockNames[cleanNumber] || "RECIPIENT NAME" 
-    };
+    return { found: false, name: null };
+  } catch {
+    return { found: false, name: null };
   }
-  
-  return { found: false, name: null };
 };
 
 // Format card number with spaces
