@@ -16,16 +16,16 @@ const mockTransactionGroups: TransactionGroup[] = [
     date: "17.01.2026",
     totalSpend: 0,
     transactions: [
-      { id: "23", merchant: "Bank Transfer", time: "14:30", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", type: "bank_transfer_incoming" as TransactionType, status: "settled" },
-      { id: "22", merchant: "Top up", time: "11:15", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as TransactionType, status: "settled" },
+      { id: "23", merchant: "Bank Transfer", time: "14:30", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", type: "bank_transfer_incoming" as TransactionType, status: "settled", senderName: "KAMIEV RENAT", description: "AE07 0331 0100 4900 1234 001" },
+      { id: "22", merchant: "Top up", time: "11:15", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as TransactionType, status: "settled", description: "TFVFkt...TxhX9L" },
     ],
   },
   {
     date: "12.01.2026",
     totalSpend: 3273.20,
     transactions: [
-      { id: "21", merchant: "Bank Transfer", time: "19:45", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", type: "bank_transfer" as TransactionType, status: "settled" },
-      { id: "20", merchant: "Stablecoin Send", time: "18:20", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", type: "crypto_withdrawal" as TransactionType, status: "settled" },
+      { id: "21", merchant: "Bank Transfer", time: "19:45", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", type: "bank_transfer" as TransactionType, status: "settled", description: "AE07 0331 0100 4900 5678 002" },
+      { id: "20", merchant: "Stablecoin Send", time: "18:20", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", type: "crypto_withdrawal" as TransactionType, status: "settled", description: "TQn9Y...3jM5rL" },
       { id: "19", merchant: "Card Transfer", time: "16:45", amountUSDT: 50.00, amountLocal: 50.00, localCurrency: "AED", color: "#22C55E", type: "card_transfer", senderName: "ANNA JOHNSON", senderCard: "8834", status: "settled" },
       { id: "17", merchant: "Card Transfer", time: "15:30", amountUSDT: 250.00, amountLocal: 250.00, localCurrency: "AED", color: "#007AFF", type: "card_transfer", recipientCard: "4521", status: "processing" },
       { id: "18", merchant: "Card Transfer", time: "12:15", amountUSDT: 100.00, amountLocal: 100.00, localCurrency: "AED", color: "#007AFF", type: "card_transfer", recipientCard: "8834", status: "settled" },
@@ -52,7 +52,7 @@ const mockTransactionGroups: TransactionGroup[] = [
     totalSpend: 22.06,
     transactions: [
       { id: "5", merchant: "CELLAR", time: "20:48", amountUSDT: 22.06, amountLocal: 79.00, localCurrency: "AED", color: "#EAB308" },
-      { id: "6", merchant: "Top up", time: "20:46", amountUSDT: 194.10, amountLocal: 200.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
+      { id: "6", merchant: "Top up", time: "20:46", amountUSDT: 194.10, amountLocal: 200.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled", description: "TFVFkt...TxhX9L" },
     ],
   },
   {
@@ -65,7 +65,7 @@ const mockTransactionGroups: TransactionGroup[] = [
       { id: "10", merchant: "CELLAR", time: "19:53", amountUSDT: 116.54, amountLocal: 114.81, localCurrency: "$", color: "#22C55E" },
       { id: "11", merchant: "Service CEO", time: "07:58", amountUSDT: 11.59, amountLocal: 41.50, localCurrency: "AED", color: "#06B6D4" },
       { id: "12", merchant: "RESTAURANT", time: "03:21", amountUSDT: 424.81, amountLocal: 418.53, localCurrency: "AED", color: "#EF4444" },
-      { id: "13", merchant: "Top up", time: "02:30", amountUSDT: 494.10, amountLocal: 500.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
+      { id: "13", merchant: "Top up", time: "02:30", amountUSDT: 494.10, amountLocal: 500.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled", description: "TFVFkt...TxhX9L" },
     ],
   },
   {
@@ -80,7 +80,7 @@ const mockTransactionGroups: TransactionGroup[] = [
     totalSpend: 204.55,
     transactions: [
       { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", type: "card_activation" },
-      { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
+      { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled", description: "TFVFkt...TxhX9L" },
     ],
   },
 ];
