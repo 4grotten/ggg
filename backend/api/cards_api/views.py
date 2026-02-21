@@ -103,6 +103,7 @@ class WalletSummaryView(APIView):
         cards_data = []
         for card in cards:
             cards_data.append({
+                "id": card.id,
                 "type": card.type,
                 "card_number": card.card_number_encrypted,
                 "currency": "AED",
