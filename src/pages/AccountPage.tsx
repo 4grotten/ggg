@@ -186,29 +186,22 @@ const AccountPage = () => {
                 <span className="text-3xl font-bold">{formatBalance(account.balance)}</span>
                 <span className="text-lg text-muted-foreground">AED</span>
               </div>
-            </motion.div>
-
-            {/* Top Up + Send buttons */}
-            <motion.div
-              className="flex gap-3"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.03 }}
-            >
-              <button
-                onClick={() => navigate("/top-up/bank")}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-3 font-medium text-sm hover:bg-primary/90 transition-colors"
-              >
-                <ArrowDownLeft className="w-4 h-4" />
-                {t('dashboard.topUp')}
-              </button>
-              <button
-                onClick={() => navigate("/send-to-card")}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors py-3 font-medium text-sm"
-              >
-                <ArrowUpRight className="w-4 h-4" />
-                {t('dashboard.send')}
-              </button>
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={() => navigate("/top-up/bank")}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-2.5 font-medium text-sm hover:bg-primary/90 transition-colors"
+                >
+                  <ArrowDownLeft className="w-4 h-4" />
+                  {t('dashboard.topUp')}
+                </button>
+                <button
+                  onClick={() => navigate("/send-to-card")}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-background/50 hover:bg-background/70 transition-colors py-2.5 font-medium text-sm"
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                  {t('dashboard.send')}
+                </button>
+              </div>
             </motion.div>
 
             {/* Action buttons: Share + QR */}
