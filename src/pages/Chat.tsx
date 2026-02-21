@@ -251,7 +251,7 @@ const Chat = () => {
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.3 }}
-                  className="absolute -top-11 right-1/2 translate-x-1/2 z-20"
+                  className="absolute -top-11 left-1/2 -translate-x-1/2 z-20"
                 >
                   <motion.div 
                     animate={{ y: [0, -2, 0] }}
@@ -276,9 +276,9 @@ const Chat = () => {
                         </AnimatePresence>
                       </div>
                       
-                      {/* Tail - small circles going down */}
-                      <div className="absolute -bottom-1.5 left-2 w-2 h-2 bg-muted rounded-full" />
-                      <div className="absolute -bottom-3 left-0.5 w-1.5 h-1.5 bg-muted rounded-full" />
+                      {/* Tail - small circles going down-right (mirrored) */}
+                      <div className="absolute -bottom-1.5 right-2 w-2 h-2 bg-muted rounded-full" />
+                      <div className="absolute -bottom-3 right-0.5 w-1.5 h-1.5 bg-muted rounded-full" />
                     </div>
                   </motion.div>
                 </motion.div>
