@@ -690,6 +690,7 @@
     "processing": "Обработка",
     "settled": "Завершено",
     "cardTransfer": "Перевод на карту",
+    "cardReceived": "Поступление на карту",
     "cardTopUp": "Пополнение карты",
     "walletDeposit": "Пополнение кошелька USDT",
     "topUp": "Пополнение",

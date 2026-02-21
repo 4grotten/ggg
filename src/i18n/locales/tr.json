@@ -621,6 +621,7 @@
     "processing": "İşleniyor",
     "settled": "Tamamlandı",
     "cardTransfer": "Kart Transferi",
+    "cardReceived": "Karta Gelen",
     "cardTopUp": "Kart Yükleme",
     "walletDeposit": "USDT Cüzdan Yatırımı",
     "topUp": "Yükleme",

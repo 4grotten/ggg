@@ -226,6 +226,8 @@ const handleClick = (transaction: Transaction) => {
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit
                           ? t("transactions.walletDeposit")
+                          : isIncomingTransfer
+                          ? t("transactions.cardReceived")
                           : translateMerchant(transaction.merchant, transaction.type, t)
                         }
                       </p>
