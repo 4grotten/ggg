@@ -1,20 +1,70 @@
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Landmark } from "lucide-react";
+import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock } from "lucide-react";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { useWalletSummary } from "@/hooks/useCards";
+import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { useTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import aedCurrency from "@/assets/aed-currency.png";
 
 const AccountPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: walletData, isLoading } = useWalletSummary();
   const account = walletData?.data?.physical_account;
+  const [qrOpen, setQrOpen] = useState(false);
+  const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
+
+  const transactionGroups = useMemo(() => {
+    const groups = transactionsData?.groups || [];
+    const bankTypes = ["transfer_in", "transfer_out", "bank_deposit", "bank_withdrawal"];
+    return groups
+      .map(group => ({
+        ...group,
+        transactions: group.transactions.filter(tx =>
+          bankTypes.includes(tx.type || "") ||
+          tx.description?.toLowerCase().includes("bank") ||
+          tx.description?.toLowerCase().includes("iban") ||
+          tx.merchant?.toLowerCase().includes("bank")
+        ),
+      }))
+      .filter(group => group.transactions.length > 0);
+  }, [transactionsData]);
+
+  const iban = account?.iban || "";
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} скопирован`);
+    toast.success(`${label} ${t('accountPage.copied')}`);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: t('accountPage.title'),
+      text: t('accountPage.shareMessage', { iban }),
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(iban);
+        toast.success(t('accountPage.copiedToClipboard'));
+      }
+    } catch {
+      // user cancelled share
+    }
   };
 
   const formatBalance = (val: string | number) =>
@@ -27,7 +77,13 @@ const AccountPage = () => {
           <button onClick={() => navigate(-1)} className="p-1">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold">AED Account</h1>
+          <h1 className="text-lg font-semibold">{t('accountPage.title')}</h1>
+        </div>
+      }
+      rightAction={
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
         </div>
       }
     >
@@ -35,6 +91,7 @@ const AccountPage = () => {
         {isLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-28 w-full rounded-2xl" />
+            <Skeleton className="h-12 w-full rounded-2xl" />
             <Skeleton className="h-20 w-full rounded-2xl" />
           </div>
         ) : account ? (
@@ -51,7 +108,7 @@ const AccountPage = () => {
                   <Landmark className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Банковский счёт</p>
+                  <p className="text-xs text-muted-foreground">{t('accountPage.bankAccount')}</p>
                   <p className="text-sm font-medium">{account.currency || "AED"}</p>
                 </div>
               </div>
@@ -62,6 +119,75 @@ const AccountPage = () => {
               </div>
             </motion.div>
 
+            {/* Action buttons: Share + QR */}
+            <motion.div
+              className="flex gap-3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.05 }}
+            >
+              <button
+                onClick={handleShare}
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-3 font-medium text-sm hover:bg-primary/90 transition-colors"
+              >
+                <Share2 className="w-4 h-4" />
+                {t('accountPage.share')}
+              </button>
+
+              <Drawer open={qrOpen} onOpenChange={setQrOpen}>
+                <DrawerTrigger asChild>
+                  <button className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors py-3 font-medium text-sm">
+                    <QrCode className="w-4 h-4" />
+                    {t('accountPage.qrCode')}
+                  </button>
+                </DrawerTrigger>
+                <DrawerContent className="pb-8">
+                  <div className="flex flex-col items-center px-6 pt-4 pb-2 space-y-5">
+                    <div className="flex items-center gap-2">
+                      <Landmark className="w-5 h-5 text-primary" />
+                      <span className="font-semibold">{t('accountPage.title')}</span>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-5 shadow-lg">
+                      <QRCodeSVG
+                        value={iban}
+                        size={220}
+                        level="H"
+                        includeMargin={false}
+                        bgColor="#ffffff"
+                        fgColor="#000000"
+                      />
+                    </div>
+
+                    <div className="text-center space-y-1">
+                      <p className="text-xs text-muted-foreground">IBAN</p>
+                      <p className="text-sm font-mono font-medium break-all px-4">{iban}</p>
+                    </div>
+
+                    <div className="flex gap-3 w-full">
+                      <button
+                        onClick={() => copyToClipboard(iban, "IBAN")}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-3 font-medium text-sm"
+                      >
+                        <Copy className="w-4 h-4" />
+                        {t('accountPage.copy')}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setQrOpen(false);
+                          handleShare();
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-secondary text-foreground py-3 font-medium text-sm"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        {t('accountPage.share')}
+                      </button>
+                    </div>
+                  </div>
+                </DrawerContent>
+              </Drawer>
+            </motion.div>
+
             {/* IBAN details */}
             <motion.div
               className="rounded-2xl bg-secondary/50 p-5 space-y-4"
@@ -69,16 +195,16 @@ const AccountPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Реквизиты</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('accountPage.details')}</h3>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">IBAN</p>
-                    <p className="text-sm font-mono font-medium break-all">{account.iban}</p>
+                    <p className="text-sm font-mono font-medium break-all">{iban}</p>
                   </div>
                   <button
-                    onClick={() => copyToClipboard(account.iban, "IBAN")}
+                    onClick={() => copyToClipboard(iban, "IBAN")}
                     className="p-2 rounded-lg hover:bg-secondary transition-colors"
                   >
                     <Copy className="w-4 h-4 text-muted-foreground" />
@@ -88,23 +214,50 @@ const AccountPage = () => {
                 <div className="h-px bg-border/50" />
 
                 <div>
-                  <p className="text-xs text-muted-foreground">Account Number</p>
-                  <p className="text-sm font-mono font-medium">{account.iban.slice(-13)}</p>
+                  <p className="text-xs text-muted-foreground">{t('accountPage.accountNumber')}</p>
+                  <p className="text-sm font-mono font-medium">{iban.slice(-13)}</p>
                 </div>
 
                 <div className="h-px bg-border/50" />
 
                 <div>
-                  <p className="text-xs text-muted-foreground">Валюта</p>
+                  <p className="text-xs text-muted-foreground">{t('accountPage.currency')}</p>
                   <p className="text-sm font-medium">{account.currency || "AED"}</p>
                 </div>
               </div>
+            </motion.div>
+
+            {/* Transaction History */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold">{t('dashboard.transactions')}</h2>
+                <button
+                  onClick={() => navigate("/card/virtual/history")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+                >
+                  <Clock className="w-4 h-4" />
+                  {t('card.transactionHistory')}
+                </button>
+              </div>
+
+              {transactionsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-16 w-full rounded-xl" />
+                  <Skeleton className="h-32 w-full rounded-xl" />
+                </div>
+              ) : (
+                <CardTransactionsList groups={transactionGroups} />
+              )}
             </motion.div>
           </>
         ) : (
           <div className="text-center py-12 text-muted-foreground">
             <Landmark className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p>Счёт не найден</p>
+            <p>{t('accountPage.notFound')}</p>
           </div>
         )}
       </div>

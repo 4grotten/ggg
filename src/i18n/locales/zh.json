@@ -1683,5 +1683,19 @@
     "copiedToClipboard": "已复制到剪贴板",
     "copy": "复制",
     "shareMessage": "USDT TRC20 钱包地址：{{address}}"
+  },
+  "accountPage": {
+    "title": "AED 账户",
+    "bankAccount": "银行账户",
+    "share": "分享",
+    "qrCode": "二维码",
+    "details": "账户详情",
+    "accountNumber": "账号",
+    "currency": "货币",
+    "copied": "已复制",
+    "copiedToClipboard": "已复制到剪贴板",
+    "copy": "复制",
+    "shareMessage": "银行账户 IBAN：{{iban}}",
+    "notFound": "未找到账户"
   }
 }

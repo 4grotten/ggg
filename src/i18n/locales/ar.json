@@ -1676,5 +1676,19 @@
     "copiedToClipboard": "تم النسخ إلى الحافظة",
     "copy": "نسخ",
     "shareMessage": "عنوان محفظة USDT TRC20: {{address}}"
+  },
+  "accountPage": {
+    "title": "حساب AED",
+    "bankAccount": "حساب بنكي",
+    "share": "مشاركة",
+    "qrCode": "رمز QR",
+    "details": "تفاصيل الحساب",
+    "accountNumber": "رقم الحساب",
+    "currency": "العملة",
+    "copied": "تم النسخ",
+    "copiedToClipboard": "تم النسخ إلى الحافظة",
+    "copy": "نسخ",
+    "shareMessage": "IBAN الحساب البنكي: {{iban}}",
+    "notFound": "الحساب غير موجود"
   }
 }

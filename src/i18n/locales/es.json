@@ -1676,5 +1676,19 @@
     "copiedToClipboard": "Copiado al portapapeles",
     "copy": "Copiar",
     "shareMessage": "Dirección de billetera USDT TRC20: {{address}}"
+  },
+  "accountPage": {
+    "title": "Cuenta AED",
+    "bankAccount": "Cuenta Bancaria",
+    "share": "Compartir",
+    "qrCode": "Código QR",
+    "details": "Datos de la cuenta",
+    "accountNumber": "Número de cuenta",
+    "currency": "Moneda",
+    "copied": "copiado",
+    "copiedToClipboard": "Copiado al portapapeles",
+    "copy": "Copiar",
+    "shareMessage": "IBAN de la cuenta bancaria: {{iban}}",
+    "notFound": "Cuenta no encontrada"
   }
 }

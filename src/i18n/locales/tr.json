@@ -1676,5 +1676,19 @@
     "copiedToClipboard": "Panoya kopyalandı",
     "copy": "Kopyala",
     "shareMessage": "USDT TRC20 Cüzdan Adresi: {{address}}"
+  },
+  "accountPage": {
+    "title": "AED Hesap",
+    "bankAccount": "Banka Hesabı",
+    "share": "Paylaş",
+    "qrCode": "QR Kod",
+    "details": "Hesap Bilgileri",
+    "accountNumber": "Hesap Numarası",
+    "currency": "Para Birimi",
+    "copied": "kopyalandı",
+    "copiedToClipboard": "Panoya kopyalandı",
+    "copy": "Kopyala",
+    "shareMessage": "Banka Hesabı IBAN: {{iban}}",
+    "notFound": "Hesap bulunamadı"
   }
 }
