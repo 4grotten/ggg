@@ -13,9 +13,8 @@ interface CardTransactionsListProps {
 const getInitial = (name: string) => name.charAt(0).toUpperCase();
 
 const maskMiddle = (value: string): string => {
-  const clean = value.replace(/\s/g, '');
-  if (clean.length <= 8) return value;
-  return `${clean.slice(0, 4)}·····${clean.slice(-4)}`;
+  if (value.length <= 10) return value;
+  return `${value.slice(0, 7)}···${value.slice(-4)}`;
 };
 
 const formatDateNumeric = (date: string): string => {
@@ -244,7 +243,7 @@ const handleClick = (transaction: Transaction) => {
                           : isCardTransfer && transaction.recipientCard
                           ? ` · ${t("transactions.to")} •••• ${transaction.recipientCard}`
                           : isBankTransferIncoming && transaction.senderName
-                          ? ` · ${t("transactions.from")} ${transaction.senderName}`
+                          ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
                           : isBankTransfer && transaction.description
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description)}`
                           : isCryptoSend && transaction.description
