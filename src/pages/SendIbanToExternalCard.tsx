@@ -291,8 +291,8 @@ const SendIbanToExternalCard = () => {
                     <div className="w-12 h-12 rounded-full bg-[#27AE60]/20 flex items-center justify-center text-lg font-bold text-[#27AE60]">
                       {recipientName.charAt(0).toUpperCase()}
                     </div>
-                    <div className="absolute -bottom-0.5 -left-0.5 w-5 h-5 rounded-full bg-[#27AE60] flex items-center justify-center border-2 border-[#27AE60]/10">
-                      <Check className="w-3 h-3 text-white" />
+                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#27AE60] flex items-center justify-center border-2 border-[#27AE60]/10">
+                      <Check className="w-2.5 h-2.5 text-white" />
                     </div>
                   </div>
                   <div className="flex-1">
@@ -334,8 +334,8 @@ const SendIbanToExternalCard = () => {
                 <div className="w-12 h-12 rounded-full bg-[#27AE60]/20 flex items-center justify-center text-lg font-bold text-[#27AE60]">
                   {recipientName?.charAt(0).toUpperCase()}
                 </div>
-                <div className="absolute -bottom-0.5 -left-0.5 w-5 h-5 rounded-full bg-[#27AE60] flex items-center justify-center border-2 border-[#27AE60]/10">
-                  <Check className="w-3 h-3 text-white" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#27AE60] flex items-center justify-center border-2 border-[#27AE60]/10">
+                  <Check className="w-2.5 h-2.5 text-white" />
                 </div>
               </div>
               <div>
