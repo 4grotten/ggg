@@ -1,6 +1,5 @@
-import { Eye, EyeOff, CreditCard, Landmark, ChevronRight, Wallet } from "lucide-react";
+import { Eye, EyeOff, CreditCard, Landmark } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import aedCurrency from "@/assets/aed-currency.png";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
@@ -49,9 +48,7 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
   return <>{formatBalance(displayValue)}</>;
 };
 
-export const BalanceCard = (props: BalanceCardProps) => {
-  const navigate = useNavigate();
-  const { balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0, accountIbanLast4 } = props;
+export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0, accountIbanLast4 }: BalanceCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
@@ -167,40 +164,7 @@ export const BalanceCard = (props: BalanceCardProps) => {
           </AnimatePresence>
         </div>
 
-        {/* Account & Wallet buttons */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => navigate("/account")}
-            className="flex-1 flex items-center justify-between rounded-xl bg-secondary/50 hover:bg-secondary/80 transition-colors p-3 group"
-          >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                <Landmark className="w-4 h-4 text-primary" />
-              </div>
-              <div className="text-left">
-                <p className="text-xs font-semibold">Счёт</p>
-                <p className="text-[10px] text-muted-foreground">AED{accountIbanLast4 && ` •${accountIbanLast4}`}</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
-          </button>
 
-          <button
-            onClick={() => navigate("/wallet")}
-            className="flex-1 flex items-center justify-between rounded-xl bg-secondary/50 hover:bg-secondary/80 transition-colors p-3 group"
-          >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[hsl(160,60%,40%)]/15 flex items-center justify-center">
-                <UsdtIcon size={16} />
-              </div>
-              <div className="text-left">
-                <p className="text-xs font-semibold">Кошелёк</p>
-                <p className="text-[10px] text-muted-foreground">USDT •TRC20</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
-          </button>
-        </div>
 
         {/* Total balance */}
         <div className="flex items-center justify-between">
