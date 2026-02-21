@@ -607,6 +607,7 @@
     "sender": "Отправитель",
     "fromCard": "С карты",
     "fromWallet": "С кошелька",
+    "toWallet": "На кошелёк",
     "toCard": "На карту",
     "recipient": "Получатель",
     "card": "Карта",

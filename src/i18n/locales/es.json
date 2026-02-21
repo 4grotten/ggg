@@ -538,6 +538,7 @@
     "sender": "Remitente",
     "fromCard": "Desde tarjeta",
     "fromWallet": "Desde billetera",
+    "toWallet": "A billetera",
     "toCard": "A tarjeta",
     "recipient": "Destinatario",
     "card": "Tarjeta",
