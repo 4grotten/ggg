@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from apps.cards_apps.models import Cards
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -7,6 +10,9 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from apps.accounts_apps.models import Profiles
 from .apofiz_client import ApofizClient
+
+def generate_uid_tail(user_id):
+    return str(user_id).zfill(6)[-6:]
 
 def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None):
     user, created = User.objects.get_or_create(username=phone_number)
@@ -19,10 +25,30 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
             if len(names) > 1:
                 user.last_name = names[1]
         user.save()
-    profile, _ = Profiles.objects.get_or_create(user_id=user.id, defaults={'phone': phone_number})
+    profile, _ = Profiles.objects.get_or_create(user_id=str(user.id), defaults={'phone': phone_number})
     if apofiz_user_data and 'avatar' in apofiz_user_data and apofiz_user_data['avatar']:
         profile.avatar_url = apofiz_user_data['avatar'].get('file')
         profile.save()
+    if not Cards.objects.filter(user_id=str(user.id)).exists():
+        tail = generate_uid_tail(user.id)
+        Cards.objects.create(
+            user_id=str(user.id),
+            type='metal',
+            name='Metal Card',
+            status='active',
+            balance=Decimal('50000.00'),
+            last_four_digits=tail[-4:],
+            card_number_encrypted=f"4532112233{tail}",
+        )
+        Cards.objects.create(
+            user_id=str(user.id),
+            type='virtual',
+            name='Virtual Card',
+            status='active',
+            balance=Decimal('50000.00'),
+            last_four_digits=tail[-4:],
+            card_number_encrypted=f"4532112244{tail}",
+        )
     Token.objects.filter(user=user).delete()
     if apofiz_token:
         Token.objects.create(key=apofiz_token, user=user)

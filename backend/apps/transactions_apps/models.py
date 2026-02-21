@@ -1,10 +1,9 @@
 from django.db import models
-from django.db import transaction
 import uuid
 
 class Transactions(models.Model):
-    id = models.UUIDField(primary_key=True)
-    user_id = models.UUIDField()
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=50, db_index=True)
     card = models.ForeignKey('cards_apps.Cards', models.DO_NOTHING, blank=True, null=True)
     type = models.TextField()
     status = models.TextField()
@@ -22,11 +21,10 @@ class Transactions(models.Model):
     reference_id = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     metadata = models.JSONField(blank=True, null=True)
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
         db_table = 'transactions'
 
 
@@ -42,21 +40,17 @@ class BankDepositAccounts(models.Model):
 
 
 class TopupsBank(models.Model):
-    TRANSFER_RAILS = (
-        ('UAE_LOCAL_AED', 'UAE Local AED'),
-        ('SWIFT_INTL', 'SWIFT International'),
-    )
+    TRANSFER_RAILS = (('UAE_LOCAL_AED', 'UAE Local AED'), ('SWIFT_INTL', 'SWIFT International'),)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.OneToOneField('Transactions', on_delete=models.CASCADE, related_name='bank_topup')
-    user_id = models.UUIDField()
+    user_id = models.CharField(max_length=50)
     channel = models.CharField(max_length=50, default='bank_wire')
     transfer_rail = models.CharField(max_length=50, choices=TRANSFER_RAILS)
     deposit_account = models.ForeignKey(BankDepositAccounts, on_delete=models.SET_NULL, null=True)
-    reference_value = models.CharField(max_length=100) # ID юзера или уникальный код
+    reference_value = models.CharField(max_length=100) 
     fee_percent = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     min_amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-    instructions_snapshot = models.JSONField() # JSON реквизитов на момент создания
-    # Данные от банка после прихода денег:
+    instructions_snapshot = models.JSONField() 
     sender_name = models.CharField(max_length=255, null=True, blank=True)
     sender_bank = models.CharField(max_length=255, null=True, blank=True)
     sender_iban = models.CharField(max_length=34, null=True, blank=True)
@@ -84,7 +78,7 @@ class BankInboundPayments(models.Model):
 class TopupsCrypto(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.OneToOneField('Transactions', on_delete=models.CASCADE, related_name='crypto_topup')
-    user_id = models.UUIDField()
+    user_id = models.CharField(max_length=50)
     card_id = models.UUIDField()
     token = models.CharField(max_length=20)
     network = models.CharField(max_length=20)
@@ -112,7 +106,7 @@ class CryptoInboundTransactions(models.Model):
     token = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=20, decimal_places=6)
     from_address = models.CharField(max_length=255)
-    to_address = models.CharField(max_length=255) # Для матчинга
+    to_address = models.CharField(max_length=255)
     confirmations = models.IntegerField(default=0)
     received_at = models.DateTimeField()
     raw_payload = models.JSONField(null=True, blank=True)
@@ -124,8 +118,8 @@ class CryptoInboundTransactions(models.Model):
 class CardTransfers(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.OneToOneField('Transactions', on_delete=models.CASCADE, related_name='card_transfer')
-    sender_user_id = models.UUIDField()
-    receiver_user_id = models.UUIDField()
+    sender_user_id = models.CharField(max_length=50)
+    receiver_user_id = models.CharField(max_length=50)
     sender_card_id = models.UUIDField()
     receiver_card_id = models.UUIDField()
     amount = models.DecimalField(max_digits=15, decimal_places=2)
@@ -140,7 +134,7 @@ class CardTransfers(models.Model):
 class CryptoWithdrawals(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.OneToOneField('Transactions', on_delete=models.CASCADE, related_name='crypto_withdrawal')
-    user_id = models.UUIDField()
+    user_id = models.CharField(max_length=50)
     token = models.CharField(max_length=20)
     network = models.CharField(max_length=20)
     to_address = models.CharField(max_length=255)
@@ -162,7 +156,7 @@ class CryptoWithdrawals(models.Model):
 class BankWithdrawals(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.OneToOneField('Transactions', on_delete=models.CASCADE, related_name='bank_withdrawal')
-    user_id = models.UUIDField()
+    user_id = models.CharField(max_length=50)
     beneficiary_iban = models.CharField(max_length=34)
     iban_validated = models.BooleanField(default=False)
     beneficiary_name = models.CharField(max_length=255)
@@ -182,10 +176,9 @@ class BankWithdrawals(models.Model):
 
 class BalanceMovements(models.Model):
     MOVEMENT_TYPES = (('debit', 'Debit (-)',), ('credit', 'Credit (+)',))
-    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.ForeignKey('Transactions', on_delete=models.CASCADE, related_name='movements')
-    user_id = models.UUIDField()
+    user_id = models.CharField(max_length=50)
     account_type = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     type = models.CharField(max_length=10, choices=MOVEMENT_TYPES)

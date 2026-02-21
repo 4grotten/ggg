@@ -10,57 +10,61 @@ from apps.transactions_apps.models import (
 )
 from apps.cards_apps.models import Cards
 
+from django.db import transaction
+from django.utils import timezone
+from decimal import Decimal
+import uuid
+
+from apps.transactions_apps.models import (
+    Transactions, TopupsBank, BankDepositAccounts, 
+    TopupsCrypto, CardTransfers, BalanceMovements, 
+    CryptoWithdrawals, BankWithdrawals
+)
+from apps.cards_apps.models import Cards
+
+
 class TransactionService:
     
-    #TASK 1
     @staticmethod
-    def initiate_bank_topup(user_id: uuid.UUID, transfer_rail: str):
+    def initiate_bank_topup(user_id: str, transfer_rail: str):
         deposit_account = BankDepositAccounts.objects.filter(is_active=True).first()
         if not deposit_account:
             raise ValueError("Нет активных банковских реквизитов для пополнения.")
-        reference = f"REF-{user_id.hex[:6]}-{uuid.uuid4().hex[:4]}".upper()
+        reference = f"REF-{str(user_id)[:6]}-{uuid.uuid4().hex[:4]}".upper()
         with transaction.atomic():
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), 
-                user_id=user_id, 
-                type='top_up',
-                status='pending',
-                amount=Decimal('0.00'), currency='AED', created_at=timezone.now(), updated_at=timezone.now()
+                user_id=str(user_id), 
+                type='top_up', status='pending',
+                amount=Decimal('0.00'), currency='AED'
             )
             topup = TopupsBank.objects.create(
-                transaction=txn, user_id=user_id, transfer_rail=transfer_rail,
+                transaction=txn, user_id=str(user_id), transfer_rail=transfer_rail,
                 deposit_account=deposit_account, reference_value=reference,
                 instructions_snapshot={
-                    "iban": deposit_account.iban,
-                    "bank_name": deposit_account.bank_name,
-                    "beneficiary": deposit_account.beneficiary,
-                    "reference": reference
+                    "iban": deposit_account.iban, "bank_name": deposit_account.bank_name,
+                    "beneficiary": deposit_account.beneficiary, "reference": reference
                 }
             )
         return topup
 
-    #TASK 2
     @staticmethod
-    def initiate_crypto_topup(user_id: uuid.UUID, card_id: uuid.UUID, token: str, network: str):
+    def initiate_crypto_topup(user_id: str, card_id: uuid.UUID, token: str, network: str):
         deposit_address = f"0x{uuid.uuid4().hex}"
         with transaction.atomic():
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), 
-                user_id=user_id, 
-                type='top_up',
-                status='pending',
-                amount=Decimal('0.00'), currency='AED', created_at=timezone.now(), updated_at=timezone.now()
+                user_id=str(user_id), 
+                type='top_up', status='pending',
+                amount=Decimal('0.00'), currency='AED'
             )
             topup = TopupsCrypto.objects.create(
-                transaction=txn, user_id=user_id, card_id=card_id, token=token,
+                transaction=txn, user_id=str(user_id), card_id=card_id, token=token,
                 network=network, deposit_address=deposit_address, address_provider='internal',
                 qr_payload=f"{token}:{deposit_address}", min_amount=Decimal('10.00'), fee_percent=Decimal('1.50')
             )
         return topup
 
-    #TASK 3
     @staticmethod
-    def execute_card_transfer(sender_id: uuid.UUID, sender_card_id: uuid.UUID, receiver_card_number: str, amount: Decimal):
+    def execute_card_transfer(sender_id: str, sender_card_id: uuid.UUID, receiver_card_number: str, amount: Decimal):
         fee_amount = Decimal('0.00')
         total_deduction = amount + fee_amount
         with transaction.atomic():
@@ -74,29 +78,28 @@ class TransactionService:
                 raise ValueError("Активная карта получателя с таким номером не найдена.")
             if sender_card.balance < total_deduction:
                 raise ValueError("Недостаточно средств на карте для перевода.")
+            
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), 
-                user_id=sender_id, 
-                type='transfer_out',
-                status='completed',
-                amount=amount, currency='AED', created_at=timezone.now(), updated_at=timezone.now()
+                user_id=str(sender_id), 
+                type='transfer_out', status='completed',
+                amount=amount, currency='AED'
             )
             CardTransfers.objects.create(
-                transaction=txn, sender_user_id=sender_id, receiver_user_id=receiver_card.user_id,
+                transaction=txn, sender_user_id=str(sender_id), receiver_user_id=str(receiver_card.user_id),
                 sender_card_id=sender_card.id, receiver_card_id=receiver_card.id,
                 amount=amount, fee_amount=fee_amount, total_amount=total_deduction
             )
-            BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='sender', amount=total_deduction, type='debit')
-            BalanceMovements.objects.create(transaction=txn, user_id=receiver_card.user_id, account_type='receiver', amount=amount, type='credit')
+            BalanceMovements.objects.create(transaction=txn, user_id=str(sender_id), account_type='sender', amount=total_deduction, type='debit')
+            BalanceMovements.objects.create(transaction=txn, user_id=str(receiver_card.user_id), account_type='receiver', amount=amount, type='credit')
+            
             sender_card.balance -= total_deduction
             receiver_card.balance += amount
             sender_card.save(update_fields=['balance'])
             receiver_card.save(update_fields=['balance'])
         return txn
 
-    #TASK 4
     @staticmethod
-    def execute_crypto_withdrawal(user_id: uuid.UUID, card_id: uuid.UUID, token: str, network: str, to_address: str, amount_crypto: Decimal):
+    def execute_crypto_withdrawal(user_id: str, card_id: uuid.UUID, token: str, network: str, to_address: str, amount_crypto: Decimal):
         network_fee_crypto = Decimal('1.50')
         total_crypto = amount_crypto + network_fee_crypto
         exchange_rate = Decimal('3.67')
@@ -108,26 +111,24 @@ class TransactionService:
                 raise ValueError("Указанная карта для списания не найдена.")
             if card.balance < total_aed:
                 raise ValueError(f"Недостаточно средств. Необходимо: {total_aed} AED (включая комиссию сети).")
+            
             card.balance -= total_aed
             card.save(update_fields=['balance'])
 
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), 
-                user_id=user_id, 
-                type='withdrawal',
-                status='pending',
-                amount=total_aed, currency='AED', created_at=timezone.now(), updated_at=timezone.now()
+                user_id=str(user_id), 
+                type='withdrawal', status='pending',
+                amount=total_aed, currency='AED'
             )
             withdrawal = CryptoWithdrawals.objects.create(
-                transaction=txn, user_id=user_id, token=token, network=network, to_address=to_address,
+                transaction=txn, user_id=str(user_id), token=token, network=network, to_address=to_address,
                 amount_crypto=amount_crypto, fee_amount=network_fee_crypto, total_debit=total_crypto
             )
-            BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='sender', amount=total_aed, type='debit')
+            BalanceMovements.objects.create(transaction=txn, user_id=str(user_id), account_type='sender', amount=total_aed, type='debit')
         return withdrawal
 
-    #TASK 5
     @staticmethod
-    def execute_bank_withdrawal(user_id: uuid.UUID, card_id: uuid.UUID, iban: str, beneficiary_name: str, bank_name: str, amount_aed: Decimal):
+    def execute_bank_withdrawal(user_id: str, card_id: uuid.UUID, iban: str, beneficiary_name: str, bank_name: str, amount_aed: Decimal):
         fee_percent = Decimal('2.00')
         fee_amount = amount_aed * (fee_percent / Decimal('100.00'))
         total_debit = amount_aed + fee_amount
@@ -138,21 +139,21 @@ class TransactionService:
                 raise ValueError("Указанная карта для списания не найдена.")
             if card.balance < total_debit:
                 raise ValueError("Недостаточно средств для банковского перевода (с учетом комиссии 2%).")
+            
             card.balance -= total_debit
             card.save(update_fields=['balance'])
+            
             txn = Transactions.objects.create(
-                id=uuid.uuid4(), 
-                user_id=user_id, 
-                type='withdrawal',
-                status='pending',
-                amount=amount_aed, currency='AED', created_at=timezone.now(), updated_at=timezone.now()
+                user_id=str(user_id), 
+                type='withdrawal', status='pending',
+                amount=amount_aed, currency='AED'
             )
             withdrawal = BankWithdrawals.objects.create(
-                transaction=txn, user_id=user_id, beneficiary_iban=iban, beneficiary_name=beneficiary_name,
+                transaction=txn, user_id=str(user_id), beneficiary_iban=iban, beneficiary_name=beneficiary_name,
                 beneficiary_bank_name=bank_name, from_card_id=card_id, amount_aed=amount_aed,
                 fee_percent=fee_percent, fee_amount=fee_amount, total_debit=total_debit
             )
-            BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='sender', amount=total_debit, type='debit')
+            BalanceMovements.objects.create(transaction=txn, user_id=str(user_id), account_type='sender', amount=total_debit, type='debit')
         return withdrawal
     
 
