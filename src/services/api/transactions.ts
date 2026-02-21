@@ -436,6 +436,60 @@ export const fetchTransactionReceipt = async (
   }
 };
 
+// =============================================
+// INTERNAL TRANSFER (Swap between own accounts)
+// POST /api/v1/transactions/transfer/internal/
+// =============================================
+
+export interface InternalTransferRequest {
+  from_type: 'card' | 'bank' | 'crypto';
+  from_id: string;
+  to_type: 'card' | 'bank' | 'crypto';
+  to_id: string;
+  amount: string;
+}
+
+export interface InternalTransferResponse {
+  message: string;
+  transaction_id: string;
+  deducted_amount: string;
+  fee: string;
+  credited_amount: string;
+}
+
+/**
+ * Execute internal transfer (swap between own accounts)
+ * POST /api/v1/transactions/transfer/internal/
+ */
+export const submitInternalTransfer = async (
+  request: InternalTransferRequest
+): Promise<{ success: boolean; data?: InternalTransferResponse; error?: string }> => {
+  try {
+    const result = await apiRequest<InternalTransferResponse>(
+      `/transactions/transfer/internal/`,
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true // rawEndpoint
+    );
+
+    if (result.error) {
+      console.warn('[Transactions API] Internal transfer error:', result.error);
+      return { success: false, error: result.error.detail || result.error.message || 'Transfer failed' };
+    }
+
+    if (result.data?.transaction_id) {
+      return { success: true, data: result.data };
+    }
+
+    return { success: false, error: 'Unexpected response' };
+  } catch (error) {
+    console.error('[Transactions API] Internal transfer failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
 /**
  * Fetch single transaction details
  * Replace mock implementation with actual API call when backend is ready

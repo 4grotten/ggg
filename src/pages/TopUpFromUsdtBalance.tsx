@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, CreditCard, Wallet, ChevronRight, ArrowRightLeft, Check, Landmark } from "lucide-react";
+import { ArrowLeft, CreditCard, Wallet, ChevronRight, ArrowRightLeft, Check, Landmark, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -11,12 +11,13 @@ import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { useSettings } from "@/contexts/SettingsContext";
 import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { useCards } from "@/hooks/useCards";
+import { useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
 import { Card } from "@/types/card";
 import { useAuth } from "@/contexts/AuthContext";
+import { submitInternalTransfer } from "@/services/api/transactions";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Destination = "card" | "account";
-
-const USDT_BALANCE = 112000;
 
 const TopUpFromUsdtBalance = () => {
   const navigate = useNavigate();
@@ -24,6 +25,16 @@ const TopUpFromUsdtBalance = () => {
   const settings = useSettings();
   const { data: cardsData } = useCards();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  
+  // Fetch crypto wallets to get the from_id
+  const { data: cryptoWalletsData } = useCryptoWallets();
+  // Fetch bank accounts to get the to_id for "account" destination
+  const { data: bankAccountsData } = useBankAccounts();
+
+  const cryptoWalletId = cryptoWalletsData?.data?.[0]?.id;
+  const cryptoBalance = parseFloat(cryptoWalletsData?.data?.[0]?.balance || '0');
+  const bankAccountId = bankAccountsData?.data?.[0]?.id;
 
   const uid = user?.id?.toString() ?? "000";
   const beneficiaryName = user?.full_name || "—";
@@ -51,7 +62,7 @@ const TopUpFromUsdtBalance = () => {
       totalUsdt,
       rate,
       receiveAed,
-      insufficientBalance: totalUsdt > USDT_BALANCE,
+      insufficientBalance: totalUsdt > cryptoBalance,
     };
   }, [amountNum, settings]);
 
@@ -64,10 +75,50 @@ const TopUpFromUsdtBalance = () => {
     !calculation.insufficientBalance &&
     (destination === "account" || selectedCard);
 
-  const handleConfirm = () => {
-    if (!isReadyToConfirm) return;
-    toast.success(t("topUpUsdt.transferInitiated", "Перевод инициирован"));
-    navigate("/");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleConfirm = async () => {
+    if (!isReadyToConfirm || !cryptoWalletId) return;
+    
+    // Determine to_type and to_id based on destination
+    const toType = destination === "card" ? "card" : "bank";
+    const toId = destination === "card" ? selectedCard!.id : bankAccountId;
+    
+    if (!toId) {
+      toast.error(t("topUpUsdt.noDestinationAccount", "Счёт назначения не найден"));
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const result = await submitInternalTransfer({
+        from_type: "crypto",
+        from_id: cryptoWalletId,
+        to_type: toType,
+        to_id: toId,
+        amount: amountNum.toFixed(2),
+      });
+      
+      if (result.success && result.data) {
+        toast.success(t("topUpUsdt.transferSuccess", "Перевод выполнен успешно"), {
+          description: `${result.data.credited_amount} AED`,
+        });
+        
+        // Invalidate caches
+        queryClient.invalidateQueries({ queryKey: ['cards'] });
+        
+        navigate("/");
+      } else {
+        toast.error(t("topUpUsdt.transferFailed", "Ошибка перевода"), {
+          description: result.error,
+        });
+      }
+    } catch {
+      toast.error(t("topUpUsdt.transferFailed", "Ошибка перевода"));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSelectDestination = (dest: Destination) => {
@@ -106,7 +157,7 @@ const TopUpFromUsdtBalance = () => {
           </div>
           <p className="text-2xl font-bold">
             <span className="text-[#26A17B]">$</span>
-            {USDT_BALANCE.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
+            {cryptoBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
             <span className="text-sm text-muted-foreground">USDT</span>
           </p>
         </div>
@@ -398,10 +449,11 @@ const TopUpFromUsdtBalance = () => {
         <div className="fixed bottom-0 left-0 right-0 p-4 max-w-[800px] mx-auto">
           <button
             onClick={handleConfirm}
-            disabled={calculation?.insufficientBalance}
-            className="w-full py-4 rounded-2xl font-semibold text-base transition-all backdrop-blur-2xl disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-primary-foreground active:scale-[0.98]"
+            disabled={calculation?.insufficientBalance || isSubmitting}
+            className="w-full py-4 rounded-2xl font-semibold text-base transition-all backdrop-blur-2xl disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-primary-foreground active:scale-[0.98] flex items-center justify-center gap-2"
           >
-            {t("topUpUsdt.confirm", "Подтвердить перевод")}
+            {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
+            {isSubmitting ? t("topUpUsdt.processing", "Обработка...") : t("topUpUsdt.confirm", "Подтвердить перевод")}
           </button>
         </div>
       )}
