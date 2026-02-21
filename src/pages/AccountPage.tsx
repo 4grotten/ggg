@@ -64,6 +64,7 @@ const AccountPage = () => {
   const iban = account?.iban || "";
   const accountNumber = iban.slice(-13);
   const bankName = account?.bank_name || "EasyCard FZE";
+  const currency = account?.currency || "AED";
   const userName = account?.beneficiary || user?.full_name || "Account Holder";
   const nameParts = userName.trim().split(/\s+/);
   const firstName = nameParts[0] || "";
@@ -75,8 +76,8 @@ const AccountPage = () => {
     "VERSION:3.0",
     `N:${lastName};${firstName};;;`,
     `FN:${userName}`,
-    `ORG:${bankName}`,
-    `NOTE:IBAN: ${iban}\\nAccount: ${accountNumber}`,
+    `ORG:${iban}`,
+    `NOTE:IBAN: ${iban}\\nAccount: ${accountNumber}\\nBank: ${bankName}\\nCurrency: ${currency}`,
     `X-IBAN:${iban}`,
     `X-ACCOUNT:${accountNumber}`,
     "END:VCARD",
@@ -86,8 +87,6 @@ const AccountPage = () => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} ${t('accountPage.copied')}`);
   };
-
-  const currency = account?.currency || "AED";
   
   const handleShare = async () => {
     const shareText = `${userName}\n${bankName}\nIBAN: ${iban}\n${t('accountPage.currency')}: ${currency}`;
