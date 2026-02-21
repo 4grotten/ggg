@@ -619,6 +619,7 @@
     "settled": "Completado",
     "cardTransfer": "Transferencia de tarjeta",
     "cardTopUp": "Recarga de tarjeta",
+    "walletDeposit": "Depósito en billetera",
     "topUp": "Recarga",
     "annualCardFee": "Cuota anual de tarjeta",
     "stablecoinSend": "Envío de Stablecoin",
