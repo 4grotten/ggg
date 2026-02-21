@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, CreditCard, Landmark } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import aedCurrency from "@/assets/aed-currency.png";
@@ -79,9 +79,12 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
           <div className="flex gap-3">
             {cards.map((card) => (
               <div key={card.id} className="flex-1 rounded-xl bg-secondary/50 p-3">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
-                  {card.name}{card.lastFourDigits && <span className="ml-1 opacity-60">•{card.lastFourDigits}</span>}
-                </p>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                    {card.name}{card.lastFourDigits && <span className="ml-1 opacity-60">•{card.lastFourDigits}</span>}
+                  </p>
+                </div>
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={isVisible ? `visible-${card.id}` : `hidden-${card.id}`}
@@ -107,7 +110,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
         {/* AED Account Balance */}
         <div className="rounded-xl bg-secondary/50 p-3">
           <div className="flex items-center gap-1.5 mb-1">
-            <img src={aedCurrency} alt="AED" className="w-3.5 h-3.5 dark:invert dark:brightness-200" />
+            <Landmark className="w-3.5 h-3.5 text-muted-foreground" />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
               AED Account{accountIbanLast4 && <span className="ml-1 opacity-60">•{accountIbanLast4}</span>}
             </p>
