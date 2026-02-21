@@ -200,47 +200,19 @@ const handleClick = (transaction: Transaction) => {
                     </div>
                     <div className="text-left">
                       <p className="font-medium">{translateMerchant(transaction.merchant, transaction.type, t)}</p>
-                      <p className="text-sm text-muted-foreground flex items-center gap-1">
-                        {isCardTransfer && (transaction.recipientCard || transaction.senderCard) ? (
-                          <>
-                            <span>
-                              {transaction.senderCard 
-                                ? `${t("transactions.from")} •••• ${transaction.senderCard}`
-                                : `${t("transactions.to")} •••• ${transaction.recipientCard}`
-                              }
-                            </span>
-                            {transaction.status === 'processing' && (
-                              <span className="flex items-center gap-0.5 text-[#FFA000] ml-1">
-                                <Clock className="w-3 h-3" />
-                                <span className="text-xs">{t("transactions.processing")}</span>
-                              </span>
-                            )}
-                            {transaction.status === 'settled' && (
-                              <span className="flex items-center gap-0.5 text-green-500 ml-1">
-                                <CheckCircle className="w-3 h-3" />
-                                <span className="text-xs">{t("transactions.settled")}</span>
-                              </span>
-                            )}
-                          </>
-                        ) : isCryptoSend || isBankTransfer || isBankTransferIncoming || isTopup ? (
-                          <>
-                            <span>{transaction.time}</span>
-                            {transaction.status === 'processing' && (
-                              <span className="flex items-center gap-0.5 text-[#FFA000] ml-1">
-                                <Clock className="w-3 h-3" />
-                                <span className="text-xs">{t("transactions.processing")}</span>
-                              </span>
-                            )}
-                            {transaction.status === 'settled' && (
-                              <span className="flex items-center gap-0.5 text-green-500 ml-1">
-                                <CheckCircle className="w-3 h-3" />
-                                <span className="text-xs">{t("transactions.settled")}</span>
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          transaction.time
-                        )}
+                      <p className="text-sm text-muted-foreground">
+                        {isCardTransfer && transaction.senderCard
+                          ? `${t("transactions.from")} •••• ${transaction.senderCard}`
+                          : isCardTransfer && transaction.recipientCard
+                          ? `${t("transactions.to")} •••• ${transaction.recipientCard}`
+                          : isBankTransferIncoming && transaction.senderName
+                          ? `${t("transactions.from")} ${transaction.senderName}`
+                          : isBankTransfer && transaction.description
+                          ? transaction.description
+                          : isCryptoSend && transaction.description
+                          ? transaction.description
+                          : transaction.time
+                        }
                       </p>
                     </div>
                   </div>
@@ -248,6 +220,18 @@ const handleClick = (transaction: Transaction) => {
                     <p className={`font-semibold ${colorClass}`}>
                       {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                     </p>
+                    {transaction.status === 'processing' && (
+                      <p className="flex items-center justify-end gap-0.5 text-[#FFA000] text-xs mt-0.5">
+                        <Clock className="w-3 h-3" />
+                        {t("transactions.processing")}
+                      </p>
+                    )}
+                    {transaction.status === 'settled' && (
+                      <p className="flex items-center justify-end gap-0.5 text-green-500 text-xs mt-0.5">
+                        <CheckCircle className="w-3 h-3" />
+                        {t("transactions.settled")}
+                      </p>
+                    )}
                   </div>
                 </button>
               );
