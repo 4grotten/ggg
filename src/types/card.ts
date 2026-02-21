@@ -61,17 +61,23 @@ export interface IbanResponse {
 }
 
 // Wallet Summary from GET /cards/wallet/summary/
+export interface WalletSummaryPhysicalAccount {
+  iban: string;
+  balance: string;
+  currency: string;
+}
+
+export interface WalletSummaryCard {
+  id: string;
+  type: string;
+  card_number: string;
+  currency: string;
+  balance: string;
+}
+
 export interface WalletSummaryData {
-  bank_account: IbanAccount | null;
-  cards: Array<{
-    card_id: number;
-    type: string;
-    balance: number;
-    last_four_digits: string;
-    status: string;
-    name?: string;
-  }>;
-  total_balance_aed: number;
+  physical_account: WalletSummaryPhysicalAccount | null;
+  cards: WalletSummaryCard[];
 }
 
 export interface WalletSummaryResponse {
