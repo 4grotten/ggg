@@ -175,6 +175,56 @@ class TransactionService:
         BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=from_type, amount=total_deduction, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=to_type, amount=converted_amount, type='credit')
         return txn, converted_amount, fee
+
+    @staticmethod
+    @transaction.atomic
+    def execute_bank_to_card_transfer(user_id, from_bank_account_id, receiver_card_number, amount):
+        """Transfer from user's bank account (IBAN) to any card (including external)."""
+        amount = Decimal(str(amount))
+        FEE_PERCENT = Decimal('0.02')  # 2%
+
+        bank_account = BankDepositAccounts.objects.select_for_update().get(
+            id=from_bank_account_id, user_id=str(user_id)
+        )
+
+        receiver_card = Cards.objects.select_for_update().get(
+            card_number_encrypted=receiver_card_number
+        )
+
+        fee = (amount * FEE_PERCENT).quantize(Decimal('0.01'))
+        total_debit = amount + fee
+
+        if bank_account.balance < total_debit:
+            raise ValueError(f"Недостаточно средств на банковском счете. Нужно: {total_debit} AED (включая комиссию {fee} AED)")
+
+        bank_account.balance -= total_debit
+        bank_account.save()
+
+        receiver_card.balance += amount
+        receiver_card.save()
+
+        txn = Transactions.objects.create(
+            user_id=user_id,
+            type='bank_to_card_transfer',
+            status='completed',
+            amount=amount,
+            currency='AED',
+            fee=fee,
+            recipient_card=receiver_card_number,
+            description=f"Перевод с IBAN на карту {receiver_card_number[-4:]}"
+        )
+
+        BalanceMovements.objects.create(
+            transaction=txn, user_id=user_id, account_type='bank',
+            amount=total_debit, type='debit'
+        )
+        BalanceMovements.objects.create(
+            transaction=txn, user_id=receiver_card.user_id, account_type=receiver_card.type,
+            amount=amount, type='credit'
+        )
+
+        return txn, fee, total_debit
+
     @staticmethod
     def get_transaction_receipt(transaction_id):
         txn = Transactions.objects.get(id=transaction_id)
