@@ -88,21 +88,51 @@ const AccountPage = () => {
     toast.success(`${label} ${t('accountPage.copied')}`);
   };
   
+  const getAllDetailsText = () => {
+    return [
+      `${t('accountPage.beneficiary', 'Beneficiary')}: ${userName}`,
+      `${t('accountPage.bankName', 'Bank')}: ${bankName}`,
+      `IBAN: ${iban}`,
+      `${t('accountPage.accountNumber')}: ${accountNumber}`,
+      `${t('accountPage.currency')}: ${currency}`,
+    ].join('\n');
+  };
+
+  const handleCopyAll = () => {
+    navigator.clipboard.writeText(getAllDetailsText());
+    toast.success(t('accountPage.copiedToClipboard'));
+  };
+
   const handleShare = async () => {
-    const shareText = `${userName}\n${bankName}\nIBAN: ${iban}\n${t('accountPage.currency')}: ${currency}`;
-    const shareData = {
-      title: t('accountPage.title'),
-      text: shareText,
-    };
+    // Try sharing vCard file first, fallback to text
     try {
+      const vCardBlob = new Blob([vCardData], { type: 'text/vcard' });
+      const vCardFile = new File([vCardBlob], `${userName.replace(/\s+/g, '_')}.vcf`, { type: 'text/vcard' });
+      
+      if (navigator.share && navigator.canShare?.({ files: [vCardFile] })) {
+        await navigator.share({
+          title: userName,
+          files: [vCardFile],
+        });
+        return;
+      }
+    } catch {
+      // vCard file share not supported, fall through
+    }
+
+    // Fallback: share as text
+    try {
+      const shareData = {
+        title: t('accountPage.title'),
+        text: getAllDetailsText(),
+      };
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(iban);
-        toast.success(t('accountPage.copiedToClipboard'));
+        handleCopyAll();
       }
     } catch {
-      // user cancelled share
+      // user cancelled
     }
   };
 
@@ -218,7 +248,7 @@ const AccountPage = () => {
 
                     <div className="flex gap-3 w-full">
                       <button
-                        onClick={() => copyToClipboard(iban, "IBAN")}
+                        onClick={handleCopyAll}
                         className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-3 font-medium text-sm"
                       >
                         <Copy className="w-4 h-4" />
