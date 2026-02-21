@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock, ArrowUpRight, ArrowDownLeft, CreditCard, Building2, Wallet } from "lucide-react";
@@ -11,7 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { useWalletSummary, useBankAccounts } from "@/hooks/useCards";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
-import { useMergedTransactionGroups } from "@/hooks/useTransactions";
+import { useIbanTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Drawer,
@@ -44,23 +44,9 @@ const AccountPage = () => {
   
   const [qrOpen, setQrOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
-  const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
+  const { data: ibanTxData, isLoading: transactionsLoading } = useIbanTransactionGroups();
 
-  const transactionGroups = useMemo(() => {
-    const groups = transactionsData?.groups || [];
-    const bankTypes = ["transfer_in", "transfer_out", "bank_deposit", "bank_withdrawal"];
-    return groups
-      .map(group => ({
-        ...group,
-        transactions: group.transactions.filter(tx =>
-          bankTypes.includes(tx.type || "") ||
-          tx.description?.toLowerCase().includes("bank") ||
-          tx.description?.toLowerCase().includes("iban") ||
-          tx.merchant?.toLowerCase().includes("bank")
-        ),
-      }))
-      .filter(group => group.transactions.length > 0);
-  }, [transactionsData]);
+  const transactionGroups = ibanTxData || [];
 
   const iban = account?.iban || "";
   const accountNumber = iban.slice(-13);
