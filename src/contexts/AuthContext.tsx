@@ -160,15 +160,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const response = await getCurrentUser();
     
     if (response.status === 401) {
-      // 401 может быть из-за проблем с сетью между бэкендами
-      // НЕ удаляем токен — оставляем пользователя залогиненным с кэшированными данными
-      console.warn('[AuthContext] checkAuth: 401 from /users/me/ — keeping cached session');
+      // Токен невалидный — Apofiz подтвердил
+      console.warn('[AuthContext] checkAuth: 401 — token invalid, cleaning up');
+      
+      // Удаляем текущий аккаунт из сохранённых (если знаем id)
+      const cachedUserObj = cachedUser ? JSON.parse(cachedUser) : null;
+      if (cachedUserObj?.id) {
+        removeAccount(cachedUserObj.id);
+      }
+      
+      // Проверяем есть ли другие сохранённые аккаунты
+      const remainingAccounts = getSavedAccounts();
+      if (remainingAccounts.length > 0) {
+        // Переключаемся на следующий аккаунт
+        const next = remainingAccounts[0];
+        setAuthToken(next.token);
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(next.user));
+        setUser(next.user);
+        syncWithApofiz(next.token, next.user);
+        console.log('[AuthContext] Switched to next account:', next.user.id);
+        // Сбрасываем флаг чтобы перепроверить новый токен
+        hasCheckedRef.current = false;
+        setIsLoading(false);
+        return;
+      } else {
+        // Нет аккаунтов — стандартный logout
+        removeAuthToken();
+        clearApofizSync();
+        setUser(null);
+        setIsLoading(false);
+        const pathname = window.location.pathname;
+        if (!PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
+          navigate('/auth/phone', { replace: true });
+        }
+        return;
+      }
     } else if (response.data) {
       // Успешный ответ — обновляем данные пользователя
       setUser(response.data);
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
     }
-    // При любых ошибках — оставляем кэшированного пользователя
+    // При сетевых ошибках (status 0, 500) — оставляем кэшированного пользователя
     
     setIsLoading(false);
   }, [navigate]);
