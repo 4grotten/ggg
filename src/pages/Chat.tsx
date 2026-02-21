@@ -7,6 +7,7 @@ import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { AnimatedBotHead } from "@/components/chat/AnimatedBotHead";
 import { useAIChat } from "@/hooks/useAIChat";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -112,6 +113,7 @@ const Chat = () => {
           <h1 className="text-lg font-semibold">{t('chat.aiAssistant')}</h1>
           
           <div className="flex items-center gap-1">
+            <ThemeSwitcher />
             <LanguageSwitcher />
             {messages.length > 0 && (
               <Button variant="ghost" size="icon" onClick={clearChat}>
