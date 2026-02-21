@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock, ArrowUpRight, ArrowDownLeft, CreditCard, Building2, Wallet } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion } from "framer-motion";
@@ -43,6 +43,7 @@ const AccountPage = () => {
   } : null;
   
   const [qrOpen, setQrOpen] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
   const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
 
   const transactionGroups = useMemo(() => {
@@ -194,13 +195,57 @@ const AccountPage = () => {
                   <ArrowDownLeft className="w-4 h-4" />
                   {t('dashboard.topUp')}
                 </button>
-                <button
-                  onClick={() => navigate("/send-to-card")}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#007AFF] text-white py-2.5 font-medium text-sm hover:bg-[#0066DD] transition-colors"
-                >
-                  <ArrowUpRight className="w-4 h-4" />
-                  {t('dashboard.send')}
-                </button>
+                <Drawer open={sendOpen} onOpenChange={setSendOpen}>
+                  <DrawerTrigger asChild>
+                    <button
+                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#007AFF] text-white py-2.5 font-medium text-sm hover:bg-[#0066DD] transition-colors"
+                    >
+                      <ArrowUpRight className="w-4 h-4" />
+                      {t('dashboard.send')}
+                    </button>
+                  </DrawerTrigger>
+                  <DrawerContent className="pb-8">
+                    <div className="px-6 pt-4 pb-2 space-y-2">
+                      <h3 className="text-lg font-semibold text-center mb-4">{t('dashboard.send')}</h3>
+                      <button
+                        onClick={() => { setSendOpen(false); navigate("/send-to-card"); }}
+                        className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-secondary/70 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-[#007AFF]/10 flex items-center justify-center">
+                          <CreditCard className="w-5 h-5 text-[#007AFF]" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium">{t('send.toCard', 'На карту')}</p>
+                          <p className="text-xs text-muted-foreground">{t('send.toCardDesc', 'Перевод на карту')}</p>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => { setSendOpen(false); navigate("/send/bank"); }}
+                        className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-secondary/70 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-[#27AE60]/10 flex items-center justify-center">
+                          <Building2 className="w-5 h-5 text-[#27AE60]" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium">{t('send.toBank', 'На счёт')}</p>
+                          <p className="text-xs text-muted-foreground">{t('send.toBankDesc', 'Банковский перевод')}</p>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => { setSendOpen(false); navigate("/send/crypto"); }}
+                        className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-secondary/70 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-[#26A17B]/10 flex items-center justify-center">
+                          <Wallet className="w-5 h-5 text-[#26A17B]" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium">{t('send.toWallet', 'Кошелёк USDT TRC20')}</p>
+                          <p className="text-xs text-muted-foreground">{t('send.toWalletDesc', 'Перевод криптовалюты')}</p>
+                        </div>
+                      </button>
+                    </div>
+                  </DrawerContent>
+                </Drawer>
               </div>
             </motion.div>
 
