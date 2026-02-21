@@ -117,6 +117,7 @@ export async function sendOtp(phone_number: string, type: 'sms' | 'whatsapp' = '
   });
 }
 
+
 /**
  * Проверка OTP кода
  * POST /otp/verify/
