@@ -16,7 +16,7 @@ export const PeriodQuickSelect = ({ onSelect }: PeriodQuickSelectProps) => {
     <motion.div
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-wrap gap-2 px-4 py-2"
+      className="flex flex-wrap gap-2 pt-3 mt-3 border-t border-border/30"
     >
       {periods.map((p) => (
         <button
