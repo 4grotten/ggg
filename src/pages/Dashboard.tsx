@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 // API hooks
-import { useCards, useTotalBalance } from "@/hooks/useCards";
+import { useWalletSummary } from "@/hooks/useCards";
 import { useTransactionGroups } from "@/hooks/useTransactions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -75,14 +75,22 @@ const Dashboard = () => {
   const tabRefs = useRef<Map<FilterType, HTMLButtonElement>>(new Map());
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
-  // Fetch data from API
-  const { data: cardsData, isLoading: cardsLoading } = useCards();
-  const { data: balanceData, isLoading: balanceLoading } = useTotalBalance();
+  // Fetch wallet summary (IBAN + cards in one request)
+  const { data: walletData, isLoading: walletLoading } = useWalletSummary();
+
   const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
 
-  // Extract data with fallbacks
-  const cards = cardsData?.data || [];
-  const totalBalance = balanceData?.balance || 0;
+  // Map wallet summary to cards format
+  const cards = (walletData?.data?.cards || []).map(c => ({
+    id: c.id,
+    type: (c.type === 'metal' ? 'metal' : 'virtual') as 'metal' | 'virtual',
+    name: c.type === 'metal' ? 'Visa Metal' : 'Visa Virtual',
+    isActive: true,
+    balance: parseFloat(c.balance) || 0,
+    lastFourDigits: c.card_number?.slice(-4),
+  }));
+  const totalBalance = cards.reduce((sum, c) => sum + c.balance, 0);
+  const physicalAccount = walletData?.data?.physical_account;
   const transactionGroups = transactionsData?.groups || [];
 
   // Use transaction filters hook
@@ -174,12 +182,12 @@ const Dashboard = () => {
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 py-6 space-y-6 pb-28">
           {/* Balance - only for authenticated users */}
-          {isAuthenticated && !balanceLoading && (
+          {isAuthenticated && !walletLoading && (
             <AnimatedSection delay={0.1} preset="fadeUpScale">
               <BalanceCard balance={totalBalance} cards={cards} usdtBalance={112000} />
             </AnimatedSection>
           )}
-          {isAuthenticated && balanceLoading && (
+          {isAuthenticated && walletLoading && (
             <Skeleton className="h-32 w-full rounded-2xl" />
           )}
 
@@ -213,7 +221,7 @@ const Dashboard = () => {
           </AnimatedSection>
 
           {/* Cards */}
-          {cardsLoading ? (
+          {walletLoading ? (
             <div className="space-y-3">
               <Skeleton className="h-24 w-full rounded-2xl" />
               <Skeleton className="h-24 w-full rounded-2xl" />
