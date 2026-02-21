@@ -395,9 +395,14 @@ const AccountPage = () => {
               <div className="space-y-3">
                 {account?.beneficiary && (
                   <>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t('accountPage.beneficiary')}</p>
-                      <p className="text-sm font-medium">{account.beneficiary}</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t('accountPage.beneficiary')}</p>
+                        <p className="text-sm font-medium">{account.beneficiary}</p>
+                      </div>
+                      <button onClick={() => copyToClipboard(account.beneficiary!, t('accountPage.beneficiary'))} className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      </button>
                     </div>
                     <div className="h-px bg-border/50" />
                   </>
@@ -405,9 +410,14 @@ const AccountPage = () => {
 
                 {account?.bank_name && (
                   <>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t('accountPage.bankName')}</p>
-                      <p className="text-sm font-medium">{account.bank_name}</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t('accountPage.bankName')}</p>
+                        <p className="text-sm font-medium">{account.bank_name}</p>
+                      </div>
+                      <button onClick={() => copyToClipboard(account.bank_name!, t('accountPage.bankName'))} className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      </button>
                     </div>
                     <div className="h-px bg-border/50" />
                   </>
@@ -418,26 +428,33 @@ const AccountPage = () => {
                     <p className="text-xs text-muted-foreground">IBAN</p>
                     <p className="text-sm font-mono font-medium break-all">{iban}</p>
                   </div>
-                  <button
-                    onClick={() => copyToClipboard(iban, "IBAN")}
-                    className="p-2 rounded-lg hover:bg-secondary transition-colors"
-                  >
+                  <button onClick={() => copyToClipboard(iban, "IBAN")} className="p-2 rounded-lg hover:bg-secondary transition-colors">
                     <Copy className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </div>
 
                 <div className="h-px bg-border/50" />
 
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('accountPage.accountNumber')}</p>
-                  <p className="text-sm font-mono font-medium">{iban.slice(-13)}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('accountPage.accountNumber')}</p>
+                    <p className="text-sm font-mono font-medium">{iban.slice(-13)}</p>
+                  </div>
+                  <button onClick={() => copyToClipboard(iban.slice(-13), t('accountPage.accountNumber'))} className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                    <Copy className="w-4 h-4 text-muted-foreground" />
+                  </button>
                 </div>
 
                 <div className="h-px bg-border/50" />
 
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('accountPage.currency')}</p>
-                  <p className="text-sm font-medium">{account.currency || "AED"}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('accountPage.currency')}</p>
+                    <p className="text-sm font-medium">{account.currency || "AED"}</p>
+                  </div>
+                  <button onClick={() => copyToClipboard(account.currency || "AED", t('accountPage.currency'))} className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                    <Copy className="w-4 h-4 text-muted-foreground" />
+                  </button>
                 </div>
               </div>
             </motion.div>
