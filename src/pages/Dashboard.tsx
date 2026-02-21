@@ -243,8 +243,8 @@ const Dashboard = () => {
               accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0}
               accountIbanLast4={physicalAccount?.iban?.slice(-4)}
               usdtBalance={112000}
-              onAccountClick={() => navigate("/account")}
-              onWalletClick={() => navigate("/wallet")}
+              onAccountClick={isAuthenticated ? () => navigate("/account") : () => setAuthAlertOpen(true)}
+              onWalletClick={isAuthenticated ? () => navigate("/wallet") : () => setAuthAlertOpen(true)}
             />
           </AnimatedSection>
 
