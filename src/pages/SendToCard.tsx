@@ -17,67 +17,61 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CARD_TO_CARD_FEE_PERCENT } from "@/lib/fees";
+import { useWalletSummary } from "@/hooks/useCards";
+import { getAuthToken } from "@/services/api/apiClient";
 
-// Transfer request/response types
-interface TransferRequest {
-  fromCardId: string;
-  toCardNumber: string;
-  recipientName: string;
+// Transfer response from real API
+interface TransferApiResponse {
+  message: string;
+  transaction_id: string;
   amount: number;
-  fee: number;
-  totalAmount: number;
 }
 
-interface TransferResponse {
-  success: boolean;
-  transactionId?: string;
-  error?: string;
-}
-
-// API-ready function to submit card-to-card transfer
-// TODO: Replace with actual API call
-const submitTransfer = async (request: TransferRequest): Promise<TransferResponse> => {
-  console.log("Submitting transfer:", request);
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Mock successful response
-  return {
-    success: true,
-    transactionId: `TXN-${Date.now()}`
+// Submit transfer via cards-proxy to POST /transactions/transfer/card/
+const submitTransferApi = async (
+  senderCardId: string,
+  receiverCardNumber: string,
+  amount: string
+): Promise<{ success: boolean; transactionId?: string; error?: string }> => {
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent('/transactions/transfer/card/')}`;
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
   };
-  
-  // Example error response for testing:
-  // return { success: false, error: "Transfer failed. Please try again." };
+  const token = getAuthToken();
+  if (token) {
+    headers['x-backend-token'] = token;
+  }
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        sender_card_id: senderCardId,
+        receiver_card_number: receiverCardNumber,
+        amount,
+      }),
+    });
+    const data = await response.json();
+    if (response.ok && data.transaction_id) {
+      return { success: true, transactionId: data.transaction_id };
+    }
+    return { success: false, error: data.detail || data.message || data.error || `HTTP ${response.status}` };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Network error' };
+  }
 };
 
-// Type for user card
+// Type for user card (mapped from wallet summary)
 interface UserCard {
   id: string;
   name: string;
   lastFour: string;
   balance: number;
   type: "virtual" | "metal";
+  cardNumber: string;
 }
-
-// API-ready function to fetch user cards
-// TODO: Replace with actual API call
-const fetchUserCards = async (): Promise<{ success: boolean; cards: UserCard[]; error?: string }> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
-  // Mock successful response
-  const mockCards: UserCard[] = [
-    { id: "1", name: "Visa Virtual", lastFour: "7617", balance: 213757.49, type: "virtual" },
-    { id: "2", name: "Visa Metal", lastFour: "4521", balance: 256508.98, type: "metal" },
-  ];
-  
-  return { success: true, cards: mockCards };
-  
-  // Example error response for testing:
-  // return { success: false, cards: [], error: "Failed to load cards" };
-};
 
 // API-ready function to get recipient name by card number
 // TODO: Replace with actual API call
@@ -151,35 +145,39 @@ const SendToCard = () => {
   // Use referral balance or card balance
   const availableBalance = isReferralWithdrawal ? referralBalance : (selectedCard?.balance || 0);
   
-  // Fetch cards on mount for referral withdrawal, or on amount step for regular transfers
+  // Use wallet summary to get real cards
+  const { data: walletData, isLoading: isWalletLoading, error: walletError, refetch: refetchWallet } = useWalletSummary();
+
+  // Sync wallet data to local state
   useEffect(() => {
-    const shouldFetchCards = isReferralWithdrawal 
-      ? (step === "card" && userCards.length === 0)
-      : (step === "amount" && userCards.length === 0);
-      
-    if (shouldFetchCards) {
-      setIsLoadingCards(true);
-      setCardsError(null);
-      
-      fetchUserCards().then((result) => {
-        if (result.success && result.cards.length > 0) {
-          setUserCards(result.cards);
-          // For referral withdrawal, set destination card
-          if (isReferralWithdrawal) {
-            setSelectedDestinationCardId(result.cards[0].id);
-          } else {
-            setSelectedCardId(result.cards[0].id);
-          }
-        } else {
-          setCardsError(result.error || t('send.failedToLoadCards'));
-        }
-        setIsLoadingCards(false);
-      }).catch(() => {
-        setCardsError(t('send.failedToLoadCards'));
-        setIsLoadingCards(false);
-      });
+    if (walletData?.data?.cards && walletData.data.cards.length > 0) {
+      const mapped: UserCard[] = walletData.data.cards.map((c) => ({
+        id: c.id,
+        name: c.type === 'metal' ? 'Visa Metal' : 'Visa Virtual',
+        lastFour: c.card_number.slice(-4),
+        balance: parseFloat(c.balance),
+        type: (c.type === 'metal' ? 'metal' : 'virtual') as "virtual" | "metal",
+        cardNumber: c.card_number,
+      }));
+      setUserCards(mapped);
+      if (isReferralWithdrawal && !selectedDestinationCardId) {
+        setSelectedDestinationCardId(mapped[0].id);
+      } else if (!isReferralWithdrawal && !selectedCardId) {
+        setSelectedCardId(mapped[0].id);
+      }
+      setIsLoadingCards(false);
+    } else if (walletError) {
+      setCardsError(t('send.failedToLoadCards'));
+      setIsLoadingCards(false);
     }
-  }, [step, userCards.length, t, isReferralWithdrawal]);
+  }, [walletData, walletError]);
+
+  // Set loading from wallet query
+  useEffect(() => {
+    if (isWalletLoading) {
+      setIsLoadingCards(true);
+    }
+  }, [isWalletLoading]);
   const cleanCardNumber = cardNumber.replace(/\s/g, "");
   const isCardValid = cleanCardNumber.length === 16;
   
@@ -289,20 +287,12 @@ const SendToCard = () => {
     setTransferError(null);
     
     try {
-      const request: TransferRequest = {
-        fromCardId: isReferralWithdrawal ? "referral" : selectedCardId,
-        toCardNumber: isReferralWithdrawal 
-          ? `****${selectedDestinationCard?.lastFour}` 
-          : cardNumber.replace(/\s/g, ""),
-        recipientName: isReferralWithdrawal 
-          ? (selectedDestinationCard?.name || "") 
-          : (recipientName || ""),
-        amount: numericAmount,
-        fee: fee,
-        totalAmount: totalAmount
-      };
+      const senderCardId = isReferralWithdrawal ? "referral" : selectedCardId;
+      const receiverNumber = isReferralWithdrawal 
+        ? (selectedDestinationCard?.cardNumber || "") 
+        : cardNumber.replace(/\s/g, "");
       
-      const response = await submitTransfer(request);
+      const response = await submitTransferApi(senderCardId, receiverNumber, numericAmount.toFixed(2));
       
       if (response.success) {
         setTransferSuccess(true);
@@ -440,19 +430,7 @@ const SendToCard = () => {
                       <button 
                         onClick={() => {
                           setCardsError(null);
-                          setIsLoadingCards(true);
-                          fetchUserCards().then((result) => {
-                            if (result.success && result.cards.length > 0) {
-                              setUserCards(result.cards);
-                              setSelectedDestinationCardId(result.cards[0].id);
-                            } else {
-                              setCardsError(result.error || t('send.failedToLoadCards'));
-                            }
-                            setIsLoadingCards(false);
-                          }).catch(() => {
-                            setCardsError(t('send.failedToLoadCards'));
-                            setIsLoadingCards(false);
-                          });
+                          refetchWallet();
                         }}
                         className="text-sm text-primary hover:underline mt-1"
                       >
@@ -609,19 +587,7 @@ const SendToCard = () => {
                       <button 
                         onClick={() => {
                           setCardsError(null);
-                          setIsLoadingCards(true);
-                          fetchUserCards().then((result) => {
-                            if (result.success && result.cards.length > 0) {
-                              setUserCards(result.cards);
-                              setSelectedCardId(result.cards[0].id);
-                            } else {
-                              setCardsError(result.error || t('send.failedToLoadCards'));
-                            }
-                            setIsLoadingCards(false);
-                          }).catch(() => {
-                            setCardsError(t('send.failedToLoadCards'));
-                            setIsLoadingCards(false);
-                          });
+                          refetchWallet();
                         }}
                         className="text-sm text-primary hover:underline mt-1"
                       >
