@@ -563,6 +563,8 @@
     "debited": "تم الخصم",
     "bankTransfer": "تحويل مصرفي",
     "bankTransferIncoming": "تحويل مصرفي وارد",
+    "accountIncoming": "إيداع في الحساب",
+    "toAccount": "إلى الحساب",
     "iban": "رقم الآيبان",
     "bankName": "اسم البنك",
     "bankFee": "رسوم البنك",

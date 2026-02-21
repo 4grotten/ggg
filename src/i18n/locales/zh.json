@@ -569,6 +569,8 @@
     "debited": "已扣款",
     "bankTransfer": "银行转账",
     "bankTransferIncoming": "银行转账收入",
+    "accountIncoming": "账户入账",
+    "toAccount": "到账户",
     "iban": "IBAN",
     "bankName": "银行名称",
     "bankFee": "银行手续费",
