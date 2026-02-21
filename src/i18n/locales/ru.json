@@ -1768,5 +1768,19 @@
     "copiedToClipboard": "Скопировано в буфер обмена",
     "copy": "Копировать",
     "shareMessage": "Адрес USDT TRC20 кошелька: {{address}}"
+  },
+  "accountPage": {
+    "title": "AED Счёт",
+    "bankAccount": "Банковский счёт",
+    "share": "Поделиться",
+    "qrCode": "QR Код",
+    "details": "Реквизиты",
+    "accountNumber": "Номер счёта",
+    "currency": "Валюта",
+    "copied": "скопирован",
+    "copiedToClipboard": "Скопировано в буфер обмена",
+    "copy": "Копировать",
+    "shareMessage": "IBAN банковского счёта: {{iban}}",
+    "notFound": "Счёт не найден"
   }
 }

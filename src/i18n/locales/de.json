@@ -1676,5 +1676,19 @@
     "copiedToClipboard": "In die Zwischenablage kopiert",
     "copy": "Kopieren",
     "shareMessage": "USDT TRC20 Wallet-Adresse: {{address}}"
+  },
+  "accountPage": {
+    "title": "AED Konto",
+    "bankAccount": "Bankkonto",
+    "share": "Teilen",
+    "qrCode": "QR-Code",
+    "details": "Kontodaten",
+    "accountNumber": "Kontonummer",
+    "currency": "Währung",
+    "copied": "kopiert",
+    "copiedToClipboard": "In die Zwischenablage kopiert",
+    "copy": "Kopieren",
+    "shareMessage": "Bankkonto IBAN: {{iban}}",
+    "notFound": "Konto nicht gefunden"
   }
 }
