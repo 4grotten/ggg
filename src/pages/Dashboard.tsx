@@ -217,10 +217,12 @@ const Dashboard = () => {
             <PartnerCard onClick={() => setPartnerDrawerOpen(true)} />
           </AnimatedSection>
 
-          {/* Open New Card Button */}
-          <AnimatedSection delay={0.5} preset="fadeUpScale">
-            <OpenCardButton onClick={() => setOpenCardOpen(true)} />
-          </AnimatedSection>
+          {/* Open New Card Button - only for authenticated users */}
+          {isAuthenticated && (
+            <AnimatedSection delay={0.5} preset="fadeUpScale">
+              <OpenCardButton onClick={() => setOpenCardOpen(true)} />
+            </AnimatedSection>
+          )}
 
           {/* Cards */}
           {walletLoading ? (
@@ -237,16 +239,18 @@ const Dashboard = () => {
             </AnimatedSection>
           )}
 
-          {/* Account & Wallet Buttons */}
-          <AnimatedSection delay={0.65} preset="fadeUpScale">
-            <AccountWalletButtons
-              accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0}
-              accountIbanLast4={physicalAccount?.iban?.slice(-4)}
-              usdtBalance={112000}
-              onAccountClick={isAuthenticated ? () => navigate("/account") : () => setAuthAlertOpen(true)}
-              onWalletClick={isAuthenticated ? () => navigate("/wallet") : () => setAuthAlertOpen(true)}
-            />
-          </AnimatedSection>
+          {/* Account & Wallet Buttons - only for authenticated users */}
+          {isAuthenticated && (
+            <AnimatedSection delay={0.65} preset="fadeUpScale">
+              <AccountWalletButtons
+                accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0}
+                accountIbanLast4={physicalAccount?.iban?.slice(-4)}
+                usdtBalance={112000}
+                onAccountClick={() => navigate("/account")}
+                onWalletClick={() => navigate("/wallet")}
+              />
+            </AnimatedSection>
+          )}
 
           {/* Send to Card */}
           <AnimatedSection delay={0.7} preset="fadeUpScale">
