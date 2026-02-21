@@ -75,7 +75,7 @@ interface UserCard {
 }
 
 // Fetch recipient info from real API: GET /transactions/recipient-info/?card_number=...
-const getRecipientName = async (cardNumber: string): Promise<{ found: boolean; name: string | null; cardType?: string }> => {
+const getRecipientName = async (cardNumber: string): Promise<{ found: boolean; name: string | null; cardType?: string; avatarUrl?: string | null }> => {
   const cleanNumber = cardNumber.replace(/\s/g, "");
   if (cleanNumber.length !== 16) return { found: false, name: null };
 
@@ -94,7 +94,7 @@ const getRecipientName = async (cardNumber: string): Promise<{ found: boolean; n
 
     const data = await res.json();
     if (data.recipient_name) {
-      return { found: true, name: data.recipient_name, cardType: data.card_type };
+      return { found: true, name: data.recipient_name, cardType: data.card_type, avatarUrl: data.avatar_url || null };
     }
     return { found: false, name: null };
   } catch {
@@ -126,6 +126,7 @@ const SendToCard = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [recipientCardType, setRecipientCardType] = useState<string | null>(null);
+  const [recipientAvatarUrl, setRecipientAvatarUrl] = useState<string | null>(null);
   const [recipientNotFound, setRecipientNotFound] = useState(false);
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -200,23 +201,27 @@ const SendToCard = () => {
         if (result.found && result.name) {
           setRecipientName(result.name);
           setRecipientCardType(result.cardType || null);
+          setRecipientAvatarUrl(result.avatarUrl || null);
           setRecipientNotFound(false);
         } else {
           setRecipientName(null);
           setRecipientCardType(null);
+          setRecipientAvatarUrl(null);
           setRecipientNotFound(true);
         }
         setIsLoading(false);
       }).catch(() => {
-        setRecipientName(null);
-        setRecipientCardType(null);
-        setRecipientNotFound(true);
-        setIsLoading(false);
+          setRecipientName(null);
+          setRecipientCardType(null);
+          setRecipientAvatarUrl(null);
+          setRecipientNotFound(true);
+          setIsLoading(false);
       });
     } else {
-      setRecipientName(null);
-      setRecipientCardType(null);
-      setRecipientNotFound(false);
+          setRecipientName(null);
+          setRecipientCardType(null);
+          setRecipientAvatarUrl(null);
+          setRecipientNotFound(false);
     }
   }, [cardNumber, isCardValid]);
 
@@ -506,9 +511,13 @@ const SendToCard = () => {
                 {recipientName && !isLoading && (
                   <div className="bg-secondary rounded-xl p-4 flex items-center gap-3 animate-fade-in">
                     <div className="relative">
-                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-lg font-bold text-foreground uppercase">
-                        {recipientName.charAt(0)}
-                      </div>
+                      {recipientAvatarUrl ? (
+                        <img src={recipientAvatarUrl} alt={recipientName} className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-lg font-bold text-foreground uppercase">
+                          {recipientName.charAt(0)}
+                        </div>
+                      )}
                       <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center border-2 border-secondary">
                         <Check className="w-2.5 h-2.5 text-white" />
                       </div>
@@ -559,9 +568,13 @@ const SendToCard = () => {
               </div>
             ) : (
               <div className="bg-secondary rounded-xl p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#007AFF] flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 text-white" />
-                </div>
+                {recipientAvatarUrl ? (
+                  <img src={recipientAvatarUrl} alt={recipientName || ''} className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-[#007AFF] flex items-center justify-center">
+                    <CreditCard className="w-5 h-5 text-white" />
+                  </div>
+                )}
                 <div>
                   <p className="font-medium">{recipientName}</p>
                   <p className="text-sm text-muted-foreground no-underline decoration-transparent">{cardNumber}</p>
