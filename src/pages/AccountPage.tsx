@@ -189,7 +189,7 @@ const AccountPage = () => {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={() => navigate("/top-up/bank")}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-white py-2.5 font-medium text-sm hover:bg-emerald-600 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#27AE60] text-white py-2.5 font-medium text-sm hover:bg-[#219653] transition-colors"
                 >
                   <ArrowDownLeft className="w-4 h-4" />
                   {t('dashboard.topUp')}
