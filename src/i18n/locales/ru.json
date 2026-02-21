@@ -1774,6 +1774,8 @@
   "accountPage": {
     "title": "AED Счёт",
     "bankAccount": "Банковский счёт",
+    "beneficiary": "Получатель",
+    "bankName": "Банк",
     "share": "Поделиться",
     "qrCode": "QR Код",
     "details": "Реквизиты",

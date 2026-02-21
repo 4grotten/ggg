@@ -1682,6 +1682,8 @@
   "accountPage": {
     "title": "AED Hesap",
     "bankAccount": "Banka Hesabı",
+    "beneficiary": "Lehtar",
+    "bankName": "Banka",
     "share": "Paylaş",
     "qrCode": "QR Kod",
     "details": "Hesap Bilgileri",

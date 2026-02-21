@@ -1682,6 +1682,8 @@
   "accountPage": {
     "title": "AED Konto",
     "bankAccount": "Bankkonto",
+    "beneficiary": "Begünstigter",
+    "bankName": "Bank",
     "share": "Teilen",
     "qrCode": "QR-Code",
     "details": "Kontodaten",

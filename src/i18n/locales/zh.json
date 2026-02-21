@@ -1689,6 +1689,8 @@
   "accountPage": {
     "title": "AED 账户",
     "bankAccount": "银行账户",
+    "beneficiary": "收款人",
+    "bankName": "银行",
     "share": "分享",
     "qrCode": "二维码",
     "details": "账户详情",
