@@ -4,6 +4,7 @@ import { Trash2, ChevronLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatMessage } from "@/components/chat/ChatMessage";
+import { PeriodQuickSelect } from "@/components/chat/PeriodQuickSelect";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { AnimatedBotHead } from "@/components/chat/AnimatedBotHead";
 import { useAIChat } from "@/hooks/useAIChat";
@@ -179,9 +180,18 @@ const Chat = () => {
             </div>
           ) : (
             <AnimatePresence>
-              {messages.map((message, index) => (
-                <ChatMessage key={index} role={message.role} content={message.content} />
-              ))}
+              {messages.map((message, index) => {
+                const isLastAssistant = message.role === 'assistant' && index === messages.length - 1;
+                const hasTransactionData = isLastAssistant && /транзакц|операц|перевод|пополнен|AED/i.test(message.content);
+                return (
+                  <div key={index}>
+                    <ChatMessage role={message.role} content={message.content} />
+                    {hasTransactionData && !isLoading && (
+                      <PeriodQuickSelect onSelect={handleSendMessage} />
+                    )}
+                  </div>
+                );
+              })}
             </AnimatePresence>
           )}
           
