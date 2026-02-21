@@ -528,7 +528,7 @@ const SendToCard = () => {
                         <p className="font-semibold">{recipientName}</p>
                         {recipientCardType && (
                           <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground capitalize">
-                            {recipientCardType}
+                            {recipientCardType === 'virtual' ? 'Virtual Card' : recipientCardType === 'metal' ? 'Metal Card' : recipientCardType}
                           </span>
                         )}
                       </div>
