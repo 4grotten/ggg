@@ -48,9 +48,57 @@ const formatAmountInText = (text: string): ReactNode[] => {
   return parts.length > 0 ? parts : [text];
 };
 
-// Custom renderers for ReactMarkdown that highlight amounts
+function processChildren(children: ReactNode): ReactNode {
+  if (typeof children === "string") {
+    return formatAmountInText(children);
+  }
+  if (Array.isArray(children)) {
+    return children.map((child, i) => {
+      if (typeof child === "string") {
+        const parts = formatAmountInText(child);
+        return parts.length === 1 && parts[0] === child ? child : <span key={i}>{parts}</span>;
+      }
+      return child;
+    });
+  }
+  return children;
+}
+
+// Detect if a paragraph is a balance/card line (💳 or 💰)
+function isBalanceLine(children: ReactNode): boolean {
+  const text = extractText(children);
+  return /^(💳|💰)/.test(text.trim());
+}
+
+function isTotalLine(children: ReactNode): boolean {
+  const text = extractText(children);
+  return /^💰/.test(text.trim());
+}
+
+function extractText(children: ReactNode): string {
+  if (typeof children === "string") return children;
+  if (Array.isArray(children)) return children.map(extractText).join("");
+  if (children && typeof children === "object" && "props" in children) {
+    return extractText((children as any).props?.children);
+  }
+  return "";
+}
+
 const markdownComponents = {
   p: ({ children }: { children?: ReactNode }) => {
+    if (isBalanceLine(children)) {
+      const isTotal = isTotalLine(children);
+      return (
+        <div className={cn(
+          "my-1.5 px-3 py-2.5 rounded-xl text-sm leading-relaxed",
+          isTotal
+            ? "bg-primary/15 border border-primary/20"
+            : "bg-muted/80 border border-border/30"
+        )}>
+          {processChildren(children)}
+        </div>
+      );
+    }
     return <p className="my-1.5 text-sm leading-relaxed">{processChildren(children)}</p>;
   },
   strong: ({ children }: { children?: ReactNode }) => {
@@ -70,23 +118,6 @@ const markdownComponents = {
   },
   hr: () => <hr className="my-2 border-border/40" />,
 };
-
-// Process children to find text nodes and highlight amounts
-function processChildren(children: ReactNode): ReactNode {
-  if (typeof children === "string") {
-    return formatAmountInText(children);
-  }
-  if (Array.isArray(children)) {
-    return children.map((child, i) => {
-      if (typeof child === "string") {
-        const parts = formatAmountInText(child);
-        return parts.length === 1 && parts[0] === child ? child : <span key={i}>{parts}</span>;
-      }
-      return child;
-    });
-  }
-  return children;
-}
 
 export const ChatMessageContent = ({ content }: ChatMessageContentProps) => {
   const hasMarkdown = /\*\*|#{1,3}\s|^- /m.test(content);
