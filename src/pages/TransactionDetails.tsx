@@ -8,6 +8,7 @@ import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
 import { useWalletSummary } from "@/hooks/useCards";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Mock transaction data - in real app would come from API/state
 const mockTransactions: Record<string, {
@@ -77,6 +78,7 @@ const TransactionDetails = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data: walletData } = useWalletSummary();
+  const { user } = useAuth();
   const userIban = walletData?.data?.physical_account?.iban || "";
   
   // Scroll to top on mount
@@ -495,6 +497,14 @@ const TransactionDetails = () => {
                     </>
                   )}
                 </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                <span className="font-medium">{user?.full_name || "—"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                <span className="font-medium">EasyCard FZE</span>
               </div>
             </>
           ) : isBankTransfer ? (
