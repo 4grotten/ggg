@@ -407,14 +407,17 @@ const PhoneEntry = () => {
       
       try {
         const fullPhone = getFullPhoneNumber();
+        console.log('[PhoneEntry] handleContinue: fullPhone=', fullPhone);
         
         // First check if user already exists in database
         const checkResponse = await registerAuth(fullPhone);
+        console.log('[PhoneEntry] registerAuth response:', JSON.stringify(checkResponse));
         
         if (checkResponse.error) {
+          console.error('[PhoneEntry] registerAuth error:', checkResponse.error, 'status:', checkResponse.status);
           setShowError(true);
           setButtonState('error');
-          setErrorMessage(checkResponse.error.message || t("auth.phone.error"));
+          setErrorMessage(checkResponse.error.detail || checkResponse.error.message || t("auth.phone.error"));
           setTimeout(() => {
             setShowError(false);
             setButtonState('idle');
