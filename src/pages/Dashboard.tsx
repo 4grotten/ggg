@@ -184,7 +184,7 @@ const Dashboard = () => {
           {/* Balance - only for authenticated users */}
           {isAuthenticated && !walletLoading && (
             <AnimatedSection delay={0.1} preset="fadeUpScale">
-              <BalanceCard balance={totalBalance} cards={cards} usdtBalance={112000} accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0} />
+              <BalanceCard balance={totalBalance} cards={cards} usdtBalance={112000} accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0} accountIbanLast4={physicalAccount?.iban?.slice(-4)} />
             </AnimatedSection>
           )}
           {isAuthenticated && walletLoading && (

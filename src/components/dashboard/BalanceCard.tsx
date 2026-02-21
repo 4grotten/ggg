@@ -13,6 +13,7 @@ interface BalanceCardProps {
   cards?: Card[];
   usdtBalance?: number;
   accountBalance?: number;
+  accountIbanLast4?: string;
 }
 
 const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: number }) => {
@@ -47,7 +48,7 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
   return <>{formatBalance(displayValue)}</>;
 };
 
-export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0 }: BalanceCardProps) => {
+export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0, accountIbanLast4 }: BalanceCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
@@ -79,7 +80,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
             {cards.map((card) => (
               <div key={card.id} className="flex-1 rounded-xl bg-secondary/50 p-3">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
-                  {card.name}
+                  {card.name}{card.lastFourDigits && <span className="ml-1 opacity-60">•{card.lastFourDigits}</span>}
                 </p>
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -108,7 +109,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
           <div className="flex items-center gap-1.5 mb-1">
             <img src={aedCurrency} alt="AED" className="w-3.5 h-3.5 dark:invert dark:brightness-200" />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-              AED Account
+              AED Account{accountIbanLast4 && <span className="ml-1 opacity-60">•{accountIbanLast4}</span>}
             </p>
           </div>
           <AnimatePresence mode="wait">
@@ -136,7 +137,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
           <div className="flex items-center gap-1.5 mb-1">
             <UsdtIcon size={14} />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-              USDT TRC20
+              USDT TRC20<span className="ml-1 opacity-60">•TRC20</span>
             </p>
             <TronIcon size={10} className="opacity-50" />
           </div>
