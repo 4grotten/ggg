@@ -100,8 +100,9 @@ const WalletPage = () => {
 
           <Drawer open={qrOpen} onOpenChange={setQrOpen}>
             <DrawerTrigger asChild>
-              <button className="w-12 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors flex items-center justify-center">
-                <QrCode className="w-5 h-5 text-foreground" />
+              <button className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors py-3 font-medium text-sm">
+                <QrCode className="w-4 h-4" />
+                QR Code
               </button>
             </DrawerTrigger>
             <DrawerContent className="pb-8">
