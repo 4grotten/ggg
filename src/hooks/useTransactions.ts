@@ -38,13 +38,13 @@ export const useTransactions = (params?: FetchTransactionsParams) => {
  * Hook to fetch real transactions from API, returns groups
  */
 export const useApiTransactionGroups = () => {
-  // Backend has no GET /transactions/ list endpoint — disabled to avoid 404
+  const token = getAuthToken();
   return useQuery({
     queryKey: transactionKeys.apiGroups(),
     queryFn: fetchApiTransactionGroups,
-    enabled: false,
+    enabled: !!token,
     staleTime: 1000 * 60 * 5,
-    retry: 0,
+    retry: 1,
   });
 };
 
