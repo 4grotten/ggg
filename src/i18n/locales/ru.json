@@ -606,6 +606,7 @@
     "cardType": "Тип карты",
     "sender": "Отправитель",
     "fromCard": "С карты",
+    "fromWallet": "С кошелька",
     "toCard": "На карту",
     "recipient": "Получатель",
     "card": "Карта",

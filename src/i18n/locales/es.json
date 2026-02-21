@@ -537,6 +537,7 @@
     "cardType": "Tipo de tarjeta",
     "sender": "Remitente",
     "fromCard": "Desde tarjeta",
+    "fromWallet": "Desde billetera",
     "toCard": "A tarjeta",
     "recipient": "Destinatario",
     "card": "Tarjeta",

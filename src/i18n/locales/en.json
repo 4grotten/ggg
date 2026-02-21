@@ -620,6 +620,7 @@
     "cardType": "Card Type",
     "sender": "Sender",
     "fromCard": "From Card",
+    "fromWallet": "From Wallet",
     "toCard": "To Card",
     "recipient": "Recipient",
     "card": "Card",
