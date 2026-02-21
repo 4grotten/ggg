@@ -16,10 +16,16 @@ Deno.serve(async (req) => {
     const endpoint = url.searchParams.get("endpoint") || "/cards/balances/";
 
     const backendToken = req.headers.get("x-backend-token");
+    const contentType = req.headers.get("content-type") || "";
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
+    const headers: Record<string, string> = {};
+
+    // Set Content-Type: for multipart keep original, otherwise default to JSON for POST/PUT/PATCH
+    if (contentType.includes("multipart")) {
+      headers["Content-Type"] = contentType;
+    } else if (["POST", "PUT", "PATCH"].includes(req.method)) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (backendToken) {
       headers["Authorization"] = `Token ${backendToken}`;
@@ -36,9 +42,13 @@ Deno.serve(async (req) => {
     // Forward body for POST/PUT/PATCH
     if (["POST", "PUT", "PATCH"].includes(req.method)) {
       try {
-        const body = await req.text();
-        if (body) {
-          fetchOptions.body = body;
+        if (contentType.includes("multipart")) {
+          fetchOptions.body = await req.arrayBuffer();
+        } else {
+          const body = await req.text();
+          if (body) {
+            fetchOptions.body = body;
+          }
         }
       } catch (_) {
         // no body
@@ -52,7 +62,7 @@ Deno.serve(async (req) => {
       status: response.status,
       headers: {
         ...corsHeaders,
-        "Content-Type": "application/json",
+        "Content-Type": response.headers.get("Content-Type") || "application/json",
       },
     });
   } catch (error) {

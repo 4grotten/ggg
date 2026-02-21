@@ -6,6 +6,7 @@ export type FilterType = "all" | "income" | "expenses" | "transfers";
 export const isIncomeTransaction = (tx: Transaction): boolean => {
   return tx.type === "topup" || 
          tx.type === "bank_transfer_incoming" || 
+         tx.type === "crypto_deposit" ||
          (tx.type === "card_transfer" && !!tx.senderCard);
 };
 

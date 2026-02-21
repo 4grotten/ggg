@@ -9,6 +9,38 @@ import {
   TransactionType 
 } from '@/types/transaction';
 import { buildApiUrl, ENDPOINTS } from './config';
+import { apiRequest, getAuthToken } from './apiClient';
+
+// === Receipt type returned by GET /transactions/<id>/receipt/ ===
+export interface TransactionReceipt {
+  transaction_id: string;
+  status: string;
+  date_time: string;
+  type: string;
+  operation: string;
+  // Common
+  amount?: number;
+  fee?: number;
+  // Crypto fields
+  to_address_mask?: string;
+  from_address_mask?: string;
+  network_and_token?: string;
+  amount_crypto?: number;
+  tx_hash?: string | null;
+  // Card transfer fields
+  sender_card_mask?: string;
+  receiver_card_mask?: string;
+  recipient_name?: string;
+  // Bank fields
+  iban_mask?: string;
+  beneficiary_name?: string;
+  bank_name?: string;
+  amount_aed?: number;
+  fee_amount?: number;
+  total_debit_aed?: number;
+  // Generic catch-all
+  [key: string]: unknown;
+}
 
 // Mock data - will be replaced with actual API calls
 const mockTransactionGroups: TransactionGroup[] = [
@@ -16,16 +48,17 @@ const mockTransactionGroups: TransactionGroup[] = [
     date: "17.01.2026",
     totalSpend: 0,
     transactions: [
-      { id: "23", merchant: "Bank Transfer", time: "14:30", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", type: "bank_transfer_incoming" as TransactionType, status: "settled" },
-      { id: "22", merchant: "Top up", time: "11:15", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as TransactionType, status: "settled" },
+      { id: "24", merchant: "Wallet Deposit", time: "16:00", amountUSDT: 5000.00, amountLocal: 5000.00, localCurrency: "USDT", color: "#22C55E", type: "crypto_deposit" as TransactionType, status: "settled", description: "TRx8K...Wp4mN2" },
+      { id: "23", merchant: "Bank Transfer", time: "14:30", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", type: "bank_transfer_incoming" as TransactionType, status: "settled", senderName: "KAMIEV RENAT", description: "AE07 0331 0100 4900 1234 001" },
+      { id: "22", merchant: "Top up", time: "11:15", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as TransactionType, status: "settled", description: "TFVFkt...TxhX9L" },
     ],
   },
   {
     date: "12.01.2026",
     totalSpend: 3273.20,
     transactions: [
-      { id: "21", merchant: "Bank Transfer", time: "19:45", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", type: "bank_transfer" as TransactionType, status: "settled" },
-      { id: "20", merchant: "Stablecoin Send", time: "18:20", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", type: "crypto_withdrawal" as TransactionType, status: "settled" },
+      { id: "21", merchant: "Bank Transfer", time: "19:45", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", type: "bank_transfer" as TransactionType, status: "settled", description: "AE07 0331 0100 4900 5678 002" },
+      { id: "20", merchant: "Stablecoin Send", time: "18:20", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", type: "crypto_withdrawal" as TransactionType, status: "settled", description: "TQn9Y...3jM5rL" },
       { id: "19", merchant: "Card Transfer", time: "16:45", amountUSDT: 50.00, amountLocal: 50.00, localCurrency: "AED", color: "#22C55E", type: "card_transfer", senderName: "ANNA JOHNSON", senderCard: "8834", status: "settled" },
       { id: "17", merchant: "Card Transfer", time: "15:30", amountUSDT: 250.00, amountLocal: 250.00, localCurrency: "AED", color: "#007AFF", type: "card_transfer", recipientCard: "4521", status: "processing" },
       { id: "18", merchant: "Card Transfer", time: "12:15", amountUSDT: 100.00, amountLocal: 100.00, localCurrency: "AED", color: "#007AFF", type: "card_transfer", recipientCard: "8834", status: "settled" },
@@ -52,7 +85,7 @@ const mockTransactionGroups: TransactionGroup[] = [
     totalSpend: 22.06,
     transactions: [
       { id: "5", merchant: "CELLAR", time: "20:48", amountUSDT: 22.06, amountLocal: 79.00, localCurrency: "AED", color: "#EAB308" },
-      { id: "6", merchant: "Top up", time: "20:46", amountUSDT: 194.10, amountLocal: 200.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
+      { id: "6", merchant: "Top up", time: "20:46", amountUSDT: 194.10, amountLocal: 200.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled", description: "TFVFkt...TxhX9L" },
     ],
   },
   {
@@ -65,7 +98,7 @@ const mockTransactionGroups: TransactionGroup[] = [
       { id: "10", merchant: "CELLAR", time: "19:53", amountUSDT: 116.54, amountLocal: 114.81, localCurrency: "$", color: "#22C55E" },
       { id: "11", merchant: "Service CEO", time: "07:58", amountUSDT: 11.59, amountLocal: 41.50, localCurrency: "AED", color: "#06B6D4" },
       { id: "12", merchant: "RESTAURANT", time: "03:21", amountUSDT: 424.81, amountLocal: 418.53, localCurrency: "AED", color: "#EF4444" },
-      { id: "13", merchant: "Top up", time: "02:30", amountUSDT: 494.10, amountLocal: 500.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
+      { id: "13", merchant: "Top up", time: "02:30", amountUSDT: 494.10, amountLocal: 500.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled", description: "TFVFkt...TxhX9L" },
     ],
   },
   {
@@ -80,7 +113,7 @@ const mockTransactionGroups: TransactionGroup[] = [
     totalSpend: 204.55,
     transactions: [
       { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", type: "card_activation" },
-      { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
+      { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled", description: "TFVFkt...TxhX9L" },
     ],
   },
 ];
@@ -174,6 +207,185 @@ export const fetchTransactionGroups = async (
       groups: [],
       error: error instanceof Error ? error.message : 'Failed to fetch transactions',
     };
+  }
+};
+
+// =============================================
+// REAL API CALLS (via cards-proxy → ueasycard.com)
+// =============================================
+
+// Raw transaction from backend GET /transactions/
+export interface ApiTransaction {
+  id: string;
+  type: string;
+  status: string;
+  amount: number;
+  currency: string;
+  created_at: string;
+  description?: string;
+  recipient_name?: string;
+  sender_name?: string;
+  card_mask?: string;
+  to_address_mask?: string;
+  from_address_mask?: string;
+  network_and_token?: string;
+  operation?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Fetch real transactions list from backend
+ * GET /api/v1/transactions/
+ */
+export const fetchApiTransactions = async (): Promise<{
+  data: ApiTransaction[] | null;
+  error: string | null;
+}> => {
+  try {
+    const result = await apiRequest<ApiTransaction[] | { results: ApiTransaction[] }>(
+      `/transactions/`,
+      { method: 'GET' },
+      true
+    );
+    
+    if (result.error) {
+      console.warn('[Transactions API] List error:', result.error);
+      return { data: null, error: result.error.detail || result.error.message || 'Failed to fetch' };
+    }
+    
+    // Handle both array and paginated response formats
+    const transactions = Array.isArray(result.data)
+      ? result.data
+      : (result.data as any)?.results || [];
+    
+    return { data: transactions, error: null };
+  } catch (error) {
+    console.error('[Transactions API] List fetch failed:', error);
+    return { data: null, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
+/**
+ * Convert API transaction to local Transaction format
+ */
+export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
+  const date = new Date(tx.created_at);
+  const time = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  const dateStr = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+  
+  // Map backend type to frontend type
+  const typeMap: Record<string, TransactionType> = {
+    'topup': 'topup',
+    'bank_topup': 'topup',
+    'crypto_topup': 'topup',
+    'card_transfer': 'card_transfer',
+    'withdrawal': 'crypto_withdrawal',
+    'crypto_withdrawal': 'crypto_withdrawal',
+    'bank_withdrawal': 'bank_transfer',
+    'bank_transfer': 'bank_transfer',
+    'bank_transfer_incoming': 'bank_transfer_incoming',
+    'crypto_deposit': 'crypto_deposit',
+    'payment': 'payment',
+    'card_payment': 'payment',
+  };
+  
+  const mappedType = typeMap[tx.type] || 'payment' as TransactionType;
+  const isIncoming = tx.amount > 0;
+  
+  // Color based on type
+  const colorMap: Record<string, string> = {
+    'topup': '#22C55E',
+    'crypto_deposit': '#22C55E',
+    'bank_transfer_incoming': '#22C55E',
+    'card_transfer': isIncoming ? '#22C55E' : '#007AFF',
+    'crypto_withdrawal': '#10B981',
+    'bank_transfer': '#8B5CF6',
+    'payment': '#3B82F6',
+  };
+  
+  // Merchant name based on operation or type
+  const merchantMap: Record<string, string> = {
+    'topup': 'Top up',
+    'bank_topup': 'Top up',
+    'crypto_topup': 'Top up',
+    'card_transfer': 'Card Transfer',
+    'withdrawal': 'Stablecoin Send',
+    'crypto_withdrawal': 'Stablecoin Send',
+    'bank_withdrawal': 'Bank Transfer',
+    'bank_transfer': 'Bank Transfer',
+    'bank_transfer_incoming': 'Bank Transfer',
+    'crypto_deposit': 'Wallet Deposit',
+  };
+  
+  return {
+    id: `api_${tx.id}`,
+    merchant: (tx.operation as string) || merchantMap[tx.type] || tx.type,
+    time,
+    amountUSDT: Math.abs(tx.amount),
+    amountLocal: Math.abs(tx.amount),
+    localCurrency: tx.currency || 'AED',
+    color: colorMap[mappedType] || '#3B82F6',
+    type: mappedType,
+    status: tx.status === 'completed' ? 'settled' : tx.status as any,
+    senderName: tx.sender_name as string,
+    recipientCard: tx.card_mask as string,
+    description: tx.description,
+    createdAt: tx.created_at,
+    metadata: { apiDate: dateStr, fromApi: true },
+  };
+};
+
+/**
+ * Fetch real transactions and group by date
+ */
+export const fetchApiTransactionGroups = async (): Promise<TransactionGroup[]> => {
+  const { data, error } = await fetchApiTransactions();
+  if (error || !data || data.length === 0) return [];
+  
+  const mapped = data.map(mapApiTransactionToLocal);
+  
+  // Group by date
+  const groupMap = new Map<string, Transaction[]>();
+  for (const tx of mapped) {
+    const dateStr = (tx.metadata as any)?.apiDate || 'Unknown';
+    if (!groupMap.has(dateStr)) groupMap.set(dateStr, []);
+    groupMap.get(dateStr)!.push(tx);
+  }
+  
+  const groups: TransactionGroup[] = [];
+  for (const [date, transactions] of groupMap) {
+    const totalSpend = transactions
+      .filter(t => !['topup', 'crypto_deposit', 'bank_transfer_incoming'].includes(t.type || ''))
+      .reduce((sum, t) => sum + t.amountLocal, 0);
+    groups.push({ date, totalSpend, transactions });
+  }
+  
+  return groups;
+};
+
+/**
+ * Fetch transaction receipt from backend
+ * GET /api/v1/transactions/<transaction_id>/receipt/
+ */
+export const fetchTransactionReceipt = async (
+  transactionId: string
+): Promise<{ data: TransactionReceipt | null; error: string | null }> => {
+  try {
+    const result = await apiRequest<TransactionReceipt>(
+      `/transactions/${transactionId}/receipt/`,
+      { method: 'GET' },
+      true // rawEndpoint — skip /accounts prefix
+    );
+    
+    if (result.error) {
+      console.warn('[Transactions API] Receipt error:', result.error);
+      return { data: null, error: result.error.detail || result.error.message || 'Failed to fetch receipt' };
+    }
+    
+    return { data: result.data, error: null };
+  } catch (error) {
+    console.error('[Transactions API] Receipt fetch failed:', error);
+    return { data: null, error: error instanceof Error ? error.message : 'Network error' };
   }
 };
 

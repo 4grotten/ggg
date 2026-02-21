@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock } from "lucide-react";
+import { Clock, Landmark, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -37,8 +37,8 @@ import {
 } from "@/components/ui/alert-dialog";
 
 // API hooks
-import { useCards, useTotalBalance } from "@/hooks/useCards";
-import { useTransactionGroups } from "@/hooks/useTransactions";
+import { useWalletSummary } from "@/hooks/useCards";
+import { useMergedTransactionGroups } from "@/hooks/useTransactions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
@@ -48,6 +48,8 @@ import { useTransactionFilters, FilterType } from "@/hooks/useTransactionFilters
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { preloadTgs } from "@/components/ui/TgsPlayer";
 import partnerNetworkHero from "@/assets/partner-network-hero.png";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
+import { AccountWalletButtons } from "@/components/dashboard/AccountWalletButtons";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -75,14 +77,22 @@ const Dashboard = () => {
   const tabRefs = useRef<Map<FilterType, HTMLButtonElement>>(new Map());
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
-  // Fetch data from API
-  const { data: cardsData, isLoading: cardsLoading } = useCards();
-  const { data: balanceData, isLoading: balanceLoading } = useTotalBalance();
-  const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
+  // Fetch wallet summary (IBAN + cards in one request)
+  const { data: walletData, isLoading: walletLoading } = useWalletSummary();
 
-  // Extract data with fallbacks
-  const cards = cardsData?.data || [];
-  const totalBalance = balanceData?.balance || 0;
+  const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
+
+  // Map wallet summary to cards format
+  const cards = (walletData?.data?.cards || []).map(c => ({
+    id: c.id,
+    type: (c.type === 'metal' ? 'metal' : 'virtual') as 'metal' | 'virtual',
+    name: c.type === 'metal' ? 'Visa Metal' : 'Visa Virtual',
+    isActive: true,
+    balance: parseFloat(c.balance) || 0,
+    lastFourDigits: c.card_number?.slice(-4),
+  }));
+  const totalBalance = cards.reduce((sum, c) => sum + c.balance, 0);
+  const physicalAccount = walletData?.data?.physical_account;
   const transactionGroups = transactionsData?.groups || [];
 
   // Use transaction filters hook
@@ -174,12 +184,12 @@ const Dashboard = () => {
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="px-4 py-6 space-y-6 pb-28">
           {/* Balance - only for authenticated users */}
-          {isAuthenticated && !balanceLoading && (
+          {isAuthenticated && !walletLoading && (
             <AnimatedSection delay={0.1} preset="fadeUpScale">
-              <BalanceCard balance={totalBalance} cards={cards} usdtBalance={112000} />
+              <BalanceCard balance={totalBalance} cards={cards} usdtBalance={112000} accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0} accountIbanLast4={physicalAccount?.iban?.slice(-4)} />
             </AnimatedSection>
           )}
-          {isAuthenticated && balanceLoading && (
+          {isAuthenticated && walletLoading && (
             <Skeleton className="h-32 w-full rounded-2xl" />
           )}
 
@@ -213,7 +223,7 @@ const Dashboard = () => {
           </AnimatedSection>
 
           {/* Cards */}
-          {cardsLoading ? (
+          {walletLoading ? (
             <div className="space-y-3">
               <Skeleton className="h-24 w-full rounded-2xl" />
               <Skeleton className="h-24 w-full rounded-2xl" />
@@ -226,6 +236,17 @@ const Dashboard = () => {
               />
             </AnimatedSection>
           )}
+
+          {/* Account & Wallet Buttons */}
+          <AnimatedSection delay={0.65} preset="fadeUpScale">
+            <AccountWalletButtons
+              accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0}
+              accountIbanLast4={physicalAccount?.iban?.slice(-4)}
+              usdtBalance={112000}
+              onAccountClick={() => navigate("/account")}
+              onWalletClick={() => navigate("/wallet")}
+            />
+          </AnimatedSection>
 
           {/* Send to Card */}
           <AnimatedSection delay={0.7} preset="fadeUpScale">

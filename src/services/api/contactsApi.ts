@@ -63,17 +63,22 @@ export async function uploadContactAvatar(id: string, file: File) {
   const formData = new FormData();
   formData.append('file', file);
 
-  // We need a custom request because Content-Type must be multipart
   const { getAuthToken } = await import('./apiClient');
-  const { APOFIZ_API_URL } = await import('@/config/apofiz');
+  
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent(`/accounts/contacts/${id}/avatar/`)}`;
 
-  const headers: HeadersInit = {};
+  const headers: Record<string, string> = {
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+  };
   const token = getAuthToken();
   if (token) {
-    headers['Authorization'] = `Token ${token}`;
+    headers['x-backend-token'] = token;
   }
 
-  const response = await fetch(`${APOFIZ_API_URL}/contacts/${id}/avatar/`, {
+  const response = await fetch(url, {
     method: 'POST',
     headers,
     body: formData,

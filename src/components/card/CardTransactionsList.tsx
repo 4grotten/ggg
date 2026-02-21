@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { Plus, Ban, ArrowUpRight, Clock, CheckCircle, Send, Landmark } from "lucide-react";
+import { Plus, Ban, ArrowUpRight, Clock, CheckCircle, Send, Landmark, CreditCard } from "lucide-react";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { useTranslation } from "react-i18next";
 import { Transaction, TransactionGroup } from "@/types/transaction";
 
 interface CardTransactionsListProps {
   groups: TransactionGroup[];
   onTransactionClick?: (transaction: Transaction) => void;
+  walletView?: boolean;
 }
 
 const getInitial = (name: string) => name.charAt(0).toUpperCase();
@@ -63,6 +65,7 @@ const translateMerchant = (merchant: string, type: string | undefined, t: (key: 
 export const CardTransactionsList = ({
   groups,
   onTransactionClick,
+  walletView = false,
 }: CardTransactionsListProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -94,17 +97,22 @@ const handleClick = (transaction: Transaction) => {
     const isCardActivation = transaction.type === "card_activation";
     const isCardTransfer = transaction.type === "card_transfer";
     const isCryptoSend = transaction.type === "crypto_withdrawal";
+    const isCryptoDeposit = transaction.type === "crypto_deposit";
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
     const isIncomingTransfer = isCardTransfer && transaction.senderCard;
     const isOutgoingTransfer = isCardTransfer && transaction.recipientCard;
     const isProcessing = transaction.status === "processing";
-    const prefix = isTopup || isIncomingTransfer || isBankTransferIncoming ? "+" : isOutgoingTransfer || isCryptoSend || isBankTransfer ? "-" : "";
+    // In wallet view, topup = outgoing (wallet → card), so it's negative
+    const walletTopupOutgoing = walletView && isTopup;
+    const prefix = (isTopup && !walletView) || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? "+" : walletTopupOutgoing || isOutgoingTransfer || isCryptoSend || isBankTransfer ? "-" : "";
     
     let colorClass = "";
     if (isProcessing && (isCardTransfer || isBankTransfer || isCryptoSend)) {
       colorClass = "text-[#FFA000]";
-    } else if (isTopup || isIncomingTransfer || isBankTransferIncoming) {
+    } else if (walletTopupOutgoing) {
+      colorClass = "text-[#007AFF]";
+    } else if (isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit) {
       colorClass = "text-green-500";
     } else if (isDeclined) {
       colorClass = "text-red-500";
@@ -112,7 +120,7 @@ const handleClick = (transaction: Transaction) => {
       colorClass = "text-[#007AFF]";
     }
     
-    return { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isBankTransfer, isBankTransferIncoming };
+    return { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming };
   };
 
   return (
@@ -125,7 +133,7 @@ const handleClick = (transaction: Transaction) => {
           {/* Date Header */}
           <div className="flex items-center justify-between px-4">
             <span className="font-semibold text-base">{formatDateNumeric(group.date)}</span>
-            {group.totalSpend > 0 && (
+            {group.totalSpend > 0 && !walletView && (
               <span className="text-[#007AFF] text-sm font-medium">
                 -{group.totalSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
               </span>
@@ -135,7 +143,7 @@ const handleClick = (transaction: Transaction) => {
           {/* Transactions */}
           <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
             {group.transactions.map((transaction, index) => {
-              const { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isBankTransfer, isBankTransferIncoming } = formatAmount(transaction);
+              const { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming } = formatAmount(transaction);
               const isTopup = transaction.type === "topup";
               const isDeclined = transaction.type === "declined";
 
@@ -173,7 +181,7 @@ const handleClick = (transaction: Transaction) => {
                       ) : isCryptoSend ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                          style={{ backgroundColor: "#10B981" }}
+                          style={{ backgroundColor: "#007AFF" }}
                         >
                           <Send className="w-5 h-5" />
                         </div>
@@ -184,12 +192,26 @@ const handleClick = (transaction: Transaction) => {
                         >
                           <ArrowUpRight className={`w-5 h-5 ${isIncomingTransfer ? "rotate-180" : ""}`} />
                         </div>
+                      ) : isCryptoDeposit ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#22C55E" }}
+                        >
+                          <UsdtIcon size={22} />
+                        </div>
+                      ) : walletView && isTopup ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#007AFF" }}
+                        >
+                          <CreditCard className="w-5 h-5" />
+                        </div>
                       ) : (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: transaction.color }}
                         >
-                          {isTopup ? <Plus className="w-5 h-5" /> : getInitial(transaction.merchant)}
+                          {isTopup ? <CreditCard className="w-5 h-5" /> : getInitial(transaction.merchant)}
                         </div>
                       )}
                       {isDeclined && (
@@ -198,56 +220,65 @@ const handleClick = (transaction: Transaction) => {
                         </div>
                       )}
                     </div>
-                    <div className="text-left">
-                      <p className="font-medium">{translateMerchant(transaction.merchant, transaction.type, t)}</p>
-                      <p className="text-sm text-muted-foreground flex items-center gap-1">
-                        {isCardTransfer && (transaction.recipientCard || transaction.senderCard) ? (
-                          <>
-                            <span>
-                              {transaction.senderCard 
-                                ? `${t("transactions.from")} •••• ${transaction.senderCard}`
-                                : `${t("transactions.to")} •••• ${transaction.recipientCard}`
-                              }
-                            </span>
-                            {transaction.status === 'processing' && (
-                              <span className="flex items-center gap-0.5 text-[#FFA000] ml-1">
-                                <Clock className="w-3 h-3" />
-                                <span className="text-xs">{t("transactions.processing")}</span>
-                              </span>
-                            )}
-                            {transaction.status === 'settled' && (
-                              <span className="flex items-center gap-0.5 text-green-500 ml-1">
-                                <CheckCircle className="w-3 h-3" />
-                                <span className="text-xs">{t("transactions.settled")}</span>
-                              </span>
-                            )}
-                          </>
-                        ) : isCryptoSend || isBankTransfer || isBankTransferIncoming || isTopup ? (
-                          <>
-                            <span>{transaction.time}</span>
-                            {transaction.status === 'processing' && (
-                              <span className="flex items-center gap-0.5 text-[#FFA000] ml-1">
-                                <Clock className="w-3 h-3" />
-                                <span className="text-xs">{t("transactions.processing")}</span>
-                              </span>
-                            )}
-                            {transaction.status === 'settled' && (
-                              <span className="flex items-center gap-0.5 text-green-500 ml-1">
-                                <CheckCircle className="w-3 h-3" />
-                                <span className="text-xs">{t("transactions.settled")}</span>
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          transaction.time
-                        )}
+                    <div className="text-left min-w-0 flex-1">
+                      <p className="font-medium">
+                        {walletView && isTopup 
+                          ? t("transactions.cardTopUp") 
+                          : isCryptoDeposit
+                          ? t("transactions.walletDeposit")
+                          : isIncomingTransfer
+                          ? t("transactions.cardReceived")
+                          : translateMerchant(transaction.merchant, transaction.type, t)
+                        }
+                      </p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {transaction.time}
+                        {isCardTransfer && transaction.senderCard
+                          ? ` · ${t("transactions.from")} •••• ${transaction.senderCard}`
+                          : isCardTransfer && transaction.recipientCard
+                          ? ` · ${t("transactions.to")} •••• ${transaction.recipientCard}`
+                          : isBankTransferIncoming && transaction.senderName
+                          ? ` · ${t("transactions.from")} ${transaction.senderName}`
+                          : isBankTransfer && transaction.description
+                          ? ` · ${t("transactions.to")} ${transaction.description}`
+                          : isCryptoSend && transaction.description
+                          ? ` · ${t("transactions.to")} ${transaction.description}`
+                          : isCryptoDeposit && transaction.description
+                          ? ` · ${t("transactions.from")} ${transaction.description}`
+                          : isTopup && transaction.description
+                          ? ` · ${t("transactions.from")} ${transaction.description}`
+                          : ""
+                        }
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`font-semibold ${colorClass}`}>
-                      {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
-                    </p>
+                  <div className="text-right shrink-0">
+                    {walletView ? (
+                      <>
+                        <p className={`font-semibold ${colorClass}`}>
+                          {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+                        </p>
+                      </>
+                    ) : (
+                      <p className={`font-semibold ${colorClass}`}>
+                        {prefix}{(isCryptoDeposit || isCryptoSend) ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {(isCryptoDeposit || isCryptoSend) ? 'USDT' : 'AED'}
+                      </p>
+                    )}
+                    {transaction.status === 'processing' && (
+                      <p className="flex items-center justify-end gap-0.5 text-[#FFA000] text-xs mt-0.5">
+                        <Clock className="w-3 h-3" />
+                        {t("transactions.processing")}
+                      </p>
+                    )}
+                    {transaction.status === 'settled' && (
+                      <p className="flex items-center justify-end gap-0.5 text-green-500 text-xs mt-0.5">
+                        <CheckCircle className="w-3 h-3" />
+                        {t("transactions.settled")}
+                      </p>
+                    )}
                   </div>
                 </button>
               );

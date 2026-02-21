@@ -40,6 +40,12 @@ export const useSavedContacts = () => {
 
     try {
       const res = await apiFetchContacts(1, 200);
+      // Backend may not have contacts endpoint yet — treat 404 as empty list
+      if (res.status === 404) {
+        setContacts([]);
+        setIsLoading(false);
+        return;
+      }
       if (res.error) throw new Error(res.error.detail || res.error.message || 'Fetch error');
 
       const list = res.data?.list ?? [];

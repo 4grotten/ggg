@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, CreditCard, Landmark } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import aedCurrency from "@/assets/aed-currency.png";
@@ -12,6 +12,8 @@ interface BalanceCardProps {
   currency?: string;
   cards?: Card[];
   usdtBalance?: number;
+  accountBalance?: number;
+  accountIbanLast4?: string;
 }
 
 const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: number }) => {
@@ -46,7 +48,7 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
   return <>{formatBalance(displayValue)}</>;
 };
 
-export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0 }: BalanceCardProps) => {
+export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0, accountIbanLast4 }: BalanceCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
@@ -77,9 +79,12 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
           <div className="flex gap-3">
             {cards.map((card) => (
               <div key={card.id} className="flex-1 rounded-xl bg-secondary/50 p-3">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
-                  {card.name}
-                </p>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                    {card.name}{card.lastFourDigits && <span className="ml-1 opacity-60">•{card.lastFourDigits}</span>}
+                  </p>
+                </div>
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={isVisible ? `visible-${card.id}` : `hidden-${card.id}`}
@@ -102,12 +107,40 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
           </div>
         )}
 
+        {/* AED Account Balance */}
+        <div className="rounded-xl bg-secondary/50 p-3">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Landmark className="w-3.5 h-3.5 text-muted-foreground" />
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+              AED Account{accountIbanLast4 && <span className="ml-1 opacity-60">•{accountIbanLast4}</span>}
+            </p>
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={isVisible ? "aed-visible" : "aed-hidden"}
+              className="text-sm font-semibold flex items-center gap-1"
+              initial={{ opacity: 0, filter: "blur(6px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(6px)" }}
+              transition={{ duration: 0.3 }}
+            >
+              {isVisible ? (
+                <>
+                  <img src={aedCurrency} alt="AED" className="w-4 h-4 dark:invert dark:brightness-200" />
+                  <AnimatedNumber key={`${animationKey}-aed-account`} value={accountBalance} duration={800} />
+                  <span className="text-xs text-muted-foreground ml-1">AED</span>
+                </>
+              ) : "••••••"}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+
         {/* USDT TRC20 Balance */}
         <div className="rounded-xl bg-secondary/50 p-3">
           <div className="flex items-center gap-1.5 mb-1">
             <UsdtIcon size={14} />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-              USDT TRC20
+              USDT TRC20<span className="ml-1 opacity-60">•TRC20</span>
             </p>
             <TronIcon size={10} className="opacity-50" />
           </div>
@@ -130,6 +163,8 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
             </motion.span>
           </AnimatePresence>
         </div>
+
+
 
         {/* Total balance */}
         <div className="flex items-center justify-between">

@@ -1,12 +1,12 @@
 /**
  * API Client для Apofiz Backend
- * Uses production URL in production, test URL in development
+ * All requests are proxied through the cards-proxy edge function to avoid CORS issues.
  * Формат токена: Token <40-символьный-hex-ключ>
  */
 
-import { APOFIZ_API_URL } from '@/config/apofiz';
-
-const API_BASE_URL = APOFIZ_API_URL;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const PROXY_URL = `${SUPABASE_URL}/functions/v1/cards-proxy`;
 
 // Ключ для хранения токена в localStorage
 export const AUTH_TOKEN_KEY = 'auth_token';
@@ -58,20 +58,28 @@ export const isAuthenticated = (): boolean => {
  */
 export async function apiRequest<T = unknown>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  /** If true, endpoint is used as-is (no /accounts prefix) */
+  rawEndpoint = false
 ): Promise<ApiResponse<T>> {
-  const url = `${API_BASE_URL}${endpoint}`;
+  // Build proxy URL: cards-proxy?endpoint=/accounts/login/
+  // The endpoint already starts with / (e.g. /login/, /otp/send/)
+  // APOFIZ_API_URL was /api/v1/accounts, so we prepend /accounts to the endpoint
+  const proxyEndpoint = rawEndpoint ? endpoint : `/accounts${endpoint}`;
+  const url = `${PROXY_URL}?endpoint=${encodeURIComponent(proxyEndpoint)}`;
   
   // Подготовка заголовков
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
     ...options.headers,
   };
   
-  // Добавляем токен авторизации, если есть
+  // Добавляем токен авторизации через x-backend-token header
   const token = getAuthToken();
   if (token) {
-    (headers as Record<string, string>)['Authorization'] = `Token ${token}`;
+    (headers as Record<string, string>)['x-backend-token'] = token;
   }
 
   // --- Internal helpers (debug + safer 401 handling) ---

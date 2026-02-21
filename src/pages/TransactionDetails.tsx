@@ -1,12 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark } from "lucide-react";
+import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
+import { useWalletSummary } from "@/hooks/useCards";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTransactionReceipt } from "@/hooks/useTransactions";
+import { getAuthToken } from "@/services/api/apiClient";
 
 // Mock transaction data - in real app would come from API/state
 const mockTransactions: Record<string, {
@@ -21,7 +25,7 @@ const mockTransactions: Record<string, {
   cardLast4: string;
   exchangeRate: number;
   status: "settled" | "pending" | "failed" | "processing";
-  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "bank_transfer" | "bank_transfer_incoming";
+  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming";
   fromAddress?: string;
   tokenNetwork?: string;
   kartaFee?: number;
@@ -37,6 +41,7 @@ const mockTransactions: Record<string, {
   senderCardFull?: string;
   toCardFull?: string;
   toWalletAddress?: string;
+  fromWalletAddress?: string;
   networkFee?: number;
   recipientIban?: string;
   recipientBankName?: string;
@@ -63,16 +68,28 @@ const mockTransactions: Record<string, {
   "17": { id: "17", merchant: "Card Transfer", time: "03:30 PM", date: "12.01.2026", amountUSDT: 250.00, amountLocal: 250.00, localCurrency: "AED", color: "#007AFF", cardLast4: "7617", exchangeRate: 1, status: "processing", type: "card_transfer", recipientCard: "4521", recipientCardFull: "4532 8921 0045 4521", recipientName: "JOHN SMITH", transferFee: 3.75, fromCardFull: "4147 2034 5567 7617", cardType: "Virtual" },
   "18": { id: "18", merchant: "Card Transfer", time: "12:15 PM", date: "12.01.2026", amountUSDT: 100.00, amountLocal: 100.00, localCurrency: "AED", color: "#007AFF", cardLast4: "4521", exchangeRate: 1, status: "settled", type: "card_transfer", recipientCard: "8834", recipientCardFull: "4111 2233 4455 8834", recipientName: "ANNA JOHNSON", transferFee: 1.50, fromCardFull: "4532 8921 0045 4521", cardType: "Metal" },
   "19": { id: "19", merchant: "Card Transfer", time: "04:45 PM", date: "12.01.2026", amountUSDT: 50.00, amountLocal: 50.00, localCurrency: "AED", color: "#22C55E", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "card_transfer", senderName: "ANNA JOHNSON", senderCard: "8834", senderCardFull: "4111 2233 4455 8834", toCardFull: "4147 2034 5567 7617", cardType: "Virtual" },
-  "20": { id: "20", merchant: "Stablecoin Send", time: "06:20 PM", date: "12.01.2026", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", cardLast4: "7617", exchangeRate: 3.69, status: "settled", type: "crypto_send", toWalletAddress: "TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7", tokenNetwork: "USDT, Tron (TRC20)", networkFee: 2.80, cardType: "Virtual" },
+  "20": { id: "20", merchant: "Stablecoin Send", time: "06:20 PM", date: "12.01.2026", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", cardLast4: "", exchangeRate: 3.69, status: "settled", type: "crypto_send", toWalletAddress: "TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7", fromWalletAddress: "TQn9Y4sBbhMczK8dXgU5dBMkR2YJb3jM5r", tokenNetwork: "USDT, Tron (TRC20)", networkFee: 5.90, transferFee: 2.80 },
   "21": { id: "21", merchant: "Bank Transfer", time: "07:45 PM", date: "12.01.2026", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "bank_transfer", recipientName: "EMIRATES TRADING LLC", recipientIban: "AE07 0331 2345 6789 0123 456", recipientBankName: "Emirates NBD", bankFee: 37.80, cardType: "Virtual" },
   "22": { id: "22", merchant: "Top up", time: "11:15 AM", date: "17.01.2026", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", cardLast4: "7617", exchangeRate: 3.65, status: "settled", type: "topup", fromAddress: "TFVFktvwmaEnMVh6ZxZq2rvmLePfTxhX9L", tokenNetwork: "USDT, Tron (TRC20)", kartaFee: 5.90, cardType: "Virtual" },
   "23": { id: "23", merchant: "Bank Transfer", time: "02:30 PM", date: "17.01.2026", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", cardLast4: "7617", exchangeRate: 1, status: "settled", type: "bank_transfer_incoming", senderName: "AL MAJID TRADING LLC", senderIban: "AE21 0331 2345 6789 0654 321", senderBankName: "Abu Dhabi Commercial Bank", cardType: "Virtual" },
+  "24": { id: "24", merchant: "Wallet Deposit", time: "04:00 PM", date: "17.01.2026", amountUSDT: 5000.00, amountLocal: 5000.00, localCurrency: "USDT", color: "#22C55E", cardLast4: "", exchangeRate: 1, status: "settled", type: "crypto_deposit", fromAddress: "TRx8Kp2mN4vD9qL7wE3jF6hY5tR8Wp4mN2", toWalletAddress: "TQn9Y4sBbhMczK8dXgU5dBMkR2YJb3jM5r", tokenNetwork: "USDT, Tron (TRC20)" },
 };
 
 const TransactionDetails = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const { data: walletData } = useWalletSummary();
+  const { user } = useAuth();
+  const userIban = walletData?.data?.physical_account?.iban || "";
+  const hasToken = !!getAuthToken();
+  
+  // Fetch receipt from real API (only if user is authenticated)
+  const { data: receiptResult, isLoading: receiptLoading } = useTransactionReceipt(
+    id || '',
+    hasToken && !!id
+  );
+  const receipt = receiptResult?.data || null;
   
   // Scroll to top on mount
   useEffect(() => {
@@ -81,32 +98,13 @@ const TransactionDetails = () => {
   
   const transaction = id ? mockTransactions[id] : null;
 
-  if (!transaction) {
-    return (
-      <MobileLayout
-        header={
-          <button 
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span className="text-sm">{t("transaction.back")}</span>
-          </button>
-        }
-      >
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">{t("transaction.notFound")}</p>
-        </div>
-      </MobileLayout>
-    );
-  }
-
   const getInitial = (name: string) => name.charAt(0).toUpperCase();
   const isTopup = transaction.type === "topup";
   const isDeclined = transaction.type === "declined";
   const isCardActivation = transaction.type === "card_activation";
   const isCardTransfer = transaction.type === "card_transfer";
   const isCryptoSend = transaction.type === "crypto_send";
+  const isCryptoDeposit = transaction.type === "crypto_deposit";
   const isBankTransfer = transaction.type === "bank_transfer";
   const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
   const isIncomingTransfer = isCardTransfer && !!transaction.senderCard;
@@ -184,7 +182,7 @@ const TransactionDetails = () => {
           ) : isCryptoSend ? (
             <motion.div 
               className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
-              style={{ backgroundColor: "#10B981" }}
+              style={{ backgroundColor: "#007AFF" }}
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
@@ -199,6 +197,29 @@ const TransactionDetails = () => {
                 }}
               >
                 <Send className="w-10 h-10" strokeWidth={2.5} />
+              </motion.div>
+            </motion.div>
+          ) : isCryptoDeposit ? (
+            <motion.div 
+              className="w-20 h-20 rounded-full flex items-center justify-center text-white"
+              style={{ backgroundColor: "#22C55E" }}
+              initial={{ scale: 1 }}
+              animate={{ 
+                scale: [1, 1.1, 1],
+                rotate: [0, 90, 90]
+              }}
+              transition={{
+                duration: 0.6,
+                ease: "easeOut",
+                times: [0, 0.4, 1]
+              }}
+            >
+              <motion.div
+                initial={{ rotate: 0, scale: 0 }}
+                animate={{ rotate: 90, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
+              >
+                <Plus className="w-10 h-10" strokeWidth={2.5} />
               </motion.div>
             </motion.div>
           ) : isCardActivation ? (
@@ -364,11 +385,11 @@ const TransactionDetails = () => {
           )}
           
           <div className="space-y-1">
-            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer ? 'text-[#007AFF]' : ''}`}>
-              {isTopup || isIncomingTransfer || isBankTransferIncoming ? '+' : '-'}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">AED</span>
+            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer ? 'text-[#007AFF]' : ''}`}>
+              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? '+' : '-'}{isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isBankTransferIncoming ? t('transaction.bankTransferIncoming') : isBankTransfer ? t('transaction.bankTransfer') : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isBankTransfer ? t('transaction.bankTransfer') : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
@@ -434,14 +455,46 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.bankName")}</span>
                 <span className="font-medium">{transaction.senderBankName}</span>
               </div>
+              <div className="flex items-start justify-between">
+                <span className="text-muted-foreground">{t("transaction.toAccount")}</span>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => navigate("/account")}
+                    className="font-medium text-[#007AFF] hover:underline transition-colors text-right text-sm"
+                  >
+                    {userIban 
+                      ? (showToCard ? userIban : `${userIban.slice(0, 4)}••••${userIban.slice(-4)}`)
+                      : "AED Account"
+                    }
+                  </button>
+                  {userIban && (
+                    <>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(userIban);
+                          toast.success(t("toast.copied", { label: "IBAN" }));
+                        }}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setShowToCard(!showToCard)}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.toCard")}</span>
-                <button 
-                  onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                  className="font-medium text-[#007AFF] hover:underline transition-colors"
-                >
-                  Visa {transaction.cardType} ••{transaction.cardLast4}
-                </button>
+                <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                <span className="font-medium">{user?.full_name || "—"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                <span className="font-medium">EasyCard FZE</span>
               </div>
             </>
           ) : isBankTransfer ? (
@@ -516,15 +569,84 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
                 <span className="font-medium">{transaction.tokenNetwork}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
-                <button 
-                  onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                  className="font-medium text-[#007AFF] hover:underline transition-colors"
-                >
-                  Visa {transaction.cardType} ••{transaction.cardLast4}
-                </button>
+              <div className="flex items-start justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromWallet")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                    {showFromAddress ? transaction.fromWalletAddress : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-6)}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(transaction.fromWalletAddress || '');
+                      toast.success(t("toast.addressCopied"));
+                    }}
+                    className="p-1 rounded-md hover:bg-muted transition-colors"
+                  >
+                    <Copy className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  <button 
+                    onClick={() => setShowFromAddress(!showFromAddress)}
+                    className="p-1 rounded-md hover:bg-muted transition-colors"
+                  >
+                    {showFromAddress ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
+                  </button>
+                </div>
               </div>
+            </>
+          ) : isCryptoDeposit ? (
+            <>
+              <div className="flex items-start justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromAddress")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                    {showFromAddress ? transaction.fromAddress : `${transaction.fromAddress?.slice(0, 6)}...${transaction.fromAddress?.slice(-6)}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(transaction.fromAddress || '');
+                      toast.success(t("toast.addressCopied"));
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setShowFromAddress(!showFromAddress)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                <span className="font-medium">{transaction.tokenNetwork}</span>
+              </div>
+              {transaction.toWalletAddress && (
+                <div className="flex items-start justify-between">
+                  <span className="text-muted-foreground">{t("transaction.toWallet")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                      {showWalletAddress ? transaction.toWalletAddress : `${transaction.toWalletAddress.slice(0, 6)}...${transaction.toWalletAddress.slice(-6)}`}
+                    </span>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(transaction.toWalletAddress || '');
+                        toast.success(t("toast.addressCopied"));
+                      }}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => setShowWalletAddress(!showWalletAddress)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showWalletAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
             </>
           ) : isTopup ? (
             <>
@@ -742,16 +864,31 @@ const TransactionDetails = () => {
                 <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
-                <span className="font-medium">1 USDT = 3.69 AED</span>
+                <span className="text-muted-foreground">{t("transaction.fee")} (1%)</span>
+                <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.networkFee")}</span>
-                <span className="font-medium">{transaction.networkFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT (1%)</span>
+                <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
+                <span className="font-medium">{transaction.networkFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-muted-foreground">{t("transaction.debited")}</span>
-                <span className="font-semibold text-[#007AFF]">-{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                <span className="text-muted-foreground">{t("transaction.total")}</span>
+                <span className="font-semibold text-[#007AFF]">-{(transaction.amountUSDT + (transaction.transferFee || 0) + (transaction.networkFee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+              </div>
+            </>
+          ) : isCryptoDeposit ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.received")}</span>
+                <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                <span className="font-medium">{transaction.tokenNetwork}</span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-muted-foreground">{t("transaction.credited")}</span>
+                <span className="font-semibold text-green-500">+{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
             </>
           ) : isTopup ? (
@@ -827,6 +964,104 @@ const TransactionDetails = () => {
               <span className="font-medium">{t("transaction.transactionDetails")}</span>
               <ExternalLink className="w-5 h-5 text-muted-foreground" />
             </button>
+          </div>
+        )}
+
+        {/* Receipt from API */}
+        {hasToken && (
+          <div className="bg-secondary rounded-2xl p-4 space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <FileText className="w-4 h-4 text-muted-foreground" />
+              <span className="font-medium text-sm">{t("transaction.receipt", "Чек / Квитанция")}</span>
+            </div>
+            {receiptLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : receipt ? (
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.status")}</span>
+                  <span className="font-medium capitalize">{receipt.status}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.operation", "Операция")}</span>
+                  <span className="font-medium">{receipt.operation}</span>
+                </div>
+                {receipt.amount_crypto != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.amount")}</span>
+                    <span className="font-medium">{receipt.amount_crypto} {receipt.network_and_token || 'USDT'}</span>
+                  </div>
+                )}
+                {receipt.amount != null && !receipt.amount_crypto && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.amount")}</span>
+                    <span className="font-medium">{receipt.amount} AED</span>
+                  </div>
+                )}
+                {receipt.fee != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fee")}</span>
+                    <span className="font-medium">{receipt.fee} {receipt.amount_crypto != null ? 'USDT' : 'AED'}</span>
+                  </div>
+                )}
+                {receipt.to_address_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.toAddress")}</span>
+                    <span className="font-medium">{receipt.to_address_mask}</span>
+                  </div>
+                )}
+                {receipt.from_address_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fromAddress")}</span>
+                    <span className="font-medium">{receipt.from_address_mask}</span>
+                  </div>
+                )}
+                {receipt.network_and_token && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                    <span className="font-medium">{receipt.network_and_token}</span>
+                  </div>
+                )}
+                {receipt.sender_card_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
+                    <span className="font-medium">{receipt.sender_card_mask}</span>
+                  </div>
+                )}
+                {receipt.receiver_card_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.toCard")}</span>
+                    <span className="font-medium">{receipt.receiver_card_mask}</span>
+                  </div>
+                )}
+                {receipt.recipient_name && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                    <span className="font-medium">{receipt.recipient_name}</span>
+                  </div>
+                )}
+                {receipt.iban_mask && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.iban")}</span>
+                    <span className="font-medium">{receipt.iban_mask}</span>
+                  </div>
+                )}
+                {receipt.tx_hash && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">TX Hash</span>
+                    <span className="font-medium text-xs break-all max-w-[180px] text-right">{receipt.tx_hash}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/50">
+                  <span>ID</span>
+                  <span className="font-mono">{receipt.transaction_id?.slice(0, 8)}...</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable", "Чек недоступен")}</p>
+            )}
           </div>
         )}
 
