@@ -84,10 +84,13 @@ const TransactionDetails = () => {
   const userIban = walletData?.data?.physical_account?.iban || "";
   const hasToken = !!getAuthToken();
   
+  // Strip api_ prefix for receipt API calls
+  const realTransactionId = id?.startsWith('api_') ? id.slice(4) : (id || '');
+  
   // Fetch receipt from real API (only if user is authenticated)
   const { data: receiptResult, isLoading: receiptLoading } = useTransactionReceipt(
-    id || '',
-    hasToken && !!id
+    realTransactionId,
+    hasToken && !!realTransactionId
   );
   const receipt = receiptResult?.data || null;
   
@@ -96,25 +99,89 @@ const TransactionDetails = () => {
     window.scrollTo(0, 0);
   }, [id]);
   
-  const transaction = id ? mockTransactions[id] : null;
+  const mockTransaction = id ? mockTransactions[id] : null;
+  
+  // Build transaction from receipt data if no mock found (API transaction)
+  const transaction = mockTransaction || (receipt ? {
+    id: id || '',
+    merchant: receipt.operation || receipt.type || 'Transaction',
+    time: new Date(receipt.date_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    date: new Date(receipt.date_time).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    amountUSDT: receipt.amount_crypto ?? receipt.amount ?? receipt.amount_aed ?? 0,
+    amountLocal: receipt.amount_aed ?? receipt.amount ?? 0,
+    localCurrency: receipt.amount_crypto != null ? 'USDT' : 'AED',
+    color: '#3B82F6',
+    cardLast4: receipt.sender_card_mask?.slice(-4) || receipt.receiver_card_mask?.slice(-4) || '',
+    exchangeRate: 3.65,
+    status: (receipt.status === 'completed' ? 'settled' : receipt.status) as any,
+    type: (() => {
+      const typeMap: Record<string, string> = {
+        'bank_withdrawal': 'bank_transfer',
+        'bank_topup': 'topup',
+        'crypto_topup': 'topup',
+        'crypto_withdrawal': 'crypto_send',
+        'card_transfer': 'card_transfer',
+        'crypto_deposit': 'crypto_deposit',
+        'bank_transfer_incoming': 'bank_transfer_incoming',
+      };
+      return (typeMap[receipt.type] || receipt.type || 'payment') as any;
+    })(),
+    recipientCard: receipt.receiver_card_mask?.slice(-4),
+    recipientCardFull: receipt.receiver_card_mask,
+    recipientName: receipt.recipient_name,
+    senderName: receipt.recipient_name,
+    fromCardFull: receipt.sender_card_mask,
+    toWalletAddress: receipt.to_address_mask,
+    fromWalletAddress: receipt.from_address_mask,
+    fromAddress: receipt.from_address_mask,
+    tokenNetwork: receipt.network_and_token,
+    transferFee: receipt.fee ?? receipt.fee_amount,
+    networkFee: receipt.fee ?? receipt.fee_amount,
+    bankFee: receipt.fee_amount,
+    recipientIban: receipt.iban_mask,
+    recipientBankName: receipt.bank_name,
+    beneficiaryName: receipt.beneficiary_name,
+    cardType: 'Virtual' as const,
+  } : null) as typeof mockTransaction;
 
   const getInitial = (name: string) => name.charAt(0).toUpperCase();
-  const isTopup = transaction.type === "topup";
-  const isDeclined = transaction.type === "declined";
-  const isCardActivation = transaction.type === "card_activation";
-  const isCardTransfer = transaction.type === "card_transfer";
-  const isCryptoSend = transaction.type === "crypto_send";
-  const isCryptoDeposit = transaction.type === "crypto_deposit";
-  const isBankTransfer = transaction.type === "bank_transfer";
-  const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
-  const isIncomingTransfer = isCardTransfer && !!transaction.senderCard;
-  const isOutgoingTransfer = isCardTransfer && !!transaction.recipientCard;
+  const isTopup = transaction?.type === "topup";
+  const isDeclined = transaction?.type === "declined";
+  const isCardActivation = transaction?.type === "card_activation";
+  const isCardTransfer = transaction?.type === "card_transfer";
+  const isCryptoSend = transaction?.type === "crypto_send";
+  const isCryptoDeposit = transaction?.type === "crypto_deposit";
+  const isBankTransfer = transaction?.type === "bank_transfer";
+  const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
+  const isIncomingTransfer = isCardTransfer && !!transaction?.senderCard;
+  const isOutgoingTransfer = isCardTransfer && !!transaction?.recipientCard;
   
   const [showToCard, setShowToCard] = useState(false);
   const [showFromCard, setShowFromCard] = useState(false);
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [showFromAddress, setShowFromAddress] = useState(false);
   const [showIban, setShowIban] = useState(false);
+
+  // Loading state for API transactions
+  if (!transaction && receiptLoading) {
+    return (
+      <MobileLayout header={<button onClick={() => navigate(-1)} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"><ChevronLeft className="w-5 h-5" /><span className="text-sm">{t("transaction.back")}</span></button>}>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
+      </MobileLayout>
+    );
+  }
+
+  if (!transaction) {
+    return (
+      <MobileLayout header={<button onClick={() => navigate(-1)} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"><ChevronLeft className="w-5 h-5" /><span className="text-sm">{t("transaction.back")}</span></button>}>
+        <div className="flex flex-col items-center justify-center h-64 gap-2">
+          <p className="text-muted-foreground">{t("transaction.notFound", "Транзакция не найдена")}</p>
+        </div>
+      </MobileLayout>
+    );
+  }
 
   return (
     <MobileLayout
