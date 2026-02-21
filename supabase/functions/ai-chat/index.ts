@@ -102,10 +102,22 @@ async function fetchUserFinancialData(supabase: any, userId: string) {
       categoryTotals[cat] = (categoryTotals[cat] || 0) + Math.abs(parseFloat(tx.amount));
     });
 
-  // Format transactions for context
-  const formattedTransactions = transactions.slice(0, 10).map((tx: any) => 
-    `- ${formatDate(tx.created_at)}: ${formatTransactionType(tx.type)} ${tx.amount > 0 ? '+' : ''}${tx.amount} AED${tx.merchant_name ? ` (${tx.merchant_name})` : ''}${tx.description ? ` - ${tx.description}` : ''}`
-  ).join('\n');
+  // Format transactions for context with full details
+  const formattedTransactions = transactions.slice(0, 10).map((tx: any, idx: number) => {
+    const num = idx + 1;
+    const date = formatDate(tx.created_at);
+    const type = formatTransactionType(tx.type);
+    const sign = tx.amount > 0 ? '+' : '';
+    const amount = `${sign}${tx.amount} AED`;
+    const merchant = tx.merchant_name || '';
+    const category = tx.merchant_category || '';
+    const desc = tx.description || '';
+    const ref = tx.reference_id ? `ref:${tx.reference_id}` : '';
+    const cardId = tx.card_id ? `card:${tx.card_id.slice(-4)}` : '';
+    const status = tx.status || 'completed';
+    
+    return `- [#${num}] ${date} | ${type} | ${amount} | ${status}${merchant ? ` | ${merchant}` : ''}${category ? ` | кат: ${category}` : ''}${cardId ? ` | ${cardId}` : ''}${ref ? ` | ${ref}` : ''}${desc ? ` | ${desc}` : ''}`;
+  }).join('\n');
 
   // Format categories
   const formattedCategories = Object.entries(categoryTotals)
@@ -233,6 +245,17 @@ Easy Card - это финансовое приложение для управл
 - Все карты работают в валюте AED (дирхамы ОАЭ)
 - Для использования карт нужно пройти верификацию
 - Поддерживаются сети TRC20 и ERC20 для крипто-пополнений
+
+## Формат вывода транзакций
+Когда пользователь спрашивает о транзакциях, выводи их как отчёт за день. Группируй по дате. Формат:
+
+📅 **ДД.ММ.ГГГГ**
+| # | Тип | Сумма | Статус | Получатель/Отправитель | Карта |
+|---|-----|-------|--------|----------------------|-------|
+| 1 | Пополнение | +28,000 AED | ✅ | — | ****8646 |
+
+В конце дня покажи итого за день (приход/расход).
+Если транзакций за несколько дней - группируй каждый день отдельно.
 ${userDataContext}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
