@@ -631,7 +631,7 @@
     "price": "Price",
     "amount": "Amount",
     "transferAmount": "Transfer amount",
-    "fee": "Fee (1%)",
+    "fee": "Fee",
     "total": "Total",
     "transactionDetails": "Transaction details",
     "termsAndFees": "Terms and fees",

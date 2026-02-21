@@ -617,7 +617,7 @@
     "price": "Цена",
     "amount": "Сумма",
     "transferAmount": "Сумма перевода",
-    "fee": "Комиссия (1%)",
+    "fee": "Комиссия",
     "total": "Итого",
     "transactionDetails": "Детали транзакции",
     "termsAndFees": "Условия и комиссии",
