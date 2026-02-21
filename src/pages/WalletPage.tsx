@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Copy, Share2, QrCode, X, Clock } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
@@ -23,7 +23,22 @@ const WalletPage = () => {
   const { t } = useTranslation();
   const [qrOpen, setQrOpen] = useState(false);
   const { data: transactionsData, isLoading: transactionsLoading } = useTransactionGroups();
-  const transactionGroups = transactionsData?.groups || [];
+  const transactionGroups = useMemo(() => {
+    const groups = transactionsData?.groups || [];
+    const cryptoTypes = ["topup", "crypto_withdrawal", "top_up", "withdrawal"];
+    return groups
+      .map(group => ({
+        ...group,
+        transactions: group.transactions.filter(tx => 
+          cryptoTypes.includes(tx.type || "") || 
+          tx.description?.toLowerCase().includes("crypto") ||
+          tx.description?.toLowerCase().includes("usdt") ||
+          tx.merchant?.toLowerCase().includes("usdt") ||
+          tx.merchant?.toLowerCase().includes("trc20")
+        ),
+      }))
+      .filter(group => group.transactions.length > 0);
+  }, [transactionsData]);
 
   const usdtBalance = 112000; // TODO: replace with real API data
   const walletAddress = "TXyz...placeholder"; // TODO: replace with real wallet address
