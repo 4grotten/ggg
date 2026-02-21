@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock } from "lucide-react";
+import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion } from "framer-motion";
@@ -186,6 +186,29 @@ const AccountPage = () => {
                 <span className="text-3xl font-bold">{formatBalance(account.balance)}</span>
                 <span className="text-lg text-muted-foreground">AED</span>
               </div>
+            </motion.div>
+
+            {/* Top Up + Send buttons */}
+            <motion.div
+              className="flex gap-3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.03 }}
+            >
+              <button
+                onClick={() => navigate("/top-up/bank")}
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-3 font-medium text-sm hover:bg-primary/90 transition-colors"
+              >
+                <ArrowDownLeft className="w-4 h-4" />
+                {t('dashboard.topUp')}
+              </button>
+              <button
+                onClick={() => navigate("/send-to-card")}
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors py-3 font-medium text-sm"
+              >
+                <ArrowUpRight className="w-4 h-4" />
+                {t('dashboard.send')}
+              </button>
             </motion.div>
 
             {/* Action buttons: Share + QR */}
