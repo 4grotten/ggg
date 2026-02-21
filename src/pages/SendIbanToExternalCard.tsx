@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, CreditCard, Landmark, ArrowRightLeft, Check, Loader2, ClipboardPaste, X, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, CreditCard, Landmark, ArrowRightLeft, Check, Loader2, ClipboardPaste, CheckCircle2, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useBankAccounts } from "@/hooks/useCards";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthToken } from "@/services/api/apiClient";
+import { BANK_TRANSFER_FEE_PERCENT } from "@/lib/fees";
 import aedCurrency from "@/assets/aed-currency.png";
 
 // Format card number with spaces
@@ -75,21 +76,18 @@ const submitBankToCardTransfer = async (
   }
 };
 
-type Step = "card" | "amount" | "confirm";
-
 const SendIbanToExternalCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { data: bankAccountsData, isLoading: bankLoading } = useBankAccounts();
+  const { data: bankAccountsData } = useBankAccounts();
 
   const bankAccount = bankAccountsData?.data?.[0];
   const bankAccountId = bankAccount?.id || "";
   const bankBalance = parseFloat(bankAccount?.balance || "0");
   const bankIban = bankAccount?.iban || "";
 
-  const [step, setStep] = useState<Step>("card");
   const [cardNumber, setCardNumber] = useState("");
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [recipientCardType, setRecipientCardType] = useState<string | null>(null);
@@ -103,10 +101,10 @@ const SendIbanToExternalCard = () => {
   const isCardValid = cleanCardNumber.length === 16;
   const amountNum = parseFloat(amount) || 0;
 
-  const calculation = useMemo(() => {
-    if (amountNum <= 0) return null;
-    return { amount: amountNum, insufficientBalance: amountNum > bankBalance };
-  }, [amountNum, bankBalance]);
+  const fee = amountNum * (BANK_TRANSFER_FEE_PERCENT / 100);
+  const totalDebit = amountNum + fee;
+  const insufficientBalance = totalDebit > bankBalance && amountNum > 0;
+  const isReadyToConfirm = recipientName && amountNum > 0 && !insufficientBalance && bankAccountId;
 
   const quickAmounts = [100, 500, 1000, 5000];
 
@@ -145,19 +143,8 @@ const SendIbanToExternalCard = () => {
     } catch { /* noop */ }
   };
 
-  const handleNext = () => {
-    if (step === "card" && isCardValid && recipientName) setStep("amount");
-    else if (step === "amount" && amountNum > 0 && !calculation?.insufficientBalance) setStep("confirm");
-  };
-
-  const handleBack = () => {
-    if (step === "amount") setStep("card");
-    else if (step === "confirm") setStep("amount");
-    else navigate(-1);
-  };
-
   const handleConfirm = async () => {
-    if (!bankAccountId || !recipientName || amountNum <= 0) return;
+    if (!isReadyToConfirm) return;
     setIsSubmitting(true);
     try {
       const result = await submitBankToCardTransfer(bankAccountId, cleanCardNumber, amountNum.toFixed(2));
@@ -205,7 +192,7 @@ const SendIbanToExternalCard = () => {
     <MobileLayout
       header={
         <div className="flex items-center gap-3">
-          <button onClick={handleBack} className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-semibold">IBAN → EasyCard</h1>
@@ -214,22 +201,6 @@ const SendIbanToExternalCard = () => {
       rightAction={<div className="flex items-center gap-2"><ThemeSwitcher /><LanguageSwitcher /></div>}
     >
       <div className="px-4 py-6 space-y-4 pb-32">
-        {/* Progress */}
-        <div className="flex items-center justify-center gap-2">
-          {(["card", "amount", "confirm"] as Step[]).map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                step === s ? "bg-primary text-primary-foreground"
-                : (["card", "amount", "confirm"] as Step[]).indexOf(step) > i ? "bg-[#27AE60] text-white"
-                : "bg-secondary text-muted-foreground"
-              }`}>
-                {(["card", "amount", "confirm"] as Step[]).indexOf(step) > i ? <Check className="w-4 h-4" /> : i + 1}
-              </div>
-              {i < 2 && <div className={`w-8 h-0.5 ${(["card", "amount", "confirm"] as Step[]).indexOf(step) > i ? "bg-[#27AE60]" : "bg-secondary"}`} />}
-            </div>
-          ))}
-        </div>
-
         {/* Source: Bank Account */}
         <div className="p-4 rounded-2xl bg-muted/50 border border-border/50">
           <div className="flex items-center gap-2 mb-1">
@@ -250,169 +221,134 @@ const SendIbanToExternalCard = () => {
           </div>
         </div>
 
-        {/* Step 1: Card Number */}
-        {step === "card" && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground px-1">{t("send.recipientCardNumber", "Номер карты получателя")}</p>
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                  <CreditCard className="w-5 h-5 text-muted-foreground" />
-                </div>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={cardNumber}
-                  onChange={handleCardNumberChange}
-                  placeholder="0000 0000 0000 0000"
-                  className="w-full pl-12 pr-12 py-4 rounded-2xl bg-muted/50 border border-border/50 text-lg font-mono tracking-wider outline-none focus:border-primary/50 transition-colors text-foreground placeholder:text-muted-foreground/40"
-                  maxLength={19}
-                />
-                <button onClick={handlePaste} className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-secondary transition-colors">
-                  <ClipboardPaste className="w-5 h-5 text-muted-foreground" />
-                </button>
-              </div>
+        {/* Card Number Input */}
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground px-1">{t("send.recipientCardNumber", "Номер карты получателя")}</p>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2">
+              <CreditCard className="w-5 h-5 text-muted-foreground" />
             </div>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={cardNumber}
+              onChange={handleCardNumberChange}
+              placeholder="0000 0000 0000 0000"
+              className="w-full pl-12 pr-12 py-4 rounded-2xl bg-muted/50 border border-border/50 text-lg font-mono tracking-wider outline-none focus:border-primary/50 transition-colors text-foreground placeholder:text-muted-foreground/40"
+              maxLength={19}
+            />
+            <button onClick={handlePaste} className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-secondary transition-colors">
+              <ClipboardPaste className="w-5 h-5 text-muted-foreground" />
+            </button>
+          </div>
+        </div>
 
-            {/* Recipient check */}
-            <AnimatePresence>
-              {isCheckingRecipient && (
-                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/50">
-                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">{t("send.checkingRecipient", "Проверка получателя...")}</span>
-                </motion.div>
-              )}
+        {/* Recipient check */}
+        <AnimatePresence>
+          {isCheckingRecipient && (
+            <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/50">
+              <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              <span className="text-sm text-muted-foreground">{t("send.checkingRecipient", "Проверка получателя...")}</span>
+            </motion.div>
+          )}
 
-              {recipientName && !isCheckingRecipient && (
-                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-3 px-4 py-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/20">
-                  <div className="relative">
-                    <div className="w-12 h-12 rounded-full bg-[#27AE60]/20 flex items-center justify-center text-lg font-bold text-[#27AE60]">
-                      {recipientName.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#27AE60] flex items-center justify-center border-2 border-[#27AE60]/10">
-                      <Check className="w-2.5 h-2.5 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold">{recipientName}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {recipientCardType ? `${recipientCardType} · ` : ""}•••• {cleanCardNumber.slice(-4)}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-
-              {recipientNotFound && !isCheckingRecipient && (
-                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/20">
-                  <AlertCircle className="w-5 h-5 text-destructive" />
-                  <span className="text-sm text-destructive">{t("send.recipientNotFound", "Карта не найдена в системе EasyCard")}</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Next button */}
-            {recipientName && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <button onClick={handleNext}
-                  className="w-full py-4 rounded-2xl font-semibold text-base bg-primary text-primary-foreground active:scale-[0.98] transition-all">
-                  {t("send.continue", "Продолжить")}
-                </button>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-
-        {/* Step 2: Amount */}
-        {step === "amount" && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-            {/* Recipient badge */}
-            <div className="flex items-center gap-3 px-4 py-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/20">
+          {recipientName && !isCheckingRecipient && (
+            <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-3 px-4 py-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/20">
               <div className="relative">
                 <div className="w-12 h-12 rounded-full bg-[#27AE60]/20 flex items-center justify-center text-lg font-bold text-[#27AE60]">
-                  {recipientName?.charAt(0).toUpperCase()}
+                  {recipientName.charAt(0).toUpperCase()}
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#27AE60] flex items-center justify-center border-2 border-[#27AE60]/10">
                   <Check className="w-2.5 h-2.5 text-white" />
                 </div>
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-semibold">{recipientName}</p>
-                <p className="text-xs text-muted-foreground">{recipientCardType ? `${recipientCardType} · ` : ""}•••• {cleanCardNumber.slice(-4)}</p>
+                <p className="text-xs text-muted-foreground">
+                  {recipientCardType ? `${recipientCardType} · ` : ""}•••• {cleanCardNumber.slice(-4)}
+                </p>
               </div>
-            </div>
+            </motion.div>
+          )}
 
-            {/* Amount input */}
-            <div className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-3">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t("sendIban.enterAmount", "Сумма перевода (AED)")}</p>
-              <div className="flex items-center gap-2">
-                <img src={aedCurrency} alt="AED" className="w-7 h-7 dark:invert dark:brightness-200" />
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="flex-1 text-2xl font-bold bg-transparent outline-none text-foreground placeholder:text-muted-foreground/40"
-                />
-                <span className="text-sm text-muted-foreground">AED</span>
-              </div>
-              <div className="flex gap-2">
-                {quickAmounts.map((qa) => (
-                  <button key={qa} onClick={() => setAmount(qa.toString())}
-                    className="flex-1 py-2 rounded-xl text-sm font-medium bg-secondary/80 hover:bg-secondary transition-colors text-foreground">
-                    {qa.toLocaleString()}
-                  </button>
-                ))}
-              </div>
-            </div>
+          {recipientNotFound && !isCheckingRecipient && (
+            <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/20">
+              <AlertCircle className="w-5 h-5 text-destructive" />
+              <span className="text-sm text-destructive">{t("send.recipientNotFound", "Карта не найдена в системе EasyCard")}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            {calculation?.insufficientBalance && (
-              <p className="text-xs text-destructive text-center">{t("sendIban.insufficientBalance", "Недостаточно средств на счёте")}</p>
-            )}
+        {/* Amount + Fee — shown after recipient verified */}
+        <AnimatePresence>
+          {recipientName && !isCheckingRecipient && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              {/* Amount input */}
+              <div className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">{t("sendIban.enterAmount", "Сумма перевода (AED)")}</p>
+                <div className="flex items-center gap-2">
+                  <img src={aedCurrency} alt="AED" className="w-7 h-7 dark:invert dark:brightness-200" />
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="flex-1 text-2xl font-bold bg-transparent outline-none text-foreground placeholder:text-muted-foreground/40"
+                  />
+                  <span className="text-sm text-muted-foreground">AED</span>
+                </div>
+                <div className="flex gap-2">
+                  {quickAmounts.map((qa) => (
+                    <button key={qa} onClick={() => setAmount(qa.toString())}
+                      className="flex-1 py-2 rounded-xl text-sm font-medium bg-secondary/80 hover:bg-secondary transition-colors text-foreground">
+                      {qa.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            {amountNum > 0 && !calculation?.insufficientBalance && (
-              <button onClick={handleNext}
-                className="w-full py-4 rounded-2xl font-semibold text-base bg-primary text-primary-foreground active:scale-[0.98] transition-all">
-                {t("send.continue", "Продолжить")}
-              </button>
-            )}
-          </motion.div>
-        )}
+              {/* Fee breakdown */}
+              {amountNum > 0 && (
+                <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
+                  className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t("sendIban.transferAmount", "Сумма")}</span>
+                    <span className="font-medium">{amountNum.toLocaleString("en-US", { minimumFractionDigits: 2 })} AED</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t("fees.commission", "Комиссия")} ({BANK_TRANSFER_FEE_PERCENT}%)</span>
+                    <span className="font-medium">{fee.toLocaleString("en-US", { minimumFractionDigits: 2 })} AED</span>
+                  </div>
+                  <div className="h-px bg-border/50" />
+                  <div className="flex justify-between text-base">
+                    <span className="font-semibold">{t("fees.total", "Итого")}</span>
+                    <span className="font-bold text-primary">{totalDebit.toLocaleString("en-US", { minimumFractionDigits: 2 })} AED</span>
+                  </div>
+                </motion.div>
+              )}
 
-        {/* Step 3: Confirm */}
-        {step === "confirm" && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-            <div className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t("sendIban.from", "Откуда")}</span>
-                <span className="font-medium">{t("sendIban.bankAccount", "Банковский счёт")}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t("sendIban.to", "Куда")}</span>
-                <span className="font-medium">•••• {cleanCardNumber.slice(-4)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t("send.recipient", "Получатель")}</span>
-                <span className="font-medium">{recipientName}</span>
-              </div>
-              <div className="h-px bg-border/50" />
-              <div className="flex justify-between text-base">
-                <span className="font-semibold">{t("sendIban.transferAmount", "Сумма")}</span>
-                <span className="font-bold text-primary">{amountNum.toLocaleString("en-US", { minimumFractionDigits: 2 })} AED</span>
-              </div>
-            </div>
-
-            <button onClick={handleConfirm} disabled={isSubmitting}
-              className="w-full py-4 rounded-2xl font-semibold text-base bg-primary text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-              {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
-              {isSubmitting ? t("sendIban.processing", "Обработка...") : t("sendIban.confirm", "Подтвердить перевод")}
-            </button>
-          </motion.div>
-        )}
+              {insufficientBalance && (
+                <p className="text-xs text-destructive text-center">{t("sendIban.insufficientBalance", "Недостаточно средств на счёте")}</p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+
+      {/* Fixed Bottom Button */}
+      {isReadyToConfirm && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 max-w-[800px] mx-auto">
+          <button onClick={handleConfirm} disabled={isSubmitting}
+            className="w-full py-4 rounded-2xl font-semibold text-base bg-primary text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+            {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
+            {isSubmitting ? t("sendIban.processing", "Обработка...") : t("sendIban.confirm", "Подтвердить перевод")}
+          </button>
+        </div>
+      )}
     </MobileLayout>
   );
 };
