@@ -30,17 +30,20 @@ function formatDate(dateStr: string): string {
   return `${day}.${month}.${year}`;
 }
 
-async function fetchCardBalances(): Promise<string> {
+async function fetchCardBalances(userToken?: string): Promise<string> {
   try {
     const BACKEND_BASE = "https://ueasycard.com/api/v1";
-    const backendToken = "e88bee3a891dd71501c14de1c1c94fd3af34cb3b";
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (userToken) {
+      headers["Authorization"] = `Token ${userToken}`;
+    }
 
     const response = await fetch(`${BACKEND_BASE}/cards/balances/`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Token ${backendToken}`,
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -145,7 +148,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, user_id, external_user_id } = await req.json();
+    const { messages, user_id, external_user_id, backend_token } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -173,7 +176,7 @@ serve(async (req) => {
     // Fetch user's financial data and card balances in parallel
     const [financialData, cardBalancesText] = await Promise.all([
       fetchUserFinancialData(supabase, effectiveUserId),
-      fetchCardBalances(),
+      fetchCardBalances(backend_token),
     ]);
     
     // Build dynamic context with real user data

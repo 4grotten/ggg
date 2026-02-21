@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { getAuthToken } from '@/services/api/apiClient';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -67,7 +68,8 @@ export const useAIChat = () => {
         },
         body: JSON.stringify({ 
           messages: [...messages, userMsg],
-          external_user_id: user?.id 
+          external_user_id: user?.id,
+          backend_token: getAuthToken(),
         }),
       });
 
