@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -22,6 +23,7 @@ import aedCurrency from "@/assets/aed-currency.png";
 const AccountPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { data: walletData, isLoading } = useWalletSummary();
   const account = walletData?.data?.physical_account;
   const [qrOpen, setQrOpen] = useState(false);
@@ -44,6 +46,21 @@ const AccountPage = () => {
   }, [transactionsData]);
 
   const iban = account?.iban || "";
+  const accountNumber = iban.slice(-13);
+  const bankName = "EasyCard FZE";
+  const userName = user?.full_name || "Account Holder";
+
+  // vCard format for QR — adds as contact to address book
+  const vCardData = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `FN:${userName}`,
+    `ORG:${bankName}`,
+    `NOTE:IBAN: ${iban}\\nAccount: ${accountNumber}`,
+    `X-IBAN:${iban}`,
+    `X-ACCOUNT:${accountNumber}`,
+    "END:VCARD",
+  ].join("\n");
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -150,7 +167,7 @@ const AccountPage = () => {
 
                     <div className="bg-white rounded-2xl p-5 shadow-lg">
                       <QRCodeSVG
-                        value={iban}
+                        value={vCardData}
                         size={220}
                         level="H"
                         includeMargin={false}
@@ -159,9 +176,18 @@ const AccountPage = () => {
                       />
                     </div>
 
-                    <div className="text-center space-y-1">
-                      <p className="text-xs text-muted-foreground">IBAN</p>
-                      <p className="text-sm font-mono font-medium break-all px-4">{iban}</p>
+                    <div className="text-center space-y-2">
+                      <p className="text-sm font-semibold">{userName}</p>
+                      <p className="text-xs text-muted-foreground">{bankName}</p>
+                      <div className="h-px bg-border/50 w-full" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">IBAN</p>
+                        <p className="text-sm font-mono font-medium break-all px-4">{iban}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{t('accountPage.accountNumber')}</p>
+                        <p className="text-sm font-mono font-medium">{accountNumber}</p>
+                      </div>
                     </div>
 
                     <div className="flex gap-3 w-full">
