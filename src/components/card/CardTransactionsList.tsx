@@ -198,20 +198,23 @@ const handleClick = (transaction: Transaction) => {
                         </div>
                       )}
                     </div>
-                    <div className="text-left">
+                    <div className="text-left min-w-0 flex-1">
                       <p className="font-medium">{translateMerchant(transaction.merchant, transaction.type, t)}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground truncate">
+                        {transaction.time}
                         {isCardTransfer && transaction.senderCard
-                          ? `${t("transactions.from")} •••• ${transaction.senderCard}`
+                          ? ` · ${t("transactions.from")} •••• ${transaction.senderCard}`
                           : isCardTransfer && transaction.recipientCard
-                          ? `${t("transactions.to")} •••• ${transaction.recipientCard}`
+                          ? ` · ${t("transactions.to")} •••• ${transaction.recipientCard}`
                           : isBankTransferIncoming && transaction.senderName
-                          ? `${t("transactions.from")} ${transaction.senderName}`
+                          ? ` · ${t("transactions.from")} ${transaction.senderName}`
                           : isBankTransfer && transaction.description
-                          ? transaction.description
+                          ? ` · ${t("transactions.to")} ${transaction.description}`
                           : isCryptoSend && transaction.description
-                          ? transaction.description
-                          : transaction.time
+                          ? ` · ${t("transactions.to")} ${transaction.description}`
+                          : isTopup && transaction.description
+                          ? ` · ${t("transactions.from")} ${transaction.description}`
+                          : ""
                         }
                       </p>
                     </div>
