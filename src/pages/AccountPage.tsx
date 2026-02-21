@@ -49,11 +49,15 @@ const AccountPage = () => {
   const accountNumber = iban.slice(-13);
   const bankName = "EasyCard FZE";
   const userName = user?.full_name || "Account Holder";
+  const nameParts = userName.trim().split(/\s+/);
+  const firstName = nameParts[0] || "";
+  const lastName = nameParts.slice(1).join(" ") || "";
 
   // vCard format for QR — adds as contact to address book
   const vCardData = [
     "BEGIN:VCARD",
     "VERSION:3.0",
+    `N:${lastName};${firstName};;;`,
     `FN:${userName}`,
     `ORG:${bankName}`,
     `NOTE:IBAN: ${iban}\\nAccount: ${accountNumber}`,
