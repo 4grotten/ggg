@@ -442,7 +442,8 @@ export const fetchTransactionReceipt = async (
 // =============================================
 
 export interface BankWithdrawalRequest {
-  from_card_id: string;
+  from_card_id?: string;
+  from_bank_account_id?: string;
   iban: string;
   beneficiary_name: string;
   bank_name: string;

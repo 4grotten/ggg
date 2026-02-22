@@ -92,24 +92,37 @@ class TransactionService:
 
     @staticmethod
     @transaction.atomic
-    def execute_bank_withdrawal(user_id, card_id, iban, beneficiary_name, bank_name, amount_aed):
+    def execute_bank_withdrawal(user_id, card_id=None, bank_account_id=None, iban='', beneficiary_name='', bank_name='', amount_aed=0):
         amount_aed = Decimal(str(amount_aed))
-        card = Cards.objects.select_for_update().get(id=card_id, user_id=str(user_id))
 
-        if card.balance < amount_aed:
-            raise ValueError("Недостаточно средств на выбранной карте")
-        card.balance -= amount_aed
-        card.save()
+        if card_id:
+            source = Cards.objects.select_for_update().get(id=card_id, user_id=str(user_id))
+            source_type = source.type
+        elif bank_account_id:
+            source = BankDepositAccounts.objects.select_for_update().get(id=bank_account_id, user_id=str(user_id))
+            source_type = 'bank'
+        else:
+            raise ValueError("Укажите from_card_id или from_bank_account_id")
+
+        if source.balance < amount_aed:
+            raise ValueError("Недостаточно средств")
+        source.balance -= amount_aed
+        source.save()
+
         txn = Transactions.objects.create(
-            user_id=user_id, card=card, type='bank_withdrawal', 
-            status='processing', amount=amount_aed, currency='AED'
+            user_id=user_id,
+            card_id=card_id,
+            type='bank_withdrawal',
+            status='processing',
+            amount=amount_aed,
+            currency='AED'
         )
         withdrawal = BankWithdrawals.objects.create(
             transaction=txn, user_id=user_id, beneficiary_iban=iban, beneficiary_name=beneficiary_name,
-            beneficiary_bank_name=bank_name, from_card_id=card.id, amount_aed=amount_aed,
-            fee_amount=Decimal('0.00'), total_debit=amount_aed
+            beneficiary_bank_name=bank_name, from_card_id=card_id,
+            amount_aed=amount_aed, fee_amount=Decimal('0.00'), total_debit=amount_aed
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=card.type, amount=amount_aed, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=source_type, amount=amount_aed, type='debit')
         return withdrawal
 
     @staticmethod

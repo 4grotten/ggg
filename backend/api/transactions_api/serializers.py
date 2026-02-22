@@ -52,7 +52,8 @@ class CryptoWithdrawalResponseSerializer(serializers.Serializer):
 
 
 class BankWithdrawalRequestSerializer(serializers.Serializer):
-    from_card_id = serializers.UUIDField(help_text="ID карты для списания средств")
+    from_card_id = serializers.UUIDField(required=False, allow_null=True, help_text="ID карты для списания средств (опционально)")
+    from_bank_account_id = serializers.UUIDField(required=False, allow_null=True, help_text="ID банковского счёта для списания (опционально)")
     iban = serializers.CharField(max_length=34, help_text="IBAN номер счета в ОАЭ (начинается с AE)")
     beneficiary_name = serializers.CharField(max_length=255, help_text="Полное имя получателя")
     bank_name = serializers.CharField(max_length=255, help_text="Название банка получателя")
@@ -62,6 +63,11 @@ class BankWithdrawalRequestSerializer(serializers.Serializer):
         if not value.startswith('AE') or len(value) != 23:
             raise serializers.ValidationError("Неверный формат UAE IBAN.")
         return value
+
+    def validate(self, data):
+        if not data.get('from_card_id') and not data.get('from_bank_account_id'):
+            raise serializers.ValidationError("Укажите from_card_id или from_bank_account_id")
+        return data
 
 
 class BankWithdrawalResponseSerializer(serializers.Serializer):
