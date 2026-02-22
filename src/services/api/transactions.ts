@@ -348,7 +348,12 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   if (tx.type === 'internal_transfer') {
     mappedType = tx.amount > 0 ? 'bank_transfer_incoming' : 'bank_transfer';
   }
-  const isIncoming = tx.amount > 0;
+  // For card_transfer, amount is always positive — determine direction by field presence
+  const isIncoming = mappedType === 'card_transfer' 
+    ? !tx.recipient_card && !!tx.sender_card  // no recipient = we received it
+    : mappedType === 'bank_transfer_incoming' || mappedType === 'crypto_deposit' || mappedType === 'topup' 
+      ? true 
+      : tx.amount > 0 && !['bank_transfer', 'crypto_withdrawal', 'payment'].includes(mappedType);
   
   // Color based on type
   const colorMap: Record<string, string> = {
