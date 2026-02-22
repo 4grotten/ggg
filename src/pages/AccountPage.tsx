@@ -53,15 +53,14 @@ const AccountPage = () => {
     const realGroups = ibanTxData || [];
     
     // Also include internal_transfer (bank→card, card→bank) from /all/ endpoint
-    const bankRelatedTypes = ["internal_transfer"];
+    const bankRelatedTypes = ["internal_transfer", "bank_transfer", "bank_transfer_incoming", "bank_to_card", "card_to_bank", "iban_to_card", "iban_to_iban"];
     const apiBankGroups = (apiTxData || [])
       .map(group => ({
         ...group,
         transactions: group.transactions.filter(tx =>
-          bankRelatedTypes.includes(tx.type || "") && (
-            tx.description?.toLowerCase().includes("bank") ||
-            tx.description?.toLowerCase().includes("iban")
-          )
+          bankRelatedTypes.includes(tx.type || "") ||
+          tx.description?.toLowerCase().includes("bank") ||
+          tx.description?.toLowerCase().includes("iban")
         ),
       }))
       .filter(group => group.transactions.length > 0);
