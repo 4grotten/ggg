@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/collapsible";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { useCards } from "@/hooks/useCards";
+import { useCardTransactionGroups } from "@/hooks/useTransactions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
@@ -47,33 +49,6 @@ const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: n
 };
 
 // Virtual card transactions (using IDs from TransactionDetails)
-const virtualCardTransactions = [
-  {
-    date: "January 10",
-    totalSpend: 125.87,
-    transactions: [
-      { id: "1", merchant: "LIFE", time: "13:02", amountUSDT: 8.34, amountLocal: 29.87, localCurrency: "AED", color: "#3B82F6" },
-      { id: "2", merchant: "ALAYA", time: "00:59", amountUSDT: 26.80, amountLocal: 96.00, localCurrency: "AED", color: "#22C55E" },
-    ],
-  },
-  {
-    date: "December 31",
-    totalSpend: 101.06,
-    transactions: [
-      { id: "5", merchant: "CELLAR", time: "20:48", amountUSDT: 22.06, amountLocal: 79.00, localCurrency: "AED", color: "#EAB308" },
-      { id: "6", merchant: "Top up", time: "20:46", amountUSDT: 194.10, amountLocal: 200.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as const },
-    ],
-  },
-  {
-    date: "December 21",
-    totalSpend: 204.55,
-    transactions: [
-      { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", type: "card_activation" as const },
-      { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as const },
-    ],
-  },
-];
-
 const VirtualCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -93,6 +68,16 @@ const VirtualCard = () => {
   // Fetch real balance from API
   const { data: cardsData } = useCards({ type: 'virtual' });
   const apiCard = cardsData?.data?.[0];
+  const cardId = apiCard?.id;
+
+  // Fetch card transactions from API
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups();
+  
+  // Filter transactions for this card only
+  const filteredGroups = (cardTxGroups || []).map(group => ({
+    ...group,
+    transactions: group.transactions.filter(tx => !cardId || tx.cardId === cardId || !tx.cardId),
+  })).filter(g => g.transactions.length > 0);
 
   const cardData = {
     holderName: "RINAT KAMIEV",
@@ -413,7 +398,15 @@ const VirtualCard = () => {
           transition={{ duration: 0.4, delay: 0.35 }}
         >
           <h2 className="text-lg font-bold mb-3">{t("card.transactions")}</h2>
-          <CardTransactionsList groups={virtualCardTransactions} />
+          {txLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+            </div>
+          ) : filteredGroups.length > 0 ? (
+            <CardTransactionsList groups={filteredGroups} />
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">{t("card.noTransactions", "No transactions yet")}</p>
+          )}
         </motion.div>
 
         {/* Footer */}
