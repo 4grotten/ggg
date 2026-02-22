@@ -109,11 +109,16 @@ class TransactionService:
         source.balance -= amount_aed
         source.save()
 
+        # Check if destination IBAN is internal
+        internal_account = BankDepositAccounts.objects.filter(iban=iban).first()
+        is_internal = internal_account is not None
+        tx_status = 'completed' if is_internal else 'processing'
+
         txn = Transactions.objects.create(
             user_id=user_id,
             card_id=card_id,
             type='bank_withdrawal',
-            status='processing',
+            status=tx_status,
             amount=amount_aed,
             currency='AED'
         )
@@ -123,6 +128,17 @@ class TransactionService:
             amount_aed=amount_aed, fee_amount=Decimal('0.00'), total_debit=amount_aed
         )
         BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=source_type, amount=amount_aed, type='debit')
+
+        # If internal IBAN — credit recipient's bank account immediately
+        if is_internal:
+            recipient_account = BankDepositAccounts.objects.select_for_update().get(id=internal_account.id)
+            recipient_account.balance += amount_aed
+            recipient_account.save()
+            BalanceMovements.objects.create(
+                transaction=txn, user_id=recipient_account.user_id,
+                account_type='bank', amount=amount_aed, type='credit'
+            )
+
         return withdrawal
 
     @staticmethod
