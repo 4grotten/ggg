@@ -467,3 +467,67 @@ class SyncContactsView(APIView):
         local_contacts = Contacts.objects.filter(user=user).order_by('full_name')
         serializer = ContactSerializer(local_contacts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Создать контакт",
+        operation_description="Создает новый контакт в локальной БД EasyCard.",
+        request_body=ContactSerializer,
+        responses={201: ContactSerializer},
+        tags=["Контакты"]
+    )
+    def post(self, request):
+        data = request.data.copy()
+        serializer = ContactSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ContactDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, pk, user):
+        try:
+            return Contacts.objects.get(pk=pk, user=user)
+        except Contacts.DoesNotExist:
+            return None
+
+    @swagger_auto_schema(
+        operation_summary="Получить контакт",
+        responses={200: ContactSerializer},
+        tags=["Контакты"]
+    )
+    def get(self, request, pk):
+        contact = self.get_object(pk, request.user)
+        if not contact:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ContactSerializer(contact)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_summary="Обновить контакт",
+        request_body=ContactSerializer,
+        responses={200: ContactSerializer},
+        tags=["Контакты"]
+    )
+    def patch(self, request, pk):
+        contact = self.get_object(pk, request.user)
+        if not contact:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ContactSerializer(contact, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        operation_summary="Удалить контакт",
+        tags=["Контакты"]
+    )
+    def delete(self, request, pk):
+        contact = self.get_object(pk, request.user)
+        if not contact:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        contact.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
