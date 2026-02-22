@@ -1237,11 +1237,13 @@
       "files": "File Uploads",
       "social": "Social Networks",
       "devices": "Devices & Sessions",
+      "contacts": "Contacts",
+      "cards": "Cards & Wallets",
       "topups": "Topups",
       "transfers": "Transfers",
-      "withdrawals": "Withdrawals",
-      "receipts": "Receipts",
-      "contacts": "Saved Contacts"
+      "transactionHistory": "Transaction History",
+      "accountsInfo": "Bank & Crypto Accounts",
+      "receipts": "Receipts"
     },
     "notes": {
       "title": "Notes"

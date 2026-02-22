@@ -1177,11 +1177,13 @@
       "files": "Datei-Uploads",
       "social": "Soziale Netzwerke",
       "devices": "Geräte & Sitzungen",
+      "contacts": "Kontakte",
+      "cards": "Karten & Wallets",
       "topups": "Aufladungen",
       "transfers": "Überweisungen",
-      "withdrawals": "Auszahlungen",
-      "receipts": "Quittungen",
-      "contacts": "Gespeicherte Kontakte"
+      "transactionHistory": "Transaktionsverlauf",
+      "accountsInfo": "Bank- & Kryptokonten",
+      "receipts": "Quittungen"
     },
     "notes": {
       "title": "Hinweise"

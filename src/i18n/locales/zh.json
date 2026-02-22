@@ -1184,11 +1184,13 @@
       "files": "文件上传",
       "social": "社交网络",
       "devices": "设备与会话",
+      "contacts": "联系人",
+      "cards": "卡片与钱包",
       "topups": "充值",
       "transfers": "转账",
-      "withdrawals": "提现",
-      "receipts": "收据",
-      "contacts": "已保存的联系人"
+      "transactionHistory": "交易记录",
+      "accountsInfo": "银行与加密账户",
+      "receipts": "收据"
     },
     "notes": {
       "title": "注意事项"

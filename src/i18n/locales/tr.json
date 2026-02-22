@@ -1177,11 +1177,13 @@
       "files": "Dosya Yüklemeleri",
       "social": "Sosyal Ağlar",
       "devices": "Cihazlar ve Oturumlar",
+      "contacts": "Kişiler",
+      "cards": "Kartlar ve Cüzdanlar",
       "topups": "Yüklemeler",
       "transfers": "Transferler",
-      "withdrawals": "Çekimler",
-      "receipts": "Makbuzlar",
-      "contacts": "Kayıtlı Kişiler"
+      "transactionHistory": "İşlem Geçmişi",
+      "accountsInfo": "Banka ve Kripto Hesapları",
+      "receipts": "Makbuzlar"
     },
     "notes": {
       "title": "Notlar"

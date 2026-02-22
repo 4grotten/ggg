@@ -1177,11 +1177,13 @@
       "files": "Carga de Archivos",
       "social": "Redes Sociales",
       "devices": "Dispositivos y Sesiones",
+      "contacts": "Contactos",
+      "cards": "Tarjetas y Billeteras",
       "topups": "Recargas",
       "transfers": "Transferencias",
-      "withdrawals": "Retiros",
-      "receipts": "Recibos",
-      "contacts": "Contactos Guardados"
+      "transactionHistory": "Historial de Transacciones",
+      "accountsInfo": "Cuentas Bancarias y Cripto",
+      "receipts": "Recibos"
     },
     "notes": {
       "title": "Notas"
