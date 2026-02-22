@@ -182,12 +182,8 @@ const CardPage = () => {
   const formatCardNumber = (num: string) =>
     num.replace(/(.{4})/g, '$1 ').trim();
 
-  // Filter API transactions for current card only
-  const apiCardId = apiCard?.id;
-  const filteredApiGroups = (cardTxGroups || []).map(group => ({
-    ...group,
-    transactions: group.transactions.filter(tx => apiCardId && tx.cardId === apiCardId),
-  })).filter(g => g.transactions.length > 0);
+  // Show all API transactions on card pages (card_id is not always set in DB)
+  const filteredApiGroups = cardTxGroups || [];
 
   const mergedTransactions = [
     ...filteredApiGroups,
