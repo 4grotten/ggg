@@ -113,8 +113,7 @@ class CardTransactionsListView(APIView):
     )
     def get(self, request):
         txs = Transactions.objects.filter(
-            user_id=str(request.user.id), 
-            card__isnull=False
+            user_id=str(request.user.id),
         ).order_by('-created_at')
         data = [{
             "id": tx.id,
