@@ -631,6 +631,7 @@
     "stablecoinSend": "Stablecoin Gönder",
     "bankTransfer": "Banka Havalesi",
     "bankTransferIncoming": "Gelen Banka Havalesi",
+    "ibanToCard": "IBAN'dan Karta",
     "months": {
       "january": "Ocak",
       "february": "Şubat",

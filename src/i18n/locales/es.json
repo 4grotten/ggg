@@ -631,6 +631,7 @@
     "stablecoinSend": "Envío de Stablecoin",
     "bankTransfer": "Transferencia Bancaria",
     "bankTransferIncoming": "Transferencia Bancaria Entrante",
+    "ibanToCard": "IBAN a Tarjeta",
     "months": {
       "january": "Enero",
       "february": "Febrero",

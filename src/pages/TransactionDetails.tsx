@@ -184,6 +184,13 @@ const TransactionDetails = () => {
           'card_transfer': 'card_transfer',
           'crypto_deposit': 'crypto_deposit',
           'bank_transfer_incoming': 'bank_transfer_incoming',
+          'transfer_out': 'bank_transfer',
+          'transfer_in': 'bank_transfer_incoming',
+          'internal_transfer': 'bank_transfer',
+          'bank_to_card': 'bank_transfer',
+          'card_to_bank': 'bank_transfer_incoming',
+          'iban_to_card': 'bank_transfer',
+          'iban_to_iban': 'bank_transfer',
         };
         return (typeMap[receipt.type] || receipt.type || 'payment') as any;
       })(),
@@ -209,6 +216,7 @@ const TransactionDetails = () => {
       senderBankName: receipt.bank_name,
       beneficiaryName: receipt.beneficiary_name,
       cardType: senderCardType,
+      originalApiType: receipt.type,
     };
   })() : null) as typeof mockTransaction;
 
@@ -530,7 +538,7 @@ const TransactionDetails = () => {
               {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? '+' : '-'}{isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isBankTransfer ? t('transaction.bankTransfer') : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' ? t('transactions.ibanToCard') : t('transaction.bankTransfer')) : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
