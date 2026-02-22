@@ -197,7 +197,7 @@ const TransactionDetails = () => {
       recipientCard: receiverLast4,
       recipientCardFull: resolveFullCard(receipt.receiver_card_mask, 1),
       recipientCardType: receiverCardType,
-      recipientName: receipt.recipient_name,
+      recipientName: receipt.recipient_name || receipt.beneficiary_name,
       senderName: receipt.sender_name,
       senderCard: senderLast4 || undefined,
       senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
