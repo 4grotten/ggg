@@ -569,7 +569,11 @@
     "bankName": "Banka Adı",
     "bankFee": "Banka ücreti",
     "networkFeeFlat": "Ağ ücreti",
-    "networkFeeAed": "Ağ ücreti (AED)"
+    "networkFeeAed": "Ağ ücreti (AED)",
+    "fromAccount": "Hesaptan",
+    "aedAccount": "AED Hesabı",
+    "cardBalance": "Kart Bakiyesi",
+    "description": "Açıklama"
   },
   "topUp": {
     "selectAccount": "Açılacak Hesabı Seçin",

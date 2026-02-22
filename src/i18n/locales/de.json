@@ -569,7 +569,11 @@
     "bankName": "Bankname",
     "bankFee": "Bankgebühr",
     "networkFeeFlat": "Netzwerkgebühr",
-    "networkFeeAed": "Netzwerkgebühr (AED)"
+    "networkFeeAed": "Netzwerkgebühr (AED)",
+    "fromAccount": "Von Konto",
+    "aedAccount": "AED-Konto",
+    "cardBalance": "Kartenguthaben",
+    "description": "Beschreibung"
   },
   "topUp": {
     "selectAccount": "Konto zum Öffnen auswählen",

@@ -25,7 +25,7 @@ const mockTransactions: Record<string, {
   cardLast4: string;
   exchangeRate: number;
   status: "settled" | "pending" | "failed" | "processing";
-  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming";
+  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer";
   fromAddress?: string;
   tokenNetwork?: string;
   kartaFee?: number;
@@ -186,7 +186,7 @@ const TransactionDetails = () => {
           'bank_transfer_incoming': 'bank_transfer_incoming',
           'transfer_out': 'bank_transfer',
           'transfer_in': 'bank_transfer_incoming',
-          'internal_transfer': 'bank_transfer',
+          'internal_transfer': 'internal_transfer',
           'bank_to_card': 'bank_transfer',
           'card_to_bank': 'bank_transfer_incoming',
           'iban_to_card': 'bank_transfer',
@@ -229,6 +229,7 @@ const TransactionDetails = () => {
   const isCryptoDeposit = transaction?.type === "crypto_deposit";
   const isBankTransfer = transaction?.type === "bank_transfer";
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
+  const isInternalTransfer = transaction?.type === "internal_transfer";
   // For API transactions, determine direction: if movements[0] is debit, it's outgoing
   const isIncomingTransfer = isCardTransfer && (() => {
     if (receipt?.movements?.length) {
@@ -534,11 +535,11 @@ const TransactionDetails = () => {
           )}
           
           <div className="space-y-1">
-            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer ? 'text-[#007AFF]' : ''}`}>
+            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer ? 'text-[#007AFF]' : ''}`}>
               {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? '+' : '-'}{isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' ? t('transactions.ibanToCard') : t('transaction.bankTransfer')) : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isInternalTransfer ? t('transactions.ibanToCard') : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' ? t('transactions.ibanToCard') : t('transaction.bankTransfer')) : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
@@ -645,6 +646,50 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.bankName")}</span>
                 <span className="font-medium">EasyCard FZE</span>
               </div>
+            </>
+          ) : isInternalTransfer ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromAccount")}</span>
+                <button 
+                  onClick={() => navigate("/account")}
+                  className="font-medium text-[#007AFF] hover:underline transition-colors"
+                >
+                  {userIban 
+                    ? (showIban ? userIban : `${userIban.slice(0, 4)}••••${userIban.slice(-4)}`)
+                    : t("transaction.aedAccount")
+                  }
+                </button>
+              </div>
+              {userIban && (
+                <div className="flex items-center justify-end gap-2 -mt-2">
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(userIban);
+                      toast.success(t("toast.copied", { label: "IBAN" }));
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setShowIban(!showIban)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.toCard")}</span>
+                <span className="font-medium">{t("transaction.cardBalance")}</span>
+              </div>
+              {receipt?.description && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.description")}</span>
+                  <span className="font-medium text-right text-sm max-w-[200px]">{receipt.description}</span>
+                </div>
+              )}
             </>
           ) : isBankTransfer ? (
             <>
@@ -995,7 +1040,22 @@ const TransactionDetails = () => {
 
         {/* Transaction details */}
         <div className="bg-secondary rounded-2xl p-4 space-y-3">
-          {isBankTransfer ? (
+          {isInternalTransfer ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.transferAmount")}</span>
+                <span className="font-medium">{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.fee")}</span>
+                <span className="font-medium">{(transaction.bankFee || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-muted-foreground">{t("transaction.total")}</span>
+                <span className="font-semibold text-[#007AFF]">-{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+            </>
+          ) : isBankTransfer ? (
             <>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.transferAmount")}</span>
