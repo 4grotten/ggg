@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X, Wallet, Landmark } from "lucide-react";
+import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X, Wallet, Landmark, CheckCircle, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -21,8 +21,32 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
 import { submitBankWithdrawal } from "@/services/api/transactions";
 import { submitInternalTransfer } from "@/services/api/transactions";
+import { getAuthToken } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+// Check if IBAN exists in the system
+const lookupIbanRecipient = async (iban: string): Promise<{ found: boolean; name: string | null; bankName: string | null }> => {
+  const cleanIban = iban.replace(/\s/g, "");
+  if (cleanIban.length < 15) return { found: false, name: null, bankName: null };
+  try {
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    const endpoint = `/transactions/recipient-info/?iban=${cleanIban}`;
+    const url = `${SUPABASE_URL}/functions/v1/cards-proxy?endpoint=${encodeURIComponent(endpoint)}`;
+    const headers: HeadersInit = { 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY };
+    const token = getAuthToken();
+    if (token) headers['x-backend-token'] = token;
+    const res = await fetch(url, { method: 'GET', headers });
+    if (!res.ok) return { found: false, name: null, bankName: null };
+    const data = await res.json();
+    if (data.recipient_name) {
+      return { found: true, name: data.recipient_name, bankName: data.bank_name || 'EasyCard FZE' };
+    }
+    return { found: false, name: null, bankName: null };
+  } catch {
+    return { found: false, name: null, bankName: null };
+  }
+};
 
 interface SourceOption {
   id: string;
@@ -112,10 +136,13 @@ const SendBank = () => {
   
   // Step 1: IBAN
   const [iban, setIban] = useState("");
+  const [ibanLookupLoading, setIbanLookupLoading] = useState(false);
+  const [isSystemIban, setIsSystemIban] = useState(false);
   
   // Step 2: Recipient details
   const [recipientName, setRecipientName] = useState("");
   const [bankName, setBankName] = useState("");
+  const [fieldsReadOnly, setFieldsReadOnly] = useState(false);
   
   // Step 3: Amount
   const [amountAED, setAmountAED] = useState("");
@@ -163,8 +190,34 @@ const SendBank = () => {
   const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= availableBalanceAed;
 
   const handleNext = useCallback(async () => {
-    if (step < 3) {
-      setStep(step + 1);
+    // Step 1 → check IBAN in the system before moving to step 2
+    if (step === 1) {
+      setIbanLookupLoading(true);
+      try {
+        const result = await lookupIbanRecipient(iban);
+        if (result.found && result.name) {
+          setRecipientName(result.name);
+          setBankName(result.bankName || 'EasyCard FZE');
+          setIsSystemIban(true);
+          setFieldsReadOnly(true);
+          setStep(2);
+        } else {
+          setIsSystemIban(false);
+          setFieldsReadOnly(false);
+          setStep(2);
+        }
+      } catch {
+        setIsSystemIban(false);
+        setFieldsReadOnly(false);
+        setStep(2);
+      } finally {
+        setIbanLookupLoading(false);
+      }
+      return;
+    }
+
+    if (step === 2) {
+      setStep(3);
       return;
     }
 
@@ -298,15 +351,26 @@ const SendBank = () => {
           {/* Step 2: Recipient Details */}
           {step === 2 && (
             <div className="space-y-6">
+              {/* System IBAN badge */}
+              {isSystemIban && (
+                <div className="flex items-center gap-2 bg-green-500/10 text-green-600 dark:text-green-400 rounded-2xl px-4 py-3">
+                  <CheckCircle className="w-5 h-5 shrink-0" />
+                  <span className="text-sm font-medium">
+                    {t("send.ibanFoundInSystem", "IBAN найден в системе — данные заполнены автоматически")}
+                  </span>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">
                   {t("send.recipientName")}
                 </label>
                 <Input
                   value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
+                  onChange={(e) => !fieldsReadOnly && setRecipientName(e.target.value)}
+                  readOnly={fieldsReadOnly}
                   placeholder="John Smith"
-                  className="h-14 rounded-2xl bg-secondary border-0 text-base"
+                  className={`h-14 rounded-2xl bg-secondary border-0 text-base ${fieldsReadOnly ? 'opacity-80' : ''}`}
                 />
               </div>
 
@@ -316,9 +380,10 @@ const SendBank = () => {
                 </label>
                 <Input
                   value={bankName}
-                  onChange={(e) => setBankName(e.target.value)}
+                  onChange={(e) => !fieldsReadOnly && setBankName(e.target.value)}
+                  readOnly={fieldsReadOnly}
                   placeholder="Emirates NBD"
-                  className="h-14 rounded-2xl bg-secondary border-0 text-base"
+                  className={`h-14 rounded-2xl bg-secondary border-0 text-base ${fieldsReadOnly ? 'opacity-80' : ''}`}
                 />
               </div>
             </div>
@@ -486,13 +551,13 @@ const SendBank = () => {
         <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
           <Button
             onClick={handleNext}
-            disabled={!getStepValid() || isSubmitting}
+            disabled={!getStepValid() || isSubmitting || ibanLookupLoading}
             className="w-full h-14 rounded-2xl text-base font-semibold bg-primary/90 hover:bg-primary active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
           >
-            {isSubmitting ? (
+            {(isSubmitting || ibanLookupLoading) ? (
               <span className="flex items-center gap-2">
-                <span className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                {t("send.processing", "Обработка...")}
+                <Loader2 className="w-5 h-5 animate-spin" />
+                {ibanLookupLoading ? t("send.checkingIban", "Проверка IBAN...") : t("send.processing", "Обработка...")}
               </span>
             ) : step === 3 ? (
               `${t("send.continue")} ${parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`

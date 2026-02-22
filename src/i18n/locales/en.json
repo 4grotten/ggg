@@ -809,6 +809,8 @@
     "transferTerms": "By confirming, you agree to our transfer terms and conditions",
     "recipientIban": "Recipient IBAN",
     "enterIban": "Enter the recipient's International Bank Account Number",
+    "ibanFoundInSystem": "IBAN found in the system — details filled automatically",
+    "checkingIban": "Checking IBAN...",
     "recipientName": "Recipient Name",
     "bankName": "Bank Name",
     "iban": "IBAN",
