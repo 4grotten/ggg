@@ -20,24 +20,58 @@ export interface TransactionReceipt {
   operation: string;
   // Common
   amount?: number;
+  currency?: string;
   fee?: number;
+  exchange_rate?: number | null;
+  original_amount?: number | null;
+  original_currency?: string | null;
+  description?: string | null;
+  merchant_name?: string | null;
+  merchant_category?: string | null;
+  reference_id?: string | null;
+  card_id?: string | null;
+  user_id?: string;
   // Crypto fields
+  token?: string;
+  network?: string;
   to_address_mask?: string;
+  to_address?: string;
   from_address_mask?: string;
+  deposit_address_mask?: string;
   network_and_token?: string;
   amount_crypto?: number;
   tx_hash?: string | null;
+  fee_type?: string;
+  total_debit?: number;
+  credited_amount_aed?: number | null;
   // Card transfer fields
   sender_card_mask?: string;
   receiver_card_mask?: string;
-  recipient_name?: string;
-  // Bank fields
+  sender_name?: string | null;
+  recipient_name?: string | null;
+  total_amount?: number;
+  // Bank topup fields
+  transfer_rail?: string;
+  reference_value?: string;
+  sender_bank?: string | null;
+  sender_iban_mask?: string | null;
+  instructions?: Record<string, unknown>;
+  deposit_iban_mask?: string | null;
+  deposit_bank_name?: string | null;
+  deposit_beneficiary?: string | null;
+  // Bank withdrawal fields
   iban_mask?: string;
+  beneficiary_iban?: string;
   beneficiary_name?: string;
+  beneficiary_bank_name?: string;
   bank_name?: string;
   amount_aed?: number;
   fee_amount?: number;
   total_debit_aed?: number;
+  from_card_id?: string | null;
+  from_bank_account_id?: string | null;
+  // Balance movements
+  movements?: Array<{ account_type: string; amount: number; type: string }>;
   // Generic catch-all
   [key: string]: unknown;
 }

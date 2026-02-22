@@ -240,11 +240,169 @@ class TransactionService:
 
     @staticmethod
     def get_transaction_receipt(transaction_id):
+        from django.contrib.auth.models import User
+        from apps.accounts_apps.models import Profiles
+
         txn = Transactions.objects.get(id=transaction_id)
-        return {
-            "transaction_id": txn.id,
+
+        # Base receipt – common for every type
+        receipt = {
+            "transaction_id": str(txn.id),
             "type": txn.type,
-            "amount": txn.amount,
             "status": txn.status,
-            "created_at": txn.created_at
+            "date_time": txn.created_at.isoformat() if txn.created_at else None,
+            "amount": float(txn.amount),
+            "currency": txn.currency,
+            "fee": float(txn.fee) if txn.fee else 0,
+            "exchange_rate": float(txn.exchange_rate) if txn.exchange_rate else None,
+            "original_amount": float(txn.original_amount) if txn.original_amount else None,
+            "original_currency": txn.original_currency,
+            "description": txn.description,
+            "merchant_name": txn.merchant_name,
+            "merchant_category": txn.merchant_category,
+            "reference_id": txn.reference_id,
+            "card_id": str(txn.card_id) if txn.card_id else None,
+            "user_id": txn.user_id,
         }
+
+        # Helper to mask card number: **** 4521
+        def mask_card(num):
+            if not num:
+                return None
+            return f"**** {num[-4:]}" if len(num) >= 4 else num
+
+        # Helper to mask IBAN: AE07 **** 1234
+        def mask_iban(iban):
+            if not iban:
+                return None
+            return f"{iban[:4]} **** {iban[-4:]}" if len(iban) >= 8 else iban
+
+        # Helper to mask crypto address
+        def mask_address(addr):
+            if not addr:
+                return None
+            return f"{addr[:5]}...{addr[-5:]}" if len(addr) > 12 else addr
+
+        # Helper to get user name by id
+        def get_user_name(uid):
+            try:
+                u = User.objects.get(id=int(uid) if str(uid).isdigit() else uid)
+                return f"{u.first_name or ''} {u.last_name or ''}".strip() or "Unknown"
+            except Exception:
+                return None
+
+        # ---- Enrich by type ----
+        tx_type = txn.type
+
+        # Card Transfer
+        if tx_type == 'card_transfer':
+            receipt["operation"] = "Card Transfer"
+            receipt["sender_card_mask"] = mask_card(txn.sender_card)
+            receipt["receiver_card_mask"] = mask_card(txn.recipient_card)
+            try:
+                ct = txn.card_transfer
+                receipt["sender_name"] = get_user_name(ct.sender_user_id)
+                receipt["recipient_name"] = get_user_name(ct.receiver_user_id)
+                receipt["fee_amount"] = float(ct.fee_amount)
+                receipt["total_amount"] = float(ct.total_amount)
+            except Exception:
+                receipt["sender_name"] = txn.sender_name
+                receipt["recipient_name"] = None
+
+        # Bank Topup
+        elif tx_type == 'bank_topup':
+            receipt["operation"] = "Bank Top Up"
+            try:
+                bt = txn.bank_topup
+                receipt["transfer_rail"] = bt.transfer_rail
+                receipt["reference_value"] = bt.reference_value
+                receipt["sender_name"] = bt.sender_name
+                receipt["sender_bank"] = bt.sender_bank
+                receipt["sender_iban_mask"] = mask_iban(bt.sender_iban)
+                receipt["instructions"] = bt.instructions_snapshot
+                if bt.deposit_account:
+                    receipt["deposit_iban_mask"] = mask_iban(bt.deposit_account.iban)
+                    receipt["deposit_bank_name"] = bt.deposit_account.bank_name
+                    receipt["deposit_beneficiary"] = bt.deposit_account.beneficiary
+            except Exception:
+                pass
+
+        # Crypto Topup
+        elif tx_type == 'crypto_topup':
+            receipt["operation"] = "Crypto Top Up"
+            try:
+                ct = txn.crypto_topup
+                receipt["token"] = ct.token
+                receipt["network"] = ct.network
+                receipt["network_and_token"] = f"{ct.network} / {ct.token}"
+                receipt["deposit_address_mask"] = mask_address(ct.deposit_address)
+                receipt["from_address_mask"] = mask_address(ct.from_address)
+                receipt["amount_crypto"] = float(ct.amount_crypto) if ct.amount_crypto else None
+                receipt["tx_hash"] = ct.tx_hash
+                receipt["credited_amount_aed"] = float(ct.credited_amount_aed) if ct.credited_amount_aed else None
+            except Exception:
+                pass
+
+        # Bank Withdrawal
+        elif tx_type == 'bank_withdrawal':
+            receipt["operation"] = "Bank Transfer"
+            try:
+                bw = txn.bank_withdrawal
+                receipt["beneficiary_name"] = bw.beneficiary_name
+                receipt["beneficiary_bank_name"] = bw.beneficiary_bank_name
+                receipt["iban_mask"] = mask_iban(bw.beneficiary_iban)
+                receipt["beneficiary_iban"] = bw.beneficiary_iban
+                receipt["amount_aed"] = float(bw.amount_aed)
+                receipt["fee_amount"] = float(bw.fee_amount)
+                receipt["total_debit_aed"] = float(bw.total_debit)
+                receipt["from_card_id"] = str(bw.from_card_id) if bw.from_card_id else None
+                receipt["from_bank_account_id"] = str(bw.from_bank_account_id) if bw.from_bank_account_id else None
+            except Exception:
+                pass
+
+        # Crypto Withdrawal
+        elif tx_type == 'crypto_withdrawal':
+            receipt["operation"] = "Crypto Withdrawal"
+            try:
+                cw = txn.crypto_withdrawal
+                receipt["token"] = cw.token
+                receipt["network"] = cw.network
+                receipt["network_and_token"] = f"{cw.network} / {cw.token}"
+                receipt["to_address_mask"] = mask_address(cw.to_address)
+                receipt["to_address"] = cw.to_address
+                receipt["amount_crypto"] = float(cw.amount_crypto)
+                receipt["fee_amount"] = float(cw.fee_amount)
+                receipt["fee_type"] = cw.fee_type
+                receipt["total_debit"] = float(cw.total_debit)
+                receipt["tx_hash"] = cw.tx_hash
+            except Exception:
+                pass
+
+        # Internal Transfer (swap between own accounts)
+        elif tx_type == 'internal_transfer':
+            receipt["operation"] = "Internal Transfer"
+            # description has "from_type -> to_type"
+
+        # Transfer Out (IBAN → Card)
+        elif tx_type == 'transfer_out':
+            receipt["operation"] = "IBAN to Card Transfer"
+            receipt["receiver_card_mask"] = mask_card(txn.recipient_card)
+
+        # Card Activation / Payment / other
+        elif tx_type == 'card_activation':
+            receipt["operation"] = "Card Activation"
+        elif tx_type == 'card_payment':
+            receipt["operation"] = "Card Payment"
+        else:
+            receipt["operation"] = txn.type.replace('_', ' ').title()
+
+        # Attach balance movements
+        movements = txn.movements.all()
+        if movements.exists():
+            receipt["movements"] = [{
+                "account_type": m.account_type,
+                "amount": float(m.amount),
+                "type": m.type,
+            } for m in movements]
+
+        return receipt
