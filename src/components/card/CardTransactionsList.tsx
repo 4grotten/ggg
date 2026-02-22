@@ -257,6 +257,8 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isBankTransferIncoming && transaction.senderName
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
+                          : isBankTransfer && transaction.merchant === 'IBAN to Card'
+                          ? ` · Card····${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isBankTransfer && transaction.description
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description)}`
                           : isCryptoSend && transaction.description
