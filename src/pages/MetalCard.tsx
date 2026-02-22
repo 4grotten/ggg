@@ -19,7 +19,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useCards } from "@/hooks/useCards";
-
+import { useCardTransactionGroups } from "@/hooks/useTransactions";
+import { Skeleton } from "@/components/ui/skeleton";
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -46,40 +47,6 @@ const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: n
   return <>{displayValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>;
 };
 
-// Metal card transactions (using IDs from TransactionDetails)
-const metalCardTransactions = [
-  {
-    date: "January 12",
-    totalSpend: 250.00,
-    transactions: [
-      { id: "17", merchant: "Card Transfer", time: "15:30", amountUSDT: 250.00, amountLocal: 250.00, localCurrency: "AED", color: "#007AFF", type: "card_transfer" as const, recipientCard: "4521", status: "processing" as const },
-    ],
-  },
-  {
-    date: "January 10",
-    totalSpend: 193.60,
-    transactions: [
-      { id: "3", merchant: "Ongaku", time: "00:17", amountUSDT: 54.05, amountLocal: 193.60, localCurrency: "AED", color: "#F97316" },
-    ],
-  },
-  {
-    date: "January 02",
-    totalSpend: 225.00,
-    transactions: [
-      { id: "4", merchant: "OPERA", time: "20:20", amountUSDT: 62.82, amountLocal: 225.00, localCurrency: "AED", color: "#A855F7" },
-    ],
-  },
-  {
-    date: "December 30",
-    totalSpend: 996.50,
-    transactions: [
-      { id: "7", merchant: "BHPC", time: "20:16", amountUSDT: 125.64, amountLocal: 450.00, localCurrency: "AED", color: "#EAB308" },
-      { id: "11", merchant: "Service CEO", time: "07:58", amountUSDT: 11.59, amountLocal: 41.50, localCurrency: "AED", color: "#06B6D4" },
-      { id: "13", merchant: "Top up", time: "02:30", amountUSDT: 494.10, amountLocal: 500.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as const },
-    ],
-  },
-];
-
 const MetalCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -99,6 +66,16 @@ const MetalCard = () => {
   // Fetch real balance from API
   const { data: cardsData } = useCards({ type: 'metal' });
   const apiCard = cardsData?.data?.[0];
+  const cardId = apiCard?.id;
+
+  // Fetch card transactions from API
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups();
+  
+  // Filter transactions for this card only
+  const filteredGroups = (cardTxGroups || []).map(group => ({
+    ...group,
+    transactions: group.transactions.filter(tx => !cardId || tx.cardId === cardId || !tx.cardId),
+  })).filter(g => g.transactions.length > 0);
 
   const cardData = {
     holderName: "RINAT KAMIEV",
@@ -446,7 +423,15 @@ const MetalCard = () => {
           transition={{ duration: 0.4, delay: 0.35 }}
         >
           <h2 className="text-lg font-bold mb-3">{t("card.transactions")}</h2>
-          <CardTransactionsList groups={metalCardTransactions} />
+          {txLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+            </div>
+          ) : filteredGroups.length > 0 ? (
+            <CardTransactionsList groups={filteredGroups} />
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">{t("card.noTransactions", "No transactions yet")}</p>
+          )}
         </motion.div>
 
         {/* Footer */}

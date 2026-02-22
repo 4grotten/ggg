@@ -5,7 +5,8 @@ import {
   fetchTransactionById,
   fetchTransactionReceipt,
   fetchApiTransactionGroups,
-  fetchIbanTransactionGroups
+  fetchIbanTransactionGroups,
+  fetchCardTransactionGroups
 } from '@/services/api/transactions';
 import { FetchTransactionsParams, TransactionGroup } from '@/types/transaction';
 import { getAuthToken } from '@/services/api/apiClient';
@@ -18,6 +19,7 @@ export const transactionKeys = {
   groups: () => [...transactionKeys.all, 'groups'] as const,
   groupsWithParams: (params?: FetchTransactionsParams) => [...transactionKeys.groups(), params] as const,
   apiGroups: () => [...transactionKeys.all, 'apiGroups'] as const,
+  cardGroups: () => [...transactionKeys.all, 'cardGroups'] as const,
   ibanGroups: () => [...transactionKeys.all, 'ibanGroups'] as const,
   details: () => [...transactionKeys.all, 'detail'] as const,
   detail: (id: string) => [...transactionKeys.details(), id] as const,
@@ -44,6 +46,20 @@ export const useApiTransactionGroups = () => {
   return useQuery({
     queryKey: transactionKeys.apiGroups(),
     queryFn: fetchApiTransactionGroups,
+    enabled: !!token,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });
+};
+
+/**
+ * Hook to fetch card-only transactions from API
+ */
+export const useCardTransactionGroups = () => {
+  const token = getAuthToken();
+  return useQuery({
+    queryKey: transactionKeys.cardGroups(),
+    queryFn: fetchCardTransactionGroups,
     enabled: !!token,
     staleTime: 1000 * 60 * 5,
     retry: 1,
