@@ -19,7 +19,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useCards } from "@/hooks/useCards";
-import { useCardTransactionGroups } from "@/hooks/useTransactions";
+import { useCardTransactionGroups, useTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
@@ -68,14 +68,15 @@ const MetalCard = () => {
   const apiCard = cardsData?.data?.[0];
   const cardId = apiCard?.id;
 
-  // Fetch card transactions from API
+  // Fetch card transactions from API + mock data
   const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups();
+  const { data: mockData } = useTransactionGroups();
   
-  // Filter transactions for this card only
-  const filteredGroups = (cardTxGroups || []).map(group => ({
-    ...group,
-    transactions: group.transactions.filter(tx => !cardId || tx.cardId === cardId || !tx.cardId),
-  })).filter(g => g.transactions.length > 0);
+  // Merge: API groups first, then mock groups below
+  const mergedGroups = [
+    ...(cardTxGroups || []),
+    ...(mockData?.groups || []),
+  ];
 
   const cardData = {
     holderName: "RINAT KAMIEV",
@@ -427,8 +428,8 @@ const MetalCard = () => {
             <div className="space-y-3">
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
             </div>
-          ) : filteredGroups.length > 0 ? (
-            <CardTransactionsList groups={filteredGroups} />
+          ) : mergedGroups.length > 0 ? (
+            <CardTransactionsList groups={mergedGroups} />
           ) : (
             <p className="text-sm text-muted-foreground text-center py-6">{t("card.noTransactions", "No transactions yet")}</p>
           )}
