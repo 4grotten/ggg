@@ -458,6 +458,9 @@ export const AddContactDrawer = ({
       const extraNotes = extraParts.length > 0 ? extraParts.join('\n') : '';
       const combinedNotes = [mainNotes, extraNotes].filter(Boolean).join('\n---\n') || undefined;
 
+      // Don't send base64 data URIs in PATCH — avatar is uploaded separately
+      const safeAvatarUrl = finalAvatarUrl && !finalAvatarUrl.startsWith('data:') ? finalAvatarUrl : undefined;
+
       const contactData = {
         full_name: (fullName || '').trim(),
         phone: phoneValues[0] || undefined,
@@ -465,7 +468,7 @@ export const AddContactDrawer = ({
         company: companyValues[0] || undefined,
         position: positionValues[0] || undefined,
         notes: combinedNotes,
-        avatar_url: finalAvatarUrl || undefined,
+        avatar_url: safeAvatarUrl,
         payment_methods: paymentMethods,
         social_links: contactSocialLinks,
       };
