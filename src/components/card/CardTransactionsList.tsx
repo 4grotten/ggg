@@ -62,6 +62,7 @@ const translateMerchant = (merchant: string, type: string | undefined, t: (key: 
     "Annual Card fee": "transactions.annualCardFee",
     "Stablecoin Send": "transactions.stablecoinSend",
     "Bank Transfer": "transactions.bankTransfer",
+    "IBAN to Card": "transactions.ibanToCard",
   };
   
   return merchantsMap[merchant] ? t(merchantsMap[merchant]) : merchant;

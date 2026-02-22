@@ -714,6 +714,7 @@
     "stablecoinSend": "Stablecoin Send",
     "bankTransfer": "Bank Transfer",
     "bankTransferIncoming": "Bank Transfer Incoming",
+    "ibanToCard": "IBAN to Card",
     "months": {
       "january": "January",
       "february": "February",
