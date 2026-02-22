@@ -9,6 +9,7 @@ from api.accounts_api.serializers import ContactSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
@@ -531,3 +532,55 @@ class ContactDetailView(APIView):
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         contact.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ContactAvatarView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_object(self, pk, user):
+        try:
+            return Contacts.objects.get(pk=pk, user=user)
+        except Contacts.DoesNotExist:
+            return None
+
+    @swagger_auto_schema(
+        operation_summary="Загрузить аватар контакта",
+        tags=["Контакты"]
+    )
+    def post(self, request, pk):
+        contact = self.get_object(pk, request.user)
+        if not contact:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        file = request.FILES.get('file')
+        if not file:
+            return Response({"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Upload via Apofiz files endpoint
+        from .apofiz_client import ApofizClient
+        token = request.META.get('HTTP_AUTHORIZATION', '').replace('Token ', '')
+        status_code, result = ApofizClient.upload_avatar(token, file)
+
+        if status_code in (200, 201):
+            avatar_url = result.get('file_url') or result.get('url') or result.get('avatar_url', '')
+            if avatar_url:
+                contact.avatar_url = avatar_url
+                contact.save()
+            serializer = ContactSerializer(contact)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(result, status=status_code)
+
+    @swagger_auto_schema(
+        operation_summary="Удалить аватар контакта",
+        tags=["Контакты"]
+    )
+    def delete(self, request, pk):
+        contact = self.get_object(pk, request.user)
+        if not contact:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        contact.avatar_url = None
+        contact.save()
+        serializer = ContactSerializer(contact)
+        return Response(serializer.data, status=status.HTTP_200_OK)
