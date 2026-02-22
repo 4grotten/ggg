@@ -102,20 +102,25 @@ class VerifyOtpView(APIView):
 
 
 class RegisterAuthView(APIView):
+    authentication_classes = []
     permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(
-        operation_summary="Регистрация / Проверка телефона",
-        operation_description="Проверяет номер. Если юзер существует — возвращает ошибку, иначе стартует отправку OTP.",
+        operation_summary="Быстрая регистрация (Автоматический вход)",
+        operation_description="Делает запрос в Apofiz. Если юзер новый и Apofiz возвращает token: null, бэкенд делает второй запрос автоматически, получает токен, создает локального юзера и 4 кошелька (Metal, Virtual, Bank, Crypto).",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number'],
-            properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING)}),
+            properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING, example="+996777999991")}),
         tags=["Аутентификация"]
     )
     def post(self, request):
         phone_number = request.data.get('phone_number')
+        if not phone_number:
+            return Response({"error": "phone_number is required"}, status=status.HTTP_400_BAD_REQUEST)
         status_code, data = ApofizClient.register_auth(phone_number)
-        if status_code == 400 and ("exists" in str(data).lower() or "зарегистрирован" in str(data).lower()):
-             return Response({"error": "Пользователь с таким номером уже зарегистрирован. Пожалуйста, выполните вход."}, status=status.HTTP_400_BAD_REQUEST)
+        if status_code == 200 and data.get('token') is None:
+            status_code, data = ApofizClient.register_auth(phone_number)
+        if status_code == 200 and data.get('token'):
+            sync_apofiz_token_and_user(phone_number, data['token'])  
         return Response(data, status=status_code)
 
 
@@ -194,13 +199,16 @@ class SetPasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Установить пароль (Apofiz)",
-        operation_description="**[Прокси на Apofiz: POST /set_password/]**\nУстанавливает пароль новому пользователю.",
-        request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['password'], properties={'password': openapi.Schema(type=openapi.TYPE_STRING)}),
+        operation_summary="Установить пароль",
+        operation_description="Устанавливает пароль для нового пользователя в Apofiz и дублирует его в локальной БД Django.",
+        request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['password'], 
+            properties={'password': openapi.Schema(type=openapi.TYPE_STRING)}),
         tags=["Управление паролями"]
     )
     def post(self, request):
         password = request.data.get('password')
+        if not password:
+             return Response({"error": "password is required"}, status=status.HTTP_400_BAD_REQUEST)  
         status_code, data = ApofizClient.set_password(request.auth.key, password)
         if status_code == 200:
             request.user.set_password(password)
@@ -264,12 +272,16 @@ class InitProfileView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Создать / Обновить профиль (Apofiz + EasyCard)",
-        operation_description="**[СИМФОНИЯ: POST /init_profile/]**\nОбновляет данные в Apofiz и синхронизирует их с локальной базой Django.",
+        operation_summary="Инициализация / Обновление профиля",
+        operation_description="Отправляет данные в Apofiz и синхронизирует их с локальной БД (Django User + Profiles).",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, properties={
-            'full_name': openapi.Schema(type=openapi.TYPE_STRING), 'email': openapi.Schema(type=openapi.TYPE_STRING),
-            'username': openapi.Schema(type=openapi.TYPE_STRING), 'gender': openapi.Schema(type=openapi.TYPE_STRING),
-            'date_of_birth': openapi.Schema(type=openapi.TYPE_STRING), 'avatar_id': openapi.Schema(type=openapi.TYPE_INTEGER)
+            'gender': openapi.Schema(type=openapi.TYPE_STRING, description="male / female"), 
+            'avatar_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+            'username': openapi.Schema(type=openapi.TYPE_STRING), 
+            'email': openapi.Schema(type=openapi.TYPE_STRING),
+            'full_name': openapi.Schema(type=openapi.TYPE_STRING), 
+            'date_of_birth': openapi.Schema(type=openapi.TYPE_STRING, description="YYYY-MM-DD"), 
+            'device_type': openapi.Schema(type=openapi.TYPE_STRING, description="android, ios, null")
         }),
         tags=["Профиль пользователя"]
     )
@@ -285,9 +297,11 @@ class InitProfileView(APIView):
                 user.email = request.data['email']
             user.save()
 
-            profile, _ = Profiles.objects.get_or_create(user_id=user.id)
+            profile, _ = Profiles.objects.get_or_create(user_id=str(user.id), defaults={'phone': user.username})
             if 'gender' in request.data:
                 profile.gender = request.data['gender']
+            if 'date_of_birth' in request.data:
+                profile.date_of_birth = request.data['date_of_birth']
             if data.get('avatar'):
                 profile.avatar_url = data['avatar'].get('file')
             profile.save()
@@ -340,23 +354,21 @@ class UploadAvatarView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Загрузить аватар (Apofiz)",
-        operation_description="**[Прокси на Apofiz: POST /files/]**\nПередает Multipart файл на сервер Apofiz, локально сохраняет полученный URL.",
+        operation_summary="Загрузить аватар",
+        operation_description="Передает Multipart файл на сервер Apofiz, локально сохраняет полученный URL в профиль пользователя.",
         consumes=['multipart/form-data'],
-        manual_parameters=[openapi.Parameter('file', openapi.IN_FORM, type=openapi.TYPE_FILE, description='Изображение (JPEG, PNG)')],
+        manual_parameters=[openapi.Parameter('file', openapi.IN_FORM, type=openapi.TYPE_FILE, description='Изображение (JPEG, PNG)', required=True)],
         tags=["Файлы и Соцсети"]
     )
     def post(self, request):
         file_obj = request.FILES.get('file')
         if not file_obj:
-            return Response({"error": "Файл не предоставлен"}, status=400)
-
+            return Response({"error": "Файл не предоставлен"}, status=status.HTTP_400_BAD_REQUEST)
         status_code, data = ApofizClient.upload_avatar(request.auth.key, file_obj)
         if status_code == 200 and 'file' in data:
-            profile, _ = Profiles.objects.get_or_create(user_id=request.user.id)
+            profile, _ = Profiles.objects.get_or_create(user_id=str(request.user.id), defaults={'phone': request.user.username})
             profile.avatar_url = data['file']
             profile.save()
-            
         return Response(data, status=status_code)
 
 
