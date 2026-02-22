@@ -403,6 +403,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     metadata: { 
       apiDate: dateStr, 
       fromApi: true,
+      isIncoming,
       merchantCategory: tx.merchant_category,
       referenceId: tx.reference_id,
       originalCurrency: tx.original_currency,
