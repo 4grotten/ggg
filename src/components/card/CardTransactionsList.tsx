@@ -105,8 +105,9 @@ const handleClick = (transaction: Transaction) => {
     const isCryptoDeposit = transaction.type === "crypto_deposit";
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
-    const isIncomingTransfer = isCardTransfer && transaction.senderCard;
-    const isOutgoingTransfer = isCardTransfer && transaction.recipientCard;
+    const apiIsIncoming = (transaction.metadata as any)?.isIncoming;
+    const isIncomingTransfer = isCardTransfer && (apiIsIncoming !== undefined ? apiIsIncoming : !!transaction.senderCard && !transaction.recipientCard);
+    const isOutgoingTransfer = isCardTransfer && (apiIsIncoming !== undefined ? !apiIsIncoming : !!transaction.recipientCard && !transaction.senderCard);
     const isProcessing = transaction.status === "processing";
     // In wallet view, topup = outgoing (wallet → card), so it's negative
     const walletTopupOutgoing = walletView && isTopup;
@@ -233,15 +234,17 @@ const handleClick = (transaction: Transaction) => {
                           ? t("transactions.walletDeposit")
                           : isIncomingTransfer
                           ? t("transactions.cardReceived")
+                          : isOutgoingTransfer
+                          ? t("transactions.cardTransfer")
                           : translateMerchant(transaction.merchant, transaction.type, t)
                         }
                       </p>
                       <p className="text-sm text-muted-foreground truncate">
                         {transaction.time}
-                        {isCardTransfer && transaction.senderCard
-                          ? ` · ${t("transactions.from")} •••• ${transaction.senderCard.slice(-4)}`
-                          : isCardTransfer && transaction.recipientCard
-                          ? ` · ${t("transactions.to")} •••• ${transaction.recipientCard.slice(-4)}`
+                        {isIncomingTransfer && (transaction.senderCard || transaction.recipientCard)
+                          ? ` · ${t("transactions.from")} •••• ${(transaction.senderCard || transaction.recipientCard || '').slice(-4)}`
+                          : isOutgoingTransfer && (transaction.recipientCard || transaction.senderCard)
+                          ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isBankTransferIncoming && transaction.senderName
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
                           : isBankTransfer && transaction.description
