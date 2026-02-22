@@ -91,8 +91,9 @@ const Dashboard = () => {
     balance: parseFloat(c.balance) || 0,
     lastFourDigits: c.card_number?.slice(-4),
   }));
-  const totalBalance = cards.reduce((sum, c) => sum + c.balance, 0);
   const physicalAccount = walletData?.data?.physical_account;
+  const accountBal = physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0;
+  const totalBalance = cards.reduce((sum, c) => sum + c.balance, 0) + accountBal;
   const transactionGroups = transactionsData?.groups || [];
 
   // Use transaction filters hook
@@ -186,7 +187,7 @@ const Dashboard = () => {
           {/* Balance - only for authenticated users */}
           {isAuthenticated && !walletLoading && (
             <AnimatedSection delay={0.1} preset="fadeUpScale">
-              <BalanceCard balance={totalBalance} cards={cards} usdtBalance={112000} accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0} accountIbanLast4={physicalAccount?.iban?.slice(-4)} />
+              <BalanceCard balance={totalBalance} cards={cards} usdtBalance={112000} accountBalance={accountBal} accountIbanLast4={physicalAccount?.iban?.slice(-4)} />
             </AnimatedSection>
           )}
           {isAuthenticated && walletLoading && (
