@@ -173,33 +173,27 @@ const SendBank = () => {
     setIsSubmitting(true);
 
     try {
-      // Resolve the card ID to use for the withdrawal
-      let cardId = selectedSource.type === "card" ? selectedSource.id : null;
-
-      // For bank/wallet sources, pick the first available card
-      if (!cardId) {
-        const cards = cardsData?.data ?? [];
-        if (cards.length > 0) {
-          cardId = cards[0].id;
-        } else {
-          toast.error(t("send.noCardAvailable", "Нет доступной карты для списания"));
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      const result = await submitBankWithdrawal({
-        from_card_id: cardId,
+      // Build request based on source type
+      const baseRequest = {
         iban: iban.replace(/\s/g, ""),
         beneficiary_name: recipientName.trim(),
         bank_name: bankName.trim(),
         amount_aed: parseFloat(amountAED).toFixed(2),
-      });
+      };
+
+      const request = selectedSource.type === "card"
+        ? { ...baseRequest, from_card_id: selectedSource.id }
+        : selectedSource.type === "bank"
+          ? { ...baseRequest, from_bank_account_id: selectedSource.id }
+          : { ...baseRequest, from_card_id: (cardsData?.data?.[0]?.id || selectedSource.id) };
+
+      const result = await submitBankWithdrawal(request);
 
       if (result.success) {
         toast.success(t("send.transferSuccess", "Перевод отправлен"));
         queryClient.invalidateQueries({ queryKey: ["cards"] });
         queryClient.invalidateQueries({ queryKey: ["transactions"] });
+        queryClient.invalidateQueries({ queryKey: ["bankAccounts"] });
         navigate(isReferralWithdrawal ? "/partner" : "/");
       } else {
         toast.error(result.error || t("send.transferFailed", "Ошибка перевода"));

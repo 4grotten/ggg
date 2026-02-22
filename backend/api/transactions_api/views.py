@@ -197,7 +197,15 @@ class BankWithdrawalView(APIView):
         serializer = BankWithdrawalRequestSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                withdrawal = TransactionService.execute_bank_withdrawal(user_id=request.user.id, card_id=serializer.validated_data['from_card_id'], iban=serializer.validated_data['iban'], beneficiary_name=serializer.validated_data['beneficiary_name'], bank_name=serializer.validated_data['bank_name'], amount_aed=serializer.validated_data['amount_aed'])
+                withdrawal = TransactionService.execute_bank_withdrawal(
+                    user_id=request.user.id,
+                    card_id=serializer.validated_data.get('from_card_id'),
+                    bank_account_id=serializer.validated_data.get('from_bank_account_id'),
+                    iban=serializer.validated_data['iban'],
+                    beneficiary_name=serializer.validated_data['beneficiary_name'],
+                    bank_name=serializer.validated_data['bank_name'],
+                    amount_aed=serializer.validated_data['amount_aed']
+                )
                 return Response({"message": "Bank wire processing", "transaction_id": withdrawal.transaction.id, "fee_amount": withdrawal.fee_amount, "total_debit_aed": withdrawal.total_debit}, status=status.HTTP_200_OK)
             except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
