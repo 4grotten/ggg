@@ -33,6 +33,7 @@ const mockTransactions: Record<string, {
   cardType?: "Virtual" | "Metal";
   recipientCard?: string;
   recipientCardFull?: string;
+  recipientCardType?: "Virtual" | "Metal";
   recipientName?: string;
   transferFee?: number;
   fromCardFull?: string;
@@ -113,7 +114,13 @@ const TransactionDetails = () => {
     }
     return mask;
   };
-  const resolveCardType = (mask: string | undefined | null): "Virtual" | "Metal" => {
+  const resolveCardType = (mask: string | undefined | null, movementIndex?: number): "Virtual" | "Metal" => {
+    // First try movements from receipt
+    if (receipt?.movements && movementIndex !== undefined && receipt.movements[movementIndex]) {
+      const accType = receipt.movements[movementIndex].account_type;
+      if (accType === 'metal') return 'Metal';
+      if (accType === 'virtual') return 'Virtual';
+    }
     if (!mask) return "Virtual";
     const last4 = mask.slice(-4);
     const found = walletCards.find((c: any) => c.card_number?.slice(-4) === last4);
@@ -136,8 +143,8 @@ const TransactionDetails = () => {
   const transaction = mockTransaction || (receipt ? (() => {
     const senderLast4 = receipt.sender_card_mask?.slice(-4) || '';
     const receiverLast4 = receipt.receiver_card_mask?.slice(-4) || '';
-    const senderCardType = resolveCardType(receipt.sender_card_mask);
-    const receiverCardType = resolveCardType(receipt.receiver_card_mask);
+    const senderCardType = resolveCardType(receipt.sender_card_mask, 0);
+    const receiverCardType = resolveCardType(receipt.receiver_card_mask, 1);
     
     return {
       id: id || '',
@@ -165,6 +172,7 @@ const TransactionDetails = () => {
       })(),
       recipientCard: receiverLast4,
       recipientCardFull: resolveFullCard(receipt.receiver_card_mask),
+      recipientCardType: receiverCardType,
       recipientName: receipt.recipient_name,
       senderName: receipt.sender_name,
       senderCard: senderLast4 || undefined,
@@ -196,8 +204,14 @@ const TransactionDetails = () => {
   const isCryptoDeposit = transaction?.type === "crypto_deposit";
   const isBankTransfer = transaction?.type === "bank_transfer";
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
-  const isIncomingTransfer = isCardTransfer && !!transaction?.senderCard;
-  const isOutgoingTransfer = isCardTransfer && !!transaction?.recipientCard;
+  // For API transactions, determine direction: if movements[0] is debit, it's outgoing
+  const isIncomingTransfer = isCardTransfer && (() => {
+    if (receipt?.movements?.length) {
+      return receipt.movements[0]?.type === 'credit';
+    }
+    return !!transaction?.senderCard && !transaction?.recipientCard;
+  })();
+  const isOutgoingTransfer = isCardTransfer && !isIncomingTransfer && !!transaction?.recipientCard;
   
   const [showToCard, setShowToCard] = useState(false);
   const [showFromCard, setShowFromCard] = useState(false);
@@ -861,7 +875,7 @@ const TransactionDetails = () => {
                     onClick={() => navigate("/card/virtual")}
                     className="font-medium text-[#007AFF] hover:underline transition-colors"
                   >
-                    {showToCard ? `Visa Virtual ${transaction.toCardFull}` : `Visa Virtual ••${transaction.cardLast4}`}
+                    {showToCard ? `Visa ${transaction.cardType || 'Virtual'} ${transaction.toCardFull}` : `Visa ${transaction.cardType || 'Virtual'} ••${transaction.cardLast4}`}
                   </button>
                   <button 
                     onClick={() => {
@@ -891,7 +905,7 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.toCard")}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">
-                    {showToCard ? `Visa ${transaction.recipientCardFull}` : `Visa ••${transaction.recipientCard}`}
+                    {showToCard ? `Visa ${transaction.recipientCardType || ''} ${transaction.recipientCardFull}` : `Visa ${transaction.recipientCardType || ''} ••${transaction.recipientCard}`}
                   </span>
                   <button 
                     onClick={() => {
