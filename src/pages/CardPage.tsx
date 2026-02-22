@@ -14,6 +14,8 @@ import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { AddToWalletDrawer } from "@/components/card/AddToWalletDrawer";
 import { useWalletSummary } from "@/hooks/useCards";
+import { useCardTransactionGroups } from "@/hooks/useTransactions";
+import { Skeleton } from "@/components/ui/skeleton";
 import { detectPlatform } from "@/lib/walletDeepLinks";
 import {
   Collapsible,
@@ -162,6 +164,9 @@ const CardPage = () => {
   const { data: walletData } = useWalletSummary();
   const apiCards = walletData?.data?.cards || [];
 
+  // Fetch real card transactions from API
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups();
+
   const handleUnlock = () => {
     setIsUnlocking(true);
     setTimeout(() => {
@@ -176,6 +181,18 @@ const CardPage = () => {
   // Format card number with spaces: "4532112233000002" → "4532 1122 3300 0002"
   const formatCardNumber = (num: string) =>
     num.replace(/(.{4})/g, '$1 ').trim();
+
+  // Filter API transactions for current card, then append mock data below
+  const apiCardId = apiCard?.id;
+  const filteredApiGroups = (cardTxGroups || []).map(group => ({
+    ...group,
+    transactions: group.transactions.filter(tx => !apiCardId || tx.cardId === apiCardId || !tx.cardId),
+  })).filter(g => g.transactions.length > 0);
+
+  const mergedTransactions = [
+    ...filteredApiGroups,
+    ...cardsData[currentCardType].transactions,
+  ];
 
   const cardData = {
     ...cardsData[currentCardType],
@@ -666,7 +683,13 @@ const CardPage = () => {
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             <h2 className="text-lg font-bold mb-3">{t("card.transactions")}</h2>
-            <CardTransactionsList groups={cardData.transactions} />
+            {txLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+              </div>
+            ) : (
+              <CardTransactionsList groups={mergedTransactions} />
+            )}
           </motion.div>
 
           {/* Footer */}
