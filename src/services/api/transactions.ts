@@ -222,9 +222,21 @@ export interface ApiTransaction {
   amount: number;
   currency: string;
   created_at: string;
+  updated_at?: string;
   description?: string;
-  recipient_name?: string;
-  sender_name?: string;
+  fee?: number | null;
+  exchange_rate?: string | null;
+  original_amount?: number | null;
+  original_currency?: string | null;
+  merchant_name?: string | null;
+  merchant_category?: string | null;
+  recipient_card?: string | null;
+  sender_name?: string | null;
+  sender_card?: string | null;
+  reference_id?: string | null;
+  card_id?: string | null;
+  metadata?: Record<string, unknown> | null;
+  // Legacy/extra fields
   card_mask?: string;
   to_address_mask?: string;
   from_address_mask?: string;
@@ -287,6 +299,9 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'crypto_deposit': 'crypto_deposit',
     'payment': 'payment',
     'card_payment': 'payment',
+    'card_activation': 'card_activation',
+    'internal_transfer': 'bank_transfer',
+    'declined': 'declined',
   };
   
   const mappedType = typeMap[tx.type] || 'payment' as TransactionType;
@@ -301,10 +316,12 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'crypto_withdrawal': '#10B981',
     'bank_transfer': '#8B5CF6',
     'payment': '#3B82F6',
+    'card_activation': '#CCFF00',
+    'declined': '#EC4899',
   };
   
-  // Merchant name based on operation or type
-  const merchantMap: Record<string, string> = {
+  // Merchant name: prefer merchant_name from DB, then operation, then fallback
+  const merchantFallback: Record<string, string> = {
     'topup': 'Top up',
     'bank_topup': 'Top up',
     'crypto_topup': 'Top up',
@@ -315,23 +332,47 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'bank_transfer': 'Bank Transfer',
     'bank_transfer_incoming': 'Bank Transfer',
     'crypto_deposit': 'Wallet Deposit',
+    'card_activation': 'Annual Card fee',
+    'internal_transfer': 'Internal Transfer',
+    'card_payment': tx.merchant_name || 'Payment',
   };
-  
+
+  const merchant = tx.merchant_name || (tx.operation as string) || merchantFallback[tx.type] || tx.type;
+
+  // Compute USDT equivalent if exchange_rate is available
+  const absAmount = Math.abs(tx.amount);
+  let amountUSDT = absAmount;
+  if (tx.original_amount != null) {
+    amountUSDT = Math.abs(tx.original_amount);
+  } else if (tx.exchange_rate) {
+    const rate = parseFloat(tx.exchange_rate);
+    if (rate > 0) amountUSDT = absAmount / rate;
+  }
+
   return {
     id: `api_${tx.id}`,
-    merchant: (tx.operation as string) || merchantMap[tx.type] || tx.type,
+    merchant,
     time,
-    amountUSDT: Math.abs(tx.amount),
-    amountLocal: Math.abs(tx.amount),
+    amountUSDT: parseFloat(amountUSDT.toFixed(2)),
+    amountLocal: absAmount,
     localCurrency: tx.currency || 'AED',
     color: colorMap[mappedType] || '#3B82F6',
     type: mappedType,
     status: tx.status === 'completed' ? 'settled' : tx.status as any,
-    senderName: tx.sender_name as string,
-    recipientCard: tx.card_mask as string,
-    description: tx.description,
+    senderName: tx.sender_name || undefined,
+    senderCard: tx.sender_card || undefined,
+    recipientCard: tx.recipient_card || undefined,
+    description: tx.description || undefined,
     createdAt: tx.created_at,
-    metadata: { apiDate: dateStr, fromApi: true },
+    cardId: tx.card_id || undefined,
+    fee: tx.fee != null ? Number(tx.fee) : undefined,
+    metadata: { 
+      apiDate: dateStr, 
+      fromApi: true,
+      merchantCategory: tx.merchant_category,
+      referenceId: tx.reference_id,
+      originalCurrency: tx.original_currency,
+    },
   };
 };
 

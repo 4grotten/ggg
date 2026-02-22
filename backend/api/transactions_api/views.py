@@ -69,8 +69,21 @@ class AllTransactionsListView(APIView):
             "status": tx.status,
             "amount": tx.amount,
             "currency": tx.currency,
+            "fee": tx.fee,
+            "exchange_rate": str(tx.exchange_rate) if tx.exchange_rate else None,
+            "original_amount": tx.original_amount,
+            "original_currency": tx.original_currency,
+            "merchant_name": tx.merchant_name,
+            "merchant_category": tx.merchant_category,
+            "recipient_card": tx.recipient_card,
+            "sender_name": tx.sender_name,
+            "sender_card": tx.sender_card,
+            "reference_id": tx.reference_id,
+            "description": tx.description,
+            "card_id": str(tx.card_id) if tx.card_id else None,
+            "metadata": tx.metadata,
             "created_at": tx.created_at,
-            "description": tx.description
+            "updated_at": tx.updated_at,
         } for tx in txs]
         return Response(data, status=status.HTTP_200_OK)
 
