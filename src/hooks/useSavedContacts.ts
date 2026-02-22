@@ -39,16 +39,16 @@ export const useSavedContacts = () => {
     setError(null);
 
     try {
-      const res = await apiFetchContacts(1, 200);
-      // Backend may not have contacts endpoint yet — treat 404 as empty list
-      if (res.status === 404) {
+      const res = await apiFetchContacts();
+      // Backend may not have contacts endpoint yet — treat 404/502 as empty list
+      if (res.status === 404 || res.status === 502) {
         setContacts([]);
         setIsLoading(false);
         return;
       }
       if (res.error) throw new Error(res.error.detail || res.error.message || 'Fetch error');
 
-      const list = res.data?.list ?? [];
+      const list = res.data ?? [];
       // Ensure arrays for nested fields
       const parsed: SavedContact[] = list.map((c) => ({
         ...c,
@@ -108,13 +108,13 @@ export const useSavedContacts = () => {
   };
 
   // Update a contact
-  const updateContactFn = async (id: string, updates: SavedContactUpdate): Promise<boolean> => {
+  const updateContactFn = async (id: string | number, updates: SavedContactUpdate): Promise<boolean> => {
     try {
       const res = await apiUpdateContact(id, updates as Record<string, unknown>);
       if (res.error) throw new Error(res.error.detail || res.error.message || 'Update error');
 
       setContacts((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
+        prev.map((c) => (String(c.id) === String(id) ? { ...c, ...updates } : c))
       );
       toast.success(t('contacts.updated'));
       return true;
@@ -126,12 +126,12 @@ export const useSavedContacts = () => {
   };
 
   // Delete a contact
-  const deleteContactFn = async (id: string): Promise<boolean> => {
+  const deleteContactFn = async (id: string | number): Promise<boolean> => {
     try {
       const res = await apiDeleteContact(id);
       if (res.error) throw new Error(res.error.detail || res.error.message || 'Delete error');
 
-      setContacts((prev) => prev.filter((c) => c.id !== id));
+      setContacts((prev) => prev.filter((c) => String(c.id) !== String(id)));
       toast.success(t('contacts.deleted'));
       return true;
     } catch (err: any) {
