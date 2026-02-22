@@ -1174,7 +1174,8 @@
       "topups": "Yüklemeler",
       "transfers": "Transferler",
       "withdrawals": "Çekimler",
-      "receipts": "Makbuzlar"
+      "receipts": "Makbuzlar",
+      "contacts": "Kayıtlı Kişiler"
     },
     "notes": {
       "title": "Notlar"

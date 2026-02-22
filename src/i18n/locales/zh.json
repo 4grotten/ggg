@@ -1181,7 +1181,8 @@
       "topups": "充值",
       "transfers": "转账",
       "withdrawals": "提现",
-      "receipts": "收据"
+      "receipts": "收据",
+      "contacts": "已保存的联系人"
     },
     "notes": {
       "title": "注意事项"

@@ -1234,7 +1234,8 @@
       "topups": "Topups",
       "transfers": "Transfers",
       "withdrawals": "Withdrawals",
-      "receipts": "Receipts"
+      "receipts": "Receipts",
+      "contacts": "Saved Contacts"
     },
     "notes": {
       "title": "Notes"

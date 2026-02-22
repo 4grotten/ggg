@@ -1174,7 +1174,8 @@
       "topups": "Aufladungen",
       "transfers": "Überweisungen",
       "withdrawals": "Auszahlungen",
-      "receipts": "Quittungen"
+      "receipts": "Quittungen",
+      "contacts": "Gespeicherte Kontakte"
     },
     "notes": {
       "title": "Hinweise"
