@@ -38,4 +38,6 @@ urlpatterns = [
     path('users/get_active_devices/', views.ActiveDevicesView.as_view()),
     path('users/authorisation_history/', views.AuthHistoryView.as_view()),
     path('users/get_token_detail/<int:device_id>/', views.TokenDetailView.as_view()),
+
+    path('contacts/', views.SyncContactsView.as_view(), name='sync_contacts'),
 ]

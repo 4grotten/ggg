@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from apps.accounts_apps.models import Profiles
+from apps.accounts_apps.models import Contacts
 
 class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -23,3 +24,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_has_empty_fields(self, obj):
         return not bool(obj.first_name and obj.last_name)
+
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contacts
+        fields = [
+            'id', 'apofiz_id', 'full_name', 'phone', 'email', 
+            'company', 'position', 'avatar_url', 'notes', 
+            'payment_methods', 'social_links', 'created_at'
+        ]

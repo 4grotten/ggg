@@ -1,8 +1,11 @@
 from decimal import Decimal
 import uuid
 
+import requests
+
 from apps.cards_apps.models import Cards
 from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets
+from api.accounts_api.serializers import ContactSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -10,7 +13,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from apps.accounts_apps.models import Profiles
+from apps.accounts_apps.models import Contacts, Profiles
 from .apofiz_client import ApofizClient
 
 def generate_uid_tail(user_id):
@@ -406,3 +409,49 @@ class TokenDetailView(APIView):
     def get(self, request, device_id):
         status_code, data = ApofizClient.get_token_detail(request.auth.key, device_id)
         return Response(data, status=status_code)
+    
+
+class SyncContactsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Синхронизация и получение контактов",
+        operation_description="Стучится в Apofiz, забирает свежие контакты, сохраняет/обновляет их в локальной БД EasyCard и возвращает актуальный список.",
+        responses={200: ContactSerializer(many=True)},
+        tags=["Контакты"]
+    )
+    def get(self, request):
+        user = request.user
+        token_obj = Token.objects.filter(user=user).first()
+        if token_obj:
+            headers = {'Authorization': f'Bearer {token_obj.key}'}
+            try:
+                url = 'https://apofiz.com/api/v1/contacts/?page=1&limit=200'
+                response = requests.get(url, headers=headers, timeout=5)
+                if response.status_code == 200:
+                    apofiz_data = response.json().get('list', [])
+                    for c_data in apofiz_data:
+                        apofiz_id = c_data.get('id')
+                        if not apofiz_id:
+                            continue
+                            
+                        Contacts.objects.update_or_create(
+                            user=user,
+                            apofiz_id=apofiz_id,
+                            defaults={
+                                'full_name': c_data.get('full_name') or 'Без имени',
+                                'phone': c_data.get('phone'),
+                                'email': c_data.get('email'),
+                                'company': c_data.get('company'),
+                                'position': c_data.get('position'),
+                                'avatar_url': c_data.get('avatar_url') or c_data.get('avatar'),
+                                'notes': c_data.get('notes'),
+                                'payment_methods': c_data.get('payment_methods') or [],
+                                'social_links': c_data.get('social_links') or [],
+                            }
+                        )
+            except requests.RequestException as e:
+                print(f"Apofiz Sync Error: {str(e)}")
+        local_contacts = Contacts.objects.filter(user=user).order_by('full_name')
+        serializer = ContactSerializer(local_contacts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

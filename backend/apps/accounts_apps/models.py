@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 import uuid
+from django.contrib.auth.models import User
+
 
 class AdminActionHistory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -64,3 +66,24 @@ class OTPRecord(models.Model):
 
     def is_valid(self):
         return not self.is_used and timezone.now() < self.created_at + timedelta(minutes=5)
+    
+
+class Contacts(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contacts')
+    apofiz_id = models.CharField(max_length=50, blank=True, null=True, help_text="ID контакта в системе Apofiz")
+    full_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    company = models.CharField(max_length=255, blank=True, null=True)
+    position = models.CharField(max_length=255, blank=True, null=True)
+    avatar_url = models.URLField(max_length=1024, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+    payment_methods = models.JSONField(default=list, blank=True, null=True)
+    social_links = models.JSONField(default=list, blank=True, null=True)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'contacts'
+        unique_together = ('user', 'apofiz_id')
