@@ -45,8 +45,11 @@ export interface ApiCategory {
   endpoints: ApiEndpoint[];
 }
 
-// Base API URL
-export const API_BASE_URL = 'https://apofiz.com/api/v1';
+// Base API URLs
+export const API_BASE_URL = 'https://ueasycard.com/api/v1';
+const ACCOUNTS_URL = `${API_BASE_URL}/accounts`;
+const CARDS_URL = `${API_BASE_URL}/cards`;
+const TRANSACTIONS_URL = `${API_BASE_URL}/transactions`;
 
 // API Categories and Endpoints
 export const apiCategories: ApiCategory[] = [
@@ -60,7 +63,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'otp-send',
         method: 'POST',
-        path: '/otp/send/',
+        path: '/accounts/otp/send/',
         title: 'Send OTP',
         description: 'Send a one-time password to the user\'s phone number via SMS or WhatsApp for verification.',
         category: 'authentication',
@@ -70,7 +73,7 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/otp/send/ \\
+  --url ${ACCOUNTS_URL}/otp/send/ \\
   --header 'Content-Type: application/json' \\
   --data '{
     "phone_number": "+971501234567",
@@ -99,7 +102,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'otp-verify',
         method: 'POST',
-        path: '/otp/verify/',
+        path: '/accounts/otp/verify/',
         title: 'Verify OTP',
         description: 'Verify the OTP code sent to the user\'s phone. Returns authentication token on success.',
         category: 'authentication',
@@ -109,7 +112,7 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/otp/verify/ \\
+  --url ${ACCOUNTS_URL}/otp/verify/ \\
   --header 'Content-Type: application/json' \\
   --data '{
     "phone_number": "+971501234567",
@@ -142,16 +145,16 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'register-auth',
         method: 'POST',
-        path: '/register_auth/',
-        title: 'Register / Check Phone',
-        description: 'Check if a phone number is registered and initiate the registration process if not.',
+        path: '/accounts/register_auth/',
+        title: 'Quick Register (Auto-login)',
+        description: 'Request token without entering a code. Initiates registration via Apofiz first.',
         category: 'authentication',
         bodyParams: [
           { name: 'phone_number', type: 'string', required: true, description: 'Phone number in international format' }
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/register_auth/ \\
+  --url ${ACCOUNTS_URL}/register_auth/ \\
   --header 'Content-Type: application/json' \\
   --data '{
     "phone_number": "+971501234567"
@@ -163,27 +166,24 @@ export const apiCategories: ApiCategory[] = [
         responseExample: {
           status: 200,
           json: `{
-  "message": "Verification code sent",
-  "is_new_user": true,
-  "token": null,
-  "temporary_code_enabled": false,
-  "email": false
+  "token": "413e117173ba3f...",
+  "user": {
+    "id": 1,
+    "phone": "+971501234567"
+  }
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Status message' },
-          { name: 'is_new_user', type: 'boolean', required: true, description: 'Whether this is a new registration' },
           { name: 'token', type: 'string', required: false, description: 'Auth token (for existing users)' },
-          { name: 'temporary_code_enabled', type: 'boolean', required: false, description: 'If temporary codes are enabled for testing' },
-          { name: 'email', type: 'boolean', required: false, description: 'Whether user has email configured' }
+          { name: 'user', type: 'object', required: true, description: 'User object with id and phone' }
         ]
       },
       {
         id: 'verify-code',
         method: 'POST',
-        path: '/verify_code/',
+        path: '/accounts/verify_code/',
         title: 'Verify SMS Code',
-        description: 'Verify the SMS code sent during registration.',
+        description: 'Verify the SMS code sent during registration. Returns token on success.',
         category: 'authentication',
         bodyParams: [
           { name: 'phone_number', type: 'string', required: true, description: 'Phone number in international format' },
@@ -191,7 +191,7 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/verify_code/ \\
+  --url ${ACCOUNTS_URL}/verify_code/ \\
   --header 'Content-Type: application/json' \\
   --data '{
     "phone_number": "+971501234567",
@@ -205,21 +205,19 @@ export const apiCategories: ApiCategory[] = [
         responseExample: {
           status: 200,
           json: `{
-  "message": "Code verified successfully",
-  "token": "abc123xyz789token",
-  "is_new_user": true
+  "token": "413e117173ba3f...",
+  "user": { "id": 1, "phone": "+971501234567" }
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Success message' },
           { name: 'token', type: 'string', required: true, description: 'Authentication token' },
-          { name: 'is_new_user', type: 'boolean', required: true, description: 'Whether user needs to complete profile setup' }
+          { name: 'user', type: 'object', required: true, description: 'User object' }
         ]
       },
       {
         id: 'resend-code',
         method: 'POST',
-        path: '/resend_code/',
+        path: '/accounts/resend_code/',
         title: 'Resend Code',
         description: 'Resend verification code to the user\'s phone number.',
         category: 'authentication',
@@ -229,7 +227,7 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/resend_code/ \\
+  --url ${ACCOUNTS_URL}/resend_code/ \\
   --header 'Content-Type: application/json' \\
   --data '{
     "phone_number": "+971501234567",
@@ -253,7 +251,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'login',
         method: 'POST',
-        path: '/login/',
+        path: '/accounts/login/',
         title: 'Login with Password',
         description: 'Authenticate user with phone number and password.',
         category: 'authentication',
@@ -265,7 +263,7 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/login/ \\
+  --url ${ACCOUNTS_URL}/login/ \\
   --header 'Content-Type: application/json' \\
   --data '{
     "phone_number": "+971501234567",
@@ -313,7 +311,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'logout',
         method: 'POST',
-        path: '/logout/',
+        path: '/accounts/logout/',
         title: 'Logout',
         description: 'Invalidate the current authentication token and end the session.',
         category: 'authentication',
@@ -323,7 +321,7 @@ export const apiCategories: ApiCategory[] = [
         },
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/logout/ \\
+  --url ${ACCOUNTS_URL}/logout/ \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
@@ -348,7 +346,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'set-password',
         method: 'POST',
-        path: '/set_password/',
+        path: '/accounts/set_password/',
         title: 'Set Password',
         description: 'Set password for a new user after registration.',
         category: 'password',
@@ -361,14 +359,14 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/set_password/ \\
+  --url ${ACCOUNTS_URL}/set_password/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
-    "password": "securePassword123"
+    "password": "NewSecurePassword123!"
   }'`,
           json: `{
-  "password": "securePassword123"
+  "password": "NewSecurePassword123!"
 }`
         },
         responseExample: {
@@ -384,7 +382,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'change-password',
         method: 'POST',
-        path: '/users/doChangePassword/',
+        path: '/accounts/users/doChangePassword/',
         title: 'Change Password',
         description: 'Change password for an authenticated user.',
         category: 'password',
@@ -398,16 +396,16 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/users/doChangePassword/ \\
+  --url ${ACCOUNTS_URL}/users/doChangePassword/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
-    "old_password": "oldPassword123",
-    "new_password": "newPassword456"
+    "old_password": "OldPassword123",
+    "new_password": "NewSecurePassword123!"
   }'`,
           json: `{
-  "old_password": "oldPassword123",
-  "new_password": "newPassword456"
+  "old_password": "OldPassword123",
+  "new_password": "NewSecurePassword123!"
 }`
         },
         responseExample: {
@@ -423,7 +421,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'forgot-password',
         method: 'POST',
-        path: '/users/forgot_password/',
+        path: '/accounts/users/forgot_password/',
         title: 'Forgot Password',
         description: 'Request a password reset code to be sent via SMS, WhatsApp, or email.',
         category: 'password',
@@ -433,7 +431,7 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/users/forgot_password/ \\
+  --url ${ACCOUNTS_URL}/users/forgot_password/ \\
   --header 'Content-Type: application/json' \\
   --data '{
     "phone_number": "+971501234567",
@@ -447,15 +445,11 @@ export const apiCategories: ApiCategory[] = [
         responseExample: {
           status: 200,
           json: `{
-  "message": "Reset code sent",
-  "method": "whatsapp",
-  "available_methods": ["sms", "whatsapp", "email"]
+  "message": "Password reset instructions sent"
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Status message' },
-          { name: 'method', type: 'string', required: true, description: 'Method used to send the code' },
-          { name: 'available_methods', type: 'array', required: true, description: 'List of available recovery methods' }
+          { name: 'message', type: 'string', required: true, description: 'Status message' }
         ],
         notes: [
           'Email method is only available if user has email configured',
@@ -465,7 +459,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'forgot-password-email',
         method: 'POST',
-        path: '/users/forgot_password_email/',
+        path: '/accounts/users/forgot_password_email/',
         title: 'Forgot Password (Email)',
         description: 'Request a password reset code to be sent to the user\'s registered email.',
         category: 'password',
@@ -475,7 +469,7 @@ export const apiCategories: ApiCategory[] = [
         },
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/users/forgot_password_email/ \\
+  --url ${ACCOUNTS_URL}/users/forgot_password_email/ \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
@@ -500,7 +494,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'get-current-user',
         method: 'GET',
-        path: '/users/me/',
+        path: '/accounts/users/me/',
         title: 'Get Current User',
         description: 'Retrieve the profile of the currently authenticated user.',
         category: 'profile',
@@ -510,46 +504,31 @@ export const apiCategories: ApiCategory[] = [
         },
         requestExample: {
           curl: `curl --request GET \\
-  --url ${API_BASE_URL}/users/me/ \\
+  --url ${ACCOUNTS_URL}/users/me/ \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
           status: 200,
           json: `{
-  "id": 12345,
+  "id": 1,
   "full_name": "John Doe",
-  "phone_number": "+971501234567",
   "email": "john@example.com",
-  "avatar": {
-    "id": 1,
-    "file": "https://cdn.apofiz.com/avatars/user123.jpg",
-    "name": "avatar.jpg",
-    "large": "https://cdn.apofiz.com/avatars/user123_large.jpg",
-    "medium": "https://cdn.apofiz.com/avatars/user123_medium.jpg",
-    "small": "https://cdn.apofiz.com/avatars/user123_small.jpg"
-  },
-  "username": "johndoe",
-  "date_of_birth": "1990-05-15",
-  "gender": "male",
-  "has_empty_fields": false
+  "username": "+971501234567",
+  "avatar": null
 }`
         },
         responseParams: [
           { name: 'id', type: 'number', required: true, description: 'Unique user ID' },
           { name: 'full_name', type: 'string', required: true, description: 'User\'s full name' },
-          { name: 'phone_number', type: 'string', required: true, description: 'User\'s phone number' },
           { name: 'email', type: 'string', required: false, description: 'User\'s email address (nullable)' },
-          { name: 'avatar', type: 'object', required: false, description: 'Avatar image data with multiple sizes' },
-          { name: 'username', type: 'string', required: false, description: 'Unique username' },
-          { name: 'date_of_birth', type: 'string', required: false, description: 'Date of birth (YYYY-MM-DD format)' },
-          { name: 'gender', type: 'enum', required: false, description: 'User\'s gender', enum: ['male', 'female'] },
-          { name: 'has_empty_fields', type: 'boolean', required: true, description: 'Indicates if profile has incomplete fields' }
+          { name: 'username', type: 'string', required: true, description: 'Username (phone number)' },
+          { name: 'avatar', type: 'object', required: false, description: 'Avatar image data (nullable)' }
         ]
       },
       {
         id: 'init-profile',
         method: 'POST',
-        path: '/init_profile/',
+        path: '/accounts/init_profile/',
         title: 'Initialize / Update Profile',
         description: 'Initialize profile for new users or update existing profile data.',
         category: 'profile',
@@ -559,32 +538,29 @@ export const apiCategories: ApiCategory[] = [
         },
         bodyParams: [
           { name: 'full_name', type: 'string', required: true, description: 'User\'s full name (minimum 2 characters)' },
-          { name: 'avatar_id', type: 'number', required: false, description: 'ID of uploaded avatar file' },
           { name: 'email', type: 'string', required: false, description: 'Email address' },
           { name: 'gender', type: 'enum', required: false, description: 'User\'s gender', enum: ['male', 'female'] },
           { name: 'date_of_birth', type: 'string', required: false, description: 'Date of birth (YYYY-MM-DD format)' },
-          { name: 'username', type: 'string', required: false, description: 'Unique username (minimum 3 characters)' }
+          { name: 'device_type', type: 'string', required: false, description: 'Device type (android, ios, web)' }
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/init_profile/ \\
+  --url ${ACCOUNTS_URL}/init_profile/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
     "full_name": "John Doe",
     "email": "john@example.com",
-    "username": "johndoe",
     "gender": "male",
-    "date_of_birth": "1990-05-15",
-    "avatar_id": 123
+    "date_of_birth": "1990-01-01",
+    "device_type": "android"
   }'`,
           json: `{
   "full_name": "John Doe",
   "email": "john@example.com",
-  "username": "johndoe",
   "gender": "male",
-  "date_of_birth": "1990-05-15",
-  "avatar_id": 123
+  "date_of_birth": "1990-01-01",
+  "device_type": "android"
 }`
         },
         responseExample: {
@@ -594,15 +570,8 @@ export const apiCategories: ApiCategory[] = [
   "full_name": "John Doe",
   "phone_number": "+971501234567",
   "email": "john@example.com",
-  "avatar": {
-    "id": 123,
-    "file": "https://cdn.apofiz.com/avatars/user123.jpg",
-    "large": "https://cdn.apofiz.com/avatars/user123_large.jpg",
-    "medium": "https://cdn.apofiz.com/avatars/user123_medium.jpg",
-    "small": "https://cdn.apofiz.com/avatars/user123_small.jpg"
-  },
   "username": "johndoe",
-  "date_of_birth": "1990-05-15",
+  "date_of_birth": "1990-01-01",
   "gender": "male",
   "has_empty_fields": false
 }`
@@ -610,22 +579,17 @@ export const apiCategories: ApiCategory[] = [
         responseParams: [
           { name: 'id', type: 'number', required: true, description: 'User ID' },
           { name: 'full_name', type: 'string', required: true, description: 'Updated full name' },
-          { name: 'email', type: 'string', required: false, description: 'Updated email' },
-          { name: 'username', type: 'string', required: false, description: 'Updated username' },
-          { name: 'gender', type: 'enum', required: false, description: 'Updated gender' },
-          { name: 'date_of_birth', type: 'string', required: false, description: 'Updated date of birth' },
           { name: 'has_empty_fields', type: 'boolean', required: true, description: 'Whether mandatory fields are still empty' }
         ],
         notes: [
           'This endpoint is used both for initial profile setup and subsequent updates',
-          'Mandatory fields: full_name, username, email, date_of_birth, gender',
-          'Username must be unique across all users'
+          'Mandatory fields: full_name, email, date_of_birth, gender'
         ]
       },
       {
         id: 'get-user-email',
         method: 'GET',
-        path: '/users/get_email/',
+        path: '/accounts/users/get_email/',
         title: 'Get User Email',
         description: 'Retrieve the email address associated with the current user.',
         category: 'profile',
@@ -635,7 +599,7 @@ export const apiCategories: ApiCategory[] = [
         },
         requestExample: {
           curl: `curl --request GET \\
-  --url ${API_BASE_URL}/users/get_email/ \\
+  --url ${ACCOUNTS_URL}/users/get_email/ \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
@@ -651,9 +615,9 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'deactivate-profile',
         method: 'POST',
-        path: '/users/deactivate/',
+        path: '/accounts/users/deactivate/',
         title: 'Deactivate Profile',
-        description: 'Deactivate the user profile. This is NOT for device logout - it deactivates the entire account.',
+        description: 'Deactivate the user profile. This deactivates the entire account.',
         category: 'profile',
         authorization: {
           type: 'Token',
@@ -661,28 +625,29 @@ export const apiCategories: ApiCategory[] = [
         },
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/users/deactivate/ \\
-  --header 'Authorization: Token abc123xyz789token'`
+  --url ${ACCOUNTS_URL}/users/deactivate/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{}'`
         },
         responseExample: {
           status: 200,
           json: `{
-  "success": true
+  "message": "Profile deactivated"
 }`
         },
         responseParams: [
-          { name: 'success', type: 'boolean', required: true, description: 'Whether the deactivation was successful' }
+          { name: 'message', type: 'string', required: true, description: 'Deactivation confirmation' }
         ],
         notes: [
           'WARNING: This deactivates the entire user account, not just a device session',
-          'Account can be reactivated by logging in again',
-          'All active sessions will be terminated'
+          'Account can be reactivated by logging in again'
         ]
       },
       {
         id: 'get-phone-numbers',
         method: 'GET',
-        path: '/users/{user_id}/phone_numbers/',
+        path: '/accounts/users/{user_id}/phone_numbers/',
         title: 'Get User Phone Numbers',
         description: 'Retrieve all phone numbers associated with a user account.',
         category: 'profile',
@@ -695,39 +660,26 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request GET \\
-  --url ${API_BASE_URL}/users/12345/phone_numbers/ \\
-  --header 'Authorization: Token abc123xyz789token' \\
-  --header 'Content-Type: application/json'`
+  --url ${ACCOUNTS_URL}/users/12345/phone_numbers/ \\
+  --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
           status: 200,
           json: `[
-  {
-    "id": 58,
-    "phone_number": "+996777123123"
-  },
-  {
-    "id": 59,
-    "phone_number": "+996312700002"
-  }
+  "+971501234567",
+  "+971509876543"
 ]`
         },
         responseParams: [
-          { name: 'id', type: 'number', required: true, description: 'Phone number record ID' },
-          { name: 'phone_number', type: 'string', required: true, description: 'Phone number in international format' }
-        ],
-        notes: [
-          'Returns an array of phone numbers associated with the user',
-          'Each phone number has a unique ID for update/delete operations',
-          'User can only retrieve their own phone numbers'
+          { name: '[]', type: 'string', required: true, description: 'Array of phone numbers in international format' }
         ]
       },
       {
         id: 'update-phone-numbers',
         method: 'POST',
-        path: '/users/phone_numbers/',
+        path: '/accounts/users/phone_numbers/',
         title: 'Update User Phone Numbers',
-        description: 'Set or update all phone numbers for the current user. Replaces the existing list with the new one.',
+        description: 'Set or update all phone numbers for the current user.',
         category: 'profile',
         authorization: {
           type: 'Token',
@@ -738,44 +690,24 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/users/phone_numbers/ \\
+  --url ${ACCOUNTS_URL}/users/phone_numbers/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
-  "phone_numbers": [
-    "+996777123123",
-    "+996312700001"
-  ]
-}'`,
+    "phone_numbers": ["+971501234567", "+971509876543"]
+  }'`,
           json: `{
-  "phone_numbers": [
-    "+996777123123",
-    "+996312700001"
-  ]
+  "phone_numbers": ["+971501234567", "+971509876543"]
 }`
         },
         responseExample: {
           status: 200,
           json: `{
-  "message": "Successfully updated",
-  "numbers": [
-    {
-      "phone_number": "+996777123123"
-    },
-    {
-      "phone_number": "+996312700002"
-    }
-  ]
+  "message": "Phone numbers updated"
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Status message' },
-          { name: 'numbers', type: 'array', required: true, description: 'Array of saved phone numbers' }
-        ],
-        notes: [
-          'This endpoint replaces all existing phone numbers with the new list',
-          'Phone numbers must be in international format (starting with +)',
-          'Returns 406 if phone_numbers field is missing or contains invalid values'
+          { name: 'message', type: 'string', required: true, description: 'Status message' }
         ]
       }
     ]
@@ -790,50 +722,38 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'upload-avatar',
         method: 'POST',
-        path: '/files/',
+        path: '/accounts/files/',
         title: 'Upload Avatar Image',
-        description: 'Upload an avatar image for user profile. Returns file data with multiple size variants (large, medium, small).',
+        description: 'Upload an avatar image for user profile. Uses multipart/form-data.',
         category: 'files',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
         headers: [
-          { name: 'Content-Type', type: 'string', required: true, description: 'Must be multipart/form-data (set automatically by browser)' }
+          { name: 'Content-Type', type: 'string', required: true, description: 'Must be multipart/form-data' }
         ],
         bodyParams: [
           { name: 'file', type: 'file', required: true, description: 'Image file to upload (JPEG, PNG)' }
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/files/ \\
+  --url ${ACCOUNTS_URL}/files/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --form 'file=@/path/to/avatar.jpg'`
         },
         responseExample: {
           status: 200,
           json: `{
-  "id": 123,
-  "file": "https://cdn.apofiz.com/uploads/image123.jpg",
-  "name": "avatar.jpg",
-  "large": "https://cdn.apofiz.com/uploads/image123_large.jpg",
-  "medium": "https://cdn.apofiz.com/uploads/image123_medium.jpg",
-  "small": "https://cdn.apofiz.com/uploads/image123_small.jpg"
+  "file": "https://apofiz.com/media/avatars/user_1.png"
 }`
         },
         responseParams: [
-          { name: 'id', type: 'number', required: true, description: 'Unique file ID (use this for avatar_id in profile update)' },
-          { name: 'file', type: 'string', required: true, description: 'Original file URL' },
-          { name: 'name', type: 'string', required: false, description: 'Original filename' },
-          { name: 'large', type: 'string', required: false, description: 'Large variant URL (for high-res displays)' },
-          { name: 'medium', type: 'string', required: false, description: 'Medium variant URL (for standard displays)' },
-          { name: 'small', type: 'string', required: false, description: 'Small variant URL (for thumbnails)' }
+          { name: 'file', type: 'string', required: true, description: 'URL of the uploaded avatar image' }
         ],
         notes: [
           'Maximum file size: 5MB',
-          'Supported formats: JPEG, PNG',
-          'Images are automatically resized to large, medium, and small variants',
-          'Use the returned "id" in the init_profile endpoint to set as avatar'
+          'Supported formats: JPEG, PNG'
         ]
       }
     ]
@@ -848,7 +768,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'get-social-networks',
         method: 'GET',
-        path: '/users/{user_id}/social_networks/',
+        path: '/accounts/users/{user_id}/social_networks/',
         title: 'Get Social Networks',
         description: 'Retrieve social network links for a specific user.',
         category: 'social',
@@ -861,7 +781,7 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request GET \\
-  --url ${API_BASE_URL}/users/12345/social_networks/ \\
+  --url ${ACCOUNTS_URL}/users/12345/social_networks/ \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
@@ -869,15 +789,11 @@ export const apiCategories: ApiCategory[] = [
           json: `[
   {
     "id": 1,
-    "url": "https://instagram.com/johndoe"
+    "url": "https://t.me/username"
   },
   {
     "id": 2,
-    "url": "https://twitter.com/johndoe"
-  },
-  {
-    "id": 3,
-    "url": "https://linkedin.com/in/johndoe"
+    "url": "https://instagram.com/username"
   }
 ]`
         },
@@ -889,7 +805,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'set-social-networks',
         method: 'POST',
-        path: '/users/social_networks/',
+        path: '/accounts/users/social_networks/',
         title: 'Set Social Networks',
         description: 'Set or replace all social network links for the current user.',
         category: 'social',
@@ -902,52 +818,30 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/users/social_networks/ \\
+  --url ${ACCOUNTS_URL}/users/social_networks/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
     "networks": [
-      "https://instagram.com/johndoe",
-      "https://twitter.com/johndoe",
-      "https://linkedin.com/in/johndoe"
+      "https://t.me/username",
+      "https://instagram.com/username"
     ]
   }'`,
           json: `{
   "networks": [
-    "https://instagram.com/johndoe",
-    "https://twitter.com/johndoe",
-    "https://linkedin.com/in/johndoe"
+    "https://t.me/username",
+    "https://instagram.com/username"
   ]
 }`
         },
         responseExample: {
           status: 200,
           json: `{
-  "message": "Social networks updated",
-  "networks": [
-    {
-      "id": 1,
-      "url": "https://instagram.com/johndoe"
-    },
-    {
-      "id": 2,
-      "url": "https://twitter.com/johndoe"
-    },
-    {
-      "id": 3,
-      "url": "https://linkedin.com/in/johndoe"
-    }
-  ]
+  "message": "Social networks updated"
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Success message' },
-          { name: 'networks', type: 'array', required: true, description: 'Updated list of social networks' }
-        ],
-        notes: [
-          'This endpoint replaces all existing social networks',
-          'Send an empty array to remove all social networks',
-          'Supported platforms: Instagram, Twitter/X, LinkedIn, Facebook, Telegram, etc.'
+          { name: 'message', type: 'string', required: true, description: 'Success message' }
         ]
       }
     ]
@@ -962,7 +856,7 @@ export const apiCategories: ApiCategory[] = [
       {
         id: 'get-active-devices',
         method: 'GET',
-        path: '/users/get_active_devices/',
+        path: '/accounts/users/get_active_devices/',
         title: 'Get Active Devices',
         description: 'Retrieve a paginated list of all active devices/sessions for the current user.',
         category: 'devices',
@@ -976,54 +870,32 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request GET \\
-  --url '${API_BASE_URL}/users/get_active_devices/?page=1&limit=50' \\
+  --url '${ACCOUNTS_URL}/users/get_active_devices/?page=1&limit=50' \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
           status: 200,
           json: `{
-  "total_count": 3,
-  "total_pages": 1,
   "list": [
     {
-      "id": 1234,
-      "key": "token_key_abc123",
-      "user": 12345,
-      "location": "Dubai, UAE",
+      "id": 123,
       "device": "iPhone 15 Pro",
-      "ip": "192.168.1.100",
-      "log_time": "2024-01-20T15:30:00Z",
-      "version_app": "1.2.0",
-      "is_active": true,
-      "operating_system": "iOS 17.2",
-      "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2...)",
-      "last_active": "2024-01-20T16:45:00Z",
-      "expired_time_choice": 30,
-      "expired_time": "2024-02-19T15:30:00Z"
+      "ip_address": "192.168.1.1",
+      "is_active": true
     }
-  ]
+  ],
+  "total": 3
 }`
         },
         responseParams: [
-          { name: 'total_count', type: 'number', required: true, description: 'Total number of active devices' },
-          { name: 'total_pages', type: 'number', required: true, description: 'Total number of pages' },
           { name: 'list', type: 'array', required: true, description: 'Array of active device objects' },
-          { name: 'list[].id', type: 'number', required: true, description: 'Unique device/token ID' },
-          { name: 'list[].key', type: 'string', required: true, description: 'Token key (partial)' },
-          { name: 'list[].location', type: 'string', required: false, description: 'Geographic location of login' },
-          { name: 'list[].device', type: 'string', required: false, description: 'Device name/model' },
-          { name: 'list[].ip', type: 'string', required: true, description: 'IP address' },
-          { name: 'list[].is_active', type: 'boolean', required: true, description: 'Whether session is currently active' },
-          { name: 'list[].operating_system', type: 'string', required: false, description: 'OS name and version' },
-          { name: 'list[].last_active', type: 'string', required: false, description: 'Last activity timestamp (ISO 8601)' },
-          { name: 'list[].expired_time_choice', type: 'number', required: false, description: 'Token expiration setting in days', enum: ['7', '30', '90', '180'] },
-          { name: 'list[].expired_time', type: 'string', required: false, description: 'Token expiration datetime (ISO 8601)' }
+          { name: 'total', type: 'number', required: true, description: 'Total number of active devices' }
         ]
       },
       {
         id: 'get-authorization-history',
         method: 'GET',
-        path: '/users/authorisation_history/',
+        path: '/accounts/users/authorisation_history/',
         title: 'Get Authorization History',
         description: 'Retrieve a paginated list of all login attempts and session history.',
         category: 'devices',
@@ -1037,49 +909,30 @@ export const apiCategories: ApiCategory[] = [
         ],
         requestExample: {
           curl: `curl --request GET \\
-  --url '${API_BASE_URL}/users/authorisation_history/?page=1&limit=20' \\
+  --url '${ACCOUNTS_URL}/users/authorisation_history/?page=1&limit=20' \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
           status: 200,
           json: `{
-  "total_count": 45,
-  "total_pages": 3,
   "list": [
     {
-      "id": 5678,
-      "key": "token_key_xyz789",
-      "user": 12345,
-      "location": "Abu Dhabi, UAE",
-      "device": "MacBook Pro",
-      "ip": "10.0.0.50",
-      "log_time": "2024-01-18T10:15:00Z",
-      "version_app": "1.1.5",
-      "is_active": false,
-      "operating_system": "macOS 14.2",
-      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7...)",
-      "last_active": "2024-01-18T14:30:00Z",
-      "expired_time_choice": null,
-      "expired_time": null
+      "ip_address": "192.168.1.1",
+      "date": "2023-10-01T12:00:00Z"
     }
-  ]
+  ],
+  "total": 5
 }`
         },
         responseParams: [
-          { name: 'total_count', type: 'number', required: true, description: 'Total number of history entries' },
-          { name: 'total_pages', type: 'number', required: true, description: 'Total number of pages' },
-          { name: 'list', type: 'array', required: true, description: 'Array of authorization history entries' }
-        ],
-        notes: [
-          'History includes both active and expired sessions',
-          'Entries are sorted by log_time descending (newest first)',
-          'is_active=false indicates expired or terminated sessions'
+          { name: 'list', type: 'array', required: true, description: 'Array of authorization history entries' },
+          { name: 'total', type: 'number', required: true, description: 'Total number of entries' }
         ]
       },
       {
         id: 'get-device-detail',
         method: 'GET',
-        path: '/users/get_token_detail/{device_id}/',
+        path: '/accounts/users/get_token_detail/{device_id}/',
         title: 'Get Device Detail',
         description: 'Retrieve detailed information about a specific device/session.',
         category: 'devices',
@@ -1088,135 +941,253 @@ export const apiCategories: ApiCategory[] = [
           description: 'Token authentication header of the form `Token <token>`'
         },
         pathParams: [
-          { name: 'device_id', type: 'number', required: true, description: 'Device/token ID to get details for' }
+          { name: 'device_id', type: 'number', required: true, description: 'Device/token ID' }
         ],
         requestExample: {
           curl: `curl --request GET \\
-  --url ${API_BASE_URL}/users/get_token_detail/1234/ \\
+  --url ${ACCOUNTS_URL}/users/get_token_detail/123/ \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
           status: 200,
           json: `{
-  "id": 1234,
-  "key": "token_key_abc123",
-  "user": 12345,
-  "location": "Dubai, UAE",
-  "device": "iPhone 15 Pro",
-  "ip": "192.168.1.100",
-  "log_time": "2024-01-20T15:30:00Z",
-  "version_app": "1.2.0",
-  "is_active": true,
-  "operating_system": "iOS 17.2",
-  "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15",
-  "last_active": "2024-01-20T16:45:00Z",
-  "expired_time_choice": 30,
-  "expired_time": "2024-02-19T15:30:00Z"
+  "id": 123,
+  "device": "iPhone 13",
+  "ip_address": "192.168.1.1",
+  "is_active": true
 }`
         },
         responseParams: [
           { name: 'id', type: 'number', required: true, description: 'Device/token ID' },
-          { name: 'key', type: 'string', required: true, description: 'Token key' },
-          { name: 'user', type: 'number', required: true, description: 'User ID' },
-          { name: 'location', type: 'string', required: false, description: 'Login location' },
           { name: 'device', type: 'string', required: false, description: 'Device name' },
-          { name: 'ip', type: 'string', required: true, description: 'IP address' },
-          { name: 'log_time', type: 'string', required: true, description: 'Login timestamp' },
-          { name: 'version_app', type: 'string', required: false, description: 'App version' },
-          { name: 'is_active', type: 'boolean', required: true, description: 'Session active status' },
-          { name: 'operating_system', type: 'string', required: false, description: 'Operating system' },
-          { name: 'user_agent', type: 'string', required: false, description: 'Full user agent string' },
-          { name: 'last_active', type: 'string', required: false, description: 'Last activity time' },
-          { name: 'expired_time_choice', type: 'number', required: false, description: 'Expiration setting (days)' },
-          { name: 'expired_time', type: 'string', required: false, description: 'Expiration datetime' }
+          { name: 'ip_address', type: 'string', required: true, description: 'IP address' },
+          { name: 'is_active', type: 'boolean', required: true, description: 'Session active status' }
         ]
-      },
+      }
+    ]
+  },
+  // ============ CONTACTS ============
+  {
+    id: 'contacts',
+    title: 'Contacts',
+    titleKey: 'api.categories.contacts',
+    icon: '📇',
+    endpoints: [
       {
-        id: 'change-token-expiration',
-        method: 'POST',
-        path: '/users/change_token_expired_time/{token_id}/',
-        title: 'Change Token Expiration',
-        description: 'Change the expiration time for a specific device/session token. Can be used to extend session duration or terminate a session by setting minimum expiration.',
-        category: 'devices',
+        id: 'contacts-sync',
+        method: 'GET',
+        path: '/accounts/contacts/',
+        title: 'Sync Contacts',
+        description: 'Retrieve all saved contacts for the authenticated user.',
+        category: 'contacts',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
-        pathParams: [
-          { name: 'token_id', type: 'number', required: true, description: 'Device/token ID to modify' }
-        ],
-        bodyParams: [
-          { name: 'expired_time_choice', type: 'enum', required: true, description: 'New expiration time in days', enum: ['7', '30', '90', '180'] }
-        ],
         requestExample: {
-          curl: `curl --request POST \\
-  --url ${API_BASE_URL}/users/change_token_expired_time/1234/ \\
-  --header 'Authorization: Token abc123xyz789token' \\
-  --header 'Content-Type: application/json' \\
-  --data '{
-    "expired_time_choice": 30
-  }'`,
-          json: `{
-  "expired_time_choice": 30
-}`
+          curl: `curl --request GET \\
+  --url ${ACCOUNTS_URL}/contacts/ \\
+  --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
           status: 200,
-          json: `{
-  "success": true
-}`
+          json: `[
+  {
+    "id": 1,
+    "apofiz_id": 50,
+    "full_name": "John Doe",
+    "phone": "+971501234567",
+    "email": "john@example.com",
+    "company": null,
+    "position": null,
+    "avatar_url": "https://...",
+    "payment_methods": [],
+    "social_links": []
+  }
+]`
         },
         responseParams: [
-          { name: 'success', type: 'boolean', required: true, description: 'Whether the operation was successful' }
-        ],
-        notes: [
-          'Use 7 days as minimum to effectively terminate a session',
-          'Users can only modify their own device sessions',
-          'The current device token cannot be terminated',
-          'Available options: 7, 30, 90, or 180 days'
+          { name: 'id', type: 'number', required: true, description: 'Contact ID' },
+          { name: 'apofiz_id', type: 'number', required: false, description: 'Apofiz platform ID' },
+          { name: 'full_name', type: 'string', required: true, description: 'Contact full name' },
+          { name: 'phone', type: 'string', required: false, description: 'Phone number' },
+          { name: 'email', type: 'string', required: false, description: 'Email address' },
+          { name: 'avatar_url', type: 'string', required: false, description: 'Avatar URL' },
+          { name: 'payment_methods', type: 'array', required: true, description: 'Payment methods' },
+          { name: 'social_links', type: 'array', required: true, description: 'Social links' }
         ]
-      },
+      }
+    ]
+  },
+  // ============ CARDS & WALLETS ============
+  {
+    id: 'cards',
+    title: 'Cards & Wallets',
+    titleKey: 'api.categories.cards',
+    icon: '💳',
+    endpoints: [
       {
-        id: 'terminate-device-session',
-        method: 'DELETE',
-        path: '/users/get_or_deactivate_token/{token_id}/',
-        title: 'Terminate Device Session',
-        description: 'Immediately terminate a specific device session by deactivating its token. This logs the user out from that device.',
-        category: 'devices',
+        id: 'get-balances',
+        method: 'GET',
+        path: '/cards/balances/',
+        title: 'Get Balances (Legacy)',
+        description: 'Retrieve balances for all user cards and total balance.',
+        category: 'cards',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
-        pathParams: [
-          { name: 'token_id', type: 'number', required: true, description: 'Device/token ID to terminate' }
-        ],
         requestExample: {
-          curl: `curl --request DELETE \\
-  --url ${API_BASE_URL}/users/get_or_deactivate_token/2689/ \\
+          curl: `curl --request GET \\
+  --url ${CARDS_URL}/balances/ \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
           status: 200,
           json: `{
-  "success": true
+  "user_id": "1",
+  "total_balance_aed": "100000.00",
+  "cards": [
+    {
+      "card_id": "uuid-1234",
+      "type": "metal",
+      "balance": "50000.00",
+      "currency": "AED"
+    }
+  ]
 }`
         },
         responseParams: [
-          { name: 'success', type: 'boolean', required: true, description: 'Whether the session was successfully terminated' }
+          { name: 'user_id', type: 'string', required: true, description: 'User ID' },
+          { name: 'total_balance_aed', type: 'string', required: true, description: 'Total balance in AED' },
+          { name: 'cards', type: 'array', required: true, description: 'Array of card objects with balances' }
+        ]
+      },
+      {
+        id: 'get-iban-balance',
+        method: 'GET',
+        path: '/cards/accounts/IBAN_AED/',
+        title: 'Get IBAN & Balance',
+        description: 'Retrieve IBAN account details and balance.',
+        category: 'cards',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${CARDS_URL}/accounts/IBAN_AED/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "iban": "AE070331234567890123456",
+  "currency": "AED",
+  "balance": "100000.00"
+}`
+        },
+        responseParams: [
+          { name: 'iban', type: 'string', required: true, description: 'IBAN account number' },
+          { name: 'currency', type: 'string', required: true, description: 'Account currency' },
+          { name: 'balance', type: 'string', required: true, description: 'Current balance' }
+        ]
+      },
+      {
+        id: 'get-user-cards',
+        method: 'GET',
+        path: '/cards/cards/',
+        title: 'List User Cards',
+        description: 'Retrieve all cards belonging to the authenticated user.',
+        category: 'cards',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${CARDS_URL}/cards/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "cards": [
+    {
+      "type": "metal",
+      "card_number": "4532112233123456",
+      "currency": "AED",
+      "balance": "50000.00"
+    },
+    {
+      "type": "virtual",
+      "card_number": "4532112244123456",
+      "currency": "AED",
+      "balance": "50000.00"
+    }
+  ]
+}`
+        },
+        responseParams: [
+          { name: 'cards', type: 'array', required: true, description: 'Array of card objects' },
+          { name: 'cards[].type', type: 'string', required: true, description: 'Card type (metal, virtual)' },
+          { name: 'cards[].card_number', type: 'string', required: true, description: '16-digit card number' },
+          { name: 'cards[].currency', type: 'string', required: true, description: 'Card currency' },
+          { name: 'cards[].balance', type: 'string', required: true, description: 'Current balance' }
+        ]
+      },
+      {
+        id: 'wallet-summary',
+        method: 'GET',
+        path: '/cards/wallet/summary/',
+        title: 'Wallet Summary',
+        description: 'Get combined summary of IBAN account and cards. Best for dashboard display.',
+        category: 'cards',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${CARDS_URL}/wallet/summary/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "physical_account": {
+    "iban": "AE070331234567890123456",
+    "balance": "100000.00",
+    "currency": "AED"
+  },
+  "cards": [
+    {
+      "id": "uuid-card",
+      "type": "metal",
+      "card_number": "4532112233123456",
+      "currency": "AED",
+      "balance": "50000.00"
+    }
+  ]
+}`
+        },
+        responseParams: [
+          { name: 'physical_account', type: 'object', required: true, description: 'IBAN account details' },
+          { name: 'physical_account.iban', type: 'string', required: true, description: 'IBAN number' },
+          { name: 'physical_account.balance', type: 'string', required: true, description: 'Account balance' },
+          { name: 'cards', type: 'array', required: true, description: 'Array of user cards' }
         ],
         notes: [
-          'This immediately invalidates the device session',
-          'The logged out device will need to authenticate again',
-          'Cannot terminate the current device session (the one making the request)',
-          'Use GET method on same endpoint to retrieve token details instead'
+          'Most convenient endpoint for the main dashboard page',
+          'Combines IBAN account and all cards in a single response'
         ]
       }
     ]
   },
-  // ============ TOPUPS (ПОПОЛНЕНИЯ) ============
+  // ============ TOPUPS ============
   {
     id: 'topups',
-    title: 'Topups (Пополнения)',
+    title: 'Topups',
     titleKey: 'api.categories.topups',
     icon: '💰',
     endpoints: [
@@ -1225,18 +1196,18 @@ export const apiCategories: ApiCategory[] = [
         method: 'POST',
         path: '/transactions/topup/bank/',
         title: 'Bank Wire Topup',
-        description: 'Инициирует заявку на банковское пополнение в статусе pending. Возвращает реквизиты компании для осуществления перевода. Завершение транзакции происходит асинхронно после Webhook от банка.',
+        description: 'Initiate a bank wire topup. Returns bank details for transfer.',
         category: 'topups',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
         bodyParams: [
-          { name: 'transfer_rail', type: 'enum', required: true, description: 'Тип банковского перевода', enum: ['UAE_LOCAL_AED', 'SWIFT_INTL'] }
+          { name: 'transfer_rail', type: 'enum', required: true, description: 'Bank transfer type', enum: ['UAE_LOCAL_AED', 'SWIFT_INTL'] }
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/transactions/topup/bank/ \\
+  --url ${TRANSACTIONS_URL}/topup/bank/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
@@ -1262,18 +1233,14 @@ export const apiCategories: ApiCategory[] = [
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Сообщение об успешном создании заявки' },
-          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID созданной транзакции пополнения' },
-          { name: 'user_id', type: 'number', required: true, description: 'Числовой ID пользователя — обязательно указывается в назначении банковского перевода' },
-          { name: 'instructions', type: 'object', required: true, description: 'Банковские реквизиты для перевода (IBAN, SWIFT, наименование банка, reference с user_id)' }
+          { name: 'message', type: 'string', required: true, description: 'Status message' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'instructions', type: 'object', required: true, description: 'Bank transfer instructions' }
         ],
         notes: [
-          'user_id извлекается из токена авторизации и привязывает транзакцию к конкретному пользователю',
-          '⚠️ ОБЯЗАТЕЛЬНО укажите user_id в назначении платежа (reference) при банковском переводе — без этого средства не будут идентифицированы',
-          'UAE_LOCAL_AED — локальный перевод внутри ОАЭ (быстрее, дешевле)',
-          'SWIFT_INTL — международный SWIFT-перевод (для клиентов за пределами ОАЭ)',
-          'Транзакция создаётся в статусе pending до подтверждения банком',
-          'Квитанция содержит: transaction_id, user_id, status, дату, тип операции, реквизиты банка, reference'
+          'UAE_LOCAL_AED — local UAE transfer (faster, cheaper)',
+          'SWIFT_INTL — international SWIFT transfer',
+          'Transaction is created in pending status until bank confirmation'
         ]
       },
       {
@@ -1281,20 +1248,20 @@ export const apiCategories: ApiCategory[] = [
         method: 'POST',
         path: '/transactions/topup/crypto/',
         title: 'Crypto Topup',
-        description: 'Генерирует уникальный криптографический адрес для пополнения баланса карты в выбранной сети и токене. На текущем этапе адрес эмулируется.',
+        description: 'Generate a unique crypto deposit address for card topup.',
         category: 'topups',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
         bodyParams: [
-          { name: 'card_id', type: 'uuid', required: true, description: 'ID карты, на которую зачислятся средства после конвертации' },
-          { name: 'token', type: 'enum', required: true, description: 'Стейблкоин для пополнения', enum: ['USDT', 'USDC'] },
-          { name: 'network', type: 'enum', required: true, description: 'Блокчейн-сеть для получения средств', enum: ['TRC20', 'ERC20', 'BEP20', 'SOL'] }
+          { name: 'card_id', type: 'uuid', required: true, description: 'Card ID to credit after conversion' },
+          { name: 'token', type: 'enum', required: true, description: 'Stablecoin', enum: ['USDT', 'USDC'] },
+          { name: 'network', type: 'enum', required: true, description: 'Blockchain network', enum: ['TRC20', 'ERC20', 'BEP20', 'SOL'] }
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/transactions/topup/crypto/ \\
+  --url ${TRANSACTIONS_URL}/topup/crypto/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
@@ -1312,31 +1279,26 @@ export const apiCategories: ApiCategory[] = [
           status: 201,
           json: `{
   "message": "Crypto address generated",
-  "user_id": 12345,
-  "deposit_address": "TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R",
-  "qr_payload": "tron:TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R?amount=0&token=USDT"
+  "deposit_address": "Txxxxxxxxx...",
+  "qr_payload": "tron:Txxxxxxxxx...?amount=0&token=USDT"
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Сообщение об успешной генерации адреса' },
-          { name: 'user_id', type: 'number', required: true, description: 'Числовой ID пользователя, к которому привязан депозитный адрес' },
-          { name: 'deposit_address', type: 'string', required: true, description: 'Сгенерированный крипто-адрес для депозита' },
-          { name: 'qr_payload', type: 'string', required: true, description: 'Строка для генерации QR-кода на фронтенде' }
+          { name: 'message', type: 'string', required: true, description: 'Status message' },
+          { name: 'deposit_address', type: 'string', required: true, description: 'Generated crypto address for deposit' },
+          { name: 'qr_payload', type: 'string', required: true, description: 'String for QR code generation' }
         ],
         notes: [
-          'user_id извлекается из токена авторизации — привязывает адрес к конкретному пользователю и его карте',
-          'Адрес уникален для каждого запроса',
-          'Поддерживаемые токены: USDT, USDC',
-          'Поддерживаемые сети: TRC20 (Tron), ERC20 (Ethereum), BEP20 (BSC), SOL (Solana)',
-          'Квитанция содержит: transaction_id, user_id, status, дату, токен, сеть, deposit_address, сумму зачисления'
+          'Supported tokens: USDT, USDC',
+          'Supported networks: TRC20 (Tron), ERC20 (Ethereum), BEP20 (BSC), SOL (Solana)'
         ]
       }
     ]
   },
-  // ============ TRANSFERS (ПЕРЕВОДЫ) ============
+  // ============ TRANSFERS ============
   {
     id: 'transfers',
-    title: 'Transfers (Переводы)',
+    title: 'Transfers',
     titleKey: 'api.categories.transfers',
     icon: '🔄',
     endpoints: [
@@ -1345,199 +1307,724 @@ export const apiCategories: ApiCategory[] = [
         method: 'POST',
         path: '/transactions/transfer/card/',
         title: 'Card to Card Transfer',
-        description: 'Моментальный перевод средств между расчётными счетами внутри закрытого контура платформы. Применяется строгая транзакционная блокировка (select_for_update) для исключения race condition.',
+        description: 'Instant transfer between cards within the platform.',
         category: 'transfers',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
         bodyParams: [
-          { name: 'sender_card_id', type: 'uuid', required: true, description: 'ID карты отправителя (ваша карта)' },
-          { name: 'receiver_card_number', type: 'string', required: true, description: '16-значный номер карты получателя' },
-          { name: 'amount', type: 'decimal', required: true, description: 'Сумма перевода в AED (минимум 1.00)' }
+          { name: 'sender_card_id', type: 'uuid', required: true, description: 'Sender card ID' },
+          { name: 'receiver_card_number', type: 'string', required: true, description: '16-digit recipient card number' },
+          { name: 'amount', type: 'string', required: true, description: 'Transfer amount' }
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/transactions/transfer/card/ \\
+  --url ${TRANSACTIONS_URL}/transfer/card/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
     "sender_card_id": "550e8400-e29b-41d4-a716-446655440000",
-    "receiver_card_number": "4111111111111234",
-    "amount": 100.00
+    "receiver_card_number": "4532112233123456",
+    "amount": "100.00"
   }'`,
           json: `{
   "sender_card_id": "550e8400-e29b-41d4-a716-446655440000",
-  "receiver_card_number": "4111111111111234",
-  "amount": 100.00
+  "receiver_card_number": "4532112233123456",
+  "amount": "100.00"
 }`
         },
         responseExample: {
           status: 200,
           json: `{
   "message": "Transfer successful",
-  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
-  "user_id": 12345,
-  "sender_user_id": 12345,
-  "receiver_user_id": 67890,
-  "amount": "100.00"
+  "transaction_id": "uuid-transaction",
+  "amount": "100.00",
+  "fee": "1.00"
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Сообщение об успешном переводе' },
-          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID выполненной транзакции' },
-          { name: 'user_id', type: 'number', required: true, description: 'ID пользователя-инициатора (отправитель)' },
-          { name: 'sender_user_id', type: 'number', required: true, description: 'ID пользователя-отправителя (владелец sender_card_id)' },
-          { name: 'receiver_user_id', type: 'number', required: true, description: 'ID пользователя-получателя (владелец receiver_card_number)' },
-          { name: 'amount', type: 'decimal', required: true, description: 'Фактически переведённая сумма в AED' }
-        ],
-        notes: [
-          'user_id, sender_user_id, receiver_user_id — идентифицируют участников перевода; карты привязаны к конкретным пользователям',
-          'Перевод моментальный, средства зачисляются мгновенно',
-          'Комиссия: 1% от суммы перевода',
-          'Минимальная сумма: 1.00 AED',
-          'Квитанция содержит: transaction_id, user_id, sender_user_id, receiver_user_id, status, дату, сумму, комиссию, маску карты отправителя (**** 1234), маску карты получателя (**** 5678), имя получателя'
+          { name: 'message', type: 'string', required: true, description: 'Status message' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'amount', type: 'string', required: true, description: 'Transfer amount' },
+          { name: 'fee', type: 'string', required: true, description: 'Fee amount (1%)' }
         ]
-      }
-    ]
-  },
-  // ============ WITHDRAWALS (ВЫВОДЫ) ============
-  {
-    id: 'withdrawals',
-    title: 'Withdrawals (Выводы)',
-    titleKey: 'api.categories.withdrawals',
-    icon: '📤',
-    endpoints: [
+      },
       {
         id: 'crypto-withdrawal',
         method: 'POST',
         path: '/transactions/withdrawal/crypto/',
-        title: 'Crypto Withdrawal',
-        description: 'Регистрирует дебетовую операцию по фиатному счёту (AED) и инициирует заявку на отправку эквивалента в цифровых активах на внешний кошелёк. Передача в блокчейн делегируется асинхронным процессам.',
-        category: 'withdrawals',
+        title: 'Card → External Crypto Wallet',
+        description: 'Withdraw from card to an external crypto wallet address.',
+        category: 'transfers',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
         bodyParams: [
-          { name: 'from_card_id', type: 'uuid', required: true, description: 'ID карты, с которой спишутся AED' },
-          { name: 'token', type: 'enum', required: true, description: 'Токен для вывода', enum: ['USDT', 'USDC'] },
-          { name: 'network', type: 'enum', required: true, description: 'Сеть получателя', enum: ['TRC20', 'ERC20', 'BEP20', 'SOL'] },
-          { name: 'to_address', type: 'string', required: true, description: 'Крипто-адрес получателя' },
-          { name: 'amount_crypto', type: 'decimal', required: true, description: 'Сумма к получению в крипте (минимум 1.00)' }
+          { name: 'from_card_id', type: 'uuid', required: true, description: 'Source card ID' },
+          { name: 'token', type: 'enum', required: true, description: 'Token type', enum: ['USDT', 'USDC'] },
+          { name: 'network', type: 'enum', required: true, description: 'Blockchain network', enum: ['TRC20', 'ERC20', 'BEP20', 'SOL'] },
+          { name: 'to_address', type: 'string', required: true, description: 'Destination crypto address' },
+          { name: 'amount_crypto', type: 'string', required: true, description: 'Amount in crypto' }
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/transactions/withdrawal/crypto/ \\
+  --url ${TRANSACTIONS_URL}/withdrawal/crypto/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
-    "from_card_id": "550e8400-e29b-41d4-a716-446655440000",
+    "from_card_id": "uuid-card",
     "token": "USDT",
     "network": "TRC20",
-    "to_address": "TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R",
-    "amount_crypto": 50.00
+    "to_address": "Txxxxxxxxx...",
+    "amount_crypto": "100.000000"
   }'`,
           json: `{
-  "from_card_id": "550e8400-e29b-41d4-a716-446655440000",
+  "from_card_id": "uuid-card",
   "token": "USDT",
   "network": "TRC20",
-  "to_address": "TXqH5gN2Y8k9m3LpWv7rJf4sKz6eCdAb1R",
-  "amount_crypto": 50.00
+  "to_address": "Txxxxxxxxx...",
+  "amount_crypto": "100.000000"
 }`
         },
         responseExample: {
           status: 200,
           json: `{
   "message": "Withdrawal processing",
-  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
-  "user_id": 12345,
-  "total_debit_crypto": "50.500000"
+  "transaction_id": "uuid-transaction",
+  "total_debit_crypto": "101.500000"
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Статус обработки вывода' },
-          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции списания' },
-          { name: 'user_id', type: 'number', required: true, description: 'ID пользователя, инициировавшего вывод (владелец карты)' },
-          { name: 'total_debit_crypto', type: 'decimal', required: true, description: 'Общая сумма списания в крипте (включая network fee)' }
-        ],
-        notes: [
-          'user_id привязывает вывод к конкретному пользователю и его карте (from_card_id)',
-          'Комиссия сети (network fee) включена в total_debit_crypto',
-          'Комиссия платформы: 1% от суммы',
-          'Фактическая отправка в блокчейн происходит асинхронно',
-          'Квитанция содержит: transaction_id, user_id, status, дату, токен, сеть, адрес получателя, сумму отправки, network fee, общее списание, курс конвертации AED → крипто'
+          { name: 'message', type: 'string', required: true, description: 'Status message' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'total_debit_crypto', type: 'string', required: true, description: 'Total debit including fee' }
         ]
       },
       {
         id: 'bank-withdrawal',
         method: 'POST',
         path: '/transactions/withdrawal/bank/',
-        title: 'Bank Wire Withdrawal',
-        description: 'Формирует поручение на банковский перевод (SWIFT или локальный клиринг) с удержанием средств с баланса карты. Маршрутизация платёжных поручений находится в стадии интеграции.',
-        category: 'withdrawals',
+        title: 'Card → External Bank (Wire)',
+        description: 'Withdraw from card/account to an external bank account.',
+        category: 'transfers',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
         bodyParams: [
-          { name: 'from_card_id', type: 'uuid', required: true, description: 'ID карты для списания средств' },
-          { name: 'iban', type: 'string', required: true, description: 'IBAN номер счёта в ОАЭ (начинается с AE, 23 символа)' },
-          { name: 'beneficiary_name', type: 'string', required: true, description: 'Полное имя получателя' },
-          { name: 'bank_name', type: 'string', required: true, description: 'Название банка получателя' },
-          { name: 'amount_aed', type: 'decimal', required: true, description: 'Сумма перевода в AED (минимум 1.00)' }
+          { name: 'receiver_card_number', type: 'string', required: true, description: 'Recipient card number' },
+          { name: 'amount', type: 'string', required: true, description: 'Transfer amount' }
         ],
         requestExample: {
           curl: `curl --request POST \\
-  --url ${API_BASE_URL}/transactions/withdrawal/bank/ \\
+  --url ${TRANSACTIONS_URL}/withdrawal/bank/ \\
   --header 'Authorization: Token abc123xyz789token' \\
   --header 'Content-Type: application/json' \\
   --data '{
-    "from_card_id": "550e8400-e29b-41d4-a716-446655440000",
-    "iban": "AE070331234567890123456",
-    "beneficiary_name": "John Doe",
-    "bank_name": "Emirates NBD",
-    "amount_aed": 500.00
+    "receiver_card_number": "4532112233123456",
+    "amount": "100.00"
   }'`,
           json: `{
-  "from_card_id": "550e8400-e29b-41d4-a716-446655440000",
-  "iban": "AE070331234567890123456",
-  "beneficiary_name": "John Doe",
-  "bank_name": "Emirates NBD",
-  "amount_aed": 500.00
+  "receiver_card_number": "4532112233123456",
+  "amount": "100.00"
 }`
         },
         responseExample: {
           status: 200,
           json: `{
-  "message": "Bank wire processing",
-  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
-  "user_id": 12345,
-  "fee_amount": "10.00",
-  "total_debit_aed": "510.00"
+  "message": "Transfer successful",
+  "transaction_id": "uuid-transaction",
+  "amount": "100.00"
 }`
         },
         responseParams: [
-          { name: 'message', type: 'string', required: true, description: 'Статус обработки перевода' },
-          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции' },
-          { name: 'user_id', type: 'number', required: true, description: 'ID пользователя-отправителя (владелец карты from_card_id)' },
-          { name: 'fee_amount', type: 'decimal', required: true, description: 'Комиссия за перевод (2%)' },
-          { name: 'total_debit_aed', type: 'decimal', required: true, description: 'Общая сумма списания (сумма + комиссия)' }
+          { name: 'message', type: 'string', required: true, description: 'Status message' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'amount', type: 'string', required: true, description: 'Transfer amount' }
+        ]
+      },
+      {
+        id: 'card-to-crypto',
+        method: 'POST',
+        path: '/transactions/transfer/card-to-crypto/',
+        title: 'Card → Crypto Wallet',
+        description: 'Transfer from card balance to internal crypto wallet.',
+        category: 'transfers',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_card_id', type: 'uuid', required: true, description: 'Source card ID' },
+          { name: 'to_wallet_id', type: 'uuid', required: true, description: 'Destination crypto wallet ID' },
+          { name: 'amount_aed', type: 'string', required: true, description: 'Amount in AED' }
         ],
-        notes: [
-          'user_id привязывает банковский перевод к конкретному пользователю и его карте',
-          'IBAN должен начинаться с AE и содержать 23 символа',
-          'Комиссия: 2% от суммы перевода',
-          'Обработка занимает 1–3 рабочих дня',
-          'Квитанция содержит: transaction_id, user_id, status, дату, сумму перевода, комиссию (2%), общее списание, IBAN получателя, имя получателя, название банка, reference'
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${TRANSACTIONS_URL}/transfer/card-to-crypto/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_card_id": "uuid-card",
+    "to_wallet_id": "uuid-wallet",
+    "amount_aed": "1000.00"
+  }'`,
+          json: `{
+  "from_card_id": "uuid-card",
+  "to_wallet_id": "uuid-wallet",
+  "amount_aed": "1000.00"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Transfer successful",
+  "transaction_id": "uuid-transaction",
+  "deducted_amount": "1000.00",
+  "fee": "15.00",
+  "credited_amount": "268.000000"
+}`
+        },
+        responseParams: [
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'deducted_amount', type: 'string', required: true, description: 'Amount deducted from card' },
+          { name: 'fee', type: 'string', required: true, description: 'Fee amount' },
+          { name: 'credited_amount', type: 'string', required: true, description: 'Amount credited to crypto wallet' }
+        ]
+      },
+      {
+        id: 'crypto-to-card',
+        method: 'POST',
+        path: '/transactions/transfer/crypto-to-card/',
+        title: 'Crypto Wallet → Card',
+        description: 'Transfer from internal crypto wallet to card balance.',
+        category: 'transfers',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_wallet_id', type: 'uuid', required: true, description: 'Source crypto wallet ID' },
+          { name: 'to_card_number', type: 'string', required: true, description: '16-digit card number' },
+          { name: 'amount_usdt', type: 'string', required: true, description: 'Amount in USDT' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${TRANSACTIONS_URL}/transfer/crypto-to-card/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_wallet_id": "uuid-wallet",
+    "to_card_number": "4532112233123456",
+    "amount_usdt": "50.000000"
+  }'`,
+          json: `{
+  "from_wallet_id": "uuid-wallet",
+  "to_card_number": "4532112233123456",
+  "amount_usdt": "50.000000"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Transfer successful",
+  "transaction_id": "uuid-transaction",
+  "deducted_amount": "50.000000",
+  "fee": "1.000000",
+  "credited_amount": "180.050000"
+}`
+        },
+        responseParams: [
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'deducted_amount', type: 'string', required: true, description: 'Amount deducted from wallet' },
+          { name: 'fee', type: 'string', required: true, description: 'Fee amount' },
+          { name: 'credited_amount', type: 'string', required: true, description: 'Amount credited to card (AED)' }
+        ]
+      },
+      {
+        id: 'bank-to-crypto',
+        method: 'POST',
+        path: '/transactions/transfer/bank-to-crypto/',
+        title: 'IBAN → Crypto Wallet',
+        description: 'Transfer from IBAN bank account to internal crypto wallet.',
+        category: 'transfers',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_bank_account_id', type: 'uuid', required: true, description: 'Source bank account ID' },
+          { name: 'to_crypto_address', type: 'string', required: true, description: 'Destination crypto address' },
+          { name: 'amount_aed', type: 'string', required: true, description: 'Amount in AED' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${TRANSACTIONS_URL}/transfer/bank-to-crypto/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_bank_account_id": "uuid-bank-account",
+    "to_crypto_address": "Txxxxxx...",
+    "amount_aed": "1000.00"
+  }'`,
+          json: `{
+  "from_bank_account_id": "uuid-bank-account",
+  "to_crypto_address": "Txxxxxx...",
+  "amount_aed": "1000.00"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Transfer successful",
+  "transaction_id": "uuid-transaction",
+  "deducted_amount": "1000.000000",
+  "fee": "15.000000",
+  "credited_amount": "268.000000"
+}`
+        },
+        responseParams: [
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'deducted_amount', type: 'string', required: true, description: 'Amount deducted' },
+          { name: 'fee', type: 'string', required: true, description: 'Fee amount' },
+          { name: 'credited_amount', type: 'string', required: true, description: 'Crypto amount credited' }
+        ]
+      },
+      {
+        id: 'crypto-to-bank',
+        method: 'POST',
+        path: '/transactions/transfer/crypto-to-bank/',
+        title: 'Crypto Wallet → IBAN',
+        description: 'Transfer from internal crypto wallet to IBAN bank account.',
+        category: 'transfers',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_wallet_id', type: 'uuid', required: true, description: 'Source crypto wallet ID' },
+          { name: 'to_iban', type: 'string', required: true, description: 'Destination IBAN' },
+          { name: 'amount_usdt', type: 'string', required: true, description: 'Amount in USDT' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${TRANSACTIONS_URL}/transfer/crypto-to-bank/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_wallet_id": "uuid-wallet",
+    "to_iban": "AE070331234567890123456",
+    "amount_usdt": "100.000000"
+  }'`,
+          json: `{
+  "from_wallet_id": "uuid-wallet",
+  "to_iban": "AE070331234567890123456",
+  "amount_usdt": "100.000000"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Transfer successful",
+  "transaction_id": "uuid-transaction",
+  "deducted_amount": "100.000000",
+  "fee": "2.000000",
+  "credited_amount": "360.000000"
+}`
+        },
+        responseParams: [
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'deducted_amount', type: 'string', required: true, description: 'USDT deducted' },
+          { name: 'fee', type: 'string', required: true, description: 'Fee amount' },
+          { name: 'credited_amount', type: 'string', required: true, description: 'AED credited to IBAN' }
+        ]
+      },
+      {
+        id: 'card-to-bank',
+        method: 'POST',
+        path: '/transactions/transfer/card-to-bank/',
+        title: 'Card → IBAN',
+        description: 'Transfer from card balance to IBAN bank account.',
+        category: 'transfers',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_card_id', type: 'uuid', required: true, description: 'Source card ID' },
+          { name: 'to_iban', type: 'string', required: true, description: 'Destination IBAN' },
+          { name: 'amount_aed', type: 'string', required: true, description: 'Amount in AED' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${TRANSACTIONS_URL}/transfer/card-to-bank/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_card_id": "uuid-card",
+    "to_iban": "AE070331234567890123456",
+    "amount_aed": "200.00"
+  }'`,
+          json: `{
+  "from_card_id": "uuid-card",
+  "to_iban": "AE070331234567890123456",
+  "amount_aed": "200.00"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Transfer successful",
+  "transaction_id": "uuid-transaction",
+  "deducted_amount": "200.000000",
+  "fee": "4.000000",
+  "credited_amount": "196.000000"
+}`
+        },
+        responseParams: [
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'deducted_amount', type: 'string', required: true, description: 'Amount deducted from card' },
+          { name: 'fee', type: 'string', required: true, description: 'Fee amount' },
+          { name: 'credited_amount', type: 'string', required: true, description: 'Amount credited to IBAN' }
+        ]
+      },
+      {
+        id: 'bank-to-card',
+        method: 'POST',
+        path: '/transactions/transfer/bank-to-card/',
+        title: 'IBAN → Card',
+        description: 'Transfer from IBAN bank account to card.',
+        category: 'transfers',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_bank_account_id', type: 'uuid', required: true, description: 'Source IBAN account ID' },
+          { name: 'receiver_card_number', type: 'string', required: true, description: 'Recipient card number' },
+          { name: 'amount', type: 'string', required: true, description: 'Transfer amount' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${TRANSACTIONS_URL}/transfer/bank-to-card/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_bank_account_id": "uuid-bank-account",
+    "receiver_card_number": "4532112233123456",
+    "amount": "500.00"
+  }'`,
+          json: `{
+  "from_bank_account_id": "uuid-bank-account",
+  "receiver_card_number": "4532112233123456",
+  "amount": "500.00"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Transfer successful",
+  "transaction_id": "uuid-transaction",
+  "amount": "500.00",
+  "fee": "10.00",
+  "total_debit": "510.00"
+}`
+        },
+        responseParams: [
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'amount', type: 'string', required: true, description: 'Transfer amount' },
+          { name: 'fee', type: 'string', required: true, description: 'Fee amount' },
+          { name: 'total_debit', type: 'string', required: true, description: 'Total debit (amount + fee)' }
         ]
       }
     ]
   },
-  // ============ RECEIPTS (КВИТАНЦИИ) ============
+  // ============ TRANSACTION HISTORY ============
+  {
+    id: 'transaction-history',
+    title: 'Transaction History',
+    titleKey: 'api.categories.transactionHistory',
+    icon: '📊',
+    endpoints: [
+      {
+        id: 'transactions-all',
+        method: 'GET',
+        path: '/transactions/all/',
+        title: 'All Transactions',
+        description: 'Get all transactions for the authenticated user.',
+        category: 'transaction-history',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${TRANSACTIONS_URL}/all/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "id": "uuid-transaction",
+    "type": "transfer",
+    "direction": "outbound",
+    "status": "completed",
+    "amount": "100.00",
+    "currency": "AED",
+    "fee": "2.00",
+    "exchange_rate": null,
+    "original_amount": null,
+    "original_currency": null,
+    "merchant_name": null,
+    "recipient_card": "4532112233123456",
+    "sender_name": "John Doe",
+    "created_at": "2023-10-01T15:30:00Z",
+    "updated_at": "2023-10-01T15:30:05Z"
+  }
+]`
+        },
+        responseParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'type', type: 'string', required: true, description: 'Transaction type' },
+          { name: 'direction', type: 'enum', required: true, description: 'Direction', enum: ['inbound', 'outbound', 'internal'] },
+          { name: 'status', type: 'string', required: true, description: 'Transaction status' },
+          { name: 'amount', type: 'string', required: true, description: 'Amount' },
+          { name: 'currency', type: 'string', required: true, description: 'Currency' },
+          { name: 'fee', type: 'string', required: false, description: 'Fee amount' },
+          { name: 'merchant_name', type: 'string', required: false, description: 'Merchant name (for card payments)' },
+          { name: 'created_at', type: 'string', required: true, description: 'Creation timestamp' }
+        ]
+      },
+      {
+        id: 'transactions-iban',
+        method: 'GET',
+        path: '/transactions/iban/',
+        title: 'Bank (IBAN) Transactions',
+        description: 'Get bank-related transactions only.',
+        category: 'transaction-history',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${TRANSACTIONS_URL}/iban/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "id": "uuid-transaction",
+    "type": "top_up",
+    "direction": "inbound",
+    "status": "completed",
+    "amount": "5000.00",
+    "currency": "AED",
+    "created_at": "2023-10-01T15:30:00Z"
+  }
+]`
+        },
+        responseParams: [
+          { name: '[]', type: 'array', required: true, description: 'Array of bank transactions (same format as all transactions)' }
+        ]
+      },
+      {
+        id: 'transactions-card',
+        method: 'GET',
+        path: '/transactions/card-transactions/',
+        title: 'Card Transactions',
+        description: 'Get card-related transactions only.',
+        category: 'transaction-history',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${TRANSACTIONS_URL}/card-transactions/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "id": "uuid-transaction",
+    "type": "card_payment",
+    "direction": "outbound",
+    "status": "completed",
+    "amount": "250.00",
+    "currency": "AED",
+    "merchant_name": "Amazon",
+    "created_at": "2023-10-01T15:30:00Z"
+  }
+]`
+        },
+        responseParams: [
+          { name: '[]', type: 'array', required: true, description: 'Array of card transactions' }
+        ]
+      },
+      {
+        id: 'transactions-crypto',
+        method: 'GET',
+        path: '/transactions/crypto/',
+        title: 'Crypto Transactions',
+        description: 'Get crypto-related transactions only.',
+        category: 'transaction-history',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${TRANSACTIONS_URL}/crypto/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "id": "uuid-transaction",
+    "type": "top_up",
+    "direction": "inbound",
+    "status": "completed",
+    "amount": "1000.000000",
+    "currency": "USDT",
+    "created_at": "2023-10-01T15:30:00Z"
+  }
+]`
+        },
+        responseParams: [
+          { name: '[]', type: 'array', required: true, description: 'Array of crypto transactions' }
+        ]
+      },
+      {
+        id: 'recipient-info',
+        method: 'GET',
+        path: '/transactions/recipient-info/',
+        title: 'Recipient Info',
+        description: 'Look up recipient name by card number or IBAN.',
+        category: 'transaction-history',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        queryParams: [
+          { name: 'card_number', type: 'string', required: true, description: '16-digit card number to look up' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url '${TRANSACTIONS_URL}/recipient-info/?card_number=4532112233123456' \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "recipient_name": "John Doe",
+  "card_type": "metal",
+  "avatar_url": "https://..."
+}`
+        },
+        responseParams: [
+          { name: 'recipient_name', type: 'string', required: true, description: 'Recipient full name' },
+          { name: 'card_type', type: 'string', required: false, description: 'Card type (metal, virtual)' },
+          { name: 'avatar_url', type: 'string', required: false, description: 'Recipient avatar URL' }
+        ]
+      }
+    ]
+  },
+  // ============ BANK & CRYPTO ACCOUNTS ============
+  {
+    id: 'accounts-info',
+    title: 'Bank & Crypto Accounts',
+    titleKey: 'api.categories.accountsInfo',
+    icon: '🏦',
+    endpoints: [
+      {
+        id: 'bank-accounts',
+        method: 'GET',
+        path: '/transactions/bank-accounts/',
+        title: 'My Bank Accounts (IBAN)',
+        description: 'Retrieve all IBAN bank accounts for the current user.',
+        category: 'accounts-info',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${TRANSACTIONS_URL}/bank-accounts/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "id": "uuid-account",
+    "iban": "AE070331234567890123456",
+    "bank_name": "EasyCard Default Bank",
+    "beneficiary": "John Doe",
+    "balance": "200000.00",
+    "is_active": true
+  }
+]`
+        },
+        responseParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Account ID' },
+          { name: 'iban', type: 'string', required: true, description: 'IBAN number' },
+          { name: 'bank_name', type: 'string', required: true, description: 'Bank name' },
+          { name: 'beneficiary', type: 'string', required: true, description: 'Account holder name' },
+          { name: 'balance', type: 'string', required: true, description: 'Current balance' },
+          { name: 'is_active', type: 'boolean', required: true, description: 'Account status' }
+        ]
+      },
+      {
+        id: 'crypto-wallets',
+        method: 'GET',
+        path: '/transactions/crypto-wallets/',
+        title: 'My Crypto Wallets',
+        description: 'Retrieve all crypto wallets for the current user.',
+        category: 'accounts-info',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${TRANSACTIONS_URL}/crypto-wallets/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "id": "uuid-wallet",
+    "network": "TRC20",
+    "token": "USDT",
+    "address": "Txxxxxx...",
+    "balance": "200000.000000",
+    "is_active": true
+  }
+]`
+        },
+        responseParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Wallet ID' },
+          { name: 'network', type: 'string', required: true, description: 'Blockchain network' },
+          { name: 'token', type: 'string', required: true, description: 'Token type' },
+          { name: 'address', type: 'string', required: true, description: 'Wallet address' },
+          { name: 'balance', type: 'string', required: true, description: 'Current balance' },
+          { name: 'is_active', type: 'boolean', required: true, description: 'Wallet status' }
+        ]
+      }
+    ]
+  },
+  // ============ RECEIPTS ============
   {
     id: 'receipts',
-    title: 'Receipts (Квитанции)',
+    title: 'Receipts',
     titleKey: 'api.categories.receipts',
     icon: '🧾',
     endpoints: [
@@ -1546,432 +2033,49 @@ export const apiCategories: ApiCategory[] = [
         method: 'GET',
         path: '/transactions/{transaction_id}/receipt/',
         title: 'Get Transaction Receipt',
-        description: 'Возвращает структурированный отчёт (квитанцию) по конкретной транзакции. Формат ответа адаптируется под тип операции. Проверяет права доступа пользователя.',
+        description: 'Get structured receipt for a specific transaction. Response format adapts to transaction type.',
         category: 'receipts',
         authorization: {
           type: 'Token',
           description: 'Token authentication header of the form `Token <token>`'
         },
         pathParams: [
-          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции для получения квитанции' }
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' }
         ],
         requestExample: {
           curl: `curl --request GET \\
-  --url ${API_BASE_URL}/transactions/123e4567-e89b-12d3-a456-426614174000/receipt/ \\
+  --url ${TRANSACTIONS_URL}/123e4567-e89b-12d3-a456-426614174000/receipt/ \\
   --header 'Authorization: Token abc123xyz789token'`
         },
         responseExample: {
           status: 200,
           json: `{
-  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
-  "user_id": 12345,
-  "status": "completed",
-  "date_time": "2026-02-20T12:00:00Z",
-  "operation": "Internal Card Transfer",
+  "transaction_id": "uuid...",
+  "date": "2023-10-01T15:30:00Z",
   "amount": "100.00",
-  "fee": "1.00",
-  "sender_user_id": 12345,
-  "sender_card_mask": "**** 1234",
-  "receiver_user_id": 67890,
-  "receiver_card_mask": "**** 5678",
-  "recipient_name": "EasyCard User"
+  "currency": "AED",
+  "fee": "2.00",
+  "status": "completed",
+  "sender": "John Doe",
+  "receiver": "Jane Smith",
+  "description": "Transfer"
 }`
         },
         responseParams: [
-          { name: 'transaction_id', type: 'uuid', required: true, description: 'ID транзакции' },
-          { name: 'user_id', type: 'number', required: true, description: 'ID пользователя-владельца транзакции' },
-          { name: 'status', type: 'string', required: true, description: 'Статус: pending, processing, completed, failed, cancelled' },
-          { name: 'date_time', type: 'string', required: true, description: 'Дата и время операции (ISO 8601)' },
-          { name: 'operation', type: 'string', required: true, description: 'Тип операции (человекочитаемый)' },
-          { name: 'amount', type: 'decimal', required: true, description: 'Сумма операции' },
-          { name: 'fee', type: 'decimal', required: false, description: 'Комиссия (если применимо)' },
-          { name: 'sender_user_id', type: 'number', required: false, description: 'ID отправителя (для переводов)' },
-          { name: 'receiver_user_id', type: 'number', required: false, description: 'ID получателя (для переводов)' }
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'date', type: 'string', required: true, description: 'Transaction date (ISO 8601)' },
+          { name: 'amount', type: 'string', required: true, description: 'Transaction amount' },
+          { name: 'currency', type: 'string', required: true, description: 'Currency' },
+          { name: 'fee', type: 'string', required: false, description: 'Fee amount (if applicable)' },
+          { name: 'status', type: 'string', required: true, description: 'Status: pending, completed, failed, cancelled' },
+          { name: 'sender', type: 'string', required: false, description: 'Sender name' },
+          { name: 'receiver', type: 'string', required: false, description: 'Receiver name' }
         ],
         notes: [
-          'user_id присутствует во ВСЕХ квитанциях — определяет владельца транзакции',
-          '**Bank Topup** (top_up) — квитанция: transaction_id, user_id, status, date_time, operation ("Bank Wire Topup"), transfer_rail, bank_instructions (IBAN, SWIFT, bank_name, account_name, reference с user_id)',
-          '**Crypto Topup** (top_up) — квитанция: transaction_id, user_id, status, date_time, operation ("Crypto Topup"), token, network, deposit_address, qr_payload, amount_received, exchange_rate, fee_amount',
-          '**Card Transfer** (transfer_out / transfer_in) — квитанция: transaction_id, user_id, sender_user_id, receiver_user_id, status, date_time, operation ("Internal Card Transfer"), amount, fee, sender_card_mask, receiver_card_mask, recipient_name',
-          '**Crypto Withdrawal** (withdrawal) — квитанция: transaction_id, user_id, status, date_time, operation ("Crypto Withdrawal"), token, network, to_address_mask, amount_crypto, fee, tx_hash',
-          '**Bank Withdrawal** (withdrawal) — квитанция: transaction_id, user_id, status, date_time, operation ("Bank Wire Withdrawal"), amount_aed, fee_amount (2%), total_debit, iban_mask, beneficiary_name, bank_name, from_card_mask',
-          '**Card Activation** (card_activation) — квитанция: transaction_id, user_id, status, date_time, operation ("Card Activation"), card_type (virtual/metal), card_mask (**** XXXX), annual_fee (183 AED), activated_at',
-          '**Card Payment** (card_payment) — квитанция: transaction_id, user_id, status, date_time, operation ("Card Payment"), merchant_name, merchant_category, amount, currency, card_mask, exchange_rate (если конвертация), original_amount, original_currency',
-          '**Fee** (fee) — квитанция: transaction_id, user_id, status, date_time, operation ("Service Fee"), fee_type (annual_fee / replacement_fee / account_opening_fee), amount, card_id, description',
-          '**Refund** (refund) — квитанция: transaction_id, user_id, status, date_time, operation ("Refund"), original_transaction_id, amount, merchant_name, card_mask, refund_reason',
-          '**Cashback** (cashback) — квитанция: transaction_id, user_id, status, date_time, operation ("Cashback"), original_transaction_id, cashback_amount, cashback_percent, merchant_name, credited_card_mask'
-        ]
-      }
-    ]
-  },
-  // ============ SAVED CONTACTS ============
-  {
-    id: 'contacts',
-    title: 'Saved Contacts',
-    titleKey: 'api.categories.contacts',
-    icon: '📇',
-    endpoints: [
-      {
-        id: 'contacts-list',
-        method: 'GET',
-        path: '/accounts/contacts/',
-        title: 'List Contacts',
-        description: 'Get paginated list of saved contacts for the authenticated user.',
-        category: 'contacts',
-        authorization: {
-          type: 'Token',
-          description: 'Token authentication header of the form `Token <token>`'
-        },
-        queryParams: [
-          { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
-          { name: 'limit', type: 'integer', required: false, description: 'Items per page (default: 100)' }
-        ],
-        requestExample: {
-          curl: `curl --request GET \\
-  --url '${API_BASE_URL}/accounts/contacts/?page=1&limit=100' \\
-  --header 'Authorization: Token abc123xyz789token'`
-        },
-        responseExample: {
-          status: 200,
-          json: `{
-  "total_count": 2,
-  "total_pages": 1,
-  "list": [
-    {
-      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "user_id": "u1234",
-      "full_name": "John Doe",
-      "phone": "+971501234567",
-      "email": "john@example.com",
-      "company": "Acme Corp",
-      "position": "CEO",
-      "avatar_url": "https://cdn.apofiz.com/avatars/contact1.jpg",
-      "notes": "Business partner",
-      "payment_methods": [
-        {
-          "id": "pm1",
-          "type": "card",
-          "label": "Visa *4242",
-          "value": "4242424242424242"
-        }
-      ],
-      "social_links": [
-        {
-          "id": "sl1",
-          "networkId": "telegram",
-          "networkName": "Telegram",
-          "url": "https://t.me/johndoe"
-        }
-      ],
-      "created_at": "2025-01-15T10:30:00Z",
-      "updated_at": "2025-01-15T10:30:00Z"
-    }
-  ]
-}`
-        },
-        responseParams: [
-          { name: 'total_count', type: 'integer', required: true, description: 'Total number of contacts' },
-          { name: 'total_pages', type: 'integer', required: true, description: 'Total number of pages' },
-          { name: 'list', type: 'array', required: true, description: 'Array of contact objects' }
-        ]
-      },
-      {
-        id: 'contacts-create',
-        method: 'POST',
-        path: '/accounts/contacts/',
-        title: 'Create Contact',
-        description: 'Create a new saved contact with optional payment methods and social links.',
-        category: 'contacts',
-        authorization: {
-          type: 'Token',
-          description: 'Token authentication header of the form `Token <token>`'
-        },
-        bodyParams: [
-          { name: 'full_name', type: 'string', required: true, description: 'Full name of the contact' },
-          { name: 'phone', type: 'string', required: false, description: 'Phone number' },
-          { name: 'email', type: 'string', required: false, description: 'Email address' },
-          { name: 'company', type: 'string', required: false, description: 'Company name' },
-          { name: 'position', type: 'string', required: false, description: 'Job title / position' },
-          { name: 'notes', type: 'string', required: false, description: 'Free-text notes' },
-          { name: 'payment_methods', type: 'array', required: false, description: 'Array of payment method objects (type, label, value, network)' },
-          { name: 'social_links', type: 'array', required: false, description: 'Array of social link objects (networkId, networkName, url)' }
-        ],
-        requestExample: {
-          curl: `curl --request POST \\
-  --url ${API_BASE_URL}/accounts/contacts/ \\
-  --header 'Authorization: Token abc123xyz789token' \\
-  --header 'Content-Type: application/json' \\
-  --data '{
-    "full_name": "Jane Smith",
-    "phone": "+971509876543",
-    "email": "jane@example.com",
-    "company": "Tech LLC",
-    "payment_methods": [
-      {
-        "type": "iban",
-        "label": "Main IBAN",
-        "value": "AE070331234567890123456"
-      }
-    ]
-  }'`,
-          json: `{
-  "full_name": "Jane Smith",
-  "phone": "+971509876543",
-  "email": "jane@example.com",
-  "company": "Tech LLC",
-  "payment_methods": [
-    {
-      "type": "iban",
-      "label": "Main IBAN",
-      "value": "AE070331234567890123456"
-    }
-  ]
-}`
-        },
-        responseExample: {
-          status: 201,
-          json: `{
-  "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-  "user_id": "u1234",
-  "full_name": "Jane Smith",
-  "phone": "+971509876543",
-  "email": "jane@example.com",
-  "company": "Tech LLC",
-  "position": null,
-  "avatar_url": null,
-  "notes": null,
-  "payment_methods": [
-    {
-      "id": "pm2",
-      "type": "iban",
-      "label": "Main IBAN",
-      "value": "AE070331234567890123456"
-    }
-  ],
-  "social_links": [],
-  "created_at": "2025-02-20T14:00:00Z",
-  "updated_at": "2025-02-20T14:00:00Z"
-}`
-        },
-        responseParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Unique contact ID' },
-          { name: 'full_name', type: 'string', required: true, description: 'Contact full name' },
-          { name: 'payment_methods', type: 'array', required: true, description: 'Saved payment methods' },
-          { name: 'social_links', type: 'array', required: true, description: 'Saved social links' }
-        ]
-      },
-      {
-        id: 'contacts-get',
-        method: 'GET',
-        path: '/accounts/contacts/{id}/',
-        title: 'Get Contact',
-        description: 'Get a single saved contact by ID.',
-        category: 'contacts',
-        authorization: {
-          type: 'Token',
-          description: 'Token authentication header of the form `Token <token>`'
-        },
-        pathParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
-        ],
-        requestExample: {
-          curl: `curl --request GET \\
-  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/ \\
-  --header 'Authorization: Token abc123xyz789token'`
-        },
-        responseExample: {
-          status: 200,
-          json: `{
-  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "user_id": "u1234",
-  "full_name": "John Doe",
-  "phone": "+971501234567",
-  "email": "john@example.com",
-  "company": "Acme Corp",
-  "position": "CEO",
-  "avatar_url": "https://cdn.apofiz.com/avatars/contact1.jpg",
-  "notes": "Business partner",
-  "payment_methods": [],
-  "social_links": [],
-  "created_at": "2025-01-15T10:30:00Z",
-  "updated_at": "2025-01-15T10:30:00Z"
-}`
-        },
-        responseParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Unique contact ID' },
-          { name: 'full_name', type: 'string', required: true, description: 'Contact full name' },
-          { name: 'phone', type: 'string', required: false, description: 'Phone number' },
-          { name: 'email', type: 'string', required: false, description: 'Email address' },
-          { name: 'avatar_url', type: 'string', required: false, description: 'Avatar image URL' }
-        ]
-      },
-      {
-        id: 'contacts-update',
-        method: 'PATCH',
-        path: '/accounts/contacts/{id}/',
-        title: 'Update Contact',
-        description: 'Partially update a saved contact. Only provided fields are changed.',
-        category: 'contacts',
-        authorization: {
-          type: 'Token',
-          description: 'Token authentication header of the form `Token <token>`'
-        },
-        pathParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
-        ],
-        bodyParams: [
-          { name: 'full_name', type: 'string', required: false, description: 'Full name' },
-          { name: 'phone', type: 'string', required: false, description: 'Phone number' },
-          { name: 'email', type: 'string', required: false, description: 'Email address' },
-          { name: 'company', type: 'string', required: false, description: 'Company name' },
-          { name: 'position', type: 'string', required: false, description: 'Job title' },
-          { name: 'notes', type: 'string', required: false, description: 'Notes' },
-          { name: 'payment_methods', type: 'array', required: false, description: 'Payment methods (replaces entire array)' },
-          { name: 'social_links', type: 'array', required: false, description: 'Social links (replaces entire array)' }
-        ],
-        requestExample: {
-          curl: `curl --request PATCH \\
-  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/ \\
-  --header 'Authorization: Token abc123xyz789token' \\
-  --header 'Content-Type: application/json' \\
-  --data '{
-    "company": "New Company Inc",
-    "position": "CTO"
-  }'`,
-          json: `{
-  "company": "New Company Inc",
-  "position": "CTO"
-}`
-        },
-        responseExample: {
-          status: 200,
-          json: `{
-  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "user_id": "u1234",
-  "full_name": "John Doe",
-  "phone": "+971501234567",
-  "email": "john@example.com",
-  "company": "New Company Inc",
-  "position": "CTO",
-  "avatar_url": "https://cdn.apofiz.com/avatars/contact1.jpg",
-  "notes": "Business partner",
-  "payment_methods": [],
-  "social_links": [],
-  "created_at": "2025-01-15T10:30:00Z",
-  "updated_at": "2025-02-20T15:00:00Z"
-}`
-        },
-        responseParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' },
-          { name: 'full_name', type: 'string', required: true, description: 'Updated full name' },
-          { name: 'updated_at', type: 'datetime', required: true, description: 'Last update timestamp' }
-        ],
-        notes: [
-          'Only fields included in the request body are updated',
-          'payment_methods and social_links replace the entire array when provided'
-        ]
-      },
-      {
-        id: 'contacts-delete',
-        method: 'DELETE',
-        path: '/accounts/contacts/{id}/',
-        title: 'Delete Contact',
-        description: 'Permanently delete a saved contact.',
-        category: 'contacts',
-        authorization: {
-          type: 'Token',
-          description: 'Token authentication header of the form `Token <token>`'
-        },
-        pathParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
-        ],
-        requestExample: {
-          curl: `curl --request DELETE \\
-  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/ \\
-  --header 'Authorization: Token abc123xyz789token'`
-        },
-        responseExample: {
-          status: 204,
-          json: `// No content`
-        },
-        notes: [
-          'Returns 204 No Content on success',
-          'Deletion is permanent and cannot be undone'
-        ]
-      },
-      {
-        id: 'contacts-avatar-upload',
-        method: 'POST',
-        path: '/accounts/contacts/{id}/avatar/',
-        title: 'Upload Avatar',
-        description: 'Upload or replace the avatar image for a contact. Accepts multipart/form-data.',
-        category: 'contacts',
-        authorization: {
-          type: 'Token',
-          description: 'Token authentication header of the form `Token <token>`'
-        },
-        pathParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
-        ],
-        bodyParams: [
-          { name: 'file', type: 'file', required: true, description: 'Image file (JPEG, PNG, WebP; max 5 MB)' }
-        ],
-        requestExample: {
-          curl: `curl --request POST \\
-  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/avatar/ \\
-  --header 'Authorization: Token abc123xyz789token' \\
-  --form 'file=@/path/to/avatar.jpg'`
-        },
-        responseExample: {
-          status: 200,
-          json: `{
-  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "avatar_url": "https://cdn.apofiz.com/contacts/avatars/a1b2c3d4.jpg",
-  "full_name": "John Doe"
-}`
-        },
-        responseParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' },
-          { name: 'avatar_url', type: 'string', required: true, description: 'URL of the uploaded avatar' },
-          { name: 'full_name', type: 'string', required: true, description: 'Contact name' }
-        ],
-        notes: [
-          'Content-Type must be multipart/form-data',
-          'Supported formats: JPEG, PNG, WebP',
-          'Maximum file size: 5 MB',
-          'Previous avatar is automatically replaced'
-        ]
-      },
-      {
-        id: 'contacts-avatar-delete',
-        method: 'DELETE',
-        path: '/accounts/contacts/{id}/avatar/',
-        title: 'Delete Avatar',
-        description: 'Remove the avatar image from a contact.',
-        category: 'contacts',
-        authorization: {
-          type: 'Token',
-          description: 'Token authentication header of the form `Token <token>`'
-        },
-        pathParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
-        ],
-        requestExample: {
-          curl: `curl --request DELETE \\
-  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/avatar/ \\
-  --header 'Authorization: Token abc123xyz789token'`
-        },
-        responseExample: {
-          status: 200,
-          json: `{
-  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "avatar_url": null,
-  "full_name": "John Doe"
-}`
-        },
-        responseParams: [
-          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' },
-          { name: 'avatar_url', type: 'null', required: true, description: 'Null after deletion' }
+          'Response format varies by transaction type',
+          'Card transfers include sender/receiver card masks',
+          'Crypto transactions include token, network, and address',
+          'Bank transfers include IBAN and bank details'
         ]
       }
     ]

@@ -1224,11 +1224,13 @@
       "files": "Загрузка файлов",
       "social": "Web и соцсети",
       "devices": "Устройства и сессии",
+      "contacts": "Контакты",
+      "cards": "Карты и кошельки",
       "topups": "Пополнения",
       "transfers": "Переводы",
-      "withdrawals": "Выводы",
-      "receipts": "Квитанции",
-      "contacts": "Сохранённые контакты"
+      "transactionHistory": "История транзакций",
+      "accountsInfo": "Банк и крипто-счета",
+      "receipts": "Квитанции"
     },
     "notes": {
       "title": "Примечания"
