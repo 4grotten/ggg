@@ -1139,6 +1139,12 @@
       "title": "介绍",
       "description": "EasyCard API允许您将卡片管理和支付功能集成到您的应用程序中。"
     },
+    "baseUrl": {
+      "accounts": "账户与认证",
+      "accountsDesc": "身份验证、个人资料、联系人、社交链接、设备",
+      "cards": "卡片与交易",
+      "cardsDesc": "卡片、余额、充值、转账、提现、加密钱包"
+    },
     "getStarted": {
       "title": "3步开始",
       "step1": {

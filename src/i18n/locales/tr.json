@@ -1132,6 +1132,12 @@
       "title": "Giriş",
       "description": "EasyCard API, kart yönetimi ve ödeme işlevlerini uygulamalarınıza entegre etmenizi sağlar."
     },
+    "baseUrl": {
+      "accounts": "Hesaplar ve Kimlik Doğrulama",
+      "accountsDesc": "Kimlik doğrulama, profil, kişiler, sosyal ağlar, cihazlar",
+      "cards": "Kartlar ve İşlemler",
+      "cardsDesc": "Kartlar, bakiyeler, yüklemeler, transferler, çekimler, kripto cüzdanlar"
+    },
     "getStarted": {
       "title": "3 Adımda Başlayın",
       "step1": {

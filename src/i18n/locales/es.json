@@ -1132,6 +1132,12 @@
       "title": "Introducción",
       "description": "La API de EasyCard le permite integrar la gestión de tarjetas y funciones de pago en sus aplicaciones."
     },
+    "baseUrl": {
+      "accounts": "Cuentas y Autenticación",
+      "accountsDesc": "Autenticación, perfil, contactos, redes sociales, dispositivos",
+      "cards": "Tarjetas y Transacciones",
+      "cardsDesc": "Tarjetas, saldos, recargas, transferencias, retiros, billeteras cripto"
+    },
     "getStarted": {
       "title": "Comienza en 3 Pasos",
       "step1": {
