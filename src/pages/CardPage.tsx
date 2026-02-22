@@ -182,11 +182,11 @@ const CardPage = () => {
   const formatCardNumber = (num: string) =>
     num.replace(/(.{4})/g, '$1 ').trim();
 
-  // Filter API transactions for current card, then append mock data below
+  // Filter API transactions for current card only
   const apiCardId = apiCard?.id;
   const filteredApiGroups = (cardTxGroups || []).map(group => ({
     ...group,
-    transactions: group.transactions.filter(tx => !apiCardId || tx.cardId === apiCardId || !tx.cardId),
+    transactions: group.transactions.filter(tx => apiCardId && tx.cardId === apiCardId),
   })).filter(g => g.transactions.length > 0);
 
   const mergedTransactions = [

@@ -527,15 +527,18 @@ export const fetchCardTransactions = async (): Promise<{
 
 /**
  * Fetch card transactions and group by date
+ * Uses /all/ endpoint for richer data (sender_card, recipient_card, description, fee)
+ * then filters to only card-related transactions (those with card_id)
  */
 export const fetchCardTransactionGroups = async (): Promise<TransactionGroup[]> => {
-  const { data, error } = await fetchCardTransactions();
-  console.log('[CardTx] fetchCardTransactionGroups result:', { count: data?.length, error });
+  const { data, error } = await fetchApiTransactions();
   if (error || !data || data.length === 0) return [];
   
-  const groups = groupApiTransactions(data);
-  console.log('[CardTx] Grouped into', groups.length, 'groups with', groups.reduce((s, g) => s + g.transactions.length, 0), 'transactions');
-  return groups;
+  // Filter to only transactions that have a card_id (card-related)
+  const cardOnly = data.filter(tx => !!tx.card_id);
+  if (cardOnly.length === 0) return [];
+  
+  return groupApiTransactions(cardOnly);
 };
 
 /**
