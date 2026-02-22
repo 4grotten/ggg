@@ -40,4 +40,5 @@ urlpatterns = [
     path('users/get_token_detail/<int:device_id>/', views.TokenDetailView.as_view()),
 
     path('contacts/', views.SyncContactsView.as_view(), name='sync_contacts'),
+    path('contacts/<uuid:pk>/', views.ContactDetailView.as_view(), name='contact_detail'),
 ]
