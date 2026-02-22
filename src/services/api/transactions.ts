@@ -527,10 +527,10 @@ export const fetchCardTransactions = async (): Promise<{
 
 /**
  * Fetch card transactions and group by date
- * Uses /all/ endpoint because card-transactions/ returns empty when card_id is not set in DB
+ * Uses /card-transactions/ endpoint
  */
 export const fetchCardTransactionGroups = async (): Promise<TransactionGroup[]> => {
-  const { data, error } = await fetchApiTransactions();
+  const { data, error } = await fetchCardTransactions();
   if (error || !data || data.length === 0) return [];
   return groupApiTransactions(data);
 };
