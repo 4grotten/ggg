@@ -1132,6 +1132,12 @@
       "title": "Einführung",
       "description": "Die EasyCard API ermöglicht die Integration von Kartenverwaltung und Zahlungsfunktionen in Ihre Anwendungen."
     },
+    "baseUrl": {
+      "accounts": "Konten & Authentifizierung",
+      "accountsDesc": "Authentifizierung, Profil, Kontakte, soziale Netzwerke, Geräte",
+      "cards": "Karten & Transaktionen",
+      "cardsDesc": "Karten, Salden, Aufladungen, Überweisungen, Auszahlungen, Krypto-Wallets"
+    },
     "getStarted": {
       "title": "Starten Sie in 3 Schritten",
       "step1": {
@@ -1174,7 +1180,8 @@
       "topups": "Aufladungen",
       "transfers": "Überweisungen",
       "withdrawals": "Auszahlungen",
-      "receipts": "Quittungen"
+      "receipts": "Quittungen",
+      "contacts": "Gespeicherte Kontakte"
     },
     "notes": {
       "title": "Hinweise"

@@ -1192,6 +1192,12 @@
       "title": "Introduction",
       "description": "EasyCard API allows you to integrate card management and payment functionality into your applications."
     },
+    "baseUrl": {
+      "accounts": "Accounts & Auth",
+      "accountsDesc": "Authentication, profile, contacts, social links, devices",
+      "cards": "Cards & Transactions",
+      "cardsDesc": "Cards, balances, top-ups, transfers, withdrawals, crypto wallets"
+    },
     "getStarted": {
       "title": "Get Started in 3 Steps",
       "step1": {
@@ -1234,7 +1240,8 @@
       "topups": "Topups",
       "transfers": "Transfers",
       "withdrawals": "Withdrawals",
-      "receipts": "Receipts"
+      "receipts": "Receipts",
+      "contacts": "Saved Contacts"
     },
     "notes": {
       "title": "Notes"
