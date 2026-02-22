@@ -73,10 +73,10 @@ Deno.serve(async (req) => {
     }
 
     return new Response(data, {
-      status: response.status,
+      status: response!.status,
       headers: {
         ...corsHeaders,
-        "Content-Type": response.headers.get("Content-Type") || "application/json",
+        "Content-Type": response!.headers.get("Content-Type") || "application/json",
       },
     });
   } catch (error) {
