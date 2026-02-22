@@ -104,13 +104,30 @@ const TransactionDetails = () => {
   
   // Helper: resolve full card number from wallet data by last 4 digits
   const walletCards = walletData?.data?.cards || [];
-  const resolveFullCard = (mask: string | undefined | null): string | undefined => {
+  const formatCardNumber = (num: string): string => {
+    const clean = num.replace(/\s/g, '');
+    if (clean.length >= 16) return `${clean.slice(0,4)} ${clean.slice(4,8)} ${clean.slice(8,12)} ${clean.slice(12,16)}`;
+    return num;
+  };
+  const resolveFullCard = (mask: string | undefined | null, movementIndex?: number): string | undefined => {
     if (!mask) return undefined;
-    const last4 = mask.slice(-4);
+    const last4 = mask.replace(/[^0-9]/g, '').slice(-4);
+    // Try wallet cards first
     const found = walletCards.find((c: any) => c.card_number?.slice(-4) === last4);
     if (found) {
-      const num = found.card_number;
-      return `${num.slice(0,4)} ${num.slice(4,8)} ${num.slice(8,12)} ${num.slice(12)}`;
+      return formatCardNumber(found.card_number);
+    }
+    // Try movements card_number
+    if (receipt?.movements && movementIndex !== undefined && (receipt.movements[movementIndex] as any)?.card_number) {
+      return formatCardNumber((receipt.movements[movementIndex] as any).card_number);
+    }
+    // Try any movement matching last4
+    if (receipt?.movements) {
+      for (const mov of receipt.movements) {
+        if ((mov as any).card_number && (mov as any).card_number.slice(-4) === last4) {
+          return formatCardNumber((mov as any).card_number);
+        }
+      }
     }
     return mask;
   };
@@ -171,14 +188,14 @@ const TransactionDetails = () => {
         return (typeMap[receipt.type] || receipt.type || 'payment') as any;
       })(),
       recipientCard: receiverLast4,
-      recipientCardFull: resolveFullCard(receipt.receiver_card_mask),
+      recipientCardFull: resolveFullCard(receipt.receiver_card_mask, 1),
       recipientCardType: receiverCardType,
       recipientName: receipt.recipient_name,
       senderName: receipt.sender_name,
       senderCard: senderLast4 || undefined,
-      senderCardFull: resolveFullCard(receipt.sender_card_mask),
-      fromCardFull: resolveFullCard(receipt.sender_card_mask),
-      toCardFull: resolveFullCard(receipt.receiver_card_mask),
+      senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
+      fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
+      toCardFull: resolveFullCard(receipt.receiver_card_mask, 1),
       toWalletAddress: receipt.to_address_mask,
       fromWalletAddress: receipt.from_address_mask,
       fromAddress: receipt.from_address_mask,
