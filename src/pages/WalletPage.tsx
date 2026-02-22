@@ -26,8 +26,8 @@ const WalletPage = () => {
   const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
   const { data: cryptoWalletsData } = useCryptoWallets();
   
-  const wallet = cryptoWalletsData?.[0];
-  const usdtBalance = wallet ? parseFloat(wallet.balance) : 0;
+  const wallet = cryptoWalletsData?.data?.[0];
+  const usdtBalance = wallet ? parseFloat(String(wallet.balance)) : 0;
   const walletAddress = wallet?.address || "—";
 
   const transactionGroups = useMemo(() => {
