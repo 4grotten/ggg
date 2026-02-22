@@ -35,23 +35,45 @@ class RecipientInfoView(APIView):
     )
     def get(self, request):
         card_number = request.query_params.get('card_number')
-        if not card_number:
-            return Response({"error": "card_number is required"}, status=status.HTTP_400_BAD_REQUEST)
-        card = Cards.objects.filter(card_number_encrypted=card_number).first()
-        if not card:
-            return Response({"error": "Card not found"}, status=status.HTTP_404_NOT_FOUND)
-        user = User.objects.filter(id=card.user_id).first()
-        recipient_name = f"{user.first_name or ''} {user.last_name or ''}".strip() if user else "Unknown User"
-        avatar_url = None
-        if user:
-            profile = Profiles.objects.filter(user_id=str(user.id)).first()
-            if profile:
-                avatar_url = profile.avatar_url
-        return Response({
-            "recipient_name": recipient_name,
-            "card_type": card.type,
-            "avatar_url": avatar_url
-        }, status=status.HTTP_200_OK)
+        iban = request.query_params.get('iban')
+
+        if card_number:
+            card = Cards.objects.filter(card_number_encrypted=card_number).first()
+            if not card:
+                return Response({"error": "Card not found"}, status=status.HTTP_404_NOT_FOUND)
+            user = User.objects.filter(id=card.user_id).first()
+            recipient_name = f"{user.first_name or ''} {user.last_name or ''}".strip() if user else "Unknown User"
+            avatar_url = None
+            if user:
+                profile = Profiles.objects.filter(user_id=str(user.id)).first()
+                if profile:
+                    avatar_url = profile.avatar_url
+            return Response({
+                "recipient_name": recipient_name,
+                "card_type": card.type,
+                "avatar_url": avatar_url
+            }, status=status.HTTP_200_OK)
+
+        elif iban:
+            account = BankDepositAccounts.objects.filter(iban=iban).first()
+            if not account:
+                return Response({"error": "IBAN not found"}, status=status.HTTP_404_NOT_FOUND)
+            user = User.objects.filter(id=account.user_id).first()
+            recipient_name = f"{user.first_name or ''} {user.last_name or ''}".strip() if user else "Unknown User"
+            avatar_url = None
+            if user:
+                profile = Profiles.objects.filter(user_id=str(user.id)).first()
+                if profile:
+                    avatar_url = profile.avatar_url
+            return Response({
+                "recipient_name": recipient_name,
+                "bank_name": account.bank_name,
+                "iban": account.iban,
+                "avatar_url": avatar_url
+            }, status=status.HTTP_200_OK)
+
+        else:
+            return Response({"error": "card_number or iban is required"}, status=status.HTTP_400_BAD_REQUEST)
 
 class AllTransactionsListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
