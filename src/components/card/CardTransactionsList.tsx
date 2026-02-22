@@ -106,8 +106,17 @@ const handleClick = (transaction: Transaction) => {
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
     const apiIsIncoming = (transaction.metadata as any)?.isIncoming;
-    const isIncomingTransfer = isCardTransfer && (apiIsIncoming !== undefined ? apiIsIncoming : !!transaction.senderCard && !transaction.recipientCard);
-    const isOutgoingTransfer = isCardTransfer && (apiIsIncoming !== undefined ? !apiIsIncoming : !!transaction.recipientCard && !transaction.senderCard);
+    const hasBothCards = !!transaction.senderCard && !!transaction.recipientCard;
+    const isIncomingTransfer = isCardTransfer && (
+      apiIsIncoming !== undefined ? apiIsIncoming 
+      : hasBothCards ? false  // default outgoing if both present and no API flag
+      : !!transaction.senderCard && !transaction.recipientCard
+    );
+    const isOutgoingTransfer = isCardTransfer && (
+      apiIsIncoming !== undefined ? !apiIsIncoming 
+      : hasBothCards ? true
+      : !!transaction.recipientCard && !transaction.senderCard
+    );
     const isProcessing = transaction.status === "processing";
     // In wallet view, topup = outgoing (wallet → card), so it's negative
     const walletTopupOutgoing = walletView && isTopup;
