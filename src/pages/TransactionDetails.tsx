@@ -101,48 +101,91 @@ const TransactionDetails = () => {
   
   const mockTransaction = id ? mockTransactions[id] : null;
   
+  // Helper: resolve full card number from wallet data by last 4 digits
+  const walletCards = walletData?.data?.cards || [];
+  const resolveFullCard = (mask: string | undefined | null): string | undefined => {
+    if (!mask) return undefined;
+    const last4 = mask.slice(-4);
+    const found = walletCards.find((c: any) => c.card_number?.slice(-4) === last4);
+    if (found) {
+      const num = found.card_number;
+      return `${num.slice(0,4)} ${num.slice(4,8)} ${num.slice(8,12)} ${num.slice(12)}`;
+    }
+    return mask;
+  };
+  const resolveCardType = (mask: string | undefined | null): "Virtual" | "Metal" => {
+    if (!mask) return "Virtual";
+    const last4 = mask.slice(-4);
+    const found = walletCards.find((c: any) => c.card_number?.slice(-4) === last4);
+    return found?.type === 'metal' ? 'Metal' : 'Virtual';
+  };
+
+  // Resolve full IBAN from wallet data
+  const fullIban = walletData?.data?.physical_account?.iban || '';
+  const resolveFullIban = (mask: string | undefined | null): string | undefined => {
+    if (!mask) return undefined;
+    // If receipt has beneficiary_iban (full), use it
+    if (receipt?.beneficiary_iban) return receipt.beneficiary_iban;
+    // Try to match from wallet
+    const last4 = mask.slice(-4);
+    if (fullIban && fullIban.slice(-4) === last4) return fullIban;
+    return mask;
+  };
+
   // Build transaction from receipt data if no mock found (API transaction)
-  const transaction = mockTransaction || (receipt ? {
-    id: id || '',
-    merchant: receipt.operation || receipt.type || 'Transaction',
-    time: new Date(receipt.date_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-    date: new Date(receipt.date_time).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-    amountUSDT: receipt.amount_crypto ?? receipt.amount ?? receipt.amount_aed ?? 0,
-    amountLocal: receipt.amount_aed ?? receipt.amount ?? 0,
-    localCurrency: receipt.amount_crypto != null ? 'USDT' : 'AED',
-    color: '#3B82F6',
-    cardLast4: receipt.sender_card_mask?.slice(-4) || receipt.receiver_card_mask?.slice(-4) || '',
-    exchangeRate: 3.65,
-    status: (receipt.status === 'completed' ? 'settled' : receipt.status) as any,
-    type: (() => {
-      const typeMap: Record<string, string> = {
-        'bank_withdrawal': 'bank_transfer',
-        'bank_topup': 'topup',
-        'crypto_topup': 'topup',
-        'crypto_withdrawal': 'crypto_send',
-        'card_transfer': 'card_transfer',
-        'crypto_deposit': 'crypto_deposit',
-        'bank_transfer_incoming': 'bank_transfer_incoming',
-      };
-      return (typeMap[receipt.type] || receipt.type || 'payment') as any;
-    })(),
-    recipientCard: receipt.receiver_card_mask?.slice(-4),
-    recipientCardFull: receipt.receiver_card_mask,
-    recipientName: receipt.recipient_name,
-    senderName: receipt.recipient_name,
-    fromCardFull: receipt.sender_card_mask,
-    toWalletAddress: receipt.to_address_mask,
-    fromWalletAddress: receipt.from_address_mask,
-    fromAddress: receipt.from_address_mask,
-    tokenNetwork: receipt.network_and_token,
-    transferFee: receipt.fee ?? receipt.fee_amount,
-    networkFee: receipt.fee ?? receipt.fee_amount,
-    bankFee: receipt.fee_amount,
-    recipientIban: receipt.iban_mask,
-    recipientBankName: receipt.bank_name,
-    beneficiaryName: receipt.beneficiary_name,
-    cardType: 'Virtual' as const,
-  } : null) as typeof mockTransaction;
+  const transaction = mockTransaction || (receipt ? (() => {
+    const senderLast4 = receipt.sender_card_mask?.slice(-4) || '';
+    const receiverLast4 = receipt.receiver_card_mask?.slice(-4) || '';
+    const senderCardType = resolveCardType(receipt.sender_card_mask);
+    const receiverCardType = resolveCardType(receipt.receiver_card_mask);
+    
+    return {
+      id: id || '',
+      merchant: receipt.operation || receipt.type || 'Transaction',
+      time: new Date(receipt.date_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      date: new Date(receipt.date_time).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      amountUSDT: receipt.amount_crypto ?? receipt.amount ?? receipt.amount_aed ?? 0,
+      amountLocal: receipt.amount_aed ?? receipt.amount ?? 0,
+      localCurrency: receipt.amount_crypto != null ? 'USDT' : 'AED',
+      color: '#3B82F6',
+      cardLast4: senderLast4 || receiverLast4 || '',
+      exchangeRate: 3.65,
+      status: (receipt.status === 'completed' ? 'settled' : receipt.status) as any,
+      type: (() => {
+        const typeMap: Record<string, string> = {
+          'bank_withdrawal': 'bank_transfer',
+          'bank_topup': 'topup',
+          'crypto_topup': 'topup',
+          'crypto_withdrawal': 'crypto_send',
+          'card_transfer': 'card_transfer',
+          'crypto_deposit': 'crypto_deposit',
+          'bank_transfer_incoming': 'bank_transfer_incoming',
+        };
+        return (typeMap[receipt.type] || receipt.type || 'payment') as any;
+      })(),
+      recipientCard: receiverLast4,
+      recipientCardFull: resolveFullCard(receipt.receiver_card_mask),
+      recipientName: receipt.recipient_name,
+      senderName: receipt.sender_name,
+      senderCard: senderLast4 || undefined,
+      senderCardFull: resolveFullCard(receipt.sender_card_mask),
+      fromCardFull: resolveFullCard(receipt.sender_card_mask),
+      toCardFull: resolveFullCard(receipt.receiver_card_mask),
+      toWalletAddress: receipt.to_address_mask,
+      fromWalletAddress: receipt.from_address_mask,
+      fromAddress: receipt.from_address_mask,
+      tokenNetwork: receipt.network_and_token,
+      transferFee: receipt.fee ?? receipt.fee_amount,
+      networkFee: receipt.fee ?? receipt.fee_amount,
+      bankFee: receipt.fee_amount,
+      recipientIban: resolveFullIban(receipt.iban_mask),
+      recipientBankName: receipt.beneficiary_bank_name || receipt.bank_name,
+      senderIban: receipt.iban_mask,
+      senderBankName: receipt.bank_name,
+      beneficiaryName: receipt.beneficiary_name,
+      cardType: senderCardType,
+    };
+  })() : null) as typeof mockTransaction;
 
   const getInitial = (name: string) => name.charAt(0).toUpperCase();
   const isTopup = transaction?.type === "topup";
