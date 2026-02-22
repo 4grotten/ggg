@@ -239,9 +239,9 @@ const handleClick = (transaction: Transaction) => {
                       <p className="text-sm text-muted-foreground truncate">
                         {transaction.time}
                         {isCardTransfer && transaction.senderCard
-                          ? ` · ${t("transactions.from")} •••• ${transaction.senderCard}`
+                          ? ` · ${t("transactions.from")} •••• ${transaction.senderCard.slice(-4)}`
                           : isCardTransfer && transaction.recipientCard
-                          ? ` · ${t("transactions.to")} •••• ${transaction.recipientCard}`
+                          ? ` · ${t("transactions.to")} •••• ${transaction.recipientCard.slice(-4)}`
                           : isBankTransferIncoming && transaction.senderName
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
                           : isBankTransfer && transaction.description
