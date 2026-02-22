@@ -14,9 +14,9 @@ import {
   createContact as apiCreateContact,
   updateContact as apiUpdateContact,
   deleteContact as apiDeleteContact,
-  uploadContactAvatar as apiUploadAvatar,
 } from '@/services/api/contactsApi';
 import { isAuthenticated } from '@/services/api/apiClient';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -141,15 +141,25 @@ export const useSavedContacts = () => {
     }
   };
 
-  // Upload contact avatar
+  // Upload contact avatar to storage bucket
   const uploadAvatar = async (file: File, contactId: string): Promise<string | null> => {
     if (!authed) return null;
 
     try {
-      const res = await apiUploadAvatar(contactId, file);
-      if (res.error) throw new Error('Upload failed');
+      const ext = file.name.split('.').pop() || 'jpg';
+      const filePath = `${contactId}/avatar.${ext}`;
 
-      const url = res.data?.avatar_url ?? null;
+      const { error: uploadError } = await supabase.storage
+        .from('contact-avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('contact-avatars')
+        .getPublicUrl(filePath);
+
+      const url = urlData?.publicUrl ? `${urlData.publicUrl}?t=${Date.now()}` : null;
 
       if (url) {
         setContacts((prev) =>
