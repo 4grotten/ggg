@@ -9,6 +9,8 @@ class Transactions(models.Model):
     status = models.TextField()
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     currency = models.CharField(max_length=3)
+    sender_id = models.CharField(max_length=50, blank=True, null=True, help_text="ID отправителя или 'EXTERNAL'")
+    receiver_id = models.CharField(max_length=50, blank=True, null=True, help_text="ID получателя или 'EXTERNAL'")
     fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     exchange_rate = models.DecimalField(max_digits=10, decimal_places=6, blank=True, null=True)
     original_amount = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)

@@ -93,3 +93,36 @@ class BankToCardTransferResponseSerializer(serializers.Serializer):
 
 class ErrorResponseSerializer(serializers.Serializer):
     error = serializers.CharField(help_text="Текст ошибки (например, 'Недостаточно средств')")
+
+
+class CardToCryptoTransferSerializer(serializers.Serializer):
+    from_card_id = serializers.UUIDField(help_text="ID карты отправителя")
+    to_crypto_address = serializers.CharField(max_length=255, help_text="USDT TRC20 адрес получателя (свой или чужой)")
+    amount_aed = serializers.DecimalField(max_digits=15, decimal_places=2, min_value=1.00)
+
+class CryptoToCardTransferSerializer(serializers.Serializer):
+    from_wallet_id = serializers.UUIDField(help_text="ID криптокошелька отправителя")
+    to_card_number = serializers.CharField(max_length=16, help_text="Номер карты получателя (своей или чужой)")
+    amount_usdt = serializers.DecimalField(max_digits=15, decimal_places=6, min_value=1.00)
+
+class CardToBankTransferSerializer(serializers.Serializer):
+    from_card_id = serializers.UUIDField(help_text="ID карты отправителя")
+    to_iban = serializers.CharField(max_length=34, help_text="IBAN получателя (свой или чужой)")
+    amount_aed = serializers.DecimalField(max_digits=15, decimal_places=2, min_value=1.00)
+
+class BankToCryptoTransferSerializer(serializers.Serializer):
+    from_bank_account_id = serializers.UUIDField(help_text="ID банковского счета отправителя")
+    to_crypto_address = serializers.CharField(max_length=255, help_text="USDT TRC20 адрес получателя")
+    amount_aed = serializers.DecimalField(max_digits=15, decimal_places=2, min_value=1.00)
+
+class CryptoToBankTransferSerializer(serializers.Serializer):
+    from_wallet_id = serializers.UUIDField(help_text="ID криптокошелька отправителя")
+    to_iban = serializers.CharField(max_length=34, help_text="IBAN получателя")
+    amount_usdt = serializers.DecimalField(max_digits=15, decimal_places=6, min_value=1.00)
+
+class TransferResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+    transaction_id = serializers.UUIDField()
+    deducted_amount = serializers.DecimalField(max_digits=15, decimal_places=6)
+    fee = serializers.DecimalField(max_digits=15, decimal_places=6)
+    credited_amount = serializers.DecimalField(max_digits=15, decimal_places=6)

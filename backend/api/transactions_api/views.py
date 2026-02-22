@@ -11,13 +11,13 @@ from apps.accounts_apps.models import Profiles
 from apps.transactions_apps.models import Transactions, BankDepositAccounts, CryptoWallets
 
 from .serializers import (
-    BankTopupRequestSerializer, BankTopupResponseSerializer,
+    BankToCryptoTransferSerializer, BankTopupRequestSerializer, BankTopupResponseSerializer, CardToBankTransferSerializer, CardToCryptoTransferSerializer, CryptoToBankTransferSerializer, CryptoToCardTransferSerializer,
     CryptoTopupRequestSerializer, CryptoTopupResponseSerializer,
     CardTransferRequestSerializer, CardTransferResponseSerializer,
     CryptoWithdrawalRequestSerializer, CryptoWithdrawalResponseSerializer,
     BankWithdrawalRequestSerializer, BankWithdrawalResponseSerializer,
     BankToCardTransferRequestSerializer, BankToCardTransferResponseSerializer,
-    ErrorResponseSerializer
+    ErrorResponseSerializer, TransferResponseSerializer
 )
 from apps.transactions_apps.services import TransactionService
 
@@ -75,19 +75,30 @@ class RecipientInfoView(APIView):
         else:
             return Response({"error": "card_number or iban is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+def get_transaction_direction(tx, user_id):
+    user_id_str = str(user_id)
+    if tx.sender_id == user_id_str and tx.receiver_id == user_id_str:
+        return 'internal'
+    elif tx.receiver_id == user_id_str:
+        return 'inbound'
+    return 'outbound'
+
+
 class AllTransactionsListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Все транзакции пользователя (Главная страница)",
-        operation_description="Возвращает абсолютно все транзакции юзера (отправки, получения, карты, банк, крипта).",
-        tags=["Транзакции (Списки)"]
-    )
+    @swagger_auto_schema(operation_summary="Все транзакции пользователя", tags=["Транзакции (Списки)"])
     def get(self, request):
-        txs = Transactions.objects.filter(Q(user_id=str(request.user.id))).order_by('-created_at')
+        user_id = str(request.user.id)
+        txs = Transactions.objects.filter(
+            Q(sender_id=user_id) | Q(receiver_id=user_id)
+        ).order_by('-created_at')
+        
         data = [{
             "id": tx.id,
             "type": tx.type,
+            "direction": get_transaction_direction(tx, user_id),
             "status": tx.status,
             "amount": tx.amount,
             "currency": tx.currency,
@@ -109,37 +120,94 @@ class AllTransactionsListView(APIView):
         } for tx in txs]
         return Response(data, status=status.HTTP_200_OK)
 
+
 class IBANTransactionsListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Транзакции по IBAN (Банковский счет)",
-        operation_description="Транзакции, относящиеся исключительно к банковским операциям пользователя.",
-        tags=["Транзакции (Списки)"]
-    )
+    @swagger_auto_schema(operation_summary="Транзакции по IBAN (Банк)", tags=["Транзакции (Списки)"])
     def get(self, request):
+        user_id = str(request.user.id)
         txs = Transactions.objects.filter(
-            user_id=str(request.user.id), 
-            type__icontains='bank'
-        ).order_by('-created_at')
-        data = [{"id": tx.id, "type": tx.type, "amount": tx.amount, "status": tx.status, "created_at": tx.created_at} for tx in txs]
+            Q(sender_id=user_id) | Q(receiver_id=user_id),
+            movements__user_id=user_id, movements__account_type='bank'
+        ).distinct().order_by('-created_at')
+        
+        data = [{
+            "id": tx.id,
+            "type": tx.type,
+            "direction": get_transaction_direction(tx, user_id),
+            "status": tx.status,
+            "amount": tx.amount,
+            "currency": tx.currency,
+            "fee": tx.fee,
+            "exchange_rate": str(tx.exchange_rate) if tx.exchange_rate else None,
+            "original_amount": tx.original_amount,
+            "original_currency": tx.original_currency,
+            "merchant_name": tx.merchant_name,
+            "merchant_category": tx.merchant_category,
+            "recipient_card": tx.recipient_card,
+            "sender_name": tx.sender_name,
+            "sender_card": tx.sender_card,
+            "reference_id": tx.reference_id,
+            "description": tx.description,
+            "card_id": str(tx.card_id) if tx.card_id else None,
+            "metadata": tx.metadata,
+            "created_at": tx.created_at,
+            "updated_at": tx.updated_at,
+        } for tx in txs]
         return Response(data, status=status.HTTP_200_OK)
 
 class CardTransactionsListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Транзакции по Картам (Metal & Virtual)",
-        operation_description="Фильтрует транзакции привязанные к Metal и Virtual картам.",
-        tags=["Транзакции (Списки)"]
-    )
+    @swagger_auto_schema(operation_summary="Транзакции по Картам", tags=["Транзакции (Списки)"])
     def get(self, request):
+        user_id = str(request.user.id)
         txs = Transactions.objects.filter(
-            user_id=str(request.user.id),
-        ).order_by('-created_at')
+            Q(sender_id=user_id) | Q(receiver_id=user_id),
+            movements__user_id=user_id, movements__account_type='card'
+        ).distinct().order_by('-created_at')
+        
         data = [{
             "id": tx.id,
             "type": tx.type,
+            "direction": get_transaction_direction(tx, user_id),
+            "status": tx.status,
+            "amount": tx.amount,
+            "currency": tx.currency,
+            "fee": tx.fee,
+            "exchange_rate": str(tx.exchange_rate) if tx.exchange_rate else None,
+            "original_amount": tx.original_amount,
+            "original_currency": tx.original_currency,
+            "merchant_name": tx.merchant_name,
+            "merchant_category": tx.merchant_category,
+            "recipient_card": tx.recipient_card,
+            "sender_name": tx.sender_name,
+            "sender_card": tx.sender_card,
+            "reference_id": tx.reference_id,
+            "description": tx.description,
+            "card_id": str(tx.card_id) if tx.card_id else None,
+            "metadata": tx.metadata,
+            "created_at": tx.created_at,
+            "updated_at": tx.updated_at,
+        } for tx in txs]
+        return Response(data, status=status.HTTP_200_OK)
+    
+class CryptoTransactionsListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(operation_summary="Транзакции по Крипте", tags=["Транзакции (Списки)"])
+    def get(self, request):
+        user_id = str(request.user.id)
+        txs = Transactions.objects.filter(
+            Q(sender_id=user_id) | Q(receiver_id=user_id),
+            movements__user_id=user_id, movements__account_type='crypto'
+        ).distinct().order_by('-created_at')
+        
+        data = [{
+            "id": tx.id,
+            "type": tx.type,
+            "direction": get_transaction_direction(tx, user_id),
             "status": tx.status,
             "amount": tx.amount,
             "currency": tx.currency,
@@ -276,47 +344,71 @@ class TransactionReceiptView(APIView):
         except Exception as e: return Response({"error": f"Внутренняя ошибка: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class InternalTransferView(APIView):
+class CardToCryptoView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    @swagger_auto_schema(
-        operation_summary="Внутренний перевод (Своп между своими счетами)",
-        operation_description="Позволяет гонять деньги между 4 счетами: card, bank, crypto. Автоматически конвертирует USDT <-> AED (Курс 3.67). Берет комиссию 1 USDT при отправке с крипты.",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['from_type', 'from_id', 'to_type', 'to_id', 'amount'],
-            properties={
-                'from_type': openapi.Schema(type=openapi.TYPE_STRING, description="card | bank | crypto"),
-                'from_id': openapi.Schema(type=openapi.TYPE_STRING, description="ID счета-источника (UUID)"),
-                'to_type': openapi.Schema(type=openapi.TYPE_STRING, description="card | bank | crypto"),
-                'to_id': openapi.Schema(type=openapi.TYPE_STRING, description="ID счета-получателя (UUID)"),
-                'amount': openapi.Schema(type=openapi.TYPE_STRING, description="Сумма списания (в валюте источника)"),
-            }
-        ),
-        tags=["Transfers (Переводы)"]
-    )
+    @swagger_auto_schema(operation_summary="Перевод с Карты на Криптокошелек (Свой/Чужой)", request_body=CardToCryptoTransferSerializer, responses={200: TransferResponseSerializer}, tags=["Transfers (Переводы)"])
     def post(self, request):
-        data = request.data
-        try:
-            txn, converted_amount, fee = TransactionService.execute_internal_transfer(
-                user_id=request.user.id,
-                from_type=data.get('from_type'),
-                from_id=data.get('from_id'),
-                to_type=data.get('to_type'),
-                to_id=data.get('to_id'),
-                amount=data.get('amount')
-            )
-            return Response({
-                "message": "Внутренний перевод успешно выполнен",
-                "transaction_id": txn.id,
-                "deducted_amount": str(data.get('amount')),
-                "fee": str(fee),
-                "credited_amount": str(converted_amount)
-            }, status=status.HTTP_200_OK)
-            
-        except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"error": f"Системная ошибка: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        ser = CardToCryptoTransferSerializer(data=request.data)
+        if ser.is_valid():
+            try:
+                txn, debit, fee, credit = TransactionService.execute_card_to_crypto(
+                    request.user.id, ser.validated_data['from_card_id'], 
+                    ser.validated_data['to_crypto_address'], ser.validated_data['amount_aed']
+                )
+                return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
+            except ValueError as e: return Response({"error": str(e)}, status=400)
+        return Response(ser.errors, status=400)
+
+class CryptoToCardView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @swagger_auto_schema(operation_summary="Перевод с Крипты на Карту (Свою/Чужую) - Комиссия 1 USDT", request_body=CryptoToCardTransferSerializer, responses={200: TransferResponseSerializer}, tags=["Transfers (Переводы)"])
+    def post(self, request):
+        ser = CryptoToCardTransferSerializer(data=request.data)
+        if ser.is_valid():
+            try:
+                txn, debit, fee, credit = TransactionService.execute_crypto_to_card(
+                    request.user.id, ser.validated_data['from_wallet_id'], 
+                    ser.validated_data['to_card_number'], ser.validated_data['amount_usdt']
+                )
+                return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
+            except ValueError as e: return Response({"error": str(e)}, status=400)
+        return Response(ser.errors, status=400)
+
+class BankToCryptoView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @swagger_auto_schema(operation_summary="Перевод с Банка на Криптокошелек", request_body=BankToCryptoTransferSerializer, tags=["Transfers (Переводы)"])
+    def post(self, request):
+        ser = BankToCryptoTransferSerializer(data=request.data)
+        if ser.is_valid():
+            try:
+                txn, debit, fee, credit = TransactionService.execute_bank_to_crypto(request.user.id, ser.validated_data['from_bank_account_id'], ser.validated_data['to_crypto_address'], ser.validated_data['amount_aed'])
+                return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
+            except ValueError as e: return Response({"error": str(e)}, status=400)
+        return Response(ser.errors, status=400)
+
+class CryptoToBankView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @swagger_auto_schema(operation_summary="Перевод с Крипты на Банк (Комиссия 1 USDT)", request_body=CryptoToBankTransferSerializer, tags=["Transfers (Переводы)"])
+    def post(self, request):
+        ser = CryptoToBankTransferSerializer(data=request.data)
+        if ser.is_valid():
+            try:
+                txn, debit, fee, credit = TransactionService.execute_crypto_to_bank(request.user.id, ser.validated_data['from_wallet_id'], ser.validated_data['to_iban'], ser.validated_data['amount_usdt'])
+                return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
+            except ValueError as e: return Response({"error": str(e)}, status=400)
+        return Response(ser.errors, status=400)
+
+class CardToBankView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @swagger_auto_schema(operation_summary="Перевод с Карты на Банк (IBAN)", request_body=CardToBankTransferSerializer, tags=["Transfers (Переводы)"])
+    def post(self, request):
+        ser = CardToBankTransferSerializer(data=request.data)
+        if ser.is_valid():
+            try:
+                txn, debit, fee, credit = TransactionService.execute_card_to_bank(request.user.id, ser.validated_data['from_card_id'], ser.validated_data['to_iban'], ser.validated_data['amount_aed'])
+                return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
+            except ValueError as e: return Response({"error": str(e)}, status=400)
+        return Response(ser.errors, status=400)
 
 
 class BankToCardTransferView(APIView):

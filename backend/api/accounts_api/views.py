@@ -17,7 +17,15 @@ def generate_uid_tail(user_id):
     return str(user_id).zfill(6)[-6:]
 
 def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None):
-    user, created = User.objects.get_or_create(username=phone_number)
+    apofiz_id = apofiz_user_data.get('id') if apofiz_user_data else None
+    user = User.objects.filter(username=phone_number).first()
+    created = False
+    if not user:
+        if apofiz_id and isinstance(apofiz_id, int):
+            user = User.objects.create(id=apofiz_id, username=phone_number)
+        else:
+            user = User.objects.create(username=phone_number)
+        created = True
     if apofiz_user_data:
         if 'email' in apofiz_user_data and apofiz_user_data['email']:
             user.email = apofiz_user_data['email']
@@ -34,43 +42,23 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
     tail = generate_uid_tail(user.id)
     if not Cards.objects.filter(user_id=str(user.id)).exists():
         Cards.objects.create(
-            user_id=str(user.id),
-            type='metal',
-            name='Metal Card',
-            status='active',
-            balance=Decimal('50000.00'),
-            last_four_digits=tail[-4:],
-            card_number_encrypted=f"4532112233{tail}",
+            user_id=str(user.id), type='metal', name='Metal Card', status='active',
+            balance=Decimal('50000.00'), last_four_digits=tail[-4:], card_number_encrypted=f"4532112233{tail}",
         )
         Cards.objects.create(
-            user_id=str(user.id),
-            type='virtual',
-            name='Virtual Card',
-            status='active',
-            balance=Decimal('50000.00'),
-            last_four_digits=tail[-4:],
-            card_number_encrypted=f"4532112244{tail}",
+            user_id=str(user.id), type='virtual', name='Virtual Card', status='active',
+            balance=Decimal('50000.00'), last_four_digits=tail[-4:], card_number_encrypted=f"4532112244{tail}",
         )
     if not BankDepositAccounts.objects.filter(user_id=str(user.id)).exists():
         BankDepositAccounts.objects.create(
-            user_id=str(user.id),
-            iban=f"AE070331234567890{tail}",
-            bank_name="EasyCard Default Bank",
-            beneficiary=f"{user.first_name} {user.last_name}".strip() or "EasyCard Client",
-            balance=Decimal('200000.00'),
-            is_active=True
+            user_id=str(user.id), iban=f"AE070331234567890{tail}", bank_name="EasyCard Default Bank",
+            beneficiary=f"{user.first_name} {user.last_name}".strip() or "EasyCard Client", balance=Decimal('200000.00'), is_active=True
         )
     if not CryptoWallets.objects.filter(user_id=str(user.id)).exists():
         mock_address = f"T{uuid.uuid4().hex[:33]}"
         CryptoWallets.objects.create(
-            user_id=str(user.id),
-            network="TRC20",
-            token="USDT",
-            address=mock_address,
-            balance=Decimal('200000.000000'),
-            is_active=True
+            user_id=str(user.id), network="TRC20", token="USDT", address=mock_address, balance=Decimal('200000.000000'), is_active=True
         )
-
     Token.objects.filter(user=user).delete()
     if apofiz_token:
         Token.objects.create(key=apofiz_token, user=user)
@@ -114,14 +102,17 @@ class RegisterAuthView(APIView):
     permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(
-        operation_summary="Регистрация / Проверка телефона (Apofiz)",
-        operation_description="**[Прокси на Apofiz: POST /register_auth/]**\nПроверяет, существует ли номер в Apofiz и начинает регистрацию.",
+        operation_summary="Регистрация / Проверка телефона",
+        operation_description="Проверяет номер. Если юзер существует — возвращает ошибку, иначе стартует отправку OTP.",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING)}),
         tags=["Аутентификация"]
     )
     def post(self, request):
-        status_code, data = ApofizClient.register_auth(request.data.get('phone_number'))
+        phone_number = request.data.get('phone_number')
+        status_code, data = ApofizClient.register_auth(phone_number)
+        if status_code == 400 and ("exists" in str(data).lower() or "зарегистрирован" in str(data).lower()):
+             return Response({"error": "Пользователь с таким номером уже зарегистрирован. Пожалуйста, выполните вход."}, status=status.HTTP_400_BAD_REQUEST)
         return Response(data, status=status_code)
 
 
