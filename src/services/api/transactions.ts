@@ -427,6 +427,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     senderName: tx.sender_name || undefined,
     senderCard: tx.sender_card || undefined,
     recipientCard: tx.recipient_card || undefined,
+    recipientName: (tx as any).beneficiary_name || (tx as any).recipient_name || undefined,
     description: tx.description || undefined,
     createdAt: tx.created_at,
     cardId: tx.card_id || undefined,

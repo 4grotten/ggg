@@ -30,6 +30,7 @@ export interface Transaction {
   recipientCard?: string;
   senderName?: string;
   senderCard?: string;
+  recipientName?: string;
   status?: TransactionStatus;
   createdAt?: string;
   updatedAt?: string;
