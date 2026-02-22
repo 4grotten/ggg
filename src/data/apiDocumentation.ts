@@ -1603,6 +1603,378 @@ export const apiCategories: ApiCategory[] = [
         ]
       }
     ]
+  },
+  // ============ SAVED CONTACTS ============
+  {
+    id: 'contacts',
+    title: 'Saved Contacts',
+    titleKey: 'api.categories.contacts',
+    icon: '📇',
+    endpoints: [
+      {
+        id: 'contacts-list',
+        method: 'GET',
+        path: '/accounts/contacts/',
+        title: 'List Contacts',
+        description: 'Get paginated list of saved contacts for the authenticated user.',
+        category: 'contacts',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        queryParams: [
+          { name: 'page', type: 'integer', required: false, description: 'Page number (default: 1)' },
+          { name: 'limit', type: 'integer', required: false, description: 'Items per page (default: 100)' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url '${API_BASE_URL}/accounts/contacts/?page=1&limit=100' \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "total_count": 2,
+  "total_pages": 1,
+  "list": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "user_id": "u1234",
+      "full_name": "John Doe",
+      "phone": "+971501234567",
+      "email": "john@example.com",
+      "company": "Acme Corp",
+      "position": "CEO",
+      "avatar_url": "https://cdn.apofiz.com/avatars/contact1.jpg",
+      "notes": "Business partner",
+      "payment_methods": [
+        {
+          "id": "pm1",
+          "type": "card",
+          "label": "Visa *4242",
+          "value": "4242424242424242"
+        }
+      ],
+      "social_links": [
+        {
+          "id": "sl1",
+          "networkId": "telegram",
+          "networkName": "Telegram",
+          "url": "https://t.me/johndoe"
+        }
+      ],
+      "created_at": "2025-01-15T10:30:00Z",
+      "updated_at": "2025-01-15T10:30:00Z"
+    }
+  ]
+}`
+        },
+        responseParams: [
+          { name: 'total_count', type: 'integer', required: true, description: 'Total number of contacts' },
+          { name: 'total_pages', type: 'integer', required: true, description: 'Total number of pages' },
+          { name: 'list', type: 'array', required: true, description: 'Array of contact objects' }
+        ]
+      },
+      {
+        id: 'contacts-create',
+        method: 'POST',
+        path: '/accounts/contacts/',
+        title: 'Create Contact',
+        description: 'Create a new saved contact with optional payment methods and social links.',
+        category: 'contacts',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'full_name', type: 'string', required: true, description: 'Full name of the contact' },
+          { name: 'phone', type: 'string', required: false, description: 'Phone number' },
+          { name: 'email', type: 'string', required: false, description: 'Email address' },
+          { name: 'company', type: 'string', required: false, description: 'Company name' },
+          { name: 'position', type: 'string', required: false, description: 'Job title / position' },
+          { name: 'notes', type: 'string', required: false, description: 'Free-text notes' },
+          { name: 'payment_methods', type: 'array', required: false, description: 'Array of payment method objects (type, label, value, network)' },
+          { name: 'social_links', type: 'array', required: false, description: 'Array of social link objects (networkId, networkName, url)' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/accounts/contacts/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "full_name": "Jane Smith",
+    "phone": "+971509876543",
+    "email": "jane@example.com",
+    "company": "Tech LLC",
+    "payment_methods": [
+      {
+        "type": "iban",
+        "label": "Main IBAN",
+        "value": "AE070331234567890123456"
+      }
+    ]
+  }'`,
+          json: `{
+  "full_name": "Jane Smith",
+  "phone": "+971509876543",
+  "email": "jane@example.com",
+  "company": "Tech LLC",
+  "payment_methods": [
+    {
+      "type": "iban",
+      "label": "Main IBAN",
+      "value": "AE070331234567890123456"
+    }
+  ]
+}`
+        },
+        responseExample: {
+          status: 201,
+          json: `{
+  "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+  "user_id": "u1234",
+  "full_name": "Jane Smith",
+  "phone": "+971509876543",
+  "email": "jane@example.com",
+  "company": "Tech LLC",
+  "position": null,
+  "avatar_url": null,
+  "notes": null,
+  "payment_methods": [
+    {
+      "id": "pm2",
+      "type": "iban",
+      "label": "Main IBAN",
+      "value": "AE070331234567890123456"
+    }
+  ],
+  "social_links": [],
+  "created_at": "2025-02-20T14:00:00Z",
+  "updated_at": "2025-02-20T14:00:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Unique contact ID' },
+          { name: 'full_name', type: 'string', required: true, description: 'Contact full name' },
+          { name: 'payment_methods', type: 'array', required: true, description: 'Saved payment methods' },
+          { name: 'social_links', type: 'array', required: true, description: 'Saved social links' }
+        ]
+      },
+      {
+        id: 'contacts-get',
+        method: 'GET',
+        path: '/accounts/contacts/{id}/',
+        title: 'Get Contact',
+        description: 'Get a single saved contact by ID.',
+        category: 'contacts',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "user_id": "u1234",
+  "full_name": "John Doe",
+  "phone": "+971501234567",
+  "email": "john@example.com",
+  "company": "Acme Corp",
+  "position": "CEO",
+  "avatar_url": "https://cdn.apofiz.com/avatars/contact1.jpg",
+  "notes": "Business partner",
+  "payment_methods": [],
+  "social_links": [],
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-01-15T10:30:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Unique contact ID' },
+          { name: 'full_name', type: 'string', required: true, description: 'Contact full name' },
+          { name: 'phone', type: 'string', required: false, description: 'Phone number' },
+          { name: 'email', type: 'string', required: false, description: 'Email address' },
+          { name: 'avatar_url', type: 'string', required: false, description: 'Avatar image URL' }
+        ]
+      },
+      {
+        id: 'contacts-update',
+        method: 'PATCH',
+        path: '/accounts/contacts/{id}/',
+        title: 'Update Contact',
+        description: 'Partially update a saved contact. Only provided fields are changed.',
+        category: 'contacts',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
+        ],
+        bodyParams: [
+          { name: 'full_name', type: 'string', required: false, description: 'Full name' },
+          { name: 'phone', type: 'string', required: false, description: 'Phone number' },
+          { name: 'email', type: 'string', required: false, description: 'Email address' },
+          { name: 'company', type: 'string', required: false, description: 'Company name' },
+          { name: 'position', type: 'string', required: false, description: 'Job title' },
+          { name: 'notes', type: 'string', required: false, description: 'Notes' },
+          { name: 'payment_methods', type: 'array', required: false, description: 'Payment methods (replaces entire array)' },
+          { name: 'social_links', type: 'array', required: false, description: 'Social links (replaces entire array)' }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "company": "New Company Inc",
+    "position": "CTO"
+  }'`,
+          json: `{
+  "company": "New Company Inc",
+  "position": "CTO"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "user_id": "u1234",
+  "full_name": "John Doe",
+  "phone": "+971501234567",
+  "email": "john@example.com",
+  "company": "New Company Inc",
+  "position": "CTO",
+  "avatar_url": "https://cdn.apofiz.com/avatars/contact1.jpg",
+  "notes": "Business partner",
+  "payment_methods": [],
+  "social_links": [],
+  "created_at": "2025-01-15T10:30:00Z",
+  "updated_at": "2025-02-20T15:00:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' },
+          { name: 'full_name', type: 'string', required: true, description: 'Updated full name' },
+          { name: 'updated_at', type: 'datetime', required: true, description: 'Last update timestamp' }
+        ],
+        notes: [
+          'Only fields included in the request body are updated',
+          'payment_methods and social_links replace the entire array when provided'
+        ]
+      },
+      {
+        id: 'contacts-delete',
+        method: 'DELETE',
+        path: '/accounts/contacts/{id}/',
+        title: 'Delete Contact',
+        description: 'Permanently delete a saved contact.',
+        category: 'contacts',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
+        ],
+        requestExample: {
+          curl: `curl --request DELETE \\
+  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 204,
+          json: `// No content`
+        },
+        notes: [
+          'Returns 204 No Content on success',
+          'Deletion is permanent and cannot be undone'
+        ]
+      },
+      {
+        id: 'contacts-avatar-upload',
+        method: 'POST',
+        path: '/accounts/contacts/{id}/avatar/',
+        title: 'Upload Avatar',
+        description: 'Upload or replace the avatar image for a contact. Accepts multipart/form-data.',
+        category: 'contacts',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
+        ],
+        bodyParams: [
+          { name: 'file', type: 'file', required: true, description: 'Image file (JPEG, PNG, WebP; max 5 MB)' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/avatar/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --form 'file=@/path/to/avatar.jpg'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "avatar_url": "https://cdn.apofiz.com/contacts/avatars/a1b2c3d4.jpg",
+  "full_name": "John Doe"
+}`
+        },
+        responseParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' },
+          { name: 'avatar_url', type: 'string', required: true, description: 'URL of the uploaded avatar' },
+          { name: 'full_name', type: 'string', required: true, description: 'Contact name' }
+        ],
+        notes: [
+          'Content-Type must be multipart/form-data',
+          'Supported formats: JPEG, PNG, WebP',
+          'Maximum file size: 5 MB',
+          'Previous avatar is automatically replaced'
+        ]
+      },
+      {
+        id: 'contacts-avatar-delete',
+        method: 'DELETE',
+        path: '/accounts/contacts/{id}/avatar/',
+        title: 'Delete Avatar',
+        description: 'Remove the avatar image from a contact.',
+        category: 'contacts',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        pathParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' }
+        ],
+        requestExample: {
+          curl: `curl --request DELETE \\
+  --url ${API_BASE_URL}/accounts/contacts/a1b2c3d4-e5f6-7890-abcd-ef1234567890/avatar/ \\
+  --header 'Authorization: Token abc123xyz789token'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "avatar_url": null,
+  "full_name": "John Doe"
+}`
+        },
+        responseParams: [
+          { name: 'id', type: 'uuid', required: true, description: 'Contact ID' },
+          { name: 'avatar_url', type: 'null', required: true, description: 'Null after deletion' }
+        ]
+      }
+    ]
   }
 ];
 
