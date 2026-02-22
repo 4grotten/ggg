@@ -335,10 +335,19 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_payment': 'payment',
     'card_activation': 'card_activation',
     'internal_transfer': 'bank_transfer',
+    'bank_to_card': 'bank_transfer',
+    'card_to_bank': 'bank_transfer_incoming',
+    'iban_to_card': 'bank_transfer',
+    'iban_to_iban': 'bank_transfer',
     'declined': 'declined',
   };
   
-  const mappedType = typeMap[tx.type] || 'payment' as TransactionType;
+  let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
+  
+  // For internal_transfer, determine direction by amount sign
+  if (tx.type === 'internal_transfer') {
+    mappedType = tx.amount > 0 ? 'bank_transfer_incoming' : 'bank_transfer';
+  }
   const isIncoming = tx.amount > 0;
   
   // Color based on type
