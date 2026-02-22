@@ -569,7 +569,11 @@
     "bankName": "اسم البنك",
     "bankFee": "رسوم البنك",
     "networkFeeFlat": "رسوم الشبكة",
-    "networkFeeAed": "رسوم الشبكة (AED)"
+    "networkFeeAed": "رسوم الشبكة (AED)",
+    "fromAccount": "من الحساب",
+    "aedAccount": "حساب AED",
+    "cardBalance": "رصيد البطاقة",
+    "description": "الوصف"
   },
   "topUp": {
     "selectAccount": "اختر الحساب للفتح",

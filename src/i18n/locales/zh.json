@@ -575,7 +575,11 @@
     "bankName": "银行名称",
     "bankFee": "银行手续费",
     "networkFeeFlat": "网络费用",
-    "networkFeeAed": "网络费用 (AED)"
+    "networkFeeAed": "网络费用 (AED)",
+    "fromAccount": "从账户",
+    "aedAccount": "AED账户",
+    "cardBalance": "卡余额",
+    "description": "描述"
   },
   "topUp": {
     "selectAccount": "选择要开通的账户",

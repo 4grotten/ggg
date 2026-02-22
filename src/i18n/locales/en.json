@@ -652,7 +652,11 @@
     "bankName": "Bank Name",
     "bankFee": "Bank fee",
     "statusChecked": "Status checked",
-    "networkFeeAed": "Network fee (AED)"
+    "networkFeeAed": "Network fee (AED)",
+    "fromAccount": "From Account",
+    "aedAccount": "AED Account",
+    "cardBalance": "Card Balance",
+    "description": "Description"
   },
   "topUp": {
     "selectAccount": "Select Account to Open",

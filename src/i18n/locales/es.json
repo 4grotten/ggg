@@ -569,7 +569,11 @@
     "bankName": "Nombre del banco",
     "bankFee": "Comisión bancaria",
     "networkFeeFlat": "Comisión de red",
-    "networkFeeAed": "Comisión de red (AED)"
+    "networkFeeAed": "Comisión de red (AED)",
+    "fromAccount": "Desde Cuenta",
+    "aedAccount": "Cuenta AED",
+    "cardBalance": "Saldo de Tarjeta",
+    "description": "Descripción"
   },
   "topUp": {
     "selectAccount": "Seleccionar Cuenta para Abrir",

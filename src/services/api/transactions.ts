@@ -396,7 +396,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'bank_transfer_incoming': 'Bank Transfer',
     'crypto_deposit': 'Wallet Deposit',
     'card_activation': 'Annual Card fee',
-    'internal_transfer': 'Internal Transfer',
+    'internal_transfer': 'IBAN to Card',
     'transfer_out': 'IBAN to Card',
     'transfer_in': 'Bank Transfer',
     'card_payment': tx.merchant_name || 'Payment',

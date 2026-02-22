@@ -638,7 +638,11 @@
     "bankName": "Название банка",
     "bankFee": "Комиссия банка",
     "statusChecked": "Статус проверен",
-    "networkFeeAed": "Сбор сети (AED)"
+    "networkFeeAed": "Сбор сети (AED)",
+    "fromAccount": "Со счёта",
+    "aedAccount": "Счёт AED",
+    "cardBalance": "Баланс карты",
+    "description": "Описание"
   },
   "topUp": {
     "selectAccount": "Выберите счёт для открытия",
