@@ -530,9 +530,12 @@ export const fetchCardTransactions = async (): Promise<{
  */
 export const fetchCardTransactionGroups = async (): Promise<TransactionGroup[]> => {
   const { data, error } = await fetchCardTransactions();
+  console.log('[CardTx] fetchCardTransactionGroups result:', { count: data?.length, error });
   if (error || !data || data.length === 0) return [];
   
-  return groupApiTransactions(data);
+  const groups = groupApiTransactions(data);
+  console.log('[CardTx] Grouped into', groups.length, 'groups with', groups.reduce((s, g) => s + g.transactions.length, 0), 'transactions');
+  return groups;
 };
 
 /**
