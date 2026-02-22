@@ -18,8 +18,9 @@ export interface ContactSocialLink {
 }
 
 export interface SavedContact {
-  id: string;
-  user_id: string;
+  id: number | string;
+  apofiz_id?: number;
+  user_id?: string;
   full_name: string;
   phone?: string;
   email?: string;
@@ -29,8 +30,8 @@ export interface SavedContact {
   notes?: string;
   payment_methods: PaymentMethod[];
   social_links: ContactSocialLink[];
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SavedContactInsert {

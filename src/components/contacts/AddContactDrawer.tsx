@@ -406,7 +406,7 @@ export const AddContactDrawer = ({
 
       // Upload avatar if new file
       if (avatarFile && editContact?.id) {
-        const uploadedUrl = await uploadAvatar(avatarFile, editContact.id);
+        const uploadedUrl = await uploadAvatar(avatarFile, String(editContact.id));
         if (uploadedUrl) finalAvatarUrl = uploadedUrl;
       }
 
@@ -484,9 +484,9 @@ export const AddContactDrawer = ({
         
         // Upload avatar for new contact
         if (savedContact && avatarFile) {
-          const uploadedUrl = await uploadAvatar(avatarFile, savedContact.id);
+          const uploadedUrl = await uploadAvatar(avatarFile, String(savedContact.id));
           if (uploadedUrl) {
-            await updateContact(savedContact.id, { avatar_url: uploadedUrl });
+            await updateContact(String(savedContact.id), { avatar_url: uploadedUrl });
             savedContact.avatar_url = uploadedUrl;
           }
         }

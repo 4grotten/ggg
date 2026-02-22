@@ -1,29 +1,22 @@
 /**
- * Contacts API — Apofiz Backend
- * Base: /api/v1/contacts/
+ * Contacts API — uEasyCard Backend
+ * Base: /api/v1/accounts/contacts/
+ * All requests go through cards-proxy edge function.
  */
 
 import { apiRequest } from './apiClient';
 import { SavedContact, PaymentMethod, ContactSocialLink } from '@/types/contact';
 
-// --- Response types ---
-
-export interface ContactsListResponse {
-  total_count: number;
-  total_pages: number;
-  list: SavedContact[];
-}
-
 // --- Endpoints ---
 
-/** GET /contacts/?page=&limit= */
-export async function fetchContacts(page = 1, limit = 100) {
-  return apiRequest<ContactsListResponse>(`/contacts/?page=${page}&limit=${limit}`, {
+/** GET /accounts/contacts/ — returns flat array of contacts */
+export async function fetchContacts() {
+  return apiRequest<SavedContact[]>('/contacts/', {
     method: 'GET',
   });
 }
 
-/** POST /contacts/ */
+/** POST /accounts/contacts/ */
 export async function createContact(body: {
   full_name: string;
   phone?: string;
@@ -40,26 +33,26 @@ export async function createContact(body: {
   });
 }
 
-/** GET /contacts/{id}/ */
-export async function getContact(id: string) {
+/** GET /accounts/contacts/{id}/ */
+export async function getContact(id: string | number) {
   return apiRequest<SavedContact>(`/contacts/${id}/`, { method: 'GET' });
 }
 
-/** PATCH /contacts/{id}/ */
-export async function updateContact(id: string, body: Record<string, unknown>) {
+/** PATCH /accounts/contacts/{id}/ */
+export async function updateContact(id: string | number, body: Record<string, unknown>) {
   return apiRequest<SavedContact>(`/contacts/${id}/`, {
     method: 'PATCH',
     body: JSON.stringify(body),
   });
 }
 
-/** DELETE /contacts/{id}/ */
-export async function deleteContact(id: string) {
+/** DELETE /accounts/contacts/{id}/ */
+export async function deleteContact(id: string | number) {
   return apiRequest<void>(`/contacts/${id}/`, { method: 'DELETE' });
 }
 
-/** POST /contacts/{id}/avatar/ — multipart/form-data */
-export async function uploadContactAvatar(id: string, file: File) {
+/** POST /accounts/contacts/{id}/avatar/ — multipart/form-data */
+export async function uploadContactAvatar(id: string | number, file: File) {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -93,7 +86,7 @@ export async function uploadContactAvatar(id: string, file: File) {
   return { data: data as SavedContact, error: null, status: response.status };
 }
 
-/** DELETE /contacts/{id}/avatar/ */
-export async function deleteContactAvatar(id: string) {
+/** DELETE /accounts/contacts/{id}/avatar/ */
+export async function deleteContactAvatar(id: string | number) {
   return apiRequest<SavedContact>(`/contacts/${id}/avatar/`, { method: 'DELETE' });
 }
