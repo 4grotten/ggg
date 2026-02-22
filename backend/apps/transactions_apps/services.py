@@ -119,7 +119,7 @@ class TransactionService:
         )
         withdrawal = BankWithdrawals.objects.create(
             transaction=txn, user_id=user_id, beneficiary_iban=iban, beneficiary_name=beneficiary_name,
-            beneficiary_bank_name=bank_name, from_card_id=card_id,
+            beneficiary_bank_name=bank_name, from_card_id=card_id, from_bank_account_id=bank_account_id,
             amount_aed=amount_aed, fee_amount=Decimal('0.00'), total_debit=amount_aed
         )
         BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=source_type, amount=amount_aed, type='debit')
