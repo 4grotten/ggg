@@ -637,6 +637,7 @@
     "stablecoinSend": "稳定币发送",
     "bankTransfer": "银行转账",
     "bankTransferIncoming": "银行转账收入",
+    "ibanToCard": "IBAN转至卡",
     "months": {
       "january": "一月",
       "february": "二月",

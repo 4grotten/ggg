@@ -631,6 +631,7 @@
     "stablecoinSend": "إرسال عملة مستقرة",
     "bankTransfer": "تحويل مصرفي",
     "bankTransferIncoming": "تحويل مصرفي وارد",
+    "ibanToCard": "تحويل من IBAN إلى بطاقة",
     "months": {
       "january": "يناير",
       "february": "فبراير",
