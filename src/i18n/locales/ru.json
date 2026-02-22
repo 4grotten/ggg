@@ -1221,7 +1221,8 @@
       "topups": "Пополнения",
       "transfers": "Переводы",
       "withdrawals": "Выводы",
-      "receipts": "Квитанции"
+      "receipts": "Квитанции",
+      "contacts": "Сохранённые контакты"
     },
     "notes": {
       "title": "Примечания"

@@ -1174,7 +1174,8 @@
       "topups": "Recargas",
       "transfers": "Transferencias",
       "withdrawals": "Retiros",
-      "receipts": "Recibos"
+      "receipts": "Recibos",
+      "contacts": "Contactos Guardados"
     },
     "notes": {
       "title": "Notas"

@@ -1174,7 +1174,8 @@
       "topups": "الإيداعات",
       "transfers": "التحويلات",
       "withdrawals": "السحوبات",
-      "receipts": "الإيصالات"
+      "receipts": "الإيصالات",
+      "contacts": "جهات الاتصال المحفوظة"
     },
     "notes": {
       "title": "ملاحظات"
