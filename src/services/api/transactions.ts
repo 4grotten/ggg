@@ -339,6 +339,8 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_to_bank': 'bank_transfer_incoming',
     'iban_to_card': 'bank_transfer',
     'iban_to_iban': 'bank_transfer',
+    'transfer_out': 'bank_transfer',
+    'transfer_in': 'bank_transfer_incoming',
     'declined': 'declined',
   };
   
@@ -348,12 +350,25 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   if (tx.type === 'internal_transfer') {
     mappedType = tx.amount > 0 ? 'bank_transfer_incoming' : 'bank_transfer';
   }
-  // For card_transfer, amount is always positive — determine direction by field presence
-  const isIncoming = mappedType === 'card_transfer' 
-    ? !tx.recipient_card && !!tx.sender_card  // no recipient = we received it
-    : mappedType === 'bank_transfer_incoming' || mappedType === 'crypto_deposit' || mappedType === 'topup' 
-      ? true 
-      : tx.amount > 0 && !['bank_transfer', 'crypto_withdrawal', 'payment'].includes(mappedType);
+
+  // Determine incoming/outgoing status
+  // For card_transfer: API always returns positive amount, use operation or sender/recipient fields
+  let isIncoming: boolean;
+  if (mappedType === 'card_transfer') {
+    // If operation explicitly says direction, use it
+    const op = (tx.operation as string || '').toLowerCase();
+    if (op.includes('incoming') || op.includes('received')) {
+      isIncoming = true;
+    } else if (op.includes('outgoing') || op.includes('sent')) {
+      isIncoming = false;
+    } else {
+      // Fallback: if only sender_card present (no recipient) = incoming
+      isIncoming = !tx.recipient_card && !!tx.sender_card;
+    }
+  } else {
+    isIncoming = ['bank_transfer_incoming', 'crypto_deposit', 'topup'].includes(mappedType) 
+      || (['transfer_in', 'card_to_bank'].includes(tx.type));
+  }
   
   // Color based on type
   const colorMap: Record<string, string> = {
@@ -382,6 +397,8 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'crypto_deposit': 'Wallet Deposit',
     'card_activation': 'Annual Card fee',
     'internal_transfer': 'Internal Transfer',
+    'transfer_out': 'IBAN to Card',
+    'transfer_in': 'Bank Transfer',
     'card_payment': tx.merchant_name || 'Payment',
   };
 

@@ -700,6 +700,7 @@
     "stablecoinSend": "Отправка стейблкоинов",
     "bankTransfer": "Банковский перевод",
     "bankTransferIncoming": "Поступление на счёт",
+    "ibanToCard": "Перевод IBAN на карту",
     "months": {
       "january": "Январь",
       "february": "Февраль",
