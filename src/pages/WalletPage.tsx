@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Share2, QrCode, X, Clock, ArrowDownLeft, ArrowUpRight, CreditCard, ChevronRight } from "lucide-react";
+import { ArrowLeft, Copy, Share2, QrCode, X, Clock, ArrowDownLeft, ArrowUpRight, CreditCard, ChevronRight, Wallet, Landmark } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion } from "framer-motion";
@@ -23,6 +23,7 @@ const WalletPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [qrOpen, setQrOpen] = useState(false);
+  const [sendDrawerOpen, setSendDrawerOpen] = useState(false);
   const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
   const { data: cryptoApiGroups, isLoading: cryptoApiLoading } = useCryptoTransactionGroups();
   const { data: cryptoWalletsData } = useCryptoWallets();
@@ -132,30 +133,13 @@ const WalletPage = () => {
               {t('dashboard.topUp')}
             </button>
             <button
-              onClick={() => navigate("/send/crypto")}
+              onClick={() => setSendDrawerOpen(true)}
               className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#007AFF] text-white py-2.5 font-medium text-sm hover:bg-[#0066DD] transition-colors"
             >
               <ArrowUpRight className="w-4 h-4" />
               {t('dashboard.send')}
             </button>
           </div>
-
-          {/* Send to Card button */}
-          <button
-            onClick={() => navigate("/send/crypto-to-card")}
-            className="w-full flex items-center justify-between mt-3 p-3 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#007AFF] flex items-center justify-center">
-                <CreditCard className="w-4 h-4 text-white" />
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-sm">{t('dashboard.sendToCard')}</p>
-                <p className="text-xs text-muted-foreground">{t('send.cryptoToCardDesc', 'USDT → Card')}</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-          </button>
         </motion.div>
 
         {/* Action buttons: Share + QR */}
@@ -297,6 +281,66 @@ const WalletPage = () => {
           )}
         </motion.div>
       </div>
+
+      {/* Send Drawer */}
+      <Drawer open={sendDrawerOpen} onOpenChange={setSendDrawerOpen}>
+        <DrawerContent className="pb-8">
+          <div className="px-6 pt-4 pb-2 space-y-2">
+            <h3 className="text-lg font-bold mb-3">{t('dashboard.send')}</h3>
+
+            {/* Send to Card */}
+            <button
+              onClick={() => { setSendDrawerOpen(false); navigate("/send/crypto-to-card"); }}
+              className="w-full flex items-center justify-between p-4 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#007AFF] flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">{t('dashboard.sendToCard')}</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.sendToCardDescription')}</p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            {/* Send to USDT Wallet */}
+            <button
+              onClick={() => { setSendDrawerOpen(false); navigate("/send/crypto"); }}
+              className="w-full flex items-center justify-between p-4 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#26A17B] flex items-center justify-center">
+                  <Wallet className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">{t('send.usdtBalance', 'Кошелёк USDT')}</p>
+                  <p className="text-xs text-muted-foreground">{t('send.usdtBalanceDesc', 'На внешний USDT адрес')}</p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            {/* Send to Bank Account */}
+            <button
+              onClick={() => { setSendDrawerOpen(false); navigate("/send/bank"); }}
+              className="w-full flex items-center justify-between p-4 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#5B6EF5] flex items-center justify-center">
+                  <Landmark className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-sm">{t('send.bankTransfer', 'Перевод на счёт')}</p>
+                  <p className="text-xs text-muted-foreground">{t('send.sendLocalBankTransfer', 'Банковский перевод')}</p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </MobileLayout>
   );
 };
