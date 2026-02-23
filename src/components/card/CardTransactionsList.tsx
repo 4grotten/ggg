@@ -263,8 +263,10 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.recipientName)}`
                           : isBankTransfer && transaction.description
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description)}`
+                          : isCryptoSend && (transaction.metadata as any)?.to_address
+                          ? ` · ${t("transactions.to")} ${maskMiddle(String((transaction.metadata as any).to_address))}`
                           : isCryptoSend && transaction.description
-                          ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description)}`
+                          ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description.replace(/^Крипто\s*(перевод:?\s*)?/i, '').replace(/^.*→\s*/, '').trim())}`
                           : isCryptoDeposit && transaction.description
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
                           : isTopup && transaction.description
