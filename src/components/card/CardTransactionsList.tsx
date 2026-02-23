@@ -56,6 +56,10 @@ const translateMerchant = (merchant: string, type: string | undefined, t: (key: 
     return t("transactions.bankTransferIncoming");
   }
   
+  if (type === "crypto_to_bank") {
+    return "Кошелёк USDT → IBAN Bank";
+  }
+  
   const merchantsMap: { [key: string]: string } = {
     "Card Transfer": "transactions.cardTransfer",
     "Top up": "transactions.topUp",
