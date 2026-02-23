@@ -272,6 +272,7 @@ export interface ApiTransaction {
   sender_card?: string | null;
   reference_id?: string | null;
   card_id?: string | null;
+  direction?: string | null;
   metadata?: Record<string, unknown> | null;
   // Legacy/extra fields
   card_mask?: string;
@@ -349,6 +350,11 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   
   let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
   
+  // For crypto_withdrawal with inbound direction, remap to crypto_deposit
+  if (tx.type === 'crypto_withdrawal' && tx.direction === 'inbound') {
+    mappedType = 'crypto_deposit';
+  }
+
   // For internal_transfer, determine direction by amount sign
   if (tx.type === 'internal_transfer') {
     mappedType = tx.amount > 0 ? 'bank_transfer_incoming' : 'bank_transfer';
@@ -405,7 +411,8 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_payment': tx.merchant_name || 'Payment',
   };
 
-  const merchant = tx.merchant_name || (tx.operation as string) || merchantFallback[tx.type] || tx.type;
+  // Use mappedType for merchant fallback to handle remapped types (e.g. crypto_withdrawal→crypto_deposit)
+  const merchant = tx.merchant_name || (mappedType === 'crypto_deposit' && tx.type === 'crypto_withdrawal' ? 'Wallet Deposit' : (tx.operation as string) || merchantFallback[tx.type] || tx.type);
 
   // Compute USDT equivalent if exchange_rate is available
   const absAmount = Math.abs(tx.amount);
