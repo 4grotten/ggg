@@ -100,6 +100,22 @@ const TransactionDetails = () => {
   );
   const receipt = receiptResult?.data || null;
   
+  // Debug: log receipt data for crypto_to_bank
+  useEffect(() => {
+    if (receipt) {
+      console.log('[TransactionDetails] Receipt data:', JSON.stringify(receipt, null, 2));
+      console.log('[TransactionDetails] Receipt keys:', Object.keys(receipt));
+      console.log('[TransactionDetails] Recipient fields:', {
+        recipient_name: receipt.recipient_name,
+        beneficiary_name: receipt.beneficiary_name,
+        to_name: (receipt as any).to_name,
+        type: receipt.type,
+        to_iban: (receipt as any).to_iban,
+        beneficiary_iban: receipt.beneficiary_iban,
+      });
+    }
+  }, [receipt]);
+  
   
   // Fetch crypto wallets for wallet address display
   const { data: cryptoWalletsData } = useCryptoWallets();
