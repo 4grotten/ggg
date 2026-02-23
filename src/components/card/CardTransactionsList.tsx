@@ -287,7 +287,10 @@ const handleClick = (transaction: Transaction) => {
                       <p className="text-sm text-muted-foreground truncate">
                         {transaction.time}
                         {isIncomingCryptoToBank
-                          ? ` · ${t("transactions.from")} ${maskMiddle((transaction.metadata as any)?.sender_name || (transaction.metadata as any)?.from_address_mask || (transaction.metadata as any)?.senderWallet || transaction.senderName || '')}`
+                          ? (() => {
+                              const sender = (transaction.metadata as any)?.sender_name || (transaction.metadata as any)?.from_address_mask || (transaction.metadata as any)?.senderWallet || transaction.senderName || '';
+                              return sender ? ` · ${t("transactions.from")} ${maskMiddle(sender)}` : '';
+                            })()
                           : isIncomingTransfer && (transaction.senderCard || transaction.recipientCard)
                           ? ` · ${t("transactions.from")} •••• ${(transaction.senderCard || transaction.recipientCard || '').slice(-4)}`
                           : isOutgoingTransfer && (transaction.recipientCard || transaction.senderCard)
@@ -297,9 +300,13 @@ const handleClick = (transaction: Transaction) => {
                           : isOutgoingCryptoToBank
                           ? (() => {
                               const iban = (transaction.metadata as any)?.beneficiary_iban;
-                              // iban_mask already formatted like "AE07 **** 2473" — convert to dot style
-                              const display = iban ? iban.replace(/\s*\*+\s*/g, '••••') : '';
-                              return display ? ` · На ${display}` : '';
+                              if (iban) {
+                                const display = iban.replace(/\s*\*+\s*/g, '••••');
+                                return ` · На ${display}`;
+                              }
+                              const name = (transaction.metadata as any)?.beneficiary_name || transaction.recipientName;
+                              if (name) return ` · ${t("transactions.to")} ${maskMiddle(name)}`;
+                              return '';
                             })()
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.merchant === 'IBAN to Card'
                           ? ` · Card····${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
