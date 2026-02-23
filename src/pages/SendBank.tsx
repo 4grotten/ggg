@@ -69,9 +69,10 @@ const SendBank = () => {
   const { data: bankAccountsData } = useBankAccounts();
   const { data: cryptoWalletsData } = useCryptoWallets();
 
-  // Check if this is a referral withdrawal
+  // Check navigation state
   const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
   const referralBalance = location.state?.referralBalance || 0;
+  const fromWallet = location.state?.fromWallet || false;
 
   const sourceOptions = useMemo<SourceOption[]>(() => {
     const options: SourceOption[] = [];
@@ -132,9 +133,14 @@ const SendBank = () => {
   // Set default source when data loads
   useEffect(() => {
     if (!selectedSource && sourceOptions.length > 0) {
-      setSelectedSource(sourceOptions[0]);
+      if (fromWallet) {
+        const walletOption = sourceOptions.find(s => s.type === "wallet");
+        setSelectedSource(walletOption || sourceOptions[0]);
+      } else {
+        setSelectedSource(sourceOptions[0]);
+      }
     }
-  }, [sourceOptions, selectedSource]);
+  }, [sourceOptions, selectedSource, fromWallet]);
 
   // Scroll to top on mount
   useEffect(() => {
