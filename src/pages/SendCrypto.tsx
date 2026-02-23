@@ -41,15 +41,9 @@ const coins = [
 const networksByCoin: Record<string, { id: string; name: string }[]> = {
   usdt: [
     { id: "trc20", name: "Tron (TRC20)" },
-    { id: "erc20", name: "Ethereum (ERC20)" },
-    { id: "bep20", name: "BNB Chain (BEP20)" },
-    { id: "polygon", name: "Polygon" },
   ],
   usdc: [
-    { id: "erc20", name: "Ethereum (ERC20)" },
-    { id: "bep20", name: "BNB Chain (BEP20)" },
-    { id: "polygon", name: "Polygon" },
-    { id: "sol", name: "Solana" },
+    { id: "trc20", name: "Tron (TRC20)" },
   ],
 };
 
