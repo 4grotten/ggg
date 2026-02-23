@@ -525,7 +525,7 @@ export const fetchApiTransactionGroups = async (): Promise<TransactionGroup[]> =
   const { data, error } = await fetchApiTransactions();
   if (error || !data || data.length === 0) return [];
   
-  return groupApiTransactions(data);
+  return await groupApiTransactions(data);
 };
 
 /**
@@ -566,7 +566,7 @@ export const fetchIbanTransactionGroups = async (): Promise<TransactionGroup[]> 
   const { data, error } = await fetchIbanTransactions();
   if (error || !data || data.length === 0) return [];
   
-  return groupApiTransactions(data);
+  return await groupApiTransactions(data);
 };
 
 /**
@@ -606,7 +606,7 @@ export const fetchCryptoTransactions = async (): Promise<{
 export const fetchCryptoTransactionGroups = async (): Promise<TransactionGroup[]> => {
   const { data, error } = await fetchCryptoTransactions();
   if (error || !data || data.length === 0) return [];
-  return groupApiTransactions(data);
+  return await groupApiTransactions(data);
 };
 
 /**
@@ -647,17 +647,36 @@ export const fetchCardTransactions = async (): Promise<{
 export const fetchCardTransactionGroups = async (): Promise<TransactionGroup[]> => {
   const { data, error } = await fetchCardTransactions();
   if (error || !data || data.length === 0) return [];
-  return groupApiTransactions(data);
+  return await groupApiTransactions(data);
 };
 
 /**
  * Helper: group API transactions by date
  */
-const groupApiTransactions = (data: ApiTransaction[]): TransactionGroup[] => {
+const groupApiTransactions = async (data: ApiTransaction[]): Promise<TransactionGroup[]> => {
   const mapped = data.map(mapApiTransactionToLocal);
   
+  // Enrich crypto_to_bank transactions with receipt data to get IBAN
+  const enrichPromises = mapped.map(async (tx) => {
+    const originalType = (tx.metadata as any)?.originalApiType;
+    if (originalType === 'crypto_to_bank' && !(tx.metadata as any)?.beneficiary_iban) {
+      try {
+        const rawId = tx.id.replace(/^api_/, '');
+        const { data: receipt } = await fetchTransactionReceipt(rawId);
+        if (receipt) {
+          (tx.metadata as any).beneficiary_iban = (receipt as any).iban_mask || (receipt as any).beneficiary_iban || undefined;
+          (tx.metadata as any).beneficiary_name = (receipt as any).beneficiary_name || undefined;
+        }
+      } catch (e) {
+        // silently skip enrichment
+      }
+    }
+    return tx;
+  });
+  const enriched = await Promise.all(enrichPromises);
+  
   const groupMap = new Map<string, Transaction[]>();
-  for (const tx of mapped) {
+  for (const tx of enriched) {
     const dateStr = (tx.metadata as any)?.apiDate || 'Unknown';
     if (!groupMap.has(dateStr)) groupMap.set(dateStr, []);
     groupMap.get(dateStr)!.push(tx);

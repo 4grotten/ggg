@@ -295,7 +295,12 @@ const handleClick = (transaction: Transaction) => {
                           : isBankTransferIncoming && transaction.senderName
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
                           : isOutgoingCryptoToBank
-                          ? ` · На ${maskMiddle(String((transaction.metadata as any)?.beneficiary_iban || transaction.recipientName || transaction.description || ''))}`
+                          ? (() => {
+                              const iban = (transaction.metadata as any)?.beneficiary_iban;
+                              // iban_mask already formatted like "AE07 **** 2473" — convert to dot style
+                              const display = iban ? iban.replace(/\s*\*+\s*/g, '••••') : '';
+                              return display ? ` · На ${display}` : '';
+                            })()
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.merchant === 'IBAN to Card'
                           ? ` · Card····${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.recipientName
