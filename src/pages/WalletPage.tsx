@@ -10,7 +10,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
-import { useMergedTransactionGroups } from "@/hooks/useTransactions";
+import { useMergedTransactionGroups, useCryptoTransactionGroups } from "@/hooks/useTransactions";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -24,6 +24,7 @@ const WalletPage = () => {
   const { t } = useTranslation();
   const [qrOpen, setQrOpen] = useState(false);
   const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
+  const { data: cryptoApiGroups, isLoading: cryptoApiLoading } = useCryptoTransactionGroups();
   const { data: cryptoWalletsData } = useCryptoWallets();
   
   const wallet = cryptoWalletsData?.data?.[0];
@@ -31,9 +32,10 @@ const WalletPage = () => {
   const walletAddress = wallet?.address || "—";
 
   const transactionGroups = useMemo(() => {
+    // Filter mock groups for crypto types
     const groups = transactionsData?.groups || [];
     const cryptoTypes = ["topup", "crypto_withdrawal", "crypto_deposit", "top_up", "withdrawal"];
-    return groups
+    const mockCryptoGroups = groups
       .map(group => ({
         ...group,
         transactions: group.transactions.filter(tx => 
@@ -45,7 +47,11 @@ const WalletPage = () => {
         ),
       }))
       .filter(group => group.transactions.length > 0);
-  }, [transactionsData]);
+
+    // Merge: API crypto groups first, then mock crypto groups
+    const merged = [...(cryptoApiGroups || []), ...mockCryptoGroups];
+    return merged;
+  }, [transactionsData, cryptoApiGroups]);
 
 
 
@@ -248,7 +254,7 @@ const WalletPage = () => {
             </button>
           </div>
 
-          {transactionsLoading ? (
+          {(transactionsLoading || cryptoApiLoading) ? (
             <div className="space-y-4">
               <Skeleton className="h-16 w-full rounded-xl" />
               <Skeleton className="h-32 w-full rounded-xl" />
