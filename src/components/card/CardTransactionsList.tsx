@@ -277,6 +277,8 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description.replace(/^Крипто\s*(перевод:?\s*)?/i, '').replace(/^.*→\s*/, '').trim())}`
                           : isCryptoDeposit && transaction.description
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description.replace(/^Крипто\s*(перевод:?\s*)?/i, '').split('→')[0].replace(/[:\s]+$/, '').trim())}`
+                          : isCryptoToCard && transaction.recipientCard
+                          ? ` ${t("transactions.toVisaCard", { type: (transaction.metadata as any)?.recipientCardType || "Metal", last4: (transaction.recipientCard || '').slice(-4), defaultValue: `На Visa ${(transaction.metadata as any)?.recipientCardType || "Metal"} ••${(transaction.recipientCard || '').slice(-4)}` })}`
                           : isTopup && transaction.description
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
                           : ""
