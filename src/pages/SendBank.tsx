@@ -589,7 +589,7 @@ const SendBank = () => {
                 {ibanLookupLoading ? t("send.checkingIban", "Проверка IBAN...") : t("send.processing", "Обработка...")}
               </span>
             ) : step === 3 ? (
-              `${t("send.continue")} ${parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
+              `${t("send.continue")} ${isWalletSource ? (parseFloat(amountAED || "0") * USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2 }) : parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
             ) : (
               <span className="flex items-center gap-2">
                 {t("send.continue")}
