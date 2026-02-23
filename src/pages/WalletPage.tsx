@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Share2, QrCode, X, Clock } from "lucide-react";
+import { ArrowLeft, Copy, Share2, QrCode, X, Clock, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion } from "framer-motion";
@@ -122,6 +122,22 @@ const WalletPage = () => {
             <span className="text-3xl font-bold text-[#26A17B]">$</span>
             <span className="text-3xl font-bold">{formatBalance(usdtBalance)}</span>
             <span className="text-lg text-muted-foreground">USDT</span>
+          </div>
+          <div className="flex gap-3 mt-4">
+            <button
+              onClick={() => navigate("/top-up/crypto")}
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#27AE60] text-white py-2.5 font-medium text-sm hover:bg-[#219653] transition-colors"
+            >
+              <ArrowDownLeft className="w-4 h-4" />
+              {t('dashboard.topUp')}
+            </button>
+            <button
+              onClick={() => navigate("/send/crypto")}
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#007AFF] text-white py-2.5 font-medium text-sm hover:bg-[#0066DD] transition-colors"
+            >
+              <ArrowUpRight className="w-4 h-4" />
+              {t('dashboard.send')}
+            </button>
           </div>
         </motion.div>
 
