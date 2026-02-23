@@ -157,11 +157,14 @@ const SendBank = () => {
   const [bankName, setBankName] = useState("");
   const [fieldsReadOnly, setFieldsReadOnly] = useState(false);
   
-  // Step 3: Amount
+  // Step 3: Amount (in USDT when wallet, in AED otherwise)
   const [amountAED, setAmountAED] = useState("");
+  const NETWORK_FEE_USDT = 5.90;
 
   const transferFee = amountAED ? (parseFloat(amountAED) * BANK_TRANSFER_FEE_PERCENT / 100).toFixed(2) : "0.00";
-  const totalAmount = amountAED ? (parseFloat(amountAED) + parseFloat(transferFee)).toFixed(2) : "0.00";
+  const totalAmount = isWalletSource
+    ? (amountAED ? (parseFloat(amountAED) + parseFloat(transferFee) + NETWORK_FEE_USDT).toFixed(2) : "0.00")
+    : (amountAED ? (parseFloat(amountAED) + parseFloat(transferFee)).toFixed(2) : "0.00");
 
   const formatIban = (value: string) => {
     // Remove all non-alphanumeric characters
@@ -200,7 +203,7 @@ const SendBank = () => {
 
   const isStep1Valid = iban.replace(/\s/g, "").length >= 15;
   const isStep2Valid = recipientName.trim().length >= 2 && bankName.trim().length >= 2;
-  const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= availableBalanceAed;
+  const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= (isWalletSource ? availableBalance : availableBalanceAed);
 
   const handleNext = useCallback(async () => {
     // Step 1 → check IBAN in the system before moving to step 2
@@ -503,15 +506,20 @@ const SendBank = () => {
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <button
                       onClick={() => {
-                      const maxAmount = availableBalanceAed / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
-                      setAmountAED(maxAmount.toFixed(2));
+                        if (isWalletSource) {
+                          const maxAmount = (availableBalance - NETWORK_FEE_USDT) / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
+                          setAmountAED(Math.max(0, maxAmount).toFixed(2));
+                        } else {
+                          const maxAmount = availableBalanceAed / (1 + BANK_TRANSFER_FEE_PERCENT / 100);
+                          setAmountAED(maxAmount.toFixed(2));
+                        }
                       }}
                       className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
                     >
                       MAX
                     </button>
                     <span className="text-muted-foreground font-medium">
-                      AED
+                      {isWalletSource ? 'USDT' : 'AED'}
                     </span>
                   </div>
                 </div>
@@ -521,19 +529,25 @@ const SendBank = () => {
               <div className="bg-secondary rounded-2xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">{t("send.transferAmount")}</span>
-                  <span className="font-medium">{parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
+                  <span className="font-medium">{parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} {isWalletSource ? 'USDT' : 'AED'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">{t("send.transferFee")} ({BANK_TRANSFER_FEE_PERCENT}%)</span>
-                  <span className="font-medium text-[#FFA000]">+{parseFloat(transferFee).toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
+                  <span className="font-medium text-[#FFA000]">+{parseFloat(transferFee).toLocaleString('en-US', { minimumFractionDigits: 2 })} {isWalletSource ? 'USDT' : 'AED'}</span>
                 </div>
+                {isWalletSource && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span>
+                    <span className="font-medium text-[#FFA000]">+{NETWORK_FEE_USDT.toFixed(2)} USDT</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between pt-2 border-t border-border">
                   <span className="text-muted-foreground">{t("send.total")}</span>
-                  <span className="font-semibold text-lg">{parseFloat(totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
+                  <span className="font-semibold text-lg">{parseFloat(totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2 })} {isWalletSource ? 'USDT' : 'AED'}</span>
                 </div>
               </div>
 
-              {/* USDT Conversion Info */}
+              {/* USDT Conversion Info — exchange rate for wallet source */}
               {isWalletSource && parseFloat(amountAED || "0") > 0 && (
                 <div className="bg-primary/5 rounded-2xl p-4 space-y-2 border border-primary/10">
                   <div className="flex items-center justify-between">
@@ -541,13 +555,13 @@ const SendBank = () => {
                     <span className="font-medium">1 USDT = {USDT_TO_AED_BUY} AED</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("send.willBeDebited", "Будет списано")}</span>
-                    <span className="font-semibold text-lg">{(parseFloat(totalAmount) / USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                    <span className="text-muted-foreground">{t("send.recipientWillReceive", "Получатель получит")}</span>
+                    <span className="font-semibold text-lg">{(parseFloat(amountAED || "0") * USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
                   </div>
                 </div>
               )}
 
-              {parseFloat(totalAmount) > availableBalanceAed && (
+              {parseFloat(totalAmount) > (isWalletSource ? availableBalance : availableBalanceAed) && (
                 <div className="bg-red-500/10 rounded-2xl p-4">
                   <p className="text-sm text-red-500">
                     ⚠️ {t("send.insufficientBalanceWarning")}
@@ -604,6 +618,9 @@ const SendBank = () => {
                 <button
                   key={source.id}
                   onClick={() => {
+                    const wasWallet = selectedSource?.type === "wallet";
+                    const isNowWallet = source.type === "wallet";
+                    if (wasWallet !== isNowWallet) setAmountAED("");
                     setSelectedSource(source);
                     setSourceDrawerOpen(false);
                   }}
