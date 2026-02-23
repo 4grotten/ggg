@@ -814,6 +814,33 @@ const TransactionDetails = () => {
                   </button>
                 </div>
               </div>
+              {/* From Wallet (sender's wallet) */}
+              {transaction.fromWalletAddress && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.fromWallet", "Кошелёк")}</span>
+                  <div className="flex items-center gap-2">
+                    <Wallet className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-medium">
+                      {showFromAddress ? transaction.fromWalletAddress : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-4)}`}
+                    </span>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText((transaction as any).fromWalletAddressFull || transaction.fromWalletAddress || '');
+                        toast.success(t("toast.addressCopied"));
+                      }}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => setShowFromAddress(!showFromAddress)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
               {/* Token & Network */}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
@@ -1256,8 +1283,20 @@ const TransactionDetails = () => {
           {isCryptoToCard && isIncomingCryptoToCard ? (
             <>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.received")}</span>
-                <span className="font-medium">{((transaction as any).cryptoToCardCreditedAed || transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                <span className="text-muted-foreground">{t("transaction.sentAmount", "Сумма перевода")}</span>
+                <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.fee")} ({(transaction as any).cryptoToCardFeePercent?.toFixed(0) || '1'}%)</span>
+                <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span>
+                <span className="font-medium">5.90 USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
+                <span className="font-medium">1 USDT = {(transaction as any).cryptoToCardExchangeRate || 3.65} AED</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
                 <span className="text-muted-foreground">{t("transaction.credited", "Зачислено на карту")}</span>
