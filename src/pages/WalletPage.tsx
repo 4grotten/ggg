@@ -150,7 +150,7 @@ const WalletPage = () => {
         >
           <button
             onClick={handleShare}
-            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground py-3 font-medium text-sm hover:bg-primary/90 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors py-3 font-medium text-sm"
           >
             <Share2 className="w-4 h-4" />
             {t('walletPage.share')}
