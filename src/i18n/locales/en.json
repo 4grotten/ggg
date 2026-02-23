@@ -794,6 +794,7 @@
     "recipientNotFound": "Recipient not found",
     "checkCardNumber": "Check the card number or try a different one",
     "fromCard": "From Card",
+    "fromSource": "From",
     "available": "Available",
     "amount": "Amount",
     "insufficientBalance": "Insufficient balance",

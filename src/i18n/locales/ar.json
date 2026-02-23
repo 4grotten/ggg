@@ -711,6 +711,7 @@
     "recipientNotFound": "لم يتم العثور على المستلم",
     "checkCardNumber": "تحقق من رقم البطاقة أو جرب بطاقة أخرى",
     "fromCard": "من البطاقة",
+    "fromSource": "من",
     "available": "متاح",
     "amount": "المبلغ",
     "insufficientBalance": "رصيد غير كافٍ",

@@ -711,6 +711,7 @@
     "recipientNotFound": "Empfänger nicht gefunden",
     "checkCardNumber": "Überprüfen Sie die Kartennummer oder probieren Sie eine andere",
     "fromCard": "Von Karte",
+    "fromSource": "Von",
     "available": "Verfügbar",
     "amount": "Betrag",
     "insufficientBalance": "Unzureichendes Guthaben",
