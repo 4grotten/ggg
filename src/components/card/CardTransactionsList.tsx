@@ -294,11 +294,13 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isBankTransferIncoming && transaction.senderName
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
-                          : isBankTransfer && transaction.merchant === 'IBAN to Card'
+                          : isOutgoingCryptoToBank && ((transaction.metadata as any)?.beneficiary_iban || transaction.recipientName)
+                          ? ` · На ${maskMiddle(String((transaction.metadata as any)?.beneficiary_iban || transaction.recipientName || ''))}`
+                          : isBankTransfer && !isOutgoingCryptoToBank && transaction.merchant === 'IBAN to Card'
                           ? ` · Card····${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
-                          : isBankTransfer && transaction.recipientName
+                          : isBankTransfer && !isOutgoingCryptoToBank && transaction.recipientName
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.recipientName)}`
-                          : isBankTransfer && transaction.description
+                          : isBankTransfer && !isOutgoingCryptoToBank && transaction.description
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description)}`
                           : isCryptoSend && (transaction.metadata as any)?.to_address
                           ? ` · ${t("transactions.to")} ${maskMiddle(String((transaction.metadata as any).to_address))}`
@@ -308,8 +310,6 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description.replace(/^Крипто\s*(перевод:?\s*)?/i, '').split('→')[0].replace(/[:\s]+$/, '').trim())}`
                           : isCryptoToCard && transaction.recipientCard
                           ? ` ${t("transactions.toVisaCard", { type: (transaction.metadata as any)?.recipientCardType || "Metal", last4: (transaction.recipientCard || '').slice(-4), defaultValue: `На Visa ${(transaction.metadata as any)?.recipientCardType || "Metal"} ••${(transaction.recipientCard || '').slice(-4)}` })}`
-                          : isOutgoingCryptoToBank && (transaction.metadata as any)?.beneficiary_iban
-                          ? ` На ${maskMiddle(String((transaction.metadata as any).beneficiary_iban))}`
                           : isTopup && transaction.description
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
                           : ""

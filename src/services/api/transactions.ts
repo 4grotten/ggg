@@ -464,7 +464,19 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   // Compute USDT equivalent if exchange_rate is available
   const absAmount = Math.abs(tx.amount);
   let amountUSDT = absAmount;
-  if (tx.original_amount != null) {
+  let amountLocal = absAmount;
+  
+  const isCryptoToBank = tx.type === 'crypto_to_bank' || (tx.type === 'transfer' && ((tx.operation as string || '').toLowerCase().includes('crypto_to_bank') || (tx as any).beneficiary_iban || (tx as any).to_iban));
+  const isCryptoToCardTx = tx.type === 'crypto_to_card' || (tx.type === 'transfer' && tx.recipient_card && tx.direction === 'outbound');
+  
+  if (isCryptoToBank || isCryptoToCardTx) {
+    // For crypto-to-bank/card: amount is in USDT, compute AED via rate
+    amountUSDT = absAmount;
+    const rate = tx.exchange_rate ? parseFloat(tx.exchange_rate) : 3.65;
+    amountLocal = (tx as any).amount_aed ? Math.abs((tx as any).amount_aed) 
+      : (tx as any).credited_amount_aed ? Math.abs((tx as any).credited_amount_aed)
+      : absAmount * rate;
+  } else if (tx.original_amount != null) {
     amountUSDT = Math.abs(tx.original_amount);
   } else if (tx.exchange_rate) {
     const rate = parseFloat(tx.exchange_rate);
@@ -476,7 +488,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     merchant,
     time,
     amountUSDT: parseFloat(amountUSDT.toFixed(2)),
-    amountLocal: absAmount,
+    amountLocal: parseFloat(amountLocal.toFixed(2)),
     localCurrency: tx.currency || 'AED',
     color: colorMap[mappedType] || '#3B82F6',
     type: mappedType,
