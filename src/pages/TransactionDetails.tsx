@@ -203,9 +203,11 @@ const TransactionDetails = () => {
       senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       toCardFull: resolveFullCard(receipt.receiver_card_mask, 1),
-      toWalletAddress: receipt.to_address_mask,
-      fromWalletAddress: receipt.from_address_mask,
-      fromAddress: receipt.from_address_mask,
+      toWalletAddress: receipt.to_address_mask || receipt.to_address,
+      fromWalletAddress: receipt.from_address_mask || receipt.from_address,
+      fromAddress: receipt.from_address_mask || receipt.from_address,
+      toWalletAddressFull: receipt.to_address,
+      fromWalletAddressFull: receipt.from_address,
       tokenNetwork: receipt.network_and_token,
       transferFee: receipt.fee ?? receipt.fee_amount,
       networkFee: receipt.fee ?? receipt.fee_amount,
@@ -736,15 +738,30 @@ const TransactionDetails = () => {
             </>
           ) : isCryptoSend ? (
             <>
+              {/* Recipient info for internal transfers */}
+              {receipt?.is_internal && receipt?.recipient_name && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                  <div className="flex items-center gap-2">
+                    {receipt.recipient_avatar && (
+                      <img src={receipt.recipient_avatar as string} alt="" className="w-6 h-6 rounded-full object-cover" />
+                    )}
+                    <span className="font-medium">{receipt.recipient_name as string}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-500">
+                      {t("transaction.inNetwork", "В сети")}
+                    </span>
+                  </div>
+                </div>
+              )}
               <div className="flex items-start justify-between">
                 <span className="text-muted-foreground">{t("transaction.toAddress")}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-right text-sm max-w-[160px] break-all">
-                    {showWalletAddress ? transaction.toWalletAddress : `${transaction.toWalletAddress?.slice(0, 6)}...${transaction.toWalletAddress?.slice(-6)}`}
+                    {showWalletAddress ? ((transaction as any).toWalletAddressFull || transaction.toWalletAddress) : `${transaction.toWalletAddress?.slice(0, 6)}...${transaction.toWalletAddress?.slice(-6)}`}
                   </span>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText(transaction.toWalletAddress || '');
+                      navigator.clipboard.writeText((transaction as any).toWalletAddressFull || transaction.toWalletAddress || '');
                       toast.success(t("toast.addressCopied"));
                     }}
                     className="text-muted-foreground hover:text-foreground transition-colors"
@@ -763,29 +780,31 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
                 <span className="font-medium">{transaction.tokenNetwork}</span>
               </div>
-              <div className="flex items-start justify-between">
-                <span className="text-muted-foreground">{t("transaction.fromWallet")}</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
-                    {showFromAddress ? transaction.fromWalletAddress : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-6)}`}
-                  </span>
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(transaction.fromWalletAddress || '');
-                      toast.success(t("toast.addressCopied"));
-                    }}
-                    className="p-1 rounded-md hover:bg-muted transition-colors"
-                  >
-                    <Copy className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                  <button 
-                    onClick={() => setShowFromAddress(!showFromAddress)}
-                    className="p-1 rounded-md hover:bg-muted transition-colors"
-                  >
-                    {showFromAddress ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
-                  </button>
+              {transaction.fromWalletAddress && (
+                <div className="flex items-start justify-between">
+                  <span className="text-muted-foreground">{t("transaction.fromWallet")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                      {showFromAddress ? ((transaction as any).fromWalletAddressFull || transaction.fromWalletAddress) : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-6)}`}
+                    </span>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText((transaction as any).fromWalletAddressFull || transaction.fromWalletAddress || '');
+                        toast.success(t("toast.addressCopied"));
+                      }}
+                      className="p-1 rounded-md hover:bg-muted transition-colors"
+                    >
+                      <Copy className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                    <button 
+                      onClick={() => setShowFromAddress(!showFromAddress)}
+                      className="p-1 rounded-md hover:bg-muted transition-colors"
+                    >
+                      {showFromAddress ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </>
           ) : isCryptoDeposit ? (
             <>

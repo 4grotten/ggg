@@ -44,6 +44,9 @@ export interface TransactionReceipt {
   fee_type?: string;
   total_debit?: number;
   credited_amount_aed?: number | null;
+  is_internal?: boolean;
+  recipient_avatar?: string | null;
+  from_address?: string;
   // Card transfer fields
   sender_card_mask?: string;
   receiver_card_mask?: string;
