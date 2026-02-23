@@ -369,7 +369,7 @@ const SendCryptoToCard = () => {
                 />
               </div>
               <div className="flex justify-between text-xs text-muted-foreground px-1">
-                <span>{t("send.available")}: {walletBalance.toFixed(2)} USDT</span>
+                <span>{t("send.available")}: {walletBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                 <button onClick={() => {
                   // MAX: subtract fees so total doesn't exceed balance
                   const maxRaw = (walletBalance - NETWORK_FEE) / (1 + COMMISSION_PERCENT / 100);
