@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet, Landmark } from "lucide-react";
+import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet, Landmark, CheckCircle2, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -19,6 +19,8 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { useCards, useIban, useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
+import { apiRequest } from "@/services/api/apiClient";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface SourceOption {
   id: string;
@@ -125,21 +127,83 @@ const SendCrypto = () => {
   const [coinDrawerOpen, setCoinDrawerOpen] = useState(false);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
-  const [amountAED, setAmountAED] = useState("");
+  const [amountInput, setAmountInput] = useState("");
+
+  // Recipient verification state
+  const [recipientInfo, setRecipientInfo] = useState<{
+    is_internal: boolean;
+    recipient_name: string | null;
+    avatar_url: string | null;
+    message?: string;
+  } | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
 
   // Use referral balance or selected source balance
   const isCryptoSource = selectedSource?.type === "crypto_wallet";
   const availableBalance = isReferralWithdrawal ? referralBalance : (selectedSource?.balance ?? 0);
+  const inputCurrency = isCryptoSource ? (selectedSource?.token || "USDT") : "AED";
 
-  const amountCrypto = amountAED ? (parseFloat(amountAED) * settings.AED_TO_USDT_RATE).toFixed(2) : "0.00";
-  const networkFee = amountAED ? (parseFloat(amountCrypto) * settings.NETWORK_FEE_PERCENT / 100).toFixed(2) : "0.00";
-  const amountAfterFee = amountAED ? (parseFloat(amountCrypto) - parseFloat(networkFee)).toFixed(2) : "0.00";
-  const isValid = walletAddress.length >= 20 && parseFloat(amountAED) > 0 && parseFloat(amountAED) <= availableBalance;
+  // Calculations depend on source type
+  const amountNum = parseFloat(amountInput) || 0;
+  let amountCrypto: string, networkFee: string, amountAfterFee: string;
+
+  if (isCryptoSource) {
+    // Input is already in USDT — no conversion needed
+    amountCrypto = amountNum.toFixed(2);
+    networkFee = "1.00"; // flat 1 USDT fee
+    amountAfterFee = (amountNum - 1).toFixed(2);
+  } else {
+    // Input is in AED — convert to crypto
+    amountCrypto = (amountNum * settings.AED_TO_USDT_RATE).toFixed(2);
+    networkFee = (parseFloat(amountCrypto) * settings.NETWORK_FEE_PERCENT / 100).toFixed(2);
+    amountAfterFee = (parseFloat(amountCrypto) - parseFloat(networkFee)).toFixed(2);
+  }
+
+  const isValid = walletAddress.length >= 20 && amountNum > 0 && amountNum <= availableBalance;
+
+  // Verify crypto address when user finishes typing
+  const verifyAddress = useCallback(async (address: string) => {
+    if (address.length < 20) {
+      setRecipientInfo(null);
+      setVerifyError(null);
+      return;
+    }
+    setIsVerifying(true);
+    setVerifyError(null);
+    try {
+      const res = await apiRequest<{
+        is_internal: boolean;
+        recipient_name: string | null;
+        avatar_url: string | null;
+        message?: string;
+      }>(`/transactions/recipient-info/?crypto_address=${encodeURIComponent(address)}`, { method: 'GET' }, true);
+      if (res.data) {
+        setRecipientInfo(res.data);
+      } else {
+        setVerifyError(res.error?.message || res.error?.detail || "Ошибка проверки");
+      }
+    } catch {
+      setVerifyError("Ошибка сети");
+    } finally {
+      setIsVerifying(false);
+    }
+  }, []);
+
+  // Debounced address verification
+  useEffect(() => {
+    if (walletAddress.length < 20) {
+      setRecipientInfo(null);
+      return;
+    }
+    const timer = setTimeout(() => verifyAddress(walletAddress), 600);
+    return () => clearTimeout(timer);
+  }, [walletAddress, verifyAddress]);
 
   const formatAmountInput = (value: string) => {
     const cleaned = value.replace(/[^\d.]/g, "");
     const parts = cleaned.split(".");
-    if (parts.length > 2) return amountAED;
+    if (parts.length > 2) return amountInput;
     if (parts[1] && parts[1].length > 2) {
       return `${parts[0]}.${parts[1].slice(0, 2)}`;
     }
@@ -350,6 +414,50 @@ const SendCrypto = () => {
                 <ClipboardPaste className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
+
+            {/* Recipient verification result */}
+            {isVerifying && (
+              <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{t("send.verifying", "Проверка адреса...")}</span>
+              </div>
+            )}
+            {verifyError && (
+              <p className="mt-2 text-sm text-destructive">{verifyError}</p>
+            )}
+            {recipientInfo && !isVerifying && (
+              <div className="flex items-center gap-3 mt-3 p-3 rounded-xl bg-secondary">
+                {recipientInfo.is_internal ? (
+                  <>
+                    <div className="relative">
+                      <Avatar className="w-10 h-10">
+                        {recipientInfo.avatar_url ? (
+                          <AvatarImage src={recipientInfo.avatar_url} />
+                        ) : null}
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                          {recipientInfo.recipient_name?.charAt(0) || "?"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <CheckCircle2 className="w-4 h-4 text-green-500 absolute -bottom-0.5 -right-0.5 bg-background rounded-full" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{recipientInfo.recipient_name}</p>
+                      <p className="text-xs text-muted-foreground">{t("send.internalUser", "Пользователь системы")}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
+                      <Wallet className="w-5 h-5 text-amber-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{t("send.externalWallet", "Внешний кошелёк")}</p>
+                      <p className="text-xs text-muted-foreground">{t("send.pendingTransfer", "Перевод будет в обработке")}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Amount Input */}
@@ -364,21 +472,21 @@ const SendCrypto = () => {
             </div>
             <div className="relative">
               <Input
-                value={formatDisplayAmount(amountAED)}
-                onChange={(e) => setAmountAED(formatAmountInput(parseDisplayAmount(e.target.value)))}
+                value={formatDisplayAmount(amountInput)}
+                onChange={(e) => setAmountInput(formatAmountInput(parseDisplayAmount(e.target.value)))}
                 placeholder="0.00"
                 className="h-14 rounded-2xl bg-secondary border-0 text-base pr-28"
                 inputMode="decimal"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 <button
-                  onClick={() => setAmountAED(availableBalance.toFixed(2))}
+                  onClick={() => setAmountInput(availableBalance.toFixed(2))}
                   className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
                 >
                   MAX
                 </button>
                 <span className="text-muted-foreground font-medium">
-                  AED
+                  {inputCurrency}
                 </span>
               </div>
             </div>
@@ -393,7 +501,7 @@ const SendCrypto = () => {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("send.networkFee")} ({settings.NETWORK_FEE_PERCENT}%)</span>
+              <span className="text-muted-foreground">{isCryptoSource ? t("send.networkFee", "Комиссия сети") + " (flat)" : `${t("send.networkFee")} (${settings.NETWORK_FEE_PERCENT}%)`}</span>
               <span className="font-medium text-[#FFA000]">-{networkFee} {selectedCoin.symbol}</span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border">
@@ -402,10 +510,12 @@ const SendCrypto = () => {
                 {amountAfterFee} {selectedCoin.symbol}
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("send.exchangeRate")}</span>
-              <span className="font-medium">1 USDT = {settings.USDT_TO_AED_SELL.toFixed(2)} AED</span>
-            </div>
+            {!isCryptoSource && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("send.exchangeRate")}</span>
+                <span className="font-medium">1 USDT = {settings.USDT_TO_AED_SELL.toFixed(2)} AED</span>
+              </div>
+            )}
           </div>
 
           {/* Warning */}
