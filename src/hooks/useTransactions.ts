@@ -6,7 +6,8 @@ import {
   fetchTransactionReceipt,
   fetchApiTransactionGroups,
   fetchIbanTransactionGroups,
-  fetchCardTransactionGroups
+  fetchCardTransactionGroups,
+  fetchCryptoTransactionGroups
 } from '@/services/api/transactions';
 import { FetchTransactionsParams, TransactionGroup } from '@/types/transaction';
 import { getAuthToken } from '@/services/api/apiClient';
@@ -19,6 +20,7 @@ export const transactionKeys = {
   groups: () => [...transactionKeys.all, 'groups'] as const,
   groupsWithParams: (params?: FetchTransactionsParams) => [...transactionKeys.groups(), params] as const,
   apiGroups: () => [...transactionKeys.all, 'apiGroups'] as const,
+  cryptoGroups: () => [...transactionKeys.all, 'cryptoGroups'] as const,
   cardGroups: () => [...transactionKeys.all, 'cardGroups'] as const,
   ibanGroups: () => [...transactionKeys.all, 'ibanGroups'] as const,
   details: () => [...transactionKeys.all, 'detail'] as const,
@@ -46,6 +48,20 @@ export const useApiTransactionGroups = () => {
   return useQuery({
     queryKey: transactionKeys.apiGroups(),
     queryFn: fetchApiTransactionGroups,
+    enabled: !!token,
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });
+};
+
+/**
+ * Hook to fetch crypto-only transactions from API
+ */
+export const useCryptoTransactionGroups = () => {
+  const token = getAuthToken();
+  return useQuery({
+    queryKey: transactionKeys.cryptoGroups(),
+    queryFn: fetchCryptoTransactionGroups,
     enabled: !!token,
     staleTime: 1000 * 60 * 5,
     retry: 1,

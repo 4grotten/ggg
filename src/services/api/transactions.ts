@@ -495,6 +495,46 @@ export const fetchIbanTransactionGroups = async (): Promise<TransactionGroup[]> 
 };
 
 /**
+ * Fetch crypto transactions from backend
+ * GET /api/v1/transactions/crypto/
+ */
+export const fetchCryptoTransactions = async (): Promise<{
+  data: ApiTransaction[] | null;
+  error: string | null;
+}> => {
+  try {
+    const result = await apiRequest<ApiTransaction[] | { results: ApiTransaction[] }>(
+      `/transactions/crypto/`,
+      { method: 'GET' },
+      true
+    );
+    
+    if (result.error) {
+      console.warn('[Transactions API] Crypto transactions error:', result.error);
+      return { data: null, error: result.error.detail || result.error.message || 'Failed to fetch' };
+    }
+    
+    const transactions = Array.isArray(result.data)
+      ? result.data
+      : (result.data as any)?.results || [];
+    
+    return { data: transactions, error: null };
+  } catch (error) {
+    console.error('[Transactions API] Crypto transactions fetch failed:', error);
+    return { data: null, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
+/**
+ * Fetch crypto transactions and group by date
+ */
+export const fetchCryptoTransactionGroups = async (): Promise<TransactionGroup[]> => {
+  const { data, error } = await fetchCryptoTransactions();
+  if (error || !data || data.length === 0) return [];
+  return groupApiTransactions(data);
+};
+
+/**
  * Fetch card-only transactions from backend
  * GET /api/v1/transactions/card-transactions/
  */
