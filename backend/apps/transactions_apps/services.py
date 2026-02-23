@@ -413,6 +413,11 @@ class TransactionService:
                 fee=CRYPTO_FEE,
                 description=f"Крипто перевод: {source_wallet.address[:6]}... → {to_address[:6]}..."
             )
+            CryptoWithdrawals.objects.create(
+                transaction=txn, user_id=user_id, token=token, network=network,
+                to_address=to_address, amount_crypto=amount_usdt, fee_amount=CRYPTO_FEE,
+                fee_type='network', total_debit=total_deduction
+            )
             BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='crypto', amount=total_deduction, type='debit')
             BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
         else:
@@ -580,8 +585,32 @@ class TransactionService:
                         pass
                 else:
                     receipt["is_internal"] = False
-            except Exception:
-                pass
+            except (CryptoWithdrawals.DoesNotExist, Exception):
+                # Fallback for old transactions without CryptoWithdrawals record
+                sender_wallet = CryptoWallets.objects.filter(user_id=str(txn.user_id), is_active=True).first()
+                if sender_wallet:
+                    receipt["from_address_mask"] = mask_address(sender_wallet.address)
+                    receipt["from_address"] = sender_wallet.address
+                    receipt["token"] = sender_wallet.token
+                    receipt["network"] = sender_wallet.network
+                    receipt["network_and_token"] = f"{sender_wallet.network} / {sender_wallet.token}"
+                # Try to find to_address from receiver_id
+                if txn.receiver_id and txn.receiver_id != 'EXTERNAL':
+                    dest_wallet = CryptoWallets.objects.filter(user_id=txn.receiver_id, is_active=True).first()
+                    if dest_wallet:
+                        receipt["to_address_mask"] = mask_address(dest_wallet.address)
+                        receipt["to_address"] = dest_wallet.address
+                        receipt["is_internal"] = True
+                        receipt["recipient_name"] = get_user_name(dest_wallet.user_id)
+                        try:
+                            profile = Profiles.objects.filter(user_id=str(dest_wallet.user_id)).first()
+                            if profile and profile.avatar_url:
+                                receipt["recipient_avatar"] = profile.avatar_url
+                        except Exception:
+                            pass
+                receipt["amount_crypto"] = float(txn.amount)
+                receipt["fee_amount"] = float(txn.fee) if txn.fee else 0
+                receipt["total_debit"] = float(txn.amount) + (float(txn.fee) if txn.fee else 0)
         elif tx_type in ['card_to_crypto', 'crypto_to_card', 'bank_to_crypto', 'crypto_to_bank', 'card_to_bank']:
             receipt["operation"] = "Internal/System Transfer"
         elif tx_type == 'transfer_out':
