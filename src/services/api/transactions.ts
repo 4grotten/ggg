@@ -664,13 +664,15 @@ const groupApiTransactions = async (data: ApiTransaction[]): Promise<Transaction
   // Enrich crypto_to_bank transactions with receipt data to get IBAN
   const enrichPromises = mapped.map(async (tx) => {
     const originalType = (tx.metadata as any)?.originalApiType;
-    if (originalType === 'crypto_to_bank' && !(tx.metadata as any)?.beneficiary_iban) {
+    if (originalType === 'crypto_to_bank') {
       try {
         const rawId = tx.id.replace(/^api_/, '');
         const { data: receipt } = await fetchTransactionReceipt(rawId);
         if (receipt) {
           (tx.metadata as any).beneficiary_iban = (receipt as any).iban_mask || (receipt as any).beneficiary_iban || undefined;
           (tx.metadata as any).beneficiary_name = (receipt as any).beneficiary_name || undefined;
+          (tx.metadata as any).sender_name = (receipt as any).sender_name || undefined;
+          (tx.metadata as any).from_address_mask = (receipt as any).from_address_mask || undefined;
         }
       } catch (e) {
         // silently skip enrichment
