@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet, Landmark } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -17,19 +17,17 @@ import {
 } from "@/components/ui/drawer";
 import { useSettings } from "@/contexts/SettingsContext";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
+import { useCards, useIban } from "@/hooks/useCards";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface Card {
+interface SourceOption {
   id: string;
-  type: "virtual" | "metal";
+  type: "virtual" | "metal" | "bank_account" | "referral";
   name: string;
-  lastFour: string;
+  lastFour?: string;
+  iban?: string;
   balance: number;
 }
-
-const cards: Card[] = [
-  { id: "1", type: "virtual", name: "Visa Virtual", lastFour: "4532", balance: 213757.49 },
-  { id: "2", type: "metal", name: "Visa Metal", lastFour: "8901", balance: 256508.98 },
-];
 
 const coins = [
   { id: "usdt", name: "Tether", symbol: "USDT", color: "#26A17B" },
@@ -61,17 +59,59 @@ const SendCrypto = () => {
   const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
   const referralBalance = location.state?.referralBalance || 0;
   
-  const [selectedCard, setSelectedCard] = useState<Card>(cards[0]);
+  // Fetch real data
+  const { data: cardsResponse, isLoading: cardsLoading } = useCards();
+  const { data: ibanResponse, isLoading: ibanLoading } = useIban();
+
+  // Build source options from real data
+  const [sourceOptions, setSourceOptions] = useState<SourceOption[]>([]);
+  const [selectedSource, setSelectedSource] = useState<SourceOption | null>(null);
+
+  useEffect(() => {
+    const options: SourceOption[] = [];
+
+    // Add cards from API
+    if (cardsResponse?.data) {
+      cardsResponse.data.forEach((card) => {
+        options.push({
+          id: card.id,
+          type: card.type,
+          name: card.name,
+          lastFour: card.lastFourDigits,
+          balance: card.balance,
+        });
+      });
+    }
+
+    // Add bank account from IBAN API
+    if (ibanResponse?.data) {
+      options.push({
+        id: "bank_account",
+        type: "bank_account",
+        name: t("send.bankAccount", "Банковский счёт AED"),
+        iban: ibanResponse.data.iban,
+        balance: ibanResponse.data.balance ?? 0,
+      });
+    }
+
+    setSourceOptions(options);
+
+    // Auto-select first option if none selected
+    if (!selectedSource && options.length > 0) {
+      setSelectedSource(options[0]);
+    }
+  }, [cardsResponse, ibanResponse]);
+
   const [selectedCoin, setSelectedCoin] = useState(coins[0]);
   const [selectedNetwork, setSelectedNetwork] = useState(networksByCoin[coins[0].id][0]);
-  const [cardDrawerOpen, setCardDrawerOpen] = useState(false);
+  const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
   const [coinDrawerOpen, setCoinDrawerOpen] = useState(false);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [amountAED, setAmountAED] = useState("");
 
-  // Use referral balance or card balance
-  const availableBalance = isReferralWithdrawal ? referralBalance : selectedCard.balance;
+  // Use referral balance or selected source balance
+  const availableBalance = isReferralWithdrawal ? referralBalance : (selectedSource?.balance ?? 0);
 
   const amountCrypto = amountAED ? (parseFloat(amountAED) * settings.AED_TO_USDT_RATE).toFixed(2) : "0.00";
   const networkFee = amountAED ? (parseFloat(amountCrypto) * settings.NETWORK_FEE_PERCENT / 100).toFixed(2) : "0.00";
@@ -112,8 +152,35 @@ const SendCrypto = () => {
 
   const handleSubmit = () => {
     if (!isValid) return;
-    // Redirect to partner page for referral withdrawals
     navigate(isReferralWithdrawal ? "/partner" : "/");
+  };
+
+  const isDataLoading = cardsLoading || ibanLoading;
+
+  const getSourceIcon = (source: SourceOption) => {
+    if (source.type === "bank_account") {
+      return (
+        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+          <Landmark className="w-5 h-5 text-white" />
+        </div>
+      );
+    }
+    return (
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+        source.type === "metal" 
+          ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+          : "bg-primary"
+      }`}>
+        <CreditCard className="w-5 h-5 text-primary-foreground" />
+      </div>
+    );
+  };
+
+  const getSourceSubtitle = (source: SourceOption) => {
+    if (source.type === "bank_account" && source.iban) {
+      return `${source.iban.slice(0, 4)}****${source.iban.slice(-4)}`;
+    }
+    return source.lastFour ? `•••• ${source.lastFour}` : "";
   };
 
   return (
@@ -138,7 +205,7 @@ const SendCrypto = () => {
             </p>
           </div>
 
-          {/* Source Selection - Card or Referral Balance */}
+          {/* Source Selection - Card, Bank Account, or Referral Balance */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground">
               {isReferralWithdrawal ? t("partner.referralBalance", "Реферальный счёт") : t("send.fromCard")}
@@ -157,28 +224,28 @@ const SendCrypto = () => {
                   </div>
                 </div>
               </div>
-            ) : (
+            ) : isDataLoading ? (
+              <Skeleton className="h-[72px] rounded-2xl" />
+            ) : selectedSource ? (
               <button
-                onClick={() => setCardDrawerOpen(true)}
+                onClick={() => setSourceDrawerOpen(true)}
                 className="w-full flex items-center justify-between p-4 bg-secondary rounded-2xl hover:bg-muted/80 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    selectedCard.type === "metal" 
-                      ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                      : "bg-primary"
-                  }`}>
-                    <CreditCard className="w-5 h-5 text-primary-foreground" />
-                  </div>
+                  {getSourceIcon(selectedSource)}
                   <div className="text-left">
-                    <p className="font-semibold">{selectedCard.name}</p>
+                    <p className="font-semibold">{selectedSource.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      •••• {selectedCard.lastFour}
+                      {getSourceSubtitle(selectedSource)} · {selectedSource.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED
                     </p>
                   </div>
                 </div>
                 <ChevronDown className="w-5 h-5 text-muted-foreground" />
               </button>
+            ) : (
+              <div className="w-full p-4 bg-secondary rounded-2xl text-muted-foreground text-sm">
+                {t("send.noSourcesAvailable", "Нет доступных источников")}
+              </div>
             )}
           </div>
 
@@ -337,12 +404,12 @@ const SendCrypto = () => {
         </div>
       </MobileLayout>
 
-      {/* Card Selection Drawer */}
-      <Drawer open={cardDrawerOpen} onOpenChange={setCardDrawerOpen}>
+      {/* Source Selection Drawer */}
+      <Drawer open={sourceDrawerOpen} onOpenChange={setSourceDrawerOpen}>
         <DrawerContent className="bg-background/95 backdrop-blur-xl">
           <DrawerHeader className="relative flex items-center justify-center py-4">
             <DrawerTitle className="text-center text-base font-semibold">
-              {t("send.selectCard")}
+              {t("send.selectSource", "Выберите источник")}
             </DrawerTitle>
             <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
               <X className="w-3.5 h-3.5 text-primary" />
@@ -351,31 +418,25 @@ const SendCrypto = () => {
           
           <div className="px-4 pb-6">
             <AnimatedDrawerContainer className="bg-muted/50 rounded-xl overflow-hidden">
-              {cards.map((card, index) => (
-                <AnimatedDrawerItem key={card.id} index={index}>
+              {sourceOptions.map((source, index) => (
+                <AnimatedDrawerItem key={source.id} index={index}>
                   <button
                     onClick={() => {
-                      setSelectedCard(card);
-                      setCardDrawerOpen(false);
+                      setSelectedSource(source);
+                      setSourceDrawerOpen(false);
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
-                      index < cards.length - 1 ? 'border-b border-border/50' : ''
+                      index < sourceOptions.length - 1 ? 'border-b border-border/50' : ''
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      card.type === "metal" 
-                        ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                        : "bg-primary"
-                    }`}>
-                      <CreditCard className="w-5 h-5 text-primary-foreground" />
-                    </div>
+                    {getSourceIcon(source)}
                     <div className="flex-1 text-left">
-                      <p className="text-base font-medium text-foreground">{card.name}</p>
+                      <p className="text-base font-medium text-foreground">{source.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        •••• {card.lastFour} · {card.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED
+                        {getSourceSubtitle(source)} · {source.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED
                       </p>
                     </div>
-                    {selectedCard.id === card.id && (
+                    {selectedSource?.id === source.id && (
                       <Check className="w-5 h-5 text-primary" />
                     )}
                   </button>
