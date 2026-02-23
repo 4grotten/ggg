@@ -562,6 +562,24 @@ class TransactionService:
                 receipt["fee_type"] = cw.fee_type
                 receipt["total_debit"] = float(cw.total_debit)
                 receipt["tx_hash"] = cw.tx_hash
+                # Sender wallet address
+                sender_wallet = CryptoWallets.objects.filter(user_id=str(txn.user_id), is_active=True).first()
+                if sender_wallet:
+                    receipt["from_address_mask"] = mask_address(sender_wallet.address)
+                    receipt["from_address"] = sender_wallet.address
+                # Check if recipient is internal (has wallet in system)
+                recipient_wallet = CryptoWallets.objects.filter(address=cw.to_address).first()
+                if recipient_wallet:
+                    receipt["is_internal"] = True
+                    receipt["recipient_name"] = get_user_name(recipient_wallet.user_id)
+                    try:
+                        profile = Profiles.objects.filter(user_id=str(recipient_wallet.user_id)).first()
+                        if profile and profile.avatar_url:
+                            receipt["recipient_avatar"] = profile.avatar_url
+                    except Exception:
+                        pass
+                else:
+                    receipt["is_internal"] = False
             except Exception:
                 pass
         elif tx_type in ['card_to_crypto', 'crypto_to_card', 'bank_to_crypto', 'crypto_to_bank', 'card_to_bank']:
