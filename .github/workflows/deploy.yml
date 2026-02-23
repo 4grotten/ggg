@@ -1,8 +1,12 @@
 name: Deploy EasyCard Stack
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Deploy to production server'
+        required: false
+        default: 'yes'
 
 jobs:
   build:
