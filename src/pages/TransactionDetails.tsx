@@ -982,7 +982,7 @@ const TransactionDetails = () => {
               {/* Recipient - IBAN */}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Получатель</span>
-                <span className="font-medium">{receipt?.beneficiary_name || transaction.recipientName || user?.full_name || '—'}</span>
+                <span className="font-medium">{receipt?.beneficiary_name || receipt?.recipient_name || transaction.recipientName || '—'}</span>
               </div>
               <div className="flex items-start justify-between">
                 <span className="text-muted-foreground">IBAN</span>
