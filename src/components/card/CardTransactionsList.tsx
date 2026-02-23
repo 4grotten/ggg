@@ -359,9 +359,16 @@ const handleClick = (transaction: Transaction) => {
                         </p>
                       </>
                     ) : (
-                      <p className={`font-semibold ${colorClass}`}>
-                        {prefix}{(isCryptoDeposit || isCryptoSend) ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {(isCryptoDeposit || isCryptoSend) ? 'USDT' : 'AED'}
-                      </p>
+                      <>
+                        <p className={`font-semibold ${colorClass}`}>
+                          {prefix}{(isCryptoDeposit || isCryptoSend) ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {(isCryptoDeposit || isCryptoSend) ? 'USDT' : 'AED'}
+                        </p>
+                        {isBankTransferIncoming && (
+                          <p className="text-xs text-muted-foreground">
+                            {transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                          </p>
+                        )}
+                      </>
                     )}
                     {transaction.status === 'processing' && (
                       <p className="flex items-center justify-end gap-0.5 text-[#FFA000] text-xs mt-0.5">
