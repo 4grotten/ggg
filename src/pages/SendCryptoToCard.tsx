@@ -136,7 +136,7 @@ const SendCryptoToCard = () => {
   const isAmountValid = numericAmount > 0 && totalDebitUsdt <= walletBalance;
   
   // Exchange rate USDT → AED
-  const usdtToAed = settings.USDT_TO_AED_SELL || 3.67;
+  const usdtToAed = settings.USDT_TO_AED_BUY || 3.65;
   const recipientGetsAed = numericAmount * usdtToAed;
 
   // Check recipient
