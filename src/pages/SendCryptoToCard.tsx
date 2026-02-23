@@ -328,11 +328,14 @@ const SendCryptoToCard = () => {
 
             {recipientNotFound && !isLoading && isCardValid && (
               <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-secondary/50 rounded-xl p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 text-muted-foreground" />
+                className="bg-destructive/10 border border-destructive/20 rounded-xl p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-sm text-muted-foreground">{t("send.cardNotInNetwork", "Карта не найдена в сети EasyCard")}</p>
+                <div>
+                  <p className="font-semibold text-sm">{t("send.cardNotFound", "Карта не найдена")}</p>
+                  <p className="text-xs text-muted-foreground">{t("send.cardNotFoundDesc", "Карта не найдена в сети EasyCard. Перевод возможен только на карты EasyCard.")}</p>
+                </div>
               </motion.div>
             )}
 
