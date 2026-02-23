@@ -1435,7 +1435,7 @@ const TransactionDetails = () => {
                 <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.fee")} ({receipt?.amount && receipt?.fee ? `${((receipt.fee / receipt.amount) * 100).toFixed(0)}%` : '1%'})</span>
+                <span className="text-muted-foreground">{t("transaction.fee")} ({receipt?.amount && receipt?.fee ? `${((receipt.fee / receipt.amount) * 100).toFixed(0)}%` : '2%'})</span>
                 <span className="font-medium">{(receipt?.fee || transaction.transferFee || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
