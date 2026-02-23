@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet, Landmark, CheckCircle2, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,8 @@ import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/ani
 import { useCards, useIban, useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest } from "@/services/api/apiClient";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface SourceOption {
@@ -236,9 +238,73 @@ const SendCrypto = () => {
     setCoinDrawerOpen(false);
   };
 
-  const handleSubmit = () => {
-    if (!isValid) return;
-    navigate(isReferralWithdrawal ? "/partner" : "/");
+  const [isSending, setIsSending] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handleSubmit = async () => {
+    if (!isValid || isSending) return;
+    setIsSending(true);
+
+    try {
+      let res;
+
+      if (isCryptoSource) {
+        // Wallet → Crypto Address
+        res = await apiRequest<{
+          message: string;
+          transaction_id: string;
+          status: string;
+          is_internal?: boolean;
+          recipient_name?: string;
+        }>('/transactions/withdrawal/crypto-wallet/', {
+          method: 'POST',
+          body: JSON.stringify({
+            from_wallet_id: selectedSource?.id,
+            to_address: walletAddress,
+            amount_usdt: amountNum.toFixed(6),
+            token: selectedCoin.symbol,
+            network: selectedNetwork.id.toUpperCase(),
+          }),
+        }, true);
+      } else {
+        // Card/Bank → External Crypto Wallet
+        res = await apiRequest<{
+          message: string;
+          transaction_id: string;
+          total_debit_crypto: string;
+        }>('/transactions/withdrawal/crypto/', {
+          method: 'POST',
+          body: JSON.stringify({
+            from_card_id: selectedSource?.id,
+            token: selectedCoin.symbol,
+            network: selectedNetwork.id.toUpperCase(),
+            to_address: walletAddress,
+            amount_crypto: amountCrypto,
+          }),
+        }, true);
+      }
+
+      if (res.data) {
+        // Invalidate caches
+        queryClient.invalidateQueries({ queryKey: ['cards'] });
+        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+
+        const statusMsg = res.data.status === 'completed'
+          ? t("send.transferCompleted", "Перевод выполнен!")
+          : t("send.transferPending", "Перевод в обработке");
+
+        toast.success(statusMsg);
+        navigate(isReferralWithdrawal ? "/partner" : "/");
+      } else {
+        const errMsg = res.error?.message || res.error?.detail || t("send.transferError", "Ошибка перевода");
+        toast.error(errMsg);
+      }
+    } catch (err) {
+      toast.error(t("send.networkError", "Ошибка сети"));
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const isDataLoading = cardsLoading || ibanLoading || cryptoLoading;
@@ -542,10 +608,17 @@ const SendCrypto = () => {
         <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
           <Button
             onClick={handleSubmit}
-            disabled={!isValid}
+            disabled={!isValid || isSending}
             className="w-full h-14 rounded-2xl text-base font-semibold bg-primary/90 hover:bg-primary active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
           >
-            Send {amountAfterFee} {selectedCoin.symbol}
+            {isSending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                {t("send.sending", "Отправка...")}
+              </span>
+            ) : (
+              `Send ${amountAfterFee} ${selectedCoin.symbol}`
+            )}
           </Button>
         </div>
       </MobileLayout>
