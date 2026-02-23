@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Retry logic for TLS connection errors
+    // Retry logic for TLS connection errors and 5xx responses
     let response: Response | null = null;
     let data = "";
     const maxRetries = 3;
@@ -64,11 +64,16 @@ Deno.serve(async (req) => {
       try {
         response = await fetch(backendUrl, fetchOptions);
         data = await response.text();
+        // Retry on 502/503/504 gateway errors
+        if (response.status >= 502 && response.status <= 504 && attempt < maxRetries - 1) {
+          console.warn(`[cards-proxy] Attempt ${attempt + 1}/${maxRetries} got ${response.status}, retrying...`);
+          await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+          continue;
+        }
         break;
       } catch (fetchErr) {
         console.warn(`[cards-proxy] Attempt ${attempt + 1}/${maxRetries} failed:`, (fetchErr as Error).message);
         if (attempt === maxRetries - 1) throw fetchErr;
-        // Small delay before retry
         await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
       }
     }
