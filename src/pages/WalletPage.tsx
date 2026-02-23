@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Share2, QrCode, X, Clock, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, Copy, Share2, QrCode, X, Clock, ArrowDownLeft, ArrowUpRight, CreditCard, ChevronRight } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion } from "framer-motion";
@@ -139,6 +139,23 @@ const WalletPage = () => {
               {t('dashboard.send')}
             </button>
           </div>
+
+          {/* Send to Card button */}
+          <button
+            onClick={() => navigate("/send/crypto-to-card")}
+            className="w-full flex items-center justify-between mt-3 p-3 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-[#007AFF] flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-sm">{t('dashboard.sendToCard')}</p>
+                <p className="text-xs text-muted-foreground">{t('send.cryptoToCardDesc', 'USDT → Card')}</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+          </button>
         </motion.div>
 
         {/* Action buttons: Share + QR */}

@@ -34,6 +34,7 @@ import TopUpCrypto from "./pages/TopUpCrypto";
 import TopUpBank from "./pages/TopUpBank";
 import TopUpBankDetails from "./pages/TopUpBankDetails";
 import SendCrypto from "./pages/SendCrypto";
+import SendCryptoToCard from "./pages/SendCryptoToCard";
 import SendBank from "./pages/SendBank";
 import OpenCardPayCrypto from "./pages/OpenCardPayCrypto";
 import OpenCardPayBank from "./pages/OpenCardPayBank";
@@ -161,6 +162,7 @@ const AppContent = () => {
             <Route path="/top-up/usdt-balance" element={<TopUpFromUsdtBalance />} />
             <Route path="/top-up/bank/details" element={<TopUpBankDetails />} />
             <Route path="/send/crypto" element={<SendCrypto />} />
+            <Route path="/send/crypto-to-card" element={<SendCryptoToCard />} />
             <Route path="/send/bank" element={<SendBank />} />
             <Route path="/send-IBAN-card" element={<SendIbanToCard />} />
             <Route path="/send-IBAN-external" element={<SendIbanToExternalCard />} />
