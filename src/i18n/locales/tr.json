@@ -702,7 +702,7 @@
     "back": "Geri",
     "sendToCard": "Karta Gönder",
     "easyCardTransfer": "Sadece EASY CARD kartlarına",
-    "sendLocalBankTransfer": "Yerel Banka Transferi Gönder",
+    "sendLocalBankTransfer": "Banka hesabına transfer (IBAN)",
     "sendToStablecoins": "AED'yi Stablecoin'lere Gönder",
     "withdrawToWallet": "Harici cüzdana çek",
     "stepOf": "Adım {{step}} / {{total}}",

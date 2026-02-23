@@ -785,7 +785,7 @@
     "back": "Back",
     "sendToCard": "Send to Card",
     "easyCardTransfer": "Only to EASY CARD cards",
-    "sendLocalBankTransfer": "Send Local Bank Transfer",
+    "sendLocalBankTransfer": "Transfer to bank account (IBAN)",
     "sendToStablecoins": "Send AED to Stablecoins",
     "withdrawToWallet": "Withdraw to external wallet",
     "stepOf": "Step {{step}} of {{total}}",
