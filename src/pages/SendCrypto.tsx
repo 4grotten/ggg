@@ -35,14 +35,10 @@ interface SourceOption {
 
 const coins = [
   { id: "usdt", name: "Tether", symbol: "USDT", color: "#26A17B" },
-  { id: "usdc", name: "USD Coin", symbol: "USDC", color: "#2775CA" },
 ];
 
 const networksByCoin: Record<string, { id: string; name: string }[]> = {
   usdt: [
-    { id: "trc20", name: "Tron (TRC20)" },
-  ],
-  usdc: [
     { id: "trc20", name: "Tron (TRC20)" },
   ],
 };
