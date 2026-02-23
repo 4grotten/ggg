@@ -106,6 +106,7 @@ const handleClick = (transaction: Transaction) => {
     const isCryptoDeposit = transaction.type === "crypto_deposit";
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
+    const isCryptoToCard = transaction.type === "crypto_to_card";
     const apiIsIncoming = (transaction.metadata as any)?.isIncoming;
     const hasBothCards = !!transaction.senderCard && !!transaction.recipientCard;
     const isIncomingTransfer = isCardTransfer && (
@@ -121,7 +122,7 @@ const handleClick = (transaction: Transaction) => {
     const isProcessing = transaction.status === "processing";
     // In wallet view, topup = outgoing (wallet → card), so it's negative
     const walletTopupOutgoing = walletView && isTopup;
-    const prefix = (isTopup && !walletView) || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? "+" : walletTopupOutgoing || isOutgoingTransfer || isCryptoSend || isBankTransfer ? "-" : "";
+    const prefix = (isTopup && !walletView) || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? "+" : walletTopupOutgoing || isOutgoingTransfer || isCryptoSend || isBankTransfer || isCryptoToCard ? "-" : "";
     
     let colorClass = "";
     if (isProcessing && (isCardTransfer || isBankTransfer || isCryptoSend)) {
@@ -132,11 +133,11 @@ const handleClick = (transaction: Transaction) => {
       colorClass = "text-green-500";
     } else if (isDeclined) {
       colorClass = "text-red-500";
-    } else if (isOutgoingTransfer || isCryptoSend || isBankTransfer) {
+    } else if (isOutgoingTransfer || isCryptoSend || isBankTransfer || isCryptoToCard) {
       colorClass = "text-[#007AFF]";
     }
     
-    return { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming };
+    return { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming, isCryptoToCard };
   };
 
   return (
@@ -159,7 +160,7 @@ const handleClick = (transaction: Transaction) => {
           {/* Transactions */}
           <div className="bg-muted/70 dark:bg-card/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-border/50">
             {group.transactions.map((transaction, index) => {
-              const { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming } = formatAmount(transaction);
+              const { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming, isCryptoToCard } = formatAmount(transaction);
               const isTopup = transaction.type === "topup";
               const isDeclined = transaction.type === "declined";
 
@@ -216,6 +217,13 @@ const handleClick = (transaction: Transaction) => {
                           <UsdtIcon size={22} />
                         </div>
                       ) : walletView && isTopup ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#007AFF" }}
+                        >
+                          <CreditCard className="w-5 h-5" />
+                        </div>
+                      ) : isCryptoToCard ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: "#007AFF" }}
