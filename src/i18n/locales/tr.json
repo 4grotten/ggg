@@ -771,7 +771,7 @@
     "stablecoins": "Stablecoin'ler",
     "bankTransfer": "Banka Transferi",
     "sendToCard": "Karta gönder",
-    "usdtBalance": "USDT TRC20 Cüzdan",
+    "usdtBalance": "USDT Cüzdan",
     "usdtBalanceDesc": "Bakiyenizden"
   },
   "topUpUsdt": {
