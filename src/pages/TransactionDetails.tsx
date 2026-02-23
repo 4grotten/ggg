@@ -273,7 +273,7 @@ const TransactionDetails = () => {
       recipientCard: receipt.type === 'crypto_to_card' ? cachedRecipientCard?.slice(-4) : receiverLast4,
       recipientCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
       recipientCardType: receipt.type === 'crypto_to_card' ? ((cryptoToCardRecipient as any)?.card_type === 'metal' ? 'Metal' : 'Virtual') : receiverCardType,
-      recipientName: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.recipient_name : (receipt.recipient_name || receipt.beneficiary_name),
+      recipientName: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.recipient_name : (receipt.recipient_name || receipt.beneficiary_name || (receipt as any).to_name),
       recipientAvatar: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.avatar_url : undefined,
       senderName: receipt.sender_name,
       senderCard: senderLast4 || undefined,
@@ -289,7 +289,7 @@ const TransactionDetails = () => {
       transferFee: receipt.fee ?? receipt.fee_amount,
       networkFee: receipt.fee ?? receipt.fee_amount,
       bankFee: receipt.fee_amount,
-      recipientIban: resolveFullIban(receipt.iban_mask),
+      recipientIban: receipt.type === 'crypto_to_bank' ? (receipt.beneficiary_iban || (receipt as any).to_iban || resolveFullIban(receipt.iban_mask)) : resolveFullIban(receipt.iban_mask),
       recipientBankName: receipt.beneficiary_bank_name || receipt.bank_name,
       senderIban: receipt.iban_mask,
       senderBankName: receipt.bank_name,
@@ -982,7 +982,7 @@ const TransactionDetails = () => {
               {/* Recipient - IBAN */}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Получатель</span>
-                <span className="font-medium">{receipt?.beneficiary_name || receipt?.recipient_name || transaction.recipientName || '—'}</span>
+                <span className="font-medium">{transaction.recipientName || receipt?.beneficiary_name || receipt?.recipient_name || (receipt as any)?.to_name || '—'}</span>
               </div>
               <div className="flex items-start justify-between">
                 <span className="text-muted-foreground">IBAN</span>
