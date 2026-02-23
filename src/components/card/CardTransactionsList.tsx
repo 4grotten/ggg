@@ -102,11 +102,8 @@ const handleClick = (transaction: Transaction) => {
     const isDeclined = transaction.type === "declined";
     const isCardActivation = transaction.type === "card_activation";
     const isCardTransfer = transaction.type === "card_transfer";
-    const rawCryptoWithdrawal = transaction.type === "crypto_withdrawal";
-    const rawCryptoDeposit = transaction.type === "crypto_deposit";
-    const cryptoIsIncoming = (transaction.metadata as any)?.isIncoming === true;
-    const isCryptoSend = rawCryptoWithdrawal && !cryptoIsIncoming;
-    const isCryptoDeposit = rawCryptoDeposit || (rawCryptoWithdrawal && cryptoIsIncoming);
+    const isCryptoSend = transaction.type === "crypto_withdrawal";
+    const isCryptoDeposit = transaction.type === "crypto_deposit";
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
     const apiIsIncoming = (transaction.metadata as any)?.isIncoming;
@@ -271,7 +268,7 @@ const handleClick = (transaction: Transaction) => {
                           : isCryptoSend && transaction.description
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.description.replace(/^Крипто\s*(перевод:?\s*)?/i, '').replace(/^.*→\s*/, '').trim())}`
                           : isCryptoDeposit && transaction.description
-                          ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
+                          ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description.replace(/^Крипто\s*(перевод:?\s*)?/i, '').split('→')[0].replace(/[:\s]+$/, '').trim())}`
                           : isTopup && transaction.description
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
                           : ""

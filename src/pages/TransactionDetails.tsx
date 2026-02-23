@@ -192,7 +192,16 @@ const TransactionDetails = () => {
           'iban_to_card': 'bank_transfer',
           'iban_to_iban': 'bank_transfer',
         };
-        return (typeMap[receipt.type] || receipt.type || 'payment') as any;
+        let mapped = typeMap[receipt.type] || receipt.type || 'payment';
+        // If crypto_withdrawal but user is the recipient (different user_id), treat as deposit
+        if (receipt.type === 'crypto_withdrawal') {
+          const currentUserId = String(user?.id || '');
+          const receiptUserId = String(receipt.user_id || '');
+          const isIncoming = (currentUserId && receiptUserId && currentUserId !== receiptUserId) ||
+            (receipt as any).is_incoming === true;
+          if (isIncoming) mapped = 'crypto_deposit';
+        }
+        return mapped as any;
       })(),
       recipientCard: receiverLast4,
       recipientCardFull: resolveFullCard(receipt.receiver_card_mask, 1),
@@ -203,12 +212,12 @@ const TransactionDetails = () => {
       senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       toCardFull: resolveFullCard(receipt.receiver_card_mask, 1),
-      toWalletAddress: receipt.to_address_mask || receipt.to_address,
-      fromWalletAddress: receipt.from_address_mask || receipt.from_address,
-      fromAddress: receipt.from_address_mask || receipt.from_address,
-      toWalletAddressFull: receipt.to_address,
-      fromWalletAddressFull: receipt.from_address,
-      tokenNetwork: receipt.network_and_token,
+      toWalletAddress: receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address,
+      fromWalletAddress: receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address,
+      fromAddress: receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address,
+      toWalletAddressFull: receipt.to_address || (receipt as any).recipient_address,
+      fromWalletAddressFull: receipt.from_address || (receipt as any).sender_address,
+      tokenNetwork: receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : undefined),
       transferFee: receipt.fee ?? receipt.fee_amount,
       networkFee: receipt.fee ?? receipt.fee_amount,
       bankFee: receipt.fee_amount,
