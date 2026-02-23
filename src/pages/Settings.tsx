@@ -700,6 +700,9 @@ const Settings = () => {
               </motion.div>
             </button>
             <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
+            {user?.id && (
+              <p className="text-xs text-muted-foreground/60 mt-0.5 font-mono">ID: {user.id}</p>
+            )}
             {displayPhone && (
               <p className="text-sm text-muted-foreground mt-1">{displayPhone}</p>
             )}
