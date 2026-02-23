@@ -315,7 +315,7 @@ const WalletPage = () => {
                   <Wallet className="w-5 h-5 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="font-medium text-sm">{t('send.usdtBalance', 'Кошелёк USDT')}</p>
+                  <p className="font-medium text-sm">{t('send.usdtBalance', 'Перевод на Кошелёк USDT')}</p>
                   <p className="text-xs text-muted-foreground">{t('send.usdtBalanceDesc', 'Перевод на USDT Кошелек')}</p>
                 </div>
               </div>
