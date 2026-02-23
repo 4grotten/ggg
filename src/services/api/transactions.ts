@@ -508,7 +508,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       merchantCategory: tx.merchant_category,
       referenceId: tx.reference_id,
       originalCurrency: tx.original_currency,
-      beneficiary_iban: (tx as any).beneficiary_iban || (tx as any).to_iban || undefined,
+      beneficiary_iban: (tx as any).beneficiary_iban || (tx as any).to_iban || (tx.metadata as any)?.beneficiary_iban || (tx.metadata as any)?.to_iban || undefined,
       beneficiary_name: (tx as any).beneficiary_name || undefined,
       operation: tx.operation || undefined,
       direction: tx.direction || undefined,

@@ -294,8 +294,8 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isBankTransferIncoming && transaction.senderName
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
-                          : isOutgoingCryptoToBank && ((transaction.metadata as any)?.beneficiary_iban || transaction.recipientName)
-                          ? ` · На ${maskMiddle(String((transaction.metadata as any)?.beneficiary_iban || transaction.recipientName || ''))}`
+                          : isOutgoingCryptoToBank
+                          ? ` · На ${maskMiddle(String((transaction.metadata as any)?.beneficiary_iban || transaction.recipientName || transaction.description || ''))}`
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.merchant === 'IBAN to Card'
                           ? ` · Card····${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.recipientName
