@@ -356,6 +356,101 @@ class TransactionService:
         return txn, fee, total_debit
 
     @staticmethod
+    @transaction.atomic
+    def execute_crypto_wallet_withdrawal(user_id, from_wallet_id, to_address, amount_usdt, token='USDT', network='TRC20'):
+        """
+        Перевод с крипто-кошелька на крипто-адрес.
+        Если адрес найден в системе — мгновенный перевод (completed) + имя/аватар.
+        Если внешний — pending.
+        """
+        amount_usdt = Decimal(str(amount_usdt))
+        CRYPTO_FEE = Decimal('1.00')
+
+        source_wallet = CryptoWallets.objects.select_for_update().get(id=from_wallet_id, user_id=str(user_id))
+
+        if source_wallet.address == to_address:
+            raise ValueError("Нельзя отправить на свой же кошелёк.")
+
+        total_deduction = amount_usdt + CRYPTO_FEE
+        if source_wallet.balance < total_deduction:
+            raise ValueError(f"Недостаточно средств. Необходимо: {total_deduction} {token}")
+
+        # Check if recipient wallet exists in the system
+        dest_wallet = CryptoWallets.objects.select_for_update().filter(address=to_address).first()
+        is_internal = dest_wallet is not None
+
+        recipient_name = None
+        avatar_url = None
+
+        if is_internal:
+            # Internal transfer — instant
+            source_wallet.balance -= total_deduction
+            source_wallet.save()
+            dest_wallet.balance += amount_usdt
+            dest_wallet.save()
+
+            # Resolve recipient name & avatar
+            try:
+                recipient_user = User.objects.get(id=int(dest_wallet.user_id) if str(dest_wallet.user_id).isdigit() else dest_wallet.user_id)
+                recipient_name = f"{recipient_user.first_name or ''} {recipient_user.last_name or ''}".strip() or None
+            except Exception:
+                pass
+            try:
+                profile = Profiles.objects.filter(user_id=str(dest_wallet.user_id)).first()
+                if profile:
+                    avatar_url = profile.avatar_url
+            except Exception:
+                pass
+
+            txn = Transactions.objects.create(
+                user_id=user_id,
+                sender_id=str(user_id),
+                receiver_id=str(dest_wallet.user_id),
+                type='crypto_withdrawal',
+                status='completed',
+                amount=amount_usdt,
+                currency=token,
+                fee=CRYPTO_FEE,
+                description=f"Крипто перевод: {source_wallet.address[:6]}... → {to_address[:6]}..."
+            )
+            BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='crypto', amount=total_deduction, type='debit')
+            BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
+        else:
+            # External transfer — pending
+            source_wallet.balance -= total_deduction
+            source_wallet.save()
+
+            txn = Transactions.objects.create(
+                user_id=user_id,
+                sender_id=str(user_id),
+                receiver_id='EXTERNAL',
+                type='crypto_withdrawal',
+                status='pending',
+                amount=amount_usdt,
+                currency=token,
+                fee=CRYPTO_FEE,
+                description=f"Внешний крипто перевод → {to_address[:8]}..."
+            )
+            CryptoWithdrawals.objects.create(
+                transaction=txn, user_id=user_id, token=token, network=network,
+                to_address=to_address, amount_crypto=amount_usdt, fee_amount=CRYPTO_FEE,
+                fee_type='network', total_debit=total_deduction
+            )
+            BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='crypto', amount=total_deduction, type='debit')
+
+        return {
+            "message": "Перевод выполнен" if is_internal else "Перевод в обработке",
+            "transaction_id": str(txn.id),
+            "status": txn.status,
+            "is_internal": is_internal,
+            "recipient_name": recipient_name,
+            "avatar_url": avatar_url,
+            "deducted_amount": str(total_deduction),
+            "fee": str(CRYPTO_FEE),
+            "credited_amount": str(amount_usdt),
+        }
+
+    @staticmethod
     def get_transaction_receipt(transaction_id):
         txn = Transactions.objects.get(id=transaction_id)
         receipt = {

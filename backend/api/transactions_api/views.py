@@ -17,7 +17,8 @@ from .serializers import (
     CryptoWithdrawalRequestSerializer, CryptoWithdrawalResponseSerializer,
     BankWithdrawalRequestSerializer, BankWithdrawalResponseSerializer,
     BankToCardTransferRequestSerializer, BankToCardTransferResponseSerializer,
-    ErrorResponseSerializer, TransferResponseSerializer
+    ErrorResponseSerializer, TransferResponseSerializer,
+    CryptoWalletWithdrawalRequestSerializer, CryptoWalletWithdrawalResponseSerializer
 )
 from apps.transactions_apps.services import TransactionService
 
@@ -26,16 +27,19 @@ class RecipientInfoView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     @swagger_auto_schema(
         operation_summary="Получить ФИО и тип карты по номеру",
-        operation_description="Вбиваешь номер карты, получаешь Имя Фамилию получателя и тип (metal/virtual).",
+        operation_description="Вбиваешь номер карты, IBAN, или крипто-адрес — получаешь имя и аватар получателя.",
         manual_parameters=[
-            openapi.Parameter('card_number', openapi.IN_QUERY, description="Номер карты получателя", type=openapi.TYPE_STRING, required=True)
+            openapi.Parameter('card_number', openapi.IN_QUERY, description="Номер карты получателя", type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('iban', openapi.IN_QUERY, description="IBAN получателя", type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('crypto_address', openapi.IN_QUERY, description="Крипто-адрес получателя", type=openapi.TYPE_STRING, required=False),
         ],
-        responses={200: openapi.Response("Данные получателя"), 404: "Карта не найдена"},
+        responses={200: openapi.Response("Данные получателя"), 404: "Не найдено"},
         tags=["Инфо (Получатели)"]
     )
     def get(self, request):
         card_number = request.query_params.get('card_number')
         iban = request.query_params.get('iban')
+        crypto_address = request.query_params.get('crypto_address')
 
         if card_number:
             card = Cards.objects.filter(card_number_encrypted=card_number).first()
@@ -72,8 +76,32 @@ class RecipientInfoView(APIView):
                 "avatar_url": avatar_url
             }, status=status.HTTP_200_OK)
 
+        elif crypto_address:
+            wallet = CryptoWallets.objects.filter(address=crypto_address).first()
+            if not wallet:
+                return Response({
+                    "is_internal": False,
+                    "recipient_name": None,
+                    "avatar_url": None,
+                    "message": "Внешний кошелёк — перевод будет в статусе pending"
+                }, status=status.HTTP_200_OK)
+            user = User.objects.filter(id=wallet.user_id).first()
+            recipient_name = f"{user.first_name or ''} {user.last_name or ''}".strip() if user else "Unknown User"
+            avatar_url = None
+            if user:
+                profile = Profiles.objects.filter(user_id=str(user.id)).first()
+                if profile:
+                    avatar_url = profile.avatar_url
+            return Response({
+                "is_internal": True,
+                "recipient_name": recipient_name,
+                "avatar_url": avatar_url,
+                "token": wallet.token,
+                "network": wallet.network
+            }, status=status.HTTP_200_OK)
+
         else:
-            return Response({"error": "card_number or iban is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "card_number, iban, or crypto_address is required"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_transaction_direction(tx, user_id):
@@ -409,6 +437,33 @@ class CardToBankView(APIView):
                 return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
             except ValueError as e: return Response({"error": str(e)}, status=400)
         return Response(ser.errors, status=400)
+
+
+class CryptoWalletWithdrawalView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @swagger_auto_schema(
+        operation_summary="Перевод с крипто-кошелька на крипто-адрес (Wallet to Wallet)",
+        operation_description="Списывает USDT с вашего кошелька. Если адрес получателя найден в системе — перевод мгновенный (completed) с именем и аватаром. Если внешний — ставится в pending.",
+        request_body=CryptoWalletWithdrawalRequestSerializer,
+        responses={200: CryptoWalletWithdrawalResponseSerializer, 400: ErrorResponseSerializer},
+        tags=["Withdrawals (Выводы)"]
+    )
+    def post(self, request):
+        serializer = CryptoWalletWithdrawalRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                result = TransactionService.execute_crypto_wallet_withdrawal(
+                    user_id=request.user.id,
+                    from_wallet_id=serializer.validated_data['from_wallet_id'],
+                    to_address=serializer.validated_data['to_address'],
+                    amount_usdt=serializer.validated_data['amount_usdt'],
+                    token=serializer.validated_data.get('token', 'USDT'),
+                    network=serializer.validated_data.get('network', 'TRC20'),
+                )
+                return Response(result, status=status.HTTP_200_OK)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BankToCardTransferView(APIView):
