@@ -354,6 +354,25 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   
   let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
   
+  // Handle generic "transfer" type from crypto endpoint — use direction + context
+  if (tx.type === 'transfer') {
+    if (tx.direction === 'inbound') {
+      mappedType = 'crypto_deposit';
+    } else if (tx.direction === 'outbound') {
+      // Check if it's crypto_to_card (has recipient_card) or crypto_to_bank (has beneficiary_iban) or plain crypto send
+      if (tx.recipient_card) {
+        mappedType = 'crypto_to_card';
+      } else if ((tx as any).beneficiary_iban || (tx as any).to_iban) {
+        mappedType = 'crypto_to_card'; // will be overridden below for crypto_to_bank
+      } else {
+        mappedType = 'crypto_withdrawal';
+      }
+    } else {
+      // internal or unknown direction
+      mappedType = tx.recipient_card ? 'crypto_to_card' : 'crypto_withdrawal';
+    }
+  }
+
   // For crypto_withdrawal with inbound direction, remap to crypto_deposit
   if (tx.type === 'crypto_withdrawal' && tx.direction === 'inbound') {
     mappedType = 'crypto_deposit';
@@ -420,10 +439,16 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'transfer_out': 'IBAN to Card',
     'transfer_in': 'Bank Transfer',
     'card_payment': tx.merchant_name || 'Payment',
+    'transfer': 'Stablecoin Send', // generic crypto transfer
   };
 
-  // Use mappedType for merchant fallback to handle remapped types (e.g. crypto_withdrawal→crypto_deposit)
-  const merchant = tx.merchant_name || (mappedType === 'crypto_deposit' && tx.type === 'crypto_withdrawal' ? 'Wallet Deposit' : (tx.operation as string) || merchantFallback[tx.type] || tx.type);
+  // Use mappedType for merchant fallback — for "transfer" type use mappedType-based fallback
+  const merchantByMappedType: Record<string, string> = {
+    'crypto_deposit': 'Wallet Deposit',
+    'crypto_withdrawal': 'Stablecoin Send',
+    'crypto_to_card': 'USDT → EasyCard',
+  };
+  const merchant = tx.merchant_name || (mappedType !== (typeMap[tx.type] || tx.type) ? merchantByMappedType[mappedType] : undefined) || (tx.operation as string) || merchantFallback[tx.type] || merchantByMappedType[mappedType] || tx.type;
 
   // Compute USDT equivalent if exchange_rate is available
   const absAmount = Math.abs(tx.amount);
