@@ -168,6 +168,8 @@ const handleClick = (transaction: Transaction) => {
               const { prefix, colorClass, isCardActivation, isCardTransfer, isIncomingTransfer, isOutgoingTransfer, isCryptoSend, isCryptoDeposit, isBankTransfer, isBankTransferIncoming, isCryptoToCard, isIncomingCryptoToCard } = formatAmount(transaction);
               const isTopup = transaction.type === "topup";
               const isDeclined = transaction.type === "declined";
+              const isIncomingCryptoToBank = isBankTransferIncoming && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank';
+              const isOutgoingCryptoToBank = (transaction.type as string) === "crypto_to_bank" || (isBankTransfer && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank');
 
               return (
                 <button
@@ -185,6 +187,13 @@ const handleClick = (transaction: Transaction) => {
                           style={{ backgroundColor: "#CCFF00" }}
                         >
                           <span className="text-black text-lg font-black">C</span>
+                        </div>
+                      ) : isIncomingCryptoToBank ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#22C55E" }}
+                        >
+                          <UsdtIcon size={22} />
                         </div>
                       ) : isBankTransferIncoming ? (
                         <div 
@@ -235,7 +244,7 @@ const handleClick = (transaction: Transaction) => {
                         >
                           <CreditCard className="w-5 h-5" />
                         </div>
-                      ) : (transaction.type as string) === "crypto_to_bank" ? (
+                      ) : isOutgoingCryptoToBank ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: "#8B5CF6" }}
@@ -258,8 +267,10 @@ const handleClick = (transaction: Transaction) => {
                     </div>
                     <div className="text-left min-w-0 flex-1">
                       <p className="font-medium">
-                      {(transaction.type as string) === "crypto_to_bank"
+                      {isOutgoingCryptoToBank
                           ? "Кошелёк USDT → IBAN Bank"
+                          : isIncomingCryptoToBank
+                          ? t("transactions.walletDeposit")
                           : walletView && isTopup 
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit
@@ -275,7 +286,9 @@ const handleClick = (transaction: Transaction) => {
                       </p>
                       <p className="text-sm text-muted-foreground truncate">
                         {transaction.time}
-                        {isIncomingTransfer && (transaction.senderCard || transaction.recipientCard)
+                        {isIncomingCryptoToBank && ((transaction.metadata as any)?.senderWallet || transaction.senderName)
+                          ? ` · ${t("transactions.from")} ${maskMiddle((transaction.metadata as any)?.senderWallet || transaction.senderName || '')}`
+                          : isIncomingTransfer && (transaction.senderCard || transaction.recipientCard)
                           ? ` · ${t("transactions.from")} •••• ${(transaction.senderCard || transaction.recipientCard || '').slice(-4)}`
                           : isOutgoingTransfer && (transaction.recipientCard || transaction.senderCard)
                           ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
@@ -295,7 +308,7 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description.replace(/^Крипто\s*(перевод:?\s*)?/i, '').split('→')[0].replace(/[:\s]+$/, '').trim())}`
                           : isCryptoToCard && transaction.recipientCard
                           ? ` ${t("transactions.toVisaCard", { type: (transaction.metadata as any)?.recipientCardType || "Metal", last4: (transaction.recipientCard || '').slice(-4), defaultValue: `На Visa ${(transaction.metadata as any)?.recipientCardType || "Metal"} ••${(transaction.recipientCard || '').slice(-4)}` })}`
-                          : (transaction.type as string) === "crypto_to_bank" && (transaction.metadata as any)?.beneficiary_iban
+                          : isOutgoingCryptoToBank && (transaction.metadata as any)?.beneficiary_iban
                           ? ` На ${maskMiddle(String((transaction.metadata as any).beneficiary_iban))}`
                           : isTopup && transaction.description
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
@@ -305,7 +318,7 @@ const handleClick = (transaction: Transaction) => {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    {(transaction.type as string) === "crypto_to_bank" ? (
+                    {(isOutgoingCryptoToBank || isIncomingCryptoToBank) ? (
                       <>
                         <p className={`font-semibold ${colorClass}`}>
                           {prefix}{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED

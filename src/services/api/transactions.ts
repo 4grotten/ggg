@@ -350,6 +350,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'transfer_in': 'bank_transfer_incoming',
     'declined': 'declined',
     'crypto_to_card': 'crypto_to_card',
+    'crypto_to_bank': 'bank_transfer', // will be remapped for inbound below
   };
   
   let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
@@ -381,6 +382,11 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   // For crypto_withdrawal with inbound direction, remap to crypto_deposit
   if (tx.type === 'crypto_withdrawal' && tx.direction === 'inbound') {
     mappedType = 'crypto_deposit';
+  }
+
+  // For crypto_to_bank with inbound direction, remap to incoming
+  if (tx.type === 'crypto_to_bank' && tx.direction === 'inbound') {
+    mappedType = 'bank_transfer_incoming';
   }
 
   // For internal_transfer, determine direction by amount sign
@@ -494,6 +500,8 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       beneficiary_name: (tx as any).beneficiary_name || undefined,
       operation: tx.operation || undefined,
       direction: tx.direction || undefined,
+      originalApiType: tx.type,
+      senderWallet: (tx as any).from_address_mask || (tx as any).from_address || (tx as any).sender_wallet || undefined,
     },
   };
 };
