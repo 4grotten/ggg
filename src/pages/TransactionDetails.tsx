@@ -102,7 +102,7 @@ const TransactionDetails = () => {
   
   // Fetch crypto wallets for wallet address display
   const { data: cryptoWalletsData } = useCryptoWallets();
-  const userCryptoWallet = (cryptoWalletsData as any)?.[0] || null;
+  const userCryptoWallet = (cryptoWalletsData as any)?.data?.[0] || (cryptoWalletsData as any)?.[0] || null;
   
   // For crypto_to_card, find recipient card from cached transaction data
   const { data: apiTxGroups } = useApiTransactionGroups();
@@ -1212,8 +1212,12 @@ const TransactionDetails = () => {
                 <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span>
+                <span className="font-medium">5.90 USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.totalDeducted", "Списано с кошелька")}</span>
-                <span className="font-medium">{(transaction.amountUSDT + (transaction.transferFee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                <span className="font-medium">{(transaction.amountUSDT + (transaction.transferFee || 0) + 5.90).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
