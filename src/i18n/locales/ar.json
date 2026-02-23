@@ -702,7 +702,7 @@
     "back": "رجوع",
     "sendToCard": "إرسال إلى البطاقة",
     "easyCardTransfer": "فقط لبطاقات EASY CARD",
-    "sendLocalBankTransfer": "إرسال تحويل بنكي محلي",
+    "sendLocalBankTransfer": "تحويل إلى حساب بنكي (IBAN)",
     "sendToStablecoins": "إرسال AED إلى العملات المستقرة",
     "withdrawToWallet": "سحب إلى محفظة خارجية",
     "stepOf": "الخطوة {{step}} من {{total}}",

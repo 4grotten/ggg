@@ -702,7 +702,7 @@
     "back": "Atrás",
     "sendToCard": "Enviar a Tarjeta",
     "easyCardTransfer": "Solo a tarjetas EASY CARD",
-    "sendLocalBankTransfer": "Enviar Transferencia Bancaria Local",
+    "sendLocalBankTransfer": "Transferencia a cuenta bancaria (IBAN)",
     "sendToStablecoins": "Enviar AED a Stablecoins",
     "withdrawToWallet": "Retirar a billetera externa",
     "stepOf": "Paso {{step}} de {{total}}",

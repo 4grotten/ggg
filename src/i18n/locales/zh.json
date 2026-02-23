@@ -708,7 +708,7 @@
     "back": "返回",
     "sendToCard": "转账到卡",
     "easyCardTransfer": "仅限 EASY CARD 卡",
-    "sendLocalBankTransfer": "发送本地银行转账",
+    "sendLocalBankTransfer": "转账到银行账户 (IBAN)",
     "sendToStablecoins": "将AED发送到稳定币",
     "withdrawToWallet": "提现到外部钱包",
     "stepOf": "第 {{step}} 步，共 {{total}} 步",

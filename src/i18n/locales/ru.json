@@ -771,7 +771,7 @@
     "back": "Назад",
     "sendToCard": "Перевод на карту",
     "easyCardTransfer": "Только на карты EASY CARD",
-    "sendLocalBankTransfer": "Локальный банковский перевод",
+    "sendLocalBankTransfer": "Перевод на банковский счет (IBAN)",
     "sendToStablecoins": "Отправить AED в стейблкоины",
     "withdrawToWallet": "Вывод на внешний кошелёк",
     "stepOf": "Шаг {{step}} из {{total}}",
