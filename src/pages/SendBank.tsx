@@ -19,7 +19,7 @@ import { BANK_TRANSFER_FEE_PERCENT } from "@/lib/fees";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
-import { submitBankWithdrawal } from "@/services/api/transactions";
+import { submitBankWithdrawal, submitCryptoToBank } from "@/services/api/transactions";
 import { submitInternalTransfer } from "@/services/api/transactions";
 import { getAuthToken } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
@@ -242,30 +242,53 @@ const SendBank = () => {
     setIsSubmitting(true);
 
     try {
-      // Build request based on source type
-      const baseRequest = {
-        iban: iban.replace(/\s/g, ""),
-        beneficiary_name: recipientName.trim(),
-        bank_name: bankName.trim(),
-        amount_aed: parseFloat(amountAED).toFixed(2),
-      };
+      const isWallet = selectedSource.type === "wallet";
 
-      const request = selectedSource.type === "card"
-        ? { ...baseRequest, from_card_id: selectedSource.id }
-        : selectedSource.type === "bank"
-          ? { ...baseRequest, from_bank_account_id: selectedSource.id }
-          : { ...baseRequest, from_card_id: (cardsData?.data?.[0]?.id || selectedSource.id) };
+      if (isWallet) {
+        // Crypto-to-bank transfer
+        const request = {
+          from_wallet_id: selectedSource.id,
+          to_iban: iban.replace(/\s/g, ""),
+          amount_usdt: parseFloat(amountAED).toFixed(6),
+        };
 
-      const result = await submitBankWithdrawal(request);
+        const result = await submitCryptoToBank(request);
 
-      if (result.success) {
-        toast.success(t("send.transferSuccess", "Перевод отправлен"));
-        queryClient.invalidateQueries({ queryKey: ["cards"] });
-        queryClient.invalidateQueries({ queryKey: ["transactions"] });
-        queryClient.invalidateQueries({ queryKey: ["bankAccounts"] });
-        navigate(isReferralWithdrawal ? "/partner" : "/");
+        if (result.success) {
+          toast.success(t("send.transferSuccess", "Перевод отправлен"));
+          queryClient.invalidateQueries({ queryKey: ["cards"] });
+          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          queryClient.invalidateQueries({ queryKey: ["cryptoWallets"] });
+          navigate(isReferralWithdrawal ? "/partner" : "/");
+        } else {
+          toast.error(result.error || t("send.transferFailed", "Ошибка перевода"));
+        }
       } else {
-        toast.error(result.error || t("send.transferFailed", "Ошибка перевода"));
+        // Regular bank withdrawal
+        const baseRequest = {
+          iban: iban.replace(/\s/g, ""),
+          beneficiary_name: recipientName.trim(),
+          bank_name: bankName.trim(),
+          amount_aed: parseFloat(amountAED).toFixed(2),
+        };
+
+        const request = selectedSource.type === "card"
+          ? { ...baseRequest, from_card_id: selectedSource.id }
+          : selectedSource.type === "bank"
+            ? { ...baseRequest, from_bank_account_id: selectedSource.id }
+            : { ...baseRequest, from_card_id: (cardsData?.data?.[0]?.id || selectedSource.id) };
+
+        const result = await submitBankWithdrawal(request);
+
+        if (result.success) {
+          toast.success(t("send.transferSuccess", "Перевод отправлен"));
+          queryClient.invalidateQueries({ queryKey: ["cards"] });
+          queryClient.invalidateQueries({ queryKey: ["transactions"] });
+          queryClient.invalidateQueries({ queryKey: ["bankAccounts"] });
+          navigate(isReferralWithdrawal ? "/partner" : "/");
+        } else {
+          toast.error(result.error || t("send.transferFailed", "Ошибка перевода"));
+        }
       }
     } catch (err) {
       toast.error(t("send.transferFailed", "Ошибка перевода"));

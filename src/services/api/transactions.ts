@@ -784,3 +784,51 @@ export const fetchTransactionById = async (
     };
   }
 };
+
+// =============================================
+// CRYPTO TO BANK TRANSFER
+// POST /api/v1/transactions/transfer/crypto-to-bank/
+// =============================================
+
+export interface CryptoToBankRequest {
+  from_wallet_id: string;
+  to_iban: string;
+  amount_usdt: string;
+}
+
+export interface CryptoToBankResponse {
+  message: string;
+  transaction_id: string;
+  deducted_amount: string;
+  fee: string;
+  credited_amount: string;
+}
+
+export const submitCryptoToBank = async (
+  request: CryptoToBankRequest
+): Promise<{ success: boolean; data?: CryptoToBankResponse; error?: string }> => {
+  try {
+    const result = await apiRequest<CryptoToBankResponse>(
+      `/transactions/transfer/crypto-to-bank/`,
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+
+    if (result.error) {
+      console.warn('[Transactions API] Crypto-to-bank error:', result.error);
+      return { success: false, error: result.error.detail || result.error.message || 'Transfer failed' };
+    }
+
+    if (result.data?.transaction_id) {
+      return { success: true, data: result.data };
+    }
+
+    return { success: false, error: 'Unexpected response' };
+  } catch (error) {
+    console.error('[Transactions API] Crypto-to-bank failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
