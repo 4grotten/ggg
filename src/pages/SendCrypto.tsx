@@ -138,16 +138,22 @@ const SendCrypto = () => {
   const amountNum = parseFloat(amountInput) || 0;
   let amountCrypto: string, networkFee: string, amountAfterFee: string;
 
+  const SEND_COMMISSION_PERCENT = 1; // 1%
+  const SEND_NETWORK_FEE = 5.90; // flat 5.90 USDT
+
   if (isCryptoSource) {
     // Input is already in USDT — no conversion needed
     amountCrypto = amountNum.toFixed(2);
-    networkFee = "1.00"; // flat 1 USDT fee
-    amountAfterFee = (amountNum - 1).toFixed(2);
+    const commission = (amountNum * SEND_COMMISSION_PERCENT / 100);
+    networkFee = SEND_NETWORK_FEE.toFixed(2);
+    amountAfterFee = (amountNum - commission - SEND_NETWORK_FEE).toFixed(2);
   } else {
     // Input is in AED — convert to crypto
     amountCrypto = (amountNum * settings.AED_TO_USDT_RATE).toFixed(2);
-    networkFee = (parseFloat(amountCrypto) * settings.NETWORK_FEE_PERCENT / 100).toFixed(2);
-    amountAfterFee = (parseFloat(amountCrypto) - parseFloat(networkFee)).toFixed(2);
+    const cryptoAmount = parseFloat(amountCrypto);
+    const commission = (cryptoAmount * SEND_COMMISSION_PERCENT / 100);
+    networkFee = SEND_NETWORK_FEE.toFixed(2);
+    amountAfterFee = (cryptoAmount - commission - SEND_NETWORK_FEE).toFixed(2);
   }
 
   const isValid = walletAddress.length >= 20 && amountNum > 0 && amountNum <= availableBalance;
@@ -499,7 +505,11 @@ const SendCrypto = () => {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{isCryptoSource ? t("send.networkFee", "Комиссия сети") + " (flat)" : `${t("send.networkFee")} (${settings.NETWORK_FEE_PERCENT}%)`}</span>
+              <span className="text-muted-foreground">{t("send.commission", "Комиссия")} (1%)</span>
+              <span className="font-medium text-[#FFA000]">-{(parseFloat(amountCrypto) * 0.01).toFixed(2)} {selectedCoin.symbol}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span>
               <span className="font-medium text-[#FFA000]">-{networkFee} {selectedCoin.symbol}</span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border">
