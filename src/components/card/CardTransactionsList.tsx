@@ -270,7 +270,7 @@ const handleClick = (transaction: Transaction) => {
                       {isOutgoingCryptoToBank
                           ? "Кошелёк USDT → IBAN Bank"
                           : isIncomingCryptoToBank
-                          ? t("transactions.walletDeposit")
+                          ? "Кошелёк USDT → IBAN Bank"
                           : walletView && isTopup 
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit
@@ -286,8 +286,8 @@ const handleClick = (transaction: Transaction) => {
                       </p>
                       <p className="text-sm text-muted-foreground truncate">
                         {transaction.time}
-                        {isIncomingCryptoToBank && ((transaction.metadata as any)?.senderWallet || transaction.senderName)
-                          ? ` · ${t("transactions.from")} ${maskMiddle((transaction.metadata as any)?.senderWallet || transaction.senderName || '')}`
+                        {isIncomingCryptoToBank
+                          ? ` · ${t("transactions.from")} ${maskMiddle((transaction.metadata as any)?.sender_name || (transaction.metadata as any)?.from_address_mask || (transaction.metadata as any)?.senderWallet || transaction.senderName || '')}`
                           : isIncomingTransfer && (transaction.senderCard || transaction.recipientCard)
                           ? ` · ${t("transactions.from")} •••• ${(transaction.senderCard || transaction.recipientCard || '').slice(-4)}`
                           : isOutgoingTransfer && (transaction.recipientCard || transaction.senderCard)
