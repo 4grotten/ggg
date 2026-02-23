@@ -42,4 +42,6 @@ urlpatterns = [
     path('contacts/', views.SyncContactsView.as_view(), name='sync_contacts'),
     path('contacts/<uuid:pk>/', views.ContactDetailView.as_view(), name='contact_detail'),
     path('contacts/<uuid:pk>/avatar/', views.ContactAvatarView.as_view(), name='contact_avatar'),
+
+    path('admin/settings/', views.AdminSettingsListView.as_view(), name='admin_settings'),
 ]

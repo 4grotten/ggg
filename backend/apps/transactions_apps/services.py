@@ -1,45 +1,116 @@
+from django.utils import timezone
 from decimal import Decimal
 from django.db import transaction
+from django.db.models import Sum
 from .models import (
     Transactions, TopupsBank, TopupsCrypto, CardTransfers, 
     CryptoWithdrawals, BankWithdrawals, BalanceMovements,
-    BankDepositAccounts, CryptoWallets
+    BankDepositAccounts, CryptoWallets, FeeRevenue
 )
 from apps.cards_apps.models import Cards
 from django.contrib.auth.models import User
-from apps.accounts_apps.models import Profiles
+from apps.accounts_apps.models import AdminSettings, Profiles
 
+
+class SettingsManager:
+    @staticmethod
+    def get_setting(category, key, default_value):
+        setting = AdminSettings.objects.filter(category=category, key=key).first()
+        return setting.value if setting else Decimal(str(default_value))
+
+    @staticmethod
+    def check_limits(user_id, amount, operation_type):
+        amount = Decimal(str(amount))
+        today = timezone.now().date()
+        this_month = today.replace(day=1)
+
+        min_limit = SettingsManager.get_setting('limits', f'{operation_type}_min', 0)
+        max_limit = SettingsManager.get_setting('limits', f'{operation_type}_max', 9999999)
+        daily_limit = SettingsManager.get_setting('limits', f'daily_{operation_type}_limit', 9999999)
+        monthly_limit = SettingsManager.get_setting('limits', f'monthly_{operation_type}_limit', 9999999)
+
+        if amount < min_limit:
+            raise ValueError(f"Сумма ниже минимального лимита ({min_limit})")
+        if amount > max_limit:
+            raise ValueError(f"Сумма превышает максимальный лимит операции ({max_limit})")
+            
+        base_query = Transactions.objects.filter(
+            status__in=['completed', 'processing', 'pending']
+        )
+        
+        if operation_type == 'transfer':
+            base_query = base_query.filter(
+                sender_id=str(user_id), 
+                type__in=['card_transfer', 'transfer_out', 'card_to_crypto', 'card_to_bank', 'crypto_to_card', 'crypto_to_bank', 'bank_to_crypto']
+            )
+        elif operation_type == 'withdrawal':
+            base_query = base_query.filter(
+                sender_id=str(user_id), 
+                type__in=['crypto_withdrawal', 'bank_withdrawal']
+            )
+        elif operation_type == 'top_up':
+            base_query = base_query.filter(
+                receiver_id=str(user_id),
+                type__in=['crypto_topup', 'bank_topup']
+            )
+
+        daily_sum = base_query.filter(created_at__date=today).aggregate(Sum('amount'))['amount__sum'] or Decimal('0')
+        if daily_sum + amount > daily_limit:
+            raise ValueError(f"Превышен дневной лимит ({daily_limit}). Доступно: {daily_limit - daily_sum}")
+
+        monthly_sum = base_query.filter(created_at__date__gte=this_month).aggregate(Sum('amount'))['amount__sum'] or Decimal('0')
+        if monthly_sum + amount > monthly_limit:
+            raise ValueError(f"Превышен месячный лимит ({monthly_limit}). Доступно: {monthly_limit - monthly_sum}")
+        
 
 class TransactionService:
     @staticmethod
     @transaction.atomic
     def execute_card_transfer(sender_id, sender_card_id, receiver_card_number, amount):
         amount = Decimal(str(amount))
+        SettingsManager.check_limits(sender_id, amount, 'transfer')
+
+        fee_percent = SettingsManager.get_setting('fees', 'card_to_card_percent', Decimal('1.0'))
+        fee_amount = (amount * fee_percent / Decimal('100')).quantize(Decimal('0.01'))
+        total_debit = amount + fee_amount
+
         sender_card = Cards.objects.select_for_update().get(id=sender_card_id, user_id=sender_id)
         if sender_card.card_number_encrypted == receiver_card_number:
             raise ValueError("Ошибка: Нельзя перевести средства на ту же самую карту.")
         receiver_card = Cards.objects.select_for_update().get(card_number_encrypted=receiver_card_number)
-        if sender_card.balance < amount:
-            raise ValueError("Недостаточно средств на карте")
+        
+        if sender_card.balance < total_debit:
+            raise ValueError(f"Недостаточно средств. Необходимо: {total_debit} AED (включая комиссию {fee_amount} AED)")
             
-        sender_card.balance -= amount
+        sender_card.balance -= total_debit
         sender_card.save()
         receiver_card.balance += amount
         receiver_card.save()
+        
         txn = Transactions.objects.create(
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(receiver_card.user_id),
             card=sender_card, type='card_transfer', 
             status='completed', amount=amount, currency='AED',
+            fee=fee_amount,
             recipient_card=receiver_card_number, sender_card=sender_card.card_number_encrypted
         )
         CardTransfers.objects.create(
             transaction=txn, sender_user_id=sender_id, receiver_user_id=receiver_card.user_id,
-            sender_card_id=sender_card.id, receiver_card_id=receiver_card.id, amount=amount, total_amount=amount
+            sender_card_id=sender_card.id, receiver_card_id=receiver_card.id, amount=amount, 
+            fee_percent=fee_percent, fee_amount=fee_amount, total_amount=total_debit
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type=sender_card.type, amount=amount, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type=sender_card.type, amount=total_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=receiver_card.user_id, account_type=receiver_card.type, amount=amount, type='credit')
+
+        if fee_amount > 0:
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(sender_id), fee_type='card_transfer', 
+                fee_amount=fee_amount, fee_percent=fee_percent, base_amount=amount, 
+                base_currency='AED', card_id=sender_card.id, description=f"Комиссия {fee_percent}% за перевод карта-карта"
+            )
+
         return txn
 
     @staticmethod
@@ -47,6 +118,10 @@ class TransactionService:
         bank_account = BankDepositAccounts.objects.filter(user_id=str(user_id), is_active=True).first()
         if not bank_account:
             raise ValueError("У пользователя нет активного банковского счета")
+            
+        fee_percent = SettingsManager.get_setting('fees', 'top_up_bank_percent', Decimal('2.0'))
+        min_amount = SettingsManager.get_setting('limits', 'top_up_bank_min', Decimal('100.0'))
+
         txn = Transactions.objects.create(
             user_id=user_id, 
             sender_id='EXTERNAL', 
@@ -56,11 +131,13 @@ class TransactionService:
         topup = TopupsBank.objects.create(
             transaction=txn, user_id=user_id, transfer_rail=transfer_rail,
             deposit_account=bank_account, reference_value=f"REF-{txn.id}",
+            fee_percent=fee_percent, min_amount=min_amount,
             instructions_snapshot={
                 "bank_name": bank_account.bank_name,
                 "iban": bank_account.iban,
                 "beneficiary": bank_account.beneficiary,
-                "reference": f"REF-{txn.id}"
+                "reference": f"REF-{txn.id}",
+                "fee_percent": str(fee_percent)
             }
         )
         return topup
@@ -70,6 +147,9 @@ class TransactionService:
         crypto_wallet = CryptoWallets.objects.filter(user_id=str(user_id), token=token, network=network).first()
         if not crypto_wallet:
             raise ValueError(f"Криптокошелек для {token} {network} не найден")
+            
+        min_amount = SettingsManager.get_setting('limits', 'top_up_crypto_min', Decimal('10.00'))
+
         txn = Transactions.objects.create(
             user_id=user_id, 
             sender_id='EXTERNAL',
@@ -81,7 +161,7 @@ class TransactionService:
             deposit_address=crypto_wallet.address,
             address_provider="easycard_internal",
             qr_payload=f"{token.lower()}:{crypto_wallet.address}",
-            min_amount=Decimal('10.00')
+            min_amount=min_amount
         )
         return topup
 
@@ -89,31 +169,56 @@ class TransactionService:
     @transaction.atomic
     def execute_crypto_withdrawal(user_id, card_id, token, network, to_address, amount_crypto):
         amount_crypto = Decimal(str(amount_crypto))
+        SettingsManager.check_limits(user_id, amount_crypto, 'withdrawal')
+
+        fee_percent = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'))
+        crypto_fee = (amount_crypto * fee_percent / Decimal('100')).quantize(Decimal('0.000000'))
+        total_crypto_debit = amount_crypto + crypto_fee
+
+        rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', Decimal('3.69'))
+        total_aed_debit = (total_crypto_debit * rate).quantize(Decimal('0.01'))
+
         card = Cards.objects.select_for_update().get(id=card_id, user_id=str(user_id))
-        if card.balance < amount_crypto:
-            raise ValueError("Недостаточно средств на выбранной карте")
-        itog = amount_crypto * Decimal('3.67')
-        card.balance -= itog
+        if card.balance < total_aed_debit:
+            raise ValueError(f"Недостаточно средств на выбранной карте. Нужно: {total_aed_debit} AED")
+            
+        card.balance -= total_aed_debit
         card.save()
+        
         txn = Transactions.objects.create(
             user_id=user_id, 
             sender_id=str(user_id),
             receiver_id='EXTERNAL',
             card=card, type='crypto_withdrawal', 
-            status='processing', amount=amount_crypto, currency=token
+            status='processing', amount=amount_crypto, currency=token,
+            fee=crypto_fee
         )
         withdrawal = CryptoWithdrawals.objects.create(
             transaction=txn, user_id=user_id, token=token, network=network,
-            to_address=to_address, amount_crypto=amount_crypto, fee_amount=Decimal('1.00'),
-            fee_type='network', total_debit=amount_crypto + Decimal('1.00')
+            to_address=to_address, amount_crypto=amount_crypto, fee_amount=crypto_fee,
+            fee_type='network', total_debit=total_crypto_debit
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=card.type, amount=amount_crypto, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=card.type, amount=total_aed_debit, type='debit')
+
+        if crypto_fee > 0:
+            fee_aed = (crypto_fee * rate).quantize(Decimal('0.01'))
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(user_id), fee_type='crypto_withdrawal', 
+                fee_amount=fee_aed, fee_percent=fee_percent, base_amount=amount_crypto, 
+                base_currency=token, card_id=card.id, description="Сетевая комиссия (crypto withdrawal)"
+            )
+
         return withdrawal
 
     @staticmethod
     @transaction.atomic
     def execute_bank_withdrawal(user_id, card_id=None, bank_account_id=None, iban='', beneficiary_name='', bank_name='', amount_aed=0):
         amount_aed = Decimal(str(amount_aed))
+        SettingsManager.check_limits(user_id, amount_aed, 'withdrawal')
+
+        fee_percent = SettingsManager.get_setting('fees', 'bank_transfer_percent', Decimal('2.0'))
+        fee_amount = (amount_aed * fee_percent / Decimal('100')).quantize(Decimal('0.01'))
+        total_debit = amount_aed + fee_amount
 
         if card_id:
             source = Cards.objects.select_for_update().get(id=card_id, user_id=str(user_id))
@@ -124,10 +229,12 @@ class TransactionService:
         else:
             raise ValueError("Укажите from_card_id или from_bank_account_id")
 
-        if source.balance < amount_aed:
-            raise ValueError("Недостаточно средств")
-        source.balance -= amount_aed
+        if source.balance < total_debit:
+            raise ValueError(f"Недостаточно средств. Нужно: {total_debit} AED")
+            
+        source.balance -= total_debit
         source.save()
+        
         internal_account = BankDepositAccounts.objects.filter(iban=iban).first()
         is_internal = internal_account is not None
         tx_status = 'completed' if is_internal else 'processing'
@@ -141,14 +248,15 @@ class TransactionService:
             type='bank_withdrawal',
             status=tx_status,
             amount=amount_aed,
-            currency='AED'
+            currency='AED',
+            fee=fee_amount
         )
         withdrawal = BankWithdrawals.objects.create(
             transaction=txn, user_id=user_id, beneficiary_iban=iban, beneficiary_name=beneficiary_name,
             beneficiary_bank_name=bank_name, from_card_id=card_id, from_bank_account_id=bank_account_id,
-            amount_aed=amount_aed, fee_amount=Decimal('0.00'), total_debit=amount_aed
+            amount_aed=amount_aed, fee_percent=fee_percent, fee_amount=fee_amount, total_debit=total_debit
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=source_type, amount=amount_aed, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=source_type, amount=total_debit, type='debit')
 
         if is_internal:
             recipient_account = BankDepositAccounts.objects.select_for_update().get(id=internal_account.id)
@@ -159,13 +267,27 @@ class TransactionService:
                 account_type='bank', amount=amount_aed, type='credit'
             )
 
+        if fee_amount > 0:
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(user_id), fee_type='bank_withdrawal', 
+                fee_amount=fee_amount, fee_percent=fee_percent, base_amount=amount_aed, 
+                base_currency='AED', card_id=card_id, description="Комиссия за банковский вывод"
+            )
+
         return withdrawal
 
     @staticmethod
     @transaction.atomic
     def execute_card_to_crypto(sender_id, from_card_id, to_address, amount_aed):
         amount_aed = Decimal(str(amount_aed))
-        EXCHANGE_RATE = Decimal('3.67')
+        SettingsManager.check_limits(sender_id, amount_aed, 'transfer')
+
+        sell_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', Decimal('3.69'))
+        conv_fee_pct = SettingsManager.get_setting('fees', 'currency_conversion_percent', Decimal('1.0'))
+        
+        conv_fee_aed = (amount_aed * conv_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
+        total_aed_debit = amount_aed + conv_fee_aed
+        amount_usdt = (amount_aed / sell_rate).quantize(Decimal('0.000000'))
         
         source_card = Cards.objects.select_for_update().get(id=from_card_id, user_id=str(sender_id))
         dest_wallet = CryptoWallets.objects.select_for_update().filter(address=to_address).first()
@@ -173,12 +295,10 @@ class TransactionService:
         if not dest_wallet:
             raise ValueError("Кошелек получателя не найден в экосистеме EasyCard.")
             
-        if source_card.balance < amount_aed:
-            raise ValueError("Недостаточно средств на карте.")
+        if source_card.balance < total_aed_debit:
+            raise ValueError(f"Недостаточно средств на карте. Нужно: {total_aed_debit} AED")
 
-        amount_usdt = (amount_aed / EXCHANGE_RATE).quantize(Decimal('0.000000'))
-        
-        source_card.balance -= amount_aed
+        source_card.balance -= total_aed_debit
         source_card.save()
         dest_wallet.balance += amount_usdt
         dest_wallet.save()
@@ -189,19 +309,34 @@ class TransactionService:
             sender_id=str(sender_id),
             receiver_id=str(dest_wallet.user_id),
             type='card_to_crypto', status='completed',
-            amount=amount_aed, currency='AED', fee=Decimal('0.00'), exchange_rate=(Decimal('1.00') / EXCHANGE_RATE),
+            amount=amount_aed, currency='AED', fee=conv_fee_aed, exchange_rate=(Decimal('1.00') / sell_rate),
+            card_id=source_card.id,
             description=f"{'Внутренний своп' if is_internal else 'Перевод пользователю'}: Карта -> Крипто"
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='card', amount=amount_aed, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='card', amount=total_aed_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
-        return txn, amount_aed, Decimal('0.00'), amount_usdt
+        
+        if conv_fee_aed > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='currency_conversion', fee_amount=conv_fee_aed, fee_percent=conv_fee_pct, base_amount=amount_aed, base_currency='AED', card_id=source_card.id, description="Комиссия за конвертацию")
+        base_rate = Decimal('3.67')
+        spread_profit = (amount_usdt * (sell_rate - base_rate)).quantize(Decimal('0.01'))
+        if spread_profit > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='exchange_spread', fee_amount=spread_profit, base_amount=amount_aed, base_currency='AED', exchange_rate=sell_rate, card_id=source_card.id, description="Доход от спреда")
+
+        return txn, total_aed_debit, conv_fee_aed, amount_usdt
 
     @staticmethod
     @transaction.atomic
     def execute_crypto_to_card(sender_id, from_wallet_id, to_card_number, amount_usdt):
         amount_usdt = Decimal(str(amount_usdt))
-        EXCHANGE_RATE = Decimal('3.67')
-        CRYPTO_FEE = Decimal('1.00') 
+        SettingsManager.check_limits(sender_id, amount_usdt, 'transfer')
+
+        buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'))
+        network_fee_pct = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'))
+        
+        crypto_fee = (amount_usdt * network_fee_pct / Decimal('100')).quantize(Decimal('0.000000'))
+        total_deduction = amount_usdt + crypto_fee
+        amount_aed = (amount_usdt * buy_rate).quantize(Decimal('0.01'))
         
         source_wallet = CryptoWallets.objects.select_for_update().get(id=from_wallet_id, user_id=str(sender_id))
         dest_card = Cards.objects.select_for_update().filter(card_number_encrypted=to_card_number).first()
@@ -209,34 +344,49 @@ class TransactionService:
         if not dest_card:
             raise ValueError("Карта получателя не найдена в системе.")
 
-        total_deduction = amount_usdt + CRYPTO_FEE
         if source_wallet.balance < total_deduction:
             raise ValueError(f"Недостаточно средств. Необходимо: {total_deduction} USDT")
 
-        amount_aed = (amount_usdt * EXCHANGE_RATE).quantize(Decimal('0.00'))
         source_wallet.balance -= total_deduction
         source_wallet.save()
         dest_card.balance += amount_aed
         dest_card.save()
+        
         is_internal = str(sender_id) == str(dest_card.user_id)
         txn = Transactions.objects.create(
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_card.user_id),
             type='crypto_to_card', status='completed',
-            amount=amount_usdt, currency='USDT', fee=CRYPTO_FEE, exchange_rate=EXCHANGE_RATE,
-            recipient_card=to_card_number,
+            amount=amount_usdt, currency='USDT', fee=crypto_fee, exchange_rate=buy_rate,
+            recipient_card=to_card_number, card_id=dest_card.id,
             description=f"{'Внутренний своп' if is_internal else 'Перевод пользователю'}: Крипто -> Карта"
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='crypto', amount=total_deduction, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_card.user_id, account_type='card', amount=amount_aed, type='credit')
-        return txn, total_deduction, CRYPTO_FEE, amount_aed
+        
+        if crypto_fee > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='crypto_withdrawal', fee_amount=(crypto_fee*buy_rate).quantize(Decimal('0.01')), fee_percent=network_fee_pct, base_amount=amount_usdt, base_currency='USDT', description="Сетевая комиссия")
+        
+        base_rate = Decimal('3.67')
+        spread_profit = (amount_usdt * (base_rate - buy_rate)).quantize(Decimal('0.01'))
+        if spread_profit > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='exchange_spread', fee_amount=spread_profit, base_amount=amount_usdt, base_currency='USDT', exchange_rate=buy_rate, description="Доход от спреда")
+
+        return txn, total_deduction, crypto_fee, amount_aed
 
     @staticmethod
     @transaction.atomic
     def execute_bank_to_crypto(sender_id, from_bank_id, to_address, amount_aed):
         amount_aed = Decimal(str(amount_aed))
-        EXCHANGE_RATE = Decimal('3.67')
+        SettingsManager.check_limits(sender_id, amount_aed, 'transfer')
+
+        sell_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', Decimal('3.69'))
+        conv_fee_pct = SettingsManager.get_setting('fees', 'currency_conversion_percent', Decimal('1.0'))
+        
+        conv_fee_aed = (amount_aed * conv_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
+        total_aed_debit = amount_aed + conv_fee_aed
+        amount_usdt = (amount_aed / sell_rate).quantize(Decimal('0.000000'))
         
         source_bank = BankDepositAccounts.objects.select_for_update().get(id=from_bank_id, user_id=str(sender_id))
         dest_wallet = CryptoWallets.objects.select_for_update().filter(address=to_address).first()
@@ -244,32 +394,48 @@ class TransactionService:
         if not dest_wallet:
             raise ValueError("Кошелек получателя не найден.")
             
-        if source_bank.balance < amount_aed:
-            raise ValueError("Недостаточно средств на банковском счете.")
-        amount_usdt = (amount_aed / EXCHANGE_RATE).quantize(Decimal('0.000000'))
-        source_bank.balance -= amount_aed
+        if source_bank.balance < total_aed_debit:
+            raise ValueError(f"Недостаточно средств на банковском счете. Нужно: {total_aed_debit} AED")
+            
+        source_bank.balance -= total_aed_debit
         source_bank.save()
         dest_wallet.balance += amount_usdt
         dest_wallet.save()
+        
         is_internal = str(sender_id) == str(dest_wallet.user_id)
         txn = Transactions.objects.create(
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_wallet.user_id),
             type='bank_to_crypto', status='completed',
-            amount=amount_aed, currency='AED', fee=Decimal('0.00'), exchange_rate=(Decimal('1.00') / EXCHANGE_RATE),
+            amount=amount_aed, currency='AED', fee=conv_fee_aed, exchange_rate=(Decimal('1.00') / sell_rate),
             description=f"{'Внутренний своп' if is_internal else 'Перевод пользователю'}: Банк -> Крипто"
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='bank', amount=amount_aed, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='bank', amount=total_aed_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
-        return txn, amount_aed, Decimal('0.00'), amount_usdt
+        
+        if conv_fee_aed > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='currency_conversion', fee_amount=conv_fee_aed, fee_percent=conv_fee_pct, base_amount=amount_aed, base_currency='AED', description="Комиссия за конвертацию")
+        
+        base_rate = Decimal('3.67')
+        spread_profit = (amount_usdt * (sell_rate - base_rate)).quantize(Decimal('0.01'))
+        if spread_profit > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='exchange_spread', fee_amount=spread_profit, base_amount=amount_aed, base_currency='AED', exchange_rate=sell_rate, description="Доход от спреда")
+
+        return txn, total_aed_debit, conv_fee_aed, amount_usdt
 
     @staticmethod
     @transaction.atomic
     def execute_crypto_to_bank(sender_id, from_wallet_id, to_iban, amount_usdt):
         amount_usdt = Decimal(str(amount_usdt))
-        EXCHANGE_RATE = Decimal('3.67')
-        CRYPTO_FEE = Decimal('1.00') 
+        SettingsManager.check_limits(sender_id, amount_usdt, 'transfer')
+
+        buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'))
+        network_fee_pct = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'))
+        
+        crypto_fee = (amount_usdt * network_fee_pct / Decimal('100')).quantize(Decimal('0.000000'))
+        total_deduction = amount_usdt + crypto_fee
+        amount_aed = (amount_usdt * buy_rate).quantize(Decimal('0.01'))
         
         source_wallet = CryptoWallets.objects.select_for_update().get(id=from_wallet_id, user_id=str(sender_id))
         dest_bank = BankDepositAccounts.objects.select_for_update().filter(iban=to_iban).first()
@@ -277,64 +443,89 @@ class TransactionService:
         if not dest_bank:
             raise ValueError("Банковский счет получателя не найден.")
 
-        total_deduction = amount_usdt + CRYPTO_FEE
         if source_wallet.balance < total_deduction:
             raise ValueError(f"Недостаточно средств. Необходимо: {total_deduction} USDT")
-        amount_aed = (amount_usdt * EXCHANGE_RATE).quantize(Decimal('0.00'))  
+            
         source_wallet.balance -= total_deduction
         source_wallet.save()
         dest_bank.balance += amount_aed
         dest_bank.save()
+        
         is_internal = str(sender_id) == str(dest_bank.user_id)
         txn = Transactions.objects.create(
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_bank.user_id),
             type='crypto_to_bank', status='completed',
-            amount=amount_usdt, currency='USDT', fee=CRYPTO_FEE, exchange_rate=EXCHANGE_RATE,
+            amount=amount_usdt, currency='USDT', fee=crypto_fee, exchange_rate=buy_rate,
             description=f"{'Внутренний своп' if is_internal else 'Перевод пользователю'}: Крипто -> Банк"
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='crypto', amount=total_deduction, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_bank.user_id, account_type='bank', amount=amount_aed, type='credit')
-        return txn, total_deduction, CRYPTO_FEE, amount_aed
+        
+        if crypto_fee > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='crypto_withdrawal', fee_amount=(crypto_fee*buy_rate).quantize(Decimal('0.01')), fee_percent=network_fee_pct, base_amount=amount_usdt, base_currency='USDT', description="Сетевая комиссия")
+            
+        base_rate = Decimal('3.67')
+        spread_profit = (amount_usdt * (base_rate - buy_rate)).quantize(Decimal('0.01'))
+        if spread_profit > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='exchange_spread', fee_amount=spread_profit, base_amount=amount_usdt, base_currency='USDT', exchange_rate=buy_rate, description="Доход от спреда")
+
+        return txn, total_deduction, crypto_fee, amount_aed
         
     @staticmethod
     @transaction.atomic
     def execute_card_to_bank(sender_id, from_card_id, to_iban, amount_aed):
         amount_aed = Decimal(str(amount_aed))
+        SettingsManager.check_limits(sender_id, amount_aed, 'transfer')
+
+        fee_percent = SettingsManager.get_setting('fees', 'card_to_card_percent', Decimal('1.0'))
+        fee_amount = (amount_aed * fee_percent / Decimal('100')).quantize(Decimal('0.01'))
+        total_debit = amount_aed + fee_amount
+
         source_card = Cards.objects.select_for_update().get(id=from_card_id, user_id=str(sender_id))
         dest_bank = BankDepositAccounts.objects.select_for_update().filter(iban=to_iban).first()
+        
         if not dest_bank:
             raise ValueError("IBAN получателя не найден в системе.")
-        if source_card.balance < amount_aed:
-            raise ValueError("Недостаточно средств на карте.")
-        source_card.balance -= amount_aed
+            
+        if source_card.balance < total_debit:
+            raise ValueError(f"Недостаточно средств на карте. Нужно: {total_debit} AED")
+            
+        source_card.balance -= total_debit
         source_card.save()
         dest_bank.balance += amount_aed
         dest_bank.save()
+        
         is_internal = str(sender_id) == str(dest_bank.user_id)
         txn = Transactions.objects.create(
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_bank.user_id),
             type='card_to_bank', status='completed', amount=amount_aed, currency='AED',
+            fee=fee_amount,
             description=f"{'Внутренний своп' if is_internal else 'Перевод пользователю'}: Карта -> Банк"
         )
-        BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='card', amount=amount_aed, type='debit')
+        BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='card', amount=total_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_bank.user_id, account_type='bank', amount=amount_aed, type='credit')
-        return txn, amount_aed, Decimal('0.00'), amount_aed
+        
+        if fee_amount > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(sender_id), fee_type='card_transfer', fee_amount=fee_amount, fee_percent=fee_percent, base_amount=amount_aed, base_currency='AED', card_id=source_card.id, description="Комиссия Карта -> Банк")
+
+        return txn, total_debit, fee_amount, amount_aed
 
     @staticmethod
     @transaction.atomic
     def execute_bank_to_card_transfer(user_id, from_bank_account_id, receiver_card_number, amount):
         amount = Decimal(str(amount))
-        FEE_PERCENT = Decimal('0.02')
+        SettingsManager.check_limits(user_id, amount, 'transfer')
+        
+        fee_percent = SettingsManager.get_setting('fees', 'bank_transfer_percent', Decimal('2.0'))
+        fee_amount = (amount * fee_percent / Decimal('100')).quantize(Decimal('0.01'))
+        total_debit = amount + fee_amount
 
         bank_account = BankDepositAccounts.objects.select_for_update().get(id=from_bank_account_id, user_id=str(user_id))
         receiver_card = Cards.objects.select_for_update().get(card_number_encrypted=receiver_card_number)
-
-        fee = (amount * FEE_PERCENT).quantize(Decimal('0.01'))
-        total_debit = amount + fee
 
         if bank_account.balance < total_debit:
             raise ValueError(f"Недостаточно средств. Нужно: {total_debit} AED")
@@ -343,39 +534,41 @@ class TransactionService:
         bank_account.save()
         receiver_card.balance += amount
         receiver_card.save()
+        
         txn = Transactions.objects.create(
             user_id=user_id,
             sender_id=str(user_id),
             receiver_id=str(receiver_card.user_id),
-            type='transfer_out', status='completed', amount=amount, currency='AED', fee=fee,
+            type='transfer_out', status='completed', amount=amount, currency='AED', fee=fee_amount,
             recipient_card=receiver_card_number,
             description=f"Перевод с IBAN на карту {receiver_card_number[-4:]}"
         )
         BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='bank', amount=total_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=receiver_card.user_id, account_type=receiver_card.type, amount=amount, type='credit')
-        return txn, fee, total_debit
+        
+        if fee_amount > 0:
+            FeeRevenue.objects.create(transaction=txn, user_id=str(user_id), fee_type='bank_withdrawal', fee_amount=fee_amount, fee_percent=fee_percent, base_amount=amount, base_currency='AED', description="Комиссия Банк -> Карта")
+
+        return txn, fee_amount, total_debit
 
     @staticmethod
     @transaction.atomic
     def execute_crypto_wallet_withdrawal(user_id, from_wallet_id, to_address, amount_usdt, token='USDT', network='TRC20'):
-        """
-        Перевод с крипто-кошелька на крипто-адрес.
-        Если адрес найден в системе — мгновенный перевод (completed) + имя/аватар.
-        Если внешний — pending.
-        """
         amount_usdt = Decimal(str(amount_usdt))
-        CRYPTO_FEE = Decimal('1.00')
+        SettingsManager.check_limits(user_id, amount_usdt, 'withdrawal')
+        
+        fee_percent = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'))
+        crypto_fee = (amount_usdt * fee_percent / Decimal('100')).quantize(Decimal('0.000000'))
+        total_deduction = amount_usdt + crypto_fee
 
         source_wallet = CryptoWallets.objects.select_for_update().get(id=from_wallet_id, user_id=str(user_id))
 
         if source_wallet.address == to_address:
             raise ValueError("Нельзя отправить на свой же кошелёк.")
 
-        total_deduction = amount_usdt + CRYPTO_FEE
         if source_wallet.balance < total_deduction:
             raise ValueError(f"Недостаточно средств. Необходимо: {total_deduction} {token}")
 
-        # Check if recipient wallet exists in the system
         dest_wallet = CryptoWallets.objects.select_for_update().filter(address=to_address).first()
         is_internal = dest_wallet is not None
 
@@ -383,13 +576,11 @@ class TransactionService:
         avatar_url = None
 
         if is_internal:
-            # Internal transfer — instant
             source_wallet.balance -= total_deduction
             source_wallet.save()
             dest_wallet.balance += amount_usdt
             dest_wallet.save()
 
-            # Resolve recipient name & avatar
             try:
                 recipient_user = User.objects.get(id=int(dest_wallet.user_id) if str(dest_wallet.user_id).isdigit() else dest_wallet.user_id)
                 recipient_name = f"{recipient_user.first_name or ''} {recipient_user.last_name or ''}".strip() or None
@@ -410,18 +601,17 @@ class TransactionService:
                 status='completed',
                 amount=amount_usdt,
                 currency=token,
-                fee=CRYPTO_FEE,
+                fee=crypto_fee,
                 description=f"Крипто перевод: {source_wallet.address[:6]}... → {to_address[:6]}..."
             )
             CryptoWithdrawals.objects.create(
                 transaction=txn, user_id=user_id, token=token, network=network,
-                to_address=to_address, amount_crypto=amount_usdt, fee_amount=CRYPTO_FEE,
+                to_address=to_address, amount_crypto=amount_usdt, fee_amount=crypto_fee,
                 fee_type='network', total_debit=total_deduction
             )
             BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='crypto', amount=total_deduction, type='debit')
             BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
         else:
-            # External transfer — pending
             source_wallet.balance -= total_deduction
             source_wallet.save()
 
@@ -433,15 +623,23 @@ class TransactionService:
                 status='pending',
                 amount=amount_usdt,
                 currency=token,
-                fee=CRYPTO_FEE,
+                fee=crypto_fee,
                 description=f"Внешний крипто перевод → {to_address[:8]}..."
             )
             CryptoWithdrawals.objects.create(
                 transaction=txn, user_id=user_id, token=token, network=network,
-                to_address=to_address, amount_crypto=amount_usdt, fee_amount=CRYPTO_FEE,
+                to_address=to_address, amount_crypto=amount_usdt, fee_amount=crypto_fee,
                 fee_type='network', total_debit=total_deduction
             )
             BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='crypto', amount=total_deduction, type='debit')
+
+        if crypto_fee > 0:
+            rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', Decimal('3.69'))
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(user_id), fee_type='crypto_withdrawal', 
+                fee_amount=(crypto_fee * rate).quantize(Decimal('0.01')), fee_currency='AED', 
+                fee_percent=fee_percent, base_amount=amount_usdt, base_currency=token, description="Сетевая комиссия"
+            )
 
         return {
             "message": "Перевод выполнен" if is_internal else "Перевод в обработке",
@@ -451,7 +649,7 @@ class TransactionService:
             "recipient_name": recipient_name,
             "avatar_url": avatar_url,
             "deducted_amount": str(total_deduction),
-            "fee": str(CRYPTO_FEE),
+            "fee": str(crypto_fee),
             "credited_amount": str(amount_usdt),
         }
 
@@ -567,12 +765,10 @@ class TransactionService:
                 receipt["fee_type"] = cw.fee_type
                 receipt["total_debit"] = float(cw.total_debit)
                 receipt["tx_hash"] = cw.tx_hash
-                # Sender wallet address
                 sender_wallet = CryptoWallets.objects.filter(user_id=str(txn.user_id), is_active=True).first()
                 if sender_wallet:
                     receipt["from_address_mask"] = mask_address(sender_wallet.address)
                     receipt["from_address"] = sender_wallet.address
-                # Check if recipient is internal (has wallet in system)
                 recipient_wallet = CryptoWallets.objects.filter(address=cw.to_address).first()
                 if recipient_wallet:
                     receipt["is_internal"] = True
@@ -586,7 +782,6 @@ class TransactionService:
                 else:
                     receipt["is_internal"] = False
             except (CryptoWithdrawals.DoesNotExist, Exception):
-                # Fallback for old transactions without CryptoWithdrawals record
                 sender_wallet = CryptoWallets.objects.filter(user_id=str(txn.user_id), is_active=True).first()
                 if sender_wallet:
                     receipt["from_address_mask"] = mask_address(sender_wallet.address)

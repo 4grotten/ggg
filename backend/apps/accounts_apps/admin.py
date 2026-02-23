@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profiles
+from .models import AdminSettings, Profiles
 
 @admin.register(Profiles)
 class ProfileAdmin(admin.ModelAdmin):
@@ -20,3 +20,9 @@ class ProfileAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+@admin.register(AdminSettings)
+class AdminSettingsAdmin(admin.ModelAdmin):
+    list_display = ('category', 'key', 'value', 'updated_at')
+    list_filter = ('category',)
+    search_fields = ('key', 'category')

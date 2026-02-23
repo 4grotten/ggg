@@ -1,5 +1,7 @@
 from django.db import models
 import uuid
+from django.db.models import Index
+
 
 class Transactions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -195,3 +197,27 @@ class BalanceMovements(models.Model):
 
     class Meta:
         db_table = 'balance_movements'
+
+
+class FeeRevenue(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    transaction = models.ForeignKey('Transactions', on_delete=models.CASCADE, related_name='fee_revenues')
+    user_id = models.CharField(max_length=50, db_index=True)
+    fee_type = models.CharField(max_length=30)
+    fee_amount = models.DecimalField(max_digits=15, decimal_places=2)
+    fee_currency = models.CharField(max_length=3, default='AED')
+    fee_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    base_amount = models.DecimalField(max_digits=15, decimal_places=2)
+    base_currency = models.CharField(max_length=3)
+    exchange_rate = models.DecimalField(max_digits=10, decimal_places=6, null=True, blank=True)
+    card_id = models.UUIDField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'fee_revenue'
+        indexes = [
+            models.Index(fields=['fee_type', 'created_at']),
+            models.Index(fields=['user_id']),
+            models.Index(fields=['created_at']),
+        ]

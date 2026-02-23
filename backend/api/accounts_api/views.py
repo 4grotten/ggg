@@ -5,7 +5,7 @@ import requests
 
 from apps.cards_apps.models import Cards
 from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets
-from api.accounts_api.serializers import ContactSerializer
+from api.accounts_api.serializers import AdminSettingsSerializer, ContactSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -14,7 +14,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from apps.accounts_apps.models import Contacts, Profiles
+from apps.accounts_apps.models import AdminSettings, Contacts, Profiles
 from .apofiz_client import ApofizClient
 
 def generate_uid_tail(user_id):
@@ -543,7 +543,6 @@ class ContactAvatarView(APIView):
             return Contacts.objects.get(pk=pk, user=user)
         except Contacts.DoesNotExist:
             return None
-
     @swagger_auto_schema(
         operation_summary="Загрузить аватар контакта",
         tags=["Контакты"]
@@ -552,12 +551,9 @@ class ContactAvatarView(APIView):
         contact = self.get_object(pk, request.user)
         if not contact:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
         file = request.FILES.get('file')
         if not file:
             return Response({"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Upload via Apofiz files endpoint
         from .apofiz_client import ApofizClient
         token = request.META.get('HTTP_AUTHORIZATION', '').replace('Token ', '')
         status_code, result = ApofizClient.upload_avatar(token, file)
@@ -583,4 +579,47 @@ class ContactAvatarView(APIView):
         contact.avatar_url = None
         contact.save()
         serializer = ContactSerializer(contact)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class AdminSettingsListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @swagger_auto_schema(
+        operation_summary="Получить все настройки администратора",
+        responses={200: AdminSettingsSerializer(many=True)},
+        tags=["Админ Настройки"]
+    )
+    def get(self, request):
+        settings = AdminSettings.objects.all().order_by('category', 'key')
+        serializer = AdminSettingsSerializer(settings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Обновить или создать настройку",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['category', 'key', 'value'],
+            properties={
+                'category': openapi.Schema(type=openapi.TYPE_STRING),
+                'key': openapi.Schema(type=openapi.TYPE_STRING),
+                'value': openapi.Schema(type=openapi.TYPE_NUMBER),
+            }
+        ),
+        tags=["Админ Настройки"]
+    )
+    def put(self, request):
+        category = request.data.get('category')
+        key = request.data.get('key')
+        value = request.data.get('value')
+        if not category or not key or value is None:
+            return Response({"error": "Отсутствуют обязательные параметры (category, key, value)"}, status=status.HTTP_400_BAD_REQUEST)
+        setting, created = AdminSettings.objects.get_or_create(
+            category=category, 
+            key=key,
+            defaults={'value': value}
+        )
+        if not created:
+            setting.value = value
+            setting.save()
+        serializer = AdminSettingsSerializer(setting)
         return Response(serializer.data, status=status.HTTP_200_OK)

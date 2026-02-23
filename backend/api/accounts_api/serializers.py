@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from apps.accounts_apps.models import Profiles
-from apps.accounts_apps.models import Contacts
+from apps.accounts_apps.models import Profiles, Contacts, AdminSettings
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -34,3 +34,8 @@ class ContactSerializer(serializers.ModelSerializer):
             'company', 'position', 'avatar_url', 'notes', 
             'payment_methods', 'social_links', 'created_at'
         ]
+
+class AdminSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminSettings
+        fields = ['id', 'category', 'key', 'value', 'description', 'updated_at']
