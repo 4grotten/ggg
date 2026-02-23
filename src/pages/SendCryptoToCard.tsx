@@ -78,7 +78,7 @@ const submitCryptoToCard = async (
       headers,
       body: JSON.stringify({
         from_wallet_id: fromWalletId,
-        receiver_card_number: receiverCardNumber,
+        to_card_number: receiverCardNumber,
         amount_usdt: amountUsdt,
       }),
     });
