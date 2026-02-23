@@ -705,7 +705,7 @@
     "sendLocalBankTransfer": "تحويل إلى حساب بنكي (IBAN)",
     "recipientCardNumber": "رقم بطاقة المستلم",
     "cryptoToCard": "كريبتو → بطاقة",
-    "cryptoToCardDesc": "إرسال USDT إلى بطاقة EasyCard أو بطاقة خارجية",
+    "cryptoToCardDesc": "إرسال USDT إلى بطاقة EasyCard",
     "externalCard": "بطاقة خارجية",
     "externalCardDesc": "لم يتم العثور على البطاقة في شبكة EasyCard. سيتم معالجة التحويل كخارجي.",
     "totalDebit": "إجمالي الخصم",

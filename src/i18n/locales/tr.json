@@ -705,7 +705,7 @@
     "sendLocalBankTransfer": "Banka hesabına transfer (IBAN)",
     "recipientCardNumber": "Alıcı kart numarası",
     "cryptoToCard": "Kripto → Kart",
-    "cryptoToCardDesc": "EasyCard veya harici karta USDT gönderin",
+    "cryptoToCardDesc": "EasyCard kartına USDT gönderin",
     "externalCard": "Harici kart",
     "externalCardDesc": "Kart EasyCard ağında bulunamadı. Transfer harici olarak işlenecek.",
     "totalDebit": "Toplam borç",

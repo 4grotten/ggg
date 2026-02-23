@@ -788,7 +788,7 @@
     "sendLocalBankTransfer": "Transfer to bank account (IBAN)",
     "recipientCardNumber": "Recipient card number",
     "cryptoToCard": "Crypto → Card",
-    "cryptoToCardDesc": "Send USDT to an EasyCard or external card",
+    "cryptoToCardDesc": "Send USDT to an EasyCard",
     "externalCard": "External card",
     "externalCardDesc": "Card not found in EasyCard network. Transfer will be processed as external.",
     "totalDebit": "Total debit",

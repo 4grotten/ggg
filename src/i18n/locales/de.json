@@ -705,7 +705,7 @@
     "sendLocalBankTransfer": "Überweisung auf Bankkonto (IBAN)",
     "recipientCardNumber": "Kartennummer des Empfängers",
     "cryptoToCard": "Krypto → Karte",
-    "cryptoToCardDesc": "USDT an eine EasyCard oder externe Karte senden",
+    "cryptoToCardDesc": "USDT an eine EasyCard senden",
     "externalCard": "Externe Karte",
     "externalCardDesc": "Karte nicht im EasyCard-Netzwerk gefunden. Überweisung wird extern verarbeitet.",
     "totalDebit": "Gesamtbelastung",
