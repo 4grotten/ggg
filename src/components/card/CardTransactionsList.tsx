@@ -258,7 +258,9 @@ const handleClick = (transaction: Transaction) => {
                     </div>
                     <div className="text-left min-w-0 flex-1">
                       <p className="font-medium">
-                        {walletView && isTopup 
+                      {(transaction.type as string) === "crypto_to_bank"
+                          ? "Кошелёк USDT → IBAN Bank"
+                          : walletView && isTopup 
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit
                           ? t("transactions.walletDeposit")
@@ -303,22 +305,22 @@ const handleClick = (transaction: Transaction) => {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    {walletView ? (
-                      <>
-                        <p className={`font-semibold ${colorClass}`}>
-                          {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
-                        </p>
-                      </>
-                    ) : (transaction.type as string) === "crypto_to_bank" ? (
+                    {(transaction.type as string) === "crypto_to_bank" ? (
                       <>
                         <p className={`font-semibold ${colorClass}`}>
                           {prefix}{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                        </p>
+                      </>
+                    ) : walletView ? (
+                      <>
+                        <p className={`font-semibold ${colorClass}`}>
+                          {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                       </>
                     ) : (
