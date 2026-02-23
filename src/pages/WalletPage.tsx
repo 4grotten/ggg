@@ -316,7 +316,7 @@ const WalletPage = () => {
                 </div>
                 <div className="text-left">
                   <p className="font-medium text-sm">{t('send.usdtBalance', 'Перевод на Кошелёк USDT')}</p>
-                  <p className="text-xs text-muted-foreground">{t('send.usdtBalanceDesc', 'Перевод на USDT Кошелек')}</p>
+                  <p className="text-xs text-muted-foreground">{t('send.usdtBalanceDesc', 'Перевод USDT на Кошелек EasyCard так и внешний')}</p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
