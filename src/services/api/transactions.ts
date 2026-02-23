@@ -334,7 +334,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_transfer': 'card_transfer',
     'withdrawal': 'crypto_withdrawal',
     'crypto_withdrawal': 'crypto_withdrawal',
-    'bank_withdrawal': 'bank_transfer',
+    'bank_withdrawal': 'bank_transfer_incoming', // money credited to bank/IBAN account
     'bank_transfer': 'bank_transfer',
     'bank_transfer_incoming': 'bank_transfer_incoming',
     'crypto_deposit': 'crypto_deposit',
@@ -661,10 +661,10 @@ export const fetchCardTransactionGroups = async (): Promise<TransactionGroup[]> 
 const groupApiTransactions = async (data: ApiTransaction[]): Promise<TransactionGroup[]> => {
   const mapped = data.map(mapApiTransactionToLocal);
   
-  // Enrich crypto_to_bank transactions with receipt data to get IBAN
+  // Enrich crypto_to_bank and bank_withdrawal transactions with receipt data
   const enrichPromises = mapped.map(async (tx) => {
     const originalType = (tx.metadata as any)?.originalApiType;
-    if (originalType === 'crypto_to_bank') {
+    if (originalType === 'crypto_to_bank' || originalType === 'bank_withdrawal') {
       try {
         const rawId = tx.id.replace(/^api_/, '');
         const { data: receipt } = await fetchTransactionReceipt(rawId);

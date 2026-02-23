@@ -295,8 +295,16 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.from")} •••• ${(transaction.senderCard || transaction.recipientCard || '').slice(-4)}`
                           : isOutgoingTransfer && (transaction.recipientCard || transaction.senderCard)
                           ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
-                          : isBankTransferIncoming && transaction.senderName
-                          ? ` · ${t("transactions.from")} ${maskMiddle(transaction.senderName)}`
+                          : isBankTransferIncoming && ((transaction.metadata as any)?.beneficiary_iban || transaction.senderName || (transaction.metadata as any)?.beneficiary_name)
+                          ? (() => {
+                              const iban = (transaction.metadata as any)?.beneficiary_iban;
+                              if (iban) {
+                                const display = iban.replace(/\s*\*+\s*/g, '••••');
+                                return ` · ${display}`;
+                              }
+                              const name = transaction.senderName || (transaction.metadata as any)?.beneficiary_name;
+                              return name ? ` · ${t("transactions.from")} ${maskMiddle(name)}` : '';
+                            })()
                           : isOutgoingCryptoToBank
                           ? (() => {
                               const iban = (transaction.metadata as any)?.beneficiary_iban;
