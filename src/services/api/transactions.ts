@@ -402,7 +402,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_transfer': 'Card Transfer',
     'withdrawal': 'Stablecoin Send',
     'crypto_withdrawal': 'Stablecoin Send',
-    'crypto_to_card': 'USDT → Card',
+    'crypto_to_card': 'USDT → EasyCard',
     'bank_withdrawal': 'Bank Transfer',
     'bank_transfer': 'Bank Transfer',
     'bank_transfer_incoming': 'Bank Transfer',
