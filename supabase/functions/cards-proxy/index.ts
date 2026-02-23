@@ -78,6 +78,11 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Debug: log receipt response bodies
+    if (endpoint.includes('receipt')) {
+      console.log(`[cards-proxy] Receipt response (${response!.status}):`, data.substring(0, 2000));
+    }
+
     // For 404 responses (e.g. recipient not found), return 200 with the body
     // to prevent Lovable error overlay from intercepting edge function 404s
     const status = response!.status === 404 ? 200 : response!.status;
