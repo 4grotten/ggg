@@ -128,6 +128,7 @@ const SendCrypto = () => {
   const [amountAED, setAmountAED] = useState("");
 
   // Use referral balance or selected source balance
+  const isCryptoSource = selectedSource?.type === "crypto_wallet";
   const availableBalance = isReferralWithdrawal ? referralBalance : (selectedSource?.balance ?? 0);
 
   const amountCrypto = amountAED ? (parseFloat(amountAED) * settings.AED_TO_USDT_RATE).toFixed(2) : "0.00";
@@ -358,7 +359,7 @@ const SendCrypto = () => {
                 {t("send.amount")}
               </label>
               <span className="text-sm text-muted-foreground">
-                {t("send.available")}: <span className="font-medium text-foreground">{availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED</span>
+                {t("send.available")}: <span className="font-medium text-foreground">{availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })} {isCryptoSource ? (selectedSource?.token || "USDT") : "AED"}</span>
               </span>
             </div>
             <div className="relative">
