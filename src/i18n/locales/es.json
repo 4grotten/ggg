@@ -711,6 +711,7 @@
     "recipientNotFound": "Destinatario no encontrado",
     "checkCardNumber": "Verifica el número de tarjeta o intenta con otra",
     "fromCard": "Desde Tarjeta",
+    "fromSource": "Desde",
     "available": "Disponible",
     "amount": "Monto",
     "insufficientBalance": "Saldo insuficiente",

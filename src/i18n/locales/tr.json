@@ -711,6 +711,7 @@
     "recipientNotFound": "Alıcı bulunamadı",
     "checkCardNumber": "Kart numarasını kontrol edin veya başka bir kart deneyin",
     "fromCard": "Kaynak Kart",
+    "fromSource": "Kaynak",
     "available": "Kullanılabilir",
     "amount": "Tutar",
     "insufficientBalance": "Yetersiz bakiye",

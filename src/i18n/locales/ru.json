@@ -780,6 +780,7 @@
     "recipientNotFound": "Получатель не найден",
     "checkCardNumber": "Проверьте номер карты или попробуйте другую",
     "fromCard": "С карты",
+    "fromSource": "Откуда",
     "available": "Доступно",
     "amount": "Сумма",
     "insufficientBalance": "Недостаточно средств",

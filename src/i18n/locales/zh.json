@@ -717,6 +717,7 @@
     "recipientNotFound": "未找到收款人",
     "checkCardNumber": "请检查卡号或尝试其他卡",
     "fromCard": "从卡",
+    "fromSource": "来源",
     "available": "可用",
     "amount": "金额",
     "insufficientBalance": "余额不足",

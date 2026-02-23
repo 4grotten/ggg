@@ -208,7 +208,7 @@ const SendCrypto = () => {
           {/* Source Selection - Card, Bank Account, or Referral Balance */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground">
-              {isReferralWithdrawal ? t("partner.referralBalance", "Реферальный счёт") : t("send.fromCard")}
+              {isReferralWithdrawal ? t("partner.referralBalance", "Реферальный счёт") : t("send.fromSource", "Откуда")}
             </label>
             {isReferralWithdrawal ? (
               <div className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20">
