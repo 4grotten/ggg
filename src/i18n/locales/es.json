@@ -771,7 +771,7 @@
     "stablecoins": "Stablecoins",
     "bankTransfer": "Transferencia Bancaria",
     "sendToCard": "Enviar a tarjeta",
-    "usdtBalance": "Billetera USDT TRC20",
+    "usdtBalance": "Billetera USDT",
     "usdtBalanceDesc": "Desde su saldo"
   },
   "topUpUsdt": {

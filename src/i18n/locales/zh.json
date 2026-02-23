@@ -777,7 +777,7 @@
     "stablecoins": "稳定币",
     "bankTransfer": "银行转账",
     "sendToCard": "转账到卡",
-    "usdtBalance": "USDT TRC20 钱包",
+    "usdtBalance": "USDT 钱包",
     "usdtBalanceDesc": "从您的余额"
   },
   "topUpUsdt": {

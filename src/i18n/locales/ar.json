@@ -771,7 +771,7 @@
     "stablecoins": "العملات المستقرة",
     "bankTransfer": "تحويل بنكي",
     "sendToCard": "إرسال إلى بطاقة",
-    "usdtBalance": "محفظة USDT TRC20",
+    "usdtBalance": "محفظة USDT",
     "usdtBalanceDesc": "من رصيدك"
   },
   "topUpUsdt": {

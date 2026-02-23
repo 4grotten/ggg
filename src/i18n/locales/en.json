@@ -861,7 +861,7 @@
     "stablecoins": "Stablecoins",
     "bankTransfer": "Bank Transfer",
     "sendToCard": "Send to card",
-    "usdtBalance": "USDT TRC20 Wallet",
+    "usdtBalance": "USDT Wallet",
     "usdtBalanceDesc": "From your balance"
   },
   "topUpUsdt": {
