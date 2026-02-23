@@ -254,8 +254,8 @@ const TransactionDetails = () => {
       fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       toCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
       toWalletAddress: receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address,
-      fromWalletAddress: receipt.type === 'crypto_to_card' ? userCryptoWallet?.address : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
-      fromAddress: receipt.type === 'crypto_to_card' ? userCryptoWallet?.address : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
+      fromWalletAddress: receipt.type === 'crypto_to_card' ? ((receipt as any).direction === 'inbound' ? (receipt.from_address_mask || receipt.from_address || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
+      fromAddress: receipt.type === 'crypto_to_card' ? ((receipt as any).direction === 'inbound' ? (receipt.from_address_mask || receipt.from_address || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
       toWalletAddressFull: receipt.to_address || (receipt as any).recipient_address,
       fromWalletAddressFull: receipt.type === 'crypto_to_card' ? userCryptoWallet?.address : (receipt.from_address || (receipt as any).sender_address),
       tokenNetwork: receipt.type === 'crypto_to_card' ? (userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : 'USDT, TRC20') : (receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : undefined)),
@@ -288,10 +288,22 @@ const TransactionDetails = () => {
   const isInternalTransfer = transaction?.type === "internal_transfer";
   const isCryptoToCard = transaction?.type === "crypto_to_card";
   const isIncomingCryptoToCard = isCryptoToCard && (() => {
+    // Check cached list data for isIncoming flag (from direction: 'inbound')
+    if (apiTxGroups) {
+      for (const group of apiTxGroups) {
+        const found = group.transactions?.find((t: any) => {
+          const txRealId = t.id?.startsWith('api_') ? t.id.slice(4) : t.id;
+          return txRealId === realTransactionId;
+        });
+        if (found?.metadata?.isIncoming !== undefined) return found.metadata.isIncoming;
+      }
+    }
+    // Check receipt direction
+    if ((receipt as any)?.direction === 'inbound') return true;
     if (receipt?.movements?.length) {
       return receipt.movements[0]?.type === 'credit';
     }
-    // Fallback: if no sender wallet info, treat as incoming
+    // Fallback: no fromWalletAddress means recipient side
     return !transaction?.fromWalletAddress && !!transaction?.recipientCard;
   })();
   // For API transactions, determine direction: if movements[0] is debit, it's outgoing
