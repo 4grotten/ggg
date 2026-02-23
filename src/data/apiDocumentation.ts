@@ -1403,6 +1403,70 @@ export const apiCategories: ApiCategory[] = [
         ]
       },
       {
+        id: 'crypto-wallet-withdrawal',
+        method: 'POST',
+        path: '/transactions/withdrawal/crypto-wallet/',
+        title: 'Crypto Wallet → Crypto Address',
+        description: 'Send USDT from your crypto wallet to another crypto address. If the recipient address exists in the system — instant transfer (completed) with recipient name & avatar. If external — pending status.',
+        category: 'transfers',
+        authorization: {
+          type: 'Token',
+          description: 'Token authentication header of the form `Token <token>`'
+        },
+        bodyParams: [
+          { name: 'from_wallet_id', type: 'uuid', required: true, description: 'Source crypto wallet ID (yours)' },
+          { name: 'to_address', type: 'string', required: true, description: 'Recipient crypto address' },
+          { name: 'amount_usdt', type: 'string', required: true, description: 'Amount in USDT' },
+          { name: 'token', type: 'enum', required: false, description: 'Token type (default: USDT)', enum: ['USDT', 'USDC'] },
+          { name: 'network', type: 'enum', required: false, description: 'Blockchain network (default: TRC20)', enum: ['TRC20', 'ERC20', 'BEP20', 'SOL'] }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${TRANSACTIONS_URL}/withdrawal/crypto-wallet/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "from_wallet_id": "uuid-wallet",
+    "to_address": "Txxxxxxxxx...",
+    "amount_usdt": "50.000000",
+    "token": "USDT",
+    "network": "TRC20"
+  }'`,
+          json: `{
+  "from_wallet_id": "uuid-wallet",
+  "to_address": "Txxxxxxxxx...",
+  "amount_usdt": "50.000000",
+  "token": "USDT",
+  "network": "TRC20"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "Перевод выполнен",
+  "transaction_id": "uuid-transaction",
+  "status": "completed",
+  "is_internal": true,
+  "recipient_name": "John Doe",
+  "avatar_url": "https://example.com/avatar.jpg",
+  "deducted_amount": "51.000000",
+  "fee": "1.000000",
+  "credited_amount": "50.000000"
+}`
+        },
+        responseParams: [
+          { name: 'message', type: 'string', required: true, description: 'Status message' },
+          { name: 'transaction_id', type: 'uuid', required: true, description: 'Transaction ID' },
+          { name: 'status', type: 'string', required: true, description: '"completed" (internal) or "pending" (external)' },
+          { name: 'is_internal', type: 'boolean', required: true, description: 'true if recipient found in system' },
+          { name: 'recipient_name', type: 'string', required: true, description: 'Recipient name (null if external)' },
+          { name: 'avatar_url', type: 'string', required: true, description: 'Recipient avatar URL (null if external)' },
+          { name: 'deducted_amount', type: 'string', required: true, description: 'Total deducted (amount + fee)' },
+          { name: 'fee', type: 'string', required: true, description: 'Network fee (1 USDT)' },
+          { name: 'credited_amount', type: 'string', required: true, description: 'Amount credited to recipient' }
+        ]
+      },
+      {
         id: 'bank-withdrawal',
         method: 'POST',
         path: '/transactions/withdrawal/bank/',
