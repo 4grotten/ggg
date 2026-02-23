@@ -633,7 +633,12 @@ export const fetchCardTransactions = async (): Promise<{
       ? result.data
       : (result.data as any)?.results || [];
     
-    return { data: transactions, error: null };
+    // Filter out non-card transaction types that backend may return
+    const cardOnly = transactions.filter(tx => 
+      !['crypto_to_card', 'crypto_to_bank', 'crypto_withdrawal', 'crypto_deposit'].includes(tx.type)
+    );
+    
+    return { data: cardOnly, error: null };
   } catch (error) {
     console.error('[Transactions API] Card transactions fetch failed:', error);
     return { data: null, error: error instanceof Error ? error.message : 'Network error' };
