@@ -364,9 +364,18 @@ const SendCryptoToCard = () => {
                   value={amount}
                   onChange={handleAmountChange}
                   placeholder="0.00"
-                  className="h-14 text-2xl font-bold text-center rounded-xl"
+                  className="h-14 text-2xl font-bold text-center rounded-xl pr-28"
                   inputMode="decimal"
+                  onBlur={() => {
+                    const num = parseFloat(amount.replace(/,/g, "")) || 0;
+                    if (num > 0) {
+                      const parts = num.toFixed(2).split(".");
+                      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                      setAmount(parts.join("."));
+                    }
+                  }}
                 />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">USDT TRC20</span>
               </div>
               <div className="flex justify-between text-xs text-muted-foreground px-1">
                 <span>{t("send.available")}: {walletBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
