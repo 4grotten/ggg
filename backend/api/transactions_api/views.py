@@ -5,11 +5,12 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.db.models import Q
 from django.contrib.auth.models import User
-
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncDate
 from apps.cards_apps.models import Cards
 from apps.accounts_apps.models import Profiles
-from apps.transactions_apps.models import Transactions, BankDepositAccounts, CryptoWallets
-
+from apps.transactions_apps.models import FeeRevenue, Transactions, BankDepositAccounts, CryptoWallets
+from decimal import Decimal
 from .serializers import (
     BankToCryptoTransferSerializer, BankTopupRequestSerializer, BankTopupResponseSerializer, CardToBankTransferSerializer, CardToCryptoTransferSerializer, CryptoToBankTransferSerializer, CryptoToCardTransferSerializer,
     CryptoTopupRequestSerializer, CryptoTopupResponseSerializer,
@@ -495,3 +496,80 @@ class BankToCardTransferView(APIView):
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class AdminRevenueSummaryView(APIView):
+    permission_classes = [permissions.IsAuthenticated] 
+
+    @swagger_auto_schema(
+        operation_summary="Отчет по заработанным комиссиям (Админ)",
+        tags=["Аналитика Доходов"]
+    )
+    def get(self, request):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+
+        query = FeeRevenue.objects.all()
+        if start_date:
+            query = query.filter(created_at__gte=start_date)
+        if end_date:
+            query = query.filter(created_at__lte=end_date)
+
+        total_revenue = query.aggregate(total=Sum('fee_amount'))['total'] or Decimal('0.00')
+
+        by_type_qs = query.values('fee_type').annotate(
+            count=Count('id'),
+            total=Sum('fee_amount')
+        )
+        by_type = {item['fee_type']: {"count": item['count'], "total": str(item['total'])} for item in by_type_qs}
+
+        by_day_qs = query.annotate(date=TruncDate('created_at')).values('date').annotate(
+            total=Sum('fee_amount')
+        ).order_by('-date')
+        
+        by_day = [{"date": item['date'].isoformat(), "total": str(item['total'])} for item in by_day_qs]
+
+        return Response({
+            "total_revenue": str(total_revenue),
+            "by_type": by_type,
+            "by_day": by_day
+        }, status=status.HTTP_200_OK)
+    
+
+class AdminRevenueTransactionsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Детальный реестр комиссий (Админ)",
+        tags=["Аналитика Доходов"]
+    )
+    def get(self, request):
+        fee_type = request.query_params.get('fee_type')
+        limit = int(request.query_params.get('limit', 50))
+        offset = int(request.query_params.get('offset', 0))
+
+        query = FeeRevenue.objects.all().order_by('-created_at')
+        if fee_type:
+            query = query.filter(fee_type=fee_type)
+
+        total_count = query.count()
+        records = query[offset:offset+limit]
+
+        data = [{
+            "id": r.id,
+            "transaction_id": r.transaction_id,
+            "user_id": r.user_id,
+            "fee_type": r.fee_type,
+            "fee_amount": str(r.fee_amount),
+            "fee_currency": r.fee_currency,
+            "fee_percent": str(r.fee_percent) if r.fee_percent else None,
+            "base_amount": str(r.base_amount),
+            "base_currency": r.base_currency,
+            "created_at": r.created_at
+        } for r in records]
+
+        return Response({
+            "count": total_count,
+            "results": data
+        }, status=status.HTTP_200_OK)

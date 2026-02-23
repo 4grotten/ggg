@@ -27,4 +27,7 @@ urlpatterns = [
     path('transfer/card-to-bank/', views.CardToBankView.as_view(), name='card_to_bank'),
     path('transfer/bank-to-card/', views.BankToCardTransferView.as_view(), name='bank_to_card_transfer'),
     path('withdrawal/crypto-wallet/', views.CryptoWalletWithdrawalView.as_view(), name='crypto_wallet_withdrawal'),
+
+    path('admin/revenue/summary/', views.AdminRevenueSummaryView.as_view(), name='admin_revenue_summary'),
+    path('admin/revenue/transactions/', views.AdminRevenueTransactionsView.as_view(), name='admin_revenue_transactions'),
 ]
