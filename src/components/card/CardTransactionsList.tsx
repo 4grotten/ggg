@@ -302,7 +302,7 @@ const handleClick = (transaction: Transaction) => {
                               const iban = (transaction.metadata as any)?.beneficiary_iban;
                               if (iban) {
                                 const display = iban.replace(/\s*\*+\s*/g, '••••');
-                                return ` · ${display}`;
+                                return ` · ${t("transactions.from")} ${display}`;
                               }
                               const name = transaction.senderName || (transaction.metadata as any)?.beneficiary_name;
                               return name ? ` · ${t("transactions.from")} ${maskMiddle(name)}` : '';
