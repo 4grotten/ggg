@@ -847,7 +847,7 @@
     "stablecoins": "Стейблкоины",
     "bankTransfer": "Банковский перевод",
     "sendToCard": "Перевод на карту",
-    "usdtBalance": "Перевод на Кошелёк USDT",
+    "usdtBalance": "Кошелёк USDT",
     "usdtBalanceDesc": "С вашего баланса"
   },
   "topUpUsdt": {
