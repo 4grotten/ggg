@@ -174,6 +174,14 @@ const SendCrypto = () => {
       }>(`/transactions/recipient-info/?crypto_address=${encodeURIComponent(address)}`, { method: 'GET' }, true);
       if (res.data) {
         setRecipientInfo(res.data);
+      } else if (res.status === 400 || res.status === 404) {
+        // Backend may not support crypto_address yet — treat as external
+        setRecipientInfo({
+          is_internal: false,
+          recipient_name: null,
+          avatar_url: null,
+          message: "Внешний кошелёк"
+        });
       } else {
         setVerifyError(res.error?.message || res.error?.detail || "Ошибка проверки");
       }
