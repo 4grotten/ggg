@@ -290,7 +290,7 @@ const WalletPage = () => {
 
             {/* Send to Card */}
             <button
-              onClick={() => { setSendDrawerOpen(false); navigate("/send/crypto-to-card"); }}
+              onClick={() => { setSendDrawerOpen(false); navigate("/send/crypto-to-card", { state: { fromWallet: true } }); }}
               className="w-full flex items-center justify-between p-4 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors group"
             >
               <div className="flex items-center gap-3">
@@ -307,7 +307,7 @@ const WalletPage = () => {
 
             {/* Send to USDT Wallet */}
             <button
-              onClick={() => { setSendDrawerOpen(false); navigate("/send/crypto"); }}
+              onClick={() => { setSendDrawerOpen(false); navigate("/send/crypto", { state: { fromWallet: true } }); }}
               className="w-full flex items-center justify-between p-4 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors group"
             >
               <div className="flex items-center gap-3">
@@ -324,7 +324,7 @@ const WalletPage = () => {
 
             {/* Send to Bank Account */}
             <button
-              onClick={() => { setSendDrawerOpen(false); navigate("/send/bank"); }}
+              onClick={() => { setSendDrawerOpen(false); navigate("/send/bank", { state: { fromWallet: true } }); }}
               className="w-full flex items-center justify-between p-4 rounded-xl bg-secondary/70 hover:bg-secondary transition-colors group"
             >
               <div className="flex items-center gap-3">
