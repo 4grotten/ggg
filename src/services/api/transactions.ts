@@ -354,16 +354,21 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   
   let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
   
-  // Handle generic "transfer" type from crypto endpoint — use direction + context
+  // Handle generic "transfer" type from API — use direction + context to determine actual type
   if (tx.type === 'transfer') {
+    const op = (tx.operation as string || '').toLowerCase();
     if (tx.direction === 'inbound') {
-      mappedType = 'crypto_deposit';
-    } else if (tx.direction === 'outbound') {
-      // Check if it's crypto_to_card (has recipient_card) or crypto_to_bank (has beneficiary_iban) or plain crypto send
-      if (tx.recipient_card) {
+      // Incoming: could be crypto deposit or incoming card transfer
+      if (tx.recipient_card || op.includes('card')) {
         mappedType = 'crypto_to_card';
-      } else if ((tx as any).beneficiary_iban || (tx as any).to_iban) {
-        mappedType = 'crypto_to_card'; // will be overridden below for crypto_to_bank
+      } else {
+        mappedType = 'crypto_deposit';
+      }
+    } else if (tx.direction === 'outbound') {
+      if (tx.recipient_card || op.includes('card') || op.includes('crypto_to_card')) {
+        mappedType = 'crypto_to_card';
+      } else if ((tx as any).beneficiary_iban || (tx as any).to_iban || op.includes('bank') || op.includes('iban') || op.includes('crypto_to_bank')) {
+        mappedType = 'bank_transfer' as TransactionType; // crypto_to_bank handled via metadata
       } else {
         mappedType = 'crypto_withdrawal';
       }
@@ -485,6 +490,10 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       merchantCategory: tx.merchant_category,
       referenceId: tx.reference_id,
       originalCurrency: tx.original_currency,
+      beneficiary_iban: (tx as any).beneficiary_iban || (tx as any).to_iban || undefined,
+      beneficiary_name: (tx as any).beneficiary_name || undefined,
+      operation: tx.operation || undefined,
+      direction: tx.direction || undefined,
     },
   };
 };
