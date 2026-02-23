@@ -184,7 +184,7 @@ const SendCryptoToCard = () => {
   };
 
   const handleNext = () => {
-    if (step === "card" && isCardValid && (recipientName || recipientNotFound)) {
+    if (step === "card" && isCardValid && recipientName) {
       setStep("amount");
     } else if (step === "amount" && isAmountValid) {
       setStep("confirm");
@@ -328,18 +328,18 @@ const SendCryptoToCard = () => {
 
             {recipientNotFound && !isLoading && isCardValid && (
               <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                className="bg-destructive/10 border border-destructive/20 rounded-xl p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center">
                   <AlertCircle className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">{t("send.externalCard", "Внешняя карта")}</p>
-                  <p className="text-xs text-muted-foreground">{t("send.externalCardDesc", "Карта не найдена в сети EasyCard. Перевод будет обработан как внешний.")}</p>
+                  <p className="font-semibold text-sm">{t("send.cardNotFound", "Карта не найдена")}</p>
+                  <p className="text-xs text-muted-foreground">{t("send.cardNotFoundDesc", "Карта не найдена в сети EasyCard. Перевод возможен только на карты EasyCard.")}</p>
                 </div>
               </motion.div>
             )}
 
-            <Button onClick={handleNext} disabled={!isCardValid || isLoading || (!recipientName && !recipientNotFound)}
+            <Button onClick={handleNext} disabled={!isCardValid || isLoading || !recipientName}
               className="w-full h-12 rounded-xl bg-[#007AFF] hover:bg-[#0066DD] text-white font-medium">
               {t("common.continue")}
             </Button>
