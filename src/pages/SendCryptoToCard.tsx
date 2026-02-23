@@ -248,7 +248,7 @@ const SendCryptoToCard = () => {
             <p className="text-xs text-muted-foreground">{t("send.fromSource", "Откуда")}</p>
           </div>
           <div className="text-right">
-            <p className="font-bold">{walletBalance.toFixed(2)}</p>
+            <p className="font-bold">{walletBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             <p className="text-xs text-muted-foreground">USDT</p>
           </div>
         </motion.div>
