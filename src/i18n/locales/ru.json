@@ -774,7 +774,7 @@
     "sendLocalBankTransfer": "Перевод на банковский счет (IBAN)",
     "recipientCardNumber": "Номер карты получателя",
     "cryptoToCard": "Крипто → Карта",
-    "cryptoToCardDesc": "Отправить USDT на карту EasyCard или внешнюю карту",
+    "cryptoToCardDesc": "Отправить USDT на карту EasyCard",
     "externalCard": "Внешняя карта",
     "externalCardDesc": "Карта не найдена в сети EasyCard. Перевод будет обработан как внешний.",
     "totalDebit": "Итого к списанию",

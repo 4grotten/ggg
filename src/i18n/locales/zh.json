@@ -711,7 +711,7 @@
     "sendLocalBankTransfer": "转账到银行账户 (IBAN)",
     "recipientCardNumber": "收款人卡号",
     "cryptoToCard": "加密货币 → 银行卡",
-    "cryptoToCardDesc": "将USDT发送到EasyCard或外部卡",
+    "cryptoToCardDesc": "将USDT发送到EasyCard",
     "externalCard": "外部卡",
     "externalCardDesc": "在EasyCard网络中未找到该卡。转账将作为外部交易处理。",
     "totalDebit": "总扣款",
