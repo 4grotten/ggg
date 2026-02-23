@@ -17,15 +17,17 @@ import {
 } from "@/components/ui/drawer";
 import { useSettings } from "@/contexts/SettingsContext";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
-import { useCards, useIban } from "@/hooks/useCards";
+import { useCards, useIban, useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface SourceOption {
   id: string;
-  type: "virtual" | "metal" | "bank_account" | "referral";
+  type: "virtual" | "metal" | "bank_account" | "crypto_wallet" | "referral";
   name: string;
   lastFour?: string;
   iban?: string;
+  walletAddress?: string;
+  token?: string;
   balance: number;
 }
 
@@ -62,6 +64,7 @@ const SendCrypto = () => {
   // Fetch real data
   const { data: cardsResponse, isLoading: cardsLoading } = useCards();
   const { data: ibanResponse, isLoading: ibanLoading } = useIban();
+  const { data: cryptoWalletsResponse, isLoading: cryptoLoading } = useCryptoWallets();
 
   // Build source options from real data
   const [sourceOptions, setSourceOptions] = useState<SourceOption[]>([]);
@@ -69,6 +72,20 @@ const SendCrypto = () => {
 
   useEffect(() => {
     const options: SourceOption[] = [];
+
+    // Add crypto wallets FIRST (default source)
+    if (cryptoWalletsResponse?.data) {
+      cryptoWalletsResponse.data.forEach((wallet) => {
+        options.push({
+          id: wallet.id,
+          type: "crypto_wallet",
+          name: `${wallet.token} ${wallet.network}`,
+          walletAddress: wallet.address,
+          token: wallet.token,
+          balance: parseFloat(wallet.balance) || 0,
+        });
+      });
+    }
 
     // Add cards from API
     if (cardsResponse?.data) {
@@ -100,7 +117,7 @@ const SendCrypto = () => {
     if (!selectedSource && options.length > 0) {
       setSelectedSource(options[0]);
     }
-  }, [cardsResponse, ibanResponse]);
+  }, [cardsResponse, ibanResponse, cryptoWalletsResponse]);
 
   const [selectedCoin, setSelectedCoin] = useState(coins[0]);
   const [selectedNetwork, setSelectedNetwork] = useState(networksByCoin[coins[0].id][0]);
@@ -155,9 +172,16 @@ const SendCrypto = () => {
     navigate(isReferralWithdrawal ? "/partner" : "/");
   };
 
-  const isDataLoading = cardsLoading || ibanLoading;
+  const isDataLoading = cardsLoading || ibanLoading || cryptoLoading;
 
   const getSourceIcon = (source: SourceOption) => {
+    if (source.type === "crypto_wallet") {
+      return (
+        <div className="w-10 h-10 rounded-full bg-[#26A17B] flex items-center justify-center">
+          <Wallet className="w-5 h-5 text-white" />
+        </div>
+      );
+    }
     if (source.type === "bank_account") {
       return (
         <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
@@ -177,6 +201,9 @@ const SendCrypto = () => {
   };
 
   const getSourceSubtitle = (source: SourceOption) => {
+    if (source.type === "crypto_wallet" && source.walletAddress) {
+      return `${source.walletAddress.slice(0, 6)}...${source.walletAddress.slice(-4)}`;
+    }
     if (source.type === "bank_account" && source.iban) {
       return `${source.iban.slice(0, 4)}****${source.iban.slice(-4)}`;
     }
@@ -236,7 +263,7 @@ const SendCrypto = () => {
                   <div className="text-left">
                     <p className="font-semibold">{selectedSource.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {getSourceSubtitle(selectedSource)} · {selectedSource.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED
+                      {getSourceSubtitle(selectedSource)} · {selectedSource.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} {selectedSource.type === "crypto_wallet" ? (selectedSource.token || "USDT") : "AED"}
                     </p>
                   </div>
                 </div>
@@ -433,7 +460,7 @@ const SendCrypto = () => {
                     <div className="flex-1 text-left">
                       <p className="text-base font-medium text-foreground">{source.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {getSourceSubtitle(source)} · {source.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} AED
+                        {getSourceSubtitle(source)} · {source.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} {source.type === "crypto_wallet" ? (source.token || "USDT") : "AED"}
                       </p>
                     </div>
                     {selectedSource?.id === source.id && (
