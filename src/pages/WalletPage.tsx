@@ -333,7 +333,7 @@ const WalletPage = () => {
                 </div>
                 <div className="text-left">
                   <p className="font-medium text-sm">{t('send.bankTransfer', 'Перевод на счёт')}</p>
-                  <p className="text-xs text-muted-foreground">{t('send.sendLocalBankTransfer', 'Банковский перевод')}</p>
+                  <p className="text-xs text-muted-foreground">{t('send.sendLocalBankTransfer', 'Перевод на банковский счет (IBAN)')}</p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
