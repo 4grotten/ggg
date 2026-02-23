@@ -375,6 +375,11 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       // Fallback: if only sender_card present (no recipient) = incoming
       isIncoming = !tx.recipient_card && !!tx.sender_card;
     }
+  } else if (mappedType === 'crypto_to_card') {
+    // On recipient side: direction is inbound, or amount > 0 with no sender wallet
+    const op = (tx.operation as string || '').toLowerCase();
+    isIncoming = tx.direction === 'inbound' || op.includes('incoming') || op.includes('received')
+      || (!!tx.recipient_card && !tx.sender_card && !(tx as any).from_wallet_id);
   } else {
     isIncoming = ['bank_transfer_incoming', 'crypto_deposit', 'topup'].includes(mappedType) 
       || (['transfer_in', 'card_to_bank'].includes(tx.type));
@@ -387,7 +392,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'bank_transfer_incoming': '#22C55E',
     'card_transfer': isIncoming ? '#22C55E' : '#007AFF',
     'crypto_withdrawal': '#10B981',
-    'crypto_to_card': '#007AFF',
+    'crypto_to_card': isIncoming ? '#22C55E' : '#007AFF',
     'bank_transfer': '#8B5CF6',
     'payment': '#3B82F6',
     'card_activation': '#CCFF00',
