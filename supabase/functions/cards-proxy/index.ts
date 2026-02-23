@@ -78,8 +78,12 @@ Deno.serve(async (req) => {
       }
     }
 
+    // For 404 responses (e.g. recipient not found), return 200 with the body
+    // to prevent Lovable error overlay from intercepting edge function 404s
+    const status = response!.status === 404 ? 200 : response!.status;
+
     return new Response(data, {
-      status: response!.status,
+      status,
       headers: {
         ...corsHeaders,
         "Content-Type": response!.headers.get("Content-Type") || "application/json",
