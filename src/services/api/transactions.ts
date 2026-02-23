@@ -68,6 +68,9 @@ export interface TransactionReceipt {
   beneficiary_name?: string;
   beneficiary_bank_name?: string;
   bank_name?: string;
+  // Crypto-to-bank fields
+  to_iban?: string;
+  to_name?: string;
   amount_aed?: number;
   fee_amount?: number;
   total_debit_aed?: number;

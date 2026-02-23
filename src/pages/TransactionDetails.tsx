@@ -100,6 +100,7 @@ const TransactionDetails = () => {
   );
   const receipt = receiptResult?.data || null;
   
+  
   // Fetch crypto wallets for wallet address display
   const { data: cryptoWalletsData } = useCryptoWallets();
   const userCryptoWallet = (cryptoWalletsData as any)?.data?.[0] || (cryptoWalletsData as any)?.[0] || null;
@@ -988,11 +989,11 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">IBAN</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-right text-sm">
-                    {showIban ? (receipt?.beneficiary_iban || transaction.recipientIban || fullIban || '—') : `${(receipt?.beneficiary_iban || transaction.recipientIban || fullIban || '').slice(0, 4)}••••${(receipt?.beneficiary_iban || transaction.recipientIban || fullIban || '').slice(-4)}`}
+                    {showIban ? (receipt?.beneficiary_iban || receipt?.to_iban || transaction.recipientIban || fullIban || '—') : `${(receipt?.beneficiary_iban || receipt?.to_iban || transaction.recipientIban || fullIban || '').slice(0, 4)}••••${(receipt?.beneficiary_iban || receipt?.to_iban || transaction.recipientIban || fullIban || '').slice(-4)}`}
                   </span>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText(receipt?.beneficiary_iban || transaction.recipientIban || fullIban || '');
+                      navigator.clipboard.writeText(receipt?.beneficiary_iban || receipt?.to_iban || transaction.recipientIban || fullIban || '');
                       toast.success(t("toast.copied", { label: "IBAN" }));
                     }}
                     className="text-muted-foreground hover:text-foreground transition-colors"
