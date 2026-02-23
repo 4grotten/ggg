@@ -33,8 +33,16 @@ const getRecipientName = async (
     const token = getAuthToken();
     if (token) headers["x-backend-token"] = token;
     const res = await fetch(url, { method: "GET", headers });
-    if (!res.ok) return { found: false, name: null };
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      return { found: false, name: null };
+    }
+    // Backend 404 is now proxied as 200 — check body for errors
+    if (data.error || !data.recipient_name) {
+      return { found: false, name: null };
+    }
     if (data.recipient_name) {
       return {
         found: true,
