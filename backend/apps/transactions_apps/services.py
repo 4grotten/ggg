@@ -808,6 +808,51 @@ class TransactionService:
                 receipt["total_debit"] = float(txn.amount) + (float(txn.fee) if txn.fee else 0)
         elif tx_type in ['card_to_crypto', 'crypto_to_card', 'bank_to_crypto', 'crypto_to_bank', 'card_to_bank']:
             receipt["operation"] = "Internal/System Transfer"
+            # Resolve sender/receiver details for cross-type transfers
+            sender_id_str = str(txn.sender_id) if txn.sender_id else None
+            receiver_id_str = str(txn.receiver_id) if txn.receiver_id else None
+            
+            # Sender info
+            if sender_id_str and sender_id_str != 'EXTERNAL':
+                receipt["sender_name"] = get_user_name(sender_id_str)
+                # Sender wallet (crypto source)
+                if tx_type in ['crypto_to_card', 'crypto_to_bank']:
+                    sender_wallet = CryptoWallets.objects.filter(user_id=sender_id_str, is_active=True).first()
+                    if sender_wallet:
+                        receipt["from_address_mask"] = mask_address(sender_wallet.address)
+                        receipt["from_address"] = sender_wallet.address
+                        receipt["network_and_token"] = f"{sender_wallet.token}, {sender_wallet.network}"
+                # Sender card
+                if tx_type in ['card_to_crypto', 'card_to_bank']:
+                    receipt["sender_card_mask"] = mask_card(txn.sender_card)
+                # Sender bank
+                if tx_type in ['bank_to_crypto']:
+                    sender_bank = BankDepositAccounts.objects.filter(user_id=sender_id_str, is_active=True).first()
+                    if sender_bank:
+                        receipt["sender_iban_mask"] = mask_iban(sender_bank.iban)
+                        receipt["bank_name"] = sender_bank.bank_name
+
+            # Recipient info
+            if receiver_id_str and receiver_id_str != 'EXTERNAL':
+                receipt["recipient_name"] = get_user_name(receiver_id_str)
+                # Recipient card
+                if tx_type in ['crypto_to_card']:
+                    receipt["receiver_card_mask"] = mask_card(txn.recipient_card)
+                # Recipient bank (IBAN)
+                if tx_type in ['crypto_to_bank', 'card_to_bank']:
+                    dest_bank = BankDepositAccounts.objects.filter(user_id=receiver_id_str, is_active=True).first()
+                    if dest_bank:
+                        receipt["beneficiary_name"] = get_user_name(receiver_id_str)
+                        receipt["beneficiary_iban"] = dest_bank.iban
+                        receipt["iban_mask"] = mask_iban(dest_bank.iban)
+                        receipt["bank_name"] = dest_bank.bank_name
+                        receipt["beneficiary_bank_name"] = dest_bank.bank_name
+                # Recipient crypto wallet
+                if tx_type in ['card_to_crypto', 'bank_to_crypto']:
+                    dest_wallet = CryptoWallets.objects.filter(user_id=receiver_id_str, is_active=True).first()
+                    if dest_wallet:
+                        receipt["to_address_mask"] = mask_address(dest_wallet.address)
+                        receipt["to_address"] = dest_wallet.address
         elif tx_type == 'transfer_out':
             receipt["operation"] = "IBAN to Card Transfer"
             receipt["receiver_card_mask"] = mask_card(txn.recipient_card)
