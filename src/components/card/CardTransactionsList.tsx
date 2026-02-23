@@ -102,8 +102,11 @@ const handleClick = (transaction: Transaction) => {
     const isDeclined = transaction.type === "declined";
     const isCardActivation = transaction.type === "card_activation";
     const isCardTransfer = transaction.type === "card_transfer";
-    const isCryptoSend = transaction.type === "crypto_withdrawal";
-    const isCryptoDeposit = transaction.type === "crypto_deposit";
+    const rawCryptoWithdrawal = transaction.type === "crypto_withdrawal";
+    const rawCryptoDeposit = transaction.type === "crypto_deposit";
+    const cryptoIsIncoming = (transaction.metadata as any)?.isIncoming === true;
+    const isCryptoSend = rawCryptoWithdrawal && !cryptoIsIncoming;
+    const isCryptoDeposit = rawCryptoDeposit || (rawCryptoWithdrawal && cryptoIsIncoming);
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
     const apiIsIncoming = (transaction.metadata as any)?.isIncoming;
