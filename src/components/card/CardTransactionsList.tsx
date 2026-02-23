@@ -288,7 +288,9 @@ const handleClick = (transaction: Transaction) => {
                         {transaction.time}
                         {isIncomingCryptoToBank
                           ? (() => {
-                              const sender = (transaction.metadata as any)?.sender_name || (transaction.metadata as any)?.from_address_mask || (transaction.metadata as any)?.senderWallet || transaction.senderName || '';
+                              const wallet = (transaction.metadata as any)?.from_address_mask || (transaction.metadata as any)?.senderWallet || '';
+                              if (wallet) return ` · ${t("transactions.from")} ${maskMiddle(wallet)}`;
+                              const sender = (transaction.metadata as any)?.sender_name || transaction.senderName || '';
                               return sender ? ` · ${t("transactions.from")} ${maskMiddle(sender)}` : '';
                             })()
                           : isIncomingTransfer && (transaction.senderCard || transaction.recipientCard)
