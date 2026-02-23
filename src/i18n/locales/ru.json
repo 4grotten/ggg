@@ -837,7 +837,7 @@
     "stablecoins": "Стейблкоины",
     "bankTransfer": "Банковский перевод",
     "sendToCard": "Перевод на карту",
-    "usdtBalance": "USDT TRC20 Кошелек",
+    "usdtBalance": "Перевод на Кошелёк USDT",
     "usdtBalanceDesc": "С вашего баланса"
   },
   "topUpUsdt": {
