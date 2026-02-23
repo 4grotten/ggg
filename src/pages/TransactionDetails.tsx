@@ -1,16 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2 } from "lucide-react";
+import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
-import { useWalletSummary } from "@/hooks/useCards";
+import { useWalletSummary, useCryptoWallets } from "@/hooks/useCards";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTransactionReceipt } from "@/hooks/useTransactions";
-import { getAuthToken } from "@/services/api/apiClient";
+import { useTransactionReceipt, useApiTransactionGroups } from "@/hooks/useTransactions";
+import { getAuthToken, apiRequest } from "@/services/api/apiClient";
+import { useQuery } from "@tanstack/react-query";
 
 // Mock transaction data - in real app would come from API/state
 const mockTransactions: Record<string, {
@@ -25,7 +26,7 @@ const mockTransactions: Record<string, {
   cardLast4: string;
   exchangeRate: number;
   status: "settled" | "pending" | "failed" | "processing";
-  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer";
+  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer" | "crypto_to_card";
   fromAddress?: string;
   tokenNetwork?: string;
   kartaFee?: number;
@@ -49,6 +50,10 @@ const mockTransactions: Record<string, {
   bankFee?: number;
   senderIban?: string;
   senderBankName?: string;
+  recipientAvatar?: string;
+  cryptoToCardCreditedAed?: number;
+  cryptoToCardExchangeRate?: number | null;
+  cryptoToCardFeePercent?: number;
 }> = {
   "1": { id: "1", merchant: "LIFE", time: "01:02 PM", date: "10.01.2026", amountUSDT: 8.34, amountLocal: 29.87, localCurrency: "AED", color: "#3B82F6", cardLast4: "7617", exchangeRate: 3.58, status: "settled", cardType: "Virtual" },
   "2": { id: "2", merchant: "ALAYA", time: "12:59 AM", date: "10.01.2026", amountUSDT: 26.80, amountLocal: 96.00, localCurrency: "AED", color: "#22C55E", cardLast4: "7617", exchangeRate: 3.58, status: "settled", cardType: "Virtual" },
@@ -94,6 +99,40 @@ const TransactionDetails = () => {
     hasToken && !!realTransactionId
   );
   const receipt = receiptResult?.data || null;
+  
+  // Fetch crypto wallets for wallet address display
+  const { data: cryptoWalletsData } = useCryptoWallets();
+  const userCryptoWallet = (cryptoWalletsData as any)?.[0] || null;
+  
+  // For crypto_to_card, find recipient card from cached transaction data
+  const { data: apiTxGroups } = useApiTransactionGroups();
+  const cachedRecipientCard = receipt?.type === 'crypto_to_card' ? (() => {
+    if (apiTxGroups) {
+      for (const group of apiTxGroups) {
+        const found = group.transactions?.find((t: any) => {
+          const txRealId = t.id?.startsWith('api_') ? t.id.slice(4) : t.id;
+          return txRealId === realTransactionId;
+        });
+        if (found?.recipientCard) return found.recipientCard;
+      }
+    }
+    return null;
+  })() : null;
+  
+  // Fetch recipient info for crypto_to_card
+  const { data: cryptoToCardRecipient } = useQuery({
+    queryKey: ['recipient-info', cachedRecipientCard],
+    queryFn: async () => {
+      const res = await apiRequest<{ recipient_name: string; card_type: string; avatar_url?: string }>(
+        `/transactions/recipient-info/?card_number=${cachedRecipientCard}`,
+        { method: 'GET' },
+        true
+      );
+      return res.data;
+    },
+    enabled: !!cachedRecipientCard,
+    staleTime: 1000 * 60 * 30,
+  });
   
   // Scroll to top on mount
   useEffect(() => {
@@ -191,6 +230,7 @@ const TransactionDetails = () => {
           'card_to_bank': 'bank_transfer_incoming',
           'iban_to_card': 'bank_transfer',
           'iban_to_iban': 'bank_transfer',
+          'crypto_to_card': 'crypto_to_card',
         };
         let mapped = typeMap[receipt.type] || receipt.type || 'payment';
         // If crypto_withdrawal but user is the recipient (different user_id), treat as deposit
@@ -203,21 +243,22 @@ const TransactionDetails = () => {
         }
         return mapped as any;
       })(),
-      recipientCard: receiverLast4,
-      recipientCardFull: resolveFullCard(receipt.receiver_card_mask, 1),
-      recipientCardType: receiverCardType,
-      recipientName: receipt.recipient_name || receipt.beneficiary_name,
+      recipientCard: receipt.type === 'crypto_to_card' ? cachedRecipientCard?.slice(-4) : receiverLast4,
+      recipientCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
+      recipientCardType: receipt.type === 'crypto_to_card' ? ((cryptoToCardRecipient as any)?.card_type === 'metal' ? 'Metal' : 'Virtual') : receiverCardType,
+      recipientName: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.recipient_name : (receipt.recipient_name || receipt.beneficiary_name),
+      recipientAvatar: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.avatar_url : undefined,
       senderName: receipt.sender_name,
       senderCard: senderLast4 || undefined,
       senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
-      toCardFull: resolveFullCard(receipt.receiver_card_mask, 1),
+      toCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
       toWalletAddress: receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address,
-      fromWalletAddress: receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address,
-      fromAddress: receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address,
+      fromWalletAddress: receipt.type === 'crypto_to_card' ? userCryptoWallet?.address : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
+      fromAddress: receipt.type === 'crypto_to_card' ? userCryptoWallet?.address : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
       toWalletAddressFull: receipt.to_address || (receipt as any).recipient_address,
-      fromWalletAddressFull: receipt.from_address || (receipt as any).sender_address,
-      tokenNetwork: receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : undefined),
+      fromWalletAddressFull: receipt.type === 'crypto_to_card' ? userCryptoWallet?.address : (receipt.from_address || (receipt as any).sender_address),
+      tokenNetwork: receipt.type === 'crypto_to_card' ? (userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : 'USDT, TRC20') : (receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : undefined)),
       transferFee: receipt.fee ?? receipt.fee_amount,
       networkFee: receipt.fee ?? receipt.fee_amount,
       bankFee: receipt.fee_amount,
@@ -228,6 +269,10 @@ const TransactionDetails = () => {
       beneficiaryName: receipt.beneficiary_name,
       cardType: senderCardType,
       originalApiType: receipt.type,
+      // crypto_to_card specific
+      cryptoToCardCreditedAed: receipt.type === 'crypto_to_card' ? receipt.movements?.find(m => m.type === 'credit')?.amount : undefined,
+      cryptoToCardExchangeRate: receipt.type === 'crypto_to_card' ? receipt.exchange_rate : undefined,
+      cryptoToCardFeePercent: receipt.type === 'crypto_to_card' && receipt.amount && receipt.fee ? ((receipt.fee / receipt.amount) * 100) : undefined,
     };
   })() : null) as typeof mockTransaction;
 
@@ -241,6 +286,7 @@ const TransactionDetails = () => {
   const isBankTransfer = transaction?.type === "bank_transfer";
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
   const isInternalTransfer = transaction?.type === "internal_transfer";
+  const isCryptoToCard = transaction?.type === "crypto_to_card";
   // For API transactions, determine direction: if movements[0] is debit, it's outgoing
   const isIncomingTransfer = isCardTransfer && (() => {
     if (receipt?.movements?.length) {
@@ -338,6 +384,26 @@ const TransactionDetails = () => {
                 }}
               >
                 <Landmark className="w-10 h-10" strokeWidth={2} />
+              </motion.div>
+            </motion.div>
+          ) : isCryptoToCard ? (
+            <motion.div 
+              className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
+              style={{ backgroundColor: "#007AFF" }}
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <motion.div
+                initial={{ y: 60, x: -60, opacity: 0 }}
+                animate={{ y: 0, x: 0, opacity: 1 }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: 0.15, 
+                  ease: [0.34, 1.56, 0.64, 1]
+                }}
+              >
+                <CreditCard className="w-10 h-10" strokeWidth={2} />
               </motion.div>
             </motion.div>
           ) : isCryptoSend ? (
@@ -546,11 +612,11 @@ const TransactionDetails = () => {
           )}
           
           <div className="space-y-1">
-            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer ? 'text-[#007AFF]' : ''}`}>
-              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? '+' : '-'}{isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
+            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer || isCryptoToCard ? 'text-[#007AFF]' : ''}`}>
+              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit ? '+' : '-'}{isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isInternalTransfer ? t('transactions.ibanToCard') : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' ? t('transactions.ibanToCard') : t('transaction.bankTransfer')) : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCryptoToCard ? 'Кошелёк USDT → Карта EasyCard' : isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isInternalTransfer ? t('transactions.ibanToCard') : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' ? t('transactions.ibanToCard') : t('transaction.bankTransfer')) : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
@@ -701,6 +767,73 @@ const TransactionDetails = () => {
                   <span className="font-medium text-right text-sm max-w-[200px]">{receipt.description}</span>
                 </div>
               )}
+            </>
+          ) : isCryptoToCard ? (
+            <>
+              {/* Recipient with avatar */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                <div className="flex items-center gap-2">
+                  {(transaction as any).recipientAvatar && (
+                    <img src={(transaction as any).recipientAvatar} alt="" className="w-6 h-6 rounded-full object-cover" />
+                  )}
+                  <span className="font-medium">{transaction.recipientName || '—'}</span>
+                </div>
+              </div>
+              {/* To Card */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.toCard")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {showToCard ? `Visa ${transaction.recipientCardType || ''} ${transaction.recipientCardFull || ''}` : `Visa ${transaction.recipientCardType || ''} ••${transaction.recipientCard || ''}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(transaction.recipientCardFull?.replace(/\s/g, '') || '');
+                      toast.success(t("toast.cardNumberCopied"));
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setShowToCard(!showToCard)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              {/* From Wallet */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromWallet", "Кошелёк")}</span>
+                <div className="flex items-center gap-2">
+                  <Wallet className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-medium">
+                    {showFromAddress ? transaction.fromWalletAddress : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-4)}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText((transaction as any).fromWalletAddressFull || transaction.fromWalletAddress || '');
+                      toast.success(t("toast.addressCopied"));
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setShowFromAddress(!showFromAddress)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              {/* Token & Network */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                <span className="font-medium">{transaction.tokenNetwork}</span>
+              </div>
             </>
           ) : isBankTransfer ? (
             <>
@@ -1068,7 +1201,30 @@ const TransactionDetails = () => {
 
         {/* Transaction details */}
         <div className="bg-secondary rounded-2xl p-4 space-y-3">
-          {isInternalTransfer ? (
+          {isCryptoToCard ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.sentAmount", "Сумма перевода")}</span>
+                <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.fee")} ({(transaction as any).cryptoToCardFeePercent?.toFixed(0) || '1'}%)</span>
+                <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.totalDeducted", "Списано с кошелька")}</span>
+                <span className="font-medium">{(transaction.amountUSDT + (transaction.transferFee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
+                <span className="font-medium">1 USDT = {(transaction as any).cryptoToCardExchangeRate || 3.65} AED</span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-muted-foreground">{t("transaction.credited", "Зачислено на карту")}</span>
+                <span className="font-semibold text-green-500">+{((transaction as any).cryptoToCardCreditedAed || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+            </>
+          ) : isInternalTransfer ? (
             <>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.transferAmount")}</span>

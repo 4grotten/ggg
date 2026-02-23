@@ -346,6 +346,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'transfer_out': 'bank_transfer',
     'transfer_in': 'bank_transfer_incoming',
     'declined': 'declined',
+    'crypto_to_card': 'crypto_to_card',
   };
   
   let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
@@ -386,6 +387,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'bank_transfer_incoming': '#22C55E',
     'card_transfer': isIncoming ? '#22C55E' : '#007AFF',
     'crypto_withdrawal': '#10B981',
+    'crypto_to_card': '#007AFF',
     'bank_transfer': '#8B5CF6',
     'payment': '#3B82F6',
     'card_activation': '#CCFF00',
@@ -400,6 +402,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_transfer': 'Card Transfer',
     'withdrawal': 'Stablecoin Send',
     'crypto_withdrawal': 'Stablecoin Send',
+    'crypto_to_card': 'USDT → Card',
     'bank_withdrawal': 'Bank Transfer',
     'bank_transfer': 'Bank Transfer',
     'bank_transfer_incoming': 'Bank Transfer',
