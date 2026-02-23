@@ -119,7 +119,7 @@ const SendBank = () => {
   }, [cardsData, bankAccountsData, cryptoWalletsData, t]);
   
   const [step, setStep] = useState(1);
-  const [selectedSource, setSelectedSource] = useState<SourceOption>(sourceOptions[0]);
+  const [selectedSource, setSelectedSource] = useState<SourceOption | null>(null);
   const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
@@ -128,6 +128,13 @@ const SendBank = () => {
   const isWalletSource = selectedSource?.type === "wallet";
   const availableBalance = isReferralWithdrawal ? referralBalance : (selectedSource?.balance ?? 0);
   const availableBalanceAed = isWalletSource ? availableBalance * USDT_TO_AED_BUY : availableBalance;
+
+  // Set default source when data loads
+  useEffect(() => {
+    if (!selectedSource && sourceOptions.length > 0) {
+      setSelectedSource(sourceOptions[0]);
+    }
+  }, [sourceOptions, selectedSource]);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -411,7 +418,7 @@ const SendBank = () => {
                       </div>
                     </div>
                   </div>
-                ) : (
+                ) : selectedSource ? (
                   <button
                     onClick={() => setSourceDrawerOpen(true)}
                     className="w-full flex items-center justify-between p-4 bg-secondary rounded-2xl hover:bg-muted/80 transition-colors"
@@ -443,6 +450,8 @@ const SendBank = () => {
                     </div>
                     <ChevronDown className="w-5 h-5 text-muted-foreground" />
                   </button>
+                ) : (
+                  <div className="w-full p-4 bg-secondary rounded-2xl animate-pulse h-16" />
                 )}
               </div>
 
@@ -619,7 +628,7 @@ const SendBank = () => {
                       {source.balance > 0 && ` · ${source.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} ${source.type === "wallet" ? "USDT" : "AED"}`}
                     </p>
                   </div>
-                  {selectedSource.id === source.id && (
+                  {selectedSource?.id === source.id && (
                     <Check className="w-5 h-5 text-primary" />
                   )}
                 </button>
