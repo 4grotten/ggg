@@ -54,7 +54,10 @@ const TopUpCrypto = () => {
   const destinations = getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress);
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedDest, setSelectedDest] = useState<Destination>(() => getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress)[0]);
+  const [selectedDest, setSelectedDest] = useState<Destination>(() => {
+    const dests = getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress);
+    return dests.find(d => d.type === "wallet") || dests[0];
+  });
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
   const [destDrawerOpen, setDestDrawerOpen] = useState(false);
   const [revealedId, setRevealedId] = useState<string | null>(null);
