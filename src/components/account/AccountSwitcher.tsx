@@ -32,10 +32,13 @@ export const AccountSwitcher = ({ open, onOpenChange }: AccountSwitcherProps) =>
     if (open) refreshAccounts();
   }, [open, refreshAccounts]);
 
-  const handleSwitchAccount = (account: SavedAccount) => {
+  const handleSwitchAccount = async (account: SavedAccount) => {
     switchUser(account.user, account.token);
     onOpenChange(false);
-    // Invalidate all cached queries so they refetch with new token
+    // Remove all cached data so queries refetch with the new token
+    queryClient.removeQueries();
+    // Small delay to let React state (new token) settle before navigating
+    await new Promise(r => setTimeout(r, 50));
     queryClient.invalidateQueries();
     navigate('/');
   };
