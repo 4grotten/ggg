@@ -126,3 +126,23 @@ class TransferResponseSerializer(serializers.Serializer):
     deducted_amount = serializers.DecimalField(max_digits=15, decimal_places=6)
     fee = serializers.DecimalField(max_digits=15, decimal_places=6)
     credited_amount = serializers.DecimalField(max_digits=15, decimal_places=6)
+
+
+class CryptoWalletWithdrawalRequestSerializer(serializers.Serializer):
+    from_wallet_id = serializers.UUIDField(help_text="ID крипто-кошелька отправителя (вашего)")
+    to_address = serializers.CharField(max_length=255, help_text="Крипто-адрес получателя")
+    amount_usdt = serializers.DecimalField(max_digits=15, decimal_places=6, min_value=1.00, help_text="Сумма перевода в USDT")
+    token = serializers.ChoiceField(choices=['USDT', 'USDC'], default='USDT', help_text="Токен")
+    network = serializers.ChoiceField(choices=['TRC20', 'ERC20', 'BEP20', 'SOL'], default='TRC20', help_text="Сеть")
+
+
+class CryptoWalletWithdrawalResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+    transaction_id = serializers.UUIDField()
+    status = serializers.CharField(help_text="completed (внутренний) или pending (внешний)")
+    is_internal = serializers.BooleanField(help_text="True если получатель в системе")
+    recipient_name = serializers.CharField(allow_null=True, help_text="Имя получателя (если внутренний)")
+    avatar_url = serializers.CharField(allow_null=True, help_text="Аватар получателя (если внутренний)")
+    deducted_amount = serializers.DecimalField(max_digits=15, decimal_places=6)
+    fee = serializers.DecimalField(max_digits=15, decimal_places=6)
+    credited_amount = serializers.DecimalField(max_digits=15, decimal_places=6)
