@@ -14,7 +14,27 @@ from apps.accounts_apps.models import AdminSettings, Profiles
 
 class SettingsManager:
     @staticmethod
-    def get_setting(category, key, default_value):
+    def get_setting(category, key, default_value, user_id=None):
+        if user_id:
+            profile = Profiles.objects.filter(user_id=str(user_id)).first()
+            if profile and profile.custom_settings_enabled:
+                mapping = {
+                    ('limits', 'transfer_min'): profile.transfer_min,
+                    ('limits', 'transfer_max'): profile.transfer_max,
+                    ('limits', 'daily_transfer_limit'): profile.daily_transfer_limit,
+                    ('limits', 'monthly_transfer_limit'): profile.monthly_transfer_limit,
+                    ('limits', 'withdrawal_min'): profile.withdrawal_min,
+                    ('limits', 'withdrawal_max'): profile.withdrawal_max,
+                    ('limits', 'daily_withdrawal_limit'): profile.daily_withdrawal_limit,
+                    ('limits', 'monthly_withdrawal_limit'): profile.monthly_withdrawal_limit,
+                    ('fees', 'card_to_card_percent'): profile.card_to_card_percent,
+                    ('fees', 'bank_transfer_percent'): profile.bank_transfer_percent,
+                    ('fees', 'network_fee_percent'): profile.network_fee_percent,
+                    ('fees', 'currency_conversion_percent'): profile.currency_conversion_percent,
+                }
+                val = mapping.get((category, key))
+                if val is not None:
+                    return Decimal(str(val))
         setting = AdminSettings.objects.filter(category=category, key=key).first()
         return setting.value if setting else Decimal(str(default_value))
 
@@ -23,11 +43,10 @@ class SettingsManager:
         amount = Decimal(str(amount))
         today = timezone.now().date()
         this_month = today.replace(day=1)
-
-        min_limit = SettingsManager.get_setting('limits', f'{operation_type}_min', 0)
-        max_limit = SettingsManager.get_setting('limits', f'{operation_type}_max', 9999999)
-        daily_limit = SettingsManager.get_setting('limits', f'daily_{operation_type}_limit', 9999999)
-        monthly_limit = SettingsManager.get_setting('limits', f'monthly_{operation_type}_limit', 9999999)
+        min_limit = SettingsManager.get_setting('limits', f'{operation_type}_min', 0, user_id)
+        max_limit = SettingsManager.get_setting('limits', f'{operation_type}_max', 9999999, user_id)
+        daily_limit = SettingsManager.get_setting('limits', f'daily_{operation_type}_limit', 9999999, user_id)
+        monthly_limit = SettingsManager.get_setting('limits', f'monthly_{operation_type}_limit', 9999999, user_id)
 
         if amount < min_limit:
             raise ValueError(f"Сумма ниже минимального лимита ({min_limit})")

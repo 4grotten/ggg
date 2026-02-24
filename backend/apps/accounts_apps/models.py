@@ -44,6 +44,22 @@ class Profiles(models.Model):
     avatar_url = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    custom_settings_enabled = models.BooleanField(default=False, help_text="Включить индивидуальные лимиты и комиссии")
+
+    transfer_min = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    transfer_max = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    daily_transfer_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    monthly_transfer_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+
+    withdrawal_min = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    withdrawal_max = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    daily_withdrawal_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    monthly_withdrawal_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+
+    card_to_card_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    bank_transfer_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    network_fee_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    currency_conversion_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
     class Meta:
         db_table = 'profiles'

@@ -44,4 +44,7 @@ urlpatterns = [
     path('contacts/<uuid:pk>/avatar/', views.ContactAvatarView.as_view(), name='contact_avatar'),
 
     path('admin/settings/', views.AdminSettingsListView.as_view(), name='admin_settings'),
+
+    path('admin/users/limits/', views.AdminUserLimitsListView.as_view(), name='admin-users-limits'),
+    path('admin/users/<str:user_id>/limits/', views.AdminUserLimitDetailView.as_view(), name='admin-user-limit-detail'),
 ]
