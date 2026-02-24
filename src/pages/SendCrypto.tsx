@@ -617,7 +617,7 @@ const SendCrypto = () => {
                 {t("send.sending", "Отправка...")}
               </span>
             ) : (
-              `${t("common.confirm", "Подтвердить")} ${parseFloat(amountCrypto).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${selectedCoin.symbol}`
+              `${t("common.confirm", "Подтвердить")} ${(parseFloat(amountCrypto) + parseFloat(amountCrypto) * 0.01 + parseFloat(networkFee)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${selectedCoin.symbol}`
             )}
           </Button>
         </div>
