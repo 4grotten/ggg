@@ -240,10 +240,13 @@ const handleClick = (transaction: Transaction) => {
                         </div>
                       ) : isCryptoToCard ? (
                         <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
                           style={{ backgroundColor: isIncomingCryptoToCard ? "#22C55E" : "#007AFF" }}
                         >
                           <CreditCard className="w-5 h-5" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center">
+                            <UsdtIcon size={10} />
+                          </div>
                         </div>
                       ) : isOutgoingCryptoToBank ? (
                         <div 
