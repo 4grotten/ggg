@@ -171,6 +171,7 @@ const handleClick = (transaction: Transaction) => {
               const isIncomingCryptoToBank = isBankTransferIncoming && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank';
               const isOutgoingCryptoToBank = (transaction.type as string) === "crypto_to_bank" || (isBankTransfer && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank');
               const isBankToCrypto = (transaction.metadata as any)?.originalApiType === 'bank_to_crypto';
+              const isCryptoToIban = (transaction.metadata as any)?.originalApiType === 'crypto_to_iban' || (transaction.type as string) === 'crypto_to_iban';
               const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction.metadata as any)?.originalApiType || '');
 
               return (
@@ -289,6 +290,8 @@ const handleClick = (transaction: Transaction) => {
                           ? t("transaction.walletToIban")
                           : isIncomingCryptoToBank
                           ? t("transaction.walletToIban")
+                          : isCryptoToIban
+                          ? "USDT → IBAN"
                           : walletView && isTopup 
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit
