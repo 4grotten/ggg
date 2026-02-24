@@ -20,11 +20,11 @@ export function AvatarPreview({ src, alt = "", children }: AvatarPreviewProps) {
           {children}
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-[90vw] w-fit [&>button]:hidden">
+          <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-none w-auto flex items-center justify-center [&>button]:hidden">
             <img
               src={src}
               alt={alt}
-              className="w-[90vw] h-[90vw] max-w-[512px] max-h-[512px] object-cover rounded-2xl"
+              className="w-[80vmin] h-[80vmin] max-w-[512px] max-h-[512px] object-cover rounded-2xl"
               onClick={() => setOpen(false)}
             />
           </DialogContent>
