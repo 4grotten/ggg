@@ -812,3 +812,32 @@
 [data-sonner-toast][data-removed="true"] {
   animation: toast-slide-up 0.2s ease-in forwards;
 }
+
+/* Receipt block styling */
+.receipt-block {
+  @apply bg-secondary/80 backdrop-blur-sm rounded-2xl p-5 border border-border/30;
+}
+
+.receipt-block .receipt-row {
+  @apply flex items-center justify-between py-0.5;
+}
+
+.receipt-block .receipt-label {
+  @apply text-[15px] text-muted-foreground;
+}
+
+.receipt-block .receipt-value {
+  @apply text-[15px] font-semibold text-foreground;
+}
+
+.receipt-block .receipt-total-row {
+  @apply flex items-center justify-between pt-3 mt-1 border-t border-border/50;
+}
+
+.receipt-block .receipt-total-label {
+  @apply text-[15px] font-medium text-muted-foreground;
+}
+
+.receipt-block .receipt-total-value {
+  @apply text-base font-bold;
+}

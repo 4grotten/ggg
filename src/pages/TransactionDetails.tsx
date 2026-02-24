@@ -819,9 +819,9 @@ const TransactionDetails = () => {
         </div>
 
         {/* Status and Card/Address info */}
-        <div className="bg-secondary rounded-2xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{t("transaction.status")}</span>
+        <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl p-5 space-y-4 border border-border/30">
+          <div className="flex items-center justify-between py-0.5">
+            <span className="text-[15px] text-muted-foreground">{t("transaction.status")}</span>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-1.5">
                 <span className={`font-medium ${isDeclined ? 'text-red-500' : transaction.status === 'processing' ? 'text-[#FFA000]' : ''}`}>
@@ -1792,7 +1792,7 @@ const TransactionDetails = () => {
           )}
 
           {/* Fee details inside first block */}
-          <div className="pt-3 mt-3 border-t border-border/50 space-y-3">
+          <div className="pt-4 mt-4 border-t border-border/40 space-y-4">
           {isCryptoToCard && isIncomingCryptoToCard ? (
             <>
               <div className="flex items-center justify-between">
@@ -2032,11 +2032,13 @@ const TransactionDetails = () => {
 
         {/* Sender block */}
         {receipt && (receipt.sender_name || (receipt as any).sender_card_mask || (receipt as any).sender_iban || (receipt as any).sender_iban_mask || (receipt as any).sender_bank || transaction.fromWalletAddress) && (
-          <div className="bg-secondary rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Send className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">{t("transaction.senderInfo", "Отправитель")}</span>
+          <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl p-5 space-y-4 border border-border/30">
+            <div className="flex items-center justify-between pb-2 border-b border-border/30">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Send className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <span className="text-[15px] font-bold text-foreground">{t("transaction.senderInfo", "Отправитель")}</span>
               </div>
               {(() => {
                 // Determine if sender is current user
@@ -2047,19 +2049,19 @@ const TransactionDetails = () => {
                 
                 return senderAvatarUrl ? (
                   <AvatarPreview src={senderAvatarUrl} alt={receipt.sender_name || ""}>
-                    <img src={senderAvatarUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                    <img src={senderAvatarUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-primary/20" />
                   </AvatarPreview>
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-base shrink-0">
                     {senderInitial}
                   </div>
                 );
               })()}
             </div>
             {receipt.sender_name && (
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.name", "Имя")}</span>
-                <span className="font-medium">{receipt.sender_name}</span>
+              <div className="flex items-center justify-between py-0.5">
+                <span className="text-[15px] text-muted-foreground">{t("transaction.name", "Имя")}</span>
+                <span className="text-[15px] font-semibold">{receipt.sender_name}</span>
               </div>
             )}
             {((receipt as any).sender_iban || (receipt as any).sender_iban_mask) && (() => {
@@ -2127,11 +2129,13 @@ const TransactionDetails = () => {
 
         {/* Receiver block */}
         {receipt && (receipt.receiver_name || (receipt as any).receiver_card_mask || receipt.beneficiary_name || receipt.beneficiary_iban || receipt.beneficiary_bank || (receipt as any).recipient_name || receipt.crypto_address || transaction.toWalletAddress) && (
-          <div className="bg-secondary rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Send className="w-4 h-4 text-green-500 rotate-180" />
-                <span className="text-sm font-semibold text-foreground">{t("transaction.receiverInfo", "Получатель")}</span>
+          <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl p-5 space-y-4 border border-border/30">
+            <div className="flex items-center justify-between pb-2 border-b border-border/30">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-green-500/10 flex items-center justify-center">
+                  <Send className="w-3.5 h-3.5 text-green-500 rotate-180" />
+                </div>
+                <span className="text-[15px] font-bold text-foreground">{t("transaction.receiverInfo", "Получатель")}</span>
               </div>
               {(() => {
                 const receiverName = receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name || transaction.recipientName;
@@ -2143,19 +2147,19 @@ const TransactionDetails = () => {
                 
                 return receiverAvatarUrl ? (
                   <AvatarPreview src={receiverAvatarUrl} alt={receiverName || ""}>
-                    <img src={receiverAvatarUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                    <img src={receiverAvatarUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-green-500/20" />
                   </AvatarPreview>
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 font-bold text-base shrink-0">
                     {receiverInitial}
                   </div>
                 );
               })()}
             </div>
             {(receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name) && (
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.name", "Имя")}</span>
-                <span className="font-medium">{receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name}</span>
+              <div className="flex items-center justify-between py-0.5">
+                <span className="text-[15px] text-muted-foreground">{t("transaction.name", "Имя")}</span>
+                <span className="text-[15px] font-semibold">{receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name}</span>
               </div>
             )}
             {(receipt as any).receiver_card_mask && (() => {
