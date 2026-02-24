@@ -243,13 +243,16 @@ const TransactionDetails = () => {
             (receipt as any).is_incoming === true;
           if (isIncoming) mapped = 'crypto_deposit';
         }
-        // If bank_withdrawal, determine direction from movements (most reliable)
+        // If bank_withdrawal, determine direction by comparing user IDs
         if (receipt.type === 'bank_withdrawal') {
           let isIncoming = false;
-          // Primary: check movements - if first movement is credit, user is recipient
-          if (receipt.movements?.length) {
-            isIncoming = receipt.movements[0]?.type === 'credit';
-          } else {
+          // Primary: compare receipt user_id (sender) with current user
+          const currentUserId = String(user?.id || '');
+          const receiptUserId = String(receipt.user_id || '');
+          if (currentUserId && receiptUserId && currentUserId !== receiptUserId) {
+            // Current user is NOT the sender → they are the recipient
+            isIncoming = true;
+          } else if (!currentUserId || !receiptUserId) {
             // Fallback: if beneficiary matches current user name, it's incoming
             if (receipt.beneficiary_name && user?.full_name) {
               const benName = receipt.beneficiary_name.toLowerCase().trim();
