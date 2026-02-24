@@ -963,3 +963,44 @@ export const submitCryptoToBank = async (
     return { success: false, error: error instanceof Error ? error.message : 'Network error' };
   }
 };
+
+// ─── Bank to Card Transfer ──────────────────────────────────────
+
+export interface BankToCardRequest {
+  from_bank_account_id: string;
+  receiver_card_number: string;
+  amount: string;
+}
+
+/**
+ * Transfer from bank account to card
+ * POST /api/v1/transactions/transfer/bank-to-card/
+ */
+export const submitBankToCard = async (
+  request: BankToCardRequest
+): Promise<{ success: boolean; data?: InternalTransferResponse; error?: string }> => {
+  try {
+    const result = await apiRequest<InternalTransferResponse>(
+      `/transactions/transfer/bank-to-card/`,
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+
+    if (result.error) {
+      console.warn('[Transactions API] Bank-to-card error:', result.error);
+      return { success: false, error: result.error.detail || result.error.message || 'Transfer failed' };
+    }
+
+    if (result.data?.transaction_id) {
+      return { success: true, data: result.data };
+    }
+
+    return { success: false, error: 'Unexpected response' };
+  } catch (error) {
+    console.error('[Transactions API] Bank-to-card failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
