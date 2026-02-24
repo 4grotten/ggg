@@ -275,6 +275,7 @@ export interface ApiTransaction {
   merchant_category?: string | null;
   recipient_card?: string | null;
   sender_name?: string | null;
+  receiver_name?: string | null;
   sender_card?: string | null;
   reference_id?: string | null;
   card_id?: string | null;
@@ -534,7 +535,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     senderName: tx.sender_name || undefined,
     senderCard: tx.sender_card || undefined,
     recipientCard: tx.recipient_card || undefined,
-    recipientName: (tx as any).beneficiary_name || (tx as any).recipient_name || undefined,
+    recipientName: tx.receiver_name || (tx as any).beneficiary_name || (tx as any).recipient_name || undefined,
     description: tx.description || undefined,
     createdAt: tx.created_at,
     cardId: tx.card_id || undefined,
