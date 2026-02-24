@@ -283,6 +283,8 @@ const handleClick = (transaction: Transaction) => {
                           ? t("transactions.cardReceived")
                           : isOutgoingTransfer
                           ? t("transactions.cardTransfer")
+                          : isBankTransfer
+                          ? "IBAN Bank → IBAN Bank"
                           : translateMerchant(transaction.merchant, transaction.type, t)
                         }
                       </p>
