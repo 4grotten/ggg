@@ -281,7 +281,7 @@ const handleClick = (transaction: Transaction) => {
                           : isIncomingIbanToCard
                            ? "IBAN → EasyCard"
                            : isBankTransferIncoming
-                           ? "IBAN Bank → IBAN Bank"
+                            ? "IBAN → EasyCard"
                            : isIncomingTransfer
                            ? t("transactions.cardReceived")
                            : isOutgoingTransfer
