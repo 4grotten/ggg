@@ -2189,14 +2189,15 @@ const TransactionDetails = () => {
             )}
             {(receipt as any).receiver_card_mask && (() => {
               const rMask = String((receipt as any).receiver_card_mask);
+              const rFull = transaction.recipientCardFull || resolveFullCard(rMask, 1) || rMask;
               return (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">{t("transaction.card")}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">
-                      {showReceiverCard ? rMask : `••••${rMask.slice(-4)}`}
+                      {showReceiverCard ? rFull : `••••${rMask.slice(-4)}`}
                     </span>
-                    <button onClick={() => { navigator.clipboard.writeText(rMask); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <button onClick={() => { navigator.clipboard.writeText(rFull); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
                       <Copy className="w-4 h-4" />
                     </button>
                     <button onClick={() => setShowReceiverCard(!showReceiverCard)} className="text-muted-foreground hover:text-foreground transition-colors">
