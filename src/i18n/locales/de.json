@@ -576,7 +576,7 @@
     "cardBalance": "Kartenguthaben",
     "description": "Beschreibung",
     "walletToIban": "USDT Wallet → IBAN Bank",
-    "walletToCard": "USDT Wallet → EasyCard",
+    "walletToCard": "USDT → EasyCard",
     "totalDeducted": "Vom Wallet abgezogen",
     "creditedToIban": "Auf IBAN gutgeschrieben",
     "receipt": "Beleg",

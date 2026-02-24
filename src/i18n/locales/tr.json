@@ -576,7 +576,7 @@
     "cardBalance": "Kart Bakiyesi",
     "description": "Açıklama",
     "walletToIban": "USDT Cüzdan → IBAN Banka",
-    "walletToCard": "USDT Cüzdan → EasyCard",
+    "walletToCard": "USDT → EasyCard",
     "totalDeducted": "Cüzdandan düşülen",
     "creditedToIban": "IBAN'a yatırılan",
     "receipt": "Makbuz",

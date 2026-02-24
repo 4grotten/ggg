@@ -645,7 +645,7 @@
     "cardBalance": "Баланс карты",
     "description": "Описание",
     "walletToIban": "Кошелёк USDT → IBAN Bank",
-    "walletToCard": "Кошелёк USDT → Карта EasyCard",
+    "walletToCard": "USDT → EasyCard",
     "totalDeducted": "Списано с кошелька",
     "creditedToIban": "Зачислено на IBAN",
     "receipt": "Чек / Квитанция",
