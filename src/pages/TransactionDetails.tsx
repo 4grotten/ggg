@@ -243,28 +243,20 @@ const TransactionDetails = () => {
             (receipt as any).is_incoming === true;
           if (isIncoming) mapped = 'crypto_deposit';
         }
-        // If bank_withdrawal but direction is inbound (recipient side), treat as incoming
+        // If bank_withdrawal, determine direction from movements (most reliable)
         if (receipt.type === 'bank_withdrawal') {
-          let isIncoming = (receipt as any).direction === 'inbound' || (receipt as any).is_incoming === true;
-          // Check cached list data for direction
-          if (!isIncoming && apiTxGroups) {
-            for (const group of apiTxGroups) {
-              const found = group.transactions?.find((t: any) => {
-                const txRealId = t.id?.startsWith('api_') ? t.id.slice(4) : t.id;
-                return txRealId === realTransactionId;
-              });
-              if (found?.metadata?.isIncoming || (found as any)?.direction === 'inbound') {
+          let isIncoming = false;
+          // Primary: check movements - if first movement is credit, user is recipient
+          if (receipt.movements?.length) {
+            isIncoming = receipt.movements[0]?.type === 'credit';
+          } else {
+            // Fallback: if beneficiary matches current user name, it's incoming
+            if (receipt.beneficiary_name && user?.full_name) {
+              const benName = receipt.beneficiary_name.toLowerCase().trim();
+              const userName = user.full_name.toLowerCase().trim();
+              if (benName === userName || userName.includes(benName) || benName.includes(userName)) {
                 isIncoming = true;
-                break;
               }
-            }
-          }
-          // Fallback: if beneficiary matches current user name, it's incoming
-          if (!isIncoming && receipt.beneficiary_name && user?.full_name) {
-            const benName = receipt.beneficiary_name.toLowerCase().trim();
-            const userName = user.full_name.toLowerCase().trim();
-            if (benName === userName || userName.includes(benName) || benName.includes(userName)) {
-              isIncoming = true;
             }
           }
           if (isIncoming) mapped = 'bank_transfer_incoming';
