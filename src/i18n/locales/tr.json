@@ -581,7 +581,9 @@
     "receipt": "Makbuz",
     "operation": "İşlem",
     "receiptUnavailable": "Makbuz mevcut değil",
-    "inNetwork": "Ağda"
+    "inNetwork": "Ağda",
+    "senderInfo": "Gönderen",
+    "receiverInfo": "Alıcı"
   },
   "topUp": {
     "selectAccount": "Açılacak Hesabı Seçin",

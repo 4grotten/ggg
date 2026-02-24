@@ -664,7 +664,9 @@
     "receipt": "Receipt",
     "operation": "Operation",
     "receiptUnavailable": "Receipt unavailable",
-    "inNetwork": "In network"
+    "inNetwork": "In network",
+    "senderInfo": "Sender",
+    "receiverInfo": "Recipient"
   },
   "topUp": {
     "selectAccount": "Select Account to Open",

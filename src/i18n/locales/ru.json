@@ -650,7 +650,9 @@
     "receipt": "Чек / Квитанция",
     "operation": "Операция",
     "receiptUnavailable": "Чек недоступен",
-    "inNetwork": "В сети"
+    "inNetwork": "В сети",
+    "senderInfo": "Отправитель",
+    "receiverInfo": "Получатель"
   },
   "topUp": {
     "selectAccount": "Выберите счёт для открытия",

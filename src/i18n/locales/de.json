@@ -581,7 +581,9 @@
     "receipt": "Beleg",
     "operation": "Vorgang",
     "receiptUnavailable": "Beleg nicht verfügbar",
-    "inNetwork": "Im Netzwerk"
+    "inNetwork": "Im Netzwerk",
+    "senderInfo": "Absender",
+    "receiverInfo": "Empfänger"
   },
   "topUp": {
     "selectAccount": "Konto zum Öffnen auswählen",

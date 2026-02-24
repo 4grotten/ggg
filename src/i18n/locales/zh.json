@@ -587,7 +587,9 @@
     "receipt": "收据",
     "operation": "操作",
     "receiptUnavailable": "收据不可用",
-    "inNetwork": "网络内"
+    "inNetwork": "网络内",
+    "senderInfo": "发送方",
+    "receiverInfo": "接收方"
   },
   "topUp": {
     "selectAccount": "选择要开通的账户",
