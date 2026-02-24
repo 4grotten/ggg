@@ -324,6 +324,12 @@ const handleClick = (transaction: Transaction) => {
                             })()
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.merchant === 'IBAN to Card'
                           ? ` · Card····${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
+                          : isBankTransfer && !isOutgoingCryptoToBank && (transaction.metadata as any)?.beneficiary_iban
+                          ? (() => {
+                              const iban = (transaction.metadata as any).beneficiary_iban;
+                              const display = `${iban.slice(0, 4)}••••${iban.slice(-4)}`;
+                              return ` · ${t("transactions.to")} ${display}`;
+                            })()
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.recipientName
                           ? ` · ${t("transactions.to")} ${maskMiddle(transaction.recipientName)}`
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.description
