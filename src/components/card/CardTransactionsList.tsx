@@ -270,6 +270,16 @@ const handleClick = (transaction: Transaction) => {
                             <UsdtIcon size={10} />
                           </div>
                         </div>
+                      ) : isCryptoToIban ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
+                          style={{ backgroundColor: "#8B5CF6" }}
+                        >
+                          <Landmark className="w-5 h-5" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center ring-2 ring-background">
+                            <UsdtIcon size={10} />
+                          </div>
+                        </div>
                       ) : (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
