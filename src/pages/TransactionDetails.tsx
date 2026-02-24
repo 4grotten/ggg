@@ -235,63 +235,44 @@ const TransactionDetails = () => {
           'crypto_to_bank': 'crypto_to_bank',
         };
         let mapped = typeMap[receipt.type] || receipt.type || 'payment';
-        
-        // Use receipt.direction as primary source of truth for all types
-        if (receipt.direction === 'inbound') {
-          // Remap outgoing types to their incoming counterparts
-          if (['crypto_withdrawal', 'crypto_send'].includes(mapped)) mapped = 'crypto_deposit';
-          if (['bank_transfer', 'bank_withdrawal'].includes(mapped)) mapped = 'bank_transfer_incoming';
-        } else if (receipt.direction === 'outbound') {
-          // Ensure outgoing types stay outgoing
-          if (mapped === 'bank_transfer_incoming') mapped = 'bank_transfer';
-          if (mapped === 'crypto_deposit') mapped = 'crypto_withdrawal';
-        } else {
-          // receipt.direction missing — check cached list data first
-          let listDirection: string | undefined;
-          if (apiTxGroups) {
-            for (const group of apiTxGroups) {
-              const found = group.transactions?.find((t: any) => {
-                const txRealId = t.id?.startsWith('api_') ? t.id.slice(4) : t.id;
-                return txRealId === realTransactionId;
-              });
-              if (found?.metadata?.isIncoming !== undefined) {
-                listDirection = found.metadata.isIncoming ? 'inbound' : 'outbound';
-                break;
+        // If crypto_withdrawal but user is the recipient (different user_id), treat as deposit
+        if (receipt.type === 'crypto_withdrawal') {
+          const currentUserId = String(user?.id || '');
+          const receiptUserId = String(receipt.user_id || '');
+          const isIncoming = (currentUserId && receiptUserId && currentUserId !== receiptUserId) ||
+            (receipt as any).is_incoming === true;
+          if (isIncoming) mapped = 'crypto_deposit';
+        }
+        // If bank_withdrawal, determine direction by comparing user IDs
+        if (receipt.type === 'bank_withdrawal') {
+          let isIncoming = false;
+          // Primary: compare receipt user_id (sender) with current user
+          const currentUserId = String(user?.id || '');
+          const receiptUserId = String(receipt.user_id || '');
+          if (currentUserId && receiptUserId && currentUserId !== receiptUserId) {
+            // Current user is NOT the sender → they are the recipient
+            isIncoming = true;
+          } else if (!currentUserId || !receiptUserId) {
+            // Fallback: if beneficiary matches current user name, it's incoming
+            if (receipt.beneficiary_name && user?.full_name) {
+              const benName = receipt.beneficiary_name.toLowerCase().trim();
+              const userName = user.full_name.toLowerCase().trim();
+              if (benName === userName || userName.includes(benName) || benName.includes(userName)) {
+                isIncoming = true;
               }
             }
           }
-          if (listDirection === 'inbound') {
-            if (['crypto_withdrawal', 'crypto_send'].includes(mapped)) mapped = 'crypto_deposit';
-            if (['bank_transfer', 'bank_withdrawal'].includes(mapped)) mapped = 'bank_transfer_incoming';
-          } else if (listDirection === 'outbound') {
-            if (mapped === 'bank_transfer_incoming') mapped = 'bank_transfer';
-            if (mapped === 'crypto_deposit') mapped = 'crypto_withdrawal';
-          } else {
-            // Final fallback: compare user IDs
-            if (receipt.type === 'crypto_withdrawal') {
-              const currentUserId = String(user?.id || '');
-              const receiptUserId = String(receipt.user_id || '');
-              const isIncoming = (currentUserId && receiptUserId && currentUserId !== receiptUserId) ||
-                (receipt as any).is_incoming === true;
-              if (isIncoming) mapped = 'crypto_deposit';
-            }
-            if (receipt.type === 'bank_withdrawal') {
-              let isIncoming = false;
-              const currentUserId = String(user?.id || '');
-              const receiptUserId = String(receipt.user_id || '');
-              if (currentUserId && receiptUserId && currentUserId !== receiptUserId) {
-                isIncoming = true;
-              } else if (!currentUserId || !receiptUserId) {
-                if (receipt.beneficiary_name && user?.full_name) {
-                  const benName = receipt.beneficiary_name.toLowerCase().trim();
-                  const userName = user.full_name.toLowerCase().trim();
-                  if (benName === userName || userName.includes(benName) || benName.includes(userName)) {
-                    isIncoming = true;
-                  }
-                }
-              }
-              if (isIncoming) mapped = 'bank_transfer_incoming';
-            }
+          if (isIncoming) mapped = 'bank_transfer_incoming';
+        }
+        // For iban_to_card / bank_to_card / transfer_out / internal_transfer: remap to incoming when direction is inbound or amount > 0
+        if (['iban_to_card', 'bank_to_card', 'transfer_out'].includes(receipt.type)) {
+          if ((receipt as any).direction === 'inbound' || receipt.amount > 0) {
+            mapped = 'bank_transfer_incoming';
+          }
+        }
+        if (receipt.type === 'internal_transfer') {
+          if ((receipt as any).direction === 'inbound' || receipt.amount > 0) {
+            mapped = 'bank_transfer_incoming';
           }
         }
         return mapped as any;
@@ -315,10 +296,10 @@ const TransactionDetails = () => {
       transferFee: receipt.fee ?? receipt.fee_amount,
       networkFee: receipt.fee ?? receipt.fee_amount,
       bankFee: receipt.fee_amount,
-      recipientIban: receipt.type === 'crypto_to_bank' ? (receipt.beneficiary_iban || receipt.to_iban || resolveFullIban(receipt.iban_mask)) : resolveFullIban(receipt.iban_mask),
+      recipientIban: receipt.type === 'crypto_to_bank' ? (receipt.beneficiary_iban || (receipt as any).to_iban || resolveFullIban(receipt.iban_mask)) : resolveFullIban(receipt.iban_mask),
       recipientBankName: receipt.beneficiary_bank_name || receipt.bank_name,
-      senderIban: receipt.sender_iban || receipt.sender_iban_mask || receipt.iban_mask,
-      senderBankName: receipt.sender_bank_name || receipt.bank_name,
+      senderIban: receipt.iban_mask,
+      senderBankName: receipt.bank_name,
       beneficiaryName: receipt.beneficiary_name,
       cardType: senderCardType,
       originalApiType: receipt.type,
@@ -339,14 +320,11 @@ const TransactionDetails = () => {
   const isBankTransfer = transaction?.type === "bank_transfer";
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
   const isInternalTransfer = transaction?.type === "internal_transfer";
-  const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card', 'transfer_out'].includes((transaction as any)?.originalApiType || '');
+  const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction as any)?.originalApiType || '');
    const isCryptoToCard = transaction?.type === "crypto_to_card";
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
   const isIncomingCryptoToBank = isCryptoToBank && (() => {
-    // Primary: use receipt direction field
-    if (receipt?.direction === 'inbound') return true;
-    if (receipt?.direction === 'outbound') return false;
-    // Fallback: check cached list data
+    // Check cached list data for direction (primary source of truth)
     if (apiTxGroups) {
       for (const group of apiTxGroups) {
         const found = group.transactions?.find((t: any) => {
@@ -356,13 +334,14 @@ const TransactionDetails = () => {
         if (found?.metadata?.isIncoming !== undefined) return found.metadata.isIncoming;
       }
     }
+    if ((receipt as any)?.direction === 'inbound') return true;
+    if ((receipt as any)?.direction === 'outbound') return false;
+    // For crypto_to_bank, do NOT use beneficiary name matching as fallback
+    // because the user may send to their own IBAN, which would falsely flag as incoming
     return false;
   })();
   const isIncomingCryptoToCard = isCryptoToCard && (() => {
-    // Primary: use receipt direction field
-    if (receipt?.direction === 'inbound') return true;
-    if (receipt?.direction === 'outbound') return false;
-    // Fallback: check cached list data
+    // Check cached list data for isIncoming flag (from direction: 'inbound')
     if (apiTxGroups) {
       for (const group of apiTxGroups) {
         const found = group.transactions?.find((t: any) => {
@@ -371,18 +350,26 @@ const TransactionDetails = () => {
         });
         if (found?.metadata?.isIncoming !== undefined) return found.metadata.isIncoming;
       }
+    }
+    // Check receipt direction explicitly
+    if ((receipt as any)?.direction === 'inbound') return true;
+    if ((receipt as any)?.direction === 'outbound') return false;
+    // If sender name matches current user, it's outgoing (user sends from their wallet to card)
+    if (receipt?.sender_name && user?.full_name) {
+      const senderName = receipt.sender_name.toLowerCase().trim();
+      const userName = user.full_name.toLowerCase().trim();
+      if (senderName === userName || userName.includes(senderName) || senderName.includes(userName)) return false;
     }
     // Fallback: check movements
     if (receipt?.movements?.length) {
       return receipt.movements[0]?.type === 'credit';
     }
+    // Fallback: no fromWalletAddress means recipient side
     return !transaction?.fromWalletAddress && !!transaction?.recipientCard;
   })();
+  // For API transactions, determine direction: check cached list data first, then movements
   const isIncomingTransfer = isCardTransfer && (() => {
-    // Primary: use receipt direction field
-    if (receipt?.direction === 'inbound') return true;
-    if (receipt?.direction === 'outbound') return false;
-    // Fallback: check cached list data
+    // Check cached list data for direction (primary source of truth)
     if (apiTxGroups) {
       for (const group of apiTxGroups) {
         const found = group.transactions?.find((t: any) => {
@@ -392,7 +379,9 @@ const TransactionDetails = () => {
         if (found?.metadata?.isIncoming !== undefined) return found.metadata.isIncoming;
       }
     }
-    // Fallback: check movements
+    // Check receipt direction explicitly
+    if ((receipt as any)?.direction === 'inbound') return true;
+    if ((receipt as any)?.direction === 'outbound') return false;
     if (receipt?.movements?.length) {
       return receipt.movements[0]?.type === 'credit';
     }

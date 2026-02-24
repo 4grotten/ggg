@@ -22,8 +22,6 @@ export interface TransactionReceipt {
   amount?: number;
   currency?: string;
   fee?: number;
-  fee_amount?: number;
-  total_amount?: number;
   exchange_rate?: number | null;
   original_amount?: number | null;
   original_currency?: string | null;
@@ -33,32 +31,12 @@ export interface TransactionReceipt {
   reference_id?: string | null;
   card_id?: string | null;
   user_id?: string;
-  direction?: 'inbound' | 'outbound' | 'internal';
-  // Card transfer fields
-  sender_name?: string | null;
-  recipient_name?: string | null;
-  sender_card_mask?: string;
-  receiver_card_mask?: string;
-  // Bank transfer fields
-  beneficiary_name?: string;
-  beneficiary_iban?: string;
-  beneficiary_bank_name?: string;
-  iban_mask?: string;
-  bank_name?: string;
-  sender_iban?: string;
-  sender_iban_mask?: string;
-  sender_bank_name?: string;
-  amount_aed?: number;
-  total_debit_aed?: number;
-  from_card_id?: string | null;
-  from_bank_account_id?: string | null;
   // Crypto fields
   token?: string;
   network?: string;
   to_address_mask?: string;
   to_address?: string;
   from_address_mask?: string;
-  from_address?: string;
   deposit_address_mask?: string;
   network_and_token?: string;
   amount_crypto?: number;
@@ -68,17 +46,36 @@ export interface TransactionReceipt {
   credited_amount_aed?: number | null;
   is_internal?: boolean;
   recipient_avatar?: string | null;
+  from_address?: string;
+  // Card transfer fields
+  sender_card_mask?: string;
+  receiver_card_mask?: string;
+  sender_name?: string | null;
+  recipient_name?: string | null;
+  total_amount?: number;
   // Bank topup fields
   transfer_rail?: string;
   reference_value?: string;
   sender_bank?: string | null;
+  sender_iban_mask?: string | null;
+  instructions?: Record<string, unknown>;
   deposit_iban_mask?: string | null;
   deposit_bank_name?: string | null;
   deposit_beneficiary?: string | null;
-  instructions?: Record<string, unknown>;
+  // Bank withdrawal fields
+  iban_mask?: string;
+  beneficiary_iban?: string;
+  beneficiary_name?: string;
+  beneficiary_bank_name?: string;
+  bank_name?: string;
   // Crypto-to-bank fields
   to_iban?: string;
   to_name?: string;
+  amount_aed?: number;
+  fee_amount?: number;
+  total_debit_aed?: number;
+  from_card_id?: string | null;
+  from_bank_account_id?: string | null;
   // Balance movements
   movements?: Array<{ account_type: string; amount: number; type: string }>;
   // Generic catch-all
@@ -275,7 +272,6 @@ export interface ApiTransaction {
   merchant_category?: string | null;
   recipient_card?: string | null;
   sender_name?: string | null;
-  receiver_name?: string | null;
   sender_card?: string | null;
   reference_id?: string | null;
   card_id?: string | null;
@@ -393,23 +389,15 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     mappedType = 'bank_transfer_incoming';
   }
 
-  // For internal_transfer: prefer explicit direction; fallback to signed amount for legacy payloads
+  // For internal_transfer, determine direction by amount sign
   if (tx.type === 'internal_transfer') {
-    if (tx.direction === 'inbound') {
-      mappedType = 'bank_transfer_incoming';
-    } else if (tx.direction === 'outbound') {
-      mappedType = 'bank_transfer';
-    } else {
-      mappedType = tx.amount < 0 ? 'bank_transfer' : 'bank_transfer_incoming';
-    }
+    mappedType = tx.amount > 0 ? 'bank_transfer_incoming' : 'bank_transfer';
   }
 
-  // For iban_to_card / bank_to_card / transfer_out: remap to incoming ONLY when backend marks inbound
+  // For iban_to_card / bank_to_card / transfer_out: remap to incoming when direction is inbound or amount > 0
   if (['iban_to_card', 'bank_to_card', 'transfer_out'].includes(tx.type)) {
-    if (tx.direction === 'inbound') {
+    if (tx.direction === 'inbound' || tx.amount > 0) {
       mappedType = 'bank_transfer_incoming';
-    } else if (tx.direction === 'outbound') {
-      mappedType = 'bank_transfer';
     }
   }
 
@@ -535,7 +523,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     senderName: tx.sender_name || undefined,
     senderCard: tx.sender_card || undefined,
     recipientCard: tx.recipient_card || undefined,
-    recipientName: tx.receiver_name || (tx as any).beneficiary_name || (tx as any).recipient_name || undefined,
+    recipientName: (tx as any).beneficiary_name || (tx as any).recipient_name || undefined,
     description: tx.description || undefined,
     createdAt: tx.created_at,
     cardId: tx.card_id || undefined,
