@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
     // Retry logic for TLS connection errors and 5xx responses
     let response: Response | null = null;
     let data = "";
-    const maxRetries = 3;
+    const maxRetries = 5;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         response = await fetch(backendUrl, fetchOptions);
@@ -80,7 +80,19 @@ Deno.serve(async (req) => {
 
     // For 404 responses (e.g. recipient not found), return 200 with the body
     // to prevent Lovable error overlay from intercepting edge function 404s
-    const status = response!.status === 404 ? 200 : response!.status;
+    let status = response!.status === 404 ? 200 : response!.status;
+
+    // If backend returned 502/503/504 after all retries, return a clean JSON error
+    // instead of raw HTML to prevent runtime error overlay
+    if (status >= 502 && status <= 504) {
+      return new Response(
+        JSON.stringify({ error: "Backend temporarily unavailable", status }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     return new Response(data, {
       status,
