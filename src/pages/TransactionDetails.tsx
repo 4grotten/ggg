@@ -440,7 +440,7 @@ const TransactionDetails = () => {
     printWindow.close();
   }, [t]);
 
-  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'crypto_address', 'sender_avatar', 'receiver_avatar', 'recipient_avatar']);
+  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar']);
 
   const receiptTypeLabels: Record<string, string> = {
     crypto_to_crypto: t("transaction.typeCryptoToCrypto", "Отправка стейблкоинов"),
@@ -2103,22 +2103,6 @@ const TransactionDetails = () => {
                 </div>
               </div>
             )}
-            {transaction.fromWalletAddress && (
-              <div className="flex items-start justify-between">
-                <span className="text-muted-foreground">{t("transaction.fromWallet", "С кошелька USDT")}</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
-                    {showFromAddress ? ((transaction as any).fromWalletAddressFull || transaction.fromWalletAddress) : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-6)}`}
-                  </span>
-                  <button onClick={() => { navigator.clipboard.writeText((transaction as any).fromWalletAddressFull || transaction.fromWalletAddress || ''); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => setShowFromAddress(!showFromAddress)} className="text-muted-foreground hover:text-foreground transition-colors">
-                    {showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            )}
             {((receipt as any).sender_iban || (receipt as any).sender_iban_mask) && (() => {
               const sIban = String((receipt as any).sender_iban || (receipt as any).sender_iban_mask);
               return (
@@ -2331,7 +2315,7 @@ const TransactionDetails = () => {
                           // Receiver
                           receiver_name: 20, receiver_id: 21, receiver_card_mask: 22, recipient_name: 23,
                           beneficiary_name: 24, beneficiary_iban: 25, beneficiary_bank: 26, beneficiary_swift: 27,
-                          crypto_address: 28, is_internal: 29,
+                          crypto_address: 10.5, is_internal: 29,
                           // Token/network
                           token: 30, network: 31, token_network: 32,
                           // Amounts & fees
