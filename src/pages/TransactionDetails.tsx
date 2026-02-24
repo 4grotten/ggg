@@ -1975,7 +1975,9 @@ const TransactionDetails = () => {
               </div>
             ) : receipt ? (
               <div className="space-y-2 text-sm">
-                {Object.entries(receipt).map(([key, value]) => (
+                {Object.entries(receipt)
+                  .filter(([, value]) => value !== null && value !== undefined)
+                  .map(([key, value]) => (
                   <div key={key} className="flex items-start justify-between gap-3">
                     <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
                     <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
