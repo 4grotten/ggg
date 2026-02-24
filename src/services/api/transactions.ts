@@ -403,18 +403,25 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     }
   }
 
-  // For card_transfer: API always returns positive amount, use operation or sender/recipient fields
+  // For card_transfer: API always returns positive amount, use direction or operation or sender/recipient fields
   let isIncoming: boolean;
   if (mappedType === 'card_transfer') {
-    // If operation explicitly says direction, use it
-    const op = (tx.operation as string || '').toLowerCase();
-    if (op.includes('incoming') || op.includes('received')) {
+    // Use explicit direction from API first
+    if (tx.direction === 'inbound') {
       isIncoming = true;
-    } else if (op.includes('outgoing') || op.includes('sent')) {
+    } else if (tx.direction === 'outbound') {
       isIncoming = false;
     } else {
-      // Fallback: if only sender_card present (no recipient) = incoming
-      isIncoming = !tx.recipient_card && !!tx.sender_card;
+      // If operation explicitly says direction, use it
+      const op = (tx.operation as string || '').toLowerCase();
+      if (op.includes('incoming') || op.includes('received')) {
+        isIncoming = true;
+      } else if (op.includes('outgoing') || op.includes('sent')) {
+        isIncoming = false;
+      } else {
+        // Fallback: if only sender_card present (no recipient) = incoming
+        isIncoming = !tx.recipient_card && !!tx.sender_card;
+      }
     }
   } else if (mappedType === 'crypto_to_card') {
     // On recipient side: direction is inbound, or amount > 0 with no sender wallet
