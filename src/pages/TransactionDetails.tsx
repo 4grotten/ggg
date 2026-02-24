@@ -2030,7 +2030,15 @@ const TransactionDetails = () => {
         {/* Sender block */}
         {receipt && (receipt.sender_name || (receipt as any).sender_card_mask || (receipt as any).sender_iban || (receipt as any).sender_iban_mask || (receipt as any).sender_bank || transaction.fromWalletAddress) && (
           <div className="bg-secondary rounded-2xl p-4 space-y-3">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("transaction.senderInfo", "Отправитель")}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Send className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-foreground">{t("transaction.senderInfo", "Отправитель")}</span>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                {receipt.sender_name ? receipt.sender_name.charAt(0).toUpperCase() : (user?.full_name?.charAt(0)?.toUpperCase() || "S")}
+              </div>
+            </div>
             {receipt.sender_name && (
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.name", "Имя")}</span>
@@ -2103,7 +2111,17 @@ const TransactionDetails = () => {
         {/* Receiver block */}
         {receipt && (receipt.receiver_name || (receipt as any).receiver_card_mask || receipt.beneficiary_name || receipt.beneficiary_iban || receipt.beneficiary_bank || (receipt as any).recipient_name || receipt.crypto_address || transaction.toWalletAddress) && (
           <div className="bg-secondary rounded-2xl p-4 space-y-3">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("transaction.receiverInfo", "Получатель")}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ArrowUpRight className="w-4 h-4 text-green-500" />
+                <span className="text-sm font-semibold text-foreground">{t("transaction.receiverInfo", "Получатель")}</span>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 font-bold text-sm shrink-0">
+                {(receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name)
+                  ? (receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name).charAt(0).toUpperCase()
+                  : (transaction.recipientName?.charAt(0)?.toUpperCase() || "R")}
+              </div>
+            </div>
             {(receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name) && (
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.name", "Имя")}</span>
