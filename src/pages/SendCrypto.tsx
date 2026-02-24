@@ -581,7 +581,7 @@ const SendCrypto = () => {
             <div className="flex items-center justify-between pt-2 border-t border-border">
               <span className="text-muted-foreground">{t("send.amount")}</span>
               <span className="font-medium">
-                {amountAfterFee} {selectedCoin.symbol}
+                {(parseFloat(amountCrypto) + parseFloat(amountCrypto) * 0.01 + parseFloat(networkFee)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {selectedCoin.symbol}
               </span>
             </div>
             {!isCryptoSource && (
