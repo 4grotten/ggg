@@ -2239,7 +2239,7 @@ const TransactionDetails = () => {
                 <span className="font-medium">{(receipt as any).beneficiary_swift}</span>
               </div>
             )}
-            {(receipt.crypto_address || transaction.toWalletAddress) && (() => {
+            {(receipt.crypto_address || transaction.toWalletAddress) && transaction.type !== 'crypto_to_card' && (() => {
               const addr = String(receipt.crypto_address || transaction.toWalletAddress);
               return (
                 <div className="flex items-start justify-between">
