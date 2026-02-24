@@ -492,9 +492,10 @@ const TransactionDetails = () => {
     if (key === 'type' && typeof value === 'string') return receiptTypeLabels[value] || value;
     if (key === 'direction' && typeof value === 'string') return receiptDirectionLabels[value] || value;
     if (key === 'status' && typeof value === 'string') return receiptStatusLabels[value] || value;
-    if (key === 'date_time' && typeof value === 'string') return formatDateTime(value);
+    if ((key === 'date_time' || key === 'created_at' || key === 'updated_at' || key === 'settled_at') && typeof value === 'string') return formatDateTime(value);
+    if (typeof value === 'boolean') return value ? t("common.yes", "Да") : t("common.no", "Нет");
     if (typeof value === 'string') return value;
-    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    if (typeof value === 'number') return String(value);
     try {
       return JSON.stringify(value, null, 2);
     } catch {
