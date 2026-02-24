@@ -712,7 +712,17 @@ const groupApiTransactions = async (data: ApiTransaction[]): Promise<Transaction
   const groups: TransactionGroup[] = [];
   for (const [date, transactions] of groupMap) {
     const totalSpend = transactions
-      .filter(t => !['topup', 'crypto_deposit', 'bank_transfer_incoming'].includes(t.type || ''))
+      .filter(t => {
+        // Exclude all incoming/credit transaction types
+        if (['topup', 'crypto_deposit', 'bank_transfer_incoming'].includes(t.type || '')) return false;
+        // Exclude incoming card transfers
+        if (t.type === 'card_transfer' && (t.metadata as any)?.isIncoming) return false;
+        // Exclude incoming crypto_to_card
+        if (t.type === 'crypto_to_card' && (t.metadata as any)?.isIncoming) return false;
+        // Exclude incoming crypto_to_bank
+        if ((t.type as string) === 'crypto_to_bank' && (t.metadata as any)?.isIncoming) return false;
+        return true;
+      })
       .reduce((sum, t) => sum + t.amountLocal, 0);
     groups.push({ date, totalSpend, transactions });
   }
