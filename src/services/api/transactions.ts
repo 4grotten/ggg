@@ -354,6 +354,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'declined': 'declined',
     'crypto_to_card': 'crypto_to_card',
     'crypto_to_bank': 'bank_transfer', // will be remapped for inbound below
+    'crypto_to_crypto': 'crypto_withdrawal',
   };
   
   let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
@@ -384,6 +385,11 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
 
   // For crypto_withdrawal with inbound direction, remap to crypto_deposit
   if (tx.type === 'crypto_withdrawal' && tx.direction === 'inbound') {
+    mappedType = 'crypto_deposit';
+  }
+
+  // For crypto_to_crypto with inbound direction, remap to crypto_deposit
+  if (tx.type === 'crypto_to_crypto' && tx.direction === 'inbound') {
     mappedType = 'crypto_deposit';
   }
 
@@ -481,6 +487,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'transfer_in': 'Bank Transfer',
     'card_payment': tx.merchant_name || 'Payment',
     'transfer': 'Stablecoin Send', // generic crypto transfer
+    'crypto_to_crypto': 'Stablecoin Send',
   };
 
   // Use mappedType for merchant fallback — for "transfer" type use mappedType-based fallback

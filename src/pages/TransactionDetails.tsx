@@ -233,6 +233,7 @@ const TransactionDetails = () => {
           'iban_to_iban': 'bank_transfer',
           'crypto_to_card': 'crypto_to_card',
           'crypto_to_bank': 'crypto_to_bank',
+          'crypto_to_crypto': 'crypto_send',
         };
         let mapped = typeMap[receipt.type] || receipt.type || 'payment';
         // If crypto_withdrawal but user is the recipient (different user_id), treat as deposit
@@ -242,6 +243,10 @@ const TransactionDetails = () => {
           const isIncoming = (currentUserId && receiptUserId && currentUserId !== receiptUserId) ||
             (receipt as any).is_incoming === true;
           if (isIncoming) mapped = 'crypto_deposit';
+        }
+        // If crypto_to_crypto with inbound direction, treat as deposit
+        if (receipt.type === 'crypto_to_crypto' && receipt.direction === 'inbound') {
+          mapped = 'crypto_deposit';
         }
         // If bank_withdrawal, determine direction using receipt.direction first
         if (receipt.type === 'bank_withdrawal') {
@@ -284,19 +289,19 @@ const TransactionDetails = () => {
       recipientCard: receipt.type === 'crypto_to_card' ? cachedRecipientCard?.slice(-4) : receiverLast4,
       recipientCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
       recipientCardType: receipt.type === 'crypto_to_card' ? ((cryptoToCardRecipient as any)?.card_type === 'metal' ? 'Metal' : 'Virtual') : receiverCardType,
-      recipientName: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.recipient_name : (receipt.recipient_name || receipt.beneficiary_name || (receipt as any).to_name),
+      recipientName: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.recipient_name : (receipt.recipient_name || (receipt as any).receiver_name || receipt.beneficiary_name || (receipt as any).to_name),
       recipientAvatar: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.avatar_url : undefined,
       senderName: receipt.sender_name,
       senderCard: senderLast4 || undefined,
       senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       toCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
-      toWalletAddress: receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address,
-      fromWalletAddress: receipt.type === 'crypto_to_card' ? ((receipt as any).direction === 'inbound' ? (receipt.from_address_mask || receipt.from_address || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
-      fromAddress: receipt.type === 'crypto_to_card' ? ((receipt as any).direction === 'inbound' ? (receipt.from_address_mask || receipt.from_address || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
-      toWalletAddressFull: receipt.to_address || (receipt as any).recipient_address,
-      fromWalletAddressFull: receipt.type === 'crypto_to_card' ? userCryptoWallet?.address : (receipt.from_address || (receipt as any).sender_address),
-      tokenNetwork: receipt.type === 'crypto_to_card' ? (userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : 'USDT, TRC20') : (receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : undefined)),
+      toWalletAddress: receipt.type === 'crypto_to_crypto' ? (receipt as any).crypto_address : (receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address),
+      fromWalletAddress: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? ((receipt as any).direction === 'inbound' ? (receipt.from_address_mask || receipt.from_address || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
+      fromAddress: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? ((receipt as any).direction === 'inbound' ? (receipt.from_address_mask || receipt.from_address || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
+      toWalletAddressFull: receipt.type === 'crypto_to_crypto' ? (receipt as any).crypto_address : (receipt.to_address || (receipt as any).recipient_address),
+      fromWalletAddressFull: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? userCryptoWallet?.address : (receipt.from_address || (receipt as any).sender_address),
+      tokenNetwork: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? (userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : ((receipt as any).crypto_token && (receipt as any).crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : 'USDT, TRC20')) : (receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : ((receipt as any).crypto_token && (receipt as any).crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : undefined))),
       transferFee: receipt.fee ?? receipt.fee_amount,
       networkFee: receipt.fee ?? receipt.fee_amount,
       bankFee: receipt.fee_amount,
