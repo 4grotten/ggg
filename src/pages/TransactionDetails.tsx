@@ -2135,7 +2135,7 @@ const TransactionDetails = () => {
                 // Determine if receiver is current user
                 const isCurrentUserReceiver = receipt.direction === 'inbound' || 
                   (receiverName && user?.full_name && receiverName.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]));
-                const receiverAvatarUrl = isCurrentUserReceiver ? currentUserAvatar : ((receipt as any).recipient_avatar || (receipt as any).receiver_avatar || (receipt as any).sender_avatar || (transaction as any).recipientAvatar);
+                const receiverAvatarUrl = isCurrentUserReceiver ? currentUserAvatar : ((receipt as any).receiver_avatar || (receipt as any).recipient_avatar || (transaction as any).recipientAvatar);
                 const receiverInitial = receiverName ? receiverName.charAt(0).toUpperCase() : "R";
                 
                 return receiverAvatarUrl ? (
