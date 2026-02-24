@@ -9,6 +9,7 @@ import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
 import { useWalletSummary, useCryptoWallets } from "@/hooks/useCards";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAvatar } from "@/contexts/AvatarContext";
 import { useTransactionReceipt, useApiTransactionGroups } from "@/hooks/useTransactions";
 import { getAuthToken, apiRequest } from "@/services/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
@@ -87,6 +88,7 @@ const TransactionDetails = () => {
   const { id } = useParams<{ id: string }>();
   const { data: walletData } = useWalletSummary();
   const { user } = useAuth();
+  const { avatarUrl: currentUserAvatar } = useAvatar();
   const userIban = walletData?.data?.physical_account?.iban || "";
   const hasToken = !!getAuthToken();
   
@@ -2035,9 +2037,21 @@ const TransactionDetails = () => {
                 <Send className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold text-foreground">{t("transaction.senderInfo", "Отправитель")}</span>
               </div>
-              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
-                {receipt.sender_name ? receipt.sender_name.charAt(0).toUpperCase() : (user?.full_name?.charAt(0)?.toUpperCase() || "S")}
-              </div>
+              {(() => {
+                // Determine if sender is current user
+                const isCurrentUserSender = receipt.direction === 'outbound' || 
+                  (receipt.sender_name && user?.full_name && receipt.sender_name.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]));
+                const senderAvatarUrl = isCurrentUserSender ? currentUserAvatar : (receipt as any).sender_avatar;
+                const senderInitial = receipt.sender_name ? receipt.sender_name.charAt(0).toUpperCase() : (user?.full_name?.charAt(0)?.toUpperCase() || "S");
+                
+                return senderAvatarUrl ? (
+                  <img src={senderAvatarUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                    {senderInitial}
+                  </div>
+                );
+              })()}
             </div>
             {receipt.sender_name && (
               <div className="flex items-center justify-between">
@@ -2116,11 +2130,22 @@ const TransactionDetails = () => {
                 <ArrowUpRight className="w-4 h-4 text-green-500" />
                 <span className="text-sm font-semibold text-foreground">{t("transaction.receiverInfo", "Получатель")}</span>
               </div>
-              <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 font-bold text-sm shrink-0">
-                {(receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name)
-                  ? (receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name).charAt(0).toUpperCase()
-                  : (transaction.recipientName?.charAt(0)?.toUpperCase() || "R")}
-              </div>
+              {(() => {
+                const receiverName = receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name || transaction.recipientName;
+                // Determine if receiver is current user
+                const isCurrentUserReceiver = receipt.direction === 'inbound' || 
+                  (receiverName && user?.full_name && receiverName.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]));
+                const receiverAvatarUrl = isCurrentUserReceiver ? currentUserAvatar : ((receipt as any).recipient_avatar || (receipt as any).receiver_avatar || (transaction as any).recipientAvatar);
+                const receiverInitial = receiverName ? receiverName.charAt(0).toUpperCase() : "R";
+                
+                return receiverAvatarUrl ? (
+                  <img src={receiverAvatarUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 font-bold text-sm shrink-0">
+                    {receiverInitial}
+                  </div>
+                );
+              })()}
             </div>
             {(receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name) && (
               <div className="flex items-center justify-between">
