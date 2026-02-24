@@ -1759,6 +1759,20 @@ const TransactionDetails = () => {
                 <span className="font-semibold text-green-500">+{(receipt?.movements?.[1]?.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
               </div>
             </>
+          ) : isIncomingIbanToCard ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.receivedAmount")}</span>
+                <span className="font-semibold text-green-500">+{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+            </>
+          ) : isBankTransferIncoming ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.receivedAmount")}</span>
+                <span className="font-semibold text-green-500">+{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+            </>
           ) : isInternalTransfer ? (
             <>
               <div className="flex items-center justify-between">
