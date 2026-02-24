@@ -170,6 +170,7 @@ const handleClick = (transaction: Transaction) => {
               const isDeclined = transaction.type === "declined";
               const isIncomingCryptoToBank = isBankTransferIncoming && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank';
               const isOutgoingCryptoToBank = (transaction.type as string) === "crypto_to_bank" || (isBankTransfer && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank');
+              const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction.metadata as any)?.originalApiType || '');
 
               return (
                 <button
@@ -277,7 +278,9 @@ const handleClick = (transaction: Transaction) => {
                           ? t("transactions.walletDeposit")
                           : isIncomingCryptoToCard
                            ? "USDT → EasyCard"
-                          : isBankTransferIncoming
+                          : isIncomingIbanToCard
+                           ? "IBAN → EasyCard"
+                           : isBankTransferIncoming
                            ? "IBAN Bank → IBAN Bank"
                            : isIncomingTransfer
                            ? t("transactions.cardReceived")
@@ -298,6 +301,12 @@ const handleClick = (transaction: Transaction) => {
                               if (wallet) return ` · ${t("transactions.from")} ${maskMiddle(wallet)}`;
                               const sender = (transaction.metadata as any)?.sender_name || transaction.senderName || '';
                               return sender ? ` · ${t("transactions.from")} ${maskMiddle(sender)}` : '';
+                            })()
+                          : isIncomingIbanToCard
+                          ? (() => {
+                              const sender = transaction.senderName || (transaction.metadata as any)?.sender_name || '';
+                              if (sender) return ` · ${t("transactions.from")} ${maskMiddle(sender)}`;
+                              return ` · Card····${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`;
                             })()
                           : isIncomingTransfer && (transaction.senderCard || transaction.recipientCard)
                           ? ` · ${t("transactions.from")} •••• ${(transaction.senderCard || transaction.recipientCard || '').slice(-4)}`
