@@ -31,7 +31,8 @@ const SendIbanToCard = () => {
   const bankIban = bankAccount?.iban || "";
 
   // Use wallet summary cards (they have UUID ids needed for internal transfers)
-  const cards = (walletData?.data?.cards || []).map(c => ({
+  type CardWithNumber = Card & { cardNumber: string };
+  const cards: CardWithNumber[] = (walletData?.data?.cards || []).map(c => ({
     id: c.id,
     type: (c.type === 'metal' ? 'metal' : 'virtual') as Card['type'],
     name: c.type === 'metal' ? 'Visa Metal' : 'Visa Virtual',
@@ -40,7 +41,7 @@ const SendIbanToCard = () => {
     lastFourDigits: c.card_number?.slice(-4),
     cardNumber: c.card_number || '',
   }));
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [selectedCard, setSelectedCard] = useState<CardWithNumber | null>(null);
   const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,7 +72,7 @@ const SendIbanToCard = () => {
     try {
       const result = await submitBankToCard({
         from_bank_account_id: bankAccountId,
-        receiver_card_number: (selectedCard as any).cardNumber || '',
+        receiver_card_number: selectedCard.cardNumber,
         amount: amountNum.toFixed(2),
       });
 
