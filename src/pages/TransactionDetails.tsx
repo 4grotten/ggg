@@ -245,31 +245,53 @@ const TransactionDetails = () => {
           // Ensure outgoing types stay outgoing
           if (mapped === 'bank_transfer_incoming') mapped = 'bank_transfer';
           if (mapped === 'crypto_deposit') mapped = 'crypto_withdrawal';
-        } else if (!receipt.direction) {
-          // Legacy fallback: compare user IDs when direction is missing
-          if (receipt.type === 'crypto_withdrawal') {
-            const currentUserId = String(user?.id || '');
-            const receiptUserId = String(receipt.user_id || '');
-            const isIncoming = (currentUserId && receiptUserId && currentUserId !== receiptUserId) ||
-              (receipt as any).is_incoming === true;
-            if (isIncoming) mapped = 'crypto_deposit';
-          }
-          if (receipt.type === 'bank_withdrawal') {
-            let isIncoming = false;
-            const currentUserId = String(user?.id || '');
-            const receiptUserId = String(receipt.user_id || '');
-            if (currentUserId && receiptUserId && currentUserId !== receiptUserId) {
-              isIncoming = true;
-            } else if (!currentUserId || !receiptUserId) {
-              if (receipt.beneficiary_name && user?.full_name) {
-                const benName = receipt.beneficiary_name.toLowerCase().trim();
-                const userName = user.full_name.toLowerCase().trim();
-                if (benName === userName || userName.includes(benName) || benName.includes(userName)) {
-                  isIncoming = true;
-                }
+        } else {
+          // receipt.direction missing — check cached list data first
+          let listDirection: string | undefined;
+          if (apiTxGroups) {
+            for (const group of apiTxGroups) {
+              const found = group.transactions?.find((t: any) => {
+                const txRealId = t.id?.startsWith('api_') ? t.id.slice(4) : t.id;
+                return txRealId === realTransactionId;
+              });
+              if (found?.metadata?.isIncoming !== undefined) {
+                listDirection = found.metadata.isIncoming ? 'inbound' : 'outbound';
+                break;
               }
             }
-            if (isIncoming) mapped = 'bank_transfer_incoming';
+          }
+          if (listDirection === 'inbound') {
+            if (['crypto_withdrawal', 'crypto_send'].includes(mapped)) mapped = 'crypto_deposit';
+            if (['bank_transfer', 'bank_withdrawal'].includes(mapped)) mapped = 'bank_transfer_incoming';
+          } else if (listDirection === 'outbound') {
+            if (mapped === 'bank_transfer_incoming') mapped = 'bank_transfer';
+            if (mapped === 'crypto_deposit') mapped = 'crypto_withdrawal';
+          } else {
+            // Final fallback: compare user IDs
+            if (receipt.type === 'crypto_withdrawal') {
+              const currentUserId = String(user?.id || '');
+              const receiptUserId = String(receipt.user_id || '');
+              const isIncoming = (currentUserId && receiptUserId && currentUserId !== receiptUserId) ||
+                (receipt as any).is_incoming === true;
+              if (isIncoming) mapped = 'crypto_deposit';
+            }
+            if (receipt.type === 'bank_withdrawal') {
+              let isIncoming = false;
+              const currentUserId = String(user?.id || '');
+              const receiptUserId = String(receipt.user_id || '');
+              if (currentUserId && receiptUserId && currentUserId !== receiptUserId) {
+                isIncoming = true;
+              } else if (!currentUserId || !receiptUserId) {
+                if (receipt.beneficiary_name && user?.full_name) {
+                  const benName = receipt.beneficiary_name.toLowerCase().trim();
+                  const userName = user.full_name.toLowerCase().trim();
+                  if (benName === userName || userName.includes(benName) || benName.includes(userName)) {
+                    isIncoming = true;
+                  }
+                }
+              }
+              if (isIncoming) mapped = 'bank_transfer_incoming';
+            }
           }
         }
         return mapped as any;
@@ -317,7 +339,7 @@ const TransactionDetails = () => {
   const isBankTransfer = transaction?.type === "bank_transfer";
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
   const isInternalTransfer = transaction?.type === "internal_transfer";
-  const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction as any)?.originalApiType || '');
+  const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card', 'transfer_out'].includes((transaction as any)?.originalApiType || '');
    const isCryptoToCard = transaction?.type === "crypto_to_card";
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
   const isIncomingCryptoToBank = isCryptoToBank && (() => {
