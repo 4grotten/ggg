@@ -1974,15 +1974,20 @@ const TransactionDetails = () => {
                 <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
               </div>
             ) : receipt ? (
-              <div className="space-y-2 text-sm">
+              <div className="space-y-3 text-sm">
                 {Object.entries(receipt)
                   .filter(([, value]) => value !== null && value !== undefined)
-                  .map(([key, value]) => (
-                  <div key={key} className="flex items-start justify-between gap-3">
-                    <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
-                    <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
-                      {renderReceiptValue(value)}
-                    </pre>
+                  .map(([key, value], idx, arr) => (
+                  <div key={key}>
+                    <div className="flex items-center justify-between py-1">
+                      <span className="text-muted-foreground">{formatReceiptKey(key)}</span>
+                      <span className="font-medium text-right max-w-[220px] truncate">
+                        {renderReceiptValue(value)}
+                      </span>
+                    </div>
+                    {idx < arr.length - 1 && (
+                      <div className="border-b border-border/50 mt-2" />
+                    )}
                   </div>
                 ))}
               </div>
