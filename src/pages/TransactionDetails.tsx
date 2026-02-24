@@ -719,37 +719,20 @@ const TransactionDetails = () => {
           
           {isBankTransferIncoming ? (
             <>
+              {/* Sender info - from the receipt's user_id perspective */}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.sender")}</span>
-                <span className="font-medium">{transaction.senderName}</span>
+                <span className="font-medium">{transaction.senderName || (receipt as any)?.sender_name || "—"}</span>
               </div>
-              <div className="flex items-start justify-between">
-                <span className="text-muted-foreground">{t("transaction.iban")}</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-right text-sm">
-                    {showIban ? transaction.senderIban : `${transaction.senderIban?.slice(0, 4)}••••${transaction.senderIban?.slice(-4)}`}
-                  </span>
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(transaction.senderIban || '');
-                      toast.success(t("toast.copied", { label: "IBAN" }));
-                    }}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => setShowIban(!showIban)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.bankName")}</span>
-                <span className="font-medium">{transaction.senderBankName}</span>
-              </div>
+              {/* Sender IBAN - use userIban from the sender's wallet if available via multi-account */}
+              {(() => {
+                // Try to find sender's IBAN from multi-account wallet data
+                // The receipt user_id is the sender
+                const senderUserId = String(receipt?.user_id || '');
+                // We don't have sender's IBAN in the receipt, so skip this row
+                return null;
+              })()}
+              {/* Recipient IBAN (current user's account) */}
               <div className="flex items-start justify-between">
                 <span className="text-muted-foreground">{t("transaction.toAccount")}</span>
                 <div className="flex items-center gap-2">
@@ -757,16 +740,17 @@ const TransactionDetails = () => {
                     onClick={() => navigate("/account")}
                     className="font-medium text-[#007AFF] hover:underline transition-colors text-right text-sm"
                   >
-                    {userIban 
-                      ? (showToCard ? userIban : `${userIban.slice(0, 4)}••••${userIban.slice(-4)}`)
-                      : "AED Account"
-                    }
+                    {(() => {
+                      const recipientIban = receipt?.beneficiary_iban || userIban;
+                      if (!recipientIban) return "AED Account";
+                      return showToCard ? recipientIban : `${recipientIban.slice(0, 4)}••••${recipientIban.slice(-4)}`;
+                    })()}
                   </button>
-                  {userIban && (
+                  {(receipt?.beneficiary_iban || userIban) && (
                     <>
                       <button 
                         onClick={() => {
-                          navigator.clipboard.writeText(userIban);
+                          navigator.clipboard.writeText(receipt?.beneficiary_iban || userIban || '');
                           toast.success(t("toast.copied", { label: "IBAN" }));
                         }}
                         className="text-muted-foreground hover:text-foreground transition-colors"
@@ -785,11 +769,11 @@ const TransactionDetails = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.recipient")}</span>
-                <span className="font-medium">{user?.full_name || "—"}</span>
+                <span className="font-medium">{receipt?.beneficiary_name || user?.full_name || "—"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.bankName")}</span>
-                <span className="font-medium">EasyCard FZE</span>
+                <span className="font-medium">{receipt?.beneficiary_bank_name || "EasyCard FZE"}</span>
               </div>
             </>
           ) : isInternalTransfer ? (
