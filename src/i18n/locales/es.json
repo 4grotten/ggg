@@ -573,7 +573,15 @@
     "fromAccount": "Desde Cuenta",
     "aedAccount": "Cuenta AED",
     "cardBalance": "Saldo de Tarjeta",
-    "description": "Descripción"
+    "description": "Descripción",
+    "walletToIban": "Billetera USDT → IBAN Banco",
+    "walletToCard": "Billetera USDT → EasyCard",
+    "totalDeducted": "Deducido de la billetera",
+    "creditedToIban": "Acreditado en IBAN",
+    "receipt": "Recibo",
+    "operation": "Operación",
+    "receiptUnavailable": "Recibo no disponible",
+    "inNetwork": "En la red"
   },
   "topUp": {
     "selectAccount": "Seleccionar Cuenta para Abrir",

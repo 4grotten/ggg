@@ -684,7 +684,7 @@ const TransactionDetails = () => {
               {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank ? '+' : '-'}{isCryptoToBank ? (receipt?.movements?.[1]?.amount || (transaction.amountUSDT * (receipt?.exchange_rate || 3.65))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoToBank ? 'AED' : isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isCryptoToBank ? 'Кошелёк USDT → IBAN Bank' : isIncomingCryptoToCard ? `Кошелёк USDT → ${t('transactions.cardTopUp')}` : isCryptoToCard ? 'Кошелёк USDT → Карта EasyCard' : isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isInternalTransfer ? t('transactions.ibanToCard') : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' ? t('transactions.ibanToCard') : t('transaction.bankTransfer')) : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCryptoToBank ? t('transaction.walletToIban') : isIncomingCryptoToCard ? `${t('transaction.walletToIban').split(' →')[0]} → ${t('transactions.cardTopUp')}` : isCryptoToCard ? t('transaction.walletToCard') : isCryptoDeposit ? t('transactions.walletDeposit') : isBankTransferIncoming ? t('transaction.accountIncoming') : isInternalTransfer ? t('transactions.ibanToCard') : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' ? t('transactions.ibanToCard') : t('transaction.bankTransfer')) : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
@@ -866,7 +866,7 @@ const TransactionDetails = () => {
               {/* From Wallet (sender's wallet) */}
               {transaction.fromWalletAddress && (
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">{t("transaction.fromWallet", "Кошелёк")}</span>
+                  <span className="text-muted-foreground">{t("transaction.fromWallet")}</span>
                   <div className="flex items-center gap-2">
                     <Wallet className="w-4 h-4 text-muted-foreground" />
                     <span className="font-medium">
@@ -997,11 +997,11 @@ const TransactionDetails = () => {
               </div>
               {/* Recipient - IBAN */}
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Получатель</span>
+                <span className="text-muted-foreground">{t("transaction.recipient")}</span>
                 <span className="font-medium">{transaction.recipientName || receipt?.beneficiary_name || receipt?.recipient_name || (receipt as any)?.to_name || '—'}</span>
               </div>
               <div className="flex items-start justify-between">
-                <span className="text-muted-foreground">IBAN</span>
+                <span className="text-muted-foreground">{t("transaction.iban")}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-right text-sm">
                     {showIban ? (receipt?.beneficiary_iban || receipt?.to_iban || transaction.recipientIban || fullIban || '—') : `${(receipt?.beneficiary_iban || receipt?.to_iban || transaction.recipientIban || fullIban || '').slice(0, 4)}••••${(receipt?.beneficiary_iban || receipt?.to_iban || transaction.recipientIban || fullIban || '').slice(-4)}`}
@@ -1083,7 +1083,7 @@ const TransactionDetails = () => {
                     )}
                     <span className="font-medium">{receipt.recipient_name as string}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-500">
-                      {t("transaction.inNetwork", "В сети")}
+                      {t("transaction.inNetwork")}
                     </span>
                   </div>
                 </div>
@@ -1397,7 +1397,7 @@ const TransactionDetails = () => {
           {isCryptoToCard && isIncomingCryptoToCard ? (
             <>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.sentAmount", "Сумма перевода")}</span>
+                <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
                 <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
@@ -1405,7 +1405,7 @@ const TransactionDetails = () => {
                 <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span>
+                <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
                 <span className="font-medium">5.90 USDT</span>
               </div>
               <div className="flex items-center justify-between">
@@ -1413,14 +1413,14 @@ const TransactionDetails = () => {
                 <span className="font-medium">1 USDT = {(transaction as any).cryptoToCardExchangeRate || 3.65} AED</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-muted-foreground">{t("transaction.credited", "Зачислено на карту")}</span>
+                <span className="text-muted-foreground">{t("transaction.credited")}</span>
                 <span className="font-semibold text-green-500">+{((transaction as any).cryptoToCardCreditedAed || transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
               </div>
             </>
           ) : isCryptoToCard ? (
             <>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.sentAmount", "Сумма перевода")}</span>
+                <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
                 <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
@@ -1428,11 +1428,11 @@ const TransactionDetails = () => {
                 <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span>
+                <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
                 <span className="font-medium">5.90 USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.totalDeducted", "Списано с кошелька")}</span>
+                <span className="text-muted-foreground">{t("transaction.totalDeducted")}</span>
                 <span className="font-medium">{(transaction.amountUSDT + (transaction.transferFee || 0) + 5.90).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
@@ -1440,14 +1440,14 @@ const TransactionDetails = () => {
                 <span className="font-medium">1 USDT = {(transaction as any).cryptoToCardExchangeRate || 3.65} AED</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-muted-foreground">{t("transaction.credited", "Зачислено на карту")}</span>
+                <span className="text-muted-foreground">{t("transaction.credited")}</span>
                 <span className="font-semibold text-green-500">+{((transaction as any).cryptoToCardCreditedAed || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
               </div>
             </>
           ) : isCryptoToBank ? (
             <>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.sentAmount", "Сумма перевода")}</span>
+                <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
                 <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
@@ -1455,11 +1455,11 @@ const TransactionDetails = () => {
                 <span className="font-medium">{(receipt?.fee || transaction.transferFee || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span>
+                <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
                 <span className="font-medium">5.90 USDT</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.totalDeducted", "Списано с кошелька")}</span>
+                <span className="text-muted-foreground">{t("transaction.totalDeducted")}</span>
                 <span className="font-medium">{(receipt?.movements?.[0]?.amount || (transaction.amountUSDT + (receipt?.fee || 0) + 5.90)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
@@ -1467,7 +1467,7 @@ const TransactionDetails = () => {
                 <span className="font-medium">1 USDT = {receipt?.exchange_rate || 3.65} AED</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-muted-foreground">Зачислено на IBAN</span>
+                <span className="text-muted-foreground">{t("transaction.creditedToIban")}</span>
                 <span className="font-semibold text-green-500">+{(receipt?.movements?.[1]?.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
               </div>
             </>
@@ -1616,7 +1616,7 @@ const TransactionDetails = () => {
           <div className="bg-secondary rounded-2xl p-4 space-y-3">
             <div className="flex items-center gap-2 mb-1">
               <FileText className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium text-sm">{t("transaction.receipt", "Чек / Квитанция")}</span>
+              <span className="font-medium text-sm">{t("transaction.receipt")}</span>
             </div>
             {receiptLoading ? (
               <div className="flex items-center justify-center py-4">
@@ -1629,7 +1629,7 @@ const TransactionDetails = () => {
                   <span className="font-medium capitalize">{receipt.status}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">{t("transaction.operation", "Операция")}</span>
+                  <span className="text-muted-foreground">{t("transaction.operation")}</span>
                   <span className="font-medium">{receipt.operation}</span>
                 </div>
                 {receipt.amount_crypto != null && (
@@ -1704,7 +1704,7 @@ const TransactionDetails = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable", "Чек недоступен")}</p>
+              <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable")}</p>
             )}
           </div>
         )}

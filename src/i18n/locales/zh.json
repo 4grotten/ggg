@@ -579,7 +579,15 @@
     "fromAccount": "从账户",
     "aedAccount": "AED账户",
     "cardBalance": "卡余额",
-    "description": "描述"
+    "description": "描述",
+    "walletToIban": "USDT 钱包 → IBAN 银行",
+    "walletToCard": "USDT 钱包 → EasyCard",
+    "totalDeducted": "从钱包扣除",
+    "creditedToIban": "已入账至IBAN",
+    "receipt": "收据",
+    "operation": "操作",
+    "receiptUnavailable": "收据不可用",
+    "inNetwork": "网络内"
   },
   "topUp": {
     "selectAccount": "选择要开通的账户",

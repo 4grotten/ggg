@@ -642,7 +642,15 @@
     "fromAccount": "Со счёта",
     "aedAccount": "Счёт AED",
     "cardBalance": "Баланс карты",
-    "description": "Описание"
+    "description": "Описание",
+    "walletToIban": "Кошелёк USDT → IBAN Bank",
+    "walletToCard": "Кошелёк USDT → Карта EasyCard",
+    "totalDeducted": "Списано с кошелька",
+    "creditedToIban": "Зачислено на IBAN",
+    "receipt": "Чек / Квитанция",
+    "operation": "Операция",
+    "receiptUnavailable": "Чек недоступен",
+    "inNetwork": "В сети"
   },
   "topUp": {
     "selectAccount": "Выберите счёт для открытия",
