@@ -404,6 +404,11 @@ const TransactionDetails = () => {
   const [showFromAddress, setShowFromAddress] = useState(false);
   const [showIban, setShowIban] = useState(false);
   const [receiptExpanded, setReceiptExpanded] = useState(false);
+  const [showSenderIban, setShowSenderIban] = useState(false);
+  const [showSenderCard, setShowSenderCard] = useState(false);
+  const [showReceiverCard, setShowReceiverCard] = useState(false);
+  const [showReceiverIban, setShowReceiverIban] = useState(false);
+  const [showCryptoAddr, setShowCryptoAddr] = useState(false);
   const receiptPrintRef = useRef<HTMLDivElement>(null);
 
   const handlePrintReceipt = useCallback(() => {
@@ -1796,24 +1801,50 @@ const TransactionDetails = () => {
                       <span className="font-medium">{receipt.sender_name}</span>
                     </div>
                   )}
-                  {((receipt as any).sender_iban || (receipt as any).sender_iban_mask) && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">IBAN</span>
-                      <span className="font-medium text-sm">{(receipt as any).sender_iban || (receipt as any).sender_iban_mask}</span>
-                    </div>
-                  )}
+                  {((receipt as any).sender_iban || (receipt as any).sender_iban_mask) && (() => {
+                    const sIban = String((receipt as any).sender_iban || (receipt as any).sender_iban_mask);
+                    return (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">IBAN</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">
+                            {showSenderIban ? sIban : `${sIban.slice(0, 4)}••••${sIban.slice(-4)}`}
+                          </span>
+                          <button onClick={() => { navigator.clipboard.writeText(sIban); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => setShowSenderIban(!showSenderIban)} className="text-muted-foreground hover:text-foreground transition-colors">
+                            {showSenderIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {(receipt as any).sender_bank && (
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">{t("transaction.bankName")}</span>
                       <span className="font-medium">{(receipt as any).sender_bank}</span>
                     </div>
                   )}
-                  {(receipt as any).sender_card_mask && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">{t("transaction.card")}</span>
-                      <span className="font-medium">{(receipt as any).sender_card_mask}</span>
-                    </div>
-                  )}
+                  {(receipt as any).sender_card_mask && (() => {
+                    const sMask = String((receipt as any).sender_card_mask);
+                    return (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t("transaction.card")}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">
+                            {showSenderCard ? sMask : `••••${sMask.slice(-4)}`}
+                          </span>
+                          <button onClick={() => { navigator.clipboard.writeText(sMask); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => setShowSenderCard(!showSenderCard)} className="text-muted-foreground hover:text-foreground transition-colors">
+                            {showSenderCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
@@ -1827,18 +1858,44 @@ const TransactionDetails = () => {
                       <span className="font-medium">{receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name}</span>
                     </div>
                   )}
-                  {(receipt as any).receiver_card_mask && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">{t("transaction.card")}</span>
-                      <span className="font-medium">{(receipt as any).receiver_card_mask}</span>
-                    </div>
-                  )}
-                  {receipt.beneficiary_iban && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">IBAN</span>
-                      <span className="font-medium text-sm">{receipt.beneficiary_iban}</span>
-                    </div>
-                  )}
+                  {(receipt as any).receiver_card_mask && (() => {
+                    const rMask = String((receipt as any).receiver_card_mask);
+                    return (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t("transaction.card")}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">
+                            {showReceiverCard ? rMask : `••••${rMask.slice(-4)}`}
+                          </span>
+                          <button onClick={() => { navigator.clipboard.writeText(rMask); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => setShowReceiverCard(!showReceiverCard)} className="text-muted-foreground hover:text-foreground transition-colors">
+                            {showReceiverCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  {receipt.beneficiary_iban && (() => {
+                    const bIban = String(receipt.beneficiary_iban);
+                    return (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">IBAN</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">
+                            {showReceiverIban ? bIban : `${bIban.slice(0, 4)}••••${bIban.slice(-4)}`}
+                          </span>
+                          <button onClick={() => { navigator.clipboard.writeText(bIban); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => setShowReceiverIban(!showReceiverIban)} className="text-muted-foreground hover:text-foreground transition-colors">
+                            {showReceiverIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {receipt.beneficiary_bank && (
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">{t("transaction.bankName")}</span>
@@ -1851,12 +1908,25 @@ const TransactionDetails = () => {
                       <span className="font-medium">{(receipt as any).beneficiary_swift}</span>
                     </div>
                   )}
-                  {receipt.crypto_address && (
-                    <div className="flex items-start justify-between">
-                      <span className="text-muted-foreground">{t("transaction.cryptoAddress", "Адрес")}</span>
-                      <span className="font-medium text-right text-sm max-w-[180px] break-all">{String(receipt.crypto_address)}</span>
-                    </div>
-                  )}
+                  {receipt.crypto_address && (() => {
+                    const addr = String(receipt.crypto_address);
+                    return (
+                      <div className="flex items-start justify-between">
+                        <span className="text-muted-foreground">{t("transaction.cryptoAddress", "Адрес")}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                            {showCryptoAddr ? addr : `${addr.slice(0, 6)}...${addr.slice(-6)}`}
+                          </span>
+                          <button onClick={() => { navigator.clipboard.writeText(addr); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => setShowCryptoAddr(!showCryptoAddr)} className="text-muted-foreground hover:text-foreground transition-colors">
+                            {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
