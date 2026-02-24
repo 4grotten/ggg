@@ -656,7 +656,15 @@
     "fromAccount": "From Account",
     "aedAccount": "AED Account",
     "cardBalance": "Card Balance",
-    "description": "Description"
+    "description": "Description",
+    "walletToIban": "USDT Wallet → IBAN Bank",
+    "walletToCard": "USDT Wallet → EasyCard",
+    "totalDeducted": "Deducted from wallet",
+    "creditedToIban": "Credited to IBAN",
+    "receipt": "Receipt",
+    "operation": "Operation",
+    "receiptUnavailable": "Receipt unavailable",
+    "inNetwork": "In network"
   },
   "topUp": {
     "selectAccount": "Select Account to Open",

@@ -573,7 +573,15 @@
     "fromAccount": "من الحساب",
     "aedAccount": "حساب AED",
     "cardBalance": "رصيد البطاقة",
-    "description": "الوصف"
+    "description": "الوصف",
+    "walletToIban": "محفظة USDT → IBAN بنك",
+    "walletToCard": "محفظة USDT → EasyCard",
+    "totalDeducted": "خصم من المحفظة",
+    "creditedToIban": "تم الإيداع في IBAN",
+    "receipt": "إيصال",
+    "operation": "عملية",
+    "receiptUnavailable": "الإيصال غير متاح",
+    "inNetwork": "في الشبكة"
   },
   "topUp": {
     "selectAccount": "اختر الحساب للفتح",

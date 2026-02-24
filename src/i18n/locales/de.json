@@ -573,7 +573,15 @@
     "fromAccount": "Von Konto",
     "aedAccount": "AED-Konto",
     "cardBalance": "Kartenguthaben",
-    "description": "Beschreibung"
+    "description": "Beschreibung",
+    "walletToIban": "USDT Wallet → IBAN Bank",
+    "walletToCard": "USDT Wallet → EasyCard",
+    "totalDeducted": "Vom Wallet abgezogen",
+    "creditedToIban": "Auf IBAN gutgeschrieben",
+    "receipt": "Beleg",
+    "operation": "Vorgang",
+    "receiptUnavailable": "Beleg nicht verfügbar",
+    "inNetwork": "Im Netzwerk"
   },
   "topUp": {
     "selectAccount": "Konto zum Öffnen auswählen",

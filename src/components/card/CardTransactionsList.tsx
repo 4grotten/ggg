@@ -57,7 +57,7 @@ const translateMerchant = (merchant: string, type: string | undefined, t: (key: 
   }
   
   if (type === "crypto_to_bank") {
-    return "Кошелёк USDT → IBAN Bank";
+    return t("transaction.walletToIban");
   }
   
   const merchantsMap: { [key: string]: string } = {
@@ -268,15 +268,15 @@ const handleClick = (transaction: Transaction) => {
                     <div className="text-left min-w-0 flex-1">
                       <p className="font-medium">
                       {isOutgoingCryptoToBank
-                          ? "Кошелёк USDT → IBAN Bank"
+                          ? t("transaction.walletToIban")
                           : isIncomingCryptoToBank
-                          ? "Кошелёк USDT → IBAN Bank"
+                          ? t("transaction.walletToIban")
                           : walletView && isTopup 
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit
                           ? t("transactions.walletDeposit")
                           : isIncomingCryptoToCard
-                           ? `Кошелёк USDT → ${t("transactions.cardTopUp")}`
+                           ? `${t("transaction.walletToIban").split(' →')[0]} → ${t("transactions.cardTopUp")}`
                           : isIncomingTransfer
                           ? t("transactions.cardReceived")
                           : isOutgoingTransfer
@@ -312,7 +312,7 @@ const handleClick = (transaction: Transaction) => {
                               const iban = (transaction.metadata as any)?.beneficiary_iban;
                               if (iban) {
                                 const display = iban.replace(/\s*\*+\s*/g, '••••');
-                                return ` · На ${display}`;
+                               return ` · ${t("transactions.to")} ${display}`;
                               }
                               const name = (transaction.metadata as any)?.beneficiary_name || transaction.recipientName;
                               if (name) return ` · ${t("transactions.to")} ${maskMiddle(name)}`;

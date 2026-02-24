@@ -573,7 +573,15 @@
     "fromAccount": "Hesaptan",
     "aedAccount": "AED Hesabı",
     "cardBalance": "Kart Bakiyesi",
-    "description": "Açıklama"
+    "description": "Açıklama",
+    "walletToIban": "USDT Cüzdan → IBAN Banka",
+    "walletToCard": "USDT Cüzdan → EasyCard",
+    "totalDeducted": "Cüzdandan düşülen",
+    "creditedToIban": "IBAN'a yatırılan",
+    "receipt": "Makbuz",
+    "operation": "İşlem",
+    "receiptUnavailable": "Makbuz mevcut değil",
+    "inNetwork": "Ağda"
   },
   "topUp": {
     "selectAccount": "Açılacak Hesabı Seçin",
