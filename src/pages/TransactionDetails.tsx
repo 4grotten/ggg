@@ -2299,6 +2299,29 @@ const TransactionDetails = () => {
                   <div ref={receiptPrintRef} className="space-y-2 text-sm">
                     {Object.entries(receipt)
                       .filter(([key, value]) => value !== null && value !== undefined && !RECEIPT_HIDDEN_KEYS.has(key))
+                      .sort(([a], [b]) => {
+                        const order: Record<string, number> = {
+                          // Identity & meta
+                          type: 0, direction: 1, status: 2, operation: 3,
+                          // Sender
+                          sender_name: 10, sender_id: 11, sender_card_mask: 12, sender_iban: 13, sender_iban_mask: 14, sender_bank: 15,
+                          // Receiver
+                          receiver_name: 20, receiver_id: 21, receiver_card_mask: 22, recipient_name: 23,
+                          beneficiary_name: 24, beneficiary_iban: 25, beneficiary_bank: 26, beneficiary_swift: 27,
+                          crypto_address: 28, is_internal: 29,
+                          // Token/network
+                          token: 30, network: 31, token_network: 32,
+                          // Amounts & fees
+                          amount: 40, currency: 41, amount_usdt: 42, exchange_rate: 43,
+                          fee: 50, fee_percent: 51, fee_amount: 52, network_fee: 53, bank_fee: 54,
+                          total: 60, credited: 61, debited: 62,
+                          // Dates
+                          created_at: 70, updated_at: 71, settled_at: 72,
+                          // Other
+                          description: 80, reference_id: 81, iban_mask: 82,
+                        };
+                        return (order[a] ?? 90) - (order[b] ?? 90);
+                      })
                       .map(([key, value]) => (
                       <div key={key} className="flex items-start justify-between gap-3">
                         <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
