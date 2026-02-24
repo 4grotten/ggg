@@ -1275,18 +1275,7 @@ const TransactionDetails = () => {
                 <>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("transaction.sender")}</span>
-                    <div className="flex items-center gap-2">
-                      <Wallet className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium">
-                        {showFromAddress ? ((receipt as any)?.crypto_address || userCryptoWallet?.address || '—') : `${((receipt as any)?.crypto_address || userCryptoWallet?.address || '').slice(0, 6)}...${((receipt as any)?.crypto_address || userCryptoWallet?.address || '').slice(-4)}`}
-                      </span>
-                      <button onClick={() => { navigator.clipboard.writeText((receipt as any)?.crypto_address || userCryptoWallet?.address || ''); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
-                        <Copy className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => setShowFromAddress(!showFromAddress)} className="text-muted-foreground hover:text-foreground transition-colors">
-                        {showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
+                    <span className="font-medium">{receipt?.sender_name || user?.full_name || '—'}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
