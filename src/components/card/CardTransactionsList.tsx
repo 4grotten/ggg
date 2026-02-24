@@ -206,7 +206,7 @@ const handleClick = (transaction: Transaction) => {
                       ) : isBankTransfer ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                          style={{ backgroundColor: "#8B5CF6" }}
+                          style={{ backgroundColor: "#007AFF" }}
                         >
                           <Landmark className="w-5 h-5" />
                         </div>
