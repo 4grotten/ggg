@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 // API hooks
-import { useWalletSummary, useCryptoWallets } from "@/hooks/useCards";
+import { useWalletSummary, useCryptoWallets, useBankAccounts } from "@/hooks/useCards";
 import { useMergedTransactionGroups } from "@/hooks/useTransactions";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -82,6 +82,7 @@ const Dashboard = () => {
 
   const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
   const { data: cryptoWalletsData } = useCryptoWallets();
+  const { data: bankAccountsData } = useBankAccounts();
 
   // Get USDT balance from crypto wallets API
   const usdtWallet = cryptoWalletsData?.data?.find(w => w.token === 'USDT' || w.token === 'usdt');
@@ -97,7 +98,9 @@ const Dashboard = () => {
     lastFourDigits: c.card_number?.slice(-4),
   }));
   const physicalAccount = walletData?.data?.physical_account;
-  const accountBal = physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0;
+  // Use bank-accounts balance (primary source), fallback to wallet summary
+  const bankAccount = bankAccountsData?.data?.[0];
+  const accountBal = bankAccount?.balance ? parseFloat(bankAccount.balance) : (physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0);
   const totalBalance = cards.reduce((sum, c) => sum + c.balance, 0) + accountBal;
   const transactionGroups = transactionsData?.groups || [];
 
@@ -249,8 +252,8 @@ const Dashboard = () => {
           {isAuthenticated && (
             <AnimatedSection delay={0.65} preset="fadeUpScale">
               <AccountWalletButtons
-                accountBalance={physicalAccount?.balance ? parseFloat(physicalAccount.balance) : 0}
-                accountIbanLast4={physicalAccount?.iban?.slice(-4)}
+                accountBalance={accountBal}
+                accountIbanLast4={bankAccount?.iban?.slice(-4) || physicalAccount?.iban?.slice(-4)}
                 usdtBalance={usdtBalance}
                 onAccountClick={() => navigate("/account")}
                 onWalletClick={() => navigate("/wallet")}
