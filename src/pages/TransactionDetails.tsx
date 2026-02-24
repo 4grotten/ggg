@@ -4,6 +4,8 @@ import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink,
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
@@ -527,6 +529,12 @@ const TransactionDetails = () => {
           <ChevronLeft className="w-5 h-5" />
           <span className="text-sm">{t("transaction.back")}</span>
         </button>
+      }
+      rightAction={
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
+        </div>
       }
     >
       <PullToRefresh
