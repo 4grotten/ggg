@@ -215,7 +215,7 @@ const handleClick = (transaction: Transaction) => {
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: "#007AFF" }}
                         >
-                          <Send className="w-5 h-5" />
+                          <UsdtIcon size={22} />
                         </div>
                       ) : isCardTransfer ? (
                         <div 
