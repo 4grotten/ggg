@@ -1051,27 +1051,37 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.bankName")}</span>
                 <span className="font-medium">{transaction.recipientBankName}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
+              <div className="flex items-start justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromAccount")}</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">
-                    {showFromCard ? `Visa ${transaction.cardType} ${transaction.fromCardFull || ''}` : `Visa ${transaction.cardType} ••${transaction.cardLast4}`}
-                  </span>
                   <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(transaction.fromCardFull?.replace(/\s/g, '') || '');
-                      toast.success(t("toast.cardNumberCopied"));
-                    }}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => navigate("/account")}
+                    className="font-medium text-[#007AFF] hover:underline transition-colors text-right text-sm"
                   >
-                    <Copy className="w-4 h-4" />
+                    {userIban 
+                      ? (showFromCard ? userIban : `${userIban.slice(0, 4)}••••${userIban.slice(-4)}`)
+                      : t("transaction.aedAccount")
+                    }
                   </button>
-                  <button 
-                    onClick={() => setShowFromCard(!showFromCard)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showFromCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+                  {userIban && (
+                    <>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(userIban);
+                          toast.success(t("toast.copied", { label: "IBAN" }));
+                        }}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setShowFromCard(!showFromCard)}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showFromCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </>
