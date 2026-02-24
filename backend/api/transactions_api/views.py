@@ -126,11 +126,14 @@ class AllTransactionsListView(APIView):
         
         data = [{
             "id": tx.id,
+            "user_id": tx.user_id,
             "type": tx.type,
             "direction": get_transaction_direction(tx, user_id),
             "status": tx.status,
             "amount": tx.amount,
             "currency": tx.currency,
+            "sender_id": tx.sender_id,
+            "receiver_id": tx.receiver_id,
             "fee": tx.fee,
             "exchange_rate": str(tx.exchange_rate) if tx.exchange_rate else None,
             "original_amount": tx.original_amount,
@@ -164,11 +167,14 @@ class IBANTransactionsListView(APIView):
         
         data = [{
             "id": tx.id,
+            "user_id": tx.user_id,
             "type": tx.type,
             "direction": get_transaction_direction(tx, user_id),
             "status": tx.status,
             "amount": tx.amount,
             "currency": tx.currency,
+            "sender_id": tx.sender_id,
+            "receiver_id": tx.receiver_id,
             "fee": tx.fee,
             "exchange_rate": str(tx.exchange_rate) if tx.exchange_rate else None,
             "original_amount": tx.original_amount,
@@ -201,11 +207,14 @@ class CardTransactionsListView(APIView):
         
         data = [{
             "id": tx.id,
+            "user_id": tx.user_id,
             "type": tx.type,
             "direction": get_transaction_direction(tx, user_id),
             "status": tx.status,
             "amount": tx.amount,
             "currency": tx.currency,
+            "sender_id": tx.sender_id,
+            "receiver_id": tx.receiver_id,
             "fee": tx.fee,
             "exchange_rate": str(tx.exchange_rate) if tx.exchange_rate else None,
             "original_amount": tx.original_amount,
@@ -238,11 +247,14 @@ class CryptoTransactionsListView(APIView):
         
         data = [{
             "id": tx.id,
+            "user_id": tx.user_id,
             "type": tx.type,
             "direction": get_transaction_direction(tx, user_id),
             "status": tx.status,
             "amount": tx.amount,
             "currency": tx.currency,
+            "sender_id": tx.sender_id,
+            "receiver_id": tx.receiver_id,
             "fee": tx.fee,
             "exchange_rate": str(tx.exchange_rate) if tx.exchange_rate else None,
             "original_amount": tx.original_amount,
