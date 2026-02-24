@@ -13,7 +13,7 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { useBankAccounts, useWalletSummary } from "@/hooks/useCards";
 import { Card } from "@/types/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { submitInternalTransfer } from "@/services/api/transactions";
+import { submitBankToCard } from "@/services/api/transactions";
 import aedCurrency from "@/assets/aed-currency.png";
 
 const SendIbanToCard = () => {
@@ -31,13 +31,14 @@ const SendIbanToCard = () => {
   const bankIban = bankAccount?.iban || "";
 
   // Use wallet summary cards (they have UUID ids needed for internal transfers)
-  const cards: Card[] = (walletData?.data?.cards || []).map(c => ({
+  const cards = (walletData?.data?.cards || []).map(c => ({
     id: c.id,
     type: (c.type === 'metal' ? 'metal' : 'virtual') as Card['type'],
     name: c.type === 'metal' ? 'Visa Metal' : 'Visa Virtual',
     isActive: true,
     balance: parseFloat(c.balance) || 0,
     lastFourDigits: c.card_number?.slice(-4),
+    cardNumber: c.card_number || '',
   }));
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [amount, setAmount] = useState("");
@@ -68,11 +69,9 @@ const SendIbanToCard = () => {
     setIsSubmitting(true);
 
     try {
-      const result = await submitInternalTransfer({
-        from_type: "bank",
-        from_id: bankAccountId,
-        to_type: "card",
-        to_id: selectedCard.id,
+      const result = await submitBankToCard({
+        from_bank_account_id: bankAccountId,
+        receiver_card_number: (selectedCard as any).cardNumber || '',
         amount: amountNum.toFixed(2),
       });
 
