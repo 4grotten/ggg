@@ -430,11 +430,55 @@ const TransactionDetails = () => {
     printWindow.close();
   }, [t]);
 
+  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id']);
+
+  const receiptTypeLabels: Record<string, string> = {
+    crypto_to_crypto: t("transaction.typeCryptoToCrypto", "Отправка стейблкоинов"),
+    card_transfer: t("transaction.typeCardTransfer", "Перевод на карту"),
+    bank_withdrawal: t("transaction.typeBankWithdrawal", "Банковский перевод"),
+    transfer_out: t("transaction.typeTransferOut", "Исходящий перевод"),
+    iban_to_card: t("transaction.typeIbanToCard", "IBAN → EasyCard"),
+    crypto_withdrawal: t("transaction.typeCryptoWithdrawal", "Вывод крипто"),
+    crypto_deposit: t("transaction.typeCryptoDeposit", "Пополнение крипто"),
+    crypto_to_card: t("transaction.typeCryptoToCard", "USDT → EasyCard"),
+    internal_transfer: t("transaction.typeInternalTransfer", "Внутренний перевод"),
+    card_payment: t("transaction.typeCardPayment", "Оплата картой"),
+    iban_to_iban: t("transaction.typeIbanToIban", "IBAN → IBAN"),
+    crypto_to_iban: t("transaction.typeCryptoToIban", "Крипто → IBAN"),
+    top_up: t("transaction.typeTopUp", "Пополнение"),
+  };
+
+  const receiptDirectionLabels: Record<string, string> = {
+    inbound: t("transaction.directionInbound", "Входящий"),
+    outbound: t("transaction.directionOutbound", "Исходящий"),
+    internal: t("transaction.directionInternal", "Внутренний"),
+  };
+
+  const receiptStatusLabels: Record<string, string> = {
+    completed: t("transaction.completed", "Завершено"),
+    pending: t("transaction.pending", "В обработке"),
+    failed: t("transaction.failed", "Ошибка"),
+    cancelled: t("transaction.cancelled", "Отменено"),
+    processing: t("transaction.processing", "Обработка"),
+  };
+
   const formatReceiptKey = (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 
-  const renderReceiptValue = (value: unknown) => {
+  const formatDateTime = (value: string) => {
+    try {
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return value;
+      return d.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch { return value; }
+  };
+
+  const renderReceiptValue = (key: string, value: unknown): string => {
     if (value === null) return 'null';
     if (value === undefined) return 'undefined';
+    if (key === 'type' && typeof value === 'string') return receiptTypeLabels[value] || value;
+    if (key === 'direction' && typeof value === 'string') return receiptDirectionLabels[value] || value;
+    if (key === 'status' && typeof value === 'string') return receiptStatusLabels[value] || value;
+    if (key === 'date_time' && typeof value === 'string') return formatDateTime(value);
     if (typeof value === 'string') return value;
     if (typeof value === 'number' || typeof value === 'boolean') return String(value);
     try {
@@ -2019,12 +2063,12 @@ const TransactionDetails = () => {
                 ) : receipt ? (
                   <div ref={receiptPrintRef} className="space-y-2 text-sm">
                     {Object.entries(receipt)
-                      .filter(([, value]) => value !== null && value !== undefined)
+                      .filter(([key, value]) => value !== null && value !== undefined && !RECEIPT_HIDDEN_KEYS.has(key))
                       .map(([key, value]) => (
                       <div key={key} className="flex items-start justify-between gap-3">
                         <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
                         <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
-                          {renderReceiptValue(value)}
+                          {renderReceiptValue(key, value)}
                         </pre>
                       </div>
                     ))}
