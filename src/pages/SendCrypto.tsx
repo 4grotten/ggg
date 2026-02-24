@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/drawer";
 import { useSettings } from "@/contexts/SettingsContext";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
-import { useCards, useIban, useCryptoWallets } from "@/hooks/useCards";
+import { useCards, useIban, useCryptoWallets, useBankAccounts } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
@@ -59,6 +59,7 @@ const SendCrypto = () => {
   const { data: cardsResponse, isLoading: cardsLoading } = useCards();
   const { data: ibanResponse, isLoading: ibanLoading } = useIban();
   const { data: cryptoWalletsResponse, isLoading: cryptoLoading } = useCryptoWallets();
+  const { data: bankAccountsResponse } = useBankAccounts();
 
   // Build source options from real data
   const [sourceOptions, setSourceOptions] = useState<SourceOption[]>([]);
@@ -94,10 +95,11 @@ const SendCrypto = () => {
       });
     }
 
-    // Add bank account from IBAN API
+    // Add bank account from IBAN API (use real UUID from bank-accounts endpoint)
     if (ibanResponse?.data) {
+      const bankAccount = bankAccountsResponse?.data?.[0];
       options.push({
-        id: "bank_account",
+        id: bankAccount?.id || "bank_account",
         type: "bank_account",
         name: t("send.bankAccount", "Банковский счёт AED"),
         iban: ibanResponse.data.iban,
@@ -112,7 +114,7 @@ const SendCrypto = () => {
       const bankOption = options.find(o => o.type === "bank_account");
       setSelectedSource(bankOption || options[0]);
     }
-  }, [cardsResponse, ibanResponse, cryptoWalletsResponse]);
+  }, [cardsResponse, ibanResponse, cryptoWalletsResponse, bankAccountsResponse]);
 
   const [selectedCoin, setSelectedCoin] = useState(coins[0]);
   const [selectedNetwork, setSelectedNetwork] = useState(networksByCoin[coins[0].id][0]);
@@ -267,8 +269,25 @@ const SendCrypto = () => {
             network: selectedNetwork.id.toUpperCase(),
           }),
         }, true);
+      } else if (selectedSource?.type === "bank_account") {
+        // Bank (IBAN) → Crypto Wallet
+        res = await apiRequest<{
+          message: string;
+          transaction_id: string;
+          status: string;
+          deducted_amount?: number;
+          fee?: number;
+          credited_amount?: number;
+        }>('/transactions/transfer/bank-to-crypto/', {
+          method: 'POST',
+          body: JSON.stringify({
+            from_bank_account_id: selectedSource.id,
+            to_crypto_address: walletAddress,
+            amount_aed: amountNum.toFixed(2),
+          }),
+        }, true);
       } else {
-        // Card/Bank → External Crypto Wallet
+        // Card → External Crypto Wallet
         res = await apiRequest<{
           message: string;
           transaction_id: string;
