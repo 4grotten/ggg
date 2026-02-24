@@ -2003,32 +2003,32 @@ const TransactionDetails = () => {
             </button>
             {receiptExpanded && (
               <div className="px-4 pb-4 space-y-3">
+                {!receiptLoading && receipt && (
+                  <button
+                    onClick={handlePrintReceipt}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-medium text-sm transition-colors"
+                  >
+                    <Printer className="w-4 h-4" />
+                    {t("transaction.printReceipt", "Распечатать чек")}
+                  </button>
+                )}
                 {receiptLoading ? (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : receipt ? (
-                  <>
-                    <div ref={receiptPrintRef} className="space-y-2 text-sm">
-                      {Object.entries(receipt)
-                        .filter(([, value]) => value !== null && value !== undefined)
-                        .map(([key, value]) => (
-                        <div key={key} className="flex items-start justify-between gap-3">
-                          <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
-                          <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
-                            {renderReceiptValue(value)}
-                          </pre>
-                        </div>
-                      ))}
-                    </div>
-                    <button
-                      onClick={handlePrintReceipt}
-                      className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-medium text-sm transition-colors"
-                    >
-                      <Printer className="w-4 h-4" />
-                      {t("transaction.printReceipt", "Распечатать чек")}
-                    </button>
-                  </>
+                  <div ref={receiptPrintRef} className="space-y-2 text-sm">
+                    {Object.entries(receipt)
+                      .filter(([, value]) => value !== null && value !== undefined)
+                      .map(([key, value]) => (
+                      <div key={key} className="flex items-start justify-between gap-3">
+                        <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
+                        <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
+                          {renderReceiptValue(value)}
+                        </pre>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable")}</p>
                 )}
