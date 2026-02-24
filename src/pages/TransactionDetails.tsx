@@ -1334,13 +1334,13 @@ const TransactionDetails = () => {
             <>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.sender")}</span>
-                <span className="font-medium">{transaction.senderName}</span>
+                <span className="font-medium">{transaction.senderName || receipt?.sender_name || "—"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">
-                    {showFromCard ? `Visa ${transaction.senderCardFull}` : `Visa ••${transaction.senderCard}`}
+                    {showFromCard ? `Visa ${resolveCardType(receipt?.sender_card_mask, 0)} ${transaction.senderCardFull || ''}` : `Visa ${resolveCardType(receipt?.sender_card_mask, 0)} ••${transaction.senderCard || ''}`}
                   </span>
                   <button 
                     onClick={() => {
@@ -1360,14 +1360,18 @@ const TransactionDetails = () => {
                 </div>
               </div>
               <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                <span className="font-medium">{transaction.recipientName || receipt?.recipient_name || user?.full_name || "—"}</span>
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.toCard")}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">
-                    {showToCard ? `Visa ${transaction.cardType || 'Virtual'} ${transaction.toCardFull}` : `Visa ${transaction.cardType || 'Virtual'} ••${transaction.cardLast4}`}
+                    {showToCard ? `Visa ${resolveCardType(receipt?.receiver_card_mask, 1)} ${transaction.toCardFull || transaction.recipientCardFull || ''}` : `Visa ${resolveCardType(receipt?.receiver_card_mask, 1)} ••${transaction.recipientCard || transaction.cardLast4 || ''}`}
                   </span>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText(transaction.toCardFull?.replace(/\s/g, '') || '');
+                      navigator.clipboard.writeText((transaction.toCardFull || transaction.recipientCardFull || '')?.replace(/\s/g, '') || '');
                       toast.success(t("toast.cardNumberCopied"));
                     }}
                     className="text-muted-foreground hover:text-foreground transition-colors"
