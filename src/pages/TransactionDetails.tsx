@@ -833,7 +833,15 @@ const TransactionDetails = () => {
             transaction.status === 'processing' ? 'bg-[#FFA000]/10 border-[#FFA000]/15' : 
             'bg-[#27AE60]/10 border-[#27AE60]/15'
           }`}>
-            <div className="flex items-center gap-2.5">
+            <span className="text-[15px] font-medium text-muted-foreground">{t("transaction.status")}</span>
+            <div className="flex items-center gap-2">
+              <span className={`text-[15px] font-bold ${
+                isDeclined ? 'text-red-500' : 
+                transaction.status === 'processing' ? 'text-[#FFA000]' : 
+                'text-[#27AE60]'
+              }`}>
+                {isDeclined ? t("transaction.declined") : transaction.status === 'processing' ? t("transaction.processing") : t("transaction.settled")}
+              </span>
               <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
                 isDeclined ? 'bg-red-500/15' : 
                 transaction.status === 'processing' ? 'bg-[#FFA000]/15' : 
@@ -847,19 +855,7 @@ const TransactionDetails = () => {
                   <CheckCircle className="w-3.5 h-3.5 text-[#27AE60]" />
                 )}
               </div>
-              <span className={`text-[15px] font-bold ${
-                isDeclined ? 'text-red-500' : 
-                transaction.status === 'processing' ? 'text-[#FFA000]' : 
-                'text-[#27AE60]'
-              }`}>
-                {isDeclined ? t("transaction.declined") : transaction.status === 'processing' ? t("transaction.processing") : t("transaction.settled")}
-              </span>
             </div>
-            {isDeclined && transaction.declineReason && (
-              <span className="text-sm text-muted-foreground">
-                {transaction.declineReason === "No funds" ? t("transaction.noFunds") : transaction.declineReason}
-              </span>
-            )}
           </div>
           <div className="px-5 py-4 space-y-4">
           
