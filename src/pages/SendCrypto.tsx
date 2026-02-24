@@ -97,9 +97,10 @@ const SendCrypto = () => {
 
     // Add bank account from IBAN API (use real UUID from bank-accounts endpoint)
     if (ibanResponse?.data) {
-      const bankAccount = bankAccountsResponse?.data?.[0];
+      const bankAccounts = bankAccountsResponse?.data as any;
+      const bankAccountId = bankAccounts?.data?.[0]?.id || bankAccounts?.[0]?.id;
       options.push({
-        id: bankAccount?.id || "bank_account",
+        id: bankAccountId || "bank_account",
         type: "bank_account",
         name: t("send.bankAccount", "Банковский счёт AED"),
         iban: ibanResponse.data.iban,
