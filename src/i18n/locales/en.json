@@ -666,7 +666,8 @@
     "receiptUnavailable": "Receipt unavailable",
     "inNetwork": "In network",
     "senderInfo": "Sender",
-    "receiverInfo": "Recipient"
+    "receiverInfo": "Recipient",
+    "name": "Name"
   },
   "topUp": {
     "selectAccount": "Select Account to Open",

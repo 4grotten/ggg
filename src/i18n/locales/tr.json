@@ -583,7 +583,8 @@
     "receiptUnavailable": "Makbuz mevcut değil",
     "inNetwork": "Ağda",
     "senderInfo": "Gönderen",
-    "receiverInfo": "Alıcı"
+    "receiverInfo": "Alıcı",
+    "name": "İsim"
   },
   "topUp": {
     "selectAccount": "Açılacak Hesabı Seçin",

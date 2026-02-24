@@ -583,7 +583,8 @@
     "receiptUnavailable": "Beleg nicht verfügbar",
     "inNetwork": "Im Netzwerk",
     "senderInfo": "Absender",
-    "receiverInfo": "Empfänger"
+    "receiverInfo": "Empfänger",
+    "name": "Name"
   },
   "topUp": {
     "selectAccount": "Konto zum Öffnen auswählen",

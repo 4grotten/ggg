@@ -589,7 +589,8 @@
     "receiptUnavailable": "收据不可用",
     "inNetwork": "网络内",
     "senderInfo": "发送方",
-    "receiverInfo": "接收方"
+    "receiverInfo": "接收方",
+    "name": "姓名"
   },
   "topUp": {
     "selectAccount": "选择要开通的账户",
