@@ -1054,15 +1054,12 @@ const TransactionDetails = () => {
               <div className="flex items-start justify-between">
                 <span className="text-muted-foreground">{t("transaction.fromAccount")}</span>
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => navigate("/account")}
-                    className="font-medium text-[#007AFF] hover:underline transition-colors text-right text-sm"
-                  >
+                  <span className="font-medium text-right text-sm">
                     {userIban 
                       ? (showFromCard ? userIban : `${userIban.slice(0, 4)}••••${userIban.slice(-4)}`)
                       : t("transaction.aedAccount")
                     }
-                  </button>
+                  </span>
                   {userIban && (
                     <>
                       <button 
