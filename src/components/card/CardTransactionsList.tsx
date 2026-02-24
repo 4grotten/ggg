@@ -244,7 +244,7 @@ const handleClick = (transaction: Transaction) => {
                           style={{ backgroundColor: isIncomingCryptoToCard ? "#22C55E" : "#007AFF" }}
                         >
                           <CreditCard className="w-5 h-5" />
-                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center">
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center ring-2 ring-background">
                             <UsdtIcon size={10} />
                           </div>
                         </div>
