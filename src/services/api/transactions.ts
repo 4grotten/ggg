@@ -974,33 +974,50 @@ export interface BankToCardRequest {
 
 /**
  * Transfer from bank account to card
- * POST /api/v1/transactions/transfer/bank-to-card/
+ * Uses dedicated edge function: bank-to-card-transfer
  */
 export const submitBankToCard = async (
   request: BankToCardRequest
 ): Promise<{ success: boolean; data?: InternalTransferResponse; error?: string }> => {
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const url = `${SUPABASE_URL}/functions/v1/bank-to-card-transfer`;
+
   try {
-    const result = await apiRequest<InternalTransferResponse>(
-      `/transactions/transfer/bank-to-card/`,
-      {
-        method: 'POST',
-        body: JSON.stringify(request),
-      },
-      true
-    );
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+    };
 
-    if (result.error) {
-      console.warn('[Transactions API] Bank-to-card error:', result.error);
-      return { success: false, error: result.error.detail || result.error.message || 'Transfer failed' };
+    const token = getAuthToken();
+    if (token) {
+      headers['x-backend-token'] = token;
     }
 
-    if (result.data?.transaction_id) {
-      return { success: true, data: result.data };
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(request),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.warn('[Bank-to-Card] Error:', data);
+      const errorMsg = typeof data === 'object'
+        ? Object.entries(data).map(([k, v]) => `${k}: ${v}`).join('; ')
+        : 'Transfer failed';
+      return { success: false, error: errorMsg };
     }
 
-    return { success: false, error: 'Unexpected response' };
+    if (data?.transaction_id) {
+      return { success: true, data };
+    }
+
+    return { success: false, error: data?.error || 'Unexpected response' };
   } catch (error) {
-    console.error('[Transactions API] Bank-to-card failed:', error);
+    console.error('[Bank-to-Card] Failed:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Network error' };
   }
 };
