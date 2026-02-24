@@ -307,8 +307,9 @@ const SendToCard = () => {
       if (response.success) {
         setTransferSuccess(true);
         
-        // Invalidate all card/balance caches so dashboard shows updated balances
+        // Invalidate all card/balance and transaction caches
         queryClient.invalidateQueries({ queryKey: ['cards'] });
+        queryClient.invalidateQueries({ queryKey: ['transactions'] });
         
         toast({
           title: t('send.transferSuccess'),
