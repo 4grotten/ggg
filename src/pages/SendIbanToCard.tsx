@@ -41,7 +41,8 @@ const SendIbanToCard = () => {
     lastFourDigits: c.card_number?.slice(-4),
     cardNumber: c.card_number || '',
   }));
-  const [selectedCard, setSelectedCard] = useState<CardWithNumber | null>(null);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const selectedCard = cards.find(c => c.id === selectedCardId) || null;
   const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -163,7 +164,7 @@ const SendIbanToCard = () => {
             {cards.map((card, index) => (
               <button
                 key={card.id}
-                onClick={() => setSelectedCard(card)}
+                onClick={() => setSelectedCardId(card.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
                   index < cards.length - 1 ? "border-b border-border/50" : ""
                 } ${
