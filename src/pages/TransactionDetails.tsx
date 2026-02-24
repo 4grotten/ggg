@@ -872,12 +872,6 @@ const TransactionDetails = () => {
                   >
                     {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
-                  <button 
-                    onClick={() => setShowToCard(!showToCard)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
               </div>
               {/* From Wallet (sender's wallet) */}
