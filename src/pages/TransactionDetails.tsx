@@ -1097,6 +1097,93 @@ const TransactionDetails = () => {
                 <span className="font-medium">{receipt?.beneficiary_bank_name || receipt?.bank_name || 'EasyCard Default Bank'}</span>
               </div>
             </>
+          ) : isBankTransfer && ['bank_to_card', 'iban_to_card', 'transfer_out', 'internal_transfer'].includes((transaction as any)?.originalApiType || '') ? (
+            <>
+              {/* Sender (current user) */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.sender")}</span>
+                <span className="font-medium">{user?.full_name || receipt?.sender_name || "—"}</span>
+              </div>
+              {/* Sender IBAN */}
+              <div className="flex items-start justify-between">
+                <span className="text-muted-foreground">IBAN</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-right text-sm">
+                    {(() => {
+                      const sIban = userIban || (receipt as any)?.sender_iban || (receipt as any)?.sender_iban_mask || receipt?.iban_mask;
+                      if (!sIban) return "—";
+                      return showIban ? sIban : `${sIban.slice(0, 4)}••••${sIban.slice(-4)}`;
+                    })()}
+                  </span>
+                  {(userIban || (receipt as any)?.sender_iban || receipt?.iban_mask) && (
+                    <>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(userIban || (receipt as any)?.sender_iban || receipt?.iban_mask || '');
+                          toast.success(t("toast.copied", { label: "IBAN" }));
+                        }}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setShowIban(!showIban)}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                <span className="font-medium">{receipt?.bank_name || "EasyCard FZE"}</span>
+              </div>
+              {/* Recipient (card) */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                <span className="font-medium">{transaction.recipientName || receipt?.beneficiary_name || user?.full_name || "—"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.toCard")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {(() => {
+                      const cardFull = transaction.recipientCardFull || transaction.toCardFull;
+                      const cardLast4 = transaction.recipientCard || transaction.cardLast4;
+                      if (showToCard && cardFull) return `Visa ${resolveCardType(cardLast4, 1)} ${cardFull}`;
+                      return `Visa ${resolveCardType(cardLast4, 1)} ••${cardLast4 || ''}`;
+                    })()}
+                  </span>
+                  {(transaction.recipientCardFull || transaction.toCardFull) && (
+                    <>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText((transaction.recipientCardFull || transaction.toCardFull || '').replace(/\s/g, ''));
+                          toast.success(t("toast.cardNumberCopied"));
+                        }}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setShowToCard(!showToCard)}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+              {receipt?.description && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.description")}</span>
+                  <span className="font-medium text-right text-sm max-w-[200px]">{receipt.description}</span>
+                </div>
+              )}
+            </>
           ) : isBankTransfer ? (
             <>
               <div className="flex items-center justify-between">
@@ -1591,6 +1678,21 @@ const TransactionDetails = () => {
               </div>
             </>
           ) : isInternalTransfer ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.transferAmount")}</span>
+                <span className="font-medium">{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.fee")}</span>
+                <span className="font-medium">{(transaction.bankFee || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-muted-foreground">{t("transaction.total")}</span>
+                <span className="font-semibold text-[#007AFF]">-{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+              </div>
+            </>
+          ) : isBankTransfer && ['bank_to_card', 'iban_to_card', 'transfer_out', 'internal_transfer'].includes((transaction as any)?.originalApiType || '') ? (
             <>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.transferAmount")}</span>
