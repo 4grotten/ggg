@@ -581,7 +581,9 @@
     "receipt": "Recibo",
     "operation": "Operación",
     "receiptUnavailable": "Recibo no disponible",
-    "inNetwork": "En la red"
+    "inNetwork": "En la red",
+    "senderInfo": "Remitente",
+    "receiverInfo": "Destinatario"
   },
   "topUp": {
     "selectAccount": "Seleccionar Cuenta para Abrir",

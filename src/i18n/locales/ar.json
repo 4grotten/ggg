@@ -581,7 +581,9 @@
     "receipt": "إيصال",
     "operation": "عملية",
     "receiptUnavailable": "الإيصال غير متاح",
-    "inNetwork": "في الشبكة"
+    "inNetwork": "في الشبكة",
+    "senderInfo": "المرسل",
+    "receiverInfo": "المستلم"
   },
   "topUp": {
     "selectAccount": "اختر الحساب للفتح",
