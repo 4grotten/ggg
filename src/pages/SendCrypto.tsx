@@ -564,9 +564,9 @@ const SendCrypto = () => {
 
           {/* Conversion Display */}
           <div className="bg-secondary rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("send.amount")}</span>
-              <span className="font-medium">
+            <div className="flex items-center justify-between pt-2 border-b border-border pb-3">
+              <span className="text-muted-foreground">{t("send.youWillReceive")}</span>
+              <span className="font-semibold text-lg">
                 {amountCrypto} {selectedCoin.symbol}
               </span>
             </div>
@@ -579,8 +579,8 @@ const SendCrypto = () => {
               <span className="font-medium text-[#FFA000]">-{networkFee} {selectedCoin.symbol}</span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border">
-              <span className="text-muted-foreground">{t("send.youWillReceive")}</span>
-              <span className="font-semibold text-lg">
+              <span className="text-muted-foreground">{t("send.amount")}</span>
+              <span className="font-medium">
                 {amountAfterFee} {selectedCoin.symbol}
               </span>
             </div>
