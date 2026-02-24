@@ -46,6 +46,8 @@ export interface TransactionReceipt {
   credited_amount_aed?: number | null;
   is_internal?: boolean;
   recipient_avatar?: string | null;
+  sender_avatar?: string | null;
+  receiver_avatar?: string | null;
   from_address?: string;
   // Card transfer fields
   sender_card_mask?: string;

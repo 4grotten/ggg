@@ -2105,7 +2105,7 @@ const TransactionDetails = () => {
             })()}
             {transaction.fromWalletAddress && (
               <div className="flex items-start justify-between">
-                <span className="text-muted-foreground">{t("transaction.fromWallet", "Кошелёк")}</span>
+                <span className="text-muted-foreground">{t("transaction.fromWallet", "С кошелька USDT")}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-right text-sm max-w-[160px] break-all">
                     {showFromAddress ? ((transaction as any).fromWalletAddressFull || transaction.fromWalletAddress) : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-6)}`}
@@ -2135,7 +2135,7 @@ const TransactionDetails = () => {
                 // Determine if receiver is current user
                 const isCurrentUserReceiver = receipt.direction === 'inbound' || 
                   (receiverName && user?.full_name && receiverName.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]));
-                const receiverAvatarUrl = isCurrentUserReceiver ? currentUserAvatar : ((receipt as any).recipient_avatar || (receipt as any).receiver_avatar || (transaction as any).recipientAvatar);
+                const receiverAvatarUrl = isCurrentUserReceiver ? currentUserAvatar : ((receipt as any).recipient_avatar || (receipt as any).receiver_avatar || (receipt as any).sender_avatar || (transaction as any).recipientAvatar);
                 const receiverInitial = receiverName ? receiverName.charAt(0).toUpperCase() : "R";
                 
                 return receiverAvatarUrl ? (
@@ -2207,7 +2207,7 @@ const TransactionDetails = () => {
               const addr = String(receipt.crypto_address || transaction.toWalletAddress);
               return (
                 <div className="flex items-start justify-between">
-                  <span className="text-muted-foreground">{t("transaction.cryptoAddress", "Адрес")}</span>
+                  <span className="text-muted-foreground">{t("transaction.toAddress", "На Кошелек USDT")}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-right text-sm max-w-[160px] break-all">
                       {showCryptoAddr ? addr : `${addr.slice(0, 6)}...${addr.slice(-6)}`}
