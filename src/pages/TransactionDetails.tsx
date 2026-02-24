@@ -2127,7 +2127,7 @@ const TransactionDetails = () => {
           <div className="bg-secondary rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ArrowUpRight className="w-4 h-4 text-green-500" />
+                <Send className="w-4 h-4 text-green-500 rotate-180" />
                 <span className="text-sm font-semibold text-foreground">{t("transaction.receiverInfo", "Получатель")}</span>
               </div>
               {(() => {
