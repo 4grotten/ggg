@@ -576,7 +576,7 @@
     "cardBalance": "رصيد البطاقة",
     "description": "الوصف",
     "walletToIban": "محفظة USDT → IBAN بنك",
-    "walletToCard": "محفظة USDT → EasyCard",
+    "walletToCard": "USDT → EasyCard",
     "totalDeducted": "خصم من المحفظة",
     "creditedToIban": "تم الإيداع في IBAN",
     "receipt": "إيصال",

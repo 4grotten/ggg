@@ -582,7 +582,7 @@
     "cardBalance": "卡余额",
     "description": "描述",
     "walletToIban": "USDT 钱包 → IBAN 银行",
-    "walletToCard": "USDT 钱包 → EasyCard",
+    "walletToCard": "USDT → EasyCard",
     "totalDeducted": "从钱包扣除",
     "creditedToIban": "已入账至IBAN",
     "receipt": "收据",

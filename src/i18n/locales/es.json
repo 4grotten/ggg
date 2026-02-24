@@ -576,7 +576,7 @@
     "cardBalance": "Saldo de Tarjeta",
     "description": "Descripción",
     "walletToIban": "Billetera USDT → IBAN Banco",
-    "walletToCard": "Billetera USDT → EasyCard",
+    "walletToCard": "USDT → EasyCard",
     "totalDeducted": "Deducido de la billetera",
     "creditedToIban": "Acreditado en IBAN",
     "receipt": "Recibo",

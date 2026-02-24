@@ -659,7 +659,7 @@
     "cardBalance": "Card Balance",
     "description": "Description",
     "walletToIban": "USDT Wallet → IBAN Bank",
-    "walletToCard": "USDT Wallet → EasyCard",
+    "walletToCard": "USDT → EasyCard",
     "totalDeducted": "Deducted from wallet",
     "creditedToIban": "Credited to IBAN",
     "receipt": "Receipt",
