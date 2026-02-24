@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronDown, ChevronUp, X, Eye, EyeOff, Copy, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronUp, X, Eye, EyeOff, Copy, Wallet, Share2 } from "lucide-react";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -288,6 +288,22 @@ const MetalCard = () => {
                 className="p-2 h-8 w-8 rounded-full bg-secondary hover:bg-muted"
               >
                 <Copy className="w-3.5 h-3.5" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  const text = cardData.fullNumber.replace(/\s/g, '');
+                  if (navigator.share) {
+                    navigator.share({ text }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(text);
+                    toast.success(t("toast.cardNumberCopied"));
+                  }
+                }}
+                className="p-2 h-8 w-8 rounded-full bg-secondary hover:bg-muted"
+              >
+                <Share2 className="w-3.5 h-3.5" />
               </Button>
               <Button
                 size="sm"
