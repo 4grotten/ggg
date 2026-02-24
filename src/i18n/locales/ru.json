@@ -652,7 +652,8 @@
     "receiptUnavailable": "Чек недоступен",
     "inNetwork": "В сети",
     "senderInfo": "Отправитель",
-    "receiverInfo": "Получатель"
+    "receiverInfo": "Получатель",
+    "name": "Имя"
   },
   "topUp": {
     "selectAccount": "Выберите счёт для открытия",

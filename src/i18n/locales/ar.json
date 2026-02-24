@@ -583,7 +583,8 @@
     "receiptUnavailable": "الإيصال غير متاح",
     "inNetwork": "في الشبكة",
     "senderInfo": "المرسل",
-    "receiverInfo": "المستلم"
+    "receiverInfo": "المستلم",
+    "name": "الاسم"
   },
   "topUp": {
     "selectAccount": "اختر الحساب للفتح",

@@ -583,7 +583,8 @@
     "receiptUnavailable": "Recibo no disponible",
     "inNetwork": "En la red",
     "senderInfo": "Remitente",
-    "receiverInfo": "Destinatario"
+    "receiverInfo": "Destinatario",
+    "name": "Nombre"
   },
   "topUp": {
     "selectAccount": "Seleccionar Cuenta para Abrir",
