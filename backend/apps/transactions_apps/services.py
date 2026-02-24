@@ -715,11 +715,20 @@ class TransactionService:
         }
 
     @staticmethod
-    def get_transaction_receipt(transaction_id):
+    def get_transaction_receipt(transaction_id, user_id=None):
         txn = Transactions.objects.get(id=transaction_id)
+        viewer_id = str(user_id) if user_id else str(txn.user_id)
+        if txn.sender_id == viewer_id and txn.receiver_id == viewer_id:
+            direction = 'internal'
+        elif txn.receiver_id == viewer_id:
+            direction = 'inbound'
+        else:
+            direction = 'outbound'
+
         receipt = {
             "transaction_id": str(txn.id),
             "type": txn.type,
+            "direction": direction,  
             "status": txn.status,
             "date_time": txn.created_at.isoformat() if txn.created_at else None,
             "amount": float(txn.amount),
@@ -734,25 +743,32 @@ class TransactionService:
             "reference_id": txn.reference_id,
             "card_id": str(txn.card_id) if txn.card_id else None,
             "user_id": txn.user_id,
+            "sender_name": txn.sender_name,
+            "receiver_name": txn.receiver_name,
         }
+
         def mask_card(num):
             if not num:
                 return None
             return f"**** {num[-4:]}" if len(num) >= 4 else num
+
         def mask_iban(iban):
             if not iban:
                 return None
             return f"{iban[:4]} **** {iban[-4:]}" if len(iban) >= 8 else iban
+
         def mask_address(addr):
             if not addr:
                 return None
             return f"{addr[:5]}...{addr[-5:]}" if len(addr) > 12 else addr
+
         def get_user_name(uid):
             try:
                 u = User.objects.get(id=int(uid) if str(uid).isdigit() else uid)
                 return f"{u.first_name or ''} {u.last_name or ''}".strip() or "Unknown"
             except Exception:
                 return None
+
         tx_type = txn.type
         if tx_type == 'card_transfer':
             receipt["operation"] = "Card Transfer"
@@ -760,20 +776,19 @@ class TransactionService:
             receipt["receiver_card_mask"] = mask_card(txn.recipient_card)
             try:
                 ct = txn.card_transfer
-                receipt["sender_name"] = get_user_name(ct.sender_user_id)
-                receipt["recipient_name"] = get_user_name(ct.receiver_user_id)
+                receipt["sender_name"] = get_user_name(ct.sender_user_id) or txn.sender_name
+                receipt["receiver_name"] = get_user_name(ct.receiver_user_id) or txn.receiver_name
+                receipt["recipient_name"] = receipt["receiver_name"]
                 receipt["fee_amount"] = float(ct.fee_amount)
                 receipt["total_amount"] = float(ct.total_amount)
             except Exception:
-                receipt["sender_name"] = txn.sender_name
-                receipt["recipient_name"] = None
+                receipt["recipient_name"] = txn.receiver_name
         elif tx_type == 'bank_topup':
             receipt["operation"] = "Bank Top Up"
             try:
                 bt = txn.bank_topup
                 receipt["transfer_rail"] = bt.transfer_rail
                 receipt["reference_value"] = bt.reference_value
-                receipt["sender_name"] = bt.sender_name
                 receipt["sender_bank"] = bt.sender_bank
                 receipt["sender_iban_mask"] = mask_iban(bt.sender_iban)
                 receipt["instructions"] = bt.instructions_snapshot
@@ -810,7 +825,6 @@ class TransactionService:
                 receipt["total_debit_aed"] = float(bw.total_debit)
                 receipt["from_card_id"] = str(bw.from_card_id) if bw.from_card_id else None
                 receipt["from_bank_account_id"] = str(bw.from_bank_account_id) if bw.from_bank_account_id else None
-                receipt["sender_name"] = get_user_name(txn.user_id)
                 sender_account = BankDepositAccounts.objects.filter(user_id=str(txn.user_id), is_active=True).first()
                 if sender_account:
                     receipt["sender_iban"] = sender_account.iban
@@ -839,7 +853,6 @@ class TransactionService:
                 recipient_wallet = CryptoWallets.objects.filter(address=cw.to_address).first()
                 if recipient_wallet:
                     receipt["is_internal"] = True
-                    receipt["recipient_name"] = get_user_name(recipient_wallet.user_id)
                     try:
                         profile = Profiles.objects.filter(user_id=str(recipient_wallet.user_id)).first()
                         if profile and profile.avatar_url:
@@ -862,7 +875,6 @@ class TransactionService:
                         receipt["to_address_mask"] = mask_address(dest_wallet.address)
                         receipt["to_address"] = dest_wallet.address
                         receipt["is_internal"] = True
-                        receipt["recipient_name"] = get_user_name(dest_wallet.user_id)
                         try:
                             profile = Profiles.objects.filter(user_id=str(dest_wallet.user_id)).first()
                             if profile and profile.avatar_url:
@@ -877,7 +889,6 @@ class TransactionService:
             sender_id_str = str(txn.sender_id) if txn.sender_id else None
             receiver_id_str = str(txn.receiver_id) if txn.receiver_id else None
             if sender_id_str and sender_id_str != 'EXTERNAL':
-                receipt["sender_name"] = get_user_name(sender_id_str)
                 if tx_type in ['crypto_to_card', 'crypto_to_bank']:
                     sender_wallet = CryptoWallets.objects.filter(user_id=sender_id_str, is_active=True).first()
                     if sender_wallet:
@@ -892,13 +903,11 @@ class TransactionService:
                         receipt["sender_iban_mask"] = mask_iban(sender_bank.iban)
                         receipt["bank_name"] = sender_bank.bank_name
             if receiver_id_str and receiver_id_str != 'EXTERNAL':
-                receipt["recipient_name"] = get_user_name(receiver_id_str)
                 if tx_type in ['crypto_to_card']:
                     receipt["receiver_card_mask"] = mask_card(txn.recipient_card)
                 if tx_type in ['crypto_to_bank', 'card_to_bank']:
                     dest_bank = BankDepositAccounts.objects.filter(user_id=receiver_id_str, is_active=True).first()
                     if dest_bank:
-                        receipt["beneficiary_name"] = get_user_name(receiver_id_str)
                         receipt["beneficiary_iban"] = dest_bank.iban
                         receipt["iban_mask"] = mask_iban(dest_bank.iban)
                         receipt["bank_name"] = dest_bank.bank_name
@@ -917,6 +926,9 @@ class TransactionService:
             receipt["operation"] = "Card Payment"
         else:
             receipt["operation"] = txn.type.replace('_', ' ').title()
+        if "recipient_name" not in receipt and "receiver_name" in receipt:
+            receipt["recipient_name"] = receipt["receiver_name"]
+
         movements = txn.movements.all()
         if movements.exists():
             receipt["movements"] = [{

@@ -371,7 +371,7 @@ class TransactionReceiptView(APIView):
     @swagger_auto_schema(operation_summary="Получить выписку (Квитанцию) по транзакции", responses={200: openapi.Response(description="Детали транзакции"), 400: ErrorResponseSerializer, 404: openapi.Response(description="Транзакция не найдена")}, tags=["Receipts (Квитанции)"])
     def get(self, request, transaction_id):
         try:
-            receipt_data = TransactionService.get_transaction_receipt(transaction_id=transaction_id)
+            receipt_data = TransactionService.get_transaction_receipt(transaction_id, request.user.id)
             return Response(receipt_data, status=status.HTTP_200_OK)
         except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e: return Response({"error": f"Внутренняя ошибка: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
