@@ -78,6 +78,8 @@ export interface TransactionReceipt {
   from_bank_account_id?: string | null;
   // Balance movements
   movements?: Array<{ account_type: string; amount: number; type: string }>;
+  // Direction field from API
+  direction?: 'inbound' | 'outbound' | 'internal' | string;
   // Generic catch-all
   [key: string]: unknown;
 }
