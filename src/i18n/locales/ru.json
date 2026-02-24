@@ -914,7 +914,7 @@
     "walletAddress": "Адрес кошелька",
     "enterWalletAddress": "Введите адрес кошелька",
     "networkFee": "Сетевая комиссия",
-    "youWillReceive": "Вы получите",
+    "youWillReceive": "Отправим",
     "exchangeRate": "Курс обмена",
     "selectCoin": "Выберите монету",
     "selectNetwork": "Выберите сеть",
