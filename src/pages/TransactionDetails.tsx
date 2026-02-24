@@ -13,6 +13,7 @@ import { useWalletSummary, useCryptoWallets } from "@/hooks/useCards";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useTransactionReceipt, useApiTransactionGroups } from "@/hooks/useTransactions";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { getAuthToken, apiRequest } from "@/services/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import { AvatarPreview } from "@/components/ui/avatar-preview";
@@ -601,7 +602,7 @@ const TransactionDetails = () => {
           ) : isCryptoToIban ? (
             <motion.div 
               className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
-              style={{ backgroundColor: "#8B5CF6" }}
+              style={{ backgroundColor: "#26A17B" }}
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
@@ -611,7 +612,7 @@ const TransactionDetails = () => {
                 animate={{ y: 0, x: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
               >
-                <Landmark className="w-10 h-10" strokeWidth={2} />
+                <UsdtIcon size={40} />
               </motion.div>
             </motion.div>
           ) : isCryptoToCard || isCryptoToBank ? (
