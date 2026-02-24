@@ -827,29 +827,41 @@ const TransactionDetails = () => {
         </div>
 
         {/* Status and Card/Address info */}
-        <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl p-5 space-y-4 border border-border/30">
-          <div className="flex items-center justify-between py-0.5">
-            <span className="text-[15px] text-muted-foreground">{t("transaction.status")}</span>
-            <div className="flex flex-col items-end">
-              <div className="flex items-center gap-1.5">
-                <span className={`font-medium ${isDeclined ? 'text-red-500' : transaction.status === 'processing' ? 'text-[#FFA000]' : ''}`}>
-                  {isDeclined ? t("transaction.declined") : transaction.status === 'processing' ? t("transaction.processing") : t("transaction.settled")}
-                </span>
+        <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/30">
+          <div className={`flex items-center justify-between px-5 py-3.5 border-b ${
+            isDeclined ? 'bg-red-500/10 border-red-500/15' : 
+            transaction.status === 'processing' ? 'bg-[#FFA000]/10 border-[#FFA000]/15' : 
+            'bg-[#27AE60]/10 border-[#27AE60]/15'
+          }`}>
+            <div className="flex items-center gap-2.5">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                isDeclined ? 'bg-red-500/15' : 
+                transaction.status === 'processing' ? 'bg-[#FFA000]/15' : 
+                'bg-[#27AE60]/15'
+              }`}>
                 {isDeclined ? (
-                  <Ban className="w-4 h-4 text-red-500" />
+                  <Ban className="w-3.5 h-3.5 text-red-500" />
                 ) : transaction.status === 'processing' ? (
-                  <Clock className="w-4 h-4 text-[#FFA000]" />
+                  <Clock className="w-3.5 h-3.5 text-[#FFA000]" />
                 ) : (
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-3.5 h-3.5 text-[#27AE60]" />
                 )}
               </div>
-              {isDeclined && transaction.declineReason && (
-                <span className="text-sm text-muted-foreground">
-                  {transaction.declineReason === "No funds" ? t("transaction.noFunds") : transaction.declineReason}
-                </span>
-              )}
+              <span className={`text-[15px] font-bold ${
+                isDeclined ? 'text-red-500' : 
+                transaction.status === 'processing' ? 'text-[#FFA000]' : 
+                'text-[#27AE60]'
+              }`}>
+                {isDeclined ? t("transaction.declined") : transaction.status === 'processing' ? t("transaction.processing") : t("transaction.settled")}
+              </span>
             </div>
+            {isDeclined && transaction.declineReason && (
+              <span className="text-sm text-muted-foreground">
+                {transaction.declineReason === "No funds" ? t("transaction.noFunds") : transaction.declineReason}
+              </span>
+            )}
           </div>
+          <div className="px-5 py-4 space-y-4">
           
           {isIncomingIbanToCard ? (
             <>
@@ -2035,6 +2047,7 @@ const TransactionDetails = () => {
               </div>
             </>
           )}
+          </div>
           </div>
         </div>
 
