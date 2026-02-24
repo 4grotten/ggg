@@ -278,14 +278,16 @@ const handleClick = (transaction: Transaction) => {
                           : isIncomingCryptoToCard
                            ? "USDT → EasyCard"
                           : isBankTransferIncoming
-                          ? "IBAN Bank → IBAN Bank"
-                          : isIncomingTransfer
-                          ? t("transactions.cardReceived")
-                          : isOutgoingTransfer
-                          ? t("transactions.cardTransfer")
-                          : isBankTransfer
-                          ? "IBAN Bank → IBAN Bank"
-                          : translateMerchant(transaction.merchant, transaction.type, t)
+                           ? "IBAN Bank → IBAN Bank"
+                           : isIncomingTransfer
+                           ? t("transactions.cardReceived")
+                           : isOutgoingTransfer
+                           ? t("transactions.cardTransfer")
+                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.merchant === 'IBAN to Card'
+                           ? "IBAN → EasyCard"
+                           : isBankTransfer
+                           ? "IBAN Bank → IBAN Bank"
+                           : translateMerchant(transaction.merchant, transaction.type, t)
                         }
                       </p>
                       <p className="text-sm text-muted-foreground truncate">
