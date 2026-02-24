@@ -107,9 +107,10 @@ const SendCrypto = () => {
 
     setSourceOptions(options);
 
-    // Auto-select first option if none selected
+    // Auto-select: prefer bank account by default, fallback to first option
     if (!selectedSource && options.length > 0) {
-      setSelectedSource(options[0]);
+      const bankOption = options.find(o => o.type === "bank_account");
+      setSelectedSource(bankOption || options[0]);
     }
   }, [cardsResponse, ibanResponse, cryptoWalletsResponse]);
 
