@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -33,22 +34,22 @@ export function AvatarPreview({ src, alt = "", children }: AvatarPreviewProps) {
     );
   }
 
-  // Desktop: hover preview
+  // Desktop: hover preview rendered via portal to avoid overflow clipping
   return (
     <div
-      className="relative"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
       {children}
-      {hover && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+      {hover && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
           <img
             src={src}
             alt={alt}
             className="w-64 h-64 object-cover rounded-2xl shadow-2xl border border-border animate-in fade-in-0 zoom-in-95 duration-150"
           />
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
