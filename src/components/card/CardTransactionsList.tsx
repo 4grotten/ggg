@@ -222,7 +222,7 @@ const handleClick = (transaction: Transaction) => {
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: isIncomingTransfer ? "#22C55E" : "#007AFF" }}
                         >
-                          <ArrowUpRight className={`w-5 h-5 ${isIncomingTransfer ? "rotate-180" : ""}`} />
+                          <CreditCard className="w-5 h-5" />
                         </div>
                       ) : isCryptoDeposit ? (
                         <div 
