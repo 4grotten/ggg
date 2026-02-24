@@ -440,7 +440,7 @@ const TransactionDetails = () => {
     printWindow.close();
   }, [t]);
 
-  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar']);
+  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar']);
 
   const receiptTypeLabels: Record<string, string> = {
     crypto_to_crypto: t("transaction.typeCryptoToCrypto", "Отправка стейблкоинов"),
