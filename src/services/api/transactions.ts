@@ -358,6 +358,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'declined': 'declined',
     'crypto_to_card': 'crypto_to_card',
     'crypto_to_bank': 'bank_transfer', // will be remapped for inbound below
+    'bank_to_crypto': 'crypto_withdrawal', // will use originalApiType for icon
     'crypto_to_crypto': 'crypto_withdrawal',
   };
   

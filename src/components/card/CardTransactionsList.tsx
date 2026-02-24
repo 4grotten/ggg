@@ -170,6 +170,7 @@ const handleClick = (transaction: Transaction) => {
               const isDeclined = transaction.type === "declined";
               const isIncomingCryptoToBank = isBankTransferIncoming && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank';
               const isOutgoingCryptoToBank = (transaction.type as string) === "crypto_to_bank" || (isBankTransfer && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank');
+              const isBankToCrypto = (transaction.metadata as any)?.originalApiType === 'bank_to_crypto';
               const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction.metadata as any)?.originalApiType || '');
 
               return (
@@ -252,6 +253,16 @@ const handleClick = (transaction: Transaction) => {
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
                           style={{ backgroundColor: "#8B5CF6" }}
+                        >
+                          <Landmark className="w-5 h-5" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center ring-2 ring-background">
+                            <UsdtIcon size={10} />
+                          </div>
+                        </div>
+                      ) : isBankToCrypto ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
+                          style={{ backgroundColor: "#007AFF" }}
                         >
                           <Landmark className="w-5 h-5" />
                           <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center ring-2 ring-background">
