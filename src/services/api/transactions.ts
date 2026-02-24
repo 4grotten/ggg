@@ -33,7 +33,7 @@ export interface TransactionReceipt {
   reference_id?: string | null;
   card_id?: string | null;
   user_id?: string;
-  direction?: 'inbound' | 'outbound';
+  direction?: 'inbound' | 'outbound' | 'internal';
   // Card transfer fields
   sender_name?: string | null;
   recipient_name?: string | null;
