@@ -344,8 +344,16 @@ const TransactionDetails = () => {
         if (found?.metadata?.isIncoming !== undefined) return found.metadata.isIncoming;
       }
     }
-    // Check receipt direction
+    // Check receipt direction explicitly
     if ((receipt as any)?.direction === 'inbound') return true;
+    if ((receipt as any)?.direction === 'outbound') return false;
+    // If sender name matches current user, it's outgoing (user sends from their wallet to card)
+    if (receipt?.sender_name && user?.full_name) {
+      const senderName = receipt.sender_name.toLowerCase().trim();
+      const userName = user.full_name.toLowerCase().trim();
+      if (senderName === userName || userName.includes(senderName) || senderName.includes(userName)) return false;
+    }
+    // Fallback: check movements
     if (receipt?.movements?.length) {
       return receipt.movements[0]?.type === 'credit';
     }
