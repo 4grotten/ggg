@@ -440,7 +440,7 @@ const TransactionDetails = () => {
     printWindow.close();
   }, [t]);
 
-  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar']);
+  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'crypto_address', 'sender_avatar', 'receiver_avatar', 'recipient_avatar']);
 
   const receiptTypeLabels: Record<string, string> = {
     crypto_to_crypto: t("transaction.typeCryptoToCrypto", "Отправка стейблкоинов"),
@@ -2085,6 +2085,22 @@ const TransactionDetails = () => {
               <div className="flex items-center justify-between py-0.5">
                 <span className="text-[15px] text-muted-foreground">{t("transaction.name", "Имя")}</span>
                 <span className="text-[15px] font-semibold">{receipt.sender_name}</span>
+              </div>
+            )}
+            {(receipt as any).crypto_address && (
+              <div className="flex items-start justify-between py-0.5">
+                <span className="text-[15px] text-muted-foreground">{t("receiptKeys.crypto_address", "Крипто-адрес")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                    {showCryptoAddr ? (receipt as any).crypto_address : `${String((receipt as any).crypto_address).slice(0, 6)}...${String((receipt as any).crypto_address).slice(-6)}`}
+                  </span>
+                  <button onClick={() => { navigator.clipboard.writeText(String((receipt as any).crypto_address)); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => setShowCryptoAddr(!showCryptoAddr)} className="text-muted-foreground hover:text-foreground transition-colors">
+                    {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             )}
             {((receipt as any).sender_iban || (receipt as any).sender_iban_mask) && (() => {
