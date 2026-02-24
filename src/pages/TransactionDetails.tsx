@@ -1051,8 +1051,12 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.bankName")}</span>
                 <span className="font-medium">{transaction.recipientBankName}</span>
               </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.sender")}</span>
+                <span className="font-medium">{user?.full_name || "—"}</span>
+              </div>
               <div className="flex items-start justify-between">
-                <span className="text-muted-foreground">{t("transaction.fromAccount")}</span>
+                <span className="text-muted-foreground">IBAN</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-right text-sm">
                     {userIban 
@@ -1080,6 +1084,10 @@ const TransactionDetails = () => {
                     </>
                   )}
                 </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                <span className="font-medium">EasyCard FZE</span>
               </div>
             </>
           ) : isCryptoSend ? (
