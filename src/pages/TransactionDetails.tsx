@@ -404,6 +404,20 @@ const TransactionDetails = () => {
   const [showFromAddress, setShowFromAddress] = useState(false);
   const [showIban, setShowIban] = useState(false);
 
+  const formatReceiptKey = (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+
+  const renderReceiptValue = (value: unknown) => {
+    if (value === null) return 'null';
+    if (value === undefined) return 'undefined';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
+    }
+  };
+
   // Loading state for API transactions
   if (!transaction && receiptLoading) {
     return (
@@ -1961,84 +1975,14 @@ const TransactionDetails = () => {
               </div>
             ) : receipt ? (
               <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">{t("transaction.status")}</span>
-                  <span className="font-medium capitalize">{receipt.status}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">{t("transaction.operation")}</span>
-                  <span className="font-medium">{receipt.operation}</span>
-                </div>
-                {receipt.amount_crypto != null && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.amount")}</span>
-                    <span className="font-medium">{receipt.amount_crypto} {receipt.network_and_token || 'USDT'}</span>
+                {Object.entries(receipt).map(([key, value]) => (
+                  <div key={key} className="flex items-start justify-between gap-3">
+                    <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
+                    <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
+                      {renderReceiptValue(value)}
+                    </pre>
                   </div>
-                )}
-                {receipt.amount != null && !receipt.amount_crypto && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.amount")}</span>
-                    <span className="font-medium">{receipt.amount} AED</span>
-                  </div>
-                )}
-                {receipt.fee != null && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.fee")}</span>
-                    <span className="font-medium">{receipt.fee} {receipt.amount_crypto != null ? 'USDT' : 'AED'}</span>
-                  </div>
-                )}
-                {receipt.to_address_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.toAddress")}</span>
-                    <span className="font-medium">{receipt.to_address_mask}</span>
-                  </div>
-                )}
-                {receipt.from_address_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.fromAddress")}</span>
-                    <span className="font-medium">{receipt.from_address_mask}</span>
-                  </div>
-                )}
-                {receipt.network_and_token && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
-                    <span className="font-medium">{receipt.network_and_token}</span>
-                  </div>
-                )}
-                {receipt.sender_card_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
-                    <span className="font-medium">{receipt.sender_card_mask}</span>
-                  </div>
-                )}
-                {receipt.receiver_card_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.toCard")}</span>
-                    <span className="font-medium">{receipt.receiver_card_mask}</span>
-                  </div>
-                )}
-                {receipt.recipient_name && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.recipient")}</span>
-                    <span className="font-medium">{receipt.recipient_name}</span>
-                  </div>
-                )}
-                {receipt.iban_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.iban")}</span>
-                    <span className="font-medium">{receipt.iban_mask}</span>
-                  </div>
-                )}
-                {receipt.tx_hash && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">TX Hash</span>
-                    <span className="font-medium text-xs break-all max-w-[180px] text-right">{receipt.tx_hash}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/50">
-                  <span>ID</span>
-                  <span className="font-mono">{receipt.transaction_id?.slice(0, 8)}...</span>
-                </div>
+                ))}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable")}</p>
