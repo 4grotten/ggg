@@ -472,7 +472,11 @@ const TransactionDetails = () => {
     processing: t("transaction.processing", "Обработка"),
   };
 
-  const formatReceiptKey = (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+  const formatReceiptKey = (key: string) => {
+    const translated = t(`receiptKeys.${key}`, { defaultValue: '' });
+    if (translated && translated !== `receiptKeys.${key}`) return translated;
+    return key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+  };
 
   const formatDateTime = (value: string) => {
     try {
