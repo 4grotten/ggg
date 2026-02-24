@@ -264,17 +264,6 @@ const TransactionDetails = () => {
           }
           if (isIncoming) mapped = 'bank_transfer_incoming';
         }
-        // For iban_to_card / bank_to_card / transfer_out / internal_transfer: remap to incoming when direction is inbound or amount > 0
-        if (['iban_to_card', 'bank_to_card', 'transfer_out'].includes(receipt.type)) {
-          if ((receipt as any).direction === 'inbound' || receipt.amount > 0) {
-            mapped = 'bank_transfer_incoming';
-          }
-        }
-        if (receipt.type === 'internal_transfer') {
-          if ((receipt as any).direction === 'inbound' || receipt.amount > 0) {
-            mapped = 'bank_transfer_incoming';
-          }
-        }
         return mapped as any;
       })(),
       recipientCard: receipt.type === 'crypto_to_card' ? cachedRecipientCard?.slice(-4) : receiverLast4,

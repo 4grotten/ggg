@@ -21,7 +21,6 @@ class Transactions(models.Model):
     merchant_category = models.TextField(blank=True, null=True)
     recipient_card = models.CharField(max_length=19, blank=True, null=True)
     sender_name = models.TextField(blank=True, null=True)
-    receiver_name = models.TextField(blank=True, null=True)
     sender_card = models.CharField(max_length=19, blank=True, null=True)
     reference_id = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)

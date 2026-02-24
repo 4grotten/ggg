@@ -84,20 +84,6 @@ class SettingsManager:
 
 class TransactionService:
     @staticmethod
-    def _get_user_full_name(uid):
-        if not uid or str(uid) == 'EXTERNAL':
-            return "External"
-        profile = Profiles.objects.filter(user_id=str(uid)).first()
-        if profile and (profile.first_name or profile.last_name):
-            return f"{profile.first_name or ''} {profile.last_name or ''}".strip()
-        try:
-            u = User.objects.get(id=int(uid) if str(uid).isdigit() else uid)
-            name = f"{u.first_name or ''} {u.last_name or ''}".strip()
-            return name if name else u.username
-        except Exception:
-            return "Unknown User"
-
-    @staticmethod
     @transaction.atomic
     def execute_card_transfer(sender_id, sender_card_id, receiver_card_number, amount):
         amount = Decimal(str(amount))
@@ -124,8 +110,6 @@ class TransactionService:
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(receiver_card.user_id),
-            sender_name=TransactionService._get_user_full_name(sender_id),
-            receiver_name=TransactionService._get_user_full_name(receiver_card.user_id),
             card=sender_card, type='card_transfer', 
             status='completed', amount=amount, currency='AED',
             fee=fee_amount,
@@ -161,8 +145,6 @@ class TransactionService:
             user_id=user_id, 
             sender_id='EXTERNAL', 
             receiver_id=str(user_id),
-            sender_name="Bank Transfer",
-            receiver_name=TransactionService._get_user_full_name(user_id),
             type='bank_topup', status='pending', amount=Decimal('0.00'), currency='AED'
         )
         topup = TopupsBank.objects.create(
@@ -191,8 +173,6 @@ class TransactionService:
             user_id=user_id, 
             sender_id='EXTERNAL',
             receiver_id=str(user_id),
-            sender_name="Crypto Network",
-            receiver_name=TransactionService._get_user_full_name(user_id),
             card_id=card_id, type='crypto_topup', status='pending', amount=Decimal('0.00'), currency=token
         )
         topup = TopupsCrypto.objects.create(
@@ -228,8 +208,6 @@ class TransactionService:
             user_id=user_id, 
             sender_id=str(user_id),
             receiver_id='EXTERNAL',
-            sender_name=TransactionService._get_user_full_name(user_id),
-            receiver_name="Внешний криптокошелек",
             card=card, type='crypto_withdrawal', 
             status='processing', amount=amount_crypto, currency=token,
             fee=crypto_fee
@@ -281,14 +259,10 @@ class TransactionService:
         tx_status = 'completed' if is_internal else 'processing'
         receiver_id = str(internal_account.user_id) if is_internal else 'EXTERNAL'
 
-        receiver_final_name = TransactionService._get_user_full_name(internal_account.user_id) if is_internal else beneficiary_name
-
         txn = Transactions.objects.create(
             user_id=user_id,
             sender_id=str(user_id),
             receiver_id=receiver_id,
-            sender_name=TransactionService._get_user_full_name(user_id),
-            receiver_name=receiver_final_name,
             card_id=card_id,
             type='bank_withdrawal',
             status=tx_status,
@@ -353,8 +327,6 @@ class TransactionService:
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_wallet.user_id),
-            sender_name=TransactionService._get_user_full_name(sender_id),
-            receiver_name=TransactionService._get_user_full_name(dest_wallet.user_id),
             type='card_to_crypto', status='completed',
             amount=amount_aed, currency='AED', fee=conv_fee_aed, exchange_rate=(Decimal('1.00') / sell_rate),
             card_id=source_card.id,
@@ -404,8 +376,6 @@ class TransactionService:
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_card.user_id),
-            sender_name=TransactionService._get_user_full_name(sender_id),
-            receiver_name=TransactionService._get_user_full_name(dest_card.user_id),
             type='crypto_to_card', status='completed',
             amount=amount_usdt, currency='USDT', fee=crypto_fee, exchange_rate=buy_rate,
             recipient_card=to_card_number, card_id=dest_card.id,
@@ -456,8 +426,6 @@ class TransactionService:
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_wallet.user_id),
-            sender_name=TransactionService._get_user_full_name(sender_id),
-            receiver_name=TransactionService._get_user_full_name(dest_wallet.user_id),
             type='bank_to_crypto', status='completed',
             amount=amount_aed, currency='AED', fee=conv_fee_aed, exchange_rate=(Decimal('1.00') / sell_rate),
             description=f"{'Внутренний своп' if is_internal else 'Перевод пользователю'}: Банк -> Крипто"
@@ -507,8 +475,6 @@ class TransactionService:
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_bank.user_id),
-            sender_name=TransactionService._get_user_full_name(sender_id),
-            receiver_name=TransactionService._get_user_full_name(dest_bank.user_id),
             type='crypto_to_bank', status='completed',
             amount=amount_usdt, currency='USDT', fee=crypto_fee, exchange_rate=buy_rate,
             description=f"{'Внутренний своп' if is_internal else 'Перевод пользователю'}: Крипто -> Банк"
@@ -555,8 +521,6 @@ class TransactionService:
             user_id=sender_id, 
             sender_id=str(sender_id),
             receiver_id=str(dest_bank.user_id),
-            sender_name=TransactionService._get_user_full_name(sender_id),
-            receiver_name=TransactionService._get_user_full_name(dest_bank.user_id),
             type='card_to_bank', status='completed', amount=amount_aed, currency='AED',
             fee=fee_amount,
             description=f"{'Внутренний своп' if is_internal else 'Перевод пользователю'}: Карта -> Банк"
@@ -594,8 +558,6 @@ class TransactionService:
             user_id=user_id,
             sender_id=str(user_id),
             receiver_id=str(receiver_card.user_id),
-            sender_name=TransactionService._get_user_full_name(user_id),
-            receiver_name=TransactionService._get_user_full_name(receiver_card.user_id),
             type='transfer_out', status='completed', amount=amount, currency='AED', fee=fee_amount,
             recipient_card=receiver_card_number,
             description=f"Перевод с IBAN на карту {receiver_card_number[-4:]}"
@@ -654,8 +616,6 @@ class TransactionService:
                 user_id=user_id,
                 sender_id=str(user_id),
                 receiver_id=str(dest_wallet.user_id),
-                sender_name=TransactionService._get_user_full_name(user_id),
-                receiver_name=TransactionService._get_user_full_name(dest_wallet.user_id),
                 type='crypto_withdrawal',
                 status='completed',
                 amount=amount_usdt,
@@ -678,8 +638,6 @@ class TransactionService:
                 user_id=user_id,
                 sender_id=str(user_id),
                 receiver_id='EXTERNAL',
-                sender_name=TransactionService._get_user_full_name(user_id),
-                receiver_name="Внешний криптокошелек",
                 type='crypto_withdrawal',
                 status='pending',
                 amount=amount_usdt,
@@ -810,6 +768,7 @@ class TransactionService:
                 receipt["total_debit_aed"] = float(bw.total_debit)
                 receipt["from_card_id"] = str(bw.from_card_id) if bw.from_card_id else None
                 receipt["from_bank_account_id"] = str(bw.from_bank_account_id) if bw.from_bank_account_id else None
+                # Sender info (the user who created the transaction)
                 receipt["sender_name"] = get_user_name(txn.user_id)
                 sender_account = BankDepositAccounts.objects.filter(user_id=str(txn.user_id), is_active=True).first()
                 if sender_account:
@@ -856,6 +815,7 @@ class TransactionService:
                     receipt["token"] = sender_wallet.token
                     receipt["network"] = sender_wallet.network
                     receipt["network_and_token"] = f"{sender_wallet.network} / {sender_wallet.token}"
+                # Try to find to_address from receiver_id
                 if txn.receiver_id and txn.receiver_id != 'EXTERNAL':
                     dest_wallet = CryptoWallets.objects.filter(user_id=txn.receiver_id, is_active=True).first()
                     if dest_wallet:
@@ -874,27 +834,37 @@ class TransactionService:
                 receipt["total_debit"] = float(txn.amount) + (float(txn.fee) if txn.fee else 0)
         elif tx_type in ['card_to_crypto', 'crypto_to_card', 'bank_to_crypto', 'crypto_to_bank', 'card_to_bank']:
             receipt["operation"] = "Internal/System Transfer"
+            # Resolve sender/receiver details for cross-type transfers
             sender_id_str = str(txn.sender_id) if txn.sender_id else None
             receiver_id_str = str(txn.receiver_id) if txn.receiver_id else None
+            
+            # Sender info
             if sender_id_str and sender_id_str != 'EXTERNAL':
                 receipt["sender_name"] = get_user_name(sender_id_str)
+                # Sender wallet (crypto source)
                 if tx_type in ['crypto_to_card', 'crypto_to_bank']:
                     sender_wallet = CryptoWallets.objects.filter(user_id=sender_id_str, is_active=True).first()
                     if sender_wallet:
                         receipt["from_address_mask"] = mask_address(sender_wallet.address)
                         receipt["from_address"] = sender_wallet.address
                         receipt["network_and_token"] = f"{sender_wallet.token}, {sender_wallet.network}"
+                # Sender card
                 if tx_type in ['card_to_crypto', 'card_to_bank']:
                     receipt["sender_card_mask"] = mask_card(txn.sender_card)
+                # Sender bank
                 if tx_type in ['bank_to_crypto']:
                     sender_bank = BankDepositAccounts.objects.filter(user_id=sender_id_str, is_active=True).first()
                     if sender_bank:
                         receipt["sender_iban_mask"] = mask_iban(sender_bank.iban)
                         receipt["bank_name"] = sender_bank.bank_name
+
+            # Recipient info
             if receiver_id_str and receiver_id_str != 'EXTERNAL':
                 receipt["recipient_name"] = get_user_name(receiver_id_str)
+                # Recipient card
                 if tx_type in ['crypto_to_card']:
                     receipt["receiver_card_mask"] = mask_card(txn.recipient_card)
+                # Recipient bank (IBAN)
                 if tx_type in ['crypto_to_bank', 'card_to_bank']:
                     dest_bank = BankDepositAccounts.objects.filter(user_id=receiver_id_str, is_active=True).first()
                     if dest_bank:
@@ -903,6 +873,7 @@ class TransactionService:
                         receipt["iban_mask"] = mask_iban(dest_bank.iban)
                         receipt["bank_name"] = dest_bank.bank_name
                         receipt["beneficiary_bank_name"] = dest_bank.bank_name
+                # Recipient crypto wallet
                 if tx_type in ['card_to_crypto', 'bank_to_crypto']:
                     dest_wallet = CryptoWallets.objects.filter(user_id=receiver_id_str, is_active=True).first()
                     if dest_wallet:
