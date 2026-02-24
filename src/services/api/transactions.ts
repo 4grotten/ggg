@@ -334,7 +334,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_transfer': 'card_transfer',
     'withdrawal': 'crypto_withdrawal',
     'crypto_withdrawal': 'crypto_withdrawal',
-    'bank_withdrawal': 'bank_transfer_incoming', // money credited to bank/IBAN account
+    'bank_withdrawal': 'bank_transfer', // will be remapped for inbound below
     'bank_transfer': 'bank_transfer',
     'bank_transfer_incoming': 'bank_transfer_incoming',
     'crypto_deposit': 'crypto_deposit',
@@ -394,7 +394,15 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     mappedType = tx.amount > 0 ? 'bank_transfer_incoming' : 'bank_transfer';
   }
 
-  // Determine incoming/outgoing status
+  // For bank_withdrawal, use direction to determine incoming/outgoing
+  if (tx.type === 'bank_withdrawal') {
+    if (tx.direction === 'inbound') {
+      mappedType = 'bank_transfer_incoming';
+    } else {
+      mappedType = 'bank_transfer';
+    }
+  }
+
   // For card_transfer: API always returns positive amount, use operation or sender/recipient fields
   let isIncoming: boolean;
   if (mappedType === 'card_transfer') {
