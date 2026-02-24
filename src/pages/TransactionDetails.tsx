@@ -13,6 +13,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useTransactionReceipt, useApiTransactionGroups } from "@/hooks/useTransactions";
 import { getAuthToken, apiRequest } from "@/services/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
+import { AvatarPreview } from "@/components/ui/avatar-preview";
 
 // Mock transaction data - in real app would come from API/state
 const mockTransactions: Record<string, {
@@ -2045,7 +2046,9 @@ const TransactionDetails = () => {
                 const senderInitial = receipt.sender_name ? receipt.sender_name.charAt(0).toUpperCase() : (user?.full_name?.charAt(0)?.toUpperCase() || "S");
                 
                 return senderAvatarUrl ? (
-                  <img src={senderAvatarUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  <AvatarPreview src={senderAvatarUrl} alt={receipt.sender_name || ""}>
+                    <img src={senderAvatarUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  </AvatarPreview>
                 ) : (
                   <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                     {senderInitial}
@@ -2139,7 +2142,9 @@ const TransactionDetails = () => {
                 const receiverInitial = receiverName ? receiverName.charAt(0).toUpperCase() : "R";
                 
                 return receiverAvatarUrl ? (
-                  <img src={receiverAvatarUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  <AvatarPreview src={receiverAvatarUrl} alt={receiverName || ""}>
+                    <img src={receiverAvatarUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  </AvatarPreview>
                 ) : (
                   <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 font-bold text-sm shrink-0">
                     {receiverInitial}
