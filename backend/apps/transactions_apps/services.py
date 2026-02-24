@@ -749,6 +749,13 @@ class TransactionService:
                 receipt["total_debit_aed"] = float(bw.total_debit)
                 receipt["from_card_id"] = str(bw.from_card_id) if bw.from_card_id else None
                 receipt["from_bank_account_id"] = str(bw.from_bank_account_id) if bw.from_bank_account_id else None
+                # Sender info (the user who created the transaction)
+                receipt["sender_name"] = get_user_name(txn.user_id)
+                sender_account = BankDepositAccounts.objects.filter(user_id=str(txn.user_id), is_active=True).first()
+                if sender_account:
+                    receipt["sender_iban"] = sender_account.iban
+                    receipt["sender_iban_mask"] = mask_iban(sender_account.iban)
+                    receipt["sender_bank_name"] = sender_account.bank_name
             except Exception:
                 pass
         elif tx_type == 'crypto_withdrawal':
