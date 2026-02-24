@@ -137,7 +137,8 @@ const SendBank = () => {
         const walletOption = sourceOptions.find(s => s.type === "wallet");
         setSelectedSource(walletOption || sourceOptions[0]);
       } else {
-        setSelectedSource(sourceOptions[0]);
+        const bankOption = sourceOptions.find(s => s.type === "bank");
+        setSelectedSource(bankOption || sourceOptions[0]);
       }
     }
   }, [sourceOptions, selectedSource, fromWallet]);
