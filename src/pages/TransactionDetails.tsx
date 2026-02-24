@@ -243,35 +243,39 @@ const TransactionDetails = () => {
             (receipt as any).is_incoming === true;
           if (isIncoming) mapped = 'crypto_deposit';
         }
-        // If bank_withdrawal, determine direction by comparing user IDs
+        // If bank_withdrawal, determine direction using receipt.direction first
         if (receipt.type === 'bank_withdrawal') {
-          let isIncoming = false;
-          // Primary: compare receipt user_id (sender) with current user
-          const currentUserId = String(user?.id || '');
-          const receiptUserId = String(receipt.user_id || '');
-          if (currentUserId && receiptUserId && currentUserId !== receiptUserId) {
-            // Current user is NOT the sender → they are the recipient
-            isIncoming = true;
-          } else if (!currentUserId || !receiptUserId) {
-            // Fallback: if beneficiary matches current user name, it's incoming
-            if (receipt.beneficiary_name && user?.full_name) {
-              const benName = receipt.beneficiary_name.toLowerCase().trim();
-              const userName = user.full_name.toLowerCase().trim();
-              if (benName === userName || userName.includes(benName) || benName.includes(userName)) {
-                isIncoming = true;
+          if (receipt.direction === 'inbound') {
+            mapped = 'bank_transfer_incoming';
+          } else if (receipt.direction === 'outbound') {
+            mapped = 'bank_transfer';
+          } else {
+            // Fallback: compare user IDs
+            let isIncoming = false;
+            const currentUserId = String(user?.id || '');
+            const receiptUserId = String(receipt.user_id || '');
+            if (currentUserId && receiptUserId && currentUserId !== receiptUserId) {
+              isIncoming = true;
+            } else if (!currentUserId || !receiptUserId) {
+              if (receipt.beneficiary_name && user?.full_name) {
+                const benName = receipt.beneficiary_name.toLowerCase().trim();
+                const userName = user.full_name.toLowerCase().trim();
+                if (benName === userName || userName.includes(benName) || benName.includes(userName)) {
+                  isIncoming = true;
+                }
               }
             }
+            if (isIncoming) mapped = 'bank_transfer_incoming';
           }
-          if (isIncoming) mapped = 'bank_transfer_incoming';
         }
         // For iban_to_card / bank_to_card / transfer_out / internal_transfer: remap to incoming when direction is inbound or amount > 0
         if (['iban_to_card', 'bank_to_card', 'transfer_out'].includes(receipt.type)) {
-          if ((receipt as any).direction === 'inbound' || receipt.amount > 0) {
+          if (receipt.direction === 'inbound' || receipt.amount > 0) {
             mapped = 'bank_transfer_incoming';
           }
         }
         if (receipt.type === 'internal_transfer') {
-          if ((receipt as any).direction === 'inbound' || receipt.amount > 0) {
+          if (receipt.direction === 'inbound' || receipt.amount > 0) {
             mapped = 'bank_transfer_incoming';
           }
         }
@@ -320,7 +324,7 @@ const TransactionDetails = () => {
   const isBankTransfer = transaction?.type === "bank_transfer";
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
   const isInternalTransfer = transaction?.type === "internal_transfer";
-  const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction as any)?.originalApiType || '');
+  const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card', 'bank_withdrawal', 'transfer_out'].includes((transaction as any)?.originalApiType || '');
    const isCryptoToCard = transaction?.type === "crypto_to_card";
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
   const isIncomingCryptoToBank = isCryptoToBank && (() => {
