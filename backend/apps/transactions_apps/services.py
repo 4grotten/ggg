@@ -695,6 +695,24 @@ class TransactionService:
         else:
             direction = 'outbound'
 
+        # Fetch avatars from Profiles
+        sender_avatar = None
+        receiver_avatar = None
+        try:
+            if txn.sender_id and txn.sender_id != 'EXTERNAL':
+                sender_profile = Profiles.objects.filter(user_id=txn.sender_id).first()
+                if sender_profile and sender_profile.avatar_url:
+                    sender_avatar = sender_profile.avatar_url
+        except Exception:
+            pass
+        try:
+            if txn.receiver_id and txn.receiver_id != 'EXTERNAL':
+                receiver_profile = Profiles.objects.filter(user_id=txn.receiver_id).first()
+                if receiver_profile and receiver_profile.avatar_url:
+                    receiver_avatar = receiver_profile.avatar_url
+        except Exception:
+            pass
+
         receipt = {
             "transaction_id": str(txn.id),
             "type": txn.type,
@@ -717,6 +735,8 @@ class TransactionService:
             "receiver_id": txn.receiver_id,
             "sender_name": txn.sender_name,
             "receiver_name": txn.receiver_name,
+            "sender_avatar": sender_avatar,
+            "receiver_avatar": receiver_avatar,
             "operation": txn.type.replace('_', ' ').title(),
             "receiver_card_mask": None,
             "recipient_name": txn.receiver_name,

@@ -54,6 +54,8 @@ export interface TransactionReceipt {
   receiver_card_mask?: string;
   sender_name?: string | null;
   recipient_name?: string | null;
+  sender_id?: string | null;
+  receiver_id?: string | null;
   total_amount?: number;
   // Bank topup fields
   transfer_rail?: string;
