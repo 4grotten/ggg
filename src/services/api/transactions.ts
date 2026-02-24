@@ -973,15 +973,15 @@ export interface BankToCardRequest {
 }
 
 /**
- * Transfer from bank account to card
- * Uses dedicated edge function: bank-to-card-transfer
+ * Transfer from user's own IBAN bank account to their card
+ * Uses dedicated edge function: send-iban-to-card
  */
 export const submitBankToCard = async (
   request: BankToCardRequest
 ): Promise<{ success: boolean; data?: InternalTransferResponse; error?: string }> => {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  const url = `${SUPABASE_URL}/functions/v1/bank-to-card-transfer`;
+  const url = `${SUPABASE_URL}/functions/v1/send-iban-to-card`;
 
   try {
     const headers: Record<string, string> = {
