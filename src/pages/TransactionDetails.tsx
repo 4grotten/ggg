@@ -719,38 +719,60 @@ const TransactionDetails = () => {
           
           {isBankTransferIncoming ? (
             <>
-              {/* Sender info - from the receipt's user_id perspective */}
+              {/* Sender info */}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.sender")}</span>
                 <span className="font-medium">{transaction.senderName || (receipt as any)?.sender_name || "—"}</span>
               </div>
-              {/* Sender IBAN - use userIban from the sender's wallet if available via multi-account */}
-              {(() => {
-                // Try to find sender's IBAN from multi-account wallet data
-                // The receipt user_id is the sender
-                const senderUserId = String(receipt?.user_id || '');
-                // We don't have sender's IBAN in the receipt, so skip this row
-                return null;
-              })()}
+              {/* Sender IBAN - from iban_mask in the receipt (shows sender's IBAN for the recipient) */}
+              {receipt?.iban_mask && (
+                <div className="flex items-start justify-between">
+                  <span className="text-muted-foreground">IBAN</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-right text-sm">
+                      {showIban 
+                        ? (receipt.beneficiary_iban || receipt.iban_mask)
+                        : receipt.iban_mask.replace(/\s*\*+\s*/g, '••••')
+                      }
+                    </span>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(receipt.beneficiary_iban || receipt.iban_mask || '');
+                        toast.success(t("toast.copied", { label: "IBAN" }));
+                      }}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => setShowIban(!showIban)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                <span className="font-medium">{receipt?.beneficiary_bank_name || "EasyCard FZE"}</span>
+              </div>
               {/* Recipient IBAN (current user's account) */}
               <div className="flex items-start justify-between">
                 <span className="text-muted-foreground">{t("transaction.toAccount")}</span>
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => navigate("/account")}
-                    className="font-medium text-[#007AFF] hover:underline transition-colors text-right text-sm"
-                  >
+                  <span className="font-medium text-right text-sm">
                     {(() => {
-                      const recipientIban = receipt?.beneficiary_iban || userIban;
+                      const recipientIban = userIban;
                       if (!recipientIban) return "AED Account";
                       return showToCard ? recipientIban : `${recipientIban.slice(0, 4)}••••${recipientIban.slice(-4)}`;
                     })()}
-                  </button>
-                  {(receipt?.beneficiary_iban || userIban) && (
+                  </span>
+                  {userIban && (
                     <>
                       <button 
                         onClick={() => {
-                          navigator.clipboard.writeText(receipt?.beneficiary_iban || userIban || '');
+                          navigator.clipboard.writeText(userIban || '');
                           toast.success(t("toast.copied", { label: "IBAN" }));
                         }}
                         className="text-muted-foreground hover:text-foreground transition-colors"
@@ -769,11 +791,11 @@ const TransactionDetails = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.recipient")}</span>
-                <span className="font-medium">{receipt?.beneficiary_name || user?.full_name || "—"}</span>
+                <span className="font-medium">{user?.full_name || "—"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.bankName")}</span>
-                <span className="font-medium">{receipt?.beneficiary_bank_name || "EasyCard FZE"}</span>
+                <span className="font-medium">EasyCard FZE</span>
               </div>
             </>
           ) : isInternalTransfer ? (
