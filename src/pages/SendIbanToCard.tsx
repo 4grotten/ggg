@@ -10,7 +10,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { useSettings } from "@/contexts/SettingsContext";
-import { useCards, useBankAccounts } from "@/hooks/useCards";
+import { useBankAccounts, useWalletSummary } from "@/hooks/useCards";
 import { Card } from "@/types/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { submitInternalTransfer } from "@/services/api/transactions";
@@ -22,7 +22,7 @@ const SendIbanToCard = () => {
   const settings = useSettings();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { data: cardsData } = useCards();
+  const { data: walletData } = useWalletSummary();
   const { data: bankAccountsData, isLoading: bankLoading } = useBankAccounts();
 
   const bankAccount = bankAccountsData?.data?.[0];
@@ -30,7 +30,15 @@ const SendIbanToCard = () => {
   const bankBalance = parseFloat(bankAccount?.balance || "0");
   const bankIban = bankAccount?.iban || "";
 
-  const cards = cardsData?.data ?? [];
+  // Use wallet summary cards (they have UUID ids needed for internal transfers)
+  const cards: Card[] = (walletData?.data?.cards || []).map(c => ({
+    id: c.id,
+    type: (c.type === 'metal' ? 'metal' : 'virtual') as Card['type'],
+    name: c.type === 'metal' ? 'Visa Metal' : 'Visa Virtual',
+    isActive: true,
+    balance: parseFloat(c.balance) || 0,
+    lastFourDigits: c.card_number?.slice(-4),
+  }));
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
