@@ -198,7 +198,6 @@ const TransactionDetails = () => {
 
   // Build transaction from receipt data if no mock found (API transaction)
   const transaction = mockTransaction || (receipt ? (() => {
-    console.log('[TransactionDetails] Receipt raw data:', JSON.stringify(receipt, null, 2));
     const senderLast4 = receipt.sender_card_mask?.slice(-4) || '';
     const receiverLast4 = receipt.receiver_card_mask?.slice(-4) || '';
     const senderCardType = resolveCardType(receipt.sender_card_mask, 0);
@@ -265,17 +264,6 @@ const TransactionDetails = () => {
           }
           if (isIncoming) mapped = 'bank_transfer_incoming';
         }
-        // For iban_to_card / bank_to_card / transfer_out / internal_transfer: remap to incoming when direction is inbound or amount > 0
-        if (['iban_to_card', 'bank_to_card', 'transfer_out'].includes(receipt.type)) {
-          if ((receipt as any).direction === 'inbound' || receipt.amount > 0) {
-            mapped = 'bank_transfer_incoming';
-          }
-        }
-        if (receipt.type === 'internal_transfer') {
-          if ((receipt as any).direction === 'inbound' || receipt.amount > 0) {
-            mapped = 'bank_transfer_incoming';
-          }
-        }
         return mapped as any;
       })(),
       recipientCard: receipt.type === 'crypto_to_card' ? cachedRecipientCard?.slice(-4) : receiverLast4,
@@ -283,7 +271,7 @@ const TransactionDetails = () => {
       recipientCardType: receipt.type === 'crypto_to_card' ? ((cryptoToCardRecipient as any)?.card_type === 'metal' ? 'Metal' : 'Virtual') : receiverCardType,
       recipientName: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.recipient_name : (receipt.recipient_name || receipt.beneficiary_name || (receipt as any).to_name),
       recipientAvatar: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.avatar_url : undefined,
-      senderName: receipt.sender_name || (receipt as any).from_name || (receipt as any).user_full_name || (receipt as any).full_name || (receipt.movements?.[0] as any)?.account_holder,
+      senderName: receipt.sender_name,
       senderCard: senderLast4 || undefined,
       senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
@@ -299,8 +287,8 @@ const TransactionDetails = () => {
       bankFee: receipt.fee_amount,
       recipientIban: receipt.type === 'crypto_to_bank' ? (receipt.beneficiary_iban || (receipt as any).to_iban || resolveFullIban(receipt.iban_mask)) : resolveFullIban(receipt.iban_mask),
       recipientBankName: receipt.beneficiary_bank_name || receipt.bank_name,
-      senderIban: (receipt as any).sender_iban_mask || (receipt as any).sender_iban || (receipt as any).from_iban || receipt.iban_mask,
-      senderBankName: (receipt as any).sender_bank_name || receipt.bank_name,
+      senderIban: receipt.iban_mask,
+      senderBankName: receipt.bank_name,
       beneficiaryName: receipt.beneficiary_name,
       cardType: senderCardType,
       originalApiType: receipt.type,
@@ -321,7 +309,7 @@ const TransactionDetails = () => {
   const isBankTransfer = transaction?.type === "bank_transfer";
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
   const isInternalTransfer = transaction?.type === "internal_transfer";
-  const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card', 'bank_withdrawal', 'transfer_out'].includes((transaction as any)?.originalApiType || '');
+  const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction as any)?.originalApiType || '');
    const isCryptoToCard = transaction?.type === "crypto_to_card";
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
   const isIncomingCryptoToBank = isCryptoToBank && (() => {
