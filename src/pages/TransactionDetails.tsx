@@ -2114,14 +2114,15 @@ const TransactionDetails = () => {
             )}
             {(receipt as any).sender_card_mask && (() => {
               const sMask = String((receipt as any).sender_card_mask);
+              const sFull = (receipt as any).sender_card ? formatCardNumber((receipt as any).sender_card) : (transaction.senderCardFull || resolveFullCard(sMask, 0) || sMask);
               return (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">{t("transaction.card")}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">
-                      {showSenderCard ? sMask : `••••${sMask.slice(-4)}`}
+                      {showSenderCard ? sFull : `••••${sMask.slice(-4)}`}
                     </span>
-                    <button onClick={() => { navigator.clipboard.writeText(sMask); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <button onClick={() => { navigator.clipboard.writeText(sFull); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
                       <Copy className="w-4 h-4" />
                     </button>
                     <button onClick={() => setShowSenderCard(!showSenderCard)} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -2189,7 +2190,7 @@ const TransactionDetails = () => {
             )}
             {(receipt as any).receiver_card_mask && (() => {
               const rMask = String((receipt as any).receiver_card_mask);
-              const rFull = transaction.recipientCardFull || resolveFullCard(rMask, 1) || rMask;
+              const rFull = (receipt as any).receiver_card ? formatCardNumber((receipt as any).receiver_card) : (transaction.recipientCardFull || resolveFullCard(rMask, 1) || rMask);
               return (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">{t("transaction.card")}</span>
