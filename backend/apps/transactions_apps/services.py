@@ -638,7 +638,8 @@ class TransactionService:
         metadata = {
             "crypto_token": token,
             "crypto_network": network,
-            "crypto_address": to_address
+            "crypto_address": to_address,
+            "from_address": source_wallet.address
         }
 
         if is_internal:
@@ -756,6 +757,7 @@ class TransactionService:
             "crypto_network": None,
             "crypto_token": None,
             "crypto_address": None,
+            "from_address": None,
             "from_card_id": None,
             "to_card_id": None,
             "from_bank_account_id": None,
