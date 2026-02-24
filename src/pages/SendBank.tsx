@@ -547,6 +547,19 @@ const SendBank = () => {
                     </span>
                   </div>
                 </div>
+
+                {/* Quick amount buttons */}
+                <div className="flex gap-2">
+                  {[500, 1000, 3000, 5000].map((val) => (
+                    <button
+                      key={val}
+                      onClick={() => setAmountAED(val.toString())}
+                      className="flex-1 py-2 rounded-xl bg-secondary text-sm font-medium text-foreground hover:bg-muted/80 transition-colors"
+                    >
+                      {val.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Fee Breakdown */}
