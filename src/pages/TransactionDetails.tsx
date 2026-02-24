@@ -355,8 +355,21 @@ const TransactionDetails = () => {
     // Fallback: no fromWalletAddress means recipient side
     return !transaction?.fromWalletAddress && !!transaction?.recipientCard;
   })();
-  // For API transactions, determine direction: if movements[0] is debit, it's outgoing
+  // For API transactions, determine direction: check cached list data first, then movements
   const isIncomingTransfer = isCardTransfer && (() => {
+    // Check cached list data for direction (primary source of truth)
+    if (apiTxGroups) {
+      for (const group of apiTxGroups) {
+        const found = group.transactions?.find((t: any) => {
+          const txRealId = t.id?.startsWith('api_') ? t.id.slice(4) : t.id;
+          return txRealId === realTransactionId;
+        });
+        if (found?.metadata?.isIncoming !== undefined) return found.metadata.isIncoming;
+      }
+    }
+    // Check receipt direction explicitly
+    if ((receipt as any)?.direction === 'inbound') return true;
+    if ((receipt as any)?.direction === 'outbound') return false;
     if (receipt?.movements?.length) {
       return receipt.movements[0]?.type === 'credit';
     }
