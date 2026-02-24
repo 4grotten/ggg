@@ -724,20 +724,20 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.sender")}</span>
                 <span className="font-medium">{transaction.senderName || (receipt as any)?.sender_name || "—"}</span>
               </div>
-              {/* Sender IBAN - from iban_mask in the receipt (shows sender's IBAN for the recipient) */}
-              {receipt?.iban_mask && (
+              {/* Sender IBAN */}
+              {((receipt as any)?.sender_iban_mask || (receipt as any)?.sender_iban) && (
                 <div className="flex items-start justify-between">
                   <span className="text-muted-foreground">IBAN</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-right text-sm">
                       {showIban 
-                        ? (receipt.beneficiary_iban || receipt.iban_mask)
-                        : receipt.iban_mask.replace(/\s*\*+\s*/g, '••••')
+                        ? ((receipt as any).sender_iban || (receipt as any).sender_iban_mask)
+                        : ((receipt as any).sender_iban_mask || '').replace(/\s*\*+\s*/g, '••••')
                       }
                     </span>
                     <button 
                       onClick={() => {
-                        navigator.clipboard.writeText(receipt.beneficiary_iban || receipt.iban_mask || '');
+                        navigator.clipboard.writeText((receipt as any).sender_iban || (receipt as any).sender_iban_mask || '');
                         toast.success(t("toast.copied", { label: "IBAN" }));
                       }}
                       className="text-muted-foreground hover:text-foreground transition-colors"
@@ -755,7 +755,7 @@ const TransactionDetails = () => {
               )}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.bankName")}</span>
-                <span className="font-medium">{receipt?.beneficiary_bank_name || "EasyCard FZE"}</span>
+                <span className="font-medium">{(receipt as any)?.sender_bank_name || "EasyCard FZE"}</span>
               </div>
               {/* Recipient IBAN (current user's account) */}
               <div className="flex items-start justify-between">
