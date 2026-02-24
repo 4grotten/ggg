@@ -832,14 +832,32 @@ export interface InternalTransferResponse {
 
 /**
  * Execute internal transfer (swap between own accounts)
- * POST /api/v1/transactions/transfer/internal/
+ * Routes to the correct backend endpoint based on from_type → to_type:
+ *   bank→card  = /transfer/bank-to-card/
+ *   card→bank  = /transfer/card-to-bank/
+ *   card→crypto = /transfer/card-to-crypto/
+ *   crypto→card = /transfer/crypto-to-card/
+ *   bank→crypto = /transfer/bank-to-crypto/
+ *   crypto→bank = /transfer/crypto-to-bank/
  */
 export const submitInternalTransfer = async (
   request: InternalTransferRequest
 ): Promise<{ success: boolean; data?: InternalTransferResponse; error?: string }> => {
+  // Determine the correct endpoint
+  const endpointMap: Record<string, string> = {
+    'bank-card': '/transactions/transfer/bank-to-card/',
+    'card-bank': '/transactions/transfer/card-to-bank/',
+    'card-crypto': '/transactions/transfer/card-to-crypto/',
+    'crypto-card': '/transactions/transfer/crypto-to-card/',
+    'bank-crypto': '/transactions/transfer/bank-to-crypto/',
+    'crypto-bank': '/transactions/transfer/crypto-to-bank/',
+  };
+  const key = `${request.from_type}-${request.to_type}`;
+  const endpoint = endpointMap[key] || `/transactions/transfer/internal/`;
+
   try {
     const result = await apiRequest<InternalTransferResponse>(
-      `/transactions/transfer/internal/`,
+      endpoint,
       {
         method: 'POST',
         body: JSON.stringify(request),
