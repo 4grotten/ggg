@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2, Wallet } from "lucide-react";
+import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2, Wallet, ChevronDown, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -403,6 +403,32 @@ const TransactionDetails = () => {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [showFromAddress, setShowFromAddress] = useState(false);
   const [showIban, setShowIban] = useState(false);
+  const [receiptExpanded, setReceiptExpanded] = useState(false);
+  const receiptPrintRef = useRef<HTMLDivElement>(null);
+
+  const handlePrintReceipt = useCallback(() => {
+    if (!receiptPrintRef.current) return;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    const content = receiptPrintRef.current.innerHTML;
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html><head><title>${t("transaction.receipt")}</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; color: #222; }
+        .flex { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 6px 0; border-bottom: 1px solid #eee; }
+        .flex:last-child { border-bottom: none; }
+        pre { margin: 0; font-family: inherit; font-size: 13px; white-space: pre-wrap; word-break: break-all; text-align: right; max-width: 220px; }
+        span { font-size: 13px; }
+        h2 { margin-bottom: 16px; }
+      </style></head>
+      <body><h2>${t("transaction.receipt")}</h2>${content}</body></html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  }, [t]);
 
   const formatReceiptKey = (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 
@@ -1964,30 +1990,49 @@ const TransactionDetails = () => {
 
         {/* Receipt from API */}
         {hasToken && (
-          <div className="bg-secondary rounded-2xl p-4 space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <FileText className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium text-sm">{t("transaction.receipt")}</span>
-            </div>
-            {receiptLoading ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+          <div className="bg-secondary rounded-2xl overflow-hidden">
+            <button
+              onClick={() => setReceiptExpanded(!receiptExpanded)}
+              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <span className="font-medium text-sm">{t("transaction.receipt")}</span>
               </div>
-            ) : receipt ? (
-              <div className="space-y-2 text-sm">
-                {Object.entries(receipt)
-                  .filter(([, value]) => value !== null && value !== undefined)
-                  .map(([key, value]) => (
-                  <div key={key} className="flex items-start justify-between gap-3">
-                    <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
-                    <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
-                      {renderReceiptValue(value)}
-                    </pre>
+              <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${receiptExpanded ? 'rotate-180' : ''}`} />
+            </button>
+            {receiptExpanded && (
+              <div className="px-4 pb-4 space-y-3">
+                {receiptLoading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                   </div>
-                ))}
+                ) : receipt ? (
+                  <>
+                    <div ref={receiptPrintRef} className="space-y-2 text-sm">
+                      {Object.entries(receipt)
+                        .filter(([, value]) => value !== null && value !== undefined)
+                        .map(([key, value]) => (
+                        <div key={key} className="flex items-start justify-between gap-3">
+                          <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
+                          <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
+                            {renderReceiptValue(value)}
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={handlePrintReceipt}
+                      className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-medium text-sm transition-colors"
+                    >
+                      <Printer className="w-4 h-4" />
+                      {t("transaction.printReceipt", "Распечатать чек")}
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable")}</p>
+                )}
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable")}</p>
             )}
           </div>
         )}
