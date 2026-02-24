@@ -854,11 +854,23 @@ const TransactionDetails = () => {
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.toCard")}</span>
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => navigate(transaction.recipientCardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                    className="font-medium text-[#007AFF] hover:underline transition-colors"
-                  >
+                  <span className="font-medium">
                     {showToCard ? `Visa ${transaction.recipientCardType || ''} ${transaction.recipientCardFull || ''}` : `Visa ${transaction.recipientCardType || ''} ••${transaction.recipientCard || transaction.cardLast4 || ''}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(transaction.recipientCardFull?.replace(/\s/g, '') || '');
+                      toast.success(t("toast.cardNumberCopied"));
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setShowToCard(!showToCard)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                   <button 
                     onClick={() => setShowToCard(!showToCard)}
@@ -1068,12 +1080,26 @@ const TransactionDetails = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
-                <button 
-                  onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                  className="font-medium text-[#007AFF] hover:underline transition-colors"
-                >
-                  Visa {transaction.cardType} ••{transaction.cardLast4}
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {showFromCard ? `Visa ${transaction.cardType} ${transaction.fromCardFull || ''}` : `Visa ${transaction.cardType} ••${transaction.cardLast4}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(transaction.fromCardFull?.replace(/\s/g, '') || '');
+                      toast.success(t("toast.cardNumberCopied"));
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setShowFromCard(!showFromCard)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showFromCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </>
           ) : isCryptoSend ? (
@@ -1232,24 +1258,33 @@ const TransactionDetails = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.toCard")}</span>
-                <button 
-                  onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                  className="font-medium text-[#007AFF] hover:underline transition-colors"
-                >
-                  Visa {transaction.cardType} ••{transaction.cardLast4}
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {showToCard ? `Visa ${transaction.cardType} ${transaction.toCardFull || ''}` : `Visa ${transaction.cardType} ••${transaction.cardLast4}`}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(transaction.toCardFull?.replace(/\s/g, '') || '');
+                      toast.success(t("toast.cardNumberCopied"));
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setShowToCard(!showToCard)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </>
           ) : isCardActivation ? (
             <>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.cardType")}</span>
-                <button 
-                  onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                  className="font-medium text-[#007AFF] hover:underline transition-colors"
-                >
-                  Visa {transaction.cardType}
-                </button>
+                <span className="font-medium">Visa {transaction.cardType}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.annualCardFee")}</span>
@@ -1300,12 +1335,9 @@ const TransactionDetails = () => {
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.toCard")}</span>
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => navigate("/card/virtual")}
-                    className="font-medium text-[#007AFF] hover:underline transition-colors"
-                  >
+                  <span className="font-medium">
                     {showToCard ? `Visa ${transaction.cardType || 'Virtual'} ${transaction.toCardFull}` : `Visa ${transaction.cardType || 'Virtual'} ••${transaction.cardLast4}`}
-                  </button>
+                  </span>
                   <button 
                     onClick={() => {
                       navigator.clipboard.writeText(transaction.toCardFull?.replace(/\s/g, '') || '');
@@ -1333,12 +1365,9 @@ const TransactionDetails = () => {
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                    className="font-medium text-[#007AFF] hover:underline transition-colors"
-                  >
+                  <span className="font-medium">
                     {showFromCard ? `Visa ${transaction.cardType} ${transaction.fromCardFull}` : `Visa ${transaction.cardType} ••${transaction.cardLast4}`}
-                  </button>
+                  </span>
                   <button 
                     onClick={() => {
                       navigator.clipboard.writeText(transaction.fromCardFull?.replace(/\s/g, '') || '');
@@ -1387,12 +1416,26 @@ const TransactionDetails = () => {
           ) : (
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t("transaction.card")}</span>
-              <button 
-                onClick={() => navigate(transaction.cardType === "Metal" ? "/card/metal" : "/card/virtual")}
-                className="font-medium text-[#007AFF] hover:underline transition-colors"
-              >
-                Visa {transaction.cardType || 'Virtual'} ••{transaction.cardLast4}
-              </button>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">
+                  {showToCard ? `Visa ${transaction.cardType || 'Virtual'} ${transaction.toCardFull || transaction.fromCardFull || ''}` : `Visa ${transaction.cardType || 'Virtual'} ••${transaction.cardLast4}`}
+                </span>
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText((transaction.toCardFull || transaction.fromCardFull || '')?.replace(/\s/g, '') || '');
+                    toast.success(t("toast.cardNumberCopied"));
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => setShowToCard(!showToCard)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
           )}
         </div>
