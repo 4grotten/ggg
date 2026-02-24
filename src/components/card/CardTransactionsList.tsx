@@ -276,7 +276,7 @@ const handleClick = (transaction: Transaction) => {
                           : isCryptoDeposit
                           ? t("transactions.walletDeposit")
                           : isIncomingCryptoToCard
-                           ? `${t("transaction.walletToIban").split(' →')[0]} → ${t("transactions.cardTopUp")}`
+                           ? "USDT → EasyCard"
                           : isIncomingTransfer
                           ? t("transactions.cardReceived")
                           : isOutgoingTransfer
