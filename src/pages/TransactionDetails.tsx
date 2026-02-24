@@ -2015,7 +2015,7 @@ const TransactionDetails = () => {
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-border">
                     <span className="text-muted-foreground">{t("transaction.credited")}</span>
-                    <span className="font-semibold text-green-500">+{(receipt?.movements?.[1]?.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 })} USDT</span>
+                    <span className="font-semibold text-green-500">+{(receipt?.movements?.[1]?.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                   </div>
                 </>
               )}
