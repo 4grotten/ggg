@@ -317,7 +317,7 @@ const TransactionDetails = () => {
    const isCryptoToCard = transaction?.type === "crypto_to_card";
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
   const isIncomingCryptoToBank = isCryptoToBank && (() => {
-    // Check cached list data for direction
+    // Check cached list data for direction (primary source of truth)
     if (apiTxGroups) {
       for (const group of apiTxGroups) {
         const found = group.transactions?.find((t: any) => {
@@ -328,12 +328,9 @@ const TransactionDetails = () => {
       }
     }
     if ((receipt as any)?.direction === 'inbound') return true;
-    // If beneficiary matches current user, it's incoming
-    if (receipt?.beneficiary_name && user?.full_name) {
-      const benName = receipt.beneficiary_name.toLowerCase().trim();
-      const userName = user.full_name.toLowerCase().trim();
-      if (benName === userName || userName.includes(benName) || benName.includes(userName)) return true;
-    }
+    if ((receipt as any)?.direction === 'outbound') return false;
+    // For crypto_to_bank, do NOT use beneficiary name matching as fallback
+    // because the user may send to their own IBAN, which would falsely flag as incoming
     return false;
   })();
   const isIncomingCryptoToCard = isCryptoToCard && (() => {
@@ -967,7 +964,7 @@ const TransactionDetails = () => {
             <>
               {/* Sender - wallet */}
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Отправитель</span>
+                <span className="text-muted-foreground">{t("transaction.sender")}</span>
                 <div className="flex items-center gap-2">
                   <Wallet className="w-4 h-4 text-muted-foreground" />
                   <span className="font-medium">
