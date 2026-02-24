@@ -42,11 +42,11 @@ export function AvatarPreview({ src, alt = "", children }: AvatarPreviewProps) {
     >
       {children}
       {hover && (
-        <div className="absolute z-50 bottom-full right-0 mb-2 animate-in fade-in-0 zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <img
             src={src}
             alt={alt}
-            className="w-48 h-48 object-cover rounded-xl shadow-xl border border-border aspect-square"
+            className="w-64 h-64 object-cover rounded-2xl shadow-2xl border border-border animate-in fade-in-0 zoom-in-95 duration-150"
           />
         </div>
       )}
