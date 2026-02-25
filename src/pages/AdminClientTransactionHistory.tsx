@@ -155,6 +155,7 @@ export default function AdminClientTransactionHistory() {
     if (t === "bank_transfer_incoming" || t === "transfer_in") return "bank_transfer_incoming";
     if (t === "crypto_to_card") return "crypto_to_card";
     if (t === "crypto_to_iban" || t === "card_to_iban") return "crypto_to_iban" as any;
+    if (t === "crypto_to_crypto") return "crypto_withdrawal";
     if (t === "crypto_withdrawal" || t === "crypto_send") return "crypto_withdrawal";
     if (t === "crypto_deposit") return "crypto_deposit";
     if (t === "card_activation") return "card_activation" as any;
@@ -168,6 +169,15 @@ export default function AdminClientTransactionHistory() {
   const mapToAppTransaction = (tx: ClientTransaction): AppTransaction => {
     const d = new Date(tx.created_at);
     const incoming = isIncome(tx);
+    const mappedType = mapTypeToAppType(tx.type);
+    
+    // Build metadata with direction info for CardTransactionsList icon logic
+    const metadata: Record<string, unknown> = {
+      ...(tx.metadata || {}),
+      originalApiType: tx.type,
+      isIncoming: incoming,
+    };
+
     return {
       id: tx.id,
       merchant: TX_TYPE_LABELS[tx.type] || tx.type,
@@ -176,13 +186,13 @@ export default function AdminClientTransactionHistory() {
       amountLocal: tx.amount,
       localCurrency: tx.currency,
       color: incoming ? "#22C55E" : "#007AFF",
-      type: mapTypeToAppType(tx.type),
+      type: mappedType,
       status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : undefined,
       recipientName: tx.receiver_name,
       senderName: tx.sender_name,
-      description: tx.description,
+      description: tx.description || TX_TYPE_LABELS[tx.type] || tx.type,
       fee: tx.fee,
-      metadata: tx.metadata as Record<string, unknown>,
+      metadata,
       createdAt: tx.created_at,
     };
   };
