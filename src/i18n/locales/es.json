@@ -859,7 +859,9 @@
     "bankTransfer": "Transferencia Bancaria",
     "sendToCard": "Enviar a tarjeta",
     "usdtBalance": "Transferir a Billetera USDT",
-    "usdtBalanceDesc": "Enviar USDT a EasyCard o billetera externa"
+    "usdtBalanceDesc": "Enviar USDT a EasyCard o billetera externa",
+    "internalUser": "Usuario del sistema",
+    "commission": "Comisión"
   },
   "topUpUsdt": {
     "title": "Recargar desde USDT",

@@ -949,7 +949,9 @@
     "bankTransfer": "Bank Transfer",
     "sendToCard": "Send to card",
     "usdtBalance": "Transfer to USDT Wallet",
-    "usdtBalanceDesc": "Send USDT to EasyCard or external wallet"
+    "usdtBalanceDesc": "Send USDT to EasyCard or external wallet",
+    "internalUser": "System user",
+    "commission": "Commission"
   },
   "topUpUsdt": {
     "title": "Top Up from USDT",

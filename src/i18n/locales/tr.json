@@ -859,7 +859,9 @@
     "bankTransfer": "Banka Transferi",
     "sendToCard": "Karta gönder",
     "usdtBalance": "USDT Cüzdanına Transfer",
-    "usdtBalanceDesc": "EasyCard veya harici cüzdana USDT gönder"
+    "usdtBalanceDesc": "EasyCard veya harici cüzdana USDT gönder",
+    "internalUser": "Sistem kullanıcısı",
+    "commission": "Komisyon"
   },
   "topUpUsdt": {
     "title": "USDT'den Yükle",

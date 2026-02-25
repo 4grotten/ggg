@@ -865,7 +865,9 @@
     "bankTransfer": "银行转账",
     "sendToCard": "转账到卡",
     "usdtBalance": "转账到 USDT 钱包",
-    "usdtBalanceDesc": "将 USDT 发送到 EasyCard 或外部钱包"
+    "usdtBalanceDesc": "将 USDT 发送到 EasyCard 或外部钱包",
+    "internalUser": "系统用户",
+    "commission": "手续费"
   },
   "topUpUsdt": {
     "title": "从USDT充值",
