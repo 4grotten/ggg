@@ -67,7 +67,8 @@ const isIncome = (tx: ClientTransaction): boolean => {
 const isExpense = (tx: ClientTransaction): boolean => {
   const t = tx.type.toLowerCase();
   return t.includes("withdrawal") || t.includes("transfer_out") || t.includes("payment") ||
-    t === "fee" || t === "card_activation" || t.includes("card_to_") || t.includes("crypto_to_");
+    t === "fee" || t === "card_activation" || t.includes("card_to_") || t.includes("crypto_to_") ||
+    t.includes("_to_iban") || t.includes("_to_card");
 };
 
 const isTransfer = (tx: ClientTransaction): boolean => {
@@ -168,10 +169,14 @@ export default function AdminClientTransactionHistory() {
     if (asset === "all") return true;
     const t = tx.type.toLowerCase();
     const desc = (tx.description || "").toLowerCase();
+    // Crypto takes priority — if it looks like crypto, it's crypto
+    const isCrypto = t.includes("crypto") || t.includes("usdt") || desc.includes("usdt") || desc.includes("trc20") || desc.includes("crypto");
+    if (asset === "crypto") return isCrypto;
+    // Exclude crypto from card/other categories
+    if (isCrypto) return false;
     if (asset === "virtual") return (t.includes("card") || t === "payment" || t === "topup" || t === "fee" || t === "card_activation" || t === "refund" || t === "cashback") && !desc.includes("metal");
     if (asset === "metal") return (t.includes("card") || t === "payment" || t === "topup" || t === "fee" || t === "refund" || t === "cashback") && desc.includes("metal");
     if (asset === "iban") return t.includes("iban") || t.includes("bank") || t.includes("transfer_in") || t.includes("transfer_out") || desc.includes("iban");
-    if (asset === "crypto") return t.includes("crypto") || t.includes("usdt") || desc.includes("usdt") || desc.includes("trc20") || desc.includes("crypto");
     return true;
   };
 
