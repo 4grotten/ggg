@@ -479,7 +479,7 @@ export default function AdminClientTransactionHistory() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <CardTransactionsList groups={filteredGroups} />
+                <CardTransactionsList groups={filteredGroups} viewAsUserId={userId} />
               </motion.div>
             </AnimatePresence>
           )}

@@ -155,11 +155,11 @@ export const useTransactionDetails = (id: string) => {
 // UUID regex to validate transaction IDs before calling receipt endpoint
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export const useTransactionReceipt = (transactionId: string, enabled = true) => {
+export const useTransactionReceipt = (transactionId: string, enabled = true, viewAsUserId?: string) => {
   const isUuid = UUID_RE.test(transactionId);
   return useQuery({
-    queryKey: transactionKeys.receipt(transactionId),
-    queryFn: () => fetchTransactionReceipt(transactionId),
+    queryKey: [...transactionKeys.receipt(transactionId), viewAsUserId],
+    queryFn: () => fetchTransactionReceipt(transactionId, viewAsUserId),
     enabled: !!transactionId && enabled && isUuid,
     staleTime: 1000 * 60 * 30,
     retry: 0,
