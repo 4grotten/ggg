@@ -110,7 +110,40 @@ export default function AdminClientTransactionHistory() {
   const assetRefs = useRef<Map<AssetType, HTMLButtonElement>>(new Map());
   const [assetIndicatorStyle, setAssetIndicatorStyle] = useState({ left: 0, width: 0 });
 
-  const { data: client, isLoading } = useQuery({
+  // Build query params for the transactions API
+  const buildQueryParams = () => {
+    const params = new URLSearchParams();
+    // Map asset filter to API type/card_type params
+    if (activeAsset === "virtual") { params.set("type", "card"); params.set("card_type", "virtual"); }
+    else if (activeAsset === "metal") { params.set("type", "card"); params.set("card_type", "metal"); }
+    else if (activeAsset === "iban") { params.set("type", "bank"); }
+    else if (activeAsset === "crypto") { params.set("type", "crypto"); }
+    // Date filters
+    if (dateFrom) params.set("start_date", format(dateFrom, "yyyy-MM-dd"));
+    if (dateTo) params.set("end_date", format(dateTo, "yyyy-MM-dd"));
+    params.set("limit", "100");
+    return params.toString();
+  };
+
+  // Fetch transactions from dedicated endpoint
+  const { data: transactions, isLoading: txLoading } = useQuery({
+    queryKey: ["admin-client-transactions", userId, activeAsset, dateFrom?.toISOString(), dateTo?.toISOString()],
+    queryFn: async () => {
+      if (!userId) throw new Error("No user ID");
+      const qs = buildQueryParams();
+      const res = await apiRequest<ClientTransaction[]>(`/users/${userId}/transactions/?${qs}`);
+      if (res.error || !res.data) {
+        const msg = res.error?.detail || res.error?.message || "Failed";
+        if (msg.includes('Connection refused') || msg.includes('tcp connect error')) return [];
+        throw new Error(msg);
+      }
+      return res.data;
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch client info (for header display only)
+  const { data: client } = useQuery({
     queryKey: ["admin-client-detail", userId],
     queryFn: async () => {
       if (!userId) throw new Error("No user ID");
@@ -205,8 +238,8 @@ export default function AdminClientTransactionHistory() {
   };
 
   const groups = useMemo((): TransactionGroup[] => {
-    if (!client?.transactions) return [];
-    const sorted = [...client.transactions].sort((a, b) =>
+    if (!transactions || transactions.length === 0) return [];
+    const sorted = [...transactions].sort((a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
     const map = new Map<string, ClientTransaction[]>();
@@ -221,7 +254,7 @@ export default function AdminClientTransactionHistory() {
       rawDate: new Date(txs[0].created_at),
       transactions: txs,
     }));
-  }, [client?.transactions]);
+  }, [transactions]);
 
   const isAssetMatch = (tx: ClientTransaction, asset: AssetType): boolean => {
     if (asset === "all") return true;
@@ -238,10 +271,8 @@ export default function AdminClientTransactionHistory() {
 
   const filteredGroups = useMemo((): AppTransactionGroup[] => {
     return groups.map(group => {
-      if (dateFrom && group.rawDate < startOfDay(dateFrom)) return null;
-      if (dateTo && group.rawDate > endOfDay(dateTo)) return null;
       let txs = group.transactions;
-      txs = txs.filter(tx => isAssetMatch(tx, activeAsset));
+      // Client-side filter by income/expense/transfer type
       if (activeFilter === "income") txs = txs.filter(isIncome);
       else if (activeFilter === "expenses") txs = txs.filter(isExpense);
       else if (activeFilter === "transfers") txs = txs.filter(isTransfer);
@@ -250,7 +281,7 @@ export default function AdminClientTransactionHistory() {
       const totalSpend = appTxs.filter(t => !isIncome(txs.find(x => x.id === t.id)!)).reduce((s, t) => s + t.amountLocal, 0);
       return { date: group.date, totalSpend, transactions: appTxs };
     }).filter(Boolean) as AppTransactionGroup[];
-  }, [groups, activeFilter, activeAsset, dateFrom, dateTo]);
+  }, [groups, activeFilter]);
 
   const filterOptions: { key: FilterType; label: string }[] = [
     { key: "all", label: t("history.all") },
@@ -413,7 +444,7 @@ export default function AdminClientTransactionHistory() {
           </div>
 
           {/* Transactions */}
-          {isLoading ? (
+          {txLoading ? (
             <div className="space-y-3">
               {[1,2,3].map(i => <div key={i} className="h-16 rounded-xl bg-muted/30 animate-pulse" />)}
             </div>
@@ -431,7 +462,7 @@ export default function AdminClientTransactionHistory() {
             </AnimatePresence>
           )}
 
-          {!isLoading && filteredGroups.length === 0 && (
+          {!txLoading && filteredGroups.length === 0 && (
             <div className="text-center py-12">
               <p className="text-muted-foreground">{t("history.noTransactions")}</p>
             </div>
