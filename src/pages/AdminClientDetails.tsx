@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp } from "lucide-react";
@@ -42,21 +42,19 @@ const TX_TYPE_LABELS: Record<string, string> = {
 
 export default function AdminClientDetails() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { userId } = useParams<{ userId: string }>();
   const { t } = useTranslation();
-  const navState = location.state as { clientUserId?: string; clientPreview?: any } | null;
-  const clientUserId = navState?.clientUserId;
 
   // Fetch full client detail from backend
   const { data: client, isLoading } = useQuery({
-    queryKey: ["admin-client-detail", clientUserId],
+    queryKey: ["admin-client-detail", userId],
     queryFn: async () => {
-      if (!clientUserId) throw new Error("No user ID");
-      const res = await apiRequest<BackendClientDetail>(`/admin/users/${clientUserId}/detail/`);
+      if (!userId) throw new Error("No user ID");
+      const res = await apiRequest<BackendClientDetail>(`/admin/users/${userId}/detail/`);
       if (res.error || !res.data) throw new Error(res.error?.detail || "Failed");
       return res.data;
     },
-    enabled: !!clientUserId,
+    enabled: !!userId,
   });
 
   const [selectedLevel, setSelectedLevel] = useState("R1");
@@ -88,7 +86,7 @@ export default function AdminClientDetails() {
     navigate(-1);
   };
 
-  if (!clientUserId) {
+  if (!userId) {
     navigate("/settings/admin/clients");
     return null;
   }

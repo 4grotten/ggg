@@ -149,7 +149,7 @@ const AppContent = () => {
             <Route path="/settings/api" element={<ApiDocumentation />} />
             <Route path="/settings/admin" element={<AdminPanel />} />
             <Route path="/settings/admin/clients" element={<AdminClients />} />
-            <Route path="/settings/admin/clients/details" element={<AdminClientDetails />} />
+            <Route path="/settings/admin/clients/details/:userId" element={<AdminClientDetails />} />
             <Route path="/fees-and-limits" element={<FeesAndLimits />} />
             <Route path="/limits-settings" element={<LimitsSettings />} />
             <Route path="/profile-verification" element={<ProfileVerification />} />
