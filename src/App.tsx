@@ -4,6 +4,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import SplashScreen from "./components/SplashScreen";
@@ -75,7 +76,40 @@ import { ScreenLockOverlay } from "./components/settings/ScreenLockOverlay";
 import { ScreenLockProvider, useScreenLockContext } from "./contexts/ScreenLockContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 
-const queryClient = new QueryClient();
+// Debounce connection error toasts
+let lastConnectionToast = 0;
+const showConnectionError = () => {
+  const now = Date.now();
+  if (now - lastConnectionToast > 10000) {
+    lastConnectionToast = now;
+    toast.error("Сервер недоступен", { description: "Нет соединения с сервером. Попробуйте позже." });
+  }
+};
+
+const isConnectionError = (error: unknown) => {
+  const msg = error instanceof Error ? error.message : String(error);
+  return msg.includes('Connection refused') || msg.includes('Network error') || msg.includes('Fetch error') || msg.includes('tcp connect error');
+};
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        if (isConnectionError(error)) return false;
+        return failureCount < 2;
+      },
+      throwOnError: false,
+    },
+    mutations: {
+      throwOnError: false,
+      onError: (error) => {
+        if (isConnectionError(error)) {
+          showConnectionError();
+        }
+      },
+    },
+  },
+});
 
 // Routes where bottom navigation should be hidden
 const hiddenNavRoutes = [

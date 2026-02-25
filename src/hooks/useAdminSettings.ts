@@ -31,7 +31,13 @@ export function useAdminSettings() {
     queryKey: ["admin-settings"],
     queryFn: async () => {
       const res = await apiRequest<BackendAdminSetting[]>("/admin/settings/");
-      if (res.error || !res.data) throw new Error(res.error?.detail || res.error?.message || "Failed to fetch settings");
+      if (res.error || !res.data) {
+        const msg = res.error?.detail || res.error?.message || "Failed to fetch settings";
+        if (msg.includes('Connection refused') || msg.includes('tcp connect error')) {
+          return [] as AdminSetting[];
+        }
+        throw new Error(msg);
+      }
       return res.data.map(mapSetting);
     },
   });

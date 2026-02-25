@@ -59,6 +59,11 @@ export interface BackendClient {
 
 /** Shape returned by GET /accounts/admin/users/<id>/detail/ */
 export interface BackendClientDetail extends BackendClient {
+  is_admin: boolean;
+  is_blocked: boolean;
+  is_vip: boolean;
+  subscription_type: string;
+  referral_level: string | null;
   cards: Array<{
     id: string;
     type: string;
@@ -90,20 +95,39 @@ export interface BackendClientDetail extends BackendClient {
   }>;
   transactions: Array<{
     id: string;
+    user_id?: string;
     type: string;
     status: string;
     amount: number;
     currency: string;
-    description: string | null;
-    merchant_name: string | null;
-    sender_name: string | null;
-    receiver_name: string | null;
+    sender_id: string | null;
+    receiver_id: string | null;
     fee: number | null;
     exchange_rate: number | null;
     original_amount: number | null;
     original_currency: string | null;
+    description: string | null;
+    merchant_name: string | null;
+    sender_name: string | null;
+    receiver_name: string | null;
     created_at: string;
+    updated_at?: string;
   }>;
+  limits_and_settings: {
+    custom_settings_enabled: boolean;
+    transfer_min: string | null;
+    transfer_max: string | null;
+    daily_transfer_limit: string | null;
+    monthly_transfer_limit: string | null;
+    withdrawal_min: string | null;
+    withdrawal_max: string | null;
+    daily_withdrawal_limit: string | null;
+    monthly_withdrawal_limit: string | null;
+    card_to_card_percent: string | null;
+    bank_transfer_percent: string | null;
+    network_fee_percent: string | null;
+    currency_conversion_percent: string | null;
+  };
 }
 
 export function useAdminManagement() {
@@ -143,10 +167,16 @@ export function useAdminManagement() {
     queryKey: ["admin-clients"],
     queryFn: async () => {
       const res = await apiRequest<BackendClient[]>("/admin/users/limits/");
-      if (res.error || !res.data) throw new Error(res.error?.detail || res.error?.message || "Failed to fetch clients");
+      if (res.error || !res.data) {
+        const msg = res.error?.detail || res.error?.message || "Failed to fetch clients";
+        if (msg.includes('Connection refused') || msg.includes('tcp connect error')) {
+          return [] as BackendClient[];
+        }
+        throw new Error(msg);
+      }
       return res.data;
     },
-    retry: 2,
+    retry: 1,
   });
 
   // Search clients (local filter on already-fetched data)

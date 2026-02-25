@@ -40,13 +40,22 @@ export const useSavedContacts = () => {
 
     try {
       const res = await apiFetchContacts();
-      // Backend may not have contacts endpoint yet — treat 404/502 as empty list
-      if (res.status === 404 || res.status === 502) {
+      // Backend may not have contacts endpoint yet — treat 404/500/502 as empty list
+      if (res.status === 404 || res.status === 502 || res.status === 500) {
         setContacts([]);
         setIsLoading(false);
         return;
       }
-      if (res.error) throw new Error(res.error.detail || res.error.message || 'Fetch error');
+      if (res.error) {
+        const msg = res.error.detail || res.error.message || 'Fetch error';
+        // Connection refused = backend is down, don't throw
+        if (msg.includes('Connection refused') || msg.includes('tcp connect error')) {
+          setContacts([]);
+          setIsLoading(false);
+          return;
+        }
+        throw new Error(msg);
+      }
 
       const list = res.data ?? [];
       // Ensure arrays for nested fields
