@@ -861,7 +861,8 @@
     "usdtBalance": "Transferir a Billetera USDT",
     "usdtBalanceDesc": "Enviar USDT a EasyCard o billetera externa",
     "internalUser": "Usuario del sistema",
-    "commission": "Comisión"
+    "commission": "Comisión",
+    "verifying": "Verificando dirección..."
   },
   "topUpUsdt": {
     "title": "Recargar desde USDT",

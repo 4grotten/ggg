@@ -861,7 +861,8 @@
     "usdtBalance": "Überweisung an USDT Wallet",
     "usdtBalanceDesc": "USDT an EasyCard oder externes Wallet senden",
     "internalUser": "Systembenutzer",
-    "commission": "Gebühr"
+    "commission": "Gebühr",
+    "verifying": "Adresse wird überprüft..."
   },
   "topUpUsdt": {
     "title": "Aufladen von USDT",

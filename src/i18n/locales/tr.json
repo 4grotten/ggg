@@ -861,7 +861,8 @@
     "usdtBalance": "USDT Cüzdanına Transfer",
     "usdtBalanceDesc": "EasyCard veya harici cüzdana USDT gönder",
     "internalUser": "Sistem kullanıcısı",
-    "commission": "Komisyon"
+    "commission": "Komisyon",
+    "verifying": "Adres doğrulanıyor..."
   },
   "topUpUsdt": {
     "title": "USDT'den Yükle",

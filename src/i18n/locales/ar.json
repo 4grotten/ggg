@@ -861,7 +861,8 @@
     "usdtBalance": "تحويل إلى محفظة USDT",
     "usdtBalanceDesc": "إرسال USDT إلى EasyCard أو محفظة خارجية",
     "internalUser": "مستخدم النظام",
-    "commission": "العمولة"
+    "commission": "العمولة",
+    "verifying": "جاري التحقق من العنوان..."
   },
   "topUpUsdt": {
     "title": "شحن من USDT",
