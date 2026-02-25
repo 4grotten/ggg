@@ -634,6 +634,7 @@ class AdminUserLimitsListView(APIView):
     )
     def get(self, request):
         from django.db.models import Sum, Count
+        from apps.accounts_apps.models import UserRoles
         profiles = Profiles.objects.all().order_by('-created_at')
         serializer = UserLimitsSerializer(profiles, many=True)
 
@@ -661,6 +662,15 @@ class AdminUserLimitsListView(APIView):
         ):
             crypto_agg[row['user_id']] = row
 
+        # Roles per user (highest priority role)
+        roles_map = {}
+        for role_row in UserRoles.objects.filter(user_id__in=user_ids).values('user_id', 'role'):
+            uid = role_row['user_id']
+            role = role_row['role']
+            # Priority: admin > moderator > user
+            if uid not in roles_map or (role == 'admin') or (role == 'moderator' and roles_map[uid] != 'admin'):
+                roles_map[uid] = role
+
         data = []
         for i, profile in enumerate(profiles):
             full_name = f"{getattr(profile, 'first_name', '')} {getattr(profile, 'last_name', '')}".strip()
@@ -676,12 +686,18 @@ class AdminUserLimitsListView(APIView):
             a = accounts_agg.get(uid, {})
             w = crypto_agg.get(uid, {})
 
+            # Simple verification check: has name + avatar
+            is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
+
             data.append({
                 "user_id": uid,
                 "full_name": full_name or "Unknown User",
                 "phone": getattr(profile, 'phone', ''),
                 "avatar_url": getattr(profile, 'avatar_url', None),
                 "created_at": profile.created_at.isoformat() if profile.created_at else None,
+                "role": roles_map.get(uid, 'user'),
+                "is_verified": is_verified,
+                "referral_level": None,  # TODO: add when referral model exists
                 "cards_count": c.get('cards_count', 0),
                 "total_cards_balance": float(c.get('total_cards_balance', 0) or 0),
                 "accounts_count": a.get('accounts_count', 0),
