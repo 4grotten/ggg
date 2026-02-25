@@ -347,7 +347,11 @@ const TransactionDetails = () => {
   const isCryptoToIbanBankSender = isCryptoToIban && !!(receipt?.sender_iban || (receipt as any)?.sender_iban_mask || (transaction as any)?.senderIban);
   const isCryptoToIbanCryptoSender = isCryptoToIban && !isCryptoToIbanBankSender;
   const isIncomingCryptoToIban = isCryptoToIban && (() => {
-    // Check cached list data for direction (primary source of truth)
+    // Receipt direction is source of truth on receipt screen (especially with ?viewAs)
+    if ((receipt as any)?.direction === 'inbound') return true;
+    if ((receipt as any)?.direction === 'outbound') return false;
+
+    // Fallback to cached list data only when receipt direction is absent
     if (apiTxGroups) {
       for (const group of apiTxGroups) {
         const found = group.transactions?.find((t: any) => {
@@ -358,8 +362,6 @@ const TransactionDetails = () => {
       }
     }
     if ((transaction as any)?.metadata?.isIncoming !== undefined) return Boolean((transaction as any)?.metadata?.isIncoming);
-    if ((receipt as any)?.direction === 'inbound') return true;
-    if ((receipt as any)?.direction === 'outbound') return false;
     return false;
   })();
   const isIncomingCryptoToBank = isCryptoToBank && (() => {
