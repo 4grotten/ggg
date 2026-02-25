@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Landmark, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
+import { useScreenLockContext } from "@/contexts/ScreenLockContext";
+import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 import aedCurrency from "@/assets/aed-currency.png";
 
 interface AccountWalletButtonsProps {
@@ -23,8 +25,41 @@ export const AccountWalletButtons = ({
 }: AccountWalletButtonsProps) => {
   const [accountVisible, setAccountVisible] = useState(false);
   const [walletVisible, setWalletVisible] = useState(false);
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+  const [pendingField, setPendingField] = useState<"account" | "wallet" | null>(null);
+
+  const { isHideDataEnabled } = useScreenLockContext();
+
+  useEffect(() => {
+    if (!isHideDataEnabled) {
+      setAccountVisible(true);
+      setWalletVisible(true);
+    } else {
+      setAccountVisible(false);
+      setWalletVisible(false);
+    }
+  }, [isHideDataEnabled]);
+
+  const toggleVisibility = (e: React.MouseEvent, field: "account" | "wallet") => {
+    e.stopPropagation();
+    const isCurrentlyVisible = field === "account" ? accountVisible : walletVisible;
+    if (!isCurrentlyVisible && isHideDataEnabled) {
+      setPendingField(field);
+      setShowUnlockDialog(true);
+      return;
+    }
+    if (field === "account") setAccountVisible(!accountVisible);
+    else setWalletVisible(!walletVisible);
+  };
+
+  const handleUnlockSuccess = () => {
+    if (pendingField === "account") setAccountVisible(true);
+    else if (pendingField === "wallet") setWalletVisible(true);
+    setPendingField(null);
+  };
 
   return (
+    <>
     <div className="flex gap-3">
       {/* AED Account */}
       <div
@@ -44,10 +79,7 @@ export const AccountWalletButtons = ({
             </div>
           </div>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setAccountVisible(!accountVisible);
-            }}
+            onClick={(e) => toggleVisibility(e, "account")}
             className="p-1.5 rounded-full hover:bg-background/50 transition-colors"
           >
             {accountVisible ? (
@@ -94,10 +126,7 @@ export const AccountWalletButtons = ({
             </div>
           </div>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setWalletVisible(!walletVisible);
-            }}
+            onClick={(e) => toggleVisibility(e, "wallet")}
             className="p-1.5 rounded-full hover:bg-background/50 transition-colors"
           >
             {walletVisible ? (
@@ -124,5 +153,15 @@ export const AccountWalletButtons = ({
         </div>
       </div>
     </div>
+
+      <DataUnlockDialog
+        isOpen={showUnlockDialog}
+        onClose={() => {
+          setShowUnlockDialog(false);
+          setPendingField(null);
+        }}
+        onSuccess={handleUnlockSuccess}
+      />
+    </>
   );
 };
