@@ -398,6 +398,14 @@ export default function AdminClientDetails() {
                 Свернуть
               </Button>
             )}
+            <Button
+              variant="default"
+              className="w-full rounded-xl mt-2"
+              onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
+            >
+              <Receipt className="w-4 h-4 mr-2" />
+              {t("admin.clients.fullHistory", "История транзакций")}
+            </Button>
           </div>
         )}
 

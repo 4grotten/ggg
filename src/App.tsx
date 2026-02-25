@@ -61,6 +61,7 @@ import ApiDocumentation from "./pages/ApiDocumentation";
 import AdminPanel from "./pages/AdminPanel";
 import AdminClients from "./pages/AdminClients";
 import AdminClientDetails from "./pages/AdminClientDetails";
+import AdminClientTransactionHistory from "./pages/AdminClientTransactionHistory";
 import AccountPage from "./pages/AccountPage";
 import WalletPage from "./pages/WalletPage";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
@@ -150,6 +151,7 @@ const AppContent = () => {
             <Route path="/settings/admin" element={<AdminPanel />} />
             <Route path="/settings/admin/clients" element={<AdminClients />} />
             <Route path="/settings/admin/clients/details/:userId" element={<AdminClientDetails />} />
+            <Route path="/settings/admin/clients/details/:userId/history" element={<AdminClientTransactionHistory />} />
             <Route path="/fees-and-limits" element={<FeesAndLimits />} />
             <Route path="/limits-settings" element={<LimitsSettings />} />
             <Route path="/profile-verification" element={<ProfileVerification />} />
