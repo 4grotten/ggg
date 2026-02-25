@@ -26,7 +26,7 @@ export const AccountWalletButtons = ({
   const [accountVisible, setAccountVisible] = useState(false);
   const [walletVisible, setWalletVisible] = useState(false);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
-  const [pendingField, setPendingField] = useState<"account" | "wallet" | null>(null);
+  const [pendingField, setPendingField] = useState<"account" | "wallet" | "nav_account" | "nav_wallet" | null>(null);
 
   const { isHideDataEnabled, isEnabled } = useScreenLockContext();
 
@@ -40,6 +40,16 @@ export const AccountWalletButtons = ({
       setWalletVisible(false);
     }
   }, [isHideDataEnabled, isEnabled]);
+
+  const handleCardClick = (target: "account" | "wallet") => {
+    if (isHideDataEnabled && isEnabled) {
+      setPendingField(target === "account" ? "nav_account" : "nav_wallet");
+      setShowUnlockDialog(true);
+      return;
+    }
+    if (target === "account") onAccountClick();
+    else onWalletClick();
+  };
 
   const toggleVisibility = (e: React.MouseEvent, field: "account" | "wallet") => {
     e.stopPropagation();
@@ -56,6 +66,8 @@ export const AccountWalletButtons = ({
   const handleUnlockSuccess = () => {
     if (pendingField === "account") setAccountVisible(true);
     else if (pendingField === "wallet") setWalletVisible(true);
+    else if (pendingField === "nav_account") onAccountClick();
+    else if (pendingField === "nav_wallet") onWalletClick();
     setPendingField(null);
   };
 
@@ -65,7 +77,7 @@ export const AccountWalletButtons = ({
       {/* AED Account */}
       <div
         className="flex-1 rounded-2xl bg-secondary/50 p-4 flex flex-col gap-3 cursor-pointer group hover:bg-secondary/70 transition-colors"
-        onClick={onAccountClick}
+        onClick={() => handleCardClick("account")}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -110,7 +122,7 @@ export const AccountWalletButtons = ({
       {/* USDT TRC20 Wallet */}
       <div
         className="flex-1 rounded-2xl bg-secondary/50 p-4 flex flex-col gap-3 cursor-pointer group hover:bg-secondary/70 transition-colors"
-        onClick={onWalletClick}
+        onClick={() => handleCardClick("wallet")}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
