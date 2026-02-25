@@ -52,7 +52,7 @@ const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: n
 const VirtualCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
+  const { isHideDataEnabled } = useScreenLockContext();
   const [showDetails, setShowDetails] = useState(false);
   const [billingOpen, setBillingOpen] = useState(false);
   const [balanceVisible, setBalanceVisible] = useState(false);
@@ -89,7 +89,7 @@ const VirtualCard = () => {
     balance: apiCard?.balance ?? 0,
   };
 
-  const requiresAuth = isHideDataEnabled && isScreenLockEnabled;
+  const requiresAuth = isHideDataEnabled;
 
   const toggleBalanceVisibility = () => {
     if (!balanceVisible && requiresAuth) {

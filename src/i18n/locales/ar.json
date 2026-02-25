@@ -428,6 +428,8 @@
     "hapticFeedback": "الاهتزاز",
     "hapticEnabled": "تم تفعيل الاهتزاز",
     "hapticDisabled": "تم إيقاف الاهتزاز",
+    "hideData": "إخفاء البيانات",
+    "hideDataDesc": "إخفاء جميع البيانات الشخصية في التطبيق",
     "savedContacts": "جهات الاتصال المحفوظة",
     "addContact": "إضافة جهة اتصال",
     "scanBusinessCard": "مسح بطاقة العمل أو تحميل صورة",

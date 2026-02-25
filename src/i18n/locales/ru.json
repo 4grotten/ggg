@@ -431,6 +431,8 @@
     "hapticFeedback": "Вибрация",
     "hapticEnabled": "Вибрация включена",
     "hapticDisabled": "Вибрация выключена",
+    "hideData": "Скрыть данные",
+    "hideDataDesc": "Скрыть все личные данные в приложении",
     "savedContacts": "Сохранённые контакты",
     "addContact": "Добавить контакт",
     "scanBusinessCard": "Сканировать визитку или загрузить фото",

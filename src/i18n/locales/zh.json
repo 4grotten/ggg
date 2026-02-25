@@ -430,6 +430,8 @@
     "hapticFeedback": "振动",
     "hapticEnabled": "振动已开启",
     "hapticDisabled": "振动已关闭",
+    "hideData": "隐藏数据",
+    "hideDataDesc": "隐藏应用中所有个人数据",
     "savedContacts": "已保存联系人",
     "addContact": "添加联系人",
     "scanBusinessCard": "扫描名片或上传照片",

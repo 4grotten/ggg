@@ -943,7 +943,7 @@ const Settings = () => {
             <div className="w-full flex items-center justify-between py-4 px-4">
               <div className="flex items-center gap-3">
                 <ColoredIcon colorKey="eyeoff"><EyeOff className="w-4 h-4" /></ColoredIcon>
-                <span className="text-sm font-medium">{t("settings.hideData") || "Скрыть данные"}</span>
+                <span className="text-sm font-medium">{t("settings.hideData")}</span>
               </div>
               <Switch
                 checked={isHideDataEnabled}

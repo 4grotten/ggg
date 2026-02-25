@@ -35,7 +35,7 @@ export const useScreenLock = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [lockTimeout, setLockTimeoutState] = useState<LockTimeout>('immediately');
-  const [isHideDataEnabled, setIsHideDataEnabled] = useState(false);
+  const [isHideDataEnabled, setIsHideDataEnabled] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
 
   // Initialize from localStorage
@@ -43,7 +43,7 @@ export const useScreenLock = () => {
     const enabled = localStorage.getItem(SCREEN_LOCK_ENABLED_KEY) === 'true';
     const biometric = localStorage.getItem(SCREEN_LOCK_BIOMETRIC_KEY) === 'true';
     const timeout = (localStorage.getItem(SCREEN_LOCK_TIMEOUT_KEY) as LockTimeout) || 'immediately';
-    const hideData = localStorage.getItem(SCREEN_LOCK_HIDE_DATA_KEY) === 'true';
+    const hideData = localStorage.getItem(SCREEN_LOCK_HIDE_DATA_KEY) !== 'false';
     const paused = localStorage.getItem(SCREEN_LOCK_PAUSED_KEY) === 'true';
     
     setIsEnabled(enabled);
