@@ -54,6 +54,7 @@ const SendCrypto = () => {
   // Check if this is a referral withdrawal
   const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
   const referralBalance = location.state?.referralBalance || 0;
+  const fromWallet = location.state?.fromWallet || false;
   
   // Fetch real data
   const { data: cardsResponse, isLoading: cardsLoading } = useCards();
@@ -112,8 +113,13 @@ const SendCrypto = () => {
 
     // Auto-select: prefer bank account by default, fallback to first option
     if (!selectedSource && options.length > 0) {
-      const bankOption = options.find(o => o.type === "bank_account");
-      setSelectedSource(bankOption || options[0]);
+      if (fromWallet) {
+        const walletOption = options.find(o => o.type === "crypto_wallet");
+        setSelectedSource(walletOption || options[0]);
+      } else {
+        const bankOption = options.find(o => o.type === "bank_account");
+        setSelectedSource(bankOption || options[0]);
+      }
     }
   }, [cardsResponse, ibanResponse, cryptoWalletsResponse, bankAccountsResponse]);
 
