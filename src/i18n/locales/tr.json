@@ -848,7 +848,9 @@
     "fromSource": "Nereden",
     "selectSource": "Nereden transfer edilecek",
     "willBeDebited": "Tahsil edilecek",
-    "bankAccountAed": "Banka Hesabı AED"
+    "bankAccountAed": "Banka Hesabı AED",
+    "limitReachedTitle": "Günlük limit aşıldı",
+    "limitResetsIn": "Limit yenilenme süresi"
   },
   "drawer": {
     "addMoneyWith": "Şununla Yükle",

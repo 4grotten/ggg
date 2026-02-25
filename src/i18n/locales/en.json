@@ -938,7 +938,9 @@
     "fromSource": "From",
     "selectSource": "Transfer from",
     "willBeDebited": "Will be debited",
-    "bankAccountAed": "Bank Account AED"
+    "bankAccountAed": "Bank Account AED",
+    "limitReachedTitle": "Daily limit reached",
+    "limitResetsIn": "Limit resets in"
   },
   "drawer": {
     "addMoneyWith": "Add Money with",

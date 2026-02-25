@@ -854,7 +854,9 @@
     "fromSource": "来源",
     "selectSource": "从哪里转账",
     "willBeDebited": "将被扣除",
-    "bankAccountAed": "银行账户 AED"
+    "bankAccountAed": "银行账户 AED",
+    "limitReachedTitle": "已达每日限额",
+    "limitResetsIn": "限额将在以下时间重置"
   },
   "drawer": {
     "addMoneyWith": "充值方式",

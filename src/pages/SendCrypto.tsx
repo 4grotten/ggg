@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet, Landmark, CheckCircle2, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet, Landmark, CheckCircle2, Loader2, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -15,6 +15,11 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useSettings } from "@/contexts/SettingsContext";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { useCards, useIban, useCryptoWallets, useBankAccounts } from "@/hooks/useCards";
@@ -23,6 +28,25 @@ import { apiRequest } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+// Calculate time remaining until midnight UTC+4 (Dubai time)
+function getTimeUntilLimitReset() {
+  const now = new Date();
+  // Dubai is UTC+4
+  const dubaiOffset = 4 * 60; // minutes
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const dubaiNow = new Date(utcMs + dubaiOffset * 60000);
+  
+  const midnight = new Date(dubaiNow);
+  midnight.setHours(24, 0, 0, 0);
+  
+  const diffMs = midnight.getTime() - dubaiNow.getTime();
+  const hours = Math.floor(diffMs / 3600000);
+  const minutes = Math.floor((diffMs % 3600000) / 60000);
+  const seconds = Math.floor((diffMs % 60000) / 1000);
+  
+  return { hours, minutes, seconds };
+}
 
 interface SourceOption {
   id: string;
@@ -248,6 +272,19 @@ const SendCrypto = () => {
     setCoinDrawerOpen(false);
   };
 
+  const [limitAlertOpen, setLimitAlertOpen] = useState(false);
+  const [limitAlertMsg, setLimitAlertMsg] = useState("");
+  const [limitCountdown, setLimitCountdown] = useState(getTimeUntilLimitReset());
+
+  // Live countdown timer when limit alert is open
+  useEffect(() => {
+    if (!limitAlertOpen) return;
+    const interval = setInterval(() => {
+      setLimitCountdown(getTimeUntilLimitReset());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [limitAlertOpen]);
+
   const [isSending, setIsSending] = useState(false);
   const queryClient = useQueryClient();
 
@@ -326,7 +363,20 @@ const SendCrypto = () => {
       } else {
         const errObj = res.error as Record<string, unknown> | null;
         const errMsg = (errObj?.error as string) || errObj?.message as string || errObj?.detail as string || t("send.transferError", "Ошибка перевода");
-        toast.error(errMsg);
+        
+        // Check if this is a daily/monthly limit error
+        const isLimitError = errMsg.toLowerCase().includes('лимит') || 
+          errMsg.toLowerCase().includes('limit') || 
+          errMsg.toLowerCase().includes('exceeded') ||
+          errMsg.toLowerCase().includes('превышен');
+        
+        if (isLimitError) {
+          setLimitAlertMsg(errMsg);
+          setLimitCountdown(getTimeUntilLimitReset());
+          setLimitAlertOpen(true);
+        } else {
+          toast.error(errMsg);
+        }
       }
     } catch (err) {
       toast.error(t("send.networkError", "Ошибка сети"));
@@ -775,6 +825,39 @@ const SendCrypto = () => {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {/* Daily Limit Alert */}
+      <AlertDialog open={limitAlertOpen} onOpenChange={setLimitAlertOpen}>
+        <AlertDialogContent className="w-[320px] rounded-2xl p-0 gap-0 bg-background/95 backdrop-blur-xl border border-border/60 shadow-2xl">
+          <div className="pt-6 pb-4 px-5 text-center">
+            <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-7 h-7 text-destructive" />
+            </div>
+            <AlertDialogTitle className="text-lg font-bold text-foreground mb-2">
+              {t("send.limitReachedTitle", "Дневной лимит исчерпан")}
+            </AlertDialogTitle>
+            <p className="text-sm text-muted-foreground mb-4">
+              {limitAlertMsg}
+            </p>
+            <div className="bg-muted/50 rounded-xl p-3 mb-1">
+              <p className="text-xs text-muted-foreground mb-1">
+                {t("send.limitResetsIn", "Лимит обновится через")}
+              </p>
+              <p className="text-2xl font-mono font-bold text-foreground tracking-wider">
+                {String(limitCountdown.hours).padStart(2, '0')}:{String(limitCountdown.minutes).padStart(2, '0')}:{String(limitCountdown.seconds).padStart(2, '0')}
+              </p>
+            </div>
+          </div>
+          <div className="border-t border-border/50">
+            <button
+              onClick={() => setLimitAlertOpen(false)}
+              className="w-full py-3.5 text-base font-semibold text-primary hover:bg-muted/50 transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
