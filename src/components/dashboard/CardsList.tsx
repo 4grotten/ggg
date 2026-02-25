@@ -58,6 +58,15 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
   
   const requiresAuth = isHideDataEnabled;
 
+  // Auto-show/hide all card balances based on toggle
+  useEffect(() => {
+    if (!isHideDataEnabled) {
+      setVisibleBalances(new Set(cards.map(c => c.id)));
+    } else {
+      setVisibleBalances(new Set());
+    }
+  }, [isHideDataEnabled, cards]);
+
   const handleCardClick = (card: Card) => {
     if (onCardClick) {
       onCardClick(card);
