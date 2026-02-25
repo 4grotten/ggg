@@ -2003,8 +2003,13 @@ const TransactionDetails = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
-                    <span className="font-medium">{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#007AFF" }}>
+                        <UsdtIcon size={14} />
+                      </div>
+                      <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
+                    </div>
+                    <span className="font-medium text-[#007AFF]">-{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("transaction.fee")} ({receipt?.amount && receipt?.fee ? `${((receipt.fee / receipt.amount) * 100).toFixed(0)}%` : '1%'})</span>
