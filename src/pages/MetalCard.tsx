@@ -51,9 +51,9 @@ const MetalCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isHideDataEnabled } = useScreenLockContext();
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(!isHideDataEnabled);
   const [billingOpen, setBillingOpen] = useState(false);
-  const [balanceVisible, setBalanceVisible] = useState(false);
+  const [balanceVisible, setBalanceVisible] = useState(!isHideDataEnabled);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<'details' | 'balance' | null>(null);
