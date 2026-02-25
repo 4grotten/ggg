@@ -848,7 +848,9 @@
     "fromSource": "من",
     "selectSource": "التحويل من",
     "willBeDebited": "سيتم خصم",
-    "bankAccountAed": "حساب بنكي AED"
+    "bankAccountAed": "حساب بنكي AED",
+    "limitReachedTitle": "تم الوصول للحد اليومي",
+    "limitResetsIn": "يتجدد الحد خلال"
   },
   "drawer": {
     "addMoneyWith": "الشحن عبر",

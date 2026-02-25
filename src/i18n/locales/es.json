@@ -848,7 +848,9 @@
     "fromSource": "Desde",
     "selectSource": "Transferir desde",
     "willBeDebited": "Se debitará",
-    "bankAccountAed": "Cuenta Bancaria AED"
+    "bankAccountAed": "Cuenta Bancaria AED",
+    "limitReachedTitle": "Límite diario alcanzado",
+    "limitResetsIn": "El límite se renueva en"
   },
   "drawer": {
     "addMoneyWith": "Recargar con",

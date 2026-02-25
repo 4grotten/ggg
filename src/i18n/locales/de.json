@@ -848,7 +848,9 @@
     "fromSource": "Von",
     "selectSource": "Überweisen von",
     "willBeDebited": "Wird abgebucht",
-    "bankAccountAed": "Bankkonto AED"
+    "bankAccountAed": "Bankkonto AED",
+    "limitReachedTitle": "Tageslimit erreicht",
+    "limitResetsIn": "Limit wird erneuert in"
   },
   "drawer": {
     "addMoneyWith": "Aufladen mit",

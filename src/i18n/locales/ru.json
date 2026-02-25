@@ -924,7 +924,9 @@
     "fromSource": "Откуда",
     "selectSource": "Откуда перевести",
     "willBeDebited": "Будет списано",
-    "bankAccountAed": "Банковский счёт AED"
+    "bankAccountAed": "Банковский счёт AED",
+    "limitReachedTitle": "Дневной лимит исчерпан",
+    "limitResetsIn": "Лимит обновится через"
   },
   "drawer": {
     "addMoneyWith": "Пополнить через",
