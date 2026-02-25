@@ -131,12 +131,17 @@ export default function AdminClientTransactionHistory() {
     queryFn: async () => {
       if (!userId) throw new Error("No user ID");
       const qs = buildQueryParams();
-      const res = await apiRequest<ClientTransaction[]>(`/transactions/admin/user/${userId}/transactions/?${qs}`, {}, true);
+      const res = await apiRequest<ClientTransaction[] | Record<string, unknown>>(`/transactions/admin/user/${userId}/transactions/?${qs}`, {}, true);
       if (res.error || !res.data) {
         const msg = res.error?.detail || res.error?.message || "Failed";
         if (msg.includes('Connection refused') || msg.includes('tcp connect error')) return [];
         throw new Error(msg);
       }
+      // API may return array directly or wrapped in an object
+      if (Array.isArray(res.data)) return res.data as ClientTransaction[];
+      if (Array.isArray((res.data as any).results)) return (res.data as any).results as ClientTransaction[];
+      if (Array.isArray((res.data as any).transactions)) return (res.data as any).transactions as ClientTransaction[];
+      return [];
       return res.data;
     },
     enabled: !!userId,
@@ -238,7 +243,7 @@ export default function AdminClientTransactionHistory() {
   };
 
   const groups = useMemo((): TransactionGroup[] => {
-    if (!transactions || transactions.length === 0) return [];
+    if (!transactions || !Array.isArray(transactions) || transactions.length === 0) return [];
     const sorted = [...transactions].sort((a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
