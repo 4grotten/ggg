@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles } from "lucide-react";
+import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -71,6 +71,15 @@ export default function AdminClientDetails() {
     transferPercent: "1.5",
     withdrawPercent: "2.0",
     conversionPercent: "1.0",
+  });
+
+  const [rates, setRates] = useState({
+    usdtAedBuy: "3.65",
+    usdtAedSell: "3.69",
+    aedUsdBuy: "0.2723",
+    aedUsdSell: "0.2715",
+    usdAedBuy: "3.68",
+    usdAedSell: "3.67",
   });
 
   const handleSave = () => {
@@ -276,6 +285,47 @@ export default function AdminClientDetails() {
                     className="pr-8 rounded-xl"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Personal Exchange Rates */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <RefreshCw className="w-5 h-5 text-primary" />
+            <h4 className="font-semibold">{t("admin.clients.personalRates")}</h4>
+          </div>
+          <div className="space-y-3">
+            {[
+              { pair: "USDT → AED", buyKey: "usdtAedBuy", sellKey: "usdtAedSell" },
+              { pair: "AED → USD", buyKey: "aedUsdBuy", sellKey: "aedUsdSell" },
+              { pair: "USD → AED", buyKey: "usdAedBuy", sellKey: "usdAedSell" },
+            ].map(({ pair, buyKey, sellKey }) => (
+              <div key={pair} className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{pair}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] text-muted-foreground">{t("admin.clients.buyRate")}</Label>
+                    <Input
+                      type="number"
+                      step="0.0001"
+                      value={rates[buyKey as keyof typeof rates]}
+                      onChange={(e) => setRates({ ...rates, [buyKey]: e.target.value })}
+                      className="text-xs rounded-xl h-9"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] text-muted-foreground">{t("admin.clients.sellRate")}</Label>
+                    <Input
+                      type="number"
+                      step="0.0001"
+                      value={rates[sellKey as keyof typeof rates]}
+                      onChange={(e) => setRates({ ...rates, [sellKey]: e.target.value })}
+                      className="text-xs rounded-xl h-9"
+                    />
+                  </div>
                 </div>
               </div>
             ))}
