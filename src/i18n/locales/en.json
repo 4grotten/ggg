@@ -952,7 +952,8 @@
     "usdtBalanceDesc": "Send USDT to EasyCard or external wallet",
     "internalUser": "System user",
     "commission": "Commission",
-    "verifying": "Verifying address..."
+    "verifying": "Verifying address...",
+    "dailyLimitExceeded": "Daily limit exceeded ({{limit}}). Available: {{available}}"
   },
   "topUpUsdt": {
     "title": "Top Up from USDT",

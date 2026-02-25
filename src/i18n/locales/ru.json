@@ -938,7 +938,8 @@
     "usdtBalanceDesc": "Перевод USDT на Кошелек EasyCard так и внешний",
     "internalUser": "Пользователь системы",
     "commission": "Комиссия",
-    "verifying": "Проверка адреса..."
+    "verifying": "Проверка адреса...",
+    "dailyLimitExceeded": "Превышен дневной лимит ({{limit}}). Доступно: {{available}}"
   },
   "topUpUsdt": {
     "title": "Пополнение с USDT",

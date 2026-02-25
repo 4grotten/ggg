@@ -862,7 +862,8 @@
     "usdtBalanceDesc": "EasyCard veya harici cüzdana USDT gönder",
     "internalUser": "Sistem kullanıcısı",
     "commission": "Komisyon",
-    "verifying": "Adres doğrulanıyor..."
+    "verifying": "Adres doğrulanıyor...",
+    "dailyLimitExceeded": "Günlük limit aşıldı ({{limit}}). Kullanılabilir: {{available}}"
   },
   "topUpUsdt": {
     "title": "USDT'den Yükle",
