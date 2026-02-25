@@ -54,9 +54,9 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
   const [pendingCardId, setPendingCardId] = useState<string | null>(null);
   const [pendingCardNavigation, setPendingCardNavigation] = useState<Card | null>(null);
   
-  const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
+  const { isHideDataEnabled } = useScreenLockContext();
   
-  const requiresAuth = isHideDataEnabled && isScreenLockEnabled;
+  const requiresAuth = isHideDataEnabled;
 
   const handleCardClick = (card: Card) => {
     if (onCardClick) {

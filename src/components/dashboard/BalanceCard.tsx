@@ -53,10 +53,10 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   
-  const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
+  const { isHideDataEnabled } = useScreenLockContext();
 
   const handleToggle = () => {
-    if (!isVisible && isHideDataEnabled && isScreenLockEnabled) {
+    if (!isVisible && isHideDataEnabled) {
       setShowUnlockDialog(true);
     } else {
       if (!isVisible) {

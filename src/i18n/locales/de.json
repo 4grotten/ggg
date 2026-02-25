@@ -428,6 +428,8 @@
     "hapticFeedback": "Vibration",
     "hapticEnabled": "Vibration aktiviert",
     "hapticDisabled": "Vibration deaktiviert",
+    "hideData": "Daten verbergen",
+    "hideDataDesc": "Alle persönlichen Daten in der App verbergen",
     "savedContacts": "Gespeicherte Kontakte",
     "addContact": "Kontakt hinzufügen",
     "scanBusinessCard": "Visitenkarte scannen oder Foto hochladen",

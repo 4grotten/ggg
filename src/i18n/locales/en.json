@@ -445,6 +445,8 @@
     "hapticFeedback": "Vibration",
     "hapticEnabled": "Vibration enabled",
     "hapticDisabled": "Vibration disabled",
+    "hideData": "Hide Data",
+    "hideDataDesc": "Hide all personal data in the app",
     "savedContacts": "Saved Contacts",
     "addContact": "Add Contact",
     "scanBusinessCard": "Scan Business Card or Upload Photo",
