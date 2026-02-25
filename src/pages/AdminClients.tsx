@@ -81,21 +81,7 @@ export default function AdminClients() {
 
   const handleOpenClientDetails = (client: BackendClient) => {
     navigate("/settings/admin/clients/details", {
-      state: {
-        id: client.user_id,
-        name: (client.full_name && client.full_name !== "None None" && client.full_name.trim()) ? client.full_name : "Без имени",
-        phone: client.phone,
-        avatarUrl: client.avatar_url || undefined,
-        isVerified: client.is_verified ?? false,
-        cardsCount: client.cards_count || 0,
-        referralLevel: client.referral_level || null,
-        role: client.role || "user",
-        accountsCount: client.accounts_count || 0,
-        cryptoWalletsCount: client.crypto_wallets_count || 0,
-        totalCryptoBalance: client.total_crypto_balance || 0,
-        balance: (client.total_cards_balance || 0) + (client.total_bank_balance || 0),
-        registrationDate: client.created_at ? new Date(client.created_at).toLocaleDateString() : "—",
-      },
+      state: { clientUserId: client.user_id, clientPreview: client },
     });
   };
 
