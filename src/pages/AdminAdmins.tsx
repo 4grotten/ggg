@@ -161,14 +161,17 @@ export default function AdminAdmins() {
         className="min-h-screen bg-background"
       >
         {/* Header */}
-        <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border/50">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => navigate("/settings/admin")}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold">{t("admin.tabs.admins")}</h1>
-              <p className="text-xs text-muted-foreground">{admins?.length || 0} {t("admin.roles.usersWithRoles")}</p>
+        <div className="sticky top-0 z-50">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
+          <div className="relative px-4 py-4">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/settings/admin")} className="shrink-0 rounded-xl bg-muted/50 hover:bg-muted">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg font-bold">{t("admin.tabs.admins")}</h1>
+                <p className="text-xs text-muted-foreground">{admins?.length || 0} {t("admin.roles.usersWithRoles")}</p>
+              </div>
             </div>
           </div>
         </div>
