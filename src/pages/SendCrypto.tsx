@@ -662,7 +662,7 @@ const SendCrypto = () => {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("send.commission", "Комиссия")} (1%)</span>
+              <span className="text-muted-foreground">{t("send.commissionPercent", "Комиссия ({{percent}}%)", { percent: "1" })}</span>
               <span className="font-medium text-[#FFA000]">-{(parseFloat(amountCrypto) * 0.01).toFixed(2)} {selectedCoin.symbol}</span>
             </div>
             <div className="flex items-center justify-between">

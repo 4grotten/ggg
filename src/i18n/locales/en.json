@@ -952,6 +952,7 @@
     "usdtBalanceDesc": "Send USDT to EasyCard or external wallet",
     "internalUser": "System user",
     "commission": "Commission",
+    "commissionPercent": "Commission ({{percent}}%)",
     "verifying": "Verifying address...",
     "dailyLimitExceeded": "Daily limit exceeded ({{limit}}). Available: {{available}}"
   },
