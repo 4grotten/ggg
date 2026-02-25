@@ -859,7 +859,9 @@
     "bankTransfer": "تحويل بنكي",
     "sendToCard": "إرسال إلى بطاقة",
     "usdtBalance": "تحويل إلى محفظة USDT",
-    "usdtBalanceDesc": "إرسال USDT إلى EasyCard أو محفظة خارجية"
+    "usdtBalanceDesc": "إرسال USDT إلى EasyCard أو محفظة خارجية",
+    "internalUser": "مستخدم النظام",
+    "commission": "العمولة"
   },
   "topUpUsdt": {
     "title": "شحن من USDT",
