@@ -488,11 +488,6 @@ export default function AdminClientDetails() {
                 <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
               </div>
               <CardTransactionsList groups={txGroups} viewAsUserId={userId} />
-              {totalCount > 3 && !showAllTx && (
-                <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
-                  Посмотреть всю историю ({totalCount})
-                </Button>
-              )}
               {showAllTx && totalCount > 3 && (
                 <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
                   <ChevronUp className="w-4 h-4 mr-1" />
