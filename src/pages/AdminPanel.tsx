@@ -364,9 +364,13 @@ export default function AdminPanel() {
     avatarUrl?: string;
     isVerified: boolean;
     cardsCount: number;
-    referralLevel: string;
+    referralLevel: string | null;
     balance: number;
     registrationDate: string;
+    role?: 'admin' | 'moderator' | 'user';
+    accountsCount?: number;
+    cryptoWalletsCount?: number;
+    totalCryptoBalance?: number;
   } | null>(null);
   
   // OpenAI settings state
@@ -412,20 +416,24 @@ export default function AdminPanel() {
     updateModel(modelId);
   }, [updateModel]);
 
-  // Mock client data for the card
-  const mockClientData = {
-    id: "mock-user-1",
-    name: "Александр Иванов",
-    phone: "+971 50 123 4567",
-    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
-    isVerified: true,
-    cardsCount: 2,
-    referralLevel: "R2",
-    balance: 12450,
-    registrationDate: "15.01.2025",
-  };
+  // Client data type for drawer
+  interface ClientCardData {
+    id: string;
+    name: string;
+    phone: string;
+    avatarUrl?: string;
+    isVerified: boolean;
+    cardsCount: number;
+    referralLevel: string | null;
+    balance: number;
+    registrationDate: string;
+    role?: 'admin' | 'moderator' | 'user';
+    accountsCount?: number;
+    cryptoWalletsCount?: number;
+    totalCryptoBalance?: number;
+  }
 
-  const handleOpenClientDetails = (client: typeof mockClientData) => {
+  const handleOpenClientDetails = (client: ClientCardData) => {
     setSelectedClient(client);
     setClientDrawerOpen(true);
   };
@@ -807,9 +815,13 @@ export default function AdminPanel() {
                             name: client.full_name,
                             phone: client.phone,
                             avatarUrl: client.avatar_url || undefined,
-                            isVerified: true,
+                            isVerified: client.is_verified ?? false,
                             cardsCount: client.cards_count || 0,
-                            referralLevel: "R1",
+                            referralLevel: client.referral_level || null,
+                            role: client.role || 'user',
+                            accountsCount: client.accounts_count || 0,
+                            cryptoWalletsCount: client.crypto_wallets_count || 0,
+                            totalCryptoBalance: client.total_crypto_balance || 0,
                             balance: (client.total_cards_balance || 0) + (client.total_bank_balance || 0),
                             registrationDate: client.created_at ? new Date(client.created_at).toLocaleDateString() : "—",
                           })}
