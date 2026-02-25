@@ -1,3 +1,4 @@
+from apps.transactions_apps.models import Transactions
 from rest_framework import serializers
 
 
@@ -146,3 +147,9 @@ class CryptoWalletWithdrawalResponseSerializer(serializers.Serializer):
     deducted_amount = serializers.DecimalField(max_digits=15, decimal_places=6)
     fee = serializers.DecimalField(max_digits=15, decimal_places=6)
     credited_amount = serializers.DecimalField(max_digits=15, decimal_places=6)
+    
+
+class TransactionFullSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transactions
+        fields = '__all__'

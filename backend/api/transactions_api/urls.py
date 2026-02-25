@@ -30,4 +30,6 @@ urlpatterns = [
 
     path('admin/revenue/summary/', views.AdminRevenueSummaryView.as_view(), name='admin_revenue_summary'),
     path('admin/revenue/transactions/', views.AdminRevenueTransactionsView.as_view(), name='admin_revenue_transactions'),
+    path('admin/user/<str:target_user_id>/transactions/', views.AdminUserTransactionsView.as_view(), name='admin_user_transactions')
+    
 ]

@@ -18,7 +18,7 @@ from .serializers import (
     CryptoWithdrawalRequestSerializer, CryptoWithdrawalResponseSerializer,
     BankWithdrawalRequestSerializer, BankWithdrawalResponseSerializer,
     BankToCardTransferRequestSerializer, BankToCardTransferResponseSerializer,
-    ErrorResponseSerializer, TransferResponseSerializer,
+    ErrorResponseSerializer, TransactionFullSerializer, TransferResponseSerializer,
     CryptoWalletWithdrawalRequestSerializer, CryptoWalletWithdrawalResponseSerializer
 )
 from apps.transactions_apps.services import TransactionService
@@ -589,3 +589,41 @@ class AdminRevenueTransactionsView(APIView):
             "count": total_count,
             "results": data
         }, status=status.HTTP_200_OK)
+    
+
+class AdminUserTransactionsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Получить транзакции пользователя (со всеми полями + фильтрация)",
+        operation_description="Возвращает полный список транзакций пользователя. Можно фильтровать по типу: bank, card, crypto. Если не передать type, вернутся все транзакции.",
+        tags=["Транзакции (Админ/Служебные)"],
+        manual_parameters=[
+            openapi.Parameter(
+                'type', 
+                openapi.IN_QUERY, 
+                description="Фильтр: bank, card, crypto. (Оставить пустым для получения всех)", 
+                type=openapi.TYPE_STRING, 
+                required=False
+            )
+        ],
+        responses={200: TransactionFullSerializer(many=True)}
+    )
+    def get(self, request, target_user_id):
+        user_id_str = str(target_user_id)
+        tx_type = request.query_params.get('type')
+        txs = Transactions.objects.filter(
+            Q(user_id=user_id_str) | 
+            Q(sender_id=user_id_str) | 
+            Q(receiver_id=user_id_str)
+        )
+        if tx_type == 'bank':
+            txs = txs.filter(movements__user_id=user_id_str, movements__account_type='bank').distinct()
+        elif tx_type == 'card':
+            txs = txs.filter(movements__user_id=user_id_str, movements__account_type='card').distinct()
+        elif tx_type == 'crypto':
+            txs = txs.filter(movements__user_id=user_id_str, movements__account_type='crypto').distinct()
+        txs = txs.order_by('-created_at')
+        
+        serializer = TransactionFullSerializer(txs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
