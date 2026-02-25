@@ -1651,6 +1651,10 @@
       "monthlyLimits": "Месячные лимиты",
       "transactionLimit": "Лимит на транзакцию",
       "saveChanges": "Сохранить изменения",
+      "cards": "Карты",
+      "bankAccounts": "Банковские счета",
+      "cryptoWallets": "Крипто кошельки",
+      "transactionHistory": "История транзакций",
       "subscriptions": {
         "free": "Бесплатная",
         "freeDesc": "Базовый функционал без дополнительных преимуществ",

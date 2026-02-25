@@ -46,5 +46,6 @@ urlpatterns = [
     path('admin/settings/', views.AdminSettingsListView.as_view(), name='admin_settings'),
 
     path('admin/users/limits/', views.AdminUserLimitsListView.as_view(), name='admin-users-limits'),
+    path('admin/users/<str:user_id>/detail/', views.AdminUserDetailView.as_view(), name='admin-user-detail'),
     path('admin/users/<str:user_id>/limits/', views.AdminUserLimitDetailView.as_view(), name='admin-user-limit-detail'),
 ]

@@ -1652,6 +1652,10 @@
       "monthlyLimits": "Monthly Limits",
       "transactionLimit": "Transaction Limit",
       "saveChanges": "Save Changes",
+      "cards": "Cards",
+      "bankAccounts": "Bank Accounts",
+      "cryptoWallets": "Crypto Wallets",
+      "transactionHistory": "Transaction History",
       "subscriptions": {
         "free": "Free",
         "freeDesc": "Basic functionality without additional benefits",

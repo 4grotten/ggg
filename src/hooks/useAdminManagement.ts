@@ -26,6 +26,9 @@ export interface BackendClient {
   user_id: string;
   full_name: string;
   phone: string;
+  email?: string;
+  gender?: string | null;
+  language?: string | null;
   avatar_url: string | null;
   created_at: string | null;
   role: 'admin' | 'moderator' | 'user';
@@ -52,6 +55,53 @@ export interface BackendClient {
     network_fee_percent: string | null;
     currency_conversion_percent: string | null;
   };
+}
+
+/** Shape returned by GET /accounts/admin/users/<id>/detail/ */
+export interface BackendClientDetail extends BackendClient {
+  cards: Array<{
+    id: string;
+    type: string;
+    name: string;
+    status: string;
+    balance: number;
+    last_four_digits: string | null;
+    expiry_date: string | null;
+    created_at: string;
+  }>;
+  accounts: Array<{
+    id: string;
+    iban: string;
+    bank_name: string;
+    beneficiary: string;
+    balance: number;
+    is_active: boolean;
+  }>;
+  wallets: Array<{
+    id: string;
+    network: string;
+    token: string;
+    address: string;
+    balance: number;
+    is_active: boolean;
+    created_at: string;
+  }>;
+  transactions: Array<{
+    id: string;
+    type: string;
+    status: string;
+    amount: number;
+    currency: string;
+    description: string | null;
+    merchant_name: string | null;
+    sender_name: string | null;
+    receiver_name: string | null;
+    fee: number | null;
+    exchange_rate: number | null;
+    original_amount: number | null;
+    original_currency: string | null;
+    created_at: string;
+  }>;
 }
 
 export function useAdminManagement() {

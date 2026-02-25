@@ -708,10 +708,17 @@ class AdminUserLimitsListView(APIView):
             # Simple verification check: has name + avatar
             is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
 
+            # Get email from User model
+            user_obj = users_map.get(uid)
+            email = user_obj.email if user_obj else ''
+
             data.append({
                 "user_id": uid,
                 "full_name": full_name or "Unknown User",
                 "phone": getattr(profile, 'phone', ''),
+                "email": email or '',
+                "gender": getattr(profile, 'gender', None),
+                "language": getattr(profile, 'language', None),
                 "avatar_url": getattr(profile, 'avatar_url', None),
                 "created_at": profile.created_at.isoformat() if profile.created_at else None,
                 "role": roles_map.get(uid, 'user'),
@@ -727,6 +734,99 @@ class AdminUserLimitsListView(APIView):
             })
             
         return Response(data, status=status.HTTP_200_OK)
+
+
+class AdminUserDetailView(APIView):
+    """GET full details for a single user (cards, accounts, wallets, transactions)"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Полная информация о пользователе (Админ)",
+        tags=["Админ: Управление пользователями"]
+    )
+    def get(self, request, user_id):
+        from apps.accounts_apps.models import UserRoles
+        from apps.transactions_apps.models import Transactions
+
+        uid = str(user_id)
+        profile = Profiles.objects.filter(user_id=uid).first()
+        if not profile:
+            return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Name
+        fname = getattr(profile, 'first_name', None) or ''
+        lname = getattr(profile, 'last_name', None) or ''
+        full_name = f"{fname} {lname}".strip()
+        email = ''
+        if uid.isdigit():
+            try:
+                user_obj = User.objects.get(id=int(uid))
+                if not full_name:
+                    full_name = f"{user_obj.first_name or ''} {user_obj.last_name or ''}".strip()
+                email = user_obj.email or ''
+            except User.DoesNotExist:
+                pass
+
+        # Role
+        role_row = UserRoles.objects.filter(user_id=uid).order_by('-created_at').first()
+        role = role_row.role if role_row else 'user'
+
+        # Cards list
+        cards = list(Cards.objects.filter(user_id=uid).values(
+            'id', 'type', 'name', 'status', 'balance', 'last_four_digits', 'expiry_date', 'created_at'
+        ))
+        for c in cards:
+            c['balance'] = float(c['balance'] or 0)
+
+        # Bank accounts list
+        accounts = list(BankDepositAccounts.objects.filter(user_id=uid).values(
+            'id', 'iban', 'bank_name', 'beneficiary', 'balance', 'is_active'
+        ))
+        for a in accounts:
+            a['balance'] = float(a['balance'] or 0)
+
+        # Crypto wallets list
+        wallets = list(CryptoWallets.objects.filter(user_id=uid).values(
+            'id', 'network', 'token', 'address', 'balance', 'is_active', 'created_at'
+        ))
+        for w in wallets:
+            w['balance'] = float(w['balance'] or 0)
+
+        # Recent transactions (last 50)
+        transactions = list(Transactions.objects.filter(user_id=uid).order_by('-created_at')[:50].values(
+            'id', 'type', 'status', 'amount', 'currency', 'description',
+            'merchant_name', 'sender_name', 'receiver_name', 'fee',
+            'exchange_rate', 'original_amount', 'original_currency', 'created_at'
+        ))
+        for tx in transactions:
+            tx['amount'] = float(tx['amount'] or 0)
+            tx['fee'] = float(tx['fee'] or 0) if tx['fee'] else None
+            tx['exchange_rate'] = float(tx['exchange_rate'] or 0) if tx['exchange_rate'] else None
+            tx['original_amount'] = float(tx['original_amount'] or 0) if tx['original_amount'] else None
+
+        # Limits
+        limits_serializer = UserLimitsSerializer(profile)
+
+        is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
+
+        return Response({
+            "user_id": uid,
+            "full_name": full_name or "Unknown User",
+            "phone": getattr(profile, 'phone', ''),
+            "email": email,
+            "gender": getattr(profile, 'gender', None),
+            "language": getattr(profile, 'language', None),
+            "avatar_url": getattr(profile, 'avatar_url', None),
+            "created_at": profile.created_at.isoformat() if profile.created_at else None,
+            "role": role,
+            "is_verified": is_verified,
+            "referral_level": None,
+            "cards": cards,
+            "accounts": accounts,
+            "wallets": wallets,
+            "transactions": transactions,
+            "limits": limits_serializer.data,
+        }, status=status.HTTP_200_OK)
 
 
 class AdminUserLimitDetailView(APIView):
