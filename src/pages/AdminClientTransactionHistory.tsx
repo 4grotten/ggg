@@ -96,6 +96,11 @@ export default function AdminClientTransactionHistory() {
   const tabRefs = useRef<Map<FilterType, HTMLButtonElement>>(new Map());
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
+  type AssetType = "all" | "card" | "iban" | "crypto";
+  const assetContainerRef = useRef<HTMLDivElement>(null);
+  const assetRefs = useRef<Map<AssetType, HTMLButtonElement>>(new Map());
+  const [assetIndicatorStyle, setAssetIndicatorStyle] = useState({ left: 0, width: 0 });
+
   const { data: client, isLoading } = useQuery({
     queryKey: ["admin-client-detail", userId],
     queryFn: async () => {
@@ -121,6 +126,19 @@ export default function AdminClientTransactionHistory() {
       });
     }
   }, [activeFilter]);
+
+  useEffect(() => {
+    const activeBtn = assetRefs.current.get(activeAsset);
+    const container = assetContainerRef.current;
+    if (activeBtn && container) {
+      const containerRect = container.getBoundingClientRect();
+      const btnRect = activeBtn.getBoundingClientRect();
+      setAssetIndicatorStyle({
+        left: btnRect.left - containerRect.left + container.scrollLeft,
+        width: btnRect.width,
+      });
+    }
+  }, [activeAsset]);
 
   const handleRefresh = async () => {
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -273,26 +291,33 @@ export default function AdminClientTransactionHistory() {
           </div>
 
           {/* Asset Category */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4">
-            {([
-              { key: "all" as const, label: t("history.allAssets", "Все") },
-              { key: "card" as const, label: t("history.cards", "Карты") },
-              { key: "iban" as const, label: "IBAN" },
-              { key: "crypto" as const, label: t("history.crypto", "Крипто") },
-            ]).map((opt) => (
-              <button
-                key={opt.key}
-                onClick={() => setActiveAsset(opt.key)}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors",
-                  activeAsset === opt.key
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-secondary text-muted-foreground border-border hover:bg-secondary/80"
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
+          <div className="relative">
+            <div ref={assetContainerRef} className="flex gap-0 overflow-x-auto pb-0 -mx-4 px-4 scrollbar-hide relative">
+              <motion.div
+                className="absolute bottom-0 h-[3px] bg-primary rounded-full"
+                animate={{ left: assetIndicatorStyle.left, width: assetIndicatorStyle.width }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+              {([
+                { key: "all" as AssetType, label: t("history.allAssets", "Все") },
+                { key: "card" as AssetType, label: t("history.cards", "Карты") },
+                { key: "iban" as AssetType, label: "IBAN" },
+                { key: "crypto" as AssetType, label: t("history.crypto", "Крипто") },
+              ]).map((opt) => (
+                <button
+                  key={opt.key}
+                  ref={(el) => { if (el) assetRefs.current.set(opt.key, el); }}
+                  onClick={() => setActiveAsset(opt.key)}
+                  className={cn(
+                    "px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative",
+                    activeAsset === opt.key ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-border/50 -mx-4" />
           </div>
 
           {/* Filter Tabs */}
