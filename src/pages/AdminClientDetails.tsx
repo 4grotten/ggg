@@ -385,72 +385,76 @@ export default function AdminClientDetails() {
     >
       <div className="px-4 pb-8 pt-4 space-y-6">
         {/* Client Header Card */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-muted/30 border border-border/50 p-4">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-muted/30 border border-border/50">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary" />
-          <div className="flex items-center gap-4">
+          
+          {/* Top section: Avatar + Name + ID + Role + Badges */}
+          <div className="p-5 flex items-start gap-4">
             <div className="relative shrink-0">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/20">
+              <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/20">
                 {client.avatar_url ? (
                   <img src={client.avatar_url} alt={client.full_name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold text-xl">
+                  <div className="w-full h-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold text-2xl">
                     {(client.full_name || "?").charAt(0)}
                   </div>
                 )}
               </div>
               {client.is_verified && (
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
-                  <CheckCircle className="w-3 h-3 text-white" />
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
+                  <CheckCircle className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-lg truncate">{client.full_name}</h3>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Phone className="w-3.5 h-3.5" />
-                <span>{client.phone}</span>
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                {isVIP && (
-                  <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] px-2 py-0.5 border-0">
-                    <Crown className="w-3 h-3 mr-1" /> VIP
-                  </Badge>
-                )}
-                {isBlocked && (
-                  <Badge variant="destructive" className="text-[10px] px-2 py-0.5">
-                    {t("admin.clients.blocked")}
-                  </Badge>
-                )}
+              <h3 className="font-bold text-xl truncate">{client.full_name}</h3>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-sm text-muted-foreground font-mono">ID: {client.user_id}</span>
                 <Badge variant="outline" className="text-[10px] px-2 py-0.5 capitalize">
                   {client.role}
                 </Badge>
               </div>
+              <div className="flex items-center gap-2 mt-2.5 flex-wrap">
+                {isVIP && (
+                  <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] px-2.5 py-0.5 border-0 shadow-sm">
+                    <Crown className="w-3 h-3 mr-1" /> VIP
+                  </Badge>
+                )}
+                {isBlocked && (
+                  <Badge variant="destructive" className="text-[10px] px-2.5 py-0.5 shadow-sm">
+                    {t("admin.clients.blocked")}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Additional info row */}
-          <div className="mt-4 pt-3 border-t border-border/30 grid grid-cols-2 gap-3">
+          {/* Bottom section: Contact details */}
+          <div className="px-5 pb-4 pt-0 grid grid-cols-2 gap-x-4 gap-y-2.5 border-t border-border/30 mt-0 pt-3">
+            {client.phone && (
+              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                <Phone className="w-4 h-4 text-primary shrink-0" />
+                <span>{client.phone}</span>
+              </div>
+            )}
             {client.email && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Mail className="w-3.5 h-3.5 text-primary" />
+              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                <Mail className="w-4 h-4 text-primary shrink-0" />
                 <span className="truncate">{client.email}</span>
               </div>
             )}
             {client.gender && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <User className="w-3.5 h-3.5 text-primary" />
+              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                <User className="w-4 h-4 text-primary shrink-0" />
                 <span className="capitalize">{client.gender}</span>
               </div>
             )}
             {client.language && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Globe className="w-3.5 h-3.5 text-primary" />
+              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                <Globe className="w-4 h-4 text-primary shrink-0" />
                 <span className="uppercase">{client.language}</span>
               </div>
             )}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>ID: {client.user_id}</span>
-            </div>
           </div>
         </div>
 
