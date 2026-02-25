@@ -666,11 +666,11 @@ export default function AdminPanel() {
                   <div className="relative h-[72px] p-2 bg-muted/50 rounded-2xl min-w-max md:min-w-0 md:w-full">
                     {/* Desktop sliding indicator */}
                     <motion.div
-                      className="absolute top-2 bottom-2 rounded-xl bg-background shadow-lg hidden md:block"
+                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg hidden md:block"
                       initial={false}
                       animate={{
-                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * (100% / ${tabConfig.length}) + 8px)`,
-                        width: `calc(100% / ${tabConfig.length} - 16px)`,
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * (100% / ${tabConfig.length}) + 6px)`,
+                        width: `calc(100% / ${tabConfig.length} - 12px)`,
                       }}
                       transition={{
                         type: "spring",
@@ -680,11 +680,11 @@ export default function AdminPanel() {
                     />
                     {/* Mobile sliding indicator */}
                     <motion.div
-                      className="absolute top-2 bottom-2 rounded-xl bg-background shadow-lg md:hidden"
+                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg md:hidden"
                       initial={false}
                       animate={{
-                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 128px + 8px)`,
-                        width: '120px',
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 128px + 6px)`,
+                        width: '124px',
                       }}
                       transition={{
                         type: "spring",
