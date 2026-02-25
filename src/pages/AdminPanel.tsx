@@ -808,9 +808,9 @@ export default function AdminPanel() {
                             phone: client.phone,
                             avatarUrl: client.avatar_url || undefined,
                             isVerified: true,
-                            cardsCount: client.cards_count,
+                            cardsCount: client.cards_count || 0,
                             referralLevel: "R1",
-                            balance: client.total_cards_balance + client.total_bank_balance,
+                            balance: (client.total_cards_balance || 0) + (client.total_bank_balance || 0),
                             registrationDate: client.created_at ? new Date(client.created_at).toLocaleDateString() : "—",
                           })}
                           className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer active:scale-[0.98] group"
@@ -874,21 +874,21 @@ export default function AdminPanel() {
                                   <CreditCard className="w-3 h-3 text-blue-500" />
                                   <span className="text-[10px] text-muted-foreground">Карты</span>
                                 </div>
-                                <p className="text-sm font-bold">{client.cards_count}</p>
+                                <p className="text-sm font-bold">{client.cards_count || 0}</p>
                               </div>
                               <div className="bg-muted/30 rounded-xl px-2.5 py-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-0.5">
                                   <Wallet className="w-3 h-3 text-emerald-500" />
                                   <span className="text-[10px] text-muted-foreground">Счета</span>
                                 </div>
-                                <p className="text-sm font-bold">{client.accounts_count}</p>
+                                <p className="text-sm font-bold">{client.accounts_count || 0}</p>
                               </div>
                               <div className="bg-muted/30 rounded-xl px-2.5 py-2 text-center">
                                 <div className="flex items-center justify-center gap-1 mb-0.5">
                                   <Zap className="w-3 h-3 text-amber-500" />
                                   <span className="text-[10px] text-muted-foreground">Крипто</span>
                                 </div>
-                                <p className="text-sm font-bold">{client.crypto_wallets_count}</p>
+                                <p className="text-sm font-bold">{client.crypto_wallets_count || 0}</p>
                               </div>
                             </div>
 
@@ -897,14 +897,14 @@ export default function AdminPanel() {
                               <div className="flex-1">
                                 <p className="text-[10px] text-muted-foreground">Карты + Счёт</p>
                                 <p className="text-sm font-bold text-foreground">
-                                  {(client.total_cards_balance + client.total_bank_balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-muted-foreground font-normal">AED</span>
+                                  {((client.total_cards_balance || 0) + (client.total_bank_balance || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-muted-foreground font-normal">AED</span>
                                 </p>
                               </div>
                               <div className="w-px h-6 bg-border/50" />
                               <div className="flex-1">
                                 <p className="text-[10px] text-muted-foreground">Крипто</p>
                                 <p className="text-sm font-bold text-foreground">
-                                  {client.total_crypto_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-muted-foreground font-normal">USDT</span>
+                                  {(client.total_crypto_balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-muted-foreground font-normal">USDT</span>
                                 </p>
                               </div>
                             </div>
