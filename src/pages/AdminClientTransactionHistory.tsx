@@ -135,7 +135,7 @@ export default function AdminClientTransactionHistory() {
       const containerRect = container.getBoundingClientRect();
       const btnRect = activeBtn.getBoundingClientRect();
       setAssetIndicatorStyle({
-        left: btnRect.left - containerRect.left + container.scrollLeft,
+        left: btnRect.left - containerRect.left,
         width: btnRect.width,
       });
     }
@@ -297,29 +297,35 @@ export default function AdminClientTransactionHistory() {
           </div>
 
           {/* Asset Category */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
-            {([
-              { key: "all" as AssetType, label: t("history.allAssets", "Все") },
-              { key: "virtual" as AssetType, label: t("history.virtualCard", "Virtual") },
-              { key: "metal" as AssetType, label: t("history.metalCard", "Metal") },
-              { key: "iban" as AssetType, label: "IBAN" },
-              { key: "crypto" as AssetType, label: t("history.crypto", "Крипто") },
-            ]).map((opt) => (
-              <motion.button
-                key={opt.key}
-                onClick={() => setActiveAsset(opt.key)}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors",
-                  activeAsset === opt.key
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-secondary text-muted-foreground hover:bg-secondary/80"
-                )}
-                layout
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              >
-                {opt.label}
-              </motion.button>
-            ))}
+          <div className="relative" ref={assetContainerRef}>
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1 relative">
+              <motion.div
+                className="absolute top-0 h-[calc(100%-4px)] bg-primary rounded-full z-0"
+                animate={{ left: assetIndicatorStyle.left, width: assetIndicatorStyle.width }}
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              />
+              {([
+                { key: "all" as AssetType, label: t("history.allAssets", "Все") },
+                { key: "virtual" as AssetType, label: t("history.virtualCard", "Virtual") },
+                { key: "metal" as AssetType, label: t("history.metalCard", "Metal") },
+                { key: "iban" as AssetType, label: "IBAN" },
+                { key: "crypto" as AssetType, label: t("history.crypto", "Крипто") },
+              ]).map((opt) => (
+                <button
+                  key={opt.key}
+                  ref={(el) => { if (el) assetRefs.current.set(opt.key, el); }}
+                  onClick={() => setActiveAsset(opt.key)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors relative z-10",
+                    activeAsset === opt.key
+                      ? "text-primary-foreground"
+                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Filter Tabs */}
