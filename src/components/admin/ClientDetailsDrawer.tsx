@@ -18,9 +18,13 @@ interface ClientData {
   avatarUrl?: string;
   isVerified: boolean;
   cardsCount: number;
-  referralLevel: string;
+  referralLevel: string | null;
   balance: number;
   registrationDate: string;
+  role?: 'admin' | 'moderator' | 'user';
+  accountsCount?: number;
+  cryptoWalletsCount?: number;
+  totalCryptoBalance?: number;
 }
 
 interface ClientDetailsDrawerProps {
