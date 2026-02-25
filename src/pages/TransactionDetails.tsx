@@ -753,7 +753,7 @@ const TransactionDetails = () => {
                     ease: [0.34, 1.56, 0.64, 1]
                   }}
                 >
-                  <ArrowUpRight className="w-10 h-10 rotate-180" strokeWidth={2.5} />
+                  <CreditCard className="w-10 h-10" strokeWidth={2} />
                 </motion.div>
               ) : (
                 <motion.div
