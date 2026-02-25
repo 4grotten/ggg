@@ -28,7 +28,7 @@ export const AccountWalletButtons = ({
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [pendingField, setPendingField] = useState<"account" | "wallet" | null>(null);
 
-  const { isHideDataEnabled } = useScreenLockContext();
+  const { isHideDataEnabled, isEnabled } = useScreenLockContext();
 
   useEffect(() => {
     if (!isHideDataEnabled) {
@@ -43,7 +43,7 @@ export const AccountWalletButtons = ({
   const toggleVisibility = (e: React.MouseEvent, field: "account" | "wallet") => {
     e.stopPropagation();
     const isCurrentlyVisible = field === "account" ? accountVisible : walletVisible;
-    if (!isCurrentlyVisible && isHideDataEnabled) {
+    if (!isCurrentlyVisible && isHideDataEnabled && isEnabled) {
       setPendingField(field);
       setShowUnlockDialog(true);
       return;
