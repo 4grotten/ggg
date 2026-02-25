@@ -414,6 +414,19 @@ export default function AdminClientDetails() {
                   {client.role}
                 </Badge>
               </div>
+              {client.gender && (
+                <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
+                  <User className="w-3.5 h-3.5" />
+                  <span className="capitalize">{client.gender}</span>
+                  {client.language && (
+                    <>
+                      <span className="mx-1">·</span>
+                      <Globe className="w-3.5 h-3.5" />
+                      <span className="uppercase">{client.language}</span>
+                    </>
+                  )}
+                </div>
+              )}
               <div className="flex items-center gap-2 mt-2.5 flex-wrap">
                 {isVIP && (
                   <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] px-2.5 py-0.5 border-0 shadow-sm">
@@ -429,31 +442,23 @@ export default function AdminClientDetails() {
             </div>
           </div>
 
-          {/* Bottom section: Contact details */}
-          <div className="px-5 pb-4 pt-0 grid grid-cols-2 gap-x-4 gap-y-2.5 border-t border-border/30 mt-0 pt-3">
+          {/* Contact buttons */}
+          <div className="px-5 pb-4 pt-0 flex items-center gap-2 border-t border-border/30 mt-0 pt-3">
             {client.phone && (
-              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                <Phone className="w-4 h-4 text-primary shrink-0" />
-                <span>{client.phone}</span>
-              </div>
+              <a href={`tel:${client.phone}`} className="flex-1">
+                <Button variant="outline" size="sm" className="w-full rounded-xl gap-2 text-xs h-9">
+                  <Phone className="w-3.5 h-3.5 text-primary" />
+                  {client.phone}
+                </Button>
+              </a>
             )}
             {client.email && (
-              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                <Mail className="w-4 h-4 text-primary shrink-0" />
-                <span className="truncate">{client.email}</span>
-              </div>
-            )}
-            {client.gender && (
-              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                <User className="w-4 h-4 text-primary shrink-0" />
-                <span className="capitalize">{client.gender}</span>
-              </div>
-            )}
-            {client.language && (
-              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                <Globe className="w-4 h-4 text-primary shrink-0" />
-                <span className="uppercase">{client.language}</span>
-              </div>
+              <a href={`mailto:${client.email}`} className="flex-1 min-w-0">
+                <Button variant="outline" size="sm" className="w-full rounded-xl gap-2 text-xs h-9 truncate">
+                  <Mail className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <span className="truncate">{client.email}</span>
+                </Button>
+              </a>
             )}
           </div>
         </div>
