@@ -891,6 +891,7 @@
     "youReceive": "Recibirá",
     "insufficientBalance": "Saldo USDT insuficiente",
     "confirm": "Confirmar transferencia",
+    "sending": "Enviando...",
     "transferInitiated": "Transferencia iniciada"
   },
   "auth": {

@@ -897,6 +897,7 @@
     "youReceive": "您将收到",
     "insufficientBalance": "USDT余额不足",
     "confirm": "确认转账",
+    "sending": "发送中...",
     "transferInitiated": "转账已发起"
   },
   "auth": {

@@ -891,6 +891,7 @@
     "youReceive": "ستتلقى",
     "insufficientBalance": "رصيد USDT غير كافٍ",
     "confirm": "تأكيد التحويل",
+    "sending": "جارٍ الإرسال...",
     "transferInitiated": "تم بدء التحويل"
   },
   "auth": {
