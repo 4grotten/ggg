@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +16,9 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { apiRequest } from "@/services/api/apiClient";
 import { BackendClientDetail } from "@/hooks/useAdminManagement";
+import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
+import { format } from "date-fns";
 
 // Referral levels configuration
 const REFERRAL_LEVELS = [
@@ -38,6 +41,30 @@ const TX_TYPE_LABELS: Record<string, string> = {
   crypto_to_card: "Crypto → Card", card_to_iban: "Card → IBAN", crypto_to_iban: "Crypto → IBAN",
   bank_topup: "Bank Top Up", crypto_topup: "Crypto Top Up", transfer_in: "Transfer In",
   transfer_out: "Transfer Out", card_payment: "Card Payment", fee: "Fee",
+};
+
+const isIncomeTx = (type: string): boolean => {
+  const t = type.toLowerCase();
+  return t.includes("topup") || t.includes("top_up") || t.includes("transfer_in") ||
+    t.includes("incoming") || t === "refund" || t === "cashback" || t.includes("deposit");
+};
+
+const mapTypeToAppType = (type: string): AppTransaction["type"] => {
+  const t = type.toLowerCase();
+  if (t === "topup" || t === "top_up" || t === "bank_topup" || t === "crypto_topup") return "topup";
+  if (t === "card_to_card" || t === "card_transfer") return "card_transfer";
+  if (t === "bank_withdrawal" || t === "bank_transfer") return "bank_transfer";
+  if (t === "bank_transfer_incoming" || t === "transfer_in") return "bank_transfer_incoming";
+  if (t === "crypto_to_card") return "crypto_to_card";
+  if (t === "crypto_to_iban" || t === "card_to_iban") return "crypto_to_iban" as any;
+  if (t === "crypto_to_crypto") return "crypto_withdrawal";
+  if (t === "crypto_withdrawal" || t === "crypto_send") return "crypto_withdrawal";
+  if (t === "crypto_deposit") return "crypto_deposit";
+  if (t === "card_activation") return "card_activation" as any;
+  if (t === "card_payment" || t === "payment") return "payment";
+  if (t === "fee") return "payment";
+  if (t === "refund" || t === "cashback") return "topup";
+  return "payment";
 };
 
 export default function AdminClientDetails() {
@@ -88,6 +115,43 @@ export default function AdminClientDetails() {
     navigate(-1);
   };
 
+  const txGroups = useMemo((): AppTransactionGroup[] => {
+    const txList = showAllTx ? client?.transactions : client?.transactions?.slice(0, 3);
+    if (!txList || txList.length === 0) return [];
+    const sorted = [...txList].sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    const map = new Map<string, AppTransaction[]>();
+    for (const tx of sorted) {
+      const d = new Date(tx.created_at);
+      const key = format(d, "dd.MM.yyyy");
+      if (!map.has(key)) map.set(key, []);
+      const incoming = isIncomeTx(tx.type);
+      map.get(key)!.push({
+        id: tx.id,
+        merchant: TX_TYPE_LABELS[tx.type] || tx.type,
+        time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        amountUSDT: tx.amount,
+        amountLocal: tx.amount,
+        localCurrency: tx.currency,
+        color: incoming ? "#22C55E" : "#007AFF",
+        type: mapTypeToAppType(tx.type),
+        status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : undefined,
+        recipientName: tx.receiver_name,
+        senderName: tx.sender_name,
+        description: tx.description || TX_TYPE_LABELS[tx.type] || tx.type,
+        fee: tx.fee,
+        metadata: { originalApiType: tx.type, isIncoming: incoming },
+        createdAt: tx.created_at,
+      });
+    }
+    return Array.from(map.entries()).map(([date, txs]) => ({
+      date,
+      totalSpend: txs.filter(t => !isIncomeTx(t.type || "")).reduce((s, t) => s + t.amountLocal, 0),
+      transactions: txs,
+    }));
+  }, [client?.transactions, showAllTx]);
+
   if (!userId) {
     navigate("/settings/admin/clients");
     return null;
@@ -110,8 +174,6 @@ export default function AdminClientDetails() {
       </MobileLayout>
     );
   }
-
-  const displayedTx = showAllTx ? client.transactions : client.transactions?.slice(0, 3);
 
   return (
     <MobileLayout
@@ -356,37 +418,7 @@ export default function AdminClientDetails() {
               <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
               <Badge variant="secondary" className="text-[10px]">{client.transactions.length}</Badge>
             </div>
-            <div className="space-y-1.5">
-              {displayedTx?.map((tx) => (
-                <div key={tx.id} className="p-3 rounded-xl bg-muted/30 border border-border/50 flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">
-                      {TX_TYPE_LABELS[tx.type] || tx.type}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground truncate">
-                      {tx.description || tx.merchant_name || tx.receiver_name || tx.sender_name || "—"}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {new Date(tx.created_at).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0 ml-2">
-                    <p className={cn("text-sm font-bold",
-                      tx.type.includes("in") || tx.type.includes("topup") || tx.type.includes("top_up") || tx.type === "refund" || tx.type === "cashback"
-                        ? "text-emerald-500" : "text-destructive"
-                    )}>
-                      {tx.type.includes("in") || tx.type.includes("topup") || tx.type.includes("top_up") ? "+" : "-"}{tx.amount.toLocaleString()} {tx.currency}
-                    </p>
-                    <Badge variant={tx.status === "completed" ? "default" : tx.status === "pending" ? "secondary" : "destructive"} className="text-[8px]">
-                      {tx.status}
-                    </Badge>
-                    {tx.fee != null && tx.fee > 0 && (
-                      <p className="text-[10px] text-muted-foreground">Fee: {tx.fee} {tx.currency}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <CardTransactionsList groups={txGroups} />
             {client.transactions.length > 3 && !showAllTx && (
               <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
                 Посмотреть всю историю ({client.transactions.length})
