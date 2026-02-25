@@ -362,20 +362,28 @@ const SendCrypto = () => {
         navigate(isReferralWithdrawal ? "/partner" : "/");
       } else {
         const errObj = res.error as Record<string, unknown> | null;
-        const errMsg = (errObj?.error as string) || errObj?.message as string || errObj?.detail as string || t("send.transferError", "Ошибка перевода");
+        const errMsg = (errObj?.error as string) || (errObj?.message as string) || (errObj?.detail as string) || t("send.transferError", "Ошибка перевода");
         
         // Check if this is a daily/monthly limit error
         const isLimitError = errMsg.toLowerCase().includes('лимит') || 
           errMsg.toLowerCase().includes('limit') || 
           errMsg.toLowerCase().includes('exceeded') ||
-          errMsg.toLowerCase().includes('превышен');
+          errMsg.toLowerCase().includes('превышен') ||
+          errMsg.toLowerCase().includes('daily') ||
+          errMsg.toLowerCase().includes('дневн') ||
+          errMsg.toLowerCase().includes('суточн') ||
+          errMsg.toLowerCase().includes('maximum') ||
+          errMsg.toLowerCase().includes('максим');
         
         if (isLimitError) {
           setLimitAlertMsg(errMsg);
           setLimitCountdown(getTimeUntilLimitReset());
           setLimitAlertOpen(true);
         } else {
-          toast.error(errMsg);
+          // Show all other errors as alert too (not just toast)
+          setLimitAlertMsg(errMsg);
+          setLimitCountdown(getTimeUntilLimitReset());
+          setLimitAlertOpen(true);
         }
       }
     } catch (err) {
