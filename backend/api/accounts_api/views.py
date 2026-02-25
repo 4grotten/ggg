@@ -2,9 +2,9 @@ from decimal import Decimal
 import uuid
 
 import requests
-
+from django.db.models import Q
 from apps.cards_apps.models import Cards
-from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets
+from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets, Transactions
 from api.accounts_api.serializers import AdminSettingsSerializer, ContactSerializer, UserLimitsSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,6 +16,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from apps.accounts_apps.models import AdminSettings, Contacts, Profiles
 from .apofiz_client import ApofizClient
+from django.db.models import Sum, Count
+from apps.accounts_apps.models import UserRoles
 
 def generate_uid_tail(user_id):
     return str(user_id).zfill(6)[-6:]
@@ -643,8 +645,6 @@ class AdminUserLimitsListView(APIView):
         tags=["Админ: Управление пользователями"]
     )
     def get(self, request):
-        from django.db.models import Sum, Count
-        from apps.accounts_apps.models import UserRoles
         profiles = Profiles.objects.all().order_by('-created_at')
         serializer = UserLimitsSerializer(profiles, many=True)
 
@@ -745,70 +745,61 @@ class AdminUserDetailView(APIView):
         tags=["Админ: Управление пользователями"]
     )
     def get(self, request, user_id):
-        from apps.accounts_apps.models import UserRoles
-        from apps.transactions_apps.models import Transactions
-
         uid = str(user_id)
         profile = Profiles.objects.filter(user_id=uid).first()
         if not profile:
             return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Name
+        is_admin_status = False
         fname = getattr(profile, 'first_name', None) or ''
         lname = getattr(profile, 'last_name', None) or ''
         full_name = f"{fname} {lname}".strip()
         email = ''
+        
         if uid.isdigit():
             try:
                 user_obj = User.objects.get(id=int(uid))
                 if not full_name:
                     full_name = f"{user_obj.first_name or ''} {user_obj.last_name or ''}".strip()
                 email = user_obj.email or ''
+                is_admin_status = user_obj.is_staff or user_obj.is_superuser 
             except User.DoesNotExist:
                 pass
 
-        # Role
-        role_row = UserRoles.objects.filter(user_id=uid).order_by('-created_at').first()
-        role = role_row.role if role_row else 'user'
+        cards_qs = Cards.objects.filter(user_id=uid).values()
+        cards = []
+        for c in cards_qs:
+            c.pop('cvv', None)
+            c.pop('cvc', None)
+            c['balance'] = float(c.get('balance') or 0)
+            cards.append(c)
 
-        # Cards list
-        cards = list(Cards.objects.filter(user_id=uid).values(
-            'id', 'type', 'name', 'status', 'balance', 'last_four_digits', 'expiry_date', 'created_at'
-        ))
-        for c in cards:
-            c['balance'] = float(c['balance'] or 0)
+        accounts_qs = BankDepositAccounts.objects.filter(user_id=uid).values()
+        accounts = []
+        for a in accounts_qs:
+            a['balance'] = float(a.get('balance') or 0)
+            accounts.append(a)
 
-        # Bank accounts list
-        accounts = list(BankDepositAccounts.objects.filter(user_id=uid).values(
-            'id', 'iban', 'bank_name', 'beneficiary', 'balance', 'is_active'
-        ))
-        for a in accounts:
-            a['balance'] = float(a['balance'] or 0)
+        wallets_qs = CryptoWallets.objects.filter(user_id=uid).values()
+        wallets = []
+        for w in wallets_qs:
+            w['balance'] = float(w.get('balance') or 0)
+            wallets.append(w)
 
-        # Crypto wallets list
-        wallets = list(CryptoWallets.objects.filter(user_id=uid).values(
-            'id', 'network', 'token', 'address', 'balance', 'is_active', 'created_at'
-        ))
-        for w in wallets:
-            w['balance'] = float(w['balance'] or 0)
+        transactions_qs = Transactions.objects.filter(
+            Q(user_id=uid) | Q(sender_id=uid) | Q(receiver_id=uid)
+        ).order_by('-created_at')[:3].values()
+        
+        transactions = []
+        for tx in transactions_qs:
+            tx['amount'] = float(tx.get('amount') or 0)
+            tx['fee'] = float(tx.get('fee') or 0) if tx.get('fee') is not None else None
+            tx['exchange_rate'] = float(tx.get('exchange_rate') or 0) if tx.get('exchange_rate') is not None else None
+            tx['original_amount'] = float(tx.get('original_amount') or 0) if tx.get('original_amount') is not None else None
+            transactions.append(tx)
 
-        # Recent transactions (last 50)
-        transactions = list(Transactions.objects.filter(user_id=uid).order_by('-created_at')[:50].values(
-            'id', 'type', 'status', 'amount', 'currency', 'description',
-            'merchant_name', 'sender_name', 'receiver_name', 'fee',
-            'exchange_rate', 'original_amount', 'original_currency', 'created_at'
-        ))
-        for tx in transactions:
-            tx['amount'] = float(tx['amount'] or 0)
-            tx['fee'] = float(tx['fee'] or 0) if tx['fee'] else None
-            tx['exchange_rate'] = float(tx['exchange_rate'] or 0) if tx['exchange_rate'] else None
-            tx['original_amount'] = float(tx['original_amount'] or 0) if tx['original_amount'] else None
-
-        # Limits
         limits_serializer = UserLimitsSerializer(profile)
-
         is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
-
         return Response({
             "user_id": uid,
             "full_name": full_name or "Unknown User",
@@ -818,14 +809,18 @@ class AdminUserDetailView(APIView):
             "language": getattr(profile, 'language', None),
             "avatar_url": getattr(profile, 'avatar_url', None),
             "created_at": profile.created_at.isoformat() if profile.created_at else None,
-            "role": role,
             "is_verified": is_verified,
-            "referral_level": None,
+            "is_admin": is_admin_status,
+            "is_blocked": profile.is_blocked,
+            "is_vip": profile.is_vip,
+            "subscription_type": profile.subscription_type,
+            "referral_level": profile.referral_level,
+
             "cards": cards,
             "accounts": accounts,
             "wallets": wallets,
             "transactions": transactions,
-            "limits": limits_serializer.data,
+            "limits_and_settings": limits_serializer.data,
         }, status=status.HTTP_200_OK)
 
 
@@ -833,32 +828,51 @@ class AdminUserLimitDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Изменить лимиты конкретного пользователя (PATCH)",
-        request_body=UserLimitsSerializer,
+        operation_summary="Изменить лимиты и данные конкретного пользователя (PATCH)",
         tags=["Админ: Управление пользователями"]
     )
     def patch(self, request, user_id):
         profile = Profiles.objects.filter(user_id=str(user_id)).first()
         if not profile:
             return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
-            
+        is_admin_flag = request.data.get('is_admin')
         serializer = UserLimitsSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            is_admin_status = False
             fname = getattr(profile, 'first_name', None) or ''
             lname = getattr(profile, 'last_name', None) or ''
             full_name = f"{fname} {lname}".strip()
-            if not full_name and profile.user_id and str(profile.user_id).isdigit():
+            
+            if profile.user_id and str(profile.user_id).isdigit():
                 try:
                     user = User.objects.get(id=int(profile.user_id))
-                    full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
+                    if not full_name:
+                        full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
+
+                    if is_admin_flag is not None:
+                        is_admin_val = str(is_admin_flag).lower() == 'true' if isinstance(is_admin_flag, str) else bool(is_admin_flag)
+                        user.is_staff = is_admin_val
+                        user.is_superuser = is_admin_val
+                        user.save()
+                        
+                    is_admin_status = user.is_staff
                 except User.DoesNotExist:
                     pass
+            
             return Response({
                 "user_id": profile.user_id,
                 "full_name": full_name or "Unknown User",
                 "phone": getattr(profile, 'phone', ''),
-                "limits": serializer.data
+                "gender": getattr(profile, 'gender', ''),
+                "language": getattr(profile, 'language', 'en'),
+                "avatar_url": getattr(profile, 'avatar_url', None),
+                "is_admin": is_admin_status,
+                "is_blocked": profile.is_blocked,
+                "is_vip": profile.is_vip,
+                "subscription_type": profile.subscription_type,
+                "referral_level": profile.referral_level,
+                "limits_and_settings": serializer.data
             }, status=status.HTTP_200_OK)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

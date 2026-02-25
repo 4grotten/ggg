@@ -61,6 +61,26 @@ class Profiles(models.Model):
     network_fee_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     currency_conversion_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
+    is_blocked = models.BooleanField(default=False, help_text="Заблокирован ли аккаунт")
+    is_vip = models.BooleanField(default=False, help_text="VIP статус")
+    
+    SUBSCRIPTION_CHOICES = [
+        ('default', 'Бесплатная (Дефолт)'),
+        ('standard', 'Стандартная'),
+        ('premium', 'Премиум'),
+        ('vip', 'VIP'),
+    ]
+    subscription_type = models.CharField(max_length=50, choices=SUBSCRIPTION_CHOICES, default='default')
+    
+    REFERRAL_CHOICES = [
+        ('R1(DEFAULT)', 'R1 (Default)'),
+        ('R2', 'R2'),
+        ('R3', 'R3'),
+        ('R4', 'R4'),
+        ('Partner', 'Partner'),
+    ]
+    referral_level = models.CharField(max_length=50, choices=REFERRAL_CHOICES, default='R1(DEFAULT)')
+
     class Meta:
         db_table = 'profiles'
 

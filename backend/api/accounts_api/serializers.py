@@ -45,9 +45,11 @@ class UserLimitsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profiles
         fields = [
-            'custom_settings_enabled',
-            'transfer_min', 'transfer_max', 'daily_transfer_limit', 'monthly_transfer_limit',
-            'withdrawal_min', 'withdrawal_max', 'daily_withdrawal_limit', 'monthly_withdrawal_limit',
-            'card_to_card_percent', 'bank_transfer_percent', 
-            'network_fee_percent', 'currency_conversion_percent'
+            'custom_settings_enabled', 'transfer_min', 'transfer_max', 
+            'daily_transfer_limit', 'monthly_transfer_limit', 'withdrawal_min', 
+            'withdrawal_max', 'daily_withdrawal_limit', 'monthly_withdrawal_limit', 
+            'card_to_card_percent', 'bank_transfer_percent', 'network_fee_percent', 
+            'currency_conversion_percent',
+            'is_blocked', 'is_vip', 'subscription_type', 'referral_level',
+            'first_name', 'last_name', 'gender', 'language', 'avatar_url'
         ]
