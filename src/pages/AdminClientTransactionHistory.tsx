@@ -82,7 +82,7 @@ export default function AdminClientTransactionHistory() {
   const { t } = useTranslation();
 
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
-  const [activeAsset, setActiveAsset] = useState<"all" | "card" | "iban" | "crypto">("all");
+  const [activeAsset, setActiveAsset] = useState<AssetType>("all");
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [selectedPreset, setSelectedPreset] = useState<PeriodPreset>("allTime");
@@ -96,7 +96,7 @@ export default function AdminClientTransactionHistory() {
   const tabRefs = useRef<Map<FilterType, HTMLButtonElement>>(new Map());
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
-  type AssetType = "all" | "card" | "iban" | "crypto";
+  type AssetType = "all" | "virtual" | "metal" | "iban" | "crypto";
   const assetContainerRef = useRef<HTMLDivElement>(null);
   const assetRefs = useRef<Map<AssetType, HTMLButtonElement>>(new Map());
   const [assetIndicatorStyle, setAssetIndicatorStyle] = useState({ left: 0, width: 0 });
@@ -164,11 +164,12 @@ export default function AdminClientTransactionHistory() {
     }));
   }, [client?.transactions]);
 
-  const isAssetMatch = (tx: ClientTransaction, asset: "all" | "card" | "iban" | "crypto"): boolean => {
+  const isAssetMatch = (tx: ClientTransaction, asset: AssetType): boolean => {
     if (asset === "all") return true;
     const t = tx.type.toLowerCase();
     const desc = (tx.description || "").toLowerCase();
-    if (asset === "card") return t.includes("card") || t === "payment" || t === "topup" || t === "fee" || t === "card_activation" || t === "refund" || t === "cashback";
+    if (asset === "virtual") return (t.includes("card") || t === "payment" || t === "topup" || t === "fee" || t === "card_activation" || t === "refund" || t === "cashback") && !desc.includes("metal");
+    if (asset === "metal") return (t.includes("card") || t === "payment" || t === "topup" || t === "fee" || t === "refund" || t === "cashback") && desc.includes("metal");
     if (asset === "iban") return t.includes("iban") || t.includes("bank") || t.includes("transfer_in") || t.includes("transfer_out") || desc.includes("iban");
     if (asset === "crypto") return t.includes("crypto") || t.includes("usdt") || desc.includes("usdt") || desc.includes("trc20") || desc.includes("crypto");
     return true;
@@ -291,33 +292,29 @@ export default function AdminClientTransactionHistory() {
           </div>
 
           {/* Asset Category */}
-          <div className="relative">
-            <div ref={assetContainerRef} className="flex gap-0 overflow-x-auto pb-0 -mx-4 px-4 scrollbar-hide relative">
-              <motion.div
-                className="absolute bottom-0 h-[3px] bg-primary rounded-full"
-                animate={{ left: assetIndicatorStyle.left, width: assetIndicatorStyle.width }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-              {([
-                { key: "all" as AssetType, label: t("history.allAssets", "Все") },
-                { key: "card" as AssetType, label: t("history.cards", "Карты") },
-                { key: "iban" as AssetType, label: "IBAN" },
-                { key: "crypto" as AssetType, label: t("history.crypto", "Крипто") },
-              ]).map((opt) => (
-                <button
-                  key={opt.key}
-                  ref={(el) => { if (el) assetRefs.current.set(opt.key, el); }}
-                  onClick={() => setActiveAsset(opt.key)}
-                  className={cn(
-                    "px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors relative",
-                    activeAsset === opt.key ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-border/50 -mx-4" />
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
+            {([
+              { key: "all" as AssetType, label: t("history.allAssets", "Все") },
+              { key: "virtual" as AssetType, label: t("history.virtualCard", "Virtual") },
+              { key: "metal" as AssetType, label: t("history.metalCard", "Metal") },
+              { key: "iban" as AssetType, label: "IBAN" },
+              { key: "crypto" as AssetType, label: t("history.crypto", "Крипто") },
+            ]).map((opt) => (
+              <motion.button
+                key={opt.key}
+                onClick={() => setActiveAsset(opt.key)}
+                className={cn(
+                  "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors",
+                  activeAsset === opt.key
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                )}
+                layout
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              >
+                {opt.label}
+              </motion.button>
+            ))}
           </div>
 
           {/* Filter Tabs */}
