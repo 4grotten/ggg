@@ -862,6 +862,7 @@
     "usdtBalanceDesc": "EasyCard veya harici cüzdana USDT gönder",
     "internalUser": "Sistem kullanıcısı",
     "commission": "Komisyon",
+    "commissionPercent": "Komisyon ({{percent}}%)",
     "verifying": "Adres doğrulanıyor...",
     "dailyLimitExceeded": "Günlük limit aşıldı ({{limit}}). Kullanılabilir: {{available}}"
   },

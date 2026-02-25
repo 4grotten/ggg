@@ -862,6 +862,7 @@
     "usdtBalanceDesc": "USDT an EasyCard oder externes Wallet senden",
     "internalUser": "Systembenutzer",
     "commission": "Gebühr",
+    "commissionPercent": "Gebühr ({{percent}}%)",
     "verifying": "Adresse wird überprüft...",
     "dailyLimitExceeded": "Tageslimit überschritten ({{limit}}). Verfügbar: {{available}}"
   },
