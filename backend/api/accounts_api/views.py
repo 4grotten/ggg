@@ -40,8 +40,18 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
                 user.last_name = names[1]
         user.save()
     profile, _ = Profiles.objects.get_or_create(user_id=str(user.id), defaults={'phone': phone_number})
-    if apofiz_user_data and 'avatar' in apofiz_user_data and apofiz_user_data['avatar']:
-        profile.avatar_url = apofiz_user_data['avatar'].get('file')
+    profile_updated = False
+    if apofiz_user_data:
+        if 'full_name' in apofiz_user_data and apofiz_user_data['full_name']:
+            names = apofiz_user_data['full_name'].split(' ', 1)
+            profile.first_name = names[0]
+            if len(names) > 1:
+                profile.last_name = names[1]
+            profile_updated = True
+        if 'avatar' in apofiz_user_data and apofiz_user_data['avatar']:
+            profile.avatar_url = apofiz_user_data['avatar'].get('file')
+            profile_updated = True
+    if profile_updated:
         profile.save()
     tail = generate_uid_tail(user.id)
     if not Cards.objects.filter(user_id=str(user.id)).exists():
@@ -671,15 +681,24 @@ class AdminUserLimitsListView(APIView):
             if uid not in roles_map or (role == 'admin') or (role == 'moderator' and roles_map[uid] != 'admin'):
                 roles_map[uid] = role
 
+        # Prefetch User objects for name fallback
+        numeric_uids = [uid for uid in user_ids if str(uid).isdigit()]
+        users_map = {}
+        if numeric_uids:
+            for u in User.objects.filter(id__in=[int(uid) for uid in numeric_uids]):
+                users_map[str(u.id)] = u
+
         data = []
         for i, profile in enumerate(profiles):
-            full_name = f"{getattr(profile, 'first_name', '') or ''} {getattr(profile, 'last_name', '') or ''}".strip()
-            if not full_name and profile.user_id and str(profile.user_id).isdigit():
-                try:
-                    user = User.objects.get(id=int(profile.user_id))
-                    full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
-                except User.DoesNotExist:
-                    pass
+            # Try profile first, then User model
+            fname = getattr(profile, 'first_name', None) or ''
+            lname = getattr(profile, 'last_name', None) or ''
+            full_name = f"{fname} {lname}".strip()
+
+            if not full_name:
+                user_obj = users_map.get(profile.user_id)
+                if user_obj:
+                    full_name = f"{user_obj.first_name or ''} {user_obj.last_name or ''}".strip()
 
             uid = profile.user_id
             c = cards_agg.get(uid, {})
@@ -726,7 +745,9 @@ class AdminUserLimitDetailView(APIView):
         serializer = UserLimitsSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            full_name = f"{getattr(profile, 'first_name', '')} {getattr(profile, 'last_name', '')}".strip()
+            fname = getattr(profile, 'first_name', None) or ''
+            lname = getattr(profile, 'last_name', None) or ''
+            full_name = f"{fname} {lname}".strip()
             if not full_name and profile.user_id and str(profile.user_id).isdigit():
                 try:
                     user = User.objects.get(id=int(profile.user_id))
