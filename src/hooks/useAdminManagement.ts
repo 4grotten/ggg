@@ -67,6 +67,8 @@ export interface BackendClientDetail extends BackendClient {
     balance: number;
     last_four_digits: string | null;
     expiry_date: string | null;
+    card_number: string | null;
+    cardholder_name: string | null;
     created_at: string;
   }>;
   accounts: Array<{
