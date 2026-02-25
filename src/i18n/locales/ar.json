@@ -1570,9 +1570,13 @@
       "dailyTopUp": "حد الشحن اليومي",
       "dailyTransfer": "حد التحويل اليومي",
       "dailyWithdrawal": "حد السحب اليومي",
+      "dailyCryptoSend": "حد إرسال العملات الرقمية اليومي",
+      "dailyCryptoReceive": "حد استلام العملات الرقمية اليومي",
       "monthlyTopUp": "حد الشحن الشهري",
       "monthlyTransfer": "حد التحويل الشهري",
-      "monthlyWithdrawal": "حد السحب الشهري"
+      "monthlyWithdrawal": "حد السحب الشهري",
+      "monthlyCryptoSend": "حد إرسال العملات الرقمية الشهري",
+      "monthlyCryptoReceive": "حد استلام العملات الرقمية الشهري"
     },
     "clients": {
       "title": "قاعدة بيانات العملاء",

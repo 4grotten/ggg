@@ -57,9 +57,13 @@ const limitFields = [
   { key: "daily_top_up_limit", labelKey: "dailyTopUp", suffix: "AED", group: "daily" },
   { key: "daily_transfer_limit", labelKey: "dailyTransfer", suffix: "AED", group: "daily" },
   { key: "daily_withdrawal_limit", labelKey: "dailyWithdrawal", suffix: "AED", group: "daily" },
+  { key: "daily_crypto_send_limit", labelKey: "dailyCryptoSend", suffix: "USDT", group: "daily" },
+  { key: "daily_crypto_receive_limit", labelKey: "dailyCryptoReceive", suffix: "USDT", group: "daily" },
   { key: "monthly_top_up_limit", labelKey: "monthlyTopUp", suffix: "AED", group: "monthly" },
   { key: "monthly_transfer_limit", labelKey: "monthlyTransfer", suffix: "AED", group: "monthly" },
   { key: "monthly_withdrawal_limit", labelKey: "monthlyWithdrawal", suffix: "AED", group: "monthly" },
+  { key: "monthly_crypto_send_limit", labelKey: "monthlyCryptoSend", suffix: "USDT", group: "monthly" },
+  { key: "monthly_crypto_receive_limit", labelKey: "monthlyCryptoReceive", suffix: "USDT", group: "monthly" },
 ];
 
 // Mock admin action history

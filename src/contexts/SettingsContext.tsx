@@ -38,9 +38,13 @@ const FALLBACK_SETTINGS: Record<string, Record<string, number>> = {
     daily_top_up_limit: 100000.00,
     daily_transfer_limit: 100000.00,
     daily_withdrawal_limit: 50000.00,
+    daily_crypto_send_limit: 50000.00,
+    daily_crypto_receive_limit: 100000.00,
     monthly_top_up_limit: 1000000.00,
     monthly_transfer_limit: 500000.00,
     monthly_withdrawal_limit: 200000.00,
+    monthly_crypto_send_limit: 500000.00,
+    monthly_crypto_receive_limit: 1000000.00,
   },
 };
 
@@ -79,9 +83,13 @@ interface SettingsContextType {
   DAILY_TOP_UP_LIMIT: number;
   DAILY_TRANSFER_LIMIT: number;
   DAILY_WITHDRAWAL_LIMIT: number;
+  DAILY_CRYPTO_SEND_LIMIT: number;
+  DAILY_CRYPTO_RECEIVE_LIMIT: number;
   MONTHLY_TOP_UP_LIMIT: number;
   MONTHLY_TRANSFER_LIMIT: number;
   MONTHLY_WITHDRAWAL_LIMIT: number;
+  MONTHLY_CRYPTO_SEND_LIMIT: number;
+  MONTHLY_CRYPTO_RECEIVE_LIMIT: number;
   
   isLoading: boolean;
   error: Error | null;
@@ -152,9 +160,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     DAILY_TOP_UP_LIMIT: getValue("limits", "daily_top_up_limit"),
     DAILY_TRANSFER_LIMIT: getValue("limits", "daily_transfer_limit"),
     DAILY_WITHDRAWAL_LIMIT: getValue("limits", "daily_withdrawal_limit"),
+    DAILY_CRYPTO_SEND_LIMIT: getValue("limits", "daily_crypto_send_limit"),
+    DAILY_CRYPTO_RECEIVE_LIMIT: getValue("limits", "daily_crypto_receive_limit"),
     MONTHLY_TOP_UP_LIMIT: getValue("limits", "monthly_top_up_limit"),
     MONTHLY_TRANSFER_LIMIT: getValue("limits", "monthly_transfer_limit"),
     MONTHLY_WITHDRAWAL_LIMIT: getValue("limits", "monthly_withdrawal_limit"),
+    MONTHLY_CRYPTO_SEND_LIMIT: getValue("limits", "monthly_crypto_send_limit"),
+    MONTHLY_CRYPTO_RECEIVE_LIMIT: getValue("limits", "monthly_crypto_receive_limit"),
 
     isLoading,
     error: error as Error | null,

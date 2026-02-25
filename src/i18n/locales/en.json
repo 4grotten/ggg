@@ -1635,9 +1635,13 @@
       "dailyTopUp": "Daily top-up limit",
       "dailyTransfer": "Daily transfer limit",
       "dailyWithdrawal": "Daily withdrawal limit",
+      "dailyCryptoSend": "Daily crypto send limit",
+      "dailyCryptoReceive": "Daily crypto receive limit",
       "monthlyTopUp": "Monthly top-up limit",
       "monthlyTransfer": "Monthly transfer limit",
-      "monthlyWithdrawal": "Monthly withdrawal limit"
+      "monthlyWithdrawal": "Monthly withdrawal limit",
+      "monthlyCryptoSend": "Monthly crypto send limit",
+      "monthlyCryptoReceive": "Monthly crypto receive limit"
     },
     "clients": {
       "title": "Client Database",

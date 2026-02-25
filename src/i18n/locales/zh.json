@@ -1577,9 +1577,13 @@
       "dailyTopUp": "每日充值限额",
       "dailyTransfer": "每日转账限额",
       "dailyWithdrawal": "每日提现限额",
+      "dailyCryptoSend": "每日加密货币发送限额",
+      "dailyCryptoReceive": "每日加密货币接收限额",
       "monthlyTopUp": "每月充值限额",
       "monthlyTransfer": "每月转账限额",
-      "monthlyWithdrawal": "每月提现限额"
+      "monthlyWithdrawal": "每月提现限额",
+      "monthlyCryptoSend": "每月加密货币发送限额",
+      "monthlyCryptoReceive": "每月加密货币接收限额"
     },
     "clients": {
       "title": "客户数据库",

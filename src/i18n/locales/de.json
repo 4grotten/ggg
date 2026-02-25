@@ -1570,9 +1570,13 @@
       "dailyTopUp": "Tägliches Aufladungslimit",
       "dailyTransfer": "Tägliches Überweisungslimit",
       "dailyWithdrawal": "Tägliches Auszahlungslimit",
+      "dailyCryptoSend": "Tägliches Krypto-Sendelimit",
+      "dailyCryptoReceive": "Tägliches Krypto-Empfangslimit",
       "monthlyTopUp": "Monatliches Aufladungslimit",
       "monthlyTransfer": "Monatliches Überweisungslimit",
-      "monthlyWithdrawal": "Monatliches Auszahlungslimit"
+      "monthlyWithdrawal": "Monatliches Auszahlungslimit",
+      "monthlyCryptoSend": "Monatliches Krypto-Sendelimit",
+      "monthlyCryptoReceive": "Monatliches Krypto-Empfangslimit"
     },
     "clients": {
       "title": "Kundendatenbank",

@@ -1570,9 +1570,13 @@
       "dailyTopUp": "Límite diario de recarga",
       "dailyTransfer": "Límite diario de transferencia",
       "dailyWithdrawal": "Límite diario de retiro",
+      "dailyCryptoSend": "Límite diario de envío cripto",
+      "dailyCryptoReceive": "Límite diario de recepción cripto",
       "monthlyTopUp": "Límite mensual de recarga",
       "monthlyTransfer": "Límite mensual de transferencia",
-      "monthlyWithdrawal": "Límite mensual de retiro"
+      "monthlyWithdrawal": "Límite mensual de retiro",
+      "monthlyCryptoSend": "Límite mensual de envío cripto",
+      "monthlyCryptoReceive": "Límite mensual de recepción cripto"
     },
     "clients": {
       "title": "Base de Datos de Clientes",
