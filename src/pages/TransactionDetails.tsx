@@ -2343,15 +2343,14 @@ const TransactionDetails = () => {
               </div>
               {(() => {
                 const receiverName = receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name || transaction.recipientName;
-                // Only use current user's avatar if the viewer IS the receiver (compare user IDs)
+                // Always prefer receiver_avatar from receipt data first
+                const receiptReceiverAvatar = (receipt as any).receiver_avatar || (receipt as any).recipient_avatar || (transaction as any).recipientAvatar;
                 const currentUserId = String(user?.id || '');
                 const receiptUserId = String(receipt.user_id || '');
                 const isViewerParticipant = currentUserId && receiptUserId && currentUserId === receiptUserId;
-                const isCurrentUserReceiver = isViewerParticipant && (
-                  receipt.direction === 'inbound' || 
-                  (receiverName && user?.full_name && receiverName.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]))
-                );
-                const receiverAvatarUrl = isCurrentUserReceiver ? currentUserAvatar : ((receipt as any).receiver_avatar || (receipt as any).recipient_avatar || (transaction as any).recipientAvatar);
+                const isCurrentUserReceiver = isViewerParticipant && receipt.direction === 'inbound';
+                // Use current user avatar ONLY if they are the receiver AND no receipt avatar exists
+                const receiverAvatarUrl = receiptReceiverAvatar || (isCurrentUserReceiver ? currentUserAvatar : null);
                 const receiverInitial = receiverName ? receiverName.charAt(0).toUpperCase() : "R";
                 
                 return receiverAvatarUrl ? (
