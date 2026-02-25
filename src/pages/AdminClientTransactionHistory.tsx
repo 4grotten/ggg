@@ -82,6 +82,7 @@ export default function AdminClientTransactionHistory() {
   const { t } = useTranslation();
 
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [activeAsset, setActiveAsset] = useState<"all" | "card" | "iban" | "crypto">("all");
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [selectedPreset, setSelectedPreset] = useState<PeriodPreset>("allTime");
@@ -145,17 +146,28 @@ export default function AdminClientTransactionHistory() {
     }));
   }, [client?.transactions]);
 
+  const isAssetMatch = (tx: ClientTransaction, asset: "all" | "card" | "iban" | "crypto"): boolean => {
+    if (asset === "all") return true;
+    const t = tx.type.toLowerCase();
+    const desc = (tx.description || "").toLowerCase();
+    if (asset === "card") return t.includes("card") || t === "payment" || t === "topup" || t === "fee" || t === "card_activation" || t === "refund" || t === "cashback";
+    if (asset === "iban") return t.includes("iban") || t.includes("bank") || t.includes("transfer_in") || t.includes("transfer_out") || desc.includes("iban");
+    if (asset === "crypto") return t.includes("crypto") || t.includes("usdt") || desc.includes("usdt") || desc.includes("trc20") || desc.includes("crypto");
+    return true;
+  };
+
   const filteredGroups = useMemo(() => {
     return groups.map(group => {
       if (dateFrom && group.rawDate < startOfDay(dateFrom)) return { ...group, transactions: [] };
       if (dateTo && group.rawDate > endOfDay(dateTo)) return { ...group, transactions: [] };
       let txs = group.transactions;
+      txs = txs.filter(tx => isAssetMatch(tx, activeAsset));
       if (activeFilter === "income") txs = txs.filter(isIncome);
       else if (activeFilter === "expenses") txs = txs.filter(isExpense);
       else if (activeFilter === "transfers") txs = txs.filter(isTransfer);
       return { ...group, transactions: txs };
     }).filter(g => g.transactions.length > 0);
-  }, [groups, activeFilter, dateFrom, dateTo]);
+  }, [groups, activeFilter, activeAsset, dateFrom, dateTo]);
 
   const filterOptions: { key: FilterType; label: string }[] = [
     { key: "all", label: t("history.all") },
@@ -258,6 +270,29 @@ export default function AdminClientTransactionHistory() {
               <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Asset Category */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4">
+            {([
+              { key: "all" as const, label: t("history.allAssets", "Все") },
+              { key: "card" as const, label: t("history.cards", "Карты") },
+              { key: "iban" as const, label: "IBAN" },
+              { key: "crypto" as const, label: t("history.crypto", "Крипто") },
+            ]).map((opt) => (
+              <button
+                key={opt.key}
+                onClick={() => setActiveAsset(opt.key)}
+                className={cn(
+                  "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors",
+                  activeAsset === opt.key
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-secondary text-muted-foreground border-border hover:bg-secondary/80"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
 
           {/* Filter Tabs */}
