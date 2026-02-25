@@ -862,7 +862,8 @@
     "usdtBalanceDesc": "Enviar USDT a EasyCard o billetera externa",
     "internalUser": "Usuario del sistema",
     "commission": "Comisión",
-    "verifying": "Verificando dirección..."
+    "verifying": "Verificando dirección...",
+    "dailyLimitExceeded": "Límite diario superado ({{limit}}). Disponible: {{available}}"
   },
   "topUpUsdt": {
     "title": "Recargar desde USDT",

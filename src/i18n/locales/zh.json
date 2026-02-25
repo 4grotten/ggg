@@ -868,7 +868,8 @@
     "usdtBalanceDesc": "将 USDT 发送到 EasyCard 或外部钱包",
     "internalUser": "系统用户",
     "commission": "手续费",
-    "verifying": "正在验证地址..."
+    "verifying": "正在验证地址...",
+    "dailyLimitExceeded": "已超过每日限额 ({{limit}})。可用: {{available}}"
   },
   "topUpUsdt": {
     "title": "从USDT充值",

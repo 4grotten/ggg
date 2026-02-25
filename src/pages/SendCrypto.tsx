@@ -48,6 +48,19 @@ function getTimeUntilLimitReset() {
   return { hours, minutes, seconds };
 }
 
+// Parse backend limit error and localize it
+function localizeLimitError(msg: string, t: (key: string, fallback: string, opts?: Record<string, string>) => string): string {
+  // Pattern: "Превышен дневной лимит (50000.00). Доступно: 0.00"
+  const limitMatch = msg.match(/(?:Превышен дневной лимит|Daily limit exceeded|Exceeded daily limit)\s*\((\d+[\d.,]*)\)\.?\s*(?:Доступно|Available)[:\s]*(\d+[\d.,]*)/i);
+  if (limitMatch) {
+    return t("send.dailyLimitExceeded", "Daily limit exceeded ({{limit}}). Available: {{available}}", {
+      limit: limitMatch[1],
+      available: limitMatch[2],
+    });
+  }
+  return msg;
+}
+
 interface SourceOption {
   id: string;
   type: "virtual" | "metal" | "bank_account" | "crypto_wallet" | "referral";
@@ -360,8 +373,9 @@ const SendCrypto = () => {
           (res.error as Record<string, unknown>)?.detail as string ||
           t("send.transferError", "Ошибка перевода");
         
-        // Show alert for ALL errors (limits, insufficient funds, etc.)
-        setLimitAlertMsg(errMsg);
+        // Localize known error patterns
+        const localizedErr = localizeLimitError(errMsg, t);
+        setLimitAlertMsg(localizedErr);
         setLimitCountdown(getTimeUntilLimitReset());
         setLimitAlertOpen(true);
       } else {
