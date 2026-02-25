@@ -721,7 +721,7 @@ export default function AdminClientDetails() {
 
       {/* Confirmation Alert */}
       <AlertDialog open={showSaveAlert} onOpenChange={setShowSaveAlert}>
-        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+        <AlertDialogContent className="max-w-[90vw] w-auto min-w-[320px] rounded-2xl backdrop-blur-md bg-background/95 border border-border/60">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base">Подтвердить изменения</AlertDialogTitle>
             <AlertDialogDescription asChild>
