@@ -937,7 +937,8 @@
     "usdtBalance": "Перевод на Кошелёк USDT",
     "usdtBalanceDesc": "Перевод USDT на Кошелек EasyCard так и внешний",
     "internalUser": "Пользователь системы",
-    "commission": "Комиссия"
+    "commission": "Комиссия",
+    "verifying": "Проверка адреса..."
   },
   "topUpUsdt": {
     "title": "Пополнение с USDT",
