@@ -131,7 +131,7 @@ export default function AdminClientTransactionHistory() {
     queryFn: async () => {
       if (!userId) throw new Error("No user ID");
       const qs = buildQueryParams();
-      const res = await apiRequest<ClientTransaction[]>(`/users/${userId}/transactions/?${qs}`);
+      const res = await apiRequest<ClientTransaction[]>(`/transactions/admin/user/${userId}/transactions/?${qs}`);
       if (res.error || !res.data) {
         const msg = res.error?.detail || res.error?.message || "Failed";
         if (msg.includes('Connection refused') || msg.includes('tcp connect error')) return [];
