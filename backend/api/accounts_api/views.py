@@ -796,6 +796,17 @@ class AdminUserDetailView(APIView):
             tx['fee'] = float(tx.get('fee') or 0) if tx.get('fee') is not None else None
             tx['exchange_rate'] = float(tx.get('exchange_rate') or 0) if tx.get('exchange_rate') is not None else None
             tx['original_amount'] = float(tx.get('original_amount') or 0) if tx.get('original_amount') is not None else None
+
+            sender_id = str(tx.get('sender_id')) if tx.get('sender_id') else None
+            receiver_id = str(tx.get('receiver_id')) if tx.get('receiver_id') else None
+            
+            if sender_id == uid and receiver_id == uid:
+                tx['direction'] = 'internal'
+            elif receiver_id == uid:
+                tx['direction'] = 'inbound'
+            else:
+                tx['direction'] = 'outbound'
+                
             transactions.append(tx)
 
         limits_serializer = UserLimitsSerializer(profile)

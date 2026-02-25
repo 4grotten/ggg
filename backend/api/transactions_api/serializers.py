@@ -153,3 +153,23 @@ class TransactionFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transactions
         fields = '__all__'
+
+
+class AdminTransactionSerializerDirect(serializers.ModelSerializer):
+    direction = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Transactions
+        fields = '__all__'
+
+    def get_direction(self, obj):
+        user_id = self.context.get('target_user_id')
+        if not user_id:
+            return 'unknown'
+            
+        user_id_str = str(user_id)
+        if obj.sender_id == user_id_str and obj.receiver_id == user_id_str:
+            return 'internal'
+        elif obj.receiver_id == user_id_str:
+            return 'inbound'
+        return 'outbound'

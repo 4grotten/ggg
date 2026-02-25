@@ -12,7 +12,7 @@ from apps.accounts_apps.models import Profiles
 from apps.transactions_apps.models import FeeRevenue, Transactions, BankDepositAccounts, CryptoWallets
 from decimal import Decimal
 from .serializers import (
-    BankToCryptoTransferSerializer, BankTopupRequestSerializer, BankTopupResponseSerializer, CardToBankTransferSerializer, CardToCryptoTransferSerializer, CryptoToBankTransferSerializer, CryptoToCardTransferSerializer,
+    AdminTransactionSerializerDirect, BankToCryptoTransferSerializer, BankTopupRequestSerializer, BankTopupResponseSerializer, CardToBankTransferSerializer, CardToCryptoTransferSerializer, CryptoToBankTransferSerializer, CryptoToCardTransferSerializer,
     CryptoTopupRequestSerializer, CryptoTopupResponseSerializer,
     CardTransferRequestSerializer, CardTransferResponseSerializer,
     CryptoWithdrawalRequestSerializer, CryptoWithdrawalResponseSerializer,
@@ -596,36 +596,26 @@ class AdminUserTransactionsView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Получить транзакции пользователя (со всеми полями + фильтрация + пагинация)",
-        operation_description="Возвращает полный список транзакций пользователя. Можно фильтровать по типу: bank, card, crypto. Если не передать type, вернутся все транзакции.",
+        operation_description="Фильтры: type (bank, card, crypto), card_type (virtual, metal), direction (inbound, outbound, internal), start_date, end_date.",
         tags=["Транзакции (Админ/Служебные)"],
         manual_parameters=[
-            openapi.Parameter(
-                'type', 
-                openapi.IN_QUERY, 
-                description="Фильтр: bank, card, crypto. (Оставить пустым для получения всех)", 
-                type=openapi.TYPE_STRING, 
-                required=False
-            ),
-            openapi.Parameter(
-                'limit', 
-                openapi.IN_QUERY, 
-                description="Количество записей на страницу (по умолчанию 50)", 
-                type=openapi.TYPE_INTEGER, 
-                required=False
-            ),
-            openapi.Parameter(
-                'offset', 
-                openapi.IN_QUERY, 
-                description="Смещение (по умолчанию 0)", 
-                type=openapi.TYPE_INTEGER, 
-                required=False
-            )
+            openapi.Parameter('type', openapi.IN_QUERY, description="Фильтр: bank, card, crypto", type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('card_type', openapi.IN_QUERY, description="Тип карты: virtual или metal", type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('direction', openapi.IN_QUERY, description="Направление: inbound, outbound, internal", type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('start_date', openapi.IN_QUERY, description="С даты (YYYY-MM-DD)", type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('end_date', openapi.IN_QUERY, description="По дату (YYYY-MM-DD)", type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('limit', openapi.IN_QUERY, description="Лимит (по умолчанию 50)", type=openapi.TYPE_INTEGER, required=False),
+            openapi.Parameter('offset', openapi.IN_QUERY, description="Смещение (по умолчанию 0)", type=openapi.TYPE_INTEGER, required=False)
         ],
         responses={200: openapi.Response("Paginated list of transactions")}
     )
     def get(self, request, target_user_id):
         user_id_str = str(target_user_id)
         tx_type = request.query_params.get('type')
+        card_type = request.query_params.get('card_type')
+        direction = request.query_params.get('direction')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
         limit = int(request.query_params.get('limit', 50))
         offset = int(request.query_params.get('offset', 0))
         txs = Transactions.objects.filter(
@@ -633,16 +623,28 @@ class AdminUserTransactionsView(APIView):
             Q(sender_id=user_id_str) | 
             Q(receiver_id=user_id_str)
         )
+        if direction == 'internal':
+            txs = txs.filter(sender_id=user_id_str, receiver_id=user_id_str)
+        elif direction == 'inbound':
+            txs = txs.filter(receiver_id=user_id_str).exclude(sender_id=user_id_str)
+        elif direction == 'outbound':
+            txs = txs.exclude(receiver_id=user_id_str)
         if tx_type == 'bank':
             txs = txs.filter(movements__user_id=user_id_str, movements__account_type='bank').distinct()
         elif tx_type == 'card':
             txs = txs.filter(movements__user_id=user_id_str, movements__account_type='card').distinct()
         elif tx_type == 'crypto':
             txs = txs.filter(movements__user_id=user_id_str, movements__account_type='crypto').distinct()
+        if card_type:
+            txs = txs.filter(card__type__iexact=card_type)
+        if start_date:
+            txs = txs.filter(created_at__gte=start_date)
+        if end_date:
+            txs = txs.filter(created_at__lte=f"{end_date} 23:59:59")
         txs = txs.order_by('-created_at')
         total_count = txs.count()
         paginated_txs = txs[offset:offset+limit]
-        serializer = TransactionFullSerializer(paginated_txs, many=True)
+        serializer = AdminTransactionSerializerDirect(paginated_txs, many=True, context={'target_user_id': user_id_str})
         return Response({
             "count": total_count,
             "results": serializer.data
