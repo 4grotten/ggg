@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { apiRequest } from "@/services/api/apiClient";
 import { toast } from "sonner";
 import { AppRole } from "@/types/admin";
 
@@ -20,6 +21,28 @@ interface ProfileSearchResult {
   last_name: string | null;
 }
 
+/** Shape returned by GET /accounts/admin/users/limits/ */
+export interface BackendClient {
+  user_id: string;
+  full_name: string;
+  phone: string;
+  limits: {
+    custom_settings_enabled: boolean;
+    transfer_min: string | null;
+    transfer_max: string | null;
+    daily_transfer_limit: string | null;
+    monthly_transfer_limit: string | null;
+    withdrawal_min: string | null;
+    withdrawal_max: string | null;
+    daily_withdrawal_limit: string | null;
+    monthly_withdrawal_limit: string | null;
+    card_to_card_percent: string | null;
+    bank_transfer_percent: string | null;
+    network_fee_percent: string | null;
+    currency_conversion_percent: string | null;
+  };
+}
+
 export function useAdminManagement() {
   const queryClient = useQueryClient();
 
@@ -34,14 +57,12 @@ export function useAdminManagement() {
 
       if (error) throw error;
 
-      // Fetch profiles for each user
       const userIds = data.map((r) => r.user_id);
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, phone, first_name, last_name")
         .in("user_id", userIds);
 
-      // Merge data
       return data.map((role) => {
         const profile = profiles?.find((p) => p.user_id === role.user_id);
         return {
@@ -54,70 +75,53 @@ export function useAdminManagement() {
     },
   });
 
-  // Fetch all clients (profiles)
+  // Fetch all clients from backend API
   const { data: clients, isLoading: clientsLoading, refetch: refetchClients } = useQuery({
     queryKey: ["admin-clients"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(100);
-
-      if (error) throw error;
-      return data;
+      const res = await apiRequest<BackendClient[]>("/admin/users/limits/");
+      if (res.error || !res.data) throw new Error(res.error?.detail || res.error?.message || "Failed to fetch clients");
+      return res.data;
     },
   });
 
-  // Search clients
-  const searchClients = async (query: string) => {
-    const cleanQuery = query.replace(/\s+/g, "").replace(/^\+/, "");
-    
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .or(`phone.ilike.%${cleanQuery}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
-      .order("created_at", { ascending: false })
-      .limit(50);
-
-    if (error) throw error;
-    return data;
+  // Search clients (local filter on already-fetched data)
+  const searchClients = async (query: string): Promise<BackendClient[]> => {
+    const cleanQuery = query.replace(/\s+/g, "").toLowerCase();
+    if (!clients) return [];
+    return clients.filter((c) => {
+      const phone = (c.phone || "").replace(/\s+/g, "").replace(/^\+/, "").toLowerCase();
+      const name = (c.full_name || "").toLowerCase();
+      return phone.includes(cleanQuery) || name.includes(cleanQuery);
+    });
   };
 
   // Search user by phone or user_id
   const searchUser = async (query: string): Promise<ProfileSearchResult | null> => {
-    // Clean phone number
     const cleanQuery = query.replace(/\s+/g, "").replace(/^\+/, "");
-    
-    // Check if it looks like a UUID
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(query);
-    
+
     if (isUUID) {
-      // Search by user_id
       const { data } = await supabase
         .from("profiles")
         .select("user_id, phone, first_name, last_name")
         .eq("user_id", query)
         .maybeSingle();
-      
       return data;
     }
-    
-    // Search by phone
+
     const { data } = await supabase
       .from("profiles")
       .select("user_id, phone, first_name, last_name")
       .ilike("phone", `%${cleanQuery}%`)
       .limit(1)
       .maybeSingle();
-
     return data;
   };
 
   // Add admin role
   const addAdmin = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
-      // Check if already has this role
       const { data: existing } = await supabase
         .from("user_roles")
         .select("id")

@@ -860,7 +860,7 @@ export default function AdminPanel() {
                     <div className="space-y-2 max-h-[60vh] overflow-y-auto">
                       {displayedClients.map((client) => (
                         <div
-                          key={client.id}
+                          key={client.user_id}
                           className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 hover:border-border transition-colors"
                         >
                           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/10 flex items-center justify-center shrink-0">
@@ -868,9 +868,7 @@ export default function AdminPanel() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm truncate">
-                              {client.first_name || client.last_name
-                                ? `${client.first_name || ""} ${client.last_name || ""}`.trim()
-                                : t("admin.roles.noName")}
+                      {client.full_name || t("admin.roles.noName")}
                             </p>
                             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                               {client.phone && (
@@ -879,10 +877,11 @@ export default function AdminPanel() {
                                   {client.phone}
                                 </span>
                               )}
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {new Date(client.created_at).toLocaleDateString()}
-                              </span>
+                              {client.limits?.custom_settings_enabled && (
+                                <span className="text-xs px-1.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-500 font-medium">
+                                  Custom
+                                </span>
+                              )}
                             </div>
                           </div>
                           <Button
