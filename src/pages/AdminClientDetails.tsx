@@ -19,6 +19,7 @@ import { apiRequest } from "@/services/api/apiClient";
 import { BackendClientDetail } from "@/hooks/useAdminManagement";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
+import { ApiTransaction, mapApiTransactionToLocal } from "@/services/api/transactions";
 import { format } from "date-fns";
 
 // Referral levels configuration
@@ -37,35 +38,10 @@ const SUBSCRIPTION_TYPES = [
   { id: "vip", icon: "👑", color: "from-amber-400 to-amber-500", nameKey: "vip", descKey: "vipDesc" },
 ];
 
-const TX_TYPE_LABELS: Record<string, string> = {
-  topup: "Top Up", card_to_card: "Card → Card", bank_withdrawal: "Bank Withdrawal",
-  crypto_to_card: "Crypto → Card", card_to_iban: "Card → IBAN", crypto_to_iban: "Crypto → IBAN",
-  bank_topup: "Bank Top Up", crypto_topup: "Crypto Top Up", transfer_in: "Transfer In",
-  transfer_out: "Transfer Out", card_payment: "Card Payment", fee: "Fee",
-};
-
 const isIncomeTx = (type: string): boolean => {
   const t = type.toLowerCase();
   return t.includes("topup") || t.includes("top_up") || t.includes("transfer_in") ||
     t.includes("incoming") || t === "refund" || t === "cashback" || t.includes("deposit");
-};
-
-const mapTypeToAppType = (type: string): AppTransaction["type"] => {
-  const t = type.toLowerCase();
-  if (t === "topup" || t === "top_up" || t === "bank_topup" || t === "crypto_topup") return "topup";
-  if (t === "card_to_card" || t === "card_transfer") return "card_transfer";
-  if (t === "bank_withdrawal" || t === "bank_transfer") return "bank_transfer";
-  if (t === "bank_transfer_incoming" || t === "transfer_in") return "bank_transfer_incoming";
-  if (t === "crypto_to_card") return "crypto_to_card";
-  if (t === "crypto_to_iban" || t === "card_to_iban") return "crypto_to_iban" as any;
-  if (t === "crypto_to_crypto") return "crypto_withdrawal";
-  if (t === "crypto_withdrawal" || t === "crypto_send") return "crypto_withdrawal";
-  if (t === "crypto_deposit") return "crypto_deposit";
-  if (t === "card_activation") return "card_activation" as any;
-  if (t === "card_payment" || t === "payment") return "payment";
-  if (t === "fee") return "payment";
-  if (t === "refund" || t === "cashback") return "topup";
-  return "payment";
 };
 
 export default function AdminClientDetails() {
@@ -257,34 +233,62 @@ export default function AdminClientDetails() {
     );
     const map = new Map<string, AppTransaction[]>();
     for (const tx of sorted) {
+      const toNum = (v: unknown): number => {
+        if (typeof v === 'number') return v;
+        if (typeof v === 'string') { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+        return 0;
+      };
+
+      const raw = tx as any;
+      const normalizedTx: ApiTransaction = {
+        id: String(tx.id),
+        type: tx.type || 'payment',
+        amount: toNum(tx.amount),
+        currency: tx.currency || 'AED',
+        status: tx.status || 'completed',
+        created_at: tx.created_at,
+        merchant_name: raw.merchant_name || null,
+        merchant_category: raw.merchant_category || null,
+        description: tx.description || null,
+        card_id: raw.card_id || null,
+        fee: tx.fee != null ? toNum(tx.fee) : null,
+        exchange_rate: tx.exchange_rate != null ? String(tx.exchange_rate) : null,
+        original_amount: tx.original_amount != null ? toNum(tx.original_amount) : null,
+        original_currency: tx.original_currency || null,
+        reference_id: raw.reference_id || null,
+        sender_card: raw.sender_card || tx.sender_name || null,
+        recipient_card: raw.recipient_card || null,
+        sender_name: tx.sender_name || null,
+        receiver_name: tx.receiver_name || null,
+        direction: raw.direction || (tx.sender_id && String(tx.sender_id) === userId ? 'outbound' : tx.receiver_id && String(tx.receiver_id) === userId ? 'inbound' : undefined),
+        operation: raw.operation || null,
+        metadata: raw.metadata || null,
+      };
+
+      const mapped = mapApiTransactionToLocal(normalizedTx);
+      const incoming = !!(mapped.metadata as any)?.isIncoming;
+
       const d = new Date(tx.created_at);
       const key = format(d, "dd.MM.yyyy");
       if (!map.has(key)) map.set(key, []);
-      const incoming = isIncomeTx(tx.type);
       map.get(key)!.push({
-        id: tx.id,
-        merchant: TX_TYPE_LABELS[tx.type] || tx.type,
-        time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        amountUSDT: tx.amount,
-        amountLocal: tx.amount,
-        localCurrency: tx.currency,
-        color: incoming ? "#22C55E" : "#007AFF",
-        type: mapTypeToAppType(tx.type),
-        status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : undefined,
-        recipientName: tx.receiver_name,
-        senderName: tx.sender_name,
-        description: tx.description || TX_TYPE_LABELS[tx.type] || tx.type,
-        fee: tx.fee,
-        metadata: { originalApiType: tx.type, isIncoming: incoming },
-        createdAt: tx.created_at,
+        ...mapped,
+        id: String(tx.id),
+        status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : mapped.status,
+        metadata: {
+          ...(mapped.metadata || {}),
+          ...(raw.metadata || {}),
+          isIncoming: incoming,
+          originalApiType: tx.type,
+        },
       });
     }
     return Array.from(map.entries()).map(([date, txs]) => ({
       date,
-      totalSpend: txs.filter(t => !isIncomeTx(t.type || "")).reduce((s, t) => s + t.amountLocal, 0),
+      totalSpend: txs.filter(t => !(t.metadata as any)?.isIncoming).reduce((s, t) => s + t.amountLocal, 0),
       transactions: txs,
     }));
-  }, [client?.transactions, showAllTx]);
+  }, [client?.transactions, showAllTx, userId]);
 
   if (!userId) {
     navigate("/settings/admin/clients");
