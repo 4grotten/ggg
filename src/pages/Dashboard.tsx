@@ -56,7 +56,7 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const { avatarUrl } = useAvatar();
-  const { isHideDataEnabled } = useScreenLockContext();
+  const { isHideDataEnabled, isEnabled } = useScreenLockContext();
   const queryClient = useQueryClient();
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
@@ -70,7 +70,7 @@ const Dashboard = () => {
   const { getCompletedSteps } = useVerificationProgress();
   const isVerified = getCompletedSteps() >= 3;
   
-  const requiresAuth = isHideDataEnabled;
+  const requiresAuth = isHideDataEnabled && isEnabled;
 
   // Refs for sliding indicator
   const tabsContainerRef = useRef<HTMLDivElement>(null);

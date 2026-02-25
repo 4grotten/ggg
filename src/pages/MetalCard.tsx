@@ -50,7 +50,7 @@ const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: n
 const MetalCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isHideDataEnabled } = useScreenLockContext();
+  const { isHideDataEnabled, isEnabled } = useScreenLockContext();
   const [showDetails, setShowDetails] = useState(!isHideDataEnabled);
   const [billingOpen, setBillingOpen] = useState(false);
   const [balanceVisible, setBalanceVisible] = useState(!isHideDataEnabled);
@@ -98,7 +98,7 @@ const MetalCard = () => {
     balance: apiCard?.balance ?? 0,
   };
 
-  const requiresAuth = isHideDataEnabled;
+  const requiresAuth = isHideDataEnabled && isEnabled;
 
   const toggleBalanceVisibility = () => {
     if (!balanceVisible && requiresAuth) {
