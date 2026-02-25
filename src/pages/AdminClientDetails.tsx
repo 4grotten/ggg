@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { apiRequest } from "@/services/api/apiClient";
 import { BackendClientDetail } from "@/hooks/useAdminManagement";
+import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
+import { format } from "date-fns";
 
 // Referral levels configuration
 const REFERRAL_LEVELS = [
@@ -38,6 +42,30 @@ const TX_TYPE_LABELS: Record<string, string> = {
   crypto_to_card: "Crypto → Card", card_to_iban: "Card → IBAN", crypto_to_iban: "Crypto → IBAN",
   bank_topup: "Bank Top Up", crypto_topup: "Crypto Top Up", transfer_in: "Transfer In",
   transfer_out: "Transfer Out", card_payment: "Card Payment", fee: "Fee",
+};
+
+const isIncomeTx = (type: string): boolean => {
+  const t = type.toLowerCase();
+  return t.includes("topup") || t.includes("top_up") || t.includes("transfer_in") ||
+    t.includes("incoming") || t === "refund" || t === "cashback" || t.includes("deposit");
+};
+
+const mapTypeToAppType = (type: string): AppTransaction["type"] => {
+  const t = type.toLowerCase();
+  if (t === "topup" || t === "top_up" || t === "bank_topup" || t === "crypto_topup") return "topup";
+  if (t === "card_to_card" || t === "card_transfer") return "card_transfer";
+  if (t === "bank_withdrawal" || t === "bank_transfer") return "bank_transfer";
+  if (t === "bank_transfer_incoming" || t === "transfer_in") return "bank_transfer_incoming";
+  if (t === "crypto_to_card") return "crypto_to_card";
+  if (t === "crypto_to_iban" || t === "card_to_iban") return "crypto_to_iban" as any;
+  if (t === "crypto_to_crypto") return "crypto_withdrawal";
+  if (t === "crypto_withdrawal" || t === "crypto_send") return "crypto_withdrawal";
+  if (t === "crypto_deposit") return "crypto_deposit";
+  if (t === "card_activation") return "card_activation" as any;
+  if (t === "card_payment" || t === "payment") return "payment";
+  if (t === "fee") return "payment";
+  if (t === "refund" || t === "cashback") return "topup";
+  return "payment";
 };
 
 export default function AdminClientDetails() {
@@ -65,6 +93,7 @@ export default function AdminClientDetails() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
   const [expandedWallet, setExpandedWallet] = useState<string | null>(null);
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
 
   const [limits, setLimits] = useState({
     dailyTopUp: "50000", monthlyTopUp: "500000",
@@ -83,10 +112,156 @@ export default function AdminClientDetails() {
     usdAedBuy: "3.68", usdAedSell: "3.67",
   });
 
-  const handleSave = () => {
-    toast.success(t("admin.clients.settingsSaved"));
-    navigate(-1);
+  const queryClient = useQueryClient();
+
+  // Initial values for change detection
+  const initialValues = useRef({
+    selectedLevel: "R1",
+    selectedSubscription: "free",
+    isVIP: false,
+    isBlocked: false,
+    limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000" },
+    fees: { topUpPercent: "2.5", transferPercent: "1.5", withdrawPercent: "2.0", conversionPercent: "1.0" },
+    rates: { usdtAedBuy: "3.65", usdtAedSell: "3.69", usdAedBuy: "3.68", usdAedSell: "3.67" },
+  });
+
+  // Initialize state from backend data
+  useEffect(() => {
+    if (!client?.limits) return;
+    const l = client.limits;
+    const newFees = {
+      topUpPercent: fees.topUpPercent,
+      transferPercent: l.card_to_card_percent != null ? String(l.card_to_card_percent) : fees.transferPercent,
+      withdrawPercent: l.bank_transfer_percent != null ? String(l.bank_transfer_percent) : fees.withdrawPercent,
+      conversionPercent: l.currency_conversion_percent != null ? String(l.currency_conversion_percent) : fees.conversionPercent,
+    };
+    const newLimits = {
+      dailyTopUp: limits.dailyTopUp,
+      monthlyTopUp: limits.monthlyTopUp,
+      dailyTransfer: l.daily_transfer_limit != null ? String(l.daily_transfer_limit) : limits.dailyTransfer,
+      monthlyTransfer: l.monthly_transfer_limit != null ? String(l.monthly_transfer_limit) : limits.monthlyTransfer,
+      dailyWithdraw: l.daily_withdrawal_limit != null ? String(l.daily_withdrawal_limit) : limits.dailyWithdraw,
+      monthlyWithdraw: l.monthly_withdrawal_limit != null ? String(l.monthly_withdrawal_limit) : limits.monthlyWithdraw,
+      singleTransaction: l.transfer_max != null ? String(l.transfer_max) : limits.singleTransaction,
+    };
+    setFees(newFees);
+    setLimits(newLimits);
+    initialValues.current = { ...initialValues.current, fees: newFees, limits: newLimits };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client]);
+
+  // Mutation to save personal limits/fees
+  const saveLimitsMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId) throw new Error("No user ID");
+      const body: Record<string, unknown> = {
+        custom_settings_enabled: true,
+        card_to_card_percent: fees.transferPercent,
+        bank_transfer_percent: fees.withdrawPercent,
+        network_fee_percent: fees.topUpPercent,
+        currency_conversion_percent: fees.conversionPercent,
+        daily_transfer_limit: limits.dailyTransfer,
+        monthly_transfer_limit: limits.monthlyTransfer,
+        daily_withdrawal_limit: limits.dailyWithdraw,
+        monthly_withdrawal_limit: limits.monthlyWithdraw,
+        transfer_min: "1",
+        transfer_max: limits.singleTransaction,
+      };
+      const res = await apiRequest(`/admin/users/${userId}/limits/`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      });
+      if (res.error) throw new Error(res.error?.detail || res.error?.message || "Failed to save");
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-client-detail", userId] });
+      toast.success("Настройки клиента сохранены");
+      // Update initial values so change detection resets
+      initialValues.current = { ...initialValues.current, fees: { ...fees }, limits: { ...limits } };
+    },
+    onError: (err) => {
+      toast.error(`Ошибка: ${err.message}`);
+    },
+  });
+
+  const getChanges = (): { label: string; from: string; to: string }[] => {
+    const changes: { label: string; from: string; to: string }[] = [];
+    const init = initialValues.current;
+
+    if (selectedLevel !== init.selectedLevel) changes.push({ label: t("admin.clients.referralLevel") || "Реферальный уровень", from: init.selectedLevel, to: selectedLevel });
+    if (selectedSubscription !== init.selectedSubscription) changes.push({ label: t("admin.clients.subscriptionType") || "Подписка", from: init.selectedSubscription, to: selectedSubscription });
+    if (isVIP !== init.isVIP) changes.push({ label: "VIP", from: init.isVIP ? "Да" : "Нет", to: isVIP ? "Да" : "Нет" });
+    if (isBlocked !== init.isBlocked) changes.push({ label: t("admin.clients.blockStatus") || "Блокировка", from: init.isBlocked ? "Да" : "Нет", to: isBlocked ? "Да" : "Нет" });
+
+    const feeLabels: Record<string, string> = { topUpPercent: t("admin.clients.topUp") || "Top Up", transferPercent: t("admin.clients.transfers") || "Переводы", withdrawPercent: t("admin.clients.withdrawal") || "Вывод", conversionPercent: t("admin.clients.conversion") || "Конвертация" };
+    for (const key of Object.keys(fees) as (keyof typeof fees)[]) {
+      if (fees[key] !== init.fees[key]) changes.push({ label: `${t("admin.clients.personalFees") || "Комиссия"}: ${feeLabels[key]}`, from: `${init.fees[key]}%`, to: `${fees[key]}%` });
+    }
+
+    const limitLabels: Record<string, string> = { dailyTopUp: "Daily Top Up", monthlyTopUp: "Monthly Top Up", dailyTransfer: "Daily Transfer", monthlyTransfer: "Monthly Transfer", dailyWithdraw: "Daily Withdraw", monthlyWithdraw: "Monthly Withdraw", singleTransaction: "Single TX" };
+    for (const key of Object.keys(limits) as (keyof typeof limits)[]) {
+      if (limits[key] !== init.limits[key]) changes.push({ label: `${t("admin.clients.personalLimits") || "Лимит"}: ${limitLabels[key]}`, from: `${init.limits[key]} AED`, to: `${limits[key]} AED` });
+    }
+
+    const rateLabels: Record<string, string> = { usdtAedBuy: "USDT→AED Buy", usdtAedSell: "USDT→AED Sell", usdAedBuy: "USD→AED Buy", usdAedSell: "USD→AED Sell" };
+    for (const key of Object.keys(rates) as (keyof typeof rates)[]) {
+      if (rates[key] !== init.rates[key]) changes.push({ label: rateLabels[key], from: init.rates[key], to: rates[key] });
+    }
+
+    return changes;
   };
+
+  const handleSaveClick = () => {
+    const changes = getChanges();
+    if (changes.length === 0) {
+      toast.info(t("admin.clients.noChanges") || "Нет изменений для сохранения");
+      return;
+    }
+    setShowSaveAlert(true);
+  };
+
+  const handleConfirmSave = () => {
+    setShowSaveAlert(false);
+    saveLimitsMutation.mutate();
+  };
+
+  const txGroups = useMemo((): AppTransactionGroup[] => {
+    const txList = showAllTx ? client?.transactions : client?.transactions?.slice(0, 3);
+    if (!txList || txList.length === 0) return [];
+    const sorted = [...txList].sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    const map = new Map<string, AppTransaction[]>();
+    for (const tx of sorted) {
+      const d = new Date(tx.created_at);
+      const key = format(d, "dd.MM.yyyy");
+      if (!map.has(key)) map.set(key, []);
+      const incoming = isIncomeTx(tx.type);
+      map.get(key)!.push({
+        id: tx.id,
+        merchant: TX_TYPE_LABELS[tx.type] || tx.type,
+        time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        amountUSDT: tx.amount,
+        amountLocal: tx.amount,
+        localCurrency: tx.currency,
+        color: incoming ? "#22C55E" : "#007AFF",
+        type: mapTypeToAppType(tx.type),
+        status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : undefined,
+        recipientName: tx.receiver_name,
+        senderName: tx.sender_name,
+        description: tx.description || TX_TYPE_LABELS[tx.type] || tx.type,
+        fee: tx.fee,
+        metadata: { originalApiType: tx.type, isIncoming: incoming },
+        createdAt: tx.created_at,
+      });
+    }
+    return Array.from(map.entries()).map(([date, txs]) => ({
+      date,
+      totalSpend: txs.filter(t => !isIncomeTx(t.type || "")).reduce((s, t) => s + t.amountLocal, 0),
+      transactions: txs,
+    }));
+  }, [client?.transactions, showAllTx]);
 
   if (!userId) {
     navigate("/settings/admin/clients");
@@ -110,8 +285,6 @@ export default function AdminClientDetails() {
       </MobileLayout>
     );
   }
-
-  const displayedTx = showAllTx ? client.transactions : client.transactions?.slice(0, 3);
 
   return (
     <MobileLayout
@@ -214,7 +387,37 @@ export default function AdminClientDetails() {
           </div>
         </div>
 
-        {/* Cards List */}
+        {/* Transaction History */}
+        {client.transactions && client.transactions.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-primary" />
+              <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
+              <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
+            </div>
+            <CardTransactionsList groups={txGroups} />
+            {client.transactions.length > 3 && !showAllTx && (
+              <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
+                Посмотреть всю историю ({client.transactions.length})
+              </Button>
+            )}
+            {showAllTx && client.transactions.length > 3 && (
+              <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
+                <ChevronUp className="w-4 h-4 mr-1" />
+                Свернуть
+              </Button>
+            )}
+            <Button
+              variant="default"
+              className="w-full rounded-xl mt-2"
+              onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
+            >
+              <Receipt className="w-4 h-4 mr-2" />
+              {t("admin.clients.fullHistory", "История транзакций")}
+            </Button>
+          </div>
+        )}
+
         {client.cards && client.cards.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
@@ -254,7 +457,7 @@ export default function AdminClientDetails() {
                       {card.cardholder_name && <div className="col-span-2"><span className="text-muted-foreground">Cardholder:</span> {card.cardholder_name}</div>}
                       {card.expiry_date && <div><span className="text-muted-foreground">Expiry:</span> {card.expiry_date}</div>}
                       <div><span className="text-muted-foreground">Type:</span> <span className="capitalize">{card.type}</span></div>
-                      <div><span className="text-muted-foreground">Status:</span> <span className="capitalize">{card.status}</span></div>
+                      <div><span className="text-muted-foreground">Status:</span> <Badge variant={card.status === "active" ? "default" : "destructive"} className="text-[10px]">{card.status === "active" ? "Active" : card.status}</Badge></div>
                       <div><span className="text-muted-foreground">Balance:</span> {card.balance.toLocaleString()} AED</div>
                       {card.last_four_digits && <div><span className="text-muted-foreground">Last 4:</span> {card.last_four_digits}</div>}
                       <div className="col-span-2"><span className="text-muted-foreground">ID:</span> <span className="font-mono text-[10px]">{card.id}</span></div>
@@ -348,66 +551,8 @@ export default function AdminClientDetails() {
           </div>
         )}
 
-        {/* Transaction History */}
-        {client.transactions && client.transactions.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
-              <Badge variant="secondary" className="text-[10px]">{client.transactions.length}</Badge>
-            </div>
-            <div className="space-y-1.5">
-              {displayedTx?.map((tx) => (
-                <div key={tx.id} className="p-3 rounded-xl bg-muted/30 border border-border/50 flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">
-                      {TX_TYPE_LABELS[tx.type] || tx.type}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground truncate">
-                      {tx.description || tx.merchant_name || tx.receiver_name || tx.sender_name || "—"}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {new Date(tx.created_at).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0 ml-2">
-                    <p className={cn("text-sm font-bold",
-                      tx.type.includes("in") || tx.type.includes("topup") || tx.type.includes("top_up") || tx.type === "refund" || tx.type === "cashback"
-                        ? "text-emerald-500" : "text-destructive"
-                    )}>
-                      {tx.type.includes("in") || tx.type.includes("topup") || tx.type.includes("top_up") ? "+" : "-"}{tx.amount.toLocaleString()} {tx.currency}
-                    </p>
-                    <Badge variant={tx.status === "completed" ? "default" : tx.status === "pending" ? "secondary" : "destructive"} className="text-[8px]">
-                      {tx.status}
-                    </Badge>
-                    {tx.fee != null && tx.fee > 0 && (
-                      <p className="text-[10px] text-muted-foreground">Fee: {tx.fee} {tx.currency}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {client.transactions.length > 3 && !showAllTx && (
-              <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
-                Посмотреть всю историю ({client.transactions.length})
-              </Button>
-            )}
-            {showAllTx && client.transactions.length > 3 && (
-              <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
-                <ChevronUp className="w-4 h-4 mr-1" />
-                Свернуть
-              </Button>
-            )}
-            <Button
-              variant="default"
-              className="w-full rounded-xl mt-2"
-              onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
-            >
-              <Receipt className="w-4 h-4 mr-2" />
-              {t("admin.clients.fullHistory", "История транзакций")}
-            </Button>
-          </div>
-        )}
+
+
 
         {/* Subscription Type */}
         <div className="space-y-3">
@@ -627,13 +772,51 @@ export default function AdminClientDetails() {
 
         {/* Save Button */}
         <Button
-          onClick={handleSave}
+          onClick={handleSaveClick}
+          disabled={saveLimitsMutation.isPending}
           className="w-full h-12 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold"
         >
-          <Save className="w-5 h-5 mr-2" />
-          {t("admin.clients.saveChanges")}
+          {saveLimitsMutation.isPending ? (
+            <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+          ) : (
+            <Save className="w-5 h-5 mr-2" />
+          )}
+          {saveLimitsMutation.isPending ? "Сохранение..." : t("admin.clients.saveChanges")}
         </Button>
       </div>
+
+      {/* Confirmation Alert */}
+      <AlertDialog open={showSaveAlert} onOpenChange={setShowSaveAlert}>
+        <AlertDialogContent className="max-w-[90vw] w-auto min-w-[320px] rounded-2xl backdrop-blur-md bg-background/95 border border-border/60">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base">Подтвердить изменения</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 pt-2">
+                <p className="text-sm text-muted-foreground">Следующие параметры будут изменены:</p>
+                <div className="space-y-2 max-h-[40vh] overflow-y-auto">
+                  {getChanges().map((change, i) => (
+                    <div key={i} className="flex flex-col gap-0.5 p-2.5 rounded-xl bg-muted/50 border border-border/50">
+                      <span className="text-xs font-medium text-foreground">{change.label}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-muted-foreground line-through">{change.from}</span>
+                        <span className="text-muted-foreground">→</span>
+                        <span className="font-semibold text-primary">{change.to}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3 mt-4">
+            <AlertDialogCancel className="flex-1 mt-0 h-11 rounded-2xl">{t("common.cancel") || "Отмена"}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSave} className="flex-1 h-11 rounded-2xl bg-primary text-primary-foreground font-semibold">
+              <Save className="w-4 h-4 mr-1.5" />
+              Сохранить изменения
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MobileLayout>
   );
 }

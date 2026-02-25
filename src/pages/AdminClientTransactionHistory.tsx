@@ -7,7 +7,7 @@ import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
-import { Badge } from "@/components/ui/badge";
+import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import {
   Drawer,
   DrawerContent,
@@ -21,6 +21,7 @@ import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, end
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/services/api/apiClient";
 import { BackendClientDetail } from "@/hooks/useAdminManagement";
+import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
 
 const TX_TYPE_LABELS: Record<string, string> = {
   topup: "Top Up", card_to_card: "Card → Card", bank_withdrawal: "Bank Withdrawal",
@@ -67,7 +68,8 @@ const isIncome = (tx: ClientTransaction): boolean => {
 const isExpense = (tx: ClientTransaction): boolean => {
   const t = tx.type.toLowerCase();
   return t.includes("withdrawal") || t.includes("transfer_out") || t.includes("payment") ||
-    t === "fee" || t === "card_activation" || t.includes("card_to_") || t.includes("crypto_to_");
+    t === "fee" || t === "card_activation" || t.includes("card_to_") || t.includes("crypto_to_") ||
+    t.includes("_to_iban") || t.includes("_to_card");
 };
 
 const isTransfer = (tx: ClientTransaction): boolean => {
@@ -134,7 +136,7 @@ export default function AdminClientTransactionHistory() {
       const containerRect = container.getBoundingClientRect();
       const btnRect = activeBtn.getBoundingClientRect();
       setAssetIndicatorStyle({
-        left: btnRect.left - containerRect.left + container.scrollLeft,
+        left: btnRect.left - containerRect.left,
         width: btnRect.width,
       });
     }
@@ -145,6 +147,56 @@ export default function AdminClientTransactionHistory() {
     toast.success(t('toast.dataUpdated'));
   };
 
+  const mapTypeToAppType = (type: string): AppTransaction["type"] => {
+    const t = type.toLowerCase();
+    if (t === "topup" || t === "top_up" || t === "bank_topup" || t === "crypto_topup") return "topup";
+    if (t === "card_to_card" || t === "card_transfer") return "card_transfer";
+    if (t === "bank_withdrawal" || t === "bank_transfer") return "bank_transfer";
+    if (t === "bank_transfer_incoming" || t === "transfer_in") return "bank_transfer_incoming";
+    if (t === "crypto_to_card") return "crypto_to_card";
+    if (t === "crypto_to_iban" || t === "card_to_iban") return "crypto_to_iban" as any;
+    if (t === "crypto_to_crypto") return "crypto_withdrawal";
+    if (t === "crypto_withdrawal" || t === "crypto_send") return "crypto_withdrawal";
+    if (t === "crypto_deposit") return "crypto_deposit";
+    if (t === "card_activation") return "card_activation" as any;
+    if (t === "card_payment" || t === "payment") return "payment";
+    if (t === "declined") return "declined" as any;
+    if (t === "fee") return "payment";
+    if (t === "refund" || t === "cashback") return "topup";
+    return "payment";
+  };
+
+  const mapToAppTransaction = (tx: ClientTransaction): AppTransaction => {
+    const d = new Date(tx.created_at);
+    const incoming = isIncome(tx);
+    const mappedType = mapTypeToAppType(tx.type);
+    
+    // Build metadata with direction info for CardTransactionsList icon logic
+    const metadata: Record<string, unknown> = {
+      ...(tx.metadata || {}),
+      originalApiType: tx.type,
+      isIncoming: incoming,
+    };
+
+    return {
+      id: tx.id,
+      merchant: TX_TYPE_LABELS[tx.type] || tx.type,
+      time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      amountUSDT: tx.amount,
+      amountLocal: tx.amount,
+      localCurrency: tx.currency,
+      color: incoming ? "#22C55E" : "#007AFF",
+      type: mappedType,
+      status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : undefined,
+      recipientName: tx.receiver_name,
+      senderName: tx.sender_name,
+      description: tx.description || TX_TYPE_LABELS[tx.type] || tx.type,
+      fee: tx.fee,
+      metadata,
+      createdAt: tx.created_at,
+    };
+  };
+
   const groups = useMemo((): TransactionGroup[] => {
     if (!client?.transactions) return [];
     const sorted = [...client.transactions].sort((a, b) =>
@@ -153,7 +205,7 @@ export default function AdminClientTransactionHistory() {
     const map = new Map<string, ClientTransaction[]>();
     for (const tx of sorted) {
       const d = new Date(tx.created_at);
-      const key = format(d, "MMMM dd");
+      const key = format(d, "dd.MM.yyyy");
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(tx);
     }
@@ -168,24 +220,29 @@ export default function AdminClientTransactionHistory() {
     if (asset === "all") return true;
     const t = tx.type.toLowerCase();
     const desc = (tx.description || "").toLowerCase();
+    const isCrypto = t.includes("crypto") || t.includes("usdt") || desc.includes("usdt") || desc.includes("trc20") || desc.includes("crypto");
+    if (asset === "crypto") return isCrypto;
+    if (isCrypto) return false;
     if (asset === "virtual") return (t.includes("card") || t === "payment" || t === "topup" || t === "fee" || t === "card_activation" || t === "refund" || t === "cashback") && !desc.includes("metal");
     if (asset === "metal") return (t.includes("card") || t === "payment" || t === "topup" || t === "fee" || t === "refund" || t === "cashback") && desc.includes("metal");
     if (asset === "iban") return t.includes("iban") || t.includes("bank") || t.includes("transfer_in") || t.includes("transfer_out") || desc.includes("iban");
-    if (asset === "crypto") return t.includes("crypto") || t.includes("usdt") || desc.includes("usdt") || desc.includes("trc20") || desc.includes("crypto");
     return true;
   };
 
-  const filteredGroups = useMemo(() => {
+  const filteredGroups = useMemo((): AppTransactionGroup[] => {
     return groups.map(group => {
-      if (dateFrom && group.rawDate < startOfDay(dateFrom)) return { ...group, transactions: [] };
-      if (dateTo && group.rawDate > endOfDay(dateTo)) return { ...group, transactions: [] };
+      if (dateFrom && group.rawDate < startOfDay(dateFrom)) return null;
+      if (dateTo && group.rawDate > endOfDay(dateTo)) return null;
       let txs = group.transactions;
       txs = txs.filter(tx => isAssetMatch(tx, activeAsset));
       if (activeFilter === "income") txs = txs.filter(isIncome);
       else if (activeFilter === "expenses") txs = txs.filter(isExpense);
       else if (activeFilter === "transfers") txs = txs.filter(isTransfer);
-      return { ...group, transactions: txs };
-    }).filter(g => g.transactions.length > 0);
+      if (txs.length === 0) return null;
+      const appTxs = txs.map(mapToAppTransaction);
+      const totalSpend = appTxs.filter(t => !isIncome(txs.find(x => x.id === t.id)!)).reduce((s, t) => s + t.amountLocal, 0);
+      return { date: group.date, totalSpend, transactions: appTxs };
+    }).filter(Boolean) as AppTransactionGroup[];
   }, [groups, activeFilter, activeAsset, dateFrom, dateTo]);
 
   const filterOptions: { key: FilterType; label: string }[] = [
@@ -292,29 +349,35 @@ export default function AdminClientTransactionHistory() {
           </div>
 
           {/* Asset Category */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
-            {([
-              { key: "all" as AssetType, label: t("history.allAssets", "Все") },
-              { key: "virtual" as AssetType, label: t("history.virtualCard", "Virtual") },
-              { key: "metal" as AssetType, label: t("history.metalCard", "Metal") },
-              { key: "iban" as AssetType, label: "IBAN" },
-              { key: "crypto" as AssetType, label: t("history.crypto", "Крипто") },
-            ]).map((opt) => (
-              <motion.button
-                key={opt.key}
-                onClick={() => setActiveAsset(opt.key)}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors",
-                  activeAsset === opt.key
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-secondary text-muted-foreground hover:bg-secondary/80"
-                )}
-                layout
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              >
-                {opt.label}
-              </motion.button>
-            ))}
+          <div className="relative" ref={assetContainerRef}>
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 relative">
+              <motion.div
+                className="absolute top-0 h-[calc(100%-4px)] bg-primary rounded-full z-0"
+                animate={{ left: assetIndicatorStyle.left, width: assetIndicatorStyle.width }}
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              />
+              {([
+                { key: "all" as AssetType, label: t("history.allAssets", "Все") },
+                { key: "virtual" as AssetType, label: t("history.virtualCard", "Virtual") },
+                { key: "metal" as AssetType, label: t("history.metalCard", "Metal") },
+                { key: "iban" as AssetType, label: "IBAN" },
+                { key: "crypto" as AssetType, label: t("history.crypto", "Крипто") },
+              ]).map((opt) => (
+                <button
+                  key={opt.key}
+                  ref={(el) => { if (el) assetRefs.current.set(opt.key, el); }}
+                  onClick={() => setActiveAsset(opt.key)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors relative z-10",
+                    activeAsset === opt.key
+                      ? "text-primary-foreground"
+                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Filter Tabs */}
@@ -356,43 +419,7 @@ export default function AdminClientTransactionHistory() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                {filteredGroups.map((group) => (
-                  <div key={group.date} className="mb-4">
-                    <p className="text-xs text-muted-foreground font-medium mb-2">{group.date}</p>
-                    <div className="space-y-1.5">
-                      {group.transactions.map((tx) => {
-                        const incoming = isIncome(tx);
-                        return (
-                          <div key={tx.id} className="p-3 rounded-xl bg-muted/30 border border-border/50 flex items-center justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium truncate">{TX_TYPE_LABELS[tx.type] || tx.type}</p>
-                              <p className="text-[10px] text-muted-foreground truncate">
-                                {tx.description || tx.merchant_name || tx.receiver_name || tx.sender_name || "—"}
-                              </p>
-                              <p className="text-[10px] text-muted-foreground">
-                                {new Date(tx.created_at).toLocaleString()}
-                              </p>
-                            </div>
-                            <div className="text-right shrink-0 ml-2">
-                              <p className={cn("text-sm font-bold", incoming ? "text-emerald-500" : "text-destructive")}>
-                                {incoming ? "+" : "-"}{tx.amount.toLocaleString()} {tx.currency}
-                              </p>
-                              <Badge
-                                variant={tx.status === "completed" ? "default" : tx.status === "pending" ? "secondary" : "destructive"}
-                                className="text-[8px]"
-                              >
-                                {tx.status}
-                              </Badge>
-                              {tx.fee != null && tx.fee > 0 && (
-                                <p className="text-[10px] text-muted-foreground">Fee: {tx.fee} {tx.currency}</p>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+                <CardTransactionsList groups={filteredGroups} />
               </motion.div>
             </AnimatePresence>
           )}

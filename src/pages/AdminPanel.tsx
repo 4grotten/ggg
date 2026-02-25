@@ -577,7 +577,7 @@ export default function AdminPanel() {
     { value: "fees", label: t("admin.tabs.fees"), icon: Percent },
     { value: "limits", label: t("admin.tabs.limits"), icon: Wallet },
     { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound, link: "/settings/admin/clients" },
-    { value: "admins", label: t("admin.tabs.admins"), icon: Users },
+    { value: "admins", label: t("admin.tabs.admins"), icon: Users, link: "/settings/admin/admins" },
     { value: "system", label: t("admin.system.title", "Система"), icon: Settings },
   ];
 
@@ -663,14 +663,14 @@ export default function AdminPanel() {
               <div className="relative mb-6 mt-4">
                 {/* Mobile: scrollable, Desktop: full width */}
                 <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
-                  <div className="relative h-16 p-1.5 bg-muted/50 rounded-2xl min-w-max md:min-w-0 md:w-full">
+                  <div className="relative h-[72px] p-2 bg-muted/50 rounded-2xl min-w-max md:min-w-0 md:w-full">
                     {/* Desktop sliding indicator */}
                     <motion.div
-                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg hidden md:block"
+                      className="absolute top-2 bottom-2 rounded-xl bg-background shadow-lg hidden md:block"
                       initial={false}
                       animate={{
-                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * (100% / ${tabConfig.length}) + 6px)`,
-                        width: `calc(100% / ${tabConfig.length} - 12px)`,
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * (100% / ${tabConfig.length}) + 8px)`,
+                        width: `calc(100% / ${tabConfig.length} - 16px)`,
                       }}
                       transition={{
                         type: "spring",
@@ -680,11 +680,11 @@ export default function AdminPanel() {
                     />
                     {/* Mobile sliding indicator */}
                     <motion.div
-                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg md:hidden"
+                      className="absolute top-2 bottom-2 rounded-xl bg-background shadow-lg md:hidden"
                       initial={false}
                       animate={{
-                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 80px + 6px)`,
-                        width: '74px',
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 128px + 8px)`,
+                        width: '120px',
                       }}
                       transition={{
                         type: "spring",
@@ -700,16 +700,16 @@ export default function AdminPanel() {
                           key={tab.value}
                           onClick={() => 'link' in tab && tab.link ? navigate(tab.link) : setActiveTab(tab.value)}
                           className={cn(
-                            "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors",
-                            "w-20 shrink-0 md:w-auto",
+                            "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors px-3",
+                            "w-32 shrink-0 md:w-auto",
                             activeTab === tab.value ? "text-foreground" : "text-muted-foreground"
                           )}
                         >
                           <tab.icon className={cn(
-                            "w-5 h-5 transition-colors",
+                            "w-5 h-5 transition-colors shrink-0",
                             activeTab === tab.value ? "text-primary" : "text-muted-foreground"
                           )} />
-                          <span className="text-[11px] font-medium">{tab.label}</span>
+                          <span className="text-[10px] font-medium leading-tight text-center">{tab.label}</span>
                         </button>
                       ))}
                     </div>

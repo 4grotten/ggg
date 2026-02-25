@@ -60,6 +60,7 @@ import DevicesPage from "./pages/DevicesPage";
 import ApiDocumentation from "./pages/ApiDocumentation";
 import AdminPanel from "./pages/AdminPanel";
 import AdminClients from "./pages/AdminClients";
+import AdminAdmins from "./pages/AdminAdmins";
 import AdminClientDetails from "./pages/AdminClientDetails";
 import AdminClientTransactionHistory from "./pages/AdminClientTransactionHistory";
 import AccountPage from "./pages/AccountPage";
@@ -94,6 +95,7 @@ const hiddenNavRoutes = [
   "/settings/api",
   "/settings/admin",
   "/settings/admin/clients",
+  "/settings/admin/admins",
   "/partner",
   "/account",
   "/wallet",
@@ -150,6 +152,7 @@ const AppContent = () => {
             <Route path="/settings/api" element={<ApiDocumentation />} />
             <Route path="/settings/admin" element={<AdminPanel />} />
             <Route path="/settings/admin/clients" element={<AdminClients />} />
+            <Route path="/settings/admin/admins" element={<AdminAdmins />} />
             <Route path="/settings/admin/clients/details/:userId" element={<AdminClientDetails />} />
             <Route path="/settings/admin/clients/details/:userId/history" element={<AdminClientTransactionHistory />} />
             <Route path="/fees-and-limits" element={<FeesAndLimits />} />
