@@ -60,6 +60,10 @@ const translateMerchant = (merchant: string, type: string | undefined, t: (key: 
     return t("transaction.walletToIban");
   }
   
+  if (type === "iban_to_iban") {
+    return "IBAN Bank → IBAN Bank";
+  }
+  
   const merchantsMap: { [key: string]: string } = {
     "Card Transfer": "transactions.cardTransfer",
     "Top up": "transactions.topUp",
