@@ -1339,7 +1339,9 @@
       "transfers": "Transfers",
       "transactionHistory": "Transaction History",
       "accountsInfo": "Bank & Crypto Accounts",
-      "receipts": "Receipts"
+      "receipts": "Receipts",
+      "admin": "Admin Panel & Limits",
+      "adminRevenue": "Admin: Revenue"
     },
     "notes": {
       "title": "Notes"
