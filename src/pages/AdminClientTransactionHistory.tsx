@@ -298,7 +298,7 @@ export default function AdminClientTransactionHistory() {
 
           {/* Asset Category */}
           <div className="relative" ref={assetContainerRef}>
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1 relative">
+            <div className="flex gap-2 justify-center pb-1 relative">
               <motion.div
                 className="absolute top-0 h-[calc(100%-4px)] bg-primary rounded-full z-0"
                 animate={{ left: assetIndicatorStyle.left, width: assetIndicatorStyle.width }}
