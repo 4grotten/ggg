@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
@@ -92,6 +93,7 @@ export default function AdminClientDetails() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
   const [expandedWallet, setExpandedWallet] = useState<string | null>(null);
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
 
   const [limits, setLimits] = useState({
     dailyTopUp: "50000", monthlyTopUp: "500000",
@@ -110,7 +112,55 @@ export default function AdminClientDetails() {
     usdAedBuy: "3.68", usdAedSell: "3.67",
   });
 
-  const handleSave = () => {
+  // Initial values for change detection
+  const initialValues = useRef({
+    selectedLevel: "R1",
+    selectedSubscription: "free",
+    isVIP: false,
+    isBlocked: false,
+    limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000" },
+    fees: { topUpPercent: "2.5", transferPercent: "1.5", withdrawPercent: "2.0", conversionPercent: "1.0" },
+    rates: { usdtAedBuy: "3.65", usdtAedSell: "3.69", usdAedBuy: "3.68", usdAedSell: "3.67" },
+  });
+
+  const getChanges = (): { label: string; from: string; to: string }[] => {
+    const changes: { label: string; from: string; to: string }[] = [];
+    const init = initialValues.current;
+
+    if (selectedLevel !== init.selectedLevel) changes.push({ label: t("admin.clients.referralLevel") || "Реферальный уровень", from: init.selectedLevel, to: selectedLevel });
+    if (selectedSubscription !== init.selectedSubscription) changes.push({ label: t("admin.clients.subscriptionType") || "Подписка", from: init.selectedSubscription, to: selectedSubscription });
+    if (isVIP !== init.isVIP) changes.push({ label: "VIP", from: init.isVIP ? "Да" : "Нет", to: isVIP ? "Да" : "Нет" });
+    if (isBlocked !== init.isBlocked) changes.push({ label: t("admin.clients.blockStatus") || "Блокировка", from: init.isBlocked ? "Да" : "Нет", to: isBlocked ? "Да" : "Нет" });
+
+    const feeLabels: Record<string, string> = { topUpPercent: t("admin.clients.topUp") || "Top Up", transferPercent: t("admin.clients.transfers") || "Переводы", withdrawPercent: t("admin.clients.withdrawal") || "Вывод", conversionPercent: t("admin.clients.conversion") || "Конвертация" };
+    for (const key of Object.keys(fees) as (keyof typeof fees)[]) {
+      if (fees[key] !== init.fees[key]) changes.push({ label: `${t("admin.clients.personalFees") || "Комиссия"}: ${feeLabels[key]}`, from: `${init.fees[key]}%`, to: `${fees[key]}%` });
+    }
+
+    const limitLabels: Record<string, string> = { dailyTopUp: "Daily Top Up", monthlyTopUp: "Monthly Top Up", dailyTransfer: "Daily Transfer", monthlyTransfer: "Monthly Transfer", dailyWithdraw: "Daily Withdraw", monthlyWithdraw: "Monthly Withdraw", singleTransaction: "Single TX" };
+    for (const key of Object.keys(limits) as (keyof typeof limits)[]) {
+      if (limits[key] !== init.limits[key]) changes.push({ label: `${t("admin.clients.personalLimits") || "Лимит"}: ${limitLabels[key]}`, from: `${init.limits[key]} AED`, to: `${limits[key]} AED` });
+    }
+
+    const rateLabels: Record<string, string> = { usdtAedBuy: "USDT→AED Buy", usdtAedSell: "USDT→AED Sell", usdAedBuy: "USD→AED Buy", usdAedSell: "USD→AED Sell" };
+    for (const key of Object.keys(rates) as (keyof typeof rates)[]) {
+      if (rates[key] !== init.rates[key]) changes.push({ label: rateLabels[key], from: init.rates[key], to: rates[key] });
+    }
+
+    return changes;
+  };
+
+  const handleSaveClick = () => {
+    const changes = getChanges();
+    if (changes.length === 0) {
+      toast.info(t("admin.clients.noChanges") || "Нет изменений для сохранения");
+      return;
+    }
+    setShowSaveAlert(true);
+  };
+
+  const handleConfirmSave = () => {
+    setShowSaveAlert(false);
     toast.success(t("admin.clients.settingsSaved"));
     navigate(-1);
   };
@@ -659,13 +709,46 @@ export default function AdminClientDetails() {
 
         {/* Save Button */}
         <Button
-          onClick={handleSave}
+          onClick={handleSaveClick}
           className="w-full h-12 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold"
         >
           <Save className="w-5 h-5 mr-2" />
           {t("admin.clients.saveChanges")}
         </Button>
       </div>
+
+      {/* Confirmation Alert */}
+      <AlertDialog open={showSaveAlert} onOpenChange={setShowSaveAlert}>
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base">{t("admin.clients.confirmSaveTitle") || "Подтвердить изменения"}</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 pt-2">
+                <p className="text-sm text-muted-foreground">{t("admin.clients.confirmSaveDesc") || "Следующие параметры будут изменены:"}</p>
+                <div className="space-y-2 max-h-[40vh] overflow-y-auto">
+                  {getChanges().map((change, i) => (
+                    <div key={i} className="flex flex-col gap-0.5 p-2.5 rounded-xl bg-muted/50 border border-border/50">
+                      <span className="text-xs font-medium text-foreground">{change.label}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-muted-foreground line-through">{change.from}</span>
+                        <span className="text-muted-foreground">→</span>
+                        <span className="font-semibold text-primary">{change.to}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3">
+            <AlertDialogCancel className="flex-1 mt-0 rounded-xl">{t("common.cancel") || "Отмена"}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSave} className="flex-1 rounded-xl bg-primary text-primary-foreground">
+              <Save className="w-4 h-4 mr-1.5" />
+              {t("admin.clients.saveChanges") || "Сохранить"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MobileLayout>
   );
 }
