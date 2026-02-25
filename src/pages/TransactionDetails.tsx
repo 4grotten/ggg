@@ -632,9 +632,9 @@ const TransactionDetails = () => {
                 transition={{ duration: 0.4, ease: "easeOut" }}
               >
                 <motion.div
-                  initial={{ y: 60, x: -60, opacity: 0 }}
-                  animate={{ y: 0, x: 0, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
+                  initial={{ y: isIncomingCryptoToIban ? -80 : 0, opacity: isIncomingCryptoToIban ? 0 : 1 }}
+                  animate={{ y: isIncomingCryptoToIban ? 0 : -80, opacity: isIncomingCryptoToIban ? 1 : 0 }}
+                  transition={{ duration: 0.6, delay: 0.15, ease: isIncomingCryptoToIban ? [0.34, 1.56, 0.64, 1] : "easeIn" }}
                 >
                   <UsdtIcon size={40} />
                 </motion.div>
@@ -658,12 +658,12 @@ const TransactionDetails = () => {
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <motion.div
-                initial={{ y: isCryptoToBank ? 60 : (isIncomingCryptoToCard ? -60 : 60), x: isCryptoToBank ? -60 : (isIncomingCryptoToCard ? 60 : -60), opacity: 0 }}
-                animate={{ y: 0, x: 0, opacity: 1 }}
+                initial={{ y: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? -80 : 0, opacity: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 0 : 1 }}
+                animate={{ y: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 0 : -80, opacity: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 1 : 0 }}
                 transition={{ 
-                  duration: 0.5, 
+                  duration: 0.6, 
                   delay: 0.15, 
-                  ease: [0.34, 1.56, 0.64, 1]
+                  ease: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? [0.34, 1.56, 0.64, 1] : "easeIn"
                 }}
               >
                 {isCryptoToBank ? <Landmark className="w-10 h-10" strokeWidth={2} /> : <CreditCard className="w-10 h-10" strokeWidth={2} />}
