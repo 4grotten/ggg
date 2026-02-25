@@ -13,7 +13,7 @@ import { useWalletSummary, useCryptoWallets } from "@/hooks/useCards";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useTransactionReceipt, useApiTransactionGroups } from "@/hooks/useTransactions";
-import { UsdtIcon, getCryptoIcon } from "@/components/icons/CryptoIcons";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { getAuthToken, apiRequest } from "@/services/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import { AvatarPreview } from "@/components/ui/avatar-preview";
@@ -431,22 +431,6 @@ const TransactionDetails = () => {
     return !!transaction?.senderCard && !transaction?.recipientCard;
   })();
   const isOutgoingTransfer = isCardTransfer && !isIncomingTransfer && !!transaction?.recipientCard;
-
-  // Extract crypto network from tokenNetwork string like "USDT, Tron (TRC20)" -> "trc20"
-  const cryptoNetworkKey = (() => {
-    const tn = String(transaction?.tokenNetwork || (receipt as any)?.token_network || '');
-    const match = tn.match(/\((\w+)\)/);
-    if (match) return match[1].toLowerCase();
-    // fallback: try known keywords
-    const lower = tn.toLowerCase();
-    if (lower.includes('trc20') || lower.includes('tron')) return 'trc20';
-    if (lower.includes('erc20') || lower.includes('ethereum')) return 'erc20';
-    if (lower.includes('bep20') || lower.includes('bsc')) return 'bep20';
-    if (lower.includes('solana')) return 'solana';
-    if (lower.includes('polygon')) return 'polygon';
-    if (lower.includes('ton')) return 'ton';
-    return 'usdt';
-  })();
   
   const [showToCard, setShowToCard] = useState(false);
   const [showFromCard, setShowFromCard] = useState(false);
@@ -652,7 +636,7 @@ const TransactionDetails = () => {
                   animate={{ y: isIncomingCryptoToIban ? 0 : -80, opacity: isIncomingCryptoToIban ? 1 : 0 }}
                   transition={{ duration: 0.6, delay: 0.15, ease: isIncomingCryptoToIban ? [0.34, 1.56, 0.64, 1] : "easeIn" }}
                 >
-                  {getCryptoIcon(cryptoNetworkKey, 40)}
+                  <UsdtIcon size={40} />
                 </motion.div>
               </motion.div>
               <motion.div
@@ -698,7 +682,7 @@ const TransactionDetails = () => {
                 animate={{ y: -80, opacity: 0 }}
                 transition={{ duration: 0.6, delay: 0.3, ease: "easeIn" }}
               >
-                {getCryptoIcon(cryptoNetworkKey, 40)}
+                <UsdtIcon size={40} />
               </motion.div>
             </motion.div>
           ) : isCryptoDeposit ? (
@@ -714,7 +698,7 @@ const TransactionDetails = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
               >
-                {getCryptoIcon(cryptoNetworkKey, 40)}
+                <UsdtIcon size={40} />
               </motion.div>
             </motion.div>
           ) : isCardActivation ? (
