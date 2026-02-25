@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, RefreshCw, UsersRound, Phone, Hash, CreditCard, Wallet, Zap, Users, Shield, CheckCircle, Sparkles, Eye, Filter, X } from "lucide-react";
+import { ArrowLeft, Search, RefreshCw, UsersRound, Phone, Hash, CreditCard, Wallet, Zap, Users, Shield, CheckCircle, Sparkles, Filter, X } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -270,7 +270,7 @@ export default function AdminClients() {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-sm truncate">{client.full_name || "Без имени"}</h4>
+                        <h4 className="font-semibold text-sm truncate">{(client.full_name && client.full_name !== "None None" && client.full_name.trim()) ? client.full_name : "Без имени"}</h4>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                             <Hash className="w-3 h-3" />
@@ -288,9 +288,6 @@ export default function AdminClients() {
                         </div>
                       </div>
 
-                      <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground" onClick={(e) => e.stopPropagation()}>
-                        <Eye className="w-4 h-4" />
-                      </Button>
                     </div>
 
                     {/* Phone */}
