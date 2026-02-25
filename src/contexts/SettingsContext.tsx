@@ -1,9 +1,9 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { apiRequest } from "@/services/api/apiClient";
 import { AdminSetting } from "@/types/admin";
 
-// Fallback values (used when DB is unavailable)
+// Fallback values (used when API is unavailable)
 const FALLBACK_SETTINGS: Record<string, Record<string, number>> = {
   exchange_rates: {
     usdt_to_aed_buy: 3.65,
@@ -52,7 +52,6 @@ interface SettingsContextType {
   AED_TO_USD_SELL: number;
   USD_TO_AED_BUY: number;
   USD_TO_AED_SELL: number;
-  // Derived rates
   AED_TO_USDT_RATE: number;
   
   // Fees
@@ -84,37 +83,44 @@ interface SettingsContextType {
   MONTHLY_TRANSFER_LIMIT: number;
   MONTHLY_WITHDRAWAL_LIMIT: number;
   
-  // Status
   isLoading: boolean;
   error: Error | null;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
+/** Raw shape from GET /accounts/admin/settings/ */
+interface BackendSetting {
+  id: number;
+  category: string;
+  key: string;
+  value: string;
+  description: string | null;
+  updated_at: string;
+}
+
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const { data: settings, isLoading, error } = useQuery({
     queryKey: ["app-settings"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("admin_settings")
-        .select("category, key, value");
-
-      if (error) throw error;
-      return data as Pick<AdminSetting, "category" | "key" | "value">[];
+      const res = await apiRequest<BackendSetting[]>("/admin/settings/");
+      if (res.error || !res.data) throw new Error(res.error?.detail || res.error?.message || "Failed to fetch settings");
+      return res.data.map((s) => ({
+        category: s.category,
+        key: s.key,
+        value: parseFloat(s.value),
+      }));
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 5,
     retry: 2,
   });
 
-  // Helper to get value with fallback
   const getValue = (category: string, key: string): number => {
     const setting = settings?.find((s) => s.category === category && s.key === key);
     return setting?.value ?? FALLBACK_SETTINGS[category]?.[key] ?? 0;
   };
 
-  // Build context value
   const value: SettingsContextType = {
-    // Exchange rates
     USDT_TO_AED_BUY: getValue("exchange_rates", "usdt_to_aed_buy"),
     USDT_TO_AED_SELL: getValue("exchange_rates", "usdt_to_aed_sell"),
     AED_TO_USD_BUY: getValue("exchange_rates", "aed_to_usd_buy"),
@@ -122,8 +128,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     USD_TO_AED_BUY: getValue("exchange_rates", "usd_to_aed_buy"),
     USD_TO_AED_SELL: getValue("exchange_rates", "usd_to_aed_sell"),
     AED_TO_USDT_RATE: 1 / getValue("exchange_rates", "usdt_to_aed_sell"),
-    
-    // Fees
+
     TOP_UP_CRYPTO_FEE: getValue("fees", "top_up_crypto_flat"),
     TOP_UP_BANK_FEE_PERCENT: getValue("fees", "top_up_bank_percent"),
     CARD_TO_CARD_FEE_PERCENT: getValue("fees", "card_to_card_percent"),
@@ -135,8 +140,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     METAL_CARD_ANNUAL_FEE: getValue("fees", "metal_card_annual"),
     METAL_CARD_REPLACEMENT_FEE: getValue("fees", "metal_card_replacement"),
     VIRTUAL_ACCOUNT_OPENING_FEE: getValue("fees", "virtual_account_opening"),
-    
-    // Limits
+
     TOP_UP_CRYPTO_MIN_AMOUNT: getValue("limits", "top_up_crypto_min"),
     TOP_UP_BANK_MIN_AMOUNT: getValue("limits", "top_up_bank_min"),
     TRANSFER_MIN_AMOUNT: getValue("limits", "transfer_min"),
@@ -151,8 +155,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     MONTHLY_TOP_UP_LIMIT: getValue("limits", "monthly_top_up_limit"),
     MONTHLY_TRANSFER_LIMIT: getValue("limits", "monthly_transfer_limit"),
     MONTHLY_WITHDRAWAL_LIMIT: getValue("limits", "monthly_withdrawal_limit"),
-    
-    // Status
+
     isLoading,
     error: error as Error | null,
   };
