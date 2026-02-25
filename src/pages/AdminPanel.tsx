@@ -351,7 +351,6 @@ export default function AdminPanel() {
   } | null>(null);
   const [selectedRole, setSelectedRole] = useState<AppRole>("admin");
   const [isSearching, setIsSearching] = useState(false);
-  const [activeMainTab, setActiveMainTab] = useState<"admins" | "settings">("settings");
   const [activeTab, setActiveTab] = useState("rates");
   const [activeAdminsSubTab, setActiveAdminsSubTab] = useState<"admins" | "history">("admins");
   const [clientSearchQuery, setClientSearchQuery] = useState("");
@@ -573,11 +572,12 @@ export default function AdminPanel() {
 
   const displayedClients = filteredClients !== undefined ? filteredClients : clients;
 
-  const settingsSubTabs = [
+  const tabConfig = [
     { value: "rates", label: t("admin.tabs.rates"), icon: TrendingUp },
     { value: "fees", label: t("admin.tabs.fees"), icon: Percent },
     { value: "limits", label: t("admin.tabs.limits"), icon: Wallet },
     { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound, link: "/settings/admin/clients" },
+    { value: "admins", label: t("admin.tabs.admins"), icon: Users },
     { value: "system", label: t("admin.system.title", "Система"), icon: Settings },
   ];
 
@@ -659,89 +659,65 @@ export default function AdminPanel() {
             </div>
           ) : (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              {/* Top-level 2-tab selector: Админы / Системные настройки */}
-              <div className="relative mb-4 mt-4">
-                <div className="relative h-14 p-1.5 bg-muted/50 rounded-2xl">
-                  <motion.div
-                    className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg"
-                    initial={false}
-                    animate={{
-                      left: activeMainTab === "admins" ? '6px' : 'calc(50% + 3px)',
-                      width: 'calc(50% - 9px)',
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
-                  <div className="relative grid grid-cols-2 h-full">
-                    <button
-                      onClick={() => setActiveMainTab("admins")}
-                      className={cn(
-                        "relative z-10 flex items-center justify-center gap-2 h-full rounded-xl transition-colors",
-                        activeMainTab === "admins" ? "text-foreground" : "text-muted-foreground"
-                      )}
-                    >
-                      <Users className={cn("w-5 h-5 transition-colors", activeMainTab === "admins" ? "text-primary" : "text-muted-foreground")} />
-                      <span className="text-sm font-medium">{t("admin.tabs.admins", "Админы")}</span>
-                    </button>
-                    <button
-                      onClick={() => setActiveMainTab("settings")}
-                      className={cn(
-                        "relative z-10 flex items-center justify-center gap-2 h-full rounded-xl transition-colors",
-                        activeMainTab === "settings" ? "text-foreground" : "text-muted-foreground"
-                      )}
-                    >
-                      <Settings className={cn("w-5 h-5 transition-colors", activeMainTab === "settings" ? "text-primary" : "text-muted-foreground")} />
-                      <span className="text-sm font-medium">{t("admin.system.title", "Системные настройки")}</span>
-                    </button>
+              {/* Custom Tab Switcher with sliding indicator and horizontal scroll */}
+              <div className="relative mb-6 mt-4">
+                {/* Mobile: scrollable, Desktop: full width */}
+                <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+                  <div className="relative h-16 p-1.5 bg-muted/50 rounded-2xl min-w-max md:min-w-0 md:w-full">
+                    {/* Desktop sliding indicator */}
+                    <motion.div
+                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg hidden md:block"
+                      initial={false}
+                      animate={{
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * (100% / ${tabConfig.length}) + 6px)`,
+                        width: `calc(100% / ${tabConfig.length} - 12px)`,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
+                    {/* Mobile sliding indicator */}
+                    <motion.div
+                      className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg md:hidden"
+                      initial={false}
+                      animate={{
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 80px + 6px)`,
+                        width: '74px',
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
+                    
+                    {/* Tab buttons - flex on mobile, grid on desktop */}
+                    <div className="relative flex md:grid md:grid-cols-6 h-full">
+                      {tabConfig.map((tab) => (
+                        <button
+                          key={tab.value}
+                          onClick={() => 'link' in tab && tab.link ? navigate(tab.link) : setActiveTab(tab.value)}
+                          className={cn(
+                            "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors",
+                            "w-20 shrink-0 md:w-auto",
+                            activeTab === tab.value ? "text-foreground" : "text-muted-foreground"
+                          )}
+                        >
+                          <tab.icon className={cn(
+                            "w-5 h-5 transition-colors",
+                            activeTab === tab.value ? "text-primary" : "text-muted-foreground"
+                          )} />
+                          <span className="text-[11px] font-medium">{tab.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Sub-tabs for Settings section */}
-              <AnimatePresence mode="wait">
-                {activeMainTab === "settings" && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.15 }}
-                    className="mb-4"
-                  >
-                    <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-                      <div className="relative h-12 p-1 bg-muted/30 rounded-xl min-w-max">
-                        <motion.div
-                          className="absolute top-1 bottom-1 rounded-lg bg-background/80 shadow-sm"
-                          initial={false}
-                          animate={{
-                            left: `calc(${settingsSubTabs.findIndex(t => t.value === activeTab)} * 76px + 4px)`,
-                            width: '72px',
-                          }}
-                          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        />
-                        <div className="relative flex h-full">
-                          {settingsSubTabs.map((tab) => (
-                            <button
-                              key={tab.value}
-                              onClick={() => 'link' in tab && tab.link ? navigate(tab.link) : setActiveTab(tab.value)}
-                              className={cn(
-                                "relative z-10 flex flex-col items-center justify-center gap-0.5 h-full rounded-lg transition-colors",
-                                "w-[76px] shrink-0",
-                                activeTab === tab.value ? "text-foreground" : "text-muted-foreground"
-                              )}
-                            >
-                              <tab.icon className={cn("w-4 h-4 transition-colors", activeTab === tab.value ? "text-primary" : "text-muted-foreground")} />
-                              <span className="text-[10px] font-medium">{tab.label}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Settings content */}
-              {activeMainTab === "settings" && (
-                <>
+              {/* Tab content without layout animations */}
 
               <TabsContent value="rates" className="mt-0">
                 <GlassCard
@@ -786,12 +762,9 @@ export default function AdminPanel() {
               <TabsContent value="clients" className="mt-0">
                 {/* Redirects to /settings/admin/clients */}
               </TabsContent>
-              </>
-              )}
 
-              {/* Admins content */}
-              {activeMainTab === "admins" && (
-              <div className="space-y-4">
+              {/* Admins Tab */}
+              <TabsContent value="admins" className="mt-0 space-y-4">
                 {/* Sub-tabs for Admins section */}
                 <div className="flex gap-2 p-1 bg-muted/50 rounded-xl">
                   <button
@@ -1075,11 +1048,8 @@ export default function AdminPanel() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
-              )}
+              </TabsContent>
 
-              {activeMainTab === "settings" && (
-              <>
               <TabsContent value="system" className="mt-0 space-y-4">
                 <GlassCard
                   title={t("admin.system.title")}
@@ -1365,8 +1335,6 @@ export default function AdminPanel() {
                   </div>
                 </GlassCard>
               </TabsContent>
-              </>
-              )}
             </Tabs>
           )}
         </div>
