@@ -678,9 +678,9 @@ const TransactionDetails = () => {
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <motion.div
-                initial={{ y: 0, opacity: 1 }}
-                animate={{ y: -80, opacity: 0 }}
-                transition={{ duration: 0.6, delay: 0.3, ease: "easeIn" }}
+                initial={{ y: 80, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
               >
                 <UsdtIcon size={40} />
               </motion.div>
