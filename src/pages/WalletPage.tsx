@@ -315,8 +315,8 @@ const WalletPage = () => {
                   <Wallet className="w-5 h-5 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="font-medium text-sm">{t('send.usdtBalance', 'Перевод на Кошелёк USDT')}</p>
-                  <p className="text-xs text-muted-foreground">{t('send.usdtBalanceDesc', 'Перевод USDT на Кошелек EasyCard так и внешний')}</p>
+                  <p className="font-medium text-sm">{t('drawer.usdtBalance', 'Перевод на Кошелёк USDT')}</p>
+                  <p className="text-xs text-muted-foreground">{t('drawer.usdtBalanceDesc', 'Перевод USDT на Кошелек EasyCard так и внешний')}</p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
@@ -332,7 +332,7 @@ const WalletPage = () => {
                   <Landmark className="w-5 h-5 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="font-medium text-sm">{t('send.bankTransfer', 'Перевод на счёт')}</p>
+                  <p className="font-medium text-sm">{t('drawer.bankTransfer', 'Перевод на счёт')}</p>
                   <p className="text-xs text-muted-foreground">{t('send.sendLocalBankTransfer', 'Перевод на банковский счет (IBAN)')}</p>
                 </div>
               </div>
