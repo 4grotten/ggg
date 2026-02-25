@@ -595,7 +595,7 @@ class AdminUserTransactionsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Получить транзакции пользователя (со всеми полями + фильтрация)",
+        operation_summary="Получить транзакции пользователя (со всеми полями + фильтрация + пагинация)",
         operation_description="Возвращает полный список транзакций пользователя. Можно фильтровать по типу: bank, card, crypto. Если не передать type, вернутся все транзакции.",
         tags=["Транзакции (Админ/Служебные)"],
         manual_parameters=[
@@ -605,13 +605,29 @@ class AdminUserTransactionsView(APIView):
                 description="Фильтр: bank, card, crypto. (Оставить пустым для получения всех)", 
                 type=openapi.TYPE_STRING, 
                 required=False
+            ),
+            openapi.Parameter(
+                'limit', 
+                openapi.IN_QUERY, 
+                description="Количество записей на страницу (по умолчанию 50)", 
+                type=openapi.TYPE_INTEGER, 
+                required=False
+            ),
+            openapi.Parameter(
+                'offset', 
+                openapi.IN_QUERY, 
+                description="Смещение (по умолчанию 0)", 
+                type=openapi.TYPE_INTEGER, 
+                required=False
             )
         ],
-        responses={200: TransactionFullSerializer(many=True)}
+        responses={200: openapi.Response("Paginated list of transactions")}
     )
     def get(self, request, target_user_id):
         user_id_str = str(target_user_id)
         tx_type = request.query_params.get('type')
+        limit = int(request.query_params.get('limit', 50))
+        offset = int(request.query_params.get('offset', 0))
         txs = Transactions.objects.filter(
             Q(user_id=user_id_str) | 
             Q(sender_id=user_id_str) | 
@@ -624,6 +640,10 @@ class AdminUserTransactionsView(APIView):
         elif tx_type == 'crypto':
             txs = txs.filter(movements__user_id=user_id_str, movements__account_type='crypto').distinct()
         txs = txs.order_by('-created_at')
-        
-        serializer = TransactionFullSerializer(txs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        total_count = txs.count()
+        paginated_txs = txs[offset:offset+limit]
+        serializer = TransactionFullSerializer(paginated_txs, many=True)
+        return Response({
+            "count": total_count,
+            "results": serializer.data
+        }, status=status.HTTP_200_OK)
