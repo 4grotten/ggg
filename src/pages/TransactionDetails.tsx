@@ -658,12 +658,12 @@ const TransactionDetails = () => {
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <motion.div
-                initial={{ y: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? -80 : 0, opacity: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 0 : 1 }}
-                animate={{ y: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 0 : -80, opacity: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 1 : 0 }}
+                initial={{ y: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? -80 : 80, x: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 80 : -80, opacity: 0 }}
+                animate={{ y: 0, x: 0, opacity: 1 }}
                 transition={{ 
                   duration: 0.6, 
                   delay: 0.15, 
-                  ease: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? [0.34, 1.56, 0.64, 1] : "easeIn"
+                  ease: [0.34, 1.56, 0.64, 1]
                 }}
               >
                 {isCryptoToBank ? <Landmark className="w-10 h-10" strokeWidth={2} /> : <CreditCard className="w-10 h-10" strokeWidth={2} />}
