@@ -9,9 +9,11 @@ export type TransactionType =
   | "bank_transfer"
   | "bank_transfer_incoming"
   | "crypto_withdrawal"
+  | "crypto_send"
   | "crypto_deposit"
   | "crypto_to_card"
-  | "crypto_to_iban";
+  | "crypto_to_iban"
+  | "internal_transfer";
 
 export type TransactionStatus = 
   | "pending" 

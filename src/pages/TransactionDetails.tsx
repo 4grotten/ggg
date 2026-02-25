@@ -31,7 +31,7 @@ const mockTransactions: Record<string, {
   cardLast4: string;
   exchangeRate: number;
   status: "settled" | "pending" | "failed" | "processing";
-  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer" | "crypto_to_card" | "crypto_to_bank" | "crypto_to_iban";
+  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_withdrawal" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer" | "crypto_to_card" | "crypto_to_bank" | "crypto_to_iban";
   fromAddress?: string;
   tokenNetwork?: string;
   kartaFee?: number;
@@ -334,7 +334,7 @@ const TransactionDetails = () => {
   const isDeclined = transaction?.type === "declined";
   const isCardActivation = transaction?.type === "card_activation";
   const isCardTransfer = transaction?.type === "card_transfer";
-  const isCryptoSend = transaction?.type === "crypto_send";
+  const isCryptoSend = transaction?.type === "crypto_send" || transaction?.type === "crypto_withdrawal";
   const isCryptoDeposit = transaction?.type === "crypto_deposit";
   const isBankTransfer = transaction?.type === "bank_transfer";
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
