@@ -196,22 +196,48 @@ interface SettingsFieldProps {
 }
 
 function SettingsField({ setting, label, suffix, onUpdate, isPending, isMissing, index }: SettingsFieldProps) {
-  const [localValue, setLocalValue] = useState(setting.value.toString());
+  const formatDisplay = (val: number | string) => {
+    const num = typeof val === 'string' ? parseFloat(val) : val;
+    if (isNaN(num)) return String(val);
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  const [localValue, setLocalValue] = useState(formatDisplay(setting.value));
   const [isDirty, setIsDirty] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
-    setLocalValue(setting.value.toString());
+    setLocalValue(formatDisplay(setting.value));
     setIsDirty(false);
   }, [setting.value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalValue(e.target.value);
-    setIsDirty(e.target.value !== setting.value.toString());
+    // Allow only digits, dots, commas
+    const raw = e.target.value.replace(/[^0-9.,]/g, '');
+    setLocalValue(raw);
+    const parsed = parseFloat(raw.replace(/,/g, ''));
+    setIsDirty(!isNaN(parsed) && parsed !== setting.value);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    const parsed = parseFloat(localValue.replace(/,/g, ''));
+    if (!isNaN(parsed)) {
+      setLocalValue(formatDisplay(parsed));
+    }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    // Show raw number on focus for easy editing
+    const parsed = parseFloat(localValue.replace(/,/g, ''));
+    if (!isNaN(parsed)) {
+      setLocalValue(parsed % 1 === 0 ? parsed.toFixed(0) : parsed.toString());
+    }
   };
 
   const handleSave = () => {
-    const numValue = parseFloat(localValue);
+    const numValue = parseFloat(localValue.replace(/,/g, ''));
     if (!isNaN(numValue)) {
       onUpdate(setting.key, numValue);
     }
@@ -245,12 +271,12 @@ function SettingsField({ setting, label, suffix, onUpdate, isPending, isMissing,
             <div className="relative flex-1">
               <Input
                 id={setting.key}
-                type="number"
-                step="0.01"
+                type="text"
+                inputMode="decimal"
                 value={localValue}
                 onChange={handleChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
                 className={cn(
                   "pr-14 h-11 bg-background/50 border-border/50 rounded-xl",
                   "focus:bg-background transition-colors",
