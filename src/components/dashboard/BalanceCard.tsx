@@ -1,4 +1,5 @@
 import { Eye, EyeOff, CreditCard, Landmark } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import aedCurrency from "@/assets/aed-currency.png";
@@ -49,6 +50,7 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
 };
 
 export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0, accountIbanLast4 }: BalanceCardProps) => {
+  const { t } = useTranslation();
   const { isHideDataEnabled, isEnabled } = useScreenLockContext();
   const shouldHide = isHideDataEnabled && isEnabled;
   const [isVisible, setIsVisible] = useState(!shouldHide);
@@ -122,7 +124,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
           <div className="flex items-center gap-1.5 mb-1">
             <Landmark className="w-3.5 h-3.5 text-muted-foreground" />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-              AED Account{accountIbanLast4 && <span className="ml-1 opacity-60">•{accountIbanLast4}</span>}
+              {t("topUp.aedAccount", "AED Account")}{accountIbanLast4 && <span className="ml-1 opacity-60">•{accountIbanLast4}</span>}
             </p>
           </div>
           <AnimatePresence mode="wait">
