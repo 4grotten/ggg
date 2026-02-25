@@ -846,6 +846,13 @@ export default function AdminPanel() {
                                   {client.limits?.custom_settings_enabled && (
                                     <Badge className="bg-cyan-500/10 text-cyan-500 border-0 text-[9px] px-1.5 py-0 h-4">Custom</Badge>
                                   )}
+                                  {/* Role badge */}
+                                  {(client.role || 'user') === 'admin' && (
+                                    <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 border-0">Admin</Badge>
+                                  )}
+                                  {(client.role || 'user') === 'moderator' && (
+                                    <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4 border-0">Mod</Badge>
+                                  )}
                                 </div>
                               </div>
 
@@ -866,6 +873,36 @@ export default function AdminPanel() {
                                 <span className="text-xs font-medium">{client.phone}</span>
                               </div>
                             )}
+
+                            {/* Tags: verification, role, referral */}
+                            <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                              {client.is_verified ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
+                                  <CheckCircle className="w-3 h-3" />
+                                  Верифицирован
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10px] font-medium">
+                                  <Shield className="w-3 h-3" />
+                                  Не верифицирован
+                                </span>
+                              )}
+                              <span className={cn(
+                                "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+                                (client.role || 'user') === 'admin' ? "bg-red-500/10 text-red-600 dark:text-red-400" :
+                                (client.role || 'user') === 'moderator' ? "bg-violet-500/10 text-violet-600 dark:text-violet-400" :
+                                "bg-muted text-muted-foreground"
+                              )}>
+                                <Users className="w-3 h-3" />
+                                {(client.role || 'user') === 'admin' ? 'Админ' : (client.role || 'user') === 'moderator' ? 'Модератор' : 'Пользователь'}
+                              </span>
+                              {client.referral_level && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
+                                  <Sparkles className="w-3 h-3" />
+                                  {client.referral_level}
+                                </span>
+                              )}
+                            </div>
 
                             {/* Stats grid: cards, accounts, crypto */}
                             <div className="grid grid-cols-3 gap-2 mb-2">

@@ -28,6 +28,9 @@ export interface BackendClient {
   phone: string;
   avatar_url: string | null;
   created_at: string | null;
+  role: 'admin' | 'moderator' | 'user';
+  is_verified: boolean;
+  referral_level: string | null;
   cards_count: number;
   total_cards_balance: number;
   accounts_count: number;
