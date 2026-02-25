@@ -683,8 +683,8 @@ export default function AdminPanel() {
                       className="absolute top-1.5 bottom-1.5 rounded-xl bg-background shadow-lg md:hidden"
                       initial={false}
                       animate={{
-                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 80px + 6px)`,
-                        width: '74px',
+                        left: `calc(${tabConfig.findIndex(t => t.value === activeTab)} * 76px + 6px)`,
+                        width: '70px',
                       }}
                       transition={{
                         type: "spring",
@@ -700,16 +700,16 @@ export default function AdminPanel() {
                           key={tab.value}
                           onClick={() => 'link' in tab && tab.link ? navigate(tab.link) : setActiveTab(tab.value)}
                           className={cn(
-                            "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors",
-                            "w-20 shrink-0 md:w-auto",
+                            "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors px-3",
+                            "min-w-[76px] shrink-0 md:w-auto",
                             activeTab === tab.value ? "text-foreground" : "text-muted-foreground"
                           )}
                         >
                           <tab.icon className={cn(
-                            "w-5 h-5 transition-colors",
+                            "w-5 h-5 transition-colors shrink-0",
                             activeTab === tab.value ? "text-primary" : "text-muted-foreground"
                           )} />
-                          <span className="text-[11px] font-medium">{tab.label}</span>
+                          <span className="text-[10px] font-medium leading-tight text-center max-w-[70px] truncate">{tab.label}</span>
                         </button>
                       ))}
                     </div>
