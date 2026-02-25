@@ -360,6 +360,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'crypto_to_bank': 'bank_transfer', // will be remapped for inbound below
     'bank_to_crypto': 'crypto_withdrawal', // will use originalApiType for icon
     'crypto_to_crypto': 'crypto_withdrawal',
+    'crypto_to_iban': 'crypto_to_iban',
   };
   
   let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
@@ -454,6 +455,12 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       isIncoming = tx.direction === 'inbound' || op.includes('incoming') || op.includes('received')
         || (!!tx.recipient_card && !tx.sender_card && !(tx as any).from_wallet_id);
     }
+  } else if (mappedType === 'crypto_to_iban') {
+    if (tx.direction === 'inbound') {
+      isIncoming = true;
+    } else {
+      isIncoming = false;
+    }
   } else {
     isIncoming = ['bank_transfer_incoming', 'crypto_deposit', 'topup'].includes(mappedType) 
       || (['transfer_in', 'card_to_bank'].includes(tx.type));
@@ -467,6 +474,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_transfer': isIncoming ? '#22C55E' : '#007AFF',
     'crypto_withdrawal': '#10B981',
     'crypto_to_card': isIncoming ? '#22C55E' : '#007AFF',
+    'crypto_to_iban': isIncoming ? '#22C55E' : '#007AFF',
     'bank_transfer': '#8B5CF6',
     'payment': '#3B82F6',
     'card_activation': '#CCFF00',
@@ -493,6 +501,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'card_payment': tx.merchant_name || 'Payment',
     'transfer': 'Stablecoin Send', // generic crypto transfer
     'crypto_to_crypto': 'Stablecoin Send',
+    'crypto_to_iban': 'USDT → IBAN',
   };
 
   // Use mappedType for merchant fallback — for "transfer" type use mappedType-based fallback
@@ -500,6 +509,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'crypto_deposit': 'Wallet Deposit',
     'crypto_withdrawal': 'Stablecoin Send',
     'crypto_to_card': 'USDT → EasyCard',
+    'crypto_to_iban': 'USDT → IBAN',
   };
   const merchant = tx.merchant_name || (mappedType !== (typeMap[tx.type] || tx.type) ? merchantByMappedType[mappedType] : undefined) || (tx.operation as string) || merchantFallback[tx.type] || merchantByMappedType[mappedType] || tx.type;
 
@@ -555,7 +565,9 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       operation: tx.operation || undefined,
       direction: tx.direction || undefined,
       originalApiType: tx.type,
-      senderWallet: (tx as any).from_address_mask || (tx as any).from_address || (tx as any).sender_wallet || undefined,
+      senderWallet: (tx as any).from_address_mask || (tx as any).from_address || (tx as any).sender_wallet || (tx.metadata as any)?.crypto_address || undefined,
+      cryptoAddress: (tx.metadata as any)?.crypto_address || undefined,
+      senderIban: (tx.metadata as any)?.sender_iban || (tx.metadata as any)?.sender_iban_mask || undefined,
     },
   };
 };
