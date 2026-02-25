@@ -673,7 +673,7 @@ class AdminUserLimitsListView(APIView):
 
         data = []
         for i, profile in enumerate(profiles):
-            full_name = f"{getattr(profile, 'first_name', '')} {getattr(profile, 'last_name', '')}".strip()
+            full_name = f"{getattr(profile, 'first_name', '') or ''} {getattr(profile, 'last_name', '') or ''}".strip()
             if not full_name and profile.user_id and str(profile.user_id).isdigit():
                 try:
                     user = User.objects.get(id=int(profile.user_id))
