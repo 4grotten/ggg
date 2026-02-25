@@ -59,6 +59,7 @@ import PartnerBonuses from "./pages/PartnerBonuses";
 import DevicesPage from "./pages/DevicesPage";
 import ApiDocumentation from "./pages/ApiDocumentation";
 import AdminPanel from "./pages/AdminPanel";
+import AdminClients from "./pages/AdminClients";
 import AccountPage from "./pages/AccountPage";
 import WalletPage from "./pages/WalletPage";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
@@ -90,6 +91,7 @@ const hiddenNavRoutes = [
   "/settings/devices",
   "/settings/api",
   "/settings/admin",
+  "/settings/admin/clients",
   "/partner",
   "/account",
   "/wallet",
@@ -145,6 +147,7 @@ const AppContent = () => {
             <Route path="/settings/devices" element={<DevicesPage />} />
             <Route path="/settings/api" element={<ApiDocumentation />} />
             <Route path="/settings/admin" element={<AdminPanel />} />
+            <Route path="/settings/admin/clients" element={<AdminClients />} />
             <Route path="/fees-and-limits" element={<FeesAndLimits />} />
             <Route path="/limits-settings" element={<LimitsSettings />} />
             <Route path="/profile-verification" element={<ProfileVerification />} />
