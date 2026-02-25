@@ -56,6 +56,12 @@ class Profiles(models.Model):
     daily_withdrawal_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
     monthly_withdrawal_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
 
+    # USDT limits
+    daily_usdt_send_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    monthly_usdt_send_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    daily_usdt_receive_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    monthly_usdt_receive_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+
     card_to_card_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     bank_transfer_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     network_fee_percent = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)

@@ -76,6 +76,8 @@ export default function AdminClientDetails() {
     dailyTransfer: "25000", monthlyTransfer: "250000",
     dailyWithdraw: "20000", monthlyWithdraw: "200000",
     singleTransaction: "10000",
+    dailyUsdtSend: "50000", monthlyUsdtSend: "500000",
+    dailyUsdtReceive: "100000", monthlyUsdtReceive: "1000000",
   });
 
   const [fees, setFees] = useState({
@@ -96,7 +98,7 @@ export default function AdminClientDetails() {
     selectedSubscription: "free",
     isVIP: false,
     isBlocked: false,
-    limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000" },
+    limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000", dailyUsdtSend: "50000", monthlyUsdtSend: "500000", dailyUsdtReceive: "100000", monthlyUsdtReceive: "1000000" },
     fees: { topUpPercent: "2.5", transferPercent: "1.5", withdrawPercent: "2.0", conversionPercent: "1.0" },
     rates: { usdtAedBuy: "3.65", usdtAedSell: "3.69", usdAedBuy: "3.68", usdAedSell: "3.67" },
   });
@@ -134,6 +136,10 @@ export default function AdminClientDetails() {
       dailyWithdraw: l.daily_withdrawal_limit != null ? String(l.daily_withdrawal_limit) : limits.dailyWithdraw,
       monthlyWithdraw: l.monthly_withdrawal_limit != null ? String(l.monthly_withdrawal_limit) : limits.monthlyWithdraw,
       singleTransaction: l.transfer_max != null ? String(l.transfer_max) : limits.singleTransaction,
+      dailyUsdtSend: l.daily_usdt_send_limit != null ? String(l.daily_usdt_send_limit) : limits.dailyUsdtSend,
+      monthlyUsdtSend: l.monthly_usdt_send_limit != null ? String(l.monthly_usdt_send_limit) : limits.monthlyUsdtSend,
+      dailyUsdtReceive: l.daily_usdt_receive_limit != null ? String(l.daily_usdt_receive_limit) : limits.dailyUsdtReceive,
+      monthlyUsdtReceive: l.monthly_usdt_receive_limit != null ? String(l.monthly_usdt_receive_limit) : limits.monthlyUsdtReceive,
     };
     setFees(newFees);
     setLimits(newLimits);
@@ -165,6 +171,10 @@ export default function AdminClientDetails() {
         monthly_withdrawal_limit: limits.monthlyWithdraw,
         transfer_min: "1",
         transfer_max: limits.singleTransaction,
+        daily_usdt_send_limit: limits.dailyUsdtSend,
+        monthly_usdt_send_limit: limits.monthlyUsdtSend,
+        daily_usdt_receive_limit: limits.dailyUsdtReceive,
+        monthly_usdt_receive_limit: limits.monthlyUsdtReceive,
       };
       const res = await apiRequest(`/admin/users/${userId}/limits/`, {
         method: "PATCH",
@@ -198,9 +208,10 @@ export default function AdminClientDetails() {
       if (fees[key] !== init.fees[key]) changes.push({ label: `${t("admin.clients.personalFees") || "Комиссия"}: ${feeLabels[key]}`, from: `${init.fees[key]}%`, to: `${fees[key]}%` });
     }
 
-    const limitLabels: Record<string, string> = { dailyTopUp: "Daily Top Up", monthlyTopUp: "Monthly Top Up", dailyTransfer: "Daily Transfer", monthlyTransfer: "Monthly Transfer", dailyWithdraw: "Daily Withdraw", monthlyWithdraw: "Monthly Withdraw", singleTransaction: "Single TX" };
+    const limitLabels: Record<string, string> = { dailyTopUp: "Daily Top Up", monthlyTopUp: "Monthly Top Up", dailyTransfer: "Daily Transfer", monthlyTransfer: "Monthly Transfer", dailyWithdraw: "Daily Withdraw", monthlyWithdraw: "Monthly Withdraw", singleTransaction: "Single TX", dailyUsdtSend: "Daily USDT Send", monthlyUsdtSend: "Monthly USDT Send", dailyUsdtReceive: "Daily USDT Receive", monthlyUsdtReceive: "Monthly USDT Receive" };
     for (const key of Object.keys(limits) as (keyof typeof limits)[]) {
-      if (limits[key] !== init.limits[key]) changes.push({ label: `${t("admin.clients.personalLimits") || "Лимит"}: ${limitLabels[key]}`, from: `${init.limits[key]} AED`, to: `${limits[key]} AED` });
+      const suffix = key.includes("Usdt") ? "USDT" : "AED";
+      if (limits[key] !== init.limits[key]) changes.push({ label: `${t("admin.clients.personalLimits") || "Лимит"}: ${limitLabels[key]}`, from: `${init.limits[key]} ${suffix}`, to: `${limits[key]} ${suffix}` });
     }
 
     const rateLabels: Record<string, string> = { usdtAedBuy: "USDT→AED Buy", usdtAedSell: "USDT→AED Sell", usdAedBuy: "USD→AED Buy", usdAedSell: "USD→AED Sell" };
@@ -782,6 +793,43 @@ export default function AdminClientDetails() {
                   <div className="relative">
                     <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-10 rounded-xl h-9" />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">AED</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* USDT Limits */}
+          <div className="p-4 rounded-2xl bg-[#26A17B]/5 border border-[#26A17B]/20 space-y-3">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">💰 USDT — {t("admin.clients.dailyLimits", "Дневные лимиты")}</p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { key: "dailyUsdtSend", label: "Отправка" },
+                { key: "dailyUsdtReceive", label: "Приём" },
+              ].map(({ key, label }) => (
+                <div key={key} className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground">{label}</Label>
+                  <div className="relative">
+                    <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-14 rounded-xl h-9" />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">USDT</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#26A17B]/5 border border-[#26A17B]/20 space-y-3">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">💰 USDT — {t("admin.clients.monthlyLimits", "Месячные лимиты")}</p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { key: "monthlyUsdtSend", label: "Отправка" },
+                { key: "monthlyUsdtReceive", label: "Приём" },
+              ].map(({ key, label }) => (
+                <div key={key} className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground">{label}</Label>
+                  <div className="relative">
+                    <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-14 rounded-xl h-9" />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">USDT</span>
                   </div>
                 </div>
               ))}
