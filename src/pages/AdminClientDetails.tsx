@@ -723,10 +723,10 @@ export default function AdminClientDetails() {
       <AlertDialog open={showSaveAlert} onOpenChange={setShowSaveAlert}>
         <AlertDialogContent className="max-w-[320px] rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base">{t("admin.clients.confirmSaveTitle") || "Подтвердить изменения"}</AlertDialogTitle>
+            <AlertDialogTitle className="text-base">Подтвердить изменения</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3 pt-2">
-                <p className="text-sm text-muted-foreground">{t("admin.clients.confirmSaveDesc") || "Следующие параметры будут изменены:"}</p>
+                <p className="text-sm text-muted-foreground">Следующие параметры будут изменены:</p>
                 <div className="space-y-2 max-h-[40vh] overflow-y-auto">
                   {getChanges().map((change, i) => (
                     <div key={i} className="flex flex-col gap-0.5 p-2.5 rounded-xl bg-muted/50 border border-border/50">
@@ -742,11 +742,11 @@ export default function AdminClientDetails() {
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row gap-3">
-            <AlertDialogCancel className="flex-1 mt-0 rounded-xl">{t("common.cancel") || "Отмена"}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmSave} className="flex-1 rounded-xl bg-primary text-primary-foreground">
+          <AlertDialogFooter className="flex-row gap-3 mt-4">
+            <AlertDialogCancel className="flex-1 mt-0 h-11 rounded-2xl">{t("common.cancel") || "Отмена"}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSave} className="flex-1 h-11 rounded-2xl bg-primary text-primary-foreground font-semibold">
               <Save className="w-4 h-4 mr-1.5" />
-              {t("admin.clients.saveChanges") || "Сохранить"}
+              Сохранить изменения
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
