@@ -626,23 +626,23 @@ class AdminSettingsListView(APIView):
     
 
 class AdminUserLimitsListView(APIView):
-    permission_classes = [permissions.IsAuthenticated] # Здесь желательно IsAdminUser
-
+    permission_classes = [permissions.IsAuthenticated]
     @swagger_auto_schema(
         operation_summary="Список лимитов всех пользователей (Админ)",
-        responses={200: UserLimitsSerializer(many=True)},
         tags=["Админ: Управление пользователями"]
     )
     def get(self, request):
-        profiles = Profiles.objects.all().order_by('user_id')
+        profiles = Profiles.objects.all().order_by('-created_at')
         serializer = UserLimitsSerializer(profiles, many=True)
         data = []
         for i, profile in enumerate(profiles):
-            item = serializer.data[i]
-            item['user_id'] = profile.user_id
-            item['phone'] = profile.phone
-            data.append(item)
-        return Response(data)
+            data.append({
+                "user_id": profile.user_id,
+                "full_name": f"{profile.first_name or ''} {profile.last_name or ''}".strip(),
+                "phone": profile.phone,
+                "limits": serializer.data[i]
+            })
+        return Response(data, status=status.HTTP_200_OK)
 
 class AdminUserLimitDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -650,17 +650,19 @@ class AdminUserLimitDetailView(APIView):
     @swagger_auto_schema(
         operation_summary="Изменить лимиты конкретного пользователя (PATCH)",
         request_body=UserLimitsSerializer,
-        responses={200: UserLimitsSerializer},
         tags=["Админ: Управление пользователями"]
     )
     def patch(self, request, user_id):
         profile = Profiles.objects.filter(user_id=str(user_id)).first()
         if not profile:
             return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
-        
-        # partial=True позволяет обновлять только переданные поля
         serializer = UserLimitsSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response({
+                "user_id": profile.user_id,
+                "full_name": f"{profile.first_name or ''} {profile.last_name or ''}".strip(),
+                "phone": profile.phone,
+                "limits": serializer.data
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
