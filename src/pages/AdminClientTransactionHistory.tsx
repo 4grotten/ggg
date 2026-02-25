@@ -66,23 +66,29 @@ interface TransactionGroup {
   transactions: ClientTransaction[];
 }
 
-const isIncome = (tx: ClientTransaction): boolean => {
+// Direction is determined by sender_id/receiver_id relative to the viewed userId
+const isIncomeForUser = (tx: ClientTransaction, viewedUserId: string): boolean => {
+  if (tx.receiver_id && tx.sender_id) {
+    return String(tx.receiver_id) === String(viewedUserId) && String(tx.sender_id) !== String(viewedUserId);
+  }
   const t = tx.type.toLowerCase();
   return t.includes("topup") || t.includes("top_up") || t.includes("transfer_in") ||
     t.includes("incoming") || t === "refund" || t === "cashback" || t.includes("deposit");
 };
 
-const isExpense = (tx: ClientTransaction): boolean => {
+const isExpenseForUser = (tx: ClientTransaction, viewedUserId: string): boolean => {
+  if (tx.sender_id && tx.receiver_id) {
+    return String(tx.sender_id) === String(viewedUserId) && String(tx.receiver_id) !== String(viewedUserId);
+  }
   const t = tx.type.toLowerCase();
   return t.includes("withdrawal") || t.includes("transfer_out") || t.includes("payment") ||
-    t === "fee" || t === "card_activation" || t.includes("card_to_") || t.includes("crypto_to_") ||
-    t.includes("_to_iban") || t.includes("_to_card");
+    t === "fee" || t === "card_activation";
 };
 
 const isTransfer = (tx: ClientTransaction): boolean => {
   const t = tx.type.toLowerCase();
   return t.includes("transfer") || t.includes("card_to_") || t.includes("crypto_to_") ||
-    t.includes("bank_") || t === "card_transfer";
+    t.includes("bank_") || t === "card_transfer" || t.includes("iban");
 };
 
 export default function AdminClientTransactionHistory() {
@@ -138,11 +144,18 @@ export default function AdminClientTransactionHistory() {
         throw new Error(msg);
       }
       // API may return array directly or wrapped in an object
-      if (Array.isArray(res.data)) return res.data as ClientTransaction[];
-      if (Array.isArray((res.data as any).results)) return (res.data as any).results as ClientTransaction[];
-      if (Array.isArray((res.data as any).transactions)) return (res.data as any).transactions as ClientTransaction[];
-      return [];
-      return res.data;
+      let list: any[] = [];
+      if (Array.isArray(res.data)) list = res.data;
+      else if (Array.isArray((res.data as any).results)) list = (res.data as any).results;
+      else if (Array.isArray((res.data as any).transactions)) list = (res.data as any).transactions;
+      // Normalize numeric fields (API returns strings)
+      return list.map(tx => ({
+        ...tx,
+        amount: typeof tx.amount === 'string' ? parseFloat(tx.amount) || 0 : tx.amount,
+        fee: typeof tx.fee === 'string' ? parseFloat(tx.fee) || 0 : tx.fee,
+        exchange_rate: typeof tx.exchange_rate === 'string' ? parseFloat(tx.exchange_rate) || null : tx.exchange_rate,
+        original_amount: typeof tx.original_amount === 'string' ? parseFloat(tx.original_amount) || null : tx.original_amount,
+      })) as ClientTransaction[];
     },
     enabled: !!userId,
   });
@@ -213,7 +226,7 @@ export default function AdminClientTransactionHistory() {
 
   const mapToAppTransaction = (tx: ClientTransaction): AppTransaction => {
     const d = new Date(tx.created_at);
-    const incoming = isIncome(tx);
+    const incoming = isIncomeForUser(tx, userId!);
     const mappedType = mapTypeToAppType(tx.type);
     
     // Build metadata with direction info for CardTransactionsList icon logic
@@ -223,9 +236,18 @@ export default function AdminClientTransactionHistory() {
       isIncoming: incoming,
     };
 
+    // Build merchant label: show counterparty name + type
+    const typeLabel = TX_TYPE_LABELS[tx.type] || tx.type;
+    let merchantLabel = typeLabel;
+    if (incoming && tx.sender_name) {
+      merchantLabel = `${tx.sender_name}`;
+    } else if (!incoming && tx.receiver_name) {
+      merchantLabel = `${tx.receiver_name}`;
+    }
+
     return {
       id: tx.id,
-      merchant: TX_TYPE_LABELS[tx.type] || tx.type,
+      merchant: merchantLabel,
       time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       amountUSDT: tx.amount,
       amountLocal: tx.amount,
@@ -235,7 +257,7 @@ export default function AdminClientTransactionHistory() {
       status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : undefined,
       recipientName: tx.receiver_name,
       senderName: tx.sender_name,
-      description: tx.description || TX_TYPE_LABELS[tx.type] || tx.type,
+      description: typeLabel,
       fee: tx.fee,
       metadata,
       createdAt: tx.created_at,
@@ -278,12 +300,12 @@ export default function AdminClientTransactionHistory() {
     return groups.map(group => {
       let txs = group.transactions;
       // Client-side filter by income/expense/transfer type
-      if (activeFilter === "income") txs = txs.filter(isIncome);
-      else if (activeFilter === "expenses") txs = txs.filter(isExpense);
+      if (activeFilter === "income") txs = txs.filter(tx => isIncomeForUser(tx, userId!));
+      else if (activeFilter === "expenses") txs = txs.filter(tx => isExpenseForUser(tx, userId!));
       else if (activeFilter === "transfers") txs = txs.filter(isTransfer);
       if (txs.length === 0) return null;
       const appTxs = txs.map(mapToAppTransaction);
-      const totalSpend = appTxs.filter(t => !isIncome(txs.find(x => x.id === t.id)!)).reduce((s, t) => s + t.amountLocal, 0);
+      const totalSpend = appTxs.filter(t => !isIncomeForUser(txs.find(x => x.id === t.id)!, userId!)).reduce((s, t) => s + t.amountLocal, 0);
       return { date: group.date, totalSpend, transactions: appTxs };
     }).filter(Boolean) as AppTransactionGroup[];
   }, [groups, activeFilter]);
