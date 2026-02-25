@@ -180,6 +180,7 @@ const handleClick = (transaction: Transaction) => {
               const isBankToCrypto = (transaction.metadata as any)?.originalApiType === 'bank_to_crypto';
               const isCryptoToIban = (transaction.metadata as any)?.originalApiType === 'crypto_to_iban' || (transaction.type as string) === 'crypto_to_iban';
               const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction.metadata as any)?.originalApiType || '');
+              const isIbanToIban = (transaction.type as string) === 'iban_to_iban' || (transaction.metadata as any)?.originalApiType === 'iban_to_iban';
 
               return (
                 <button
@@ -286,6 +287,13 @@ const handleClick = (transaction: Transaction) => {
                           <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#8B5CF6] flex items-center justify-center ring-2 ring-background">
                             <Landmark className="w-2.5 h-2.5 text-white" />
                           </div>
+                        </div>
+                      ) : isIbanToIban ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#007AFF" }}
+                        >
+                          <Landmark className="w-5 h-5" />
                         </div>
                       ) : (
                         <div 
