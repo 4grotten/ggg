@@ -113,19 +113,20 @@ export const useScreenLock = () => {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [isEnabled, lockTimeout]);
 
-  // Extra reliability on mobile/PWA: lock on blur/pagehide for "immediately"
+  // Extra reliability on mobile/PWA: lock on pagehide for "immediately"
+  // Note: we intentionally do NOT lock on 'blur' because SPA route changes
+  // (e.g. navigating to /wallet or /account) fire blur events and would
+  // incorrectly lock the app during internal navigation.
   useEffect(() => {
     if (!isEnabled) return;
 
-    const handleBlur = () => {
+    const handlePageHide = () => {
       if (lockTimeout === 'immediately') setIsLocked(true);
     };
 
-    window.addEventListener('blur', handleBlur);
-    window.addEventListener('pagehide', handleBlur);
+    window.addEventListener('pagehide', handlePageHide);
     return () => {
-      window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('pagehide', handleBlur);
+      window.removeEventListener('pagehide', handlePageHide);
     };
   }, [isEnabled, lockTimeout]);
 
