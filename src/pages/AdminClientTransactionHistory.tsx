@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -90,10 +90,17 @@ const isTransfer = (tx: ClientTransaction): boolean => {
 export default function AdminClientTransactionHistory() {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
 
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
-  const [activeAsset, setActiveAsset] = useState<AssetType>("all");
+  const [activeFilter, setActiveFilter] = useState<FilterType>(() => {
+    const p = searchParams.get("filter");
+    return (["all", "income", "expenses", "transfers"] as FilterType[]).includes(p as FilterType) ? p as FilterType : "all";
+  });
+  const [activeAsset, setActiveAsset] = useState<AssetType>(() => {
+    const p = searchParams.get("asset");
+    return (["all", "virtual", "metal", "iban", "crypto"] as AssetType[]).includes(p as AssetType) ? p as AssetType : "all";
+  });
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [selectedPreset, setSelectedPreset] = useState<PeriodPreset>("allTime");
@@ -111,6 +118,16 @@ export default function AdminClientTransactionHistory() {
   const assetContainerRef = useRef<HTMLDivElement>(null);
   const assetRefs = useRef<Map<AssetType, HTMLButtonElement>>(new Map());
   const [assetIndicatorStyle, setAssetIndicatorStyle] = useState({ left: 0, width: 0 });
+
+  // Sync filter/asset tabs to URL search params so they persist across navigation
+  useEffect(() => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (activeFilter !== "all") next.set("filter", activeFilter); else next.delete("filter");
+      if (activeAsset !== "all") next.set("asset", activeAsset); else next.delete("asset");
+      return next;
+    }, { replace: true });
+  }, [activeFilter, activeAsset, setSearchParams]);
 
   // Build query params for the transactions API
   const buildQueryParams = () => {

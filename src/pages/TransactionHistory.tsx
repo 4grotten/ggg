@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -115,10 +115,14 @@ type PeriodPreset = "allTime" | "today" | "thisWeek" | "lastWeek" | "thisMonth" 
 const TransactionHistory = () => {
   const navigate = useNavigate();
   const { type } = useParams<{ type: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
   
   const cardType = (type === "metal" ? "metal" : "virtual") as "virtual" | "metal";
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [activeFilter, setActiveFilter] = useState<FilterType>(() => {
+    const p = searchParams.get("filter");
+    return (["all", "income", "expenses", "transfers"] as FilterType[]).includes(p as FilterType) ? p as FilterType : "all";
+  });
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [selectedPreset, setSelectedPreset] = useState<PeriodPreset>("allTime");
@@ -133,6 +137,15 @@ const TransactionHistory = () => {
   const tabRefs = useRef<Map<FilterType, HTMLButtonElement>>(new Map());
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   
+  // Sync filter tab to URL search params so it persists across navigation
+  useEffect(() => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (activeFilter !== "all") next.set("filter", activeFilter); else next.delete("filter");
+      return next;
+    }, { replace: true });
+  }, [activeFilter, setSearchParams]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
