@@ -1,7 +1,7 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
@@ -112,6 +112,8 @@ export default function AdminClientDetails() {
     usdAedBuy: "3.68", usdAedSell: "3.67",
   });
 
+  const queryClient = useQueryClient();
+
   // Initial values for change detection
   const initialValues = useRef({
     selectedLevel: "R1",
@@ -121,6 +123,66 @@ export default function AdminClientDetails() {
     limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000" },
     fees: { topUpPercent: "2.5", transferPercent: "1.5", withdrawPercent: "2.0", conversionPercent: "1.0" },
     rates: { usdtAedBuy: "3.65", usdtAedSell: "3.69", usdAedBuy: "3.68", usdAedSell: "3.67" },
+  });
+
+  // Initialize state from backend data
+  useEffect(() => {
+    if (!client?.limits) return;
+    const l = client.limits;
+    const newFees = {
+      topUpPercent: fees.topUpPercent,
+      transferPercent: l.card_to_card_percent != null ? String(l.card_to_card_percent) : fees.transferPercent,
+      withdrawPercent: l.bank_transfer_percent != null ? String(l.bank_transfer_percent) : fees.withdrawPercent,
+      conversionPercent: l.currency_conversion_percent != null ? String(l.currency_conversion_percent) : fees.conversionPercent,
+    };
+    const newLimits = {
+      dailyTopUp: limits.dailyTopUp,
+      monthlyTopUp: limits.monthlyTopUp,
+      dailyTransfer: l.daily_transfer_limit != null ? String(l.daily_transfer_limit) : limits.dailyTransfer,
+      monthlyTransfer: l.monthly_transfer_limit != null ? String(l.monthly_transfer_limit) : limits.monthlyTransfer,
+      dailyWithdraw: l.daily_withdrawal_limit != null ? String(l.daily_withdrawal_limit) : limits.dailyWithdraw,
+      monthlyWithdraw: l.monthly_withdrawal_limit != null ? String(l.monthly_withdrawal_limit) : limits.monthlyWithdraw,
+      singleTransaction: l.transfer_max != null ? String(l.transfer_max) : limits.singleTransaction,
+    };
+    setFees(newFees);
+    setLimits(newLimits);
+    initialValues.current = { ...initialValues.current, fees: newFees, limits: newLimits };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client]);
+
+  // Mutation to save personal limits/fees
+  const saveLimitsMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId) throw new Error("No user ID");
+      const body: Record<string, unknown> = {
+        custom_settings_enabled: true,
+        card_to_card_percent: fees.transferPercent,
+        bank_transfer_percent: fees.withdrawPercent,
+        network_fee_percent: fees.topUpPercent,
+        currency_conversion_percent: fees.conversionPercent,
+        daily_transfer_limit: limits.dailyTransfer,
+        monthly_transfer_limit: limits.monthlyTransfer,
+        daily_withdrawal_limit: limits.dailyWithdraw,
+        monthly_withdrawal_limit: limits.monthlyWithdraw,
+        transfer_min: "1",
+        transfer_max: limits.singleTransaction,
+      };
+      const res = await apiRequest(`/admin/users/${userId}/limits/`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      });
+      if (res.error) throw new Error(res.error?.detail || res.error?.message || "Failed to save");
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-client-detail", userId] });
+      toast.success("Настройки клиента сохранены");
+      // Update initial values so change detection resets
+      initialValues.current = { ...initialValues.current, fees: { ...fees }, limits: { ...limits } };
+    },
+    onError: (err) => {
+      toast.error(`Ошибка: ${err.message}`);
+    },
   });
 
   const getChanges = (): { label: string; from: string; to: string }[] => {
@@ -161,8 +223,7 @@ export default function AdminClientDetails() {
 
   const handleConfirmSave = () => {
     setShowSaveAlert(false);
-    toast.success(t("admin.clients.settingsSaved"));
-    navigate(-1);
+    saveLimitsMutation.mutate();
   };
 
   const txGroups = useMemo((): AppTransactionGroup[] => {
@@ -712,10 +773,15 @@ export default function AdminClientDetails() {
         {/* Save Button */}
         <Button
           onClick={handleSaveClick}
+          disabled={saveLimitsMutation.isPending}
           className="w-full h-12 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold"
         >
-          <Save className="w-5 h-5 mr-2" />
-          {t("admin.clients.saveChanges")}
+          {saveLimitsMutation.isPending ? (
+            <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+          ) : (
+            <Save className="w-5 h-5 mr-2" />
+          )}
+          {saveLimitsMutation.isPending ? "Сохранение..." : t("admin.clients.saveChanges")}
         </Button>
       </div>
 
