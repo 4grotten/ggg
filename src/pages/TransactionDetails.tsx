@@ -695,8 +695,7 @@ const TransactionDetails = () => {
               style={{ backgroundColor: "#22C55E" }}
               initial={{ scale: 1 }}
               animate={{ 
-                scale: [1, 1.1, 1],
-                rotate: [0, 90, 90]
+                scale: [1, 1.1, 1]
               }}
               transition={{
                 duration: 0.6,
@@ -705,8 +704,8 @@ const TransactionDetails = () => {
               }}
             >
               <motion.div
-                initial={{ rotate: 0, scale: 0 }}
-                animate={{ rotate: 90, scale: 1 }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
               >
                 <UsdtIcon size={40} />
