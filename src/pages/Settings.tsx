@@ -15,7 +15,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode, Contact, BookUser } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode, Contact, BookUser, EyeOff } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -54,6 +54,7 @@ const iconGradients: Record<string, string> = {
   admin: 'linear-gradient(135deg, #1e3a5f 0%, #0a0a0a 100%)',
   vibrate: 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)',
   contacts: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+  eyeoff: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
 };
 
 interface ColoredIconProps {
@@ -309,7 +310,7 @@ const Settings = () => {
   const [isAddContactOpen, setIsAddContactOpen] = useState(false);
   const [isContactsListOpen, setIsContactsListOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<SavedContact | null>(null);
-  const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused, isHideDataEnabled } = useScreenLockContext();
+  const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused, isHideDataEnabled, setHideDataEnabled } = useScreenLockContext();
   const { isAdmin } = useUserRole();
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
   const { tap } = useHapticFeedback();
@@ -937,6 +938,18 @@ const Settings = () => {
               valueClassName={isScreenLockEnabled ? "text-sm font-medium text-green-500" : "text-muted-foreground text-sm"}
               onClick={() => setIsScreenLockOpen(true)}
             />
+
+            {/* Hide Data Toggle */}
+            <div className="w-full flex items-center justify-between py-4 px-4">
+              <div className="flex items-center gap-3">
+                <ColoredIcon colorKey="eyeoff"><EyeOff className="w-4 h-4" /></ColoredIcon>
+                <span className="text-sm font-medium">{t("settings.hideData") || "Скрыть данные"}</span>
+              </div>
+              <Switch
+                checked={isHideDataEnabled}
+                onCheckedChange={setHideDataEnabled}
+              />
+            </div>
 
             {/* Referral Partner */}
             {(() => {
