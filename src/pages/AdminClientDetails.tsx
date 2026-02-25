@@ -61,6 +61,49 @@ export default function AdminClientDetails() {
     enabled: !!userId,
   });
 
+  // Fetch all client transactions (paginated) for accurate "last 3" and full preview
+  const { data: clientTransactions = [] } = useQuery({
+    queryKey: ["admin-client-transactions-preview", userId],
+    queryFn: async () => {
+      if (!userId) throw new Error("No user ID");
+
+      const pageSize = 100;
+      let offset = 0;
+      let hasMore = true;
+      const all: any[] = [];
+
+      while (hasMore) {
+        const params = new URLSearchParams();
+        params.set("limit", String(pageSize));
+        if (offset > 0) params.set("offset", String(offset));
+
+        const res = await apiRequest<any[] | Record<string, unknown>>(
+          `/transactions/admin/user/${userId}/transactions/?${params.toString()}`,
+          {},
+          true
+        );
+
+        if (res.error || !res.data) {
+          const msg = res.error?.detail || res.error?.message || "Failed";
+          if (msg.includes("Connection refused") || msg.includes("tcp connect error")) return [];
+          throw new Error(msg);
+        }
+
+        let page: any[] = [];
+        if (Array.isArray(res.data)) page = res.data;
+        else if (Array.isArray((res.data as any).results)) page = (res.data as any).results;
+        else if (Array.isArray((res.data as any).transactions)) page = (res.data as any).transactions;
+
+        all.push(...page);
+        hasMore = page.length === pageSize;
+        offset += pageSize;
+      }
+
+      return all;
+    },
+    enabled: !!userId,
+  });
+
   const [selectedLevel, setSelectedLevel] = useState("R1");
   const [selectedSubscription, setSelectedSubscription] = useState("free");
   const [isVIP, setIsVIP] = useState(false);
@@ -237,13 +280,17 @@ export default function AdminClientDetails() {
   };
 
   const txGroups = useMemo((): AppTransactionGroup[] => {
-    const txList = showAllTx ? client?.transactions : client?.transactions?.slice(0, 3);
-    if (!txList || txList.length === 0) return [];
-    const sorted = [...txList].sort((a, b) =>
+    const fallbackTx = client?.transactions ?? [];
+    const sourceTransactions = clientTransactions.length > 0 ? clientTransactions : fallbackTx;
+    if (!sourceTransactions || sourceTransactions.length === 0) return [];
+
+    const sortedAll = [...sourceTransactions].sort((a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
+    const txList = showAllTx ? sortedAll : sortedAll.slice(0, 3);
+
     const map = new Map<string, AppTransaction[]>();
-    for (const tx of sorted) {
+    for (const tx of txList) {
       const toNum = (v: unknown): number => {
         if (typeof v === 'number') return v;
         if (typeof v === 'string') { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
@@ -299,7 +346,7 @@ export default function AdminClientDetails() {
       totalSpend: txs.filter(t => !(t.metadata as any)?.isIncoming).reduce((s, t) => s + t.amountLocal, 0),
       transactions: txs,
     }));
-  }, [client?.transactions, showAllTx, userId]);
+  }, [client?.transactions, clientTransactions, showAllTx, userId]);
 
   if (!userId) {
     navigate("/settings/admin/clients");
@@ -426,35 +473,43 @@ export default function AdminClientDetails() {
         </div>
 
         {/* Transaction History */}
-        {client.transactions && client.transactions.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
-              <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
+        {(() => {
+          const fallbackTx = client.transactions ?? [];
+          const sourceTransactions = clientTransactions.length > 0 ? clientTransactions : fallbackTx;
+          const totalCount = sourceTransactions.length;
+
+          if (totalCount === 0) return null;
+
+          return (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-primary" />
+                <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
+                <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
+              </div>
+              <CardTransactionsList groups={txGroups} viewAsUserId={userId} />
+              {totalCount > 3 && !showAllTx && (
+                <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
+                  Посмотреть всю историю ({totalCount})
+                </Button>
+              )}
+              {showAllTx && totalCount > 3 && (
+                <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
+                  <ChevronUp className="w-4 h-4 mr-1" />
+                  Свернуть
+                </Button>
+              )}
+              <Button
+                variant="default"
+                className="w-full rounded-xl mt-2"
+                onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
+              >
+                <Receipt className="w-4 h-4 mr-2" />
+                {t("admin.clients.fullHistory", "История транзакций")}
+              </Button>
             </div>
-            <CardTransactionsList groups={txGroups} viewAsUserId={userId} />
-            {client.transactions.length > 3 && !showAllTx && (
-              <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
-                Посмотреть всю историю ({client.transactions.length})
-              </Button>
-            )}
-            {showAllTx && client.transactions.length > 3 && (
-              <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
-                <ChevronUp className="w-4 h-4 mr-1" />
-                Свернуть
-              </Button>
-            )}
-            <Button
-              variant="default"
-              className="w-full rounded-xl mt-2"
-              onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
-            >
-              <Receipt className="w-4 h-4 mr-2" />
-              {t("admin.clients.fullHistory", "История транзакций")}
-            </Button>
-          </div>
-        )}
+          );
+        })()}
 
         {client.cards && client.cards.length > 0 && (
           <div className="space-y-3">

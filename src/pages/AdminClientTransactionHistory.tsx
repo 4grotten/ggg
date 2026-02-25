@@ -130,7 +130,7 @@ export default function AdminClientTransactionHistory() {
   }, [activeFilter, activeAsset, setSearchParams]);
 
   // Build query params for the transactions API
-  const buildQueryParams = () => {
+  const buildQueryParams = (offset = 0) => {
     const params = new URLSearchParams();
     // Map asset filter to API type/card_type params
     if (activeAsset === "virtual") { params.set("type", "card"); params.set("card_type", "virtual"); }
@@ -141,6 +141,7 @@ export default function AdminClientTransactionHistory() {
     if (dateFrom) params.set("start_date", format(dateFrom, "yyyy-MM-dd"));
     if (dateTo) params.set("end_date", format(dateTo, "yyyy-MM-dd"));
     params.set("limit", "100");
+    if (offset > 0) params.set("offset", String(offset));
     return params.toString();
   };
 
@@ -149,29 +150,44 @@ export default function AdminClientTransactionHistory() {
     queryKey: ["admin-client-transactions", userId, activeAsset, dateFrom?.toISOString(), dateTo?.toISOString()],
     queryFn: async () => {
       if (!userId) throw new Error("No user ID");
-      const qs = buildQueryParams();
-      const res = await apiRequest<ClientTransaction[] | Record<string, unknown>>(`/transactions/admin/user/${userId}/transactions/?${qs}`, {}, true);
-      if (res.error || !res.data) {
-        const msg = res.error?.detail || res.error?.message || "Failed";
-        if (msg.includes('Connection refused') || msg.includes('tcp connect error')) return [];
-        throw new Error(msg);
+
+      const pageSize = 100;
+      let offset = 0;
+      let hasMore = true;
+      const allTransactions: ClientTransaction[] = [];
+
+      while (hasMore) {
+        const qs = buildQueryParams(offset);
+        const res = await apiRequest<ClientTransaction[] | Record<string, unknown>>(`/transactions/admin/user/${userId}/transactions/?${qs}`, {}, true);
+
+        if (res.error || !res.data) {
+          const msg = res.error?.detail || res.error?.message || "Failed";
+          if (msg.includes('Connection refused') || msg.includes('tcp connect error')) return [];
+          throw new Error(msg);
+        }
+
+        let page: any[] = [];
+        if (Array.isArray(res.data)) page = res.data;
+        else if (Array.isArray((res.data as any).results)) page = (res.data as any).results;
+        else if (Array.isArray((res.data as any).transactions)) page = (res.data as any).transactions;
+
+        const normalizedPage = page.map(tx => ({
+          ...tx,
+          card_id: tx.card_id || tx.card || undefined,
+          sender_card: tx.sender_card || tx.senderCard || null,
+          recipient_card: tx.recipient_card || tx.recipientCard || null,
+          amount: typeof tx.amount === 'string' ? parseFloat(tx.amount) || 0 : tx.amount,
+          fee: typeof tx.fee === 'string' ? parseFloat(tx.fee) || 0 : tx.fee,
+          exchange_rate: typeof tx.exchange_rate === 'string' ? parseFloat(tx.exchange_rate) || null : tx.exchange_rate,
+          original_amount: typeof tx.original_amount === 'string' ? parseFloat(tx.original_amount) || null : tx.original_amount,
+        })) as ClientTransaction[];
+
+        allTransactions.push(...normalizedPage);
+        hasMore = page.length === pageSize;
+        offset += pageSize;
       }
-      // API may return array directly or wrapped in an object
-      let list: any[] = [];
-      if (Array.isArray(res.data)) list = res.data;
-      else if (Array.isArray((res.data as any).results)) list = (res.data as any).results;
-      else if (Array.isArray((res.data as any).transactions)) list = (res.data as any).transactions;
-      // Normalize numeric fields (API returns strings)
-      return list.map(tx => ({
-        ...tx,
-        card_id: tx.card_id || tx.card || undefined,
-        sender_card: tx.sender_card || tx.senderCard || null,
-        recipient_card: tx.recipient_card || tx.recipientCard || null,
-        amount: typeof tx.amount === 'string' ? parseFloat(tx.amount) || 0 : tx.amount,
-        fee: typeof tx.fee === 'string' ? parseFloat(tx.fee) || 0 : tx.fee,
-        exchange_rate: typeof tx.exchange_rate === 'string' ? parseFloat(tx.exchange_rate) || null : tx.exchange_rate,
-        original_amount: typeof tx.original_amount === 'string' ? parseFloat(tx.original_amount) || null : tx.original_amount,
-      })) as ClientTransaction[];
+
+      return allTransactions;
     },
     enabled: !!userId,
   });
