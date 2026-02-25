@@ -326,7 +326,37 @@ export default function AdminClientDetails() {
           </div>
         </div>
 
-        {/* Cards List */}
+        {/* Transaction History */}
+        {client.transactions && client.transactions.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-primary" />
+              <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
+              <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
+            </div>
+            <CardTransactionsList groups={txGroups} />
+            {client.transactions.length > 3 && !showAllTx && (
+              <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
+                Посмотреть всю историю ({client.transactions.length})
+              </Button>
+            )}
+            {showAllTx && client.transactions.length > 3 && (
+              <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
+                <ChevronUp className="w-4 h-4 mr-1" />
+                Свернуть
+              </Button>
+            )}
+            <Button
+              variant="default"
+              className="w-full rounded-xl mt-2"
+              onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
+            >
+              <Receipt className="w-4 h-4 mr-2" />
+              {t("admin.clients.fullHistory", "История транзакций")}
+            </Button>
+          </div>
+        )}
+
         {client.cards && client.cards.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
@@ -460,36 +490,8 @@ export default function AdminClientDetails() {
           </div>
         )}
 
-        {/* Transaction History */}
-        {client.transactions && client.transactions.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
-              <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
-            </div>
-            <CardTransactionsList groups={txGroups} />
-            {client.transactions.length > 3 && !showAllTx && (
-              <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
-                Посмотреть всю историю ({client.transactions.length})
-              </Button>
-            )}
-            {showAllTx && client.transactions.length > 3 && (
-              <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
-                <ChevronUp className="w-4 h-4 mr-1" />
-                Свернуть
-              </Button>
-            )}
-            <Button
-              variant="default"
-              className="w-full rounded-xl mt-2"
-              onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
-            >
-              <Receipt className="w-4 h-4 mr-2" />
-              {t("admin.clients.fullHistory", "История транзакций")}
-            </Button>
-          </div>
-        )}
+
+
 
         {/* Subscription Type */}
         <div className="space-y-3">
