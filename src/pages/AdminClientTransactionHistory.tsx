@@ -237,9 +237,22 @@ export default function AdminClientTransactionHistory() {
         <div className="px-4 py-6 space-y-4 pb-28">
           {/* Title + Period */}
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-semibold">{t("history.title")}</h1>
-              {client && <p className="text-xs text-muted-foreground">{client.full_name} · ID {client.user_id}</p>}
+            <div className="flex items-center gap-3">
+              {client && (
+                <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-primary/20 shrink-0">
+                  {client.avatar_url ? (
+                    <img src={client.avatar_url} alt={client.full_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold text-sm">
+                      {(client.full_name || "?").charAt(0)}
+                    </div>
+                  )}
+                </div>
+              )}
+              <div>
+                <h1 className="text-lg font-semibold">{t("history.title")}</h1>
+                {client && <p className="text-xs text-muted-foreground">{client.full_name} · ID {client.user_id}</p>}
+              </div>
             </div>
             <button onClick={() => setIsDateDrawerOpen(true)} className="flex items-center gap-1.5 text-primary">
               <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
