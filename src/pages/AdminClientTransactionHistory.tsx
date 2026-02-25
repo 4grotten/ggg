@@ -119,6 +119,39 @@ export default function AdminClientTransactionHistory() {
   const assetRefs = useRef<Map<AssetType, HTMLButtonElement>>(new Map());
   const [assetIndicatorStyle, setAssetIndicatorStyle] = useState({ left: 0, width: 0 });
 
+  // Reset tab/date state when switching to another client to avoid carrying stale filters
+  useEffect(() => {
+    const filterFromUrl = searchParams.get("filter");
+    const assetFromUrl = searchParams.get("asset");
+
+    setActiveFilter(([
+      "all",
+      "income",
+      "expenses",
+      "transfers",
+    ] as FilterType[]).includes(filterFromUrl as FilterType)
+      ? (filterFromUrl as FilterType)
+      : "all");
+
+    setActiveAsset(([
+      "all",
+      "virtual",
+      "metal",
+      "iban",
+      "crypto",
+    ] as AssetType[]).includes(assetFromUrl as AssetType)
+      ? (assetFromUrl as AssetType)
+      : "all");
+
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setSelectedPreset("allTime");
+    setTempCustomFrom(undefined);
+    setTempCustomTo(undefined);
+    setCustomDateField(null);
+    setHasSelectedFrom(false);
+  }, [userId]);
+
   // Sync filter/asset tabs to URL search params so they persist across navigation
   useEffect(() => {
     setSearchParams(prev => {
