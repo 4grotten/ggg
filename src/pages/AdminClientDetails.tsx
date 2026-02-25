@@ -457,7 +457,7 @@ export default function AdminClientDetails() {
                       {card.cardholder_name && <div className="col-span-2"><span className="text-muted-foreground">Cardholder:</span> {card.cardholder_name}</div>}
                       {card.expiry_date && <div><span className="text-muted-foreground">Expiry:</span> {card.expiry_date}</div>}
                       <div><span className="text-muted-foreground">Type:</span> <span className="capitalize">{card.type}</span></div>
-                      <div><span className="text-muted-foreground">Status:</span> <span className="capitalize">{card.status}</span></div>
+                      <div><span className="text-muted-foreground">Status:</span> <Badge variant={card.status === "active" ? "default" : "destructive"} className="text-[10px]">{card.status === "active" ? "Active" : card.status}</Badge></div>
                       <div><span className="text-muted-foreground">Balance:</span> {card.balance.toLocaleString()} AED</div>
                       {card.last_four_digits && <div><span className="text-muted-foreground">Last 4:</span> {card.last_four_digits}</div>}
                       <div className="col-span-2"><span className="text-muted-foreground">ID:</span> <span className="font-mono text-[10px]">{card.id}</span></div>
