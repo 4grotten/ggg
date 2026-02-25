@@ -858,8 +858,8 @@
     "stablecoins": "العملات المستقرة",
     "bankTransfer": "تحويل بنكي",
     "sendToCard": "إرسال إلى بطاقة",
-    "usdtBalance": "محفظة USDT",
-    "usdtBalanceDesc": "من رصيدك"
+    "usdtBalance": "تحويل إلى محفظة USDT",
+    "usdtBalanceDesc": "إرسال USDT إلى EasyCard أو محفظة خارجية"
   },
   "topUpUsdt": {
     "title": "شحن من USDT",

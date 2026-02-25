@@ -864,8 +864,8 @@
     "stablecoins": "稳定币",
     "bankTransfer": "银行转账",
     "sendToCard": "转账到卡",
-    "usdtBalance": "USDT 钱包",
-    "usdtBalanceDesc": "从您的余额"
+    "usdtBalance": "转账到 USDT 钱包",
+    "usdtBalanceDesc": "将 USDT 发送到 EasyCard 或外部钱包"
   },
   "topUpUsdt": {
     "title": "从USDT充值",
