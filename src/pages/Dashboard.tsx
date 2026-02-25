@@ -65,6 +65,7 @@ const Dashboard = () => {
   const [partnerDrawerOpen, setPartnerDrawerOpen] = useState(false);
   const [authAlertOpen, setAuthAlertOpen] = useState(false);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+  const [pendingUnlockAction, setPendingUnlockAction] = useState<'send' | 'topup' | null>(null);
   
   const { addCurrentAccount } = useMultiAccount();
   const { getCompletedSteps } = useVerificationProgress();
@@ -205,9 +206,17 @@ const Dashboard = () => {
           {/* Action Buttons */}
           <AnimatedSection delay={0.2} preset="fadeUp">
             <ActionButtons 
-              onTopUp={() => setTopUpOpen(true)} 
+              onTopUp={() => {
+                if (requiresAuth) {
+                  setPendingUnlockAction('topup');
+                  setShowUnlockDialog(true);
+                } else {
+                  setTopUpOpen(true);
+                }
+              }} 
               onSend={() => {
                 if (requiresAuth) {
+                  setPendingUnlockAction('send');
                   setShowUnlockDialog(true);
                 } else {
                   setSendOpen(true);
@@ -399,8 +408,12 @@ const Dashboard = () => {
 
     <DataUnlockDialog
       isOpen={showUnlockDialog}
-      onClose={() => setShowUnlockDialog(false)}
-      onSuccess={() => setSendOpen(true)}
+      onClose={() => { setShowUnlockDialog(false); setPendingUnlockAction(null); }}
+      onSuccess={() => {
+        if (pendingUnlockAction === 'send') setSendOpen(true);
+        else if (pendingUnlockAction === 'topup') setTopUpOpen(true);
+        setPendingUnlockAction(null);
+      }}
     />
   </>
 );
