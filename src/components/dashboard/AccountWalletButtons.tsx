@@ -31,14 +31,15 @@ export const AccountWalletButtons = ({
   const { isHideDataEnabled, isEnabled } = useScreenLockContext();
 
   useEffect(() => {
-    if (!isHideDataEnabled) {
+    const hide = isHideDataEnabled && isEnabled;
+    if (!hide) {
       setAccountVisible(true);
       setWalletVisible(true);
     } else {
       setAccountVisible(false);
       setWalletVisible(false);
     }
-  }, [isHideDataEnabled]);
+  }, [isHideDataEnabled, isEnabled]);
 
   const toggleVisibility = (e: React.MouseEvent, field: "account" | "wallet") => {
     e.stopPropagation();

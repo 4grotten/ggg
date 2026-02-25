@@ -51,9 +51,10 @@ const MetalCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isHideDataEnabled, isEnabled } = useScreenLockContext();
-  const [showDetails, setShowDetails] = useState(!isHideDataEnabled);
+  const shouldHide = isHideDataEnabled && isEnabled;
+  const [showDetails, setShowDetails] = useState(!shouldHide);
   const [billingOpen, setBillingOpen] = useState(false);
-  const [balanceVisible, setBalanceVisible] = useState(!isHideDataEnabled);
+  const [balanceVisible, setBalanceVisible] = useState(!shouldHide);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<'details' | 'balance' | null>(null);
@@ -65,14 +66,15 @@ const MetalCard = () => {
 
   // Sync balance visibility with global toggle
   useEffect(() => {
-    if (!isHideDataEnabled) {
+    const hide = isHideDataEnabled && isEnabled;
+    if (!hide) {
       setBalanceVisible(true);
       setShowDetails(true);
     } else {
       setBalanceVisible(false);
       setShowDetails(false);
     }
-  }, [isHideDataEnabled]);
+  }, [isHideDataEnabled, isEnabled]);
 
   // Fetch real balance from API
   const { data: cardsData } = useCards({ type: 'metal' });

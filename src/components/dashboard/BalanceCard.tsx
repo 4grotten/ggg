@@ -49,20 +49,21 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
 };
 
 export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0, accountIbanLast4 }: BalanceCardProps) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const { isHideDataEnabled, isEnabled } = useScreenLockContext();
+  const shouldHide = isHideDataEnabled && isEnabled;
+  const [isVisible, setIsVisible] = useState(!shouldHide);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
-  
-  const { isHideDataEnabled, isEnabled } = useScreenLockContext();
 
   // Auto-show/hide based on toggle
   useEffect(() => {
-    if (!isHideDataEnabled) {
+    const hide = isHideDataEnabled && isEnabled;
+    if (!hide) {
       setIsVisible(true);
     } else {
       setIsVisible(false);
     }
-  }, [isHideDataEnabled]);
+  }, [isHideDataEnabled, isEnabled]);
 
   const handleToggle = () => {
     if (!isVisible && isHideDataEnabled && isEnabled) {
