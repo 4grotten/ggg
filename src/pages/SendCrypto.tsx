@@ -324,7 +324,8 @@ const SendCrypto = () => {
         toast.success(statusMsg);
         navigate(isReferralWithdrawal ? "/partner" : "/");
       } else {
-        const errMsg = res.error?.message || res.error?.detail || t("send.transferError", "Ошибка перевода");
+        const errObj = res.error as Record<string, unknown> | null;
+        const errMsg = (errObj?.error as string) || errObj?.message as string || errObj?.detail as string || t("send.transferError", "Ошибка перевода");
         toast.error(errMsg);
       }
     } catch (err) {
