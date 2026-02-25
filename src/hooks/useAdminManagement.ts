@@ -26,6 +26,14 @@ export interface BackendClient {
   user_id: string;
   full_name: string;
   phone: string;
+  avatar_url: string | null;
+  created_at: string | null;
+  cards_count: number;
+  total_cards_balance: number;
+  accounts_count: number;
+  total_bank_balance: number;
+  crypto_wallets_count: number;
+  total_crypto_balance: number;
   limits: {
     custom_settings_enabled: boolean;
     transfer_min: string | null;

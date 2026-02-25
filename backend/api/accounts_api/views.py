@@ -629,14 +629,39 @@ class AdminUserLimitsListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
     @swagger_auto_schema(
-        operation_summary="Список лимитов всех пользователей (Админ)",
+        operation_summary="Список пользователей с полной информацией (Админ)",
         tags=["Админ: Управление пользователями"]
     )
     def get(self, request):
+        from django.db.models import Sum, Count
         profiles = Profiles.objects.all().order_by('-created_at')
         serializer = UserLimitsSerializer(profiles, many=True)
+
+        # Prefetch aggregated data for all users at once
+        user_ids = [p.user_id for p in profiles]
+
+        # Cards: count and total balance per user
+        cards_agg = {}
+        for row in Cards.objects.filter(user_id__in=user_ids).values('user_id').annotate(
+            cards_count=Count('id'), total_cards_balance=Sum('balance')
+        ):
+            cards_agg[row['user_id']] = row
+
+        # Bank accounts count per user
+        accounts_agg = {}
+        for row in BankDepositAccounts.objects.filter(user_id__in=user_ids).values('user_id').annotate(
+            accounts_count=Count('id'), total_bank_balance=Sum('balance')
+        ):
+            accounts_agg[row['user_id']] = row
+
+        # Crypto wallets per user
+        crypto_agg = {}
+        for row in CryptoWallets.objects.filter(user_id__in=user_ids).values('user_id').annotate(
+            wallets_count=Count('id'), total_crypto_balance=Sum('balance')
+        ):
+            crypto_agg[row['user_id']] = row
+
         data = []
-        
         for i, profile in enumerate(profiles):
             full_name = f"{getattr(profile, 'first_name', '')} {getattr(profile, 'last_name', '')}".strip()
             if not full_name and profile.user_id and str(profile.user_id).isdigit():
@@ -646,10 +671,23 @@ class AdminUserLimitsListView(APIView):
                 except User.DoesNotExist:
                     pass
 
+            uid = profile.user_id
+            c = cards_agg.get(uid, {})
+            a = accounts_agg.get(uid, {})
+            w = crypto_agg.get(uid, {})
+
             data.append({
-                "user_id": profile.user_id,
+                "user_id": uid,
                 "full_name": full_name or "Unknown User",
                 "phone": getattr(profile, 'phone', ''),
+                "avatar_url": getattr(profile, 'avatar_url', None),
+                "created_at": profile.created_at.isoformat() if profile.created_at else None,
+                "cards_count": c.get('cards_count', 0),
+                "total_cards_balance": float(c.get('total_cards_balance', 0) or 0),
+                "accounts_count": a.get('accounts_count', 0),
+                "total_bank_balance": float(a.get('total_bank_balance', 0) or 0),
+                "crypto_wallets_count": w.get('wallets_count', 0),
+                "total_crypto_balance": float(w.get('total_crypto_balance', 0) or 0),
                 "limits": serializer.data[i]
             })
             

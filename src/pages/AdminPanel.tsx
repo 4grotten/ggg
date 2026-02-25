@@ -787,69 +787,7 @@ export default function AdminPanel() {
                     </Button>
                   </div>
 
-                  {/* Mock User Card - Ultra Modern Design */}
-                  <div 
-                    onClick={() => handleOpenClientDetails(mockClientData)}
-                    className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-muted/30 border border-border/50 mb-4 group hover:border-primary/30 transition-all duration-300 cursor-pointer active:scale-[0.98]"
-                  >
-                    {/* Glassmorphism overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
-                    {/* Status indicator line */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500" />
-                    
-                    <div className="relative p-5">
-                      {/* Main content row */}
-                      <div className="flex items-start gap-4">
-                        {/* Avatar with photo and status below */}
-                        <div className="flex flex-col items-center gap-2 shrink-0">
-                          <div className="relative">
-                            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-primary/20 ring-2 ring-primary/20">
-                              <img 
-                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" 
-                                alt="Александр Иванов"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            {/* Online indicator */}
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
-                              <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                            </div>
-                          </div>
-                          {/* VIP Badge below photo */}
-                          <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-[10px] px-2.5 py-0.5 font-semibold border-0 shadow-sm">
-                            VIP
-                          </Badge>
-                        </div>
-                        
-                        {/* Info section */}
-                        <div className="flex-1 min-w-0">
-                          {/* Full Name */}
-                          <h3 className="font-bold text-lg mb-2">Александр Иванов</h3>
-                          
-                          {/* Phone number */}
-                          <div className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 w-fit mb-3">
-                            <Phone className="w-4 h-4 text-primary" />
-                            <span className="text-sm font-medium">+971 50 123 4567</span>
-                          </div>
-                          
-                          {/* Tags */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
-                              <CheckCircle className="w-3 h-3" />
-                              Верифицирован
-                            </span>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-medium">
-                              <CreditCard className="w-3 h-3" />
-                              2 карты
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Clients List */}
+                  {/* Client cards rendered from API data below */}
                   {clientsLoading ? (
                     <div className="space-y-3">
                       {[1, 2, 3].map((i) => (
@@ -857,41 +795,121 @@ export default function AdminPanel() {
                       ))}
                     </div>
                   ) : displayedClients && displayedClients.length > 0 ? (
-                    <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-                      {displayedClients.map((client) => (
-                        <div
+                    <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+                      {displayedClients.map((client, index) => (
+                        <motion.div
                           key={client.user_id}
-                          className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 hover:border-border transition-colors"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.03 }}
+                          onClick={() => handleOpenClientDetails({
+                            id: client.user_id,
+                            name: client.full_name,
+                            phone: client.phone,
+                            avatarUrl: client.avatar_url || undefined,
+                            isVerified: true,
+                            cardsCount: client.cards_count,
+                            referralLevel: "R1",
+                            balance: client.total_cards_balance + client.total_bank_balance,
+                            registrationDate: client.created_at ? new Date(client.created_at).toLocaleDateString() : "—",
+                          })}
+                          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer active:scale-[0.98] group"
                         >
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/10 flex items-center justify-center shrink-0">
-                            <UsersRound className="w-5 h-5 text-cyan-500" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">
-                      {client.full_name || t("admin.roles.noName")}
-                            </p>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                              {client.phone && (
-                                <span className="flex items-center gap-1">
-                                  <Phone className="w-3 h-3" />
-                                  {client.phone}
-                                </span>
-                              )}
-                              {client.limits?.custom_settings_enabled && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-500 font-medium">
-                                  Custom
-                                </span>
-                              )}
+                          {/* Status line */}
+                          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
+
+                          <div className="p-4">
+                            {/* Top row: avatar + name + ID */}
+                            <div className="flex items-start gap-3 mb-3">
+                              <div className="relative shrink-0">
+                                <div className="w-12 h-12 rounded-xl overflow-hidden ring-2 ring-primary/20 bg-muted">
+                                  {client.avatar_url ? (
+                                    <img src={client.avatar_url} alt={client.full_name} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10">
+                                      <UsersRound className="w-5 h-5 text-primary" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-card" />
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-sm truncate">
+                                  {client.full_name || t("admin.roles.noName")}
+                                </h4>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                                    <Hash className="w-3 h-3" />
+                                    {client.user_id.length > 8 ? `${client.user_id.slice(0, 8)}…` : client.user_id}
+                                  </span>
+                                  {client.limits?.custom_settings_enabled && (
+                                    <Badge className="bg-cyan-500/10 text-cyan-500 border-0 text-[9px] px-1.5 py-0 h-4">Custom</Badge>
+                                  )}
+                                </div>
+                              </div>
+
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="shrink-0 w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground"
+                                onClick={(e) => { e.stopPropagation(); }}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                            </div>
+
+                            {/* Phone */}
+                            {client.phone && (
+                              <div className="flex items-center gap-2 bg-muted/40 rounded-lg px-2.5 py-1.5 mb-3 w-fit">
+                                <Phone className="w-3.5 h-3.5 text-primary" />
+                                <span className="text-xs font-medium">{client.phone}</span>
+                              </div>
+                            )}
+
+                            {/* Stats grid: cards, accounts, crypto */}
+                            <div className="grid grid-cols-3 gap-2 mb-2">
+                              <div className="bg-muted/30 rounded-xl px-2.5 py-2 text-center">
+                                <div className="flex items-center justify-center gap-1 mb-0.5">
+                                  <CreditCard className="w-3 h-3 text-blue-500" />
+                                  <span className="text-[10px] text-muted-foreground">Карты</span>
+                                </div>
+                                <p className="text-sm font-bold">{client.cards_count}</p>
+                              </div>
+                              <div className="bg-muted/30 rounded-xl px-2.5 py-2 text-center">
+                                <div className="flex items-center justify-center gap-1 mb-0.5">
+                                  <Wallet className="w-3 h-3 text-emerald-500" />
+                                  <span className="text-[10px] text-muted-foreground">Счета</span>
+                                </div>
+                                <p className="text-sm font-bold">{client.accounts_count}</p>
+                              </div>
+                              <div className="bg-muted/30 rounded-xl px-2.5 py-2 text-center">
+                                <div className="flex items-center justify-center gap-1 mb-0.5">
+                                  <Zap className="w-3 h-3 text-amber-500" />
+                                  <span className="text-[10px] text-muted-foreground">Крипто</span>
+                                </div>
+                                <p className="text-sm font-bold">{client.crypto_wallets_count}</p>
+                              </div>
+                            </div>
+
+                            {/* Balances row */}
+                            <div className="flex items-center gap-3 pt-2 border-t border-border/30">
+                              <div className="flex-1">
+                                <p className="text-[10px] text-muted-foreground">Карты + Счёт</p>
+                                <p className="text-sm font-bold text-foreground">
+                                  {(client.total_cards_balance + client.total_bank_balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-muted-foreground font-normal">AED</span>
+                                </p>
+                              </div>
+                              <div className="w-px h-6 bg-border/50" />
+                              <div className="flex-1">
+                                <p className="text-[10px] text-muted-foreground">Крипто</p>
+                                <p className="text-sm font-bold text-foreground">
+                                  {client.total_crypto_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-muted-foreground font-normal">USDT</span>
+                                </p>
+                              </div>
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="shrink-0 rounded-xl text-muted-foreground hover:text-foreground"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </div>
+                        </motion.div>
                       ))}
                     </div>
                   ) : (
