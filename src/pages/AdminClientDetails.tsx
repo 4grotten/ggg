@@ -416,7 +416,7 @@ export default function AdminClientDetails() {
             <div className="flex items-center gap-2">
               <Receipt className="w-5 h-5 text-primary" />
               <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
-              <Badge variant="secondary" className="text-[10px]">{client.transactions.length}</Badge>
+              <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
             </div>
             <CardTransactionsList groups={txGroups} />
             {client.transactions.length > 3 && !showAllTx && (
