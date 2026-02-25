@@ -678,7 +678,7 @@ const TransactionDetails = () => {
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <motion.div
-                initial={{ y: 80, x: -80, opacity: 0 }}
+                initial={{ y: -80, x: 80, opacity: 0 }}
                 animate={{ y: 0, x: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
               >
