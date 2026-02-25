@@ -220,7 +220,45 @@ export default function AdminClientTransactionHistory() {
         offset += pageSize;
       }
 
-      return allTransactions;
+      // Fallback: merge user-related rows from global feed if dedicated endpoint misses latest records
+      if (activeAsset === "all" && !dateFrom && !dateTo) {
+        const allRes = await apiRequest<ClientTransaction[] | Record<string, unknown>>(`/transactions/all/`, {}, true);
+        if (allRes.data) {
+          const globalRows = Array.isArray(allRes.data)
+            ? allRes.data
+            : (Array.isArray((allRes.data as any).results) ? (allRes.data as any).results : []);
+
+          const fallbackRows = globalRows
+            .filter((tx: any) => {
+              const uid = String(userId);
+              return String(tx?.user_id ?? "") === uid
+                || String(tx?.sender_id ?? "") === uid
+                || String(tx?.receiver_id ?? "") === uid;
+            })
+            .map((tx: any) => ({
+              ...tx,
+              card_id: tx.card_id || tx.card || undefined,
+              sender_card: tx.sender_card || tx.senderCard || null,
+              recipient_card: tx.recipient_card || tx.recipientCard || null,
+              amount: typeof tx.amount === 'string' ? parseFloat(tx.amount) || 0 : tx.amount,
+              fee: typeof tx.fee === 'string' ? parseFloat(tx.fee) || 0 : tx.fee,
+              exchange_rate: typeof tx.exchange_rate === 'string' ? parseFloat(tx.exchange_rate) || null : tx.exchange_rate,
+              original_amount: typeof tx.original_amount === 'string' ? parseFloat(tx.original_amount) || null : tx.original_amount,
+            })) as ClientTransaction[];
+
+          const merged = new Map<string, ClientTransaction>();
+          [...allTransactions, ...fallbackRows].forEach((tx) => {
+            if (tx?.id) merged.set(String(tx.id), tx);
+          });
+          return Array.from(merged.values()).sort((a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        }
+      }
+
+      return allTransactions.sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
     },
     enabled: !!userId,
   });
@@ -361,15 +399,20 @@ export default function AdminClientTransactionHistory() {
     return groups.map(group => {
       let txs = group.transactions;
       const viewedUserId = userId ?? "";
+
+      txs = txs.filter((tx) => isAssetMatch(tx, activeAsset));
       if (activeFilter === "income") txs = txs.filter(tx => isIncomeForUser(tx, viewedUserId));
       else if (activeFilter === "expenses") txs = txs.filter(tx => isExpenseForUser(tx, viewedUserId));
       else if (activeFilter === "transfers") txs = txs.filter(isTransfer);
+
       if (txs.length === 0) return null;
       const appTxs = txs.map(mapToAppTransaction);
-      const totalSpend = appTxs.filter(t => !isIncomeForUser(txs.find(x => x.id === t.id)!, viewedUserId)).reduce((s, t) => s + t.amountLocal, 0);
+      const totalSpend = appTxs
+        .filter(t => !isIncomeForUser(txs.find(x => x.id === t.id)!, viewedUserId))
+        .reduce((s, t) => s + t.amountLocal, 0);
       return { date: group.date, totalSpend, transactions: appTxs };
     }).filter(Boolean) as AppTransactionGroup[];
-  }, [groups, activeFilter]);
+  }, [groups, activeFilter, activeAsset, userId]);
 
   const filterOptions: { key: FilterType; label: string }[] = [
     { key: "all", label: t("history.all") },
