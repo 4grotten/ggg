@@ -111,7 +111,9 @@ const handleClick = (transaction: Transaction) => {
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
     const isCryptoToCard = transaction.type === "crypto_to_card";
+    const isCryptoToIbanList = (transaction.type as string) === "crypto_to_iban";
     const isIncomingCryptoToCard = isCryptoToCard && (transaction.metadata as any)?.isIncoming;
+    const isIncomingCryptoToIban = isCryptoToIbanList && (transaction.metadata as any)?.isIncoming;
     const apiIsIncoming = (transaction.metadata as any)?.isIncoming;
     const hasBothCards = !!transaction.senderCard && !!transaction.recipientCard;
     const isIncomingTransfer = isCardTransfer && (
@@ -127,18 +129,18 @@ const handleClick = (transaction: Transaction) => {
     const isProcessing = transaction.status === "processing";
     // In wallet view, topup = outgoing (wallet → card), so it's negative
     const walletTopupOutgoing = walletView && isTopup;
-    const prefix = (isTopup && !walletView) || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard ? "+" : walletTopupOutgoing || isOutgoingTransfer || isCryptoSend || isBankTransfer || (isCryptoToCard && !isIncomingCryptoToCard) ? "-" : "";
+    const prefix = (isTopup && !walletView) || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToIban ? "+" : walletTopupOutgoing || isOutgoingTransfer || isCryptoSend || isBankTransfer || (isCryptoToCard && !isIncomingCryptoToCard) || (isCryptoToIbanList && !isIncomingCryptoToIban) ? "-" : "";
     
     let colorClass = "";
     if (isProcessing && (isCardTransfer || isBankTransfer || isCryptoSend)) {
       colorClass = "text-[#FFA000]";
     } else if (walletTopupOutgoing) {
       colorClass = "text-[#007AFF]";
-    } else if (isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard) {
+    } else if (isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToIban) {
       colorClass = "text-green-500";
     } else if (isDeclined) {
       colorClass = "text-red-500";
-    } else if (isOutgoingTransfer || isCryptoSend || isBankTransfer || isCryptoToCard) {
+    } else if (isOutgoingTransfer || isCryptoSend || isBankTransfer || isCryptoToCard || isCryptoToIbanList) {
       colorClass = "text-[#007AFF]";
     }
     
@@ -273,7 +275,7 @@ const handleClick = (transaction: Transaction) => {
                       ) : isCryptoToIban ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
-                          style={{ backgroundColor: "#26A17B" }}
+                          style={{ backgroundColor: (transaction.metadata as any)?.isIncoming ? "#26A17B" : "#007AFF" }}
                         >
                           <UsdtIcon size={20} />
                           <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#8B5CF6] flex items-center justify-center ring-2 ring-background">
@@ -383,6 +385,13 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description.replace(/^Крипто\s*(перевод:?\s*)?/i, '').split('→')[0].replace(/[:\s]+$/, '').trim())}`
                           : isCryptoToCard && transaction.recipientCard
                           ? ` ${t("transactions.toVisaCard", { type: (transaction.metadata as any)?.recipientCardType || "Metal", last4: (transaction.recipientCard || '').slice(-4), defaultValue: `На Visa ${(transaction.metadata as any)?.recipientCardType || "Metal"} ••${(transaction.recipientCard || '').slice(-4)}` })}`
+                          : isCryptoToIban
+                          ? (() => {
+                              const wallet = (transaction.metadata as any)?.cryptoAddress || (transaction.metadata as any)?.senderWallet || '';
+                              if (wallet) return ` · ${maskMiddle(wallet)}`;
+                              const name = transaction.recipientName || '';
+                              return name ? ` · ${t("transactions.to")} ${maskMiddle(name)}` : '';
+                            })()
                           : isTopup && transaction.description
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
                           : ""
@@ -391,7 +400,7 @@ const handleClick = (transaction: Transaction) => {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    {(isOutgoingCryptoToBank || isIncomingCryptoToBank) ? (
+                    {(isOutgoingCryptoToBank || isIncomingCryptoToBank || isCryptoToIban) ? (
                       <>
                         <p className={`font-semibold ${colorClass}`}>
                           {prefix}{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
