@@ -636,9 +636,10 @@ class AdminUserLimitsListView(APIView):
         serializer = UserLimitsSerializer(profiles, many=True)
         data = []
         for i, profile in enumerate(profiles):
+            user = User.objects.get(id=profile.user_id)
             data.append({
                 "user_id": profile.user_id,
-                "full_name": f"{profile.first_name or ''} {profile.last_name or ''}".strip(),
+                "full_name": f"{user.first_name or ''} {user.last_name or ''}".strip(),
                 "phone": profile.phone,
                 "limits": serializer.data[i]
             })
@@ -659,9 +660,10 @@ class AdminUserLimitDetailView(APIView):
         serializer = UserLimitsSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            user = User.objects.get(id=profile.user_id)
             return Response({
                 "user_id": profile.user_id,
-                "full_name": f"{profile.first_name or ''} {profile.last_name or ''}".strip(),
+                "full_name": f"{user.first_name or ''} {user.last_name or ''}".strip(),
                 "phone": profile.phone,
                 "limits": serializer.data
             }, status=status.HTTP_200_OK)
