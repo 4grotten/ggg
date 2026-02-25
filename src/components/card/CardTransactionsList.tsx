@@ -71,6 +71,7 @@ const translateMerchant = (merchant: string, type: string | undefined, t: (key: 
     "Stablecoin Send": "transactions.stablecoinSend",
     "Bank Transfer": "transactions.bankTransfer",
     "IBAN to Card": "transactions.ibanToCard",
+    "iban_to_iban": "IBAN Bank → IBAN Bank",
   };
   
   return merchantsMap[merchant] ? t(merchantsMap[merchant]) : merchant;
