@@ -18,7 +18,7 @@ type AssetsFilter = "all" | "has_cards" | "has_accounts" | "has_crypto";
 export default function AdminClients() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { clients, clientsLoading, searchClients, refetchClients } = useAdminManagement();
+  const { clients, clientsLoading, clientsError, searchClients, refetchClients } = useAdminManagement();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
@@ -202,7 +202,21 @@ export default function AdminClients() {
           </AnimatePresence>
 
           {/* Client list */}
-          {clientsLoading ? (
+          {clientsError ? (
+            <div className="flex flex-col items-center justify-center py-16 space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center">
+                <X className="w-8 h-8 text-destructive" />
+              </div>
+              <div className="text-center space-y-1">
+                <p className="font-semibold text-sm">Ошибка загрузки</p>
+                <p className="text-xs text-muted-foreground max-w-[250px]">Сервер недоступен. Попробуйте позже.</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => refetchClients()} className="rounded-xl gap-2">
+                <RefreshCw className="w-4 h-4" />
+                Повторить
+              </Button>
+            </div>
+          ) : clientsLoading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4].map((i) => (
                 <Skeleton key={i} className="h-48 w-full rounded-2xl" />

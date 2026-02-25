@@ -137,13 +137,14 @@ export function useAdminManagement() {
   });
 
   // Fetch all clients from backend API
-  const { data: clients, isLoading: clientsLoading, refetch: refetchClients } = useQuery({
+  const { data: clients, isLoading: clientsLoading, error: clientsError, refetch: refetchClients } = useQuery({
     queryKey: ["admin-clients"],
     queryFn: async () => {
       const res = await apiRequest<BackendClient[]>("/admin/users/limits/");
       if (res.error || !res.data) throw new Error(res.error?.detail || res.error?.message || "Failed to fetch clients");
       return res.data;
     },
+    retry: 2,
   });
 
   // Search clients (local filter on already-fetched data)
@@ -233,6 +234,7 @@ export function useAdminManagement() {
     isLoading,
     clients,
     clientsLoading,
+    clientsError,
     refetchClients,
     searchUser,
     searchClients,
