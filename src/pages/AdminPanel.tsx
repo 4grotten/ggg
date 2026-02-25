@@ -576,7 +576,7 @@ export default function AdminPanel() {
     { value: "rates", label: t("admin.tabs.rates"), icon: TrendingUp },
     { value: "fees", label: t("admin.tabs.fees"), icon: Percent },
     { value: "limits", label: t("admin.tabs.limits"), icon: Wallet },
-    { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound },
+    { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound, link: "/settings/admin/clients" },
     { value: "admins", label: t("admin.tabs.admins"), icon: Users },
     { value: "system", label: t("admin.system.title", "Система"), icon: Settings },
   ];
@@ -698,7 +698,7 @@ export default function AdminPanel() {
                       {tabConfig.map((tab) => (
                         <button
                           key={tab.value}
-                          onClick={() => setActiveTab(tab.value)}
+                          onClick={() => 'link' in tab && tab.link ? navigate(tab.link) : setActiveTab(tab.value)}
                           className={cn(
                             "relative z-10 flex flex-col items-center justify-center gap-1 h-full rounded-xl transition-colors",
                             "w-20 shrink-0 md:w-auto",
@@ -759,217 +759,8 @@ export default function AdminPanel() {
                 </GlassCard>
               </TabsContent>
 
-              <TabsContent value="clients" className="mt-0 space-y-4">
-                <GlassCard
-                  title={t("admin.clients.title")}
-                  description={`${displayedClients?.length || 0} ${t("admin.roles.usersWithRoles", "пользователей")}`}
-                  icon={UsersRound}
-                  iconColor="text-cyan-500"
-                >
-                  {/* Search */}
-                  <div className="flex gap-2 mb-4">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        placeholder={t("admin.clients.searchPlaceholder")}
-                        value={clientSearchQuery}
-                        onChange={(e) => {
-                          setClientSearchQuery(e.target.value);
-                          if (!e.target.value.trim()) setFilteredClients(undefined);
-                        }}
-                        onKeyDown={(e) => e.key === "Enter" && handleClientSearch()}
-                        className="pl-10 h-11 rounded-xl bg-background/50"
-                      />
-                    </div>
-                    <Button
-                      size="icon"
-                      onClick={handleClientSearch}
-                      disabled={isClientSearching}
-                      className="h-11 w-11 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600"
-                    >
-                      {isClientSearching ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Search className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-
-                  {/* Client cards rendered from API data below */}
-                  {clientsLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <Skeleton key={i} className="h-20 w-full rounded-2xl" />
-                      ))}
-                    </div>
-                  ) : displayedClients && displayedClients.length > 0 ? (
-                    <div className="space-y-3 max-h-[60vh] overflow-y-auto">
-                      {displayedClients.map((client, index) => (
-                        <motion.div
-                          key={client.user_id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.03 }}
-                          onClick={() => handleOpenClientDetails({
-                            id: client.user_id,
-                            name: client.full_name,
-                            phone: client.phone,
-                            avatarUrl: client.avatar_url || undefined,
-                            isVerified: client.is_verified ?? false,
-                            cardsCount: client.cards_count || 0,
-                            referralLevel: client.referral_level || null,
-                            role: client.role || 'user',
-                            accountsCount: client.accounts_count || 0,
-                            cryptoWalletsCount: client.crypto_wallets_count || 0,
-                            totalCryptoBalance: client.total_crypto_balance || 0,
-                            balance: (client.total_cards_balance || 0) + (client.total_bank_balance || 0),
-                            registrationDate: client.created_at ? new Date(client.created_at).toLocaleDateString() : "—",
-                          })}
-                          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-muted/20 border border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer active:scale-[0.98] group"
-                        >
-                          {/* Status line */}
-                          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent" />
-
-                          <div className="p-4">
-                            {/* Top row: avatar + name + ID */}
-                            <div className="flex items-start gap-3 mb-3">
-                              <div className="relative shrink-0">
-                                <div className="w-12 h-12 rounded-xl overflow-hidden ring-2 ring-primary/20 bg-muted">
-                                  {client.avatar_url ? (
-                                    <img src={client.avatar_url} alt={client.full_name} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10">
-                                      <UsersRound className="w-5 h-5 text-primary" />
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-card" />
-                              </div>
-
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-sm truncate">
-                                  {client.full_name || t("admin.roles.noName")}
-                                </h4>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                                    <Hash className="w-3 h-3" />
-                                    {client.user_id.length > 8 ? `${client.user_id.slice(0, 8)}…` : client.user_id}
-                                  </span>
-                                  {client.limits?.custom_settings_enabled && (
-                                    <Badge className="bg-cyan-500/10 text-cyan-500 border-0 text-[9px] px-1.5 py-0 h-4">Custom</Badge>
-                                  )}
-                                  {/* Role badge */}
-                                  {(client.role || 'user') === 'admin' && (
-                                    <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 border-0">Admin</Badge>
-                                  )}
-                                  {(client.role || 'user') === 'moderator' && (
-                                    <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4 border-0">Mod</Badge>
-                                  )}
-                                </div>
-                              </div>
-
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="shrink-0 w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground"
-                                onClick={(e) => { e.stopPropagation(); }}
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                            </div>
-
-                            {/* Phone */}
-                            {client.phone && (
-                              <div className="flex items-center gap-2 bg-muted/40 rounded-lg px-2.5 py-1.5 mb-3 w-fit">
-                                <Phone className="w-3.5 h-3.5 text-primary" />
-                                <span className="text-xs font-medium">{client.phone}</span>
-                              </div>
-                            )}
-
-                            {/* Tags: verification, role, referral */}
-                            <div className="flex items-center gap-1.5 flex-wrap mb-3">
-                              {client.is_verified ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
-                                  <CheckCircle className="w-3 h-3" />
-                                  Верифицирован
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10px] font-medium">
-                                  <Shield className="w-3 h-3" />
-                                  Не верифицирован
-                                </span>
-                              )}
-                              <span className={cn(
-                                "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
-                                (client.role || 'user') === 'admin' ? "bg-red-500/10 text-red-600 dark:text-red-400" :
-                                (client.role || 'user') === 'moderator' ? "bg-violet-500/10 text-violet-600 dark:text-violet-400" :
-                                "bg-muted text-muted-foreground"
-                              )}>
-                                <Users className="w-3 h-3" />
-                                {(client.role || 'user') === 'admin' ? 'Админ' : (client.role || 'user') === 'moderator' ? 'Модератор' : 'Пользователь'}
-                              </span>
-                              {client.referral_level && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
-                                  <Sparkles className="w-3 h-3" />
-                                  {client.referral_level}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Stats grid: cards, accounts, crypto */}
-                            <div className="grid grid-cols-3 gap-2 mb-2">
-                              <div className="bg-muted/30 rounded-xl px-2.5 py-2 text-center">
-                                <div className="flex items-center justify-center gap-1 mb-0.5">
-                                  <CreditCard className="w-3 h-3 text-blue-500" />
-                                  <span className="text-[10px] text-muted-foreground">Карты</span>
-                                </div>
-                                <p className="text-sm font-bold">{client.cards_count || 0}</p>
-                              </div>
-                              <div className="bg-muted/30 rounded-xl px-2.5 py-2 text-center">
-                                <div className="flex items-center justify-center gap-1 mb-0.5">
-                                  <Wallet className="w-3 h-3 text-emerald-500" />
-                                  <span className="text-[10px] text-muted-foreground">Счета</span>
-                                </div>
-                                <p className="text-sm font-bold">{client.accounts_count || 0}</p>
-                              </div>
-                              <div className="bg-muted/30 rounded-xl px-2.5 py-2 text-center">
-                                <div className="flex items-center justify-center gap-1 mb-0.5">
-                                  <Zap className="w-3 h-3 text-amber-500" />
-                                  <span className="text-[10px] text-muted-foreground">Крипто</span>
-                                </div>
-                                <p className="text-sm font-bold">{client.crypto_wallets_count || 0}</p>
-                              </div>
-                            </div>
-
-                            {/* Balances row */}
-                            <div className="flex items-center gap-3 pt-2 border-t border-border/30">
-                              <div className="flex-1">
-                                <p className="text-[10px] text-muted-foreground">Карты + Счёт</p>
-                                <p className="text-sm font-bold text-foreground">
-                                  {((client.total_cards_balance || 0) + (client.total_bank_balance || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-muted-foreground font-normal">AED</span>
-                                </p>
-                              </div>
-                              <div className="w-px h-6 bg-border/50" />
-                              <div className="flex-1">
-                                <p className="text-[10px] text-muted-foreground">Крипто</p>
-                                <p className="text-sm font-bold text-foreground">
-                                  {(client.total_crypto_balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-muted-foreground font-normal">USDT</span>
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center py-8 text-muted-foreground">
-                      <UsersRound className="w-12 h-12 mb-2 opacity-30" />
-                      <p className="text-sm">
-                        {clientSearchQuery ? t("admin.clients.notFound") : t("admin.clients.noClients")}
-                      </p>
-                    </div>
-                  )}
-                </GlassCard>
+              <TabsContent value="clients" className="mt-0">
+                {/* Redirects to /settings/admin/clients */}
               </TabsContent>
 
               {/* Admins Tab */}
