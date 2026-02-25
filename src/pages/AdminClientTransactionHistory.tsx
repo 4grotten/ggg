@@ -39,16 +39,23 @@ type PeriodPreset = "allTime" | "today" | "thisWeek" | "lastWeek" | "thisMonth" 
 
 interface ClientTransaction {
   id: string;
+  user_id?: string;
   type: string;
   amount: number;
   currency: string;
   status: string;
   created_at: string;
+  updated_at?: string;
   description?: string;
   merchant_name?: string;
   receiver_name?: string;
   sender_name?: string;
+  sender_id?: string | null;
+  receiver_id?: string | null;
   fee?: number;
+  exchange_rate?: number | null;
+  original_amount?: number | null;
+  original_currency?: string | null;
   card_id?: string;
   metadata?: Record<string, unknown>;
 }

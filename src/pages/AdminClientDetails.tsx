@@ -127,10 +127,25 @@ export default function AdminClientDetails() {
 
   // Initialize state from backend data
   useEffect(() => {
-    if (!client?.limits) return;
-    const l = client.limits;
+    if (!client) return;
+    
+    // Set root-level fields
+    setIsVIP(client.is_vip ?? false);
+    setIsBlocked(client.is_blocked ?? false);
+    if (client.subscription_type) setSelectedSubscription(client.subscription_type === 'default' ? 'free' : client.subscription_type);
+    if (client.referral_level) {
+      // Strip "(DEFAULT)" suffix if present
+      const level = client.referral_level.replace(/\(DEFAULT\)/i, '').trim();
+      const match = REFERRAL_LEVELS.find(l => l.id.toLowerCase() === level.toLowerCase());
+      if (match) setSelectedLevel(match.id);
+    }
+
+    // Use limits_and_settings if available, fallback to limits
+    const l = client.limits_and_settings || client.limits;
+    if (!l) return;
+
     const newFees = {
-      topUpPercent: fees.topUpPercent,
+      topUpPercent: l.network_fee_percent != null ? String(l.network_fee_percent) : fees.topUpPercent,
       transferPercent: l.card_to_card_percent != null ? String(l.card_to_card_percent) : fees.transferPercent,
       withdrawPercent: l.bank_transfer_percent != null ? String(l.bank_transfer_percent) : fees.withdrawPercent,
       conversionPercent: l.currency_conversion_percent != null ? String(l.currency_conversion_percent) : fees.conversionPercent,
@@ -146,7 +161,15 @@ export default function AdminClientDetails() {
     };
     setFees(newFees);
     setLimits(newLimits);
-    initialValues.current = { ...initialValues.current, fees: newFees, limits: newLimits };
+    initialValues.current = { 
+      ...initialValues.current, 
+      fees: newFees, 
+      limits: newLimits,
+      isVIP: client.is_vip ?? false,
+      isBlocked: client.is_blocked ?? false,
+      selectedSubscription: client.subscription_type === 'default' ? 'free' : (client.subscription_type || 'free'),
+      selectedLevel: selectedLevel,
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client]);
 
