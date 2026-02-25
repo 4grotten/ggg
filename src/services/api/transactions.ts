@@ -46,12 +46,16 @@ export interface TransactionReceipt {
   credited_amount_aed?: number | null;
   is_internal?: boolean;
   recipient_avatar?: string | null;
+  sender_avatar?: string | null;
+  receiver_avatar?: string | null;
   from_address?: string;
   // Card transfer fields
   sender_card_mask?: string;
   receiver_card_mask?: string;
   sender_name?: string | null;
   recipient_name?: string | null;
+  sender_id?: string | null;
+  receiver_id?: string | null;
   total_amount?: number;
   // Bank topup fields
   transfer_rail?: string;
@@ -354,6 +358,8 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'declined': 'declined',
     'crypto_to_card': 'crypto_to_card',
     'crypto_to_bank': 'bank_transfer', // will be remapped for inbound below
+    'bank_to_crypto': 'crypto_withdrawal', // will use originalApiType for icon
+    'crypto_to_crypto': 'crypto_withdrawal',
   };
   
   let mappedType = typeMap[tx.type] || 'payment' as TransactionType;
@@ -384,6 +390,11 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
 
   // For crypto_withdrawal with inbound direction, remap to crypto_deposit
   if (tx.type === 'crypto_withdrawal' && tx.direction === 'inbound') {
+    mappedType = 'crypto_deposit';
+  }
+
+  // For crypto_to_crypto with inbound direction, remap to crypto_deposit
+  if (tx.type === 'crypto_to_crypto' && tx.direction === 'inbound') {
     mappedType = 'crypto_deposit';
   }
 
@@ -481,6 +492,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     'transfer_in': 'Bank Transfer',
     'card_payment': tx.merchant_name || 'Payment',
     'transfer': 'Stablecoin Send', // generic crypto transfer
+    'crypto_to_crypto': 'Stablecoin Send',
   };
 
   // Use mappedType for merchant fallback — for "transfer" type use mappedType-based fallback

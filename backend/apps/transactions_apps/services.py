@@ -638,7 +638,8 @@ class TransactionService:
         metadata = {
             "crypto_token": token,
             "crypto_network": network,
-            "crypto_address": to_address
+            "crypto_address": to_address,
+            "from_address": source_wallet.address
         }
 
         if is_internal:
@@ -695,6 +696,24 @@ class TransactionService:
         else:
             direction = 'outbound'
 
+        # Fetch avatars from Profiles
+        sender_avatar = None
+        receiver_avatar = None
+        try:
+            if txn.sender_id and txn.sender_id != 'EXTERNAL':
+                sender_profile = Profiles.objects.filter(user_id=txn.sender_id).first()
+                if sender_profile and sender_profile.avatar_url:
+                    sender_avatar = sender_profile.avatar_url
+        except Exception:
+            pass
+        try:
+            if txn.receiver_id and txn.receiver_id != 'EXTERNAL':
+                receiver_profile = Profiles.objects.filter(user_id=txn.receiver_id).first()
+                if receiver_profile and receiver_profile.avatar_url:
+                    receiver_avatar = receiver_profile.avatar_url
+        except Exception:
+            pass
+
         receipt = {
             "transaction_id": str(txn.id),
             "type": txn.type,
@@ -717,10 +736,14 @@ class TransactionService:
             "receiver_id": txn.receiver_id,
             "sender_name": txn.sender_name,
             "receiver_name": txn.receiver_name,
+            "sender_avatar": sender_avatar,
+            "receiver_avatar": receiver_avatar,
             "operation": txn.type.replace('_', ' ').title(),
-            "receiver_card_mask": None,
+            "receiver_card_mask": TransactionService._mask_card(txn.recipient_card) if txn.recipient_card else None,
+            "receiver_card": txn.recipient_card,
             "recipient_name": txn.receiver_name,
-            "sender_card_mask": None,
+            "sender_card_mask": TransactionService._mask_card(txn.sender_card) if txn.sender_card else None,
+            "sender_card": txn.sender_card,
             "sender_iban": None,
             "sender_bank": None,
             "sender_iban_mask": None,
@@ -734,6 +757,7 @@ class TransactionService:
             "crypto_network": None,
             "crypto_token": None,
             "crypto_address": None,
+            "from_address": None,
             "from_card_id": None,
             "to_card_id": None,
             "from_bank_account_id": None,

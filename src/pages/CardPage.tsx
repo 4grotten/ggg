@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight, ChevronDown, Lock, LockOpen, RefreshCw, Eye, EyeOff, X, ChevronUp, Clock, Share2, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Lock, LockOpen, RefreshCw, Eye, EyeOff, X, ChevronUp, Clock, Share2, Wallet, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -471,6 +471,17 @@ const CardPage = () => {
                 </motion.span>
               </AnimatePresence>
               <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    navigator.clipboard.writeText(cardData.fullNumber.replace(/\s/g, ''));
+                    toast.success(t("toast.cardNumberCopied"));
+                  }}
+                  className="p-2 h-8 w-8 rounded-full bg-secondary hover:bg-muted"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </Button>
                 <Button
                   size="sm"
                   variant="ghost"

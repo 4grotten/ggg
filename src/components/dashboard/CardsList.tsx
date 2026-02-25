@@ -54,9 +54,19 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
   const [pendingCardId, setPendingCardId] = useState<string | null>(null);
   const [pendingCardNavigation, setPendingCardNavigation] = useState<Card | null>(null);
   
-  const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
+  const { isHideDataEnabled, isEnabled } = useScreenLockContext();
   
-  const requiresAuth = isHideDataEnabled && isScreenLockEnabled;
+  const requiresAuth = isHideDataEnabled && isEnabled;
+
+  // Auto-show/hide all card balances based on toggle
+  useEffect(() => {
+    const hide = isHideDataEnabled && isEnabled;
+    if (!hide) {
+      setVisibleBalances(new Set(cards.map(c => c.id)));
+    } else {
+      setVisibleBalances(new Set());
+    }
+  }, [isHideDataEnabled, isEnabled, cards]);
 
   const handleCardClick = (card: Card) => {
     if (onCardClick) {

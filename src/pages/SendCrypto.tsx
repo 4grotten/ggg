@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/drawer";
 import { useSettings } from "@/contexts/SettingsContext";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
-import { useCards, useIban, useCryptoWallets } from "@/hooks/useCards";
+import { useCards, useIban, useCryptoWallets, useBankAccounts } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
@@ -59,6 +59,7 @@ const SendCrypto = () => {
   const { data: cardsResponse, isLoading: cardsLoading } = useCards();
   const { data: ibanResponse, isLoading: ibanLoading } = useIban();
   const { data: cryptoWalletsResponse, isLoading: cryptoLoading } = useCryptoWallets();
+  const { data: bankAccountsResponse } = useBankAccounts();
 
   // Build source options from real data
   const [sourceOptions, setSourceOptions] = useState<SourceOption[]>([]);
@@ -94,10 +95,12 @@ const SendCrypto = () => {
       });
     }
 
-    // Add bank account from IBAN API
+    // Add bank account from IBAN API (use real UUID from bank-accounts endpoint)
     if (ibanResponse?.data) {
+      const bankAccounts = bankAccountsResponse?.data as any;
+      const bankAccountId = bankAccounts?.data?.[0]?.id || bankAccounts?.[0]?.id;
       options.push({
-        id: "bank_account",
+        id: bankAccountId || "bank_account",
         type: "bank_account",
         name: t("send.bankAccount", "Банковский счёт AED"),
         iban: ibanResponse.data.iban,
@@ -107,11 +110,12 @@ const SendCrypto = () => {
 
     setSourceOptions(options);
 
-    // Auto-select first option if none selected
+    // Auto-select: prefer bank account by default, fallback to first option
     if (!selectedSource && options.length > 0) {
-      setSelectedSource(options[0]);
+      const bankOption = options.find(o => o.type === "bank_account");
+      setSelectedSource(bankOption || options[0]);
     }
-  }, [cardsResponse, ibanResponse, cryptoWalletsResponse]);
+  }, [cardsResponse, ibanResponse, cryptoWalletsResponse, bankAccountsResponse]);
 
   const [selectedCoin, setSelectedCoin] = useState(coins[0]);
   const [selectedNetwork, setSelectedNetwork] = useState(networksByCoin[coins[0].id][0]);
@@ -266,8 +270,25 @@ const SendCrypto = () => {
             network: selectedNetwork.id.toUpperCase(),
           }),
         }, true);
+      } else if (selectedSource?.type === "bank_account") {
+        // Bank (IBAN) → Crypto Wallet
+        res = await apiRequest<{
+          message: string;
+          transaction_id: string;
+          status: string;
+          deducted_amount?: number;
+          fee?: number;
+          credited_amount?: number;
+        }>('/transactions/transfer/bank-to-crypto/', {
+          method: 'POST',
+          body: JSON.stringify({
+            from_bank_account_id: selectedSource.id,
+            to_crypto_address: walletAddress,
+            amount_aed: amountNum.toFixed(2),
+          }),
+        }, true);
       } else {
-        // Card/Bank → External Crypto Wallet
+        // Card → External Crypto Wallet
         res = await apiRequest<{
           message: string;
           transaction_id: string;
@@ -564,9 +585,9 @@ const SendCrypto = () => {
 
           {/* Conversion Display */}
           <div className="bg-secondary rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("send.amount")}</span>
-              <span className="font-medium">
+            <div className="flex items-center justify-between pt-2 border-b border-border pb-3">
+              <span className="text-muted-foreground">{t("send.youWillReceive")}</span>
+              <span className="font-semibold text-lg">
                 {amountCrypto} {selectedCoin.symbol}
               </span>
             </div>
@@ -579,9 +600,9 @@ const SendCrypto = () => {
               <span className="font-medium text-[#FFA000]">-{networkFee} {selectedCoin.symbol}</span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-border">
-              <span className="text-muted-foreground">{t("send.youWillReceive")}</span>
-              <span className="font-semibold text-lg">
-                {amountAfterFee} {selectedCoin.symbol}
+              <span className="text-muted-foreground">{t("send.amount")}</span>
+              <span className="font-medium">
+                {(parseFloat(amountCrypto) + parseFloat(amountCrypto) * 0.01 + parseFloat(networkFee)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {selectedCoin.symbol}
               </span>
             </div>
             {!isCryptoSource && (
@@ -617,7 +638,7 @@ const SendCrypto = () => {
                 {t("send.sending", "Отправка...")}
               </span>
             ) : (
-              `Send ${amountAfterFee} ${selectedCoin.symbol}`
+              `${t("common.confirm", "Подтвердить")} ${(parseFloat(amountCrypto) + parseFloat(amountCrypto) * 0.01 + parseFloat(networkFee)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${selectedCoin.symbol}`
             )}
           </Button>
         </div>

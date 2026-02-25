@@ -78,9 +78,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    // For 404 responses (e.g. recipient not found), return 200 with the body
-    // to prevent Lovable error overlay from intercepting edge function 404s
-    let status = response!.status === 404 ? 200 : response!.status;
+    // For 4xx client errors (400, 404, etc.), return 200 with the body
+    // to prevent Lovable error overlay from intercepting edge function errors
+    // The frontend handles these errors via the JSON response body
+    let status = (response!.status >= 400 && response!.status < 500) ? 200 : response!.status;
 
     // If backend returned 502/503/504 after all retries, return a clean JSON error
     // instead of raw HTML to prevent runtime error overlay

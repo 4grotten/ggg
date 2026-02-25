@@ -170,6 +170,8 @@ const handleClick = (transaction: Transaction) => {
               const isDeclined = transaction.type === "declined";
               const isIncomingCryptoToBank = isBankTransferIncoming && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank';
               const isOutgoingCryptoToBank = (transaction.type as string) === "crypto_to_bank" || (isBankTransfer && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank');
+              const isBankToCrypto = (transaction.metadata as any)?.originalApiType === 'bank_to_crypto';
+              const isCryptoToIban = (transaction.metadata as any)?.originalApiType === 'crypto_to_iban' || (transaction.type as string) === 'crypto_to_iban';
               const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction.metadata as any)?.originalApiType || '');
 
               return (
@@ -206,7 +208,7 @@ const handleClick = (transaction: Transaction) => {
                       ) : isBankTransfer ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                          style={{ backgroundColor: "#8B5CF6" }}
+                          style={{ backgroundColor: "#007AFF" }}
                         >
                           <Landmark className="w-5 h-5" />
                         </div>
@@ -215,14 +217,14 @@ const handleClick = (transaction: Transaction) => {
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: "#007AFF" }}
                         >
-                          <Send className="w-5 h-5" />
+                          <UsdtIcon size={22} />
                         </div>
                       ) : isCardTransfer ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: isIncomingTransfer ? "#22C55E" : "#007AFF" }}
                         >
-                          <ArrowUpRight className={`w-5 h-5 ${isIncomingTransfer ? "rotate-180" : ""}`} />
+                          <CreditCard className="w-5 h-5" />
                         </div>
                       ) : isCryptoDeposit ? (
                         <div 
@@ -240,17 +242,43 @@ const handleClick = (transaction: Transaction) => {
                         </div>
                       ) : isCryptoToCard ? (
                         <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
                           style={{ backgroundColor: isIncomingCryptoToCard ? "#22C55E" : "#007AFF" }}
                         >
                           <CreditCard className="w-5 h-5" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center ring-2 ring-background">
+                            <UsdtIcon size={10} />
+                          </div>
                         </div>
                       ) : isOutgoingCryptoToBank ? (
                         <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
                           style={{ backgroundColor: "#8B5CF6" }}
                         >
                           <Landmark className="w-5 h-5" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center ring-2 ring-background">
+                            <UsdtIcon size={10} />
+                          </div>
+                        </div>
+                      ) : isBankToCrypto ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
+                          style={{ backgroundColor: "#007AFF" }}
+                        >
+                          <Landmark className="w-5 h-5" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#26A17B] flex items-center justify-center ring-2 ring-background">
+                            <UsdtIcon size={10} />
+                          </div>
+                        </div>
+                      ) : isCryptoToIban ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
+                          style={{ backgroundColor: "#26A17B" }}
+                        >
+                          <UsdtIcon size={20} />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#8B5CF6] flex items-center justify-center ring-2 ring-background">
+                            <Landmark className="w-2.5 h-2.5 text-white" />
+                          </div>
                         </div>
                       ) : (
                         <div 
@@ -272,6 +300,8 @@ const handleClick = (transaction: Transaction) => {
                           ? t("transaction.walletToIban")
                           : isIncomingCryptoToBank
                           ? t("transaction.walletToIban")
+                          : isCryptoToIban
+                          ? "USDT → IBAN"
                           : walletView && isTopup 
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit

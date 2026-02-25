@@ -1,7 +1,28 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { apiRequest } from "@/services/api/apiClient";
 import { AdminSetting } from "@/types/admin";
 import { toast } from "sonner";
+
+/** Raw shape returned by GET /accounts/admin/settings/ */
+interface BackendAdminSetting {
+  id: number;
+  category: string;
+  key: string;
+  value: string; // e.g. "1.000000"
+  description: string | null;
+  updated_at: string;
+}
+
+/** Map backend response to the existing AdminSetting type used by the UI */
+const mapSetting = (s: BackendAdminSetting): AdminSetting => ({
+  id: String(s.id),
+  category: s.category as AdminSetting["category"],
+  key: s.key,
+  value: parseFloat(s.value),
+  description: s.description,
+  updated_at: s.updated_at,
+  updated_by: null,
+});
 
 export function useAdminSettings() {
   const queryClient = useQueryClient();
@@ -9,35 +30,24 @@ export function useAdminSettings() {
   const { data: settings, isLoading, error } = useQuery({
     queryKey: ["admin-settings"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("admin_settings")
-        .select("*")
-        .order("category", { ascending: true })
-        .order("key", { ascending: true });
-
-      if (error) throw error;
-      return data as AdminSetting[];
+      const res = await apiRequest<BackendAdminSetting[]>("/admin/settings/");
+      if (res.error || !res.data) throw new Error(res.error?.detail || res.error?.message || "Failed to fetch settings");
+      return res.data.map(mapSetting);
     },
   });
 
   const updateSetting = useMutation({
     mutationFn: async ({ category, key, value }: { category: string; key: string; value: number }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { error } = await supabase
-        .from("admin_settings")
-        .update({ 
-          value, 
-          updated_by: user?.id,
-          updated_at: new Date().toISOString()
-        })
-        .eq("category", category)
-        .eq("key", key);
-
-      if (error) throw error;
+      const res = await apiRequest<BackendAdminSetting>("/admin/settings/", {
+        method: "PUT",
+        body: JSON.stringify({ category, key, value }),
+      });
+      if (res.error || !res.data) throw new Error(res.error?.detail || res.error?.message || "Failed to update setting");
+      return mapSetting(res.data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["app-settings"] });
       toast.success("Настройка обновлена");
     },
     onError: (error) => {
@@ -46,12 +56,10 @@ export function useAdminSettings() {
     },
   });
 
-  // Group settings by category
   const getSettingsByCategory = (category: string) => {
     return settings?.filter((s) => s.category === category) ?? [];
   };
 
-  // Get a single setting value
   const getSettingValue = (category: string, key: string): number | undefined => {
     return settings?.find((s) => s.category === category && s.key === key)?.value;
   };

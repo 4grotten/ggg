@@ -1,17 +1,22 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2, Wallet } from "lucide-react";
+import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2, Wallet, ChevronDown, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { useTranslation } from "react-i18next";
 import { useWalletSummary, useCryptoWallets } from "@/hooks/useCards";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAvatar } from "@/contexts/AvatarContext";
 import { useTransactionReceipt, useApiTransactionGroups } from "@/hooks/useTransactions";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { getAuthToken, apiRequest } from "@/services/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
+import { AvatarPreview } from "@/components/ui/avatar-preview";
 
 // Mock transaction data - in real app would come from API/state
 const mockTransactions: Record<string, {
@@ -26,7 +31,7 @@ const mockTransactions: Record<string, {
   cardLast4: string;
   exchangeRate: number;
   status: "settled" | "pending" | "failed" | "processing";
-  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer" | "crypto_to_card" | "crypto_to_bank";
+  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer" | "crypto_to_card" | "crypto_to_bank" | "crypto_to_iban";
   fromAddress?: string;
   tokenNetwork?: string;
   kartaFee?: number;
@@ -87,6 +92,7 @@ const TransactionDetails = () => {
   const { id } = useParams<{ id: string }>();
   const { data: walletData } = useWalletSummary();
   const { user } = useAuth();
+  const { avatarUrl: currentUserAvatar } = useAvatar();
   const userIban = walletData?.data?.physical_account?.iban || "";
   const hasToken = !!getAuthToken();
   
@@ -233,6 +239,8 @@ const TransactionDetails = () => {
           'iban_to_iban': 'bank_transfer',
           'crypto_to_card': 'crypto_to_card',
           'crypto_to_bank': 'crypto_to_bank',
+          'crypto_to_iban': 'crypto_to_iban',
+          'crypto_to_crypto': 'crypto_send',
         };
         let mapped = typeMap[receipt.type] || receipt.type || 'payment';
         // If crypto_withdrawal but user is the recipient (different user_id), treat as deposit
@@ -242,6 +250,10 @@ const TransactionDetails = () => {
           const isIncoming = (currentUserId && receiptUserId && currentUserId !== receiptUserId) ||
             (receipt as any).is_incoming === true;
           if (isIncoming) mapped = 'crypto_deposit';
+        }
+        // If crypto_to_crypto with inbound direction, treat as deposit
+        if (receipt.type === 'crypto_to_crypto' && receipt.direction === 'inbound') {
+          mapped = 'crypto_deposit';
         }
         // If bank_withdrawal, determine direction using receipt.direction first
         if (receipt.type === 'bank_withdrawal') {
@@ -284,19 +296,19 @@ const TransactionDetails = () => {
       recipientCard: receipt.type === 'crypto_to_card' ? cachedRecipientCard?.slice(-4) : receiverLast4,
       recipientCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
       recipientCardType: receipt.type === 'crypto_to_card' ? ((cryptoToCardRecipient as any)?.card_type === 'metal' ? 'Metal' : 'Virtual') : receiverCardType,
-      recipientName: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.recipient_name : (receipt.recipient_name || receipt.beneficiary_name || (receipt as any).to_name),
+      recipientName: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.recipient_name : (receipt.recipient_name || (receipt as any).receiver_name || receipt.beneficiary_name || (receipt as any).to_name),
       recipientAvatar: receipt.type === 'crypto_to_card' ? (cryptoToCardRecipient as any)?.avatar_url : undefined,
       senderName: receipt.sender_name,
       senderCard: senderLast4 || undefined,
       senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       toCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
-      toWalletAddress: receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address,
-      fromWalletAddress: receipt.type === 'crypto_to_card' ? ((receipt as any).direction === 'inbound' ? (receipt.from_address_mask || receipt.from_address || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
-      fromAddress: receipt.type === 'crypto_to_card' ? ((receipt as any).direction === 'inbound' ? (receipt.from_address_mask || receipt.from_address || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
-      toWalletAddressFull: receipt.to_address || (receipt as any).recipient_address,
-      fromWalletAddressFull: receipt.type === 'crypto_to_card' ? userCryptoWallet?.address : (receipt.from_address || (receipt as any).sender_address),
-      tokenNetwork: receipt.type === 'crypto_to_card' ? (userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : 'USDT, TRC20') : (receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : undefined)),
+      toWalletAddress: receipt.type === 'crypto_to_crypto' ? (receipt as any).crypto_address : (receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address),
+      fromWalletAddress: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? ((receipt as any).direction === 'inbound' ? ((receipt as any).from_address || receipt.from_address_mask || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
+      fromAddress: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? ((receipt as any).direction === 'inbound' ? ((receipt as any).from_address || receipt.from_address_mask || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
+      toWalletAddressFull: receipt.type === 'crypto_to_crypto' ? (receipt as any).crypto_address : (receipt.to_address || (receipt as any).recipient_address),
+      fromWalletAddressFull: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? userCryptoWallet?.address : (receipt.from_address || (receipt as any).sender_address),
+      tokenNetwork: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? (userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : ((receipt as any).crypto_token && (receipt as any).crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : 'USDT, TRC20')) : (receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : ((receipt as any).crypto_token && (receipt as any).crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : undefined))),
       transferFee: receipt.fee ?? receipt.fee_amount,
       networkFee: receipt.fee ?? receipt.fee_amount,
       bankFee: receipt.fee_amount,
@@ -327,6 +339,10 @@ const TransactionDetails = () => {
   const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card', 'bank_withdrawal', 'transfer_out'].includes((transaction as any)?.originalApiType || '');
    const isCryptoToCard = transaction?.type === "crypto_to_card";
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
+  const isCryptoToIban = transaction?.type === "crypto_to_iban" || (transaction as any)?.originalApiType === 'crypto_to_iban';
+  // Determine if crypto_to_iban is bank→crypto (sender has IBAN) or crypto→bank (sender has crypto)
+  const isCryptoToIbanBankSender = isCryptoToIban && !!(receipt?.sender_iban || (receipt as any)?.sender_iban_mask || (transaction as any)?.senderIban);
+  const isCryptoToIbanCryptoSender = isCryptoToIban && !isCryptoToIbanBankSender;
   const isIncomingCryptoToBank = isCryptoToBank && (() => {
     // Check cached list data for direction (primary source of truth)
     if (apiTxGroups) {
@@ -398,6 +414,100 @@ const TransactionDetails = () => {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [showFromAddress, setShowFromAddress] = useState(false);
   const [showIban, setShowIban] = useState(false);
+  const [receiptExpanded, setReceiptExpanded] = useState(false);
+  const [showSenderIban, setShowSenderIban] = useState(false);
+  const [showSenderCard, setShowSenderCard] = useState(false);
+  const [showReceiverCard, setShowReceiverCard] = useState(false);
+  const [showReceiverIban, setShowReceiverIban] = useState(false);
+  const [showCryptoAddr, setShowCryptoAddr] = useState(false);
+  const receiptPrintRef = useRef<HTMLDivElement>(null);
+
+  const handlePrintReceipt = useCallback(() => {
+    if (!receiptPrintRef.current) return;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    const content = receiptPrintRef.current.innerHTML;
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html><head><title>${t("transaction.receipt")}</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; color: #222; }
+        .flex { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 6px 0; border-bottom: 1px solid #eee; }
+        .flex:last-child { border-bottom: none; }
+        pre { margin: 0; font-family: inherit; font-size: 13px; white-space: pre-wrap; word-break: break-all; text-align: right; max-width: 220px; }
+        span { font-size: 13px; }
+        h2 { margin-bottom: 16px; }
+      </style></head>
+      <body><h2>${t("transaction.receipt")}</h2>${content}</body></html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  }, [t]);
+
+  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar']);
+
+  const receiptTypeLabels: Record<string, string> = {
+    crypto_to_crypto: t("transaction.typeCryptoToCrypto", "Отправка стейблкоинов"),
+    card_transfer: t("transaction.typeCardTransfer", "Перевод на карту"),
+    bank_withdrawal: t("transaction.typeBankWithdrawal", "Банковский перевод"),
+    transfer_out: t("transaction.typeTransferOut", "Исходящий перевод"),
+    iban_to_card: t("transaction.typeIbanToCard", "IBAN → EasyCard"),
+    crypto_withdrawal: t("transaction.typeCryptoWithdrawal", "Вывод крипто"),
+    crypto_deposit: t("transaction.typeCryptoDeposit", "Пополнение крипто"),
+    crypto_to_card: t("transaction.typeCryptoToCard", "USDT → EasyCard"),
+    internal_transfer: t("transaction.typeInternalTransfer", "Внутренний перевод"),
+    card_payment: t("transaction.typeCardPayment", "Оплата картой"),
+    iban_to_iban: t("transaction.typeIbanToIban", "IBAN → IBAN"),
+    crypto_to_iban: t("transaction.typeCryptoToIban", "Крипто → IBAN"),
+    top_up: t("transaction.typeTopUp", "Пополнение"),
+  };
+
+  const receiptDirectionLabels: Record<string, string> = {
+    inbound: t("transaction.directionInbound", "Входящий"),
+    outbound: t("transaction.directionOutbound", "Исходящий"),
+    internal: t("transaction.directionInternal", "Внутренний"),
+  };
+
+  const receiptStatusLabels: Record<string, string> = {
+    completed: t("transaction.completed", "Завершено"),
+    pending: t("transaction.pending", "В обработке"),
+    failed: t("transaction.failed", "Ошибка"),
+    cancelled: t("transaction.cancelled", "Отменено"),
+    processing: t("transaction.processing", "Обработка"),
+  };
+
+  const formatReceiptKey = (key: string) => {
+    const translated = t(`receiptKeys.${key}`, { defaultValue: '' });
+    if (translated && translated !== `receiptKeys.${key}`) return translated;
+    return key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const formatDateTime = (value: string) => {
+    try {
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return value;
+      return d.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch { return value; }
+  };
+
+  const renderReceiptValue = (key: string, value: unknown): string => {
+    if (value === null) return 'null';
+    if (value === undefined) return 'undefined';
+    if (key === 'type' && typeof value === 'string') return receiptTypeLabels[value] || value;
+    if (key === 'direction' && typeof value === 'string') return receiptDirectionLabels[value] || value;
+    if (key === 'status' && typeof value === 'string') return receiptStatusLabels[value] || value;
+    if ((key === 'date_time' || key === 'created_at' || key === 'updated_at' || key === 'settled_at') && typeof value === 'string') return formatDateTime(value);
+    if (typeof value === 'boolean') return value ? t("common.yes", "Да") : t("common.no", "Нет");
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return String(value);
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
+    }
+  };
 
   // Loading state for API transactions
   if (!transaction && receiptLoading) {
@@ -430,6 +540,12 @@ const TransactionDetails = () => {
           <ChevronLeft className="w-5 h-5" />
           <span className="text-sm">{t("transaction.back")}</span>
         </button>
+      }
+      rightAction={
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
+        </div>
       }
     >
       <PullToRefresh
@@ -481,6 +597,22 @@ const TransactionDetails = () => {
                 }}
               >
                 <Landmark className="w-10 h-10" strokeWidth={2} />
+              </motion.div>
+            </motion.div>
+          ) : isCryptoToIban ? (
+            <motion.div 
+              className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
+              style={{ backgroundColor: "#26A17B" }}
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <motion.div
+                initial={{ y: 60, x: -60, opacity: 0 }}
+                animate={{ y: 0, x: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
+              >
+                <UsdtIcon size={40} />
               </motion.div>
             </motion.div>
           ) : isCryptoToCard || isCryptoToBank ? (
@@ -709,11 +841,11 @@ const TransactionDetails = () => {
           )}
           
           <div className="space-y-1">
-            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer || isCryptoToCard || isCryptoToBank ? 'text-[#007AFF]' : ''}`}>
-              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank ? '+' : '-'}{isCryptoToBank ? (receipt?.movements?.[1]?.amount || (transaction.amountUSDT * (receipt?.exchange_rate || 3.65))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoToBank ? 'AED' : isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
+            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer || isCryptoToCard || isCryptoToBank || isCryptoToIban ? 'text-[#007AFF]' : ''}`}>
+              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank ? '+' : '-'}{isCryptoToIban ? (isCryptoToIbanCryptoSender ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : isCryptoToBank ? (receipt?.movements?.[1]?.amount || (transaction.amountUSDT * (receipt?.exchange_rate || 3.65))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoToIban ? (isCryptoToIbanCryptoSender ? 'USDT' : 'AED') : isCryptoToBank ? 'AED' : isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isCryptoToBank ? t('transaction.walletToIban') : isIncomingCryptoToCard ? "USDT → EasyCard" : isCryptoToCard ? t('transaction.walletToCard') : isCryptoDeposit ? t('transactions.walletDeposit') : isIncomingIbanToCard ? "IBAN → EasyCard" : isBankTransferIncoming ? "IBAN Bank → IBAN Bank" : isInternalTransfer ? "IBAN → EasyCard" : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' || (transaction as any)?.originalApiType === 'bank_to_card' || (transaction as any)?.originalApiType === 'iban_to_card' ? "IBAN → EasyCard" : "IBAN Bank → IBAN Bank") : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCryptoToBank ? t('transaction.walletToIban') : isCryptoToIban ? "USDT → IBAN" : isIncomingCryptoToCard ? "USDT → EasyCard" : isCryptoToCard ? t('transaction.walletToCard') : isCryptoDeposit ? t('transactions.walletDeposit') : isIncomingIbanToCard ? "IBAN → EasyCard" : isBankTransferIncoming ? "IBAN Bank → IBAN Bank" : isInternalTransfer ? "IBAN → EasyCard" : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' || (transaction as any)?.originalApiType === 'bank_to_card' || (transaction as any)?.originalApiType === 'iban_to_card' ? "IBAN → EasyCard" : "IBAN Bank → IBAN Bank") : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
@@ -722,29 +854,37 @@ const TransactionDetails = () => {
         </div>
 
         {/* Status and Card/Address info */}
-        <div className="bg-secondary rounded-2xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{t("transaction.status")}</span>
-            <div className="flex flex-col items-end">
-              <div className="flex items-center gap-1.5">
-                <span className={`font-medium ${isDeclined ? 'text-red-500' : transaction.status === 'processing' ? 'text-[#FFA000]' : ''}`}>
-                  {isDeclined ? t("transaction.declined") : transaction.status === 'processing' ? t("transaction.processing") : t("transaction.settled")}
-                </span>
+        <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/30">
+          <div className={`flex items-center justify-between px-5 py-3.5 border-b ${
+            isDeclined ? 'bg-red-500/10 border-red-500/15' : 
+            transaction.status === 'processing' ? 'bg-[#FFA000]/10 border-[#FFA000]/15' : 
+            'bg-[#27AE60]/10 border-[#27AE60]/15'
+          }`}>
+            <span className="text-[15px] font-medium text-muted-foreground">{t("transaction.status")}</span>
+            <div className="flex items-center gap-2">
+              <span className={`text-[15px] font-bold ${
+                isDeclined ? 'text-red-500' : 
+                transaction.status === 'processing' ? 'text-[#FFA000]' : 
+                'text-[#27AE60]'
+              }`}>
+                {isDeclined ? t("transaction.declined") : transaction.status === 'processing' ? t("transaction.processing") : t("transaction.settled")}
+              </span>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                isDeclined ? 'bg-red-500/15' : 
+                transaction.status === 'processing' ? 'bg-[#FFA000]/15' : 
+                'bg-[#27AE60]/15'
+              }`}>
                 {isDeclined ? (
-                  <Ban className="w-4 h-4 text-red-500" />
+                  <Ban className="w-3.5 h-3.5 text-red-500" />
                 ) : transaction.status === 'processing' ? (
-                  <Clock className="w-4 h-4 text-[#FFA000]" />
+                  <Clock className="w-3.5 h-3.5 text-[#FFA000]" />
                 ) : (
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-3.5 h-3.5 text-[#27AE60]" />
                 )}
               </div>
-              {isDeclined && transaction.declineReason && (
-                <span className="text-sm text-muted-foreground">
-                  {transaction.declineReason === "No funds" ? t("transaction.noFunds") : transaction.declineReason}
-                </span>
-              )}
             </div>
           </div>
+          <div className="px-5 py-4 space-y-4">
           
           {isIncomingIbanToCard ? (
             <>
@@ -1128,6 +1268,88 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
                 <span className="font-medium">{transaction.tokenNetwork}</span>
               </div>
+            </>
+          ) : isCryptoToIban ? (
+            <>
+              {/* Sender */}
+              {isCryptoToIbanCryptoSender ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.sender")}</span>
+                    <span className="font-medium">{receipt?.sender_name || user?.full_name || '—'}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                    <span className="font-medium">{(receipt as any)?.crypto_token && (receipt as any)?.crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : 'USDT, TRC20'}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.sender")}</span>
+                    <span className="font-medium">{receipt?.sender_name || user?.full_name || '—'}</span>
+                  </div>
+                  <div className="flex items-start justify-between">
+                    <span className="text-muted-foreground">IBAN</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-right text-sm">
+                        {(() => { const sIban = (receipt as any)?.sender_iban || (receipt as any)?.sender_iban_mask || ''; if (!sIban) return '—'; return showSenderIban ? sIban : `${sIban.slice(0, 4)}••••${sIban.slice(-4)}`; })()}
+                      </span>
+                      {((receipt as any)?.sender_iban || (receipt as any)?.sender_iban_mask) && (
+                        <>
+                          <button onClick={() => { navigator.clipboard.writeText((receipt as any)?.sender_iban || ''); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                          <button onClick={() => setShowSenderIban(!showSenderIban)} className="text-muted-foreground hover:text-foreground transition-colors">{showSenderIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                    <span className="font-medium">{(receipt as any)?.sender_bank_name || (receipt as any)?.sender_bank || '—'}</span>
+                  </div>
+                </>
+              )}
+              {/* Recipient */}
+              {isCryptoToIbanCryptoSender ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                    <span className="font-medium">{receipt?.beneficiary_name || receipt?.recipient_name || (receipt as any)?.receiver_name || '—'}</span>
+                  </div>
+                  <div className="flex items-start justify-between">
+                    <span className="text-muted-foreground">IBAN</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-right text-sm">
+                        {showIban ? (receipt?.beneficiary_iban || (receipt as any)?.iban_mask || '—') : `${(receipt?.beneficiary_iban || (receipt as any)?.iban_mask || '').slice(0, 4)}••••${(receipt?.beneficiary_iban || (receipt as any)?.iban_mask || '').slice(-4)}`}
+                      </span>
+                      <button onClick={() => { navigator.clipboard.writeText(receipt?.beneficiary_iban || ''); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                      <button onClick={() => setShowIban(!showIban)} className="text-muted-foreground hover:text-foreground transition-colors">{showIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                    <span className="font-medium">{receipt?.beneficiary_bank_name || '—'}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                    <div className="flex items-center gap-2">
+                      <Wallet className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">
+                        {showWalletAddress ? ((receipt as any)?.crypto_address || '—') : `${((receipt as any)?.crypto_address || '').slice(0, 6)}...${((receipt as any)?.crypto_address || '').slice(-4)}`}
+                      </span>
+                      <button onClick={() => { navigator.clipboard.writeText((receipt as any)?.crypto_address || ''); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                      <button onClick={() => setShowWalletAddress(!showWalletAddress)} className="text-muted-foreground hover:text-foreground transition-colors">{showWalletAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                    <span className="font-medium">{(receipt as any)?.crypto_token && (receipt as any)?.crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : 'USDT, TRC20'}</span>
+                  </div>
+                </>
+              )}
             </>
           ) : isCryptoToBank ? (
             <>
@@ -1693,10 +1915,9 @@ const TransactionDetails = () => {
               </div>
             </div>
           )}
-        </div>
 
-        {/* Transaction details */}
-        <div className="bg-secondary rounded-2xl p-4 space-y-3">
+          {/* Fee details inside first block */}
+          <div className="pt-4 mt-4 border-t border-border/40 space-y-4">
           {isCryptoToCard && isIncomingCryptoToCard ? (
             <>
               <div className="flex items-center justify-between">
@@ -1746,6 +1967,48 @@ const TransactionDetails = () => {
                 <span className="text-muted-foreground">{t("transaction.credited")}</span>
                 <span className="font-semibold text-green-500">+{((transaction as any).cryptoToCardCreditedAed || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
               </div>
+            </>
+          ) : isCryptoToIban ? (
+            <>
+              {isCryptoToIbanCryptoSender ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
+                    <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fee")} ({receipt?.amount && receipt?.fee ? `${((receipt.fee / receipt.amount) * 100).toFixed(0)}%` : '1%'})</span>
+                    <span className="font-medium">{(receipt?.fee || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
+                    <span className="font-medium">1 USDT = {receipt?.exchange_rate || 3.65} AED</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <span className="text-muted-foreground">{t("transaction.creditedToIban")}</span>
+                    <span className="font-semibold text-green-500">+{(receipt?.movements?.[1]?.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
+                    <span className="font-medium">{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fee")} ({receipt?.amount && receipt?.fee ? `${((receipt.fee / receipt.amount) * 100).toFixed(0)}%` : '1%'})</span>
+                    <span className="font-medium">{(receipt?.fee || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
+                    <span className="font-medium">1 USDT = {receipt?.exchange_rate ? (1 / receipt.exchange_rate).toFixed(2) : '3.69'} AED</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <span className="text-muted-foreground">{t("transaction.credited")}</span>
+                    <span className="font-semibold text-green-500">+{(receipt?.movements?.[1]?.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                </>
+              )}
             </>
           ) : isCryptoToBank ? (
             <>
@@ -1931,7 +2194,221 @@ const TransactionDetails = () => {
               </div>
             </>
           )}
+          </div>
+          </div>
         </div>
+
+        {/* Sender block */}
+        {receipt && (receipt.sender_name || (receipt as any).sender_card_mask || (receipt as any).sender_iban || (receipt as any).sender_iban_mask || (receipt as any).sender_bank || transaction.fromWalletAddress) && (
+          <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/30">
+            <div className="flex items-center justify-between px-5 py-3.5 bg-[#007AFF]/10 border-b border-[#007AFF]/15">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-[#007AFF]/15 flex items-center justify-center">
+                  <Send className="w-3.5 h-3.5 text-[#007AFF]" />
+                </div>
+                <span className="text-[15px] font-bold text-[#007AFF]">{t("transaction.senderInfo", "Отправитель")}</span>
+              </div>
+              {(() => {
+                // Determine if sender is current user
+                const isCurrentUserSender = receipt.direction === 'outbound' || 
+                  (receipt.sender_name && user?.full_name && receipt.sender_name.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]));
+                const senderAvatarUrl = isCurrentUserSender ? currentUserAvatar : (receipt as any).sender_avatar;
+                const senderInitial = receipt.sender_name ? receipt.sender_name.charAt(0).toUpperCase() : (user?.full_name?.charAt(0)?.toUpperCase() || "S");
+                
+                return senderAvatarUrl ? (
+                  <AvatarPreview src={senderAvatarUrl} alt={receipt.sender_name || ""}>
+                    <img src={senderAvatarUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-[#007AFF]/20" />
+                  </AvatarPreview>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-[#007AFF]/10 flex items-center justify-center text-[#007AFF] font-bold text-base shrink-0">
+                    {senderInitial}
+                  </div>
+                );
+              })()}
+            </div>
+            <div className="px-5 py-4 space-y-4">
+            {receipt.sender_name && (
+              <div className="flex items-center justify-between py-0.5">
+                <span className="text-[15px] text-muted-foreground">{t("transaction.name", "Имя")}</span>
+                <span className="text-[15px] font-semibold">{receipt.sender_name}</span>
+              </div>
+            )}
+            {(receipt as any).crypto_address && !isCryptoToIban && (
+              <div className="flex items-start justify-between py-0.5">
+                <span className="text-[15px] text-muted-foreground">{t("receiptKeys.crypto_address", "Крипто-адрес")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                    {showCryptoAddr ? (receipt as any).crypto_address : `${String((receipt as any).crypto_address).slice(0, 6)}...${String((receipt as any).crypto_address).slice(-6)}`}
+                  </span>
+                  <button onClick={() => { navigator.clipboard.writeText(String((receipt as any).crypto_address)); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => setShowCryptoAddr(!showCryptoAddr)} className="text-muted-foreground hover:text-foreground transition-colors">
+                    {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            )}
+            {((receipt as any).sender_iban || (receipt as any).sender_iban_mask) && (() => {
+              const sIban = String((receipt as any).sender_iban || (receipt as any).sender_iban_mask);
+              return (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">IBAN</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm">
+                      {showSenderIban ? sIban : `${sIban.slice(0, 4)}••••${sIban.slice(-4)}`}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(sIban); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setShowSenderIban(!showSenderIban)} className="text-muted-foreground hover:text-foreground transition-colors">
+                      {showSenderIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            {(receipt as any).sender_bank && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                <span className="font-medium">{(receipt as any).sender_bank}</span>
+              </div>
+            )}
+            {(receipt as any).sender_card_mask && (() => {
+              const sMask = String((receipt as any).sender_card_mask);
+              const sFull = (receipt as any).sender_card ? formatCardNumber((receipt as any).sender_card) : (transaction.senderCardFull || resolveFullCard(sMask, 0) || sMask);
+              return (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.card")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">
+                      {showSenderCard ? sFull : `••••${sMask.slice(-4)}`}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(sFull); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setShowSenderCard(!showSenderCard)} className="text-muted-foreground hover:text-foreground transition-colors">
+                      {showSenderCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            </div>
+          </div>
+        )}
+
+        {/* Receiver block */}
+        {receipt && (receipt.receiver_name || (receipt as any).receiver_card_mask || receipt.beneficiary_name || receipt.beneficiary_iban || receipt.beneficiary_bank || (receipt as any).recipient_name || receipt.crypto_address || transaction.toWalletAddress) && (
+          <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/30">
+            <div className="flex items-center justify-between px-5 py-3.5 bg-[#27AE60]/10 border-b border-[#27AE60]/15">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-[#27AE60]/15 flex items-center justify-center">
+                  <Send className="w-3.5 h-3.5 text-[#27AE60] rotate-180" />
+                </div>
+                <span className="text-[15px] font-bold text-[#27AE60]">{t("transaction.receiverInfo", "Получатель")}</span>
+              </div>
+              {(() => {
+                const receiverName = receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name || transaction.recipientName;
+                // Determine if receiver is current user
+                const isCurrentUserReceiver = receipt.direction === 'inbound' || 
+                  (receiverName && user?.full_name && receiverName.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]));
+                const receiverAvatarUrl = isCurrentUserReceiver ? currentUserAvatar : ((receipt as any).receiver_avatar || (receipt as any).recipient_avatar || (transaction as any).recipientAvatar);
+                const receiverInitial = receiverName ? receiverName.charAt(0).toUpperCase() : "R";
+                
+                return receiverAvatarUrl ? (
+                  <AvatarPreview src={receiverAvatarUrl} alt={receiverName || ""}>
+                    <img src={receiverAvatarUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-[#27AE60]/20" />
+                  </AvatarPreview>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-[#27AE60]/10 flex items-center justify-center text-[#27AE60] font-bold text-base shrink-0">
+                    {receiverInitial}
+                  </div>
+                );
+              })()}
+            </div>
+            <div className="px-5 py-4 space-y-4">
+            {(receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name) && (
+              <div className="flex items-center justify-between py-0.5">
+                <span className="text-[15px] text-muted-foreground">{t("transaction.name", "Имя")}</span>
+                <span className="text-[15px] font-semibold">{receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name}</span>
+              </div>
+            )}
+            {(receipt as any).receiver_card_mask && (() => {
+              const rMask = String((receipt as any).receiver_card_mask);
+              const rFull = (receipt as any).receiver_card ? formatCardNumber((receipt as any).receiver_card) : (transaction.recipientCardFull || resolveFullCard(rMask, 1) || rMask);
+              return (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">{t("transaction.card")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">
+                      {showReceiverCard ? rFull : `••••${rMask.slice(-4)}`}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(rFull); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setShowReceiverCard(!showReceiverCard)} className="text-muted-foreground hover:text-foreground transition-colors">
+                      {showReceiverCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            {receipt.beneficiary_iban && (() => {
+              const bIban = String(receipt.beneficiary_iban);
+              return (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">IBAN</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm">
+                      {showReceiverIban ? bIban : `${bIban.slice(0, 4)}••••${bIban.slice(-4)}`}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(bIban); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setShowReceiverIban(!showReceiverIban)} className="text-muted-foreground hover:text-foreground transition-colors">
+                      {showReceiverIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            {receipt.beneficiary_bank && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.bankName")}</span>
+                <span className="font-medium">{String(receipt.beneficiary_bank)}</span>
+              </div>
+            )}
+            {(receipt as any).beneficiary_swift && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">SWIFT</span>
+                <span className="font-medium">{(receipt as any).beneficiary_swift}</span>
+              </div>
+            )}
+            {(receipt.crypto_address || transaction.toWalletAddress) && transaction.type !== 'crypto_to_card' && (() => {
+              const addr = String(receipt.crypto_address || transaction.toWalletAddress);
+              return (
+                <div className="flex items-start justify-between">
+                  <span className="text-muted-foreground">{t("transaction.toAddress", "На Кошелек USDT")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                      {showCryptoAddr ? addr : `${addr.slice(0, 6)}...${addr.slice(-6)}`}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(addr); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setShowCryptoAddr(!showCryptoAddr)} className="text-muted-foreground hover:text-foreground transition-colors">
+                      {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+            </div>
+          </div>
+        )}
+
+        {/* Fee block moved into first block above */}
 
         {/* Transaction details link (only for topup) */}
         {isTopup && (
@@ -1945,98 +2422,72 @@ const TransactionDetails = () => {
 
         {/* Receipt from API */}
         {hasToken && (
-          <div className="bg-secondary rounded-2xl p-4 space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <FileText className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium text-sm">{t("transaction.receipt")}</span>
-            </div>
-            {receiptLoading ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+          <div className="bg-secondary rounded-2xl overflow-hidden">
+            <button
+              onClick={() => setReceiptExpanded(!receiptExpanded)}
+              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <span className="font-medium text-sm">{t("transaction.receipt")}</span>
               </div>
-            ) : receipt ? (
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">{t("transaction.status")}</span>
-                  <span className="font-medium capitalize">{receipt.status}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">{t("transaction.operation")}</span>
-                  <span className="font-medium">{receipt.operation}</span>
-                </div>
-                {receipt.amount_crypto != null && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.amount")}</span>
-                    <span className="font-medium">{receipt.amount_crypto} {receipt.network_and_token || 'USDT'}</span>
-                  </div>
+              <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${receiptExpanded ? 'rotate-180' : ''}`} />
+            </button>
+            {receiptExpanded && (
+              <div className="px-4 pb-4 space-y-3">
+                {!receiptLoading && receipt && (
+                  <button
+                    onClick={handlePrintReceipt}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-medium text-sm transition-colors"
+                  >
+                    <Printer className="w-4 h-4" />
+                    {t("transaction.printReceipt", "Распечатать чек")}
+                  </button>
                 )}
-                {receipt.amount != null && !receipt.amount_crypto && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.amount")}</span>
-                    <span className="font-medium">{receipt.amount} AED</span>
+                {receiptLoading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                   </div>
-                )}
-                {receipt.fee != null && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.fee")}</span>
-                    <span className="font-medium">{receipt.fee} {receipt.amount_crypto != null ? 'USDT' : 'AED'}</span>
+                ) : receipt ? (
+                  <div ref={receiptPrintRef} className="space-y-2 text-sm">
+                    {Object.entries(receipt)
+                      .filter(([key, value]) => value !== null && value !== undefined && !RECEIPT_HIDDEN_KEYS.has(key))
+                      .sort(([a], [b]) => {
+                        const order: Record<string, number> = {
+                          // Identity & meta
+                          type: 0, direction: 1, status: 2, operation: 3,
+                          // Sender
+                          sender_name: 10, sender_id: 11, sender_card_mask: 12, sender_iban: 13, sender_iban_mask: 14, sender_bank: 15,
+                          // Receiver
+                          receiver_name: 20, receiver_id: 21, receiver_card_mask: 22, recipient_name: 23,
+                          beneficiary_name: 24, beneficiary_iban: 25, beneficiary_bank: 26, beneficiary_swift: 27,
+                          crypto_address: 10.5, is_internal: 29,
+                          // Token/network
+                          token: 30, network: 31, token_network: 32,
+                          // Amounts & fees
+                          amount: 40, currency: 41, amount_usdt: 42, exchange_rate: 43,
+                          fee: 50, fee_percent: 51, fee_amount: 52, network_fee: 53, bank_fee: 54,
+                          total: 60, credited: 61, debited: 62,
+                          // Dates
+                          created_at: 70, updated_at: 71, settled_at: 72,
+                          // Other
+                          description: 80, reference_id: 81, iban_mask: 82,
+                        };
+                        return (order[a] ?? 90) - (order[b] ?? 90);
+                      })
+                      .map(([key, value]) => (
+                      <div key={key} className="flex items-start justify-between gap-3">
+                        <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
+                        <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
+                          {renderReceiptValue(key, value)}
+                        </pre>
+                      </div>
+                    ))}
                   </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable")}</p>
                 )}
-                {receipt.to_address_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.toAddress")}</span>
-                    <span className="font-medium">{receipt.to_address_mask}</span>
-                  </div>
-                )}
-                {receipt.from_address_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.fromAddress")}</span>
-                    <span className="font-medium">{receipt.from_address_mask}</span>
-                  </div>
-                )}
-                {receipt.network_and_token && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
-                    <span className="font-medium">{receipt.network_and_token}</span>
-                  </div>
-                )}
-                {receipt.sender_card_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.fromCard")}</span>
-                    <span className="font-medium">{receipt.sender_card_mask}</span>
-                  </div>
-                )}
-                {receipt.receiver_card_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.toCard")}</span>
-                    <span className="font-medium">{receipt.receiver_card_mask}</span>
-                  </div>
-                )}
-                {receipt.recipient_name && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.recipient")}</span>
-                    <span className="font-medium">{receipt.recipient_name}</span>
-                  </div>
-                )}
-                {receipt.iban_mask && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.iban")}</span>
-                    <span className="font-medium">{receipt.iban_mask}</span>
-                  </div>
-                )}
-                {receipt.tx_hash && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">TX Hash</span>
-                    <span className="font-medium text-xs break-all max-w-[180px] text-right">{receipt.tx_hash}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/50">
-                  <span>ID</span>
-                  <span className="font-mono">{receipt.transaction_id?.slice(0, 8)}...</span>
-                </div>
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable")}</p>
             )}
           </div>
         )}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronDown, ChevronUp, X, Eye, EyeOff, Copy, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronDown, ChevronUp, X, Eye, EyeOff, Copy, Wallet, Share2 } from "lucide-react";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -50,10 +50,11 @@ const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: n
 const MetalCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
-  const [showDetails, setShowDetails] = useState(false);
+  const { isHideDataEnabled, isEnabled } = useScreenLockContext();
+  const shouldHide = isHideDataEnabled && isEnabled;
+  const [showDetails, setShowDetails] = useState(!shouldHide);
   const [billingOpen, setBillingOpen] = useState(false);
-  const [balanceVisible, setBalanceVisible] = useState(false);
+  const [balanceVisible, setBalanceVisible] = useState(!shouldHide);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<'details' | 'balance' | null>(null);
@@ -62,6 +63,18 @@ const MetalCard = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Sync balance visibility with global toggle
+  useEffect(() => {
+    const hide = isHideDataEnabled && isEnabled;
+    if (!hide) {
+      setBalanceVisible(true);
+      setShowDetails(true);
+    } else {
+      setBalanceVisible(false);
+      setShowDetails(false);
+    }
+  }, [isHideDataEnabled, isEnabled]);
 
   // Fetch real balance from API
   const { data: cardsData } = useCards({ type: 'metal' });
@@ -87,7 +100,7 @@ const MetalCard = () => {
     balance: apiCard?.balance ?? 0,
   };
 
-  const requiresAuth = isHideDataEnabled && isScreenLockEnabled;
+  const requiresAuth = isHideDataEnabled && isEnabled;
 
   const toggleBalanceVisibility = () => {
     if (!balanceVisible && requiresAuth) {
@@ -288,6 +301,22 @@ const MetalCard = () => {
                 className="p-2 h-8 w-8 rounded-full bg-secondary hover:bg-muted"
               >
                 <Copy className="w-3.5 h-3.5" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  const text = cardData.fullNumber.replace(/\s/g, '');
+                  if (navigator.share) {
+                    navigator.share({ text }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(text);
+                    toast.success(t("toast.cardNumberCopied"));
+                  }
+                }}
+                className="p-2 h-8 w-8 rounded-full bg-secondary hover:bg-muted"
+              >
+                <Share2 className="w-3.5 h-3.5" />
               </Button>
               <Button
                 size="sm"

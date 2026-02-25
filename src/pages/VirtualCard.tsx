@@ -52,10 +52,11 @@ const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: n
 const VirtualCard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isHideDataEnabled, isEnabled: isScreenLockEnabled } = useScreenLockContext();
-  const [showDetails, setShowDetails] = useState(false);
+  const { isHideDataEnabled, isEnabled } = useScreenLockContext();
+  const shouldHide = isHideDataEnabled && isEnabled;
+  const [showDetails, setShowDetails] = useState(!shouldHide);
   const [billingOpen, setBillingOpen] = useState(false);
-  const [balanceVisible, setBalanceVisible] = useState(false);
+  const [balanceVisible, setBalanceVisible] = useState(!shouldHide);
   const [animationKey, setAnimationKey] = useState(0);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<'details' | 'balance' | null>(null);
@@ -64,6 +65,18 @@ const VirtualCard = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Sync balance visibility with global toggle
+  useEffect(() => {
+    const hide = isHideDataEnabled && isEnabled;
+    if (!hide) {
+      setBalanceVisible(true);
+      setShowDetails(true);
+    } else {
+      setBalanceVisible(false);
+      setShowDetails(false);
+    }
+  }, [isHideDataEnabled, isEnabled]);
 
   // Fetch real balance from API
   const { data: cardsData } = useCards({ type: 'virtual' });
@@ -89,7 +102,7 @@ const VirtualCard = () => {
     balance: apiCard?.balance ?? 0,
   };
 
-  const requiresAuth = isHideDataEnabled && isScreenLockEnabled;
+  const requiresAuth = isHideDataEnabled && isEnabled;
 
   const toggleBalanceVisibility = () => {
     if (!balanceVisible && requiresAuth) {
