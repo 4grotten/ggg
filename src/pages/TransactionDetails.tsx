@@ -285,12 +285,12 @@ const TransactionDetails = () => {
         }
         // For iban_to_card / bank_to_card / transfer_out / internal_transfer: remap to incoming when direction is inbound or amount > 0
         if (['iban_to_card', 'bank_to_card', 'transfer_out'].includes(receipt.type)) {
-          if (receipt.direction === 'inbound' || receipt.amount > 0) {
+          if (receipt.direction === 'inbound') {
             mapped = 'bank_transfer_incoming';
           }
         }
         if (receipt.type === 'internal_transfer') {
-          if (receipt.direction === 'inbound' || receipt.amount > 0) {
+          if (receipt.direction === 'inbound') {
             mapped = 'bank_transfer_incoming';
           }
         }
