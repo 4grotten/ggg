@@ -348,43 +348,34 @@ const SendCrypto = () => {
         }, true);
       }
 
-      if (res.data) {
-        // Invalidate caches
+      // cards-proxy maps 4xx to 200, so error may be inside res.data
+      const responseData = res.data as Record<string, unknown> | null;
+      const errorInData = responseData?.error as string | undefined;
+      const hasError = !responseData || errorInData || res.error;
+
+      if (hasError) {
+        const errMsg = errorInData || 
+          (res.error as Record<string, unknown>)?.error as string ||
+          (res.error as Record<string, unknown>)?.message as string ||
+          (res.error as Record<string, unknown>)?.detail as string ||
+          t("send.transferError", "Ошибка перевода");
+        
+        // Show alert for ALL errors (limits, insufficient funds, etc.)
+        setLimitAlertMsg(errMsg);
+        setLimitCountdown(getTimeUntilLimitReset());
+        setLimitAlertOpen(true);
+      } else {
+        // Success - invalidate caches
         queryClient.invalidateQueries({ queryKey: ['cards'] });
         queryClient.invalidateQueries({ queryKey: ['transactions'] });
         queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
 
-        const statusMsg = res.data.status === 'completed'
+        const statusMsg = responseData?.status === 'completed'
           ? t("send.transferCompleted", "Перевод выполнен!")
           : t("send.transferPending", "Перевод в обработке");
 
         toast.success(statusMsg);
         navigate(isReferralWithdrawal ? "/partner" : "/");
-      } else {
-        const errObj = res.error as Record<string, unknown> | null;
-        const errMsg = (errObj?.error as string) || (errObj?.message as string) || (errObj?.detail as string) || t("send.transferError", "Ошибка перевода");
-        
-        // Check if this is a daily/monthly limit error
-        const isLimitError = errMsg.toLowerCase().includes('лимит') || 
-          errMsg.toLowerCase().includes('limit') || 
-          errMsg.toLowerCase().includes('exceeded') ||
-          errMsg.toLowerCase().includes('превышен') ||
-          errMsg.toLowerCase().includes('daily') ||
-          errMsg.toLowerCase().includes('дневн') ||
-          errMsg.toLowerCase().includes('суточн') ||
-          errMsg.toLowerCase().includes('maximum') ||
-          errMsg.toLowerCase().includes('максим');
-        
-        if (isLimitError) {
-          setLimitAlertMsg(errMsg);
-          setLimitCountdown(getTimeUntilLimitReset());
-          setLimitAlertOpen(true);
-        } else {
-          // Show all other errors as alert too (not just toast)
-          setLimitAlertMsg(errMsg);
-          setLimitCountdown(getTimeUntilLimitReset());
-          setLimitAlertOpen(true);
-        }
       }
     } catch (err) {
       toast.error(t("send.networkError", "Ошибка сети"));
