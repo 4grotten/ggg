@@ -678,35 +678,25 @@ const TransactionDetails = () => {
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <motion.div
-                initial={{ y: 60, x: -60, opacity: 0 }}
-                animate={{ y: 0, x: 0, opacity: 1 }}
-                transition={{ 
-                  duration: 0.5, 
-                  delay: 0.15, 
-                  ease: [0.34, 1.56, 0.64, 1]
-                }}
+                initial={{ y: 0, opacity: 1 }}
+                animate={{ y: -80, opacity: 0 }}
+                transition={{ duration: 0.6, delay: 0.3, ease: "easeIn" }}
               >
-                <Send className="w-10 h-10" strokeWidth={2.5} />
+                <UsdtIcon size={40} />
               </motion.div>
             </motion.div>
           ) : isCryptoDeposit ? (
             <motion.div 
-              className="w-20 h-20 rounded-full flex items-center justify-center text-white"
+              className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
               style={{ backgroundColor: "#22C55E" }}
-              initial={{ scale: 1 }}
-              animate={{ 
-                scale: [1, 1.1, 1]
-              }}
-              transition={{
-                duration: 0.6,
-                ease: "easeOut",
-                times: [0, 0.4, 1]
-              }}
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1, ease: "backOut" }}
+                initial={{ y: -80, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
               >
                 <UsdtIcon size={40} />
               </motion.div>
