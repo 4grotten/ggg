@@ -22,17 +22,8 @@ import { cn } from "@/lib/utils";
 import { apiRequest } from "@/services/api/apiClient";
 import { BackendClientDetail } from "@/hooks/useAdminManagement";
 import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
+import { ApiTransaction, mapApiTransactionToLocal } from "@/services/api/transactions";
 
-const TX_TYPE_LABELS: Record<string, string> = {
-  topup: "Top Up", card_to_card: "Card → Card", bank_withdrawal: "Bank Withdrawal",
-  crypto_to_card: "Crypto → Card", card_to_iban: "Card → IBAN", crypto_to_iban: "Crypto → IBAN",
-  bank_topup: "Bank Top Up", crypto_topup: "Crypto Top Up", transfer_in: "Transfer In",
-  transfer_out: "Transfer Out", card_payment: "Card Payment", fee: "Fee",
-  bank_transfer: "Bank Transfer", bank_transfer_incoming: "Bank Transfer In",
-  crypto_withdrawal: "Crypto Withdrawal", crypto_deposit: "Crypto Deposit",
-  card_transfer: "Card Transfer", card_activation: "Card Activation",
-  refund: "Refund", cashback: "Cashback",
-};
 
 type FilterType = "all" | "income" | "expenses" | "transfers";
 type PeriodPreset = "allTime" | "today" | "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "custom";
@@ -41,25 +32,28 @@ interface ClientTransaction {
   id: string;
   user_id?: string;
   type: string;
-  amount: number;
+  amount: number | string;
   currency: string;
   status: string;
   created_at: string;
   updated_at?: string;
-  description?: string;
-  merchant_name?: string;
-  receiver_name?: string;
-  sender_name?: string;
-  sender_id?: string | null;
-  receiver_id?: string | null;
+  description?: string | null;
+  merchant_name?: string | null;
+  receiver_name?: string | null;
+  sender_name?: string | null;
+  sender_id?: string | number | null;
+  receiver_id?: string | number | null;
   sender_card?: string | null;
+  senderCard?: string | null;
   recipient_card?: string | null;
-  fee?: number;
-  exchange_rate?: number | null;
-  original_amount?: number | null;
+  recipientCard?: string | null;
+  fee?: number | string | null;
+  exchange_rate?: number | string | null;
+  original_amount?: number | string | null;
   original_currency?: string | null;
-  card_id?: string;
-  metadata?: Record<string, unknown>;
+  card_id?: string | null;
+  card?: string | null;
+  metadata?: Record<string, unknown> | null;
 }
 
 interface TransactionGroup {
@@ -210,65 +204,58 @@ export default function AdminClientTransactionHistory() {
     toast.success(t('toast.dataUpdated'));
   };
 
-  const mapTypeToAppType = (type: string, incoming: boolean): AppTransaction["type"] => {
-    const t = type.toLowerCase();
-    if (t === "topup" || t === "top_up" || t === "bank_topup" || t === "crypto_topup") return "topup";
-    if (t === "card_to_card" || t === "card_transfer") return "card_transfer";
-    if (t === "bank_withdrawal" || t === "bank_transfer") return "bank_transfer";
-    if (t === "bank_transfer_incoming" || t === "transfer_in") return "bank_transfer_incoming";
-    if (t === "iban_to_iban") return incoming ? "bank_transfer_incoming" : "bank_transfer";
-    if (t === "crypto_to_card") return "crypto_to_card";
-    if (t === "crypto_to_iban" || t === "card_to_iban") return "crypto_to_iban" as any;
-    if (t === "crypto_to_crypto") return incoming ? "crypto_deposit" : "crypto_withdrawal";
-    if (t === "crypto_withdrawal" || t === "crypto_send") return "crypto_withdrawal";
-    if (t === "crypto_deposit") return "crypto_deposit";
-    if (t === "card_activation") return "card_activation" as any;
-    if (t === "card_payment" || t === "payment") return "payment";
-    if (t === "declined") return "declined" as any;
-    if (t === "fee") return "payment";
-    if (t === "refund" || t === "cashback") return "topup";
-    return "payment";
+  const toNumber = (value: number | string | null | undefined): number | null => {
+    if (value === null || value === undefined || value === "") return null;
+    const parsed = typeof value === "string" ? parseFloat(value) : value;
+    return Number.isFinite(parsed) ? parsed : null;
   };
 
   const mapToAppTransaction = (tx: ClientTransaction): AppTransaction => {
-    const d = new Date(tx.created_at);
     const viewedUserId = userId ?? "";
     const incoming = isIncomeForUser(tx, viewedUserId);
-    const mappedType = mapTypeToAppType(tx.type, incoming);
-    const typeLabel = TX_TYPE_LABELS[tx.type] || tx.type;
 
-    const amountLocal = tx.amount;
-    const amountUSDT = tx.original_amount ?? (
-      tx.exchange_rate && tx.exchange_rate > 0 ? tx.amount / tx.exchange_rate : tx.amount
-    );
-
-    const metadata: Record<string, unknown> = {
-      ...(tx.metadata || {}),
-      originalApiType: tx.type,
-      isIncoming: incoming,
-      sender_name: tx.sender_name,
-      receiver_name: tx.receiver_name,
+    const normalizedTx: ApiTransaction = {
+      id: tx.id,
+      type: tx.type,
+      status: tx.status,
+      amount: toNumber(tx.amount) ?? 0,
+      currency: tx.currency,
+      created_at: tx.created_at,
+      updated_at: tx.updated_at,
+      description: tx.description ?? undefined,
+      fee: toNumber(tx.fee),
+      exchange_rate: tx.exchange_rate != null ? String(tx.exchange_rate) : null,
+      original_amount: toNumber(tx.original_amount),
+      original_currency: tx.original_currency ?? null,
+      merchant_name: tx.merchant_name ?? null,
+      recipient_card: tx.recipient_card || tx.recipientCard || null,
+      sender_name: tx.sender_name ?? null,
+      receiver_name: tx.receiver_name ?? null,
+      sender_card: tx.sender_card || tx.senderCard || null,
+      card_id: tx.card_id || tx.card || null,
+      direction: incoming ? "inbound" : "outbound",
+      metadata: tx.metadata ?? null,
     };
 
+    const mapped = mapApiTransactionToLocal(normalizedTx);
+
     return {
+      ...mapped,
       id: tx.id,
-      merchant: typeLabel,
-      time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      amountUSDT,
-      amountLocal,
-      localCurrency: tx.currency,
       color: incoming ? "#22C55E" : "#007AFF",
-      type: mappedType,
-      status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : undefined,
-      recipientName: tx.receiver_name,
-      senderName: tx.sender_name,
-      recipientCard: tx.recipient_card || undefined,
-      senderCard: tx.sender_card || undefined,
-      cardId: tx.card_id,
-      description: typeLabel,
-      fee: tx.fee,
-      metadata,
-      createdAt: tx.created_at,
+      status: tx.status === "completed" ? "settled" : tx.status === "pending" ? "processing" : mapped.status,
+      senderName: tx.sender_name || mapped.senderName,
+      recipientName: tx.receiver_name || mapped.recipientName,
+      senderCard: tx.sender_card || tx.senderCard || mapped.senderCard,
+      recipientCard: tx.recipient_card || tx.recipientCard || mapped.recipientCard,
+      metadata: {
+        ...(mapped.metadata || {}),
+        ...(tx.metadata || {}),
+        originalApiType: tx.type,
+        isIncoming: incoming,
+        sender_name: tx.sender_name,
+        receiver_name: tx.receiver_name,
+      },
     };
   };
 
@@ -497,11 +484,6 @@ export default function AdminClientTransactionHistory() {
             </AnimatePresence>
           )}
 
-          {!txLoading && filteredGroups.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">{t("history.noTransactions")}</p>
-            </div>
-          )}
 
           <div className="pt-4"><PoweredByFooter /></div>
         </div>
