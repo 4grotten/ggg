@@ -80,9 +80,7 @@ export default function AdminClients() {
   };
 
   const handleOpenClientDetails = (client: BackendClient) => {
-    navigate("/settings/admin/clients/details", {
-      state: { clientUserId: client.user_id, clientPreview: client },
-    });
+    navigate(`/settings/admin/clients/details/${client.user_id}`);
   };
 
   const FilterChip = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
