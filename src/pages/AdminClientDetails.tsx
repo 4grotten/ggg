@@ -446,7 +446,7 @@ export default function AdminClientDetails() {
           <div className="px-5 pb-4 pt-0 flex items-center gap-2 border-t border-border/30 mt-0 pt-3">
             {client.phone && (
               <a href={`tel:${client.phone}`} className="flex-1">
-                <Button variant="outline" size="sm" className="w-full rounded-xl gap-2 text-xs h-9">
+                <Button variant="outline" size="sm" className="w-full rounded-xl gap-2 text-xs h-9 hover:bg-muted hover:text-foreground">
                   <Phone className="w-3.5 h-3.5 text-primary" />
                   {client.phone}
                 </Button>
@@ -454,7 +454,7 @@ export default function AdminClientDetails() {
             )}
             {client.email && (
               <a href={`mailto:${client.email}`} className="flex-1 min-w-0">
-                <Button variant="outline" size="sm" className="w-full rounded-xl gap-2 text-xs h-9 truncate">
+                <Button variant="outline" size="sm" className="w-full rounded-xl gap-2 text-xs h-9 truncate hover:bg-muted hover:text-foreground">
                   <Mail className="w-3.5 h-3.5 text-primary shrink-0" />
                   <span className="truncate">{client.email}</span>
                 </Button>
