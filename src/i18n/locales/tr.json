@@ -1570,9 +1570,13 @@
       "dailyTopUp": "Günlük yükleme limiti",
       "dailyTransfer": "Günlük transfer limiti",
       "dailyWithdrawal": "Günlük çekim limiti",
+      "dailyCryptoSend": "Günlük kripto gönderim limiti",
+      "dailyCryptoReceive": "Günlük kripto alım limiti",
       "monthlyTopUp": "Aylık yükleme limiti",
       "monthlyTransfer": "Aylık transfer limiti",
-      "monthlyWithdrawal": "Aylık çekim limiti"
+      "monthlyWithdrawal": "Aylık çekim limiti",
+      "monthlyCryptoSend": "Aylık kripto gönderim limiti",
+      "monthlyCryptoReceive": "Aylık kripto alım limiti"
     },
     "clients": {
       "title": "Müşteri Veritabanı",

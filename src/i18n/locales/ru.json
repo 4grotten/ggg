@@ -1634,9 +1634,13 @@
       "dailyTopUp": "Дневной лимит пополнения",
       "dailyTransfer": "Дневной лимит переводов",
       "dailyWithdrawal": "Дневной лимит вывода",
+      "dailyCryptoSend": "Дневной лимит отправки крипты",
+      "dailyCryptoReceive": "Дневной лимит получения крипты",
       "monthlyTopUp": "Месячный лимит пополнения",
       "monthlyTransfer": "Месячный лимит переводов",
-      "monthlyWithdrawal": "Месячный лимит вывода"
+      "monthlyWithdrawal": "Месячный лимит вывода",
+      "monthlyCryptoSend": "Месячный лимит отправки крипты",
+      "monthlyCryptoReceive": "Месячный лимит получения крипты"
     },
     "clients": {
       "title": "База клиентов",
