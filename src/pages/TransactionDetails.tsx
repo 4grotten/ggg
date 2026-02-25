@@ -632,9 +632,9 @@ const TransactionDetails = () => {
                 transition={{ duration: 0.4, ease: "easeOut" }}
               >
                 <motion.div
-                  initial={{ y: isIncomingCryptoToIban ? -80 : 0, opacity: isIncomingCryptoToIban ? 0 : 1 }}
-                  animate={{ y: isIncomingCryptoToIban ? 0 : -80, opacity: isIncomingCryptoToIban ? 1 : 0 }}
-                  transition={{ duration: 0.6, delay: 0.15, ease: isIncomingCryptoToIban ? [0.34, 1.56, 0.64, 1] : "easeIn" }}
+                  initial={{ y: isIncomingCryptoToIban ? -80 : 80, x: isIncomingCryptoToIban ? 80 : -80, opacity: 0 }}
+                  animate={{ y: 0, x: 0, opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
                 >
                   <UsdtIcon size={40} />
                 </motion.div>
