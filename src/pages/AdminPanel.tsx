@@ -577,7 +577,7 @@ export default function AdminPanel() {
     { value: "fees", label: t("admin.tabs.fees"), icon: Percent },
     { value: "limits", label: t("admin.tabs.limits"), icon: Wallet },
     { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound, link: "/settings/admin/clients" },
-    { value: "admins", label: t("admin.tabs.admins"), icon: Users },
+    { value: "admins", label: t("admin.tabs.admins"), icon: Users, link: "/settings/admin/admins" },
     { value: "system", label: t("admin.system.title", "Система"), icon: Settings },
   ];
 
