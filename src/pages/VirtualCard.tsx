@@ -65,6 +65,17 @@ const VirtualCard = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Sync balance visibility with global toggle
+  useEffect(() => {
+    if (!isHideDataEnabled) {
+      setBalanceVisible(true);
+      setShowDetails(true);
+    } else {
+      setBalanceVisible(false);
+      setShowDetails(false);
+    }
+  }, [isHideDataEnabled]);
+
   // Fetch real balance from API
   const { data: cardsData } = useCards({ type: 'virtual' });
   const apiCard = cardsData?.data?.[0];
