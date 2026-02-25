@@ -60,12 +60,13 @@ export const CardsList = ({ cards, onCardClick }: CardsListProps) => {
 
   // Auto-show/hide all card balances based on toggle
   useEffect(() => {
-    if (!isHideDataEnabled) {
+    const hide = isHideDataEnabled && isEnabled;
+    if (!hide) {
       setVisibleBalances(new Set(cards.map(c => c.id)));
     } else {
       setVisibleBalances(new Set());
     }
-  }, [isHideDataEnabled, cards]);
+  }, [isHideDataEnabled, isEnabled, cards]);
 
   const handleCardClick = (card: Card) => {
     if (onCardClick) {
