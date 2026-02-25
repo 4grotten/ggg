@@ -891,6 +891,7 @@
     "youReceive": "Alacağınız",
     "insufficientBalance": "Yetersiz USDT bakiyesi",
     "confirm": "Transferi onayla",
+    "sending": "Gönderiliyor...",
     "transferInitiated": "Transfer başlatıldı"
   },
   "auth": {

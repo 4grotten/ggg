@@ -967,6 +967,7 @@
     "youReceive": "Вы получите",
     "insufficientBalance": "Недостаточно средств на USDT балансе",
     "confirm": "Подтвердить перевод",
+    "sending": "Отправка...",
     "transferInitiated": "Перевод инициирован"
   },
   "auth": {

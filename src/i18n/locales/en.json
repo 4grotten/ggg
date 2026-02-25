@@ -981,6 +981,7 @@
     "youReceive": "You receive",
     "insufficientBalance": "Insufficient USDT balance",
     "confirm": "Confirm transfer",
+    "sending": "Sending...",
     "transferInitiated": "Transfer initiated"
   },
   "auth": {

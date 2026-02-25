@@ -891,6 +891,7 @@
     "youReceive": "Sie erhalten",
     "insufficientBalance": "Unzureichendes USDT-Guthaben",
     "confirm": "Überweisung bestätigen",
+    "sending": "Wird gesendet...",
     "transferInitiated": "Überweisung eingeleitet"
   },
   "auth": {
