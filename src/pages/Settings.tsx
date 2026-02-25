@@ -947,7 +947,10 @@ const Settings = () => {
               </div>
               <Switch
                 checked={isHideDataEnabled}
-                onCheckedChange={setHideDataEnabled}
+                onCheckedChange={(checked) => {
+                  setHideDataEnabled(checked);
+                  toast(checked ? t("screenLock.hideDataEnabled") : t("screenLock.hideDataDisabled"));
+                }}
               />
             </div>
 
