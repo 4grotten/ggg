@@ -250,12 +250,14 @@ export default function AdminClientDetails() {
                   </div>
                   {expandedCard === card.id && (
                     <div className="mt-3 pt-3 border-t border-border/30 grid grid-cols-2 gap-2 text-xs">
-                      <div><span className="text-muted-foreground">ID:</span> <span className="font-mono text-[10px]">{card.id}</span></div>
+                      {card.card_number && <div className="col-span-2"><span className="text-muted-foreground">Card Number:</span> <span className="font-mono">{card.card_number}</span></div>}
+                      {card.cardholder_name && <div className="col-span-2"><span className="text-muted-foreground">Cardholder:</span> {card.cardholder_name}</div>}
+                      {card.expiry_date && <div><span className="text-muted-foreground">Expiry:</span> {card.expiry_date}</div>}
                       <div><span className="text-muted-foreground">Type:</span> <span className="capitalize">{card.type}</span></div>
                       <div><span className="text-muted-foreground">Status:</span> <span className="capitalize">{card.status}</span></div>
                       <div><span className="text-muted-foreground">Balance:</span> {card.balance.toLocaleString()} AED</div>
                       {card.last_four_digits && <div><span className="text-muted-foreground">Last 4:</span> {card.last_four_digits}</div>}
-                      {card.expiry_date && <div><span className="text-muted-foreground">Expiry:</span> {card.expiry_date}</div>}
+                      <div className="col-span-2"><span className="text-muted-foreground">ID:</span> <span className="font-mono text-[10px]">{card.id}</span></div>
                       <div className="col-span-2"><span className="text-muted-foreground">Created:</span> {new Date(card.created_at).toLocaleString()}</div>
                     </div>
                   )}
@@ -396,6 +398,14 @@ export default function AdminClientDetails() {
                 Свернуть
               </Button>
             )}
+            <Button
+              variant="default"
+              className="w-full rounded-xl mt-2"
+              onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
+            >
+              <Receipt className="w-4 h-4 mr-2" />
+              {t("admin.clients.fullHistory", "История транзакций")}
+            </Button>
           </div>
         )}
 

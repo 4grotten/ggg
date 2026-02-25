@@ -343,6 +343,22 @@ const TransactionDetails = () => {
   // Determine if crypto_to_iban is bank→crypto (sender has IBAN) or crypto→bank (sender has crypto)
   const isCryptoToIbanBankSender = isCryptoToIban && !!(receipt?.sender_iban || (receipt as any)?.sender_iban_mask || (transaction as any)?.senderIban);
   const isCryptoToIbanCryptoSender = isCryptoToIban && !isCryptoToIbanBankSender;
+  const isIncomingCryptoToIban = isCryptoToIban && (() => {
+    // Check cached list data for direction (primary source of truth)
+    if (apiTxGroups) {
+      for (const group of apiTxGroups) {
+        const found = group.transactions?.find((t: any) => {
+          const txRealId = t.id?.startsWith('api_') ? t.id.slice(4) : t.id;
+          return txRealId === realTransactionId;
+        });
+        if (found?.metadata?.isIncoming !== undefined) return found.metadata.isIncoming;
+      }
+    }
+    if ((transaction as any)?.metadata?.isIncoming !== undefined) return Boolean((transaction as any)?.metadata?.isIncoming);
+    if ((receipt as any)?.direction === 'inbound') return true;
+    if ((receipt as any)?.direction === 'outbound') return false;
+    return false;
+  })();
   const isIncomingCryptoToBank = isCryptoToBank && (() => {
     // Check cached list data for direction (primary source of truth)
     if (apiTxGroups) {
@@ -600,21 +616,32 @@ const TransactionDetails = () => {
               </motion.div>
             </motion.div>
           ) : isCryptoToIban ? (
-            <motion.div 
-              className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
-              style={{ backgroundColor: "#26A17B" }}
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            >
-              <motion.div
-                initial={{ y: 60, x: -60, opacity: 0 }}
-                animate={{ y: 0, x: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
+            <div className="relative">
+              <motion.div 
+                className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
+                style={{ backgroundColor: isIncomingCryptoToIban ? "#26A17B" : "#007AFF" }}
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               >
-                <UsdtIcon size={40} />
+                <motion.div
+                  initial={{ y: 60, x: -60, opacity: 0 }}
+                  animate={{ y: 0, x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
+                >
+                  <UsdtIcon size={40} />
+                </motion.div>
               </motion.div>
-            </motion.div>
+              <motion.div
+                className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-white ring-2 ring-background"
+                style={{ backgroundColor: "#8B5CF6" }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
+              >
+                <Landmark className="w-4 h-4" strokeWidth={2} />
+              </motion.div>
+            </div>
           ) : isCryptoToCard || isCryptoToBank ? (
             <motion.div 
               className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
@@ -841,8 +868,8 @@ const TransactionDetails = () => {
           )}
           
           <div className="space-y-1">
-            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer || isCryptoToCard || isCryptoToBank || isCryptoToIban ? 'text-[#007AFF]' : ''}`}>
-              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank ? '+' : '-'}{isCryptoToIban ? (isCryptoToIbanCryptoSender ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : isCryptoToBank ? (receipt?.movements?.[1]?.amount || (transaction.amountUSDT * (receipt?.exchange_rate || 3.65))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoToIban ? (isCryptoToIbanCryptoSender ? 'USDT' : 'AED') : isCryptoToBank ? 'AED' : isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
+            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank || isIncomingCryptoToIban ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer || isCryptoToCard || isCryptoToBank || isCryptoToIban ? 'text-[#007AFF]' : ''}`}>
+              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank || isIncomingCryptoToIban ? '+' : '-'}{isCryptoToIban ? (isCryptoToIbanCryptoSender ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : isCryptoToBank ? (receipt?.movements?.[1]?.amount || (transaction.amountUSDT * (receipt?.exchange_rate || 3.65))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoToIban ? (isCryptoToIbanCryptoSender ? 'USDT' : 'AED') : isCryptoToBank ? 'AED' : isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
               {isCryptoToBank ? t('transaction.walletToIban') : isCryptoToIban ? "USDT → IBAN" : isIncomingCryptoToCard ? "USDT → EasyCard" : isCryptoToCard ? t('transaction.walletToCard') : isCryptoDeposit ? t('transactions.walletDeposit') : isIncomingIbanToCard ? "IBAN → EasyCard" : isBankTransferIncoming ? "IBAN Bank → IBAN Bank" : isInternalTransfer ? "IBAN → EasyCard" : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' || (transaction as any)?.originalApiType === 'bank_to_card' || (transaction as any)?.originalApiType === 'iban_to_card' ? "IBAN → EasyCard" : "IBAN Bank → IBAN Bank") : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
@@ -1992,8 +2019,13 @@ const TransactionDetails = () => {
               ) : (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
-                    <span className="font-medium">{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#007AFF" }}>
+                        <UsdtIcon size={14} />
+                      </div>
+                      <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
+                    </div>
+                    <span className="font-medium text-[#007AFF]">-{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("transaction.fee")} ({receipt?.amount && receipt?.fee ? `${((receipt.fee / receipt.amount) * 100).toFixed(0)}%` : '1%'})</span>
