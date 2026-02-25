@@ -627,6 +627,7 @@ class AdminSettingsListView(APIView):
 
 class AdminUserLimitsListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    
     @swagger_auto_schema(
         operation_summary="Список лимитов всех пользователей (Админ)",
         tags=["Админ: Управление пользователями"]
@@ -635,15 +636,25 @@ class AdminUserLimitsListView(APIView):
         profiles = Profiles.objects.all().order_by('-created_at')
         serializer = UserLimitsSerializer(profiles, many=True)
         data = []
+        
         for i, profile in enumerate(profiles):
-            user = User.objects.get(user_id=profile.user_id)
+            full_name = f"{getattr(profile, 'first_name', '')} {getattr(profile, 'last_name', '')}".strip()
+            if not full_name and profile.user_id and str(profile.user_id).isdigit():
+                try:
+                    user = User.objects.get(id=int(profile.user_id))
+                    full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
+                except User.DoesNotExist:
+                    pass
+
             data.append({
                 "user_id": profile.user_id,
-                "full_name": f"{user.first_name or ''} {user.last_name or ''}".strip(),
-                "phone": profile.phone,
+                "full_name": full_name or "Unknown User",
+                "phone": getattr(profile, 'phone', ''),
                 "limits": serializer.data[i]
             })
+            
         return Response(data, status=status.HTTP_200_OK)
+
 
 class AdminUserLimitDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -657,14 +668,22 @@ class AdminUserLimitDetailView(APIView):
         profile = Profiles.objects.filter(user_id=str(user_id)).first()
         if not profile:
             return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
+            
         serializer = UserLimitsSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            user = User.objects.get(user_id=profile.user_id)
+            full_name = f"{getattr(profile, 'first_name', '')} {getattr(profile, 'last_name', '')}".strip()
+            if not full_name and profile.user_id and str(profile.user_id).isdigit():
+                try:
+                    user = User.objects.get(id=int(profile.user_id))
+                    full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
+                except User.DoesNotExist:
+                    pass
             return Response({
                 "user_id": profile.user_id,
-                "full_name": f"{user.first_name or ''} {user.last_name or ''}".strip(),
-                "phone": profile.phone,
+                "full_name": full_name or "Unknown User",
+                "phone": getattr(profile, 'phone', ''),
                 "limits": serializer.data
             }, status=status.HTTP_200_OK)
+            
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
