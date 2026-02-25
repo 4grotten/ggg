@@ -143,10 +143,16 @@ export function useAdminManagement() {
     queryKey: ["admin-clients"],
     queryFn: async () => {
       const res = await apiRequest<BackendClient[]>("/admin/users/limits/");
-      if (res.error || !res.data) throw new Error(res.error?.detail || res.error?.message || "Failed to fetch clients");
+      if (res.error || !res.data) {
+        const msg = res.error?.detail || res.error?.message || "Failed to fetch clients";
+        if (msg.includes('Connection refused') || msg.includes('tcp connect error')) {
+          return [] as BackendClient[];
+        }
+        throw new Error(msg);
+      }
       return res.data;
     },
-    retry: 2,
+    retry: 1,
   });
 
   // Search clients (local filter on already-fetched data)
