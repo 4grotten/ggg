@@ -406,9 +406,13 @@ const TransactionDetails = () => {
     // Fallback: no fromWalletAddress means recipient side
     return !transaction?.fromWalletAddress && !!transaction?.recipientCard;
   })();
-  // For API transactions, determine direction: check cached list data first, then movements
+  // For API transactions, determine direction: receipt perspective first (especially with ?viewAs)
   const isIncomingTransfer = isCardTransfer && (() => {
-    // Check cached list data for direction (primary source of truth)
+    // Receipt direction must be the source of truth on the receipt screen
+    if ((receipt as any)?.direction === 'inbound') return true;
+    if ((receipt as any)?.direction === 'outbound') return false;
+
+    // Fallback to cached list data only when receipt direction is absent
     if (apiTxGroups) {
       for (const group of apiTxGroups) {
         const found = group.transactions?.find((t: any) => {
@@ -418,9 +422,7 @@ const TransactionDetails = () => {
         if (found?.metadata?.isIncoming !== undefined) return found.metadata.isIncoming;
       }
     }
-    // Check receipt direction explicitly
-    if ((receipt as any)?.direction === 'inbound') return true;
-    if ((receipt as any)?.direction === 'outbound') return false;
+
     if (receipt?.movements?.length) {
       return receipt.movements[0]?.type === 'credit';
     }
