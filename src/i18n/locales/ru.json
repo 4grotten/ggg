@@ -934,8 +934,8 @@
     "stablecoins": "Стейблкоины",
     "bankTransfer": "Банковский перевод",
     "sendToCard": "Перевод на карту",
-    "usdtBalance": "Кошелёк USDT",
-    "usdtBalanceDesc": "С вашего баланса"
+    "usdtBalance": "Перевод на Кошелёк USDT",
+    "usdtBalanceDesc": "Перевод USDT на Кошелек EasyCard так и внешний"
   },
   "topUpUsdt": {
     "title": "Пополнение с USDT",

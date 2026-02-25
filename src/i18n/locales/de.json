@@ -858,8 +858,8 @@
     "stablecoins": "Stablecoins",
     "bankTransfer": "Banküberweisung",
     "sendToCard": "An Karte senden",
-    "usdtBalance": "USDT Wallet",
-    "usdtBalanceDesc": "Von Ihrem Guthaben"
+    "usdtBalance": "Überweisung an USDT Wallet",
+    "usdtBalanceDesc": "USDT an EasyCard oder externes Wallet senden"
   },
   "topUpUsdt": {
     "title": "Aufladen von USDT",

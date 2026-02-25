@@ -948,8 +948,8 @@
     "stablecoins": "Stablecoins",
     "bankTransfer": "Bank Transfer",
     "sendToCard": "Send to card",
-    "usdtBalance": "USDT Wallet",
-    "usdtBalanceDesc": "From your balance"
+    "usdtBalance": "Transfer to USDT Wallet",
+    "usdtBalanceDesc": "Send USDT to EasyCard or external wallet"
   },
   "topUpUsdt": {
     "title": "Top Up from USDT",
