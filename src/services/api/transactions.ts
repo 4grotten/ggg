@@ -769,11 +769,15 @@ const groupApiTransactions = async (data: ApiTransaction[]): Promise<Transaction
  * GET /api/v1/transactions/<transaction_id>/receipt/
  */
 export const fetchTransactionReceipt = async (
-  transactionId: string
+  transactionId: string,
+  viewAsUserId?: string
 ): Promise<{ data: TransactionReceipt | null; error: string | null }> => {
   try {
+    const endpoint = viewAsUserId 
+      ? `/transactions/${transactionId}/receipt/?view_as=${viewAsUserId}`
+      : `/transactions/${transactionId}/receipt/`;
     const result = await apiRequest<TransactionReceipt>(
-      `/transactions/${transactionId}/receipt/`,
+      endpoint,
       { method: 'GET' },
       true // rawEndpoint — skip /accounts prefix
     );

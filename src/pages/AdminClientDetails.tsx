@@ -422,7 +422,7 @@ export default function AdminClientDetails() {
               <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
               <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
             </div>
-            <CardTransactionsList groups={txGroups} />
+            <CardTransactionsList groups={txGroups} viewAsUserId={userId} />
             {client.transactions.length > 3 && !showAllTx && (
               <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
                 Посмотреть всю историю ({client.transactions.length})

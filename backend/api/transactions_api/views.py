@@ -383,7 +383,20 @@ class TransactionReceiptView(APIView):
     @swagger_auto_schema(operation_summary="Получить выписку (Квитанцию) по транзакции", responses={200: openapi.Response(description="Детали транзакции"), 400: ErrorResponseSerializer, 404: openapi.Response(description="Транзакция не найдена")}, tags=["Receipts (Квитанции)"])
     def get(self, request, transaction_id):
         try:
-            receipt_data = TransactionService.get_transaction_receipt(transaction_id, request.user.id)
+            # Allow admins to view receipt from another user's perspective
+            view_as = request.query_params.get('view_as')
+            viewer_id = request.user.id
+            if view_as:
+                # Check if requester is admin/staff
+                if request.user.is_staff or request.user.is_superuser:
+                    viewer_id = view_as
+                else:
+                    # Check via Profiles if user has admin role
+                    from apps.accounts_apps.models import Profiles
+                    profile = Profiles.objects.filter(user_id=str(request.user.id)).first()
+                    if profile and getattr(profile, 'role', None) in ['admin', 'superadmin']:
+                        viewer_id = view_as
+            receipt_data = TransactionService.get_transaction_receipt(transaction_id, viewer_id)
             return Response(receipt_data, status=status.HTTP_200_OK)
         except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e: return Response({"error": f"Внутренняя ошибка: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)

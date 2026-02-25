@@ -8,6 +8,7 @@ interface CardTransactionsListProps {
   groups: TransactionGroup[];
   onTransactionClick?: (transaction: Transaction) => void;
   walletView?: boolean;
+  viewAsUserId?: string;
 }
 
 const getInitial = (name: string) => name.charAt(0).toUpperCase();
@@ -81,6 +82,7 @@ export const CardTransactionsList = ({
   groups,
   onTransactionClick,
   walletView = false,
+  viewAsUserId,
 }: CardTransactionsListProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -89,7 +91,10 @@ const handleClick = (transaction: Transaction) => {
     if (onTransactionClick) {
       onTransactionClick(transaction);
     } else {
-      navigate(`/transaction/${transaction.id}`);
+      const url = viewAsUserId 
+        ? `/transaction/${transaction.id}?viewAs=${viewAsUserId}`
+        : `/transaction/${transaction.id}`;
+      navigate(url);
     }
   };
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft, CheckCircle, Info, MessageSquare, Ban, Plus, ExternalLink, ArrowUpRight, Clock, Eye, EyeOff, Copy, CreditCard, XCircle, Send, Landmark, FileText, Loader2, Wallet, ChevronDown, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -90,6 +90,8 @@ const TransactionDetails = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const viewAsUserId = searchParams.get('viewAs') || undefined;
   const { data: walletData } = useWalletSummary();
   const { user } = useAuth();
   const { avatarUrl: currentUserAvatar } = useAvatar();
@@ -102,7 +104,8 @@ const TransactionDetails = () => {
   // Fetch receipt from real API (only if user is authenticated)
   const { data: receiptResult, isLoading: receiptLoading } = useTransactionReceipt(
     realTransactionId,
-    hasToken && !!realTransactionId
+    hasToken && !!realTransactionId,
+    viewAsUserId
   );
   const receipt = receiptResult?.data || null;
   
