@@ -2241,11 +2241,16 @@ const TransactionDetails = () => {
                 <span className="text-[15px] font-bold text-[#007AFF]">{t("transaction.senderInfo", "Отправитель")}</span>
               </div>
               {(() => {
-                // Determine if sender is current user
-                const isCurrentUserSender = receipt.direction === 'outbound' || 
-                  (receipt.sender_name && user?.full_name && receipt.sender_name.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]));
+                // Only use current user's avatar if the viewer IS the sender (compare user IDs)
+                const currentUserId = String(user?.id || '');
+                const receiptUserId = String(receipt.user_id || '');
+                const isViewerParticipant = currentUserId && receiptUserId && currentUserId === receiptUserId;
+                const isCurrentUserSender = isViewerParticipant && (
+                  receipt.direction === 'outbound' || 
+                  (receipt.sender_name && user?.full_name && receipt.sender_name.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]))
+                );
                 const senderAvatarUrl = isCurrentUserSender ? currentUserAvatar : (receipt as any).sender_avatar;
-                const senderInitial = receipt.sender_name ? receipt.sender_name.charAt(0).toUpperCase() : (user?.full_name?.charAt(0)?.toUpperCase() || "S");
+                const senderInitial = receipt.sender_name ? receipt.sender_name.charAt(0).toUpperCase() : "S";
                 
                 return senderAvatarUrl ? (
                   <AvatarPreview src={senderAvatarUrl} alt={receipt.sender_name || ""}>
@@ -2342,9 +2347,14 @@ const TransactionDetails = () => {
               </div>
               {(() => {
                 const receiverName = receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name || transaction.recipientName;
-                // Determine if receiver is current user
-                const isCurrentUserReceiver = receipt.direction === 'inbound' || 
-                  (receiverName && user?.full_name && receiverName.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]));
+                // Only use current user's avatar if the viewer IS the receiver (compare user IDs)
+                const currentUserId = String(user?.id || '');
+                const receiptUserId = String(receipt.user_id || '');
+                const isViewerParticipant = currentUserId && receiptUserId && currentUserId === receiptUserId;
+                const isCurrentUserReceiver = isViewerParticipant && (
+                  receipt.direction === 'inbound' || 
+                  (receiverName && user?.full_name && receiverName.toLowerCase().includes(user.full_name.toLowerCase().split(' ')[0]))
+                );
                 const receiverAvatarUrl = isCurrentUserReceiver ? currentUserAvatar : ((receipt as any).receiver_avatar || (receipt as any).recipient_avatar || (transaction as any).recipientAvatar);
                 const receiverInitial = receiverName ? receiverName.charAt(0).toUpperCase() : "R";
                 
