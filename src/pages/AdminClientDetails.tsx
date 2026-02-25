@@ -62,6 +62,9 @@ export default function AdminClientDetails() {
   const [isVIP, setIsVIP] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [showAllTx, setShowAllTx] = useState(false);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
+  const [expandedWallet, setExpandedWallet] = useState<string | null>(null);
 
   const [limits, setLimits] = useState({
     dailyTopUp: "50000", monthlyTopUp: "500000",
@@ -77,7 +80,6 @@ export default function AdminClientDetails() {
 
   const [rates, setRates] = useState({
     usdtAedBuy: "3.65", usdtAedSell: "3.69",
-    aedUsdBuy: "0.2723", aedUsdSell: "0.2715",
     usdAedBuy: "3.68", usdAedSell: "3.67",
   });
 
@@ -109,7 +111,7 @@ export default function AdminClientDetails() {
     );
   }
 
-  const displayedTx = showAllTx ? client.transactions : client.transactions?.slice(0, 5);
+  const displayedTx = showAllTx ? client.transactions : client.transactions?.slice(0, 3);
 
   return (
     <MobileLayout
@@ -222,22 +224,42 @@ export default function AdminClientDetails() {
             </div>
             <div className="space-y-2">
               {client.cards.map((card) => (
-                <div key={card.id} className="p-3 rounded-xl bg-muted/30 border border-border/50 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-lg",
-                      card.type === 'metal' ? "bg-gradient-to-br from-gray-600 to-gray-800" : "bg-gradient-to-br from-blue-500 to-blue-700"
-                    )}>
-                      <CreditCard className="w-5 h-5 text-white" />
+                <button
+                  key={card.id}
+                  onClick={() => setExpandedCard(expandedCard === card.id ? null : card.id)}
+                  className="w-full text-left p-3 rounded-xl bg-muted/30 border border-border/50 transition-all"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-lg",
+                        card.type === 'metal' ? "bg-gradient-to-br from-gray-600 to-gray-800" : "bg-gradient-to-br from-blue-500 to-blue-700"
+                      )}>
+                        <CreditCard className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{card.name}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          •••• {card.last_four_digits || "****"} · <span className="capitalize">{card.status}</span>
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">{card.name}</p>
-                      <p className="text-[10px] text-muted-foreground">
-                        •••• {card.last_four_digits || "****"} · <span className="capitalize">{card.status}</span>
-                      </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-emerald-500">{card.balance.toLocaleString()} AED</p>
+                      <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", expandedCard === card.id && "rotate-180")} />
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-emerald-500">{card.balance.toLocaleString()} AED</p>
-                </div>
+                  {expandedCard === card.id && (
+                    <div className="mt-3 pt-3 border-t border-border/30 grid grid-cols-2 gap-2 text-xs">
+                      <div><span className="text-muted-foreground">ID:</span> <span className="font-mono text-[10px]">{card.id}</span></div>
+                      <div><span className="text-muted-foreground">Type:</span> <span className="capitalize">{card.type}</span></div>
+                      <div><span className="text-muted-foreground">Status:</span> <span className="capitalize">{card.status}</span></div>
+                      <div><span className="text-muted-foreground">Balance:</span> {card.balance.toLocaleString()} AED</div>
+                      {card.last_four_digits && <div><span className="text-muted-foreground">Last 4:</span> {card.last_four_digits}</div>}
+                      {card.expiry_date && <div><span className="text-muted-foreground">Expiry:</span> {card.expiry_date}</div>}
+                      <div className="col-span-2"><span className="text-muted-foreground">Created:</span> {new Date(card.created_at).toLocaleString()}</div>
+                    </div>
+                  )}
+                </button>
               ))}
             </div>
           </div>
@@ -253,19 +275,31 @@ export default function AdminClientDetails() {
             </div>
             <div className="space-y-2">
               {client.accounts.map((acc) => (
-                <div key={acc.id} className="p-3 rounded-xl bg-muted/30 border border-border/50 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">{acc.bank_name}</p>
-                    <p className="text-[10px] text-muted-foreground font-mono">{acc.iban}</p>
-                    <p className="text-[10px] text-muted-foreground">{acc.beneficiary}</p>
+                <button
+                  key={acc.id}
+                  onClick={() => setExpandedAccount(expandedAccount === acc.id ? null : acc.id)}
+                  className="w-full text-left p-3 rounded-xl bg-muted/30 border border-border/50 transition-all"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">{acc.bank_name}</p>
+                      <p className="text-[10px] text-muted-foreground font-mono">{acc.iban.slice(0, 8)}••••</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-emerald-500">{acc.balance.toLocaleString()} AED</p>
+                      <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", expandedAccount === acc.id && "rotate-180")} />
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-emerald-500">{acc.balance.toLocaleString()} AED</p>
-                    <Badge variant={acc.is_active ? "default" : "destructive"} className="text-[10px]">
-                      {acc.is_active ? "Active" : "Inactive"}
-                    </Badge>
-                  </div>
-                </div>
+                  {expandedAccount === acc.id && (
+                    <div className="mt-3 pt-3 border-t border-border/30 space-y-1.5 text-xs">
+                      <div><span className="text-muted-foreground">IBAN:</span> <span className="font-mono">{acc.iban}</span></div>
+                      <div><span className="text-muted-foreground">Bank:</span> {acc.bank_name}</div>
+                      <div><span className="text-muted-foreground">Beneficiary:</span> {acc.beneficiary}</div>
+                      <div><span className="text-muted-foreground">Balance:</span> {acc.balance.toLocaleString()} AED</div>
+                      <div><span className="text-muted-foreground">Status:</span> <Badge variant={acc.is_active ? "default" : "destructive"} className="text-[10px]">{acc.is_active ? "Active" : "Inactive"}</Badge></div>
+                    </div>
+                  )}
+                </button>
               ))}
             </div>
           </div>
@@ -281,20 +315,32 @@ export default function AdminClientDetails() {
             </div>
             <div className="space-y-2">
               {client.wallets.map((w) => (
-                <div key={w.id} className="p-3 rounded-xl bg-muted/30 border border-border/50">
+                <button
+                  key={w.id}
+                  onClick={() => setExpandedWallet(expandedWallet === w.id ? null : w.id)}
+                  className="w-full text-left p-3 rounded-xl bg-muted/30 border border-border/50 transition-all"
+                >
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">{w.token} ({w.network})</p>
-                      <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[200px]">{w.address}</p>
+                      <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[200px]">{w.address.slice(0, 10)}••••{w.address.slice(-6)}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="flex items-center gap-2">
                       <p className="text-sm font-bold text-emerald-500">{w.balance.toLocaleString()} {w.token}</p>
-                      <Badge variant={w.is_active ? "default" : "destructive"} className="text-[10px]">
-                        {w.is_active ? "Active" : "Inactive"}
-                      </Badge>
+                      <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", expandedWallet === w.id && "rotate-180")} />
                     </div>
                   </div>
-                </div>
+                  {expandedWallet === w.id && (
+                    <div className="mt-3 pt-3 border-t border-border/30 space-y-1.5 text-xs">
+                      <div><span className="text-muted-foreground">Network:</span> {w.network}</div>
+                      <div><span className="text-muted-foreground">Token:</span> {w.token}</div>
+                      <div className="break-all"><span className="text-muted-foreground">Address:</span> <span className="font-mono text-[10px]">{w.address}</span></div>
+                      <div><span className="text-muted-foreground">Balance:</span> {w.balance.toLocaleString()} {w.token}</div>
+                      <div><span className="text-muted-foreground">Status:</span> <Badge variant={w.is_active ? "default" : "destructive"} className="text-[10px]">{w.is_active ? "Active" : "Inactive"}</Badge></div>
+                      <div><span className="text-muted-foreground">Created:</span> {new Date(w.created_at).toLocaleString()}</div>
+                    </div>
+                  )}
+                </button>
               ))}
             </div>
           </div>
@@ -339,10 +385,15 @@ export default function AdminClientDetails() {
                 </div>
               ))}
             </div>
-            {client.transactions.length > 5 && (
-              <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(!showAllTx)}>
-                {showAllTx ? <ChevronUp className="w-4 h-4 mr-1" /> : <ChevronDown className="w-4 h-4 mr-1" />}
-                {showAllTx ? "Свернуть" : `Показать все (${client.transactions.length})`}
+            {client.transactions.length > 3 && !showAllTx && (
+              <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowAllTx(true)}>
+                Посмотреть всю историю ({client.transactions.length})
+              </Button>
+            )}
+            {showAllTx && client.transactions.length > 3 && (
+              <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
+                <ChevronUp className="w-4 h-4 mr-1" />
+                Свернуть
               </Button>
             )}
           </div>
@@ -479,7 +530,6 @@ export default function AdminClientDetails() {
           <div className="space-y-3">
             {[
               { pair: "USDT → AED", buyKey: "usdtAedBuy", sellKey: "usdtAedSell" },
-              { pair: "AED → USD", buyKey: "aedUsdBuy", sellKey: "aedUsdSell" },
               { pair: "USD → AED", buyKey: "usdAedBuy", sellKey: "usdAedSell" },
             ].map(({ pair, buyKey, sellKey }) => (
               <div key={pair} className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
