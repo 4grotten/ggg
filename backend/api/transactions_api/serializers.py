@@ -304,10 +304,10 @@ class AdminTransactionSerializerDirect(serializers.ModelSerializer):
 
         # ---- Crypto conversion types with v2 pricing stored in metadata ----
         if tx_type in ('card_to_crypto', 'bank_to_crypto'):
-            return self._amounts_fiat_to_crypto(meta, direction)
+            return self._amounts_fiat_to_crypto(obj, meta, direction)
 
         if tx_type in ('crypto_to_card', 'crypto_to_iban'):
-            return self._amounts_crypto_to_fiat(meta, direction)
+            return self._amounts_crypto_to_fiat(obj, meta, direction)
 
         if tx_type in ('crypto_withdrawal', 'crypto_to_crypto'):
             return self._amounts_crypto_withdrawal(obj, meta, direction)
@@ -316,11 +316,26 @@ class AdminTransactionSerializerDirect(serializers.ModelSerializer):
         return self._amounts_fiat_default(obj, direction)
 
     # --- card_to_crypto / bank_to_crypto ---
-    def _amounts_fiat_to_crypto(self, meta, direction):
+    def _amounts_fiat_to_crypto(self, obj, meta, direction):
         crypto_receive = meta.get('crypto_send_usdt') or meta.get('crypto_to_receive_usdt')
         total_debited_usdt = meta.get('total_debited_usdt')
         fiat_amount = meta.get('fiat_amount_aed')
         token = meta.get('crypto_token', 'USDT')
+
+        # Fallback: calculate from raw transaction fields when v2 metadata is missing
+        if not crypto_receive and not total_debited_usdt:
+            amount = float(obj.amount) if obj.amount else 0
+            fee = float(obj.fee) if obj.fee else 0
+            rate = float(obj.exchange_rate) if obj.exchange_rate else 0
+            if rate > 1:
+                # amount is in AED, rate is AED/USDT (e.g. 3.69)
+                crypto_receive = round(amount / rate, 2)
+                total_debited_usdt = round((amount + fee) / rate, 2)
+            else:
+                crypto_receive = amount
+                total_debited_usdt = amount + fee
+            if not fiat_amount:
+                fiat_amount = amount
 
         if direction == 'inbound':
             primary = {"sign": "+", "amount": self._fmt(crypto_receive), "currency": token}
@@ -331,11 +346,39 @@ class AdminTransactionSerializerDirect(serializers.ModelSerializer):
         return primary, secondary
 
     # --- crypto_to_card / crypto_to_iban ---
-    def _amounts_crypto_to_fiat(self, meta, direction):
+    def _amounts_crypto_to_fiat(self, obj, meta, direction):
         credited_aed = meta.get('credited_amount_aed') or meta.get('fiat_amount_aed')
         usdt_amount = meta.get('usdt_amount') or meta.get('amount_usdt')
         total_debited_usdt = meta.get('total_debited_usdt')
         token = meta.get('crypto_token', 'USDT')
+
+        # Fallback: calculate from raw fields when v2 metadata is missing
+        if not credited_aed and not usdt_amount and not total_debited_usdt:
+            amount = float(obj.amount) if obj.amount else 0
+            fee = float(obj.fee) if obj.fee else 0
+            rate = float(obj.exchange_rate) if obj.exchange_rate else 0
+            currency = obj.currency or 'AED'
+            if currency == 'AED':
+                credited_aed = amount
+                if rate > 1:
+                    # rate is AED/USDT
+                    usdt_amount = round(amount / rate, 2)
+                    total_debited_usdt = round((amount / rate) + fee, 2)
+                elif rate > 0:
+                    # rate < 1 means USDT/AED (e.g. 0.271)
+                    usdt_amount = round(amount * rate, 2)
+                    total_debited_usdt = round(usdt_amount + fee, 2)
+                else:
+                    usdt_amount = amount
+                    total_debited_usdt = amount + fee
+            else:
+                # currency is USDT
+                usdt_amount = amount
+                total_debited_usdt = amount + fee
+                if rate > 1:
+                    credited_aed = round(amount * rate, 2)
+                elif rate > 0:
+                    credited_aed = round(amount / rate, 2)
 
         if direction == 'inbound':
             primary = {"sign": "+", "amount": self._fmt(credited_aed), "currency": "AED"}
