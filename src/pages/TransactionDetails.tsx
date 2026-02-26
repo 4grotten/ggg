@@ -2289,7 +2289,7 @@ const TransactionDetails = () => {
             )}
             {(receipt as any).crypto_address && (
               <div className="flex items-start justify-between py-0.5">
-                <span className="text-[15px] text-muted-foreground">{t("receiptKeys.crypto_address", "Крипто-адрес")}</span>
+                <span className="text-[15px] text-muted-foreground">{t("receiptKeys.crypto_address", "Кошелек USDT")}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-right text-sm max-w-[160px] break-all">
                     {showCryptoAddr ? (receipt as any).crypto_address : `${String((receipt as any).crypto_address).slice(0, 6)}...${String((receipt as any).crypto_address).slice(-6)}`}
