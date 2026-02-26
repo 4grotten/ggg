@@ -562,8 +562,9 @@ class TransactionInfoView(APIView):
         operation_summary="Инфо по транзакции (Комиссии, Курсы, Лимиты)",
         manual_parameters=[
             openapi.Parameter('type', openapi.IN_QUERY, type=openapi.TYPE_STRING, required=True, 
-                description="Типы: card_to_card, bank_to_card, crypto_to_card, card_to_bank, crypto_to_bank, bank_to_crypto, card_to_crypto")
-        ]
+                description="Типы: card_to_card, bank_to_card, crypto_to_card, card_to_bank, crypto_to_bank, bank_to_crypto, card_to_crypto, crypto_to_crypto, crypto_to_iban, iban_to_iban, iban_to_card, internal_transfer, crypto_withdrawal")
+        ],
+        tags=["Инфо (Транзакции)"]
     )
     def get(self, request):
         tx_type = request.query_params.get('type')
@@ -573,6 +574,8 @@ class TransactionInfoView(APIView):
         transfer_min = SettingsManager.get_setting('limits', 'transfer_min', 1.0, user_id)
         transfer_max = SettingsManager.get_setting('limits', 'transfer_max', 50000.0, user_id)
         withdrawal_min = SettingsManager.get_setting('limits', 'withdrawal_min', 50.0, user_id)
+        withdrawal_max = SettingsManager.get_setting('limits', 'withdrawal_max', 50000.0, user_id)
+        
         info = {
             "fee_type": "percent",
             "fee_value": 0,
@@ -580,26 +583,63 @@ class TransactionInfoView(APIView):
             "max_amount": float(transfer_max),
             "exchange_rate": None,
             "currency_from": "AED",
-            "currency_to": "AED"
+            "currency_to": "AED",
+            "network_fee_usdt": None,
         }
+
         if tx_type == "card_to_card":
+            # services.py: execute_card_transfer → card_to_card_percent
             info["fee_value"] = float(SettingsManager.get_setting('fees', 'card_to_card_percent', 1.0, user_id))
-        elif tx_type in ["crypto_to_card", "crypto_to_bank"]:
+
+        elif tx_type == "internal_transfer":
+            # services.py: execute_card_transfer → card_to_card_percent (same logic)
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'card_to_card_percent', 1.0, user_id))
+
+        elif tx_type in ["card_to_crypto", "bank_to_crypto"]:
+            # services.py: execute_card_to_crypto / execute_bank_to_crypto → currency_conversion_percent + network_fee flat
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'currency_conversion_percent', 1.5, user_id))
+            info["exchange_rate"] = float(usdt_to_aed_sell)
+            info["currency_to"] = "USDT"
+            info["min_amount"] = float(withdrawal_min)
+            info["max_amount"] = float(withdrawal_max)
+            info["network_fee_usdt"] = float(SettingsManager.get_setting('fees', 'top_up_crypto_flat', 5.90, user_id))
+
+        elif tx_type in ["crypto_to_card", "crypto_to_bank", "crypto_to_iban"]:
+            # services.py: execute_crypto_to_card / crypto_to_bank → top_up_crypto_flat (flat USDT fee)
             info["fee_type"] = "flat"
             info["fee_value"] = float(SettingsManager.get_setting('fees', 'top_up_crypto_flat', 5.90, user_id))
             info["exchange_rate"] = float(usdt_to_aed_buy)
             info["currency_from"] = "USDT"
             info["min_amount"] = float(SettingsManager.get_setting('limits', 'top_up_crypto_min', 15.0, user_id))
-        elif tx_type == "bank_to_card":
-            info["fee_value"] = float(SettingsManager.get_setting('fees', 'top_up_bank_percent', 1.5, user_id))
-            info["min_amount"] = float(SettingsManager.get_setting('limits', 'top_up_bank_min', 50.0, user_id))
-        elif tx_type == "card_to_bank":
-            info["fee_value"] = float(SettingsManager.get_setting('fees', 'bank_transfer_percent', 2.0, user_id))
-            info["min_amount"] = float(withdrawal_min)
-        elif tx_type in ["card_to_crypto", "bank_to_crypto"]:
+            info["max_amount"] = float(SettingsManager.get_setting('limits', 'top_up_crypto_max', 50000.0, user_id))
+
+        elif tx_type in ["crypto_to_crypto", "crypto_withdrawal"]:
+            # services.py: execute_crypto_wallet_withdrawal → network_fee_percent
             info["fee_value"] = float(SettingsManager.get_setting('fees', 'network_fee_percent', 1.0, user_id))
-            info["exchange_rate"] = float(usdt_to_aed_sell)
+            info["currency_from"] = "USDT"
             info["currency_to"] = "USDT"
+            info["min_amount"] = float(SettingsManager.get_setting('limits', 'top_up_crypto_min', 15.0, user_id))
+            info["max_amount"] = float(SettingsManager.get_setting('limits', 'top_up_crypto_max', 50000.0, user_id))
+
+        elif tx_type == "bank_to_card":
+            # services.py: execute_bank_to_card_transfer → bank_transfer_percent
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'bank_transfer_percent', 2.0, user_id))
+            info["min_amount"] = float(SettingsManager.get_setting('limits', 'top_up_bank_min', 50.0, user_id))
+            info["max_amount"] = float(SettingsManager.get_setting('limits', 'top_up_bank_max', 100000.0, user_id))
+
+        elif tx_type == "iban_to_card":
+            # services.py: execute_bank_to_card_transfer → bank_transfer_percent
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'bank_transfer_percent', 2.0, user_id))
+            info["min_amount"] = float(SettingsManager.get_setting('limits', 'top_up_bank_min', 50.0, user_id))
+            info["max_amount"] = float(SettingsManager.get_setting('limits', 'top_up_bank_max', 100000.0, user_id))
+
+        elif tx_type in ["card_to_bank", "iban_to_iban"]:
+            # services.py: execute_card_to_bank → card_to_card_percent; execute_bank_withdrawal → bank_transfer_percent
+            if tx_type == "card_to_bank":
+                info["fee_value"] = float(SettingsManager.get_setting('fees', 'card_to_card_percent', 1.0, user_id))
+            else:
+                info["fee_value"] = float(SettingsManager.get_setting('fees', 'bank_transfer_percent', 2.0, user_id))
             info["min_amount"] = float(withdrawal_min)
+            info["max_amount"] = float(withdrawal_max)
 
         return Response(info, status=status.HTTP_200_OK)
