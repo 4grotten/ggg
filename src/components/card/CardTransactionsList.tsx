@@ -418,13 +418,22 @@ const handleClick = (transaction: Transaction) => {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    {(isOutgoingCryptoToBank || isIncomingCryptoToBank || isCryptoToIban) ? (
+                    {(isOutgoingCryptoToBank || isIncomingCryptoToBank) ? (
                       <>
                         <p className={`font-semibold ${colorClass}`}>
                           {prefix}{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                        </p>
+                      </>
+                    ) : isCryptoToIban ? (
+                      <>
+                        <p className={`font-semibold ${colorClass}`}>
+                          {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                       </>
                     ) : walletView ? (
