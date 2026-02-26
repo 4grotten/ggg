@@ -282,11 +282,13 @@ const handleClick = (transaction: Transaction) => {
                       ) : isCryptoToIban ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
-                          style={{ backgroundColor: (transaction.metadata as any)?.isIncoming ? "#26A17B" : "#007AFF" }}
+                          style={{ backgroundColor: (transaction.metadata as any)?.isIncoming ? "#26A17B" : "#26A17B" }}
                         >
-                          <UsdtIcon size={20} />
-                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#8B5CF6] flex items-center justify-center ring-2 ring-background">
-                            <Landmark className="w-2.5 h-2.5 text-white" />
+                          {(transaction.metadata as any)?.isIncoming ? <Landmark className="w-5 h-5" /> : <UsdtIcon size={20} />}
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-background"
+                            style={{ backgroundColor: (transaction.metadata as any)?.isIncoming ? "#26A17B" : "#007AFF" }}
+                          >
+                            {(transaction.metadata as any)?.isIncoming ? <UsdtIcon size={10} /> : <Landmark className="w-2.5 h-2.5 text-white" />}
                           </div>
                         </div>
                       ) : isIbanToIban ? (
