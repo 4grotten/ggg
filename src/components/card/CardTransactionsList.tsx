@@ -319,7 +319,7 @@ const handleClick = (transaction: Transaction) => {
                           : isIncomingCryptoToBank
                           ? t("transaction.walletToIban")
                           : isCryptoToIban
-                          ? "USDT → IBAN"
+                          ? "IBAN → USDT"
                           : walletView && isTopup 
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit
