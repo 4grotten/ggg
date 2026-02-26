@@ -820,6 +820,110 @@ export const fetchTransactionReceipt = async (
 };
 
 // =============================================
+// BANK TOPUP INITIATION
+// POST /api/v1/transactions/topup/bank/
+// =============================================
+
+export interface BankTopupRequest {
+  transfer_rail: 'UAE_LOCAL_AED' | 'SWIFT_INTL';
+}
+
+export interface BankTopupResponse {
+  message: string;
+  transaction_id: string;
+  instructions: {
+    bank_name: string;
+    iban: string;
+    beneficiary: string;
+    reference: string;
+    fee_percent: string;
+  };
+}
+
+/**
+ * Initiate bank topup - creates pending transaction with bank details
+ * POST /api/v1/transactions/topup/bank/
+ */
+export const submitBankTopup = async (
+  request: BankTopupRequest
+): Promise<{ success: boolean; data?: BankTopupResponse; error?: string }> => {
+  try {
+    const result = await apiRequest<BankTopupResponse>(
+      `/transactions/topup/bank/`,
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+
+    if (result.error) {
+      console.warn('[Transactions API] Bank topup error:', result.error);
+      return { success: false, error: result.error.detail || result.error.message || 'Topup initiation failed' };
+    }
+
+    if (result.data?.transaction_id) {
+      return { success: true, data: result.data };
+    }
+
+    return { success: false, error: 'Unexpected response' };
+  } catch (error) {
+    console.error('[Transactions API] Bank topup failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
+// =============================================
+// CRYPTO TOPUP INITIATION
+// POST /api/v1/transactions/topup/crypto/
+// =============================================
+
+export interface CryptoTopupRequest {
+  card_id: string;
+  token: 'USDT' | 'USDC';
+  network: 'TRC20' | 'ERC20' | 'BEP20' | 'SOL';
+}
+
+export interface CryptoTopupResponse {
+  message: string;
+  deposit_address: string;
+  qr_payload: string;
+}
+
+/**
+ * Initiate crypto topup - generates deposit address
+ * POST /api/v1/transactions/topup/crypto/
+ */
+export const submitCryptoTopup = async (
+  request: CryptoTopupRequest
+): Promise<{ success: boolean; data?: CryptoTopupResponse; error?: string }> => {
+  try {
+    const result = await apiRequest<CryptoTopupResponse>(
+      `/transactions/topup/crypto/`,
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+
+    if (result.error) {
+      console.warn('[Transactions API] Crypto topup error:', result.error);
+      return { success: false, error: result.error.detail || result.error.message || 'Topup initiation failed' };
+    }
+
+    if (result.data?.deposit_address) {
+      return { success: true, data: result.data };
+    }
+
+    return { success: false, error: 'Unexpected response' };
+  } catch (error) {
+    console.error('[Transactions API] Crypto topup failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
+// =============================================
 // BANK WITHDRAWAL (Bank Wire to external bank)
 // POST /api/v1/transactions/withdrawal/bank/
 // =============================================

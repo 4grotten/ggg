@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark, Eye, EyeOff, Wallet } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -15,6 +15,8 @@ import {
 import { TOP_UP_CRYPTO_FEE, TOP_UP_CRYPTO_MIN_AMOUNT } from "@/lib/fees";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { useCryptoWallets } from "@/hooks/useCards";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Destination {
   id: string;
@@ -25,51 +27,65 @@ interface Destination {
   fullNumber: string;
 }
 
-const getDestinations = (bankLabel: string, walletLabel: string, walletAddress: string): Destination[] => [
-  { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
-  { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
-  { id: "bank", type: "bank", name: bankLabel, subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
-  { id: "wallet", type: "wallet", name: walletLabel, subtitle: `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`, fullNumber: walletAddress },
+const networks = [
+  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", apiValue: "TRC20" as const },
+  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20", apiValue: "ERC20" as const },
+  { id: "bep20", name: "BNB Chain (BEP20)", shortName: "BEP20", apiValue: "BEP20" as const },
+  { id: "sol", name: "Solana (SOL)", shortName: "SOL", apiValue: "SOL" as const },
 ];
 
-const networkAddresses: Record<string, string> = {
+// Fallback addresses for networks without a real wallet
+const fallbackAddresses: Record<string, string> = {
   trc20: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc",
   erc20: "0x4A8b2e1F7cD9E3a6B5f0C2d8E9F1a3B4c5D6e7F8",
   bep20: "0x7F2c9A3d5E8b1C4f6D0a2B9e7F3c5A8d1E4b6C9D",
   sol: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgHkv",
 };
 
-const networks = [
-  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20" },
-  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20" },
-  { id: "bep20", name: "BNB Chain (BEP20)", shortName: "BEP20" },
-  { id: "sol", name: "Solana (SOL)", shortName: "SOL" },
-];
-
 const TopUpCrypto = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const userWalletAddress = networkAddresses.trc20;
+  const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
+
+  // Build a network→address map from real wallets
+  const walletAddressMap = useMemo(() => {
+    const map: Record<string, string> = { ...fallbackAddresses };
+    if (cryptoWalletsData?.data) {
+      for (const w of cryptoWalletsData.data) {
+        const key = w.network.toLowerCase();
+        map[key] = w.address;
+      }
+    }
+    return map;
+  }, [cryptoWalletsData]);
+
   const walletLabel = t("drawer.usdtBalance", "USDT TRC20 Кошелек");
-  const destinations = getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress);
+  const primaryWalletAddress = walletAddressMap.trc20;
+
+  const getDestinations = (): Destination[] => [
+    { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
+    { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
+    { id: "bank", type: "bank", name: t("topUp.bankAccountAed", "Bank Account AED"), subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
+    { id: "wallet", type: "wallet", name: walletLabel, subtitle: `${primaryWalletAddress.slice(0, 6)}...${primaryWalletAddress.slice(-4)}`, fullNumber: primaryWalletAddress },
+  ];
+
+  const destinations = getDestinations();
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
   const [selectedDest, setSelectedDest] = useState<Destination>(() => {
-    const dests = getDestinations(t("topUp.bankAccountAed", "Bank Account AED"), walletLabel, userWalletAddress);
-    return dests.find(d => d.type === "wallet") || dests[0];
+    return destinations.find(d => d.type === "wallet") || destinations[0];
   });
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
   const [destDrawerOpen, setDestDrawerOpen] = useState(false);
   const [revealedId, setRevealedId] = useState<string | null>(null);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
   
-  // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
   
-  // Wallet address based on selected network
-  const walletAddress = networkAddresses[selectedNetwork.id] || networkAddresses.trc20;
+  // Use real wallet address for selected network
+  const walletAddress = walletAddressMap[selectedNetwork.id] || fallbackAddresses.trc20;
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
@@ -89,7 +105,7 @@ const TopUpCrypto = () => {
   const handleShare = async () => {
     const shareData = {
       title: "USDT Wallet Address",
-      text: `USDT (TRC20) Address: ${walletAddress}`,
+      text: `USDT (${selectedNetwork.shortName}) Address: ${walletAddress}`,
       url: window.location.href,
     };
 
@@ -97,10 +113,9 @@ const TopUpCrypto = () => {
       if (navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
       } else if (navigator.share) {
-        // Try without URL if canShare fails
         await navigator.share({
           title: "USDT Wallet Address",
-          text: `USDT (TRC20) Address: ${walletAddress}`,
+          text: `USDT (${selectedNetwork.shortName}) Address: ${walletAddress}`,
         });
       } else {
         handleCopy();
@@ -129,30 +144,34 @@ const TopUpCrypto = () => {
 
         {/* QR Code */}
         <div className="flex justify-center px-6 mb-6">
-          <div className="bg-white p-6 rounded-2xl">
-            <QRCodeSVG 
-              value={walletAddress} 
-              size={200}
-              level="H"
-              includeMargin={false}
-            />
-            <div className="flex items-center justify-center gap-2 mt-4">
-              <p className="text-primary font-medium">
-                {truncateAddress(walletAddress)}
-              </p>
-              <button
-                onClick={handleCopy}
-                className="p-1.5 rounded-full hover:bg-muted transition-colors"
-                aria-label={t("topUp.copy")}
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 text-green-500" />
-                ) : (
-                  <Copy className="w-4 h-4 text-[#007AFF]" />
-                )}
-              </button>
+          {walletsLoading ? (
+            <Skeleton className="w-[252px] h-[280px] rounded-2xl" />
+          ) : (
+            <div className="bg-white p-6 rounded-2xl">
+              <QRCodeSVG 
+                value={walletAddress} 
+                size={200}
+                level="H"
+                includeMargin={false}
+              />
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <p className="text-primary font-medium">
+                  {truncateAddress(walletAddress)}
+                </p>
+                <button
+                  onClick={handleCopy}
+                  className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                  aria-label={t("topUp.copy")}
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-[#007AFF]" />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Info Cards */}
