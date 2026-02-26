@@ -2443,25 +2443,6 @@ const TransactionDetails = () => {
                 <span className="font-medium">{(receipt as any).beneficiary_swift}</span>
               </div>
             )}
-            {(receipt.crypto_address || transaction.toWalletAddress) && transaction.type !== 'crypto_to_card' && (() => {
-              const addr = String(receipt.crypto_address || transaction.toWalletAddress);
-              return (
-                <div className="flex items-start justify-between">
-                  <span className="text-muted-foreground">{t("transaction.toAddress", "На Кошелек USDT")}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-right text-sm max-w-[160px] break-all">
-                      {showCryptoAddr ? addr : `${addr.slice(0, 6)}...${addr.slice(-6)}`}
-                    </span>
-                    <button onClick={() => { navigator.clipboard.writeText(addr); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setShowCryptoAddr(!showCryptoAddr)} className="text-muted-foreground hover:text-foreground transition-colors">
-                      {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
             </div>
           </div>
         )}
