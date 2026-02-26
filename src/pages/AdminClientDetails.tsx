@@ -390,7 +390,7 @@ export default function AdminClientDetails() {
           
           {/* Top section: Avatar + Name + ID + Role + Badges */}
           <div className="p-5 flex items-start gap-4">
-            <div className="relative shrink-0">
+            <div className="relative shrink-0 flex flex-col items-center">
               <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/20">
                 {client.avatar_url ? (
                   <img src={client.avatar_url} alt={client.full_name} className="w-full h-full object-cover" />
@@ -401,10 +401,22 @@ export default function AdminClientDetails() {
                 )}
               </div>
               {client.is_verified && (
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
+                <div className="absolute top-[60px] right-[-4px] w-6 h-6 rounded-full bg-emerald-500 border-2 border-card flex items-center justify-center">
                   <CheckCircle className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
+              <div className="flex items-center gap-1.5 mt-2 flex-wrap justify-center">
+                {isVIP && (
+                  <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] px-2.5 py-0.5 border-0 shadow-sm">
+                    <Crown className="w-3 h-3 mr-1" /> VIP
+                  </Badge>
+                )}
+                {isBlocked && (
+                  <Badge variant="destructive" className="text-[10px] px-2.5 py-0.5 shadow-sm">
+                    {t("admin.clients.blocked")}
+                  </Badge>
+                )}
+              </div>
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-xl truncate">{client.full_name}</h3>
@@ -427,18 +439,6 @@ export default function AdminClientDetails() {
                   )}
                 </div>
               )}
-              <div className="flex items-center gap-2 mt-2.5 flex-wrap">
-                {isVIP && (
-                  <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] px-2.5 py-0.5 border-0 shadow-sm">
-                    <Crown className="w-3 h-3 mr-1" /> VIP
-                  </Badge>
-                )}
-                {isBlocked && (
-                  <Badge variant="destructive" className="text-[10px] px-2.5 py-0.5 shadow-sm">
-                    {t("admin.clients.blocked")}
-                  </Badge>
-                )}
-              </div>
             </div>
           </div>
 
