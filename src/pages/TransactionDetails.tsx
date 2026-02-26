@@ -2041,7 +2041,7 @@ const TransactionDetails = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#007AFF" }}>
-                        <UsdtIcon size={14} />
+                        <Landmark className="w-3.5 h-3.5 text-white" />
                       </div>
                       <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
                     </div>
