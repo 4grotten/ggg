@@ -227,7 +227,7 @@ const handleClick = (transaction: Transaction) => {
                       ) : isCryptoSend ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                          style={{ backgroundColor: "#007AFF" }}
+                          style={{ backgroundColor: (transaction.metadata as any)?.isIncoming ? "#22C55E" : "#007AFF" }}
                         >
                           <UsdtIcon size={22} />
                         </div>
