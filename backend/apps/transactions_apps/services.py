@@ -737,24 +737,187 @@ class TransactionService:
         else:
             direction = 'outbound'
 
+        # Avatars
         sender_avatar = None
         receiver_avatar = None
         try:
             if txn.sender_id and txn.sender_id != 'EXTERNAL':
-                sender_profile = Profiles.objects.filter(user_id=txn.sender_id).first()
-                if sender_profile and sender_profile.avatar_url:
-                    sender_avatar = sender_profile.avatar_url
+                sp = Profiles.objects.filter(user_id=txn.sender_id).first()
+                if sp and sp.avatar_url:
+                    sender_avatar = sp.avatar_url
         except Exception:
             pass
         try:
             if txn.receiver_id and txn.receiver_id != 'EXTERNAL':
-                receiver_profile = Profiles.objects.filter(user_id=txn.receiver_id).first()
-                if receiver_profile and receiver_profile.avatar_url:
-                    receiver_avatar = receiver_profile.avatar_url
+                rp = Profiles.objects.filter(user_id=txn.receiver_id).first()
+                if rp and rp.avatar_url:
+                    receiver_avatar = rp.avatar_url
         except Exception:
             pass
 
-        receipt = {
+        meta = txn.metadata or {}
+
+        # === TRANSACTION BLOCK ===
+        transaction_block = {
+            "type": txn.type,
+            "direction": direction,
+            "status": txn.status,
+            "operation": txn.type.replace('_', ' ').title(),
+            "transaction_id": str(txn.id),
+            "date_time": txn.created_at.isoformat() if txn.created_at else None,
+        }
+
+        # === SENDER BLOCK ===
+        sender_block = {
+            "name": txn.sender_name,
+            "user_id": txn.sender_id,
+            "avatar": sender_avatar,
+        }
+        # Card mask
+        sender_card_mask = meta.get('sender_card_mask') or (TransactionService._mask_card(txn.sender_card) if txn.sender_card else None)
+        if sender_card_mask:
+            sender_block["card_mask"] = sender_card_mask
+        sender_block["card_full"] = txn.sender_card
+        # IBAN
+        if meta.get('sender_iban_mask'):
+            sender_block["iban_mask"] = meta['sender_iban_mask']
+        if meta.get('sender_iban'):
+            sender_block["iban"] = meta['sender_iban']
+        if meta.get('sender_bank_name') or meta.get('sender_bank'):
+            sender_block["bank_name"] = meta.get('sender_bank_name') or meta.get('sender_bank')
+        # Crypto from_address
+        if meta.get('from_address'):
+            sender_block["wallet_address"] = meta['from_address']
+
+        # === RECIPIENT BLOCK ===
+        recipient_block = {
+            "name": txn.receiver_name,
+            "user_id": txn.receiver_id,
+            "avatar": receiver_avatar,
+        }
+        receiver_card_mask = meta.get('receiver_card_mask') or (TransactionService._mask_card(txn.recipient_card) if txn.recipient_card else None)
+        if receiver_card_mask:
+            recipient_block["card_mask"] = receiver_card_mask
+        recipient_block["card_full"] = txn.recipient_card
+        # Crypto address
+        if meta.get('crypto_address'):
+            recipient_block["wallet_address"] = meta['crypto_address']
+        # IBAN
+        if meta.get('beneficiary_iban'):
+            recipient_block["iban"] = meta['beneficiary_iban']
+        if meta.get('iban_mask'):
+            recipient_block["iban_mask"] = meta['iban_mask']
+        if meta.get('beneficiary_bank_name') or meta.get('beneficiary_bank'):
+            recipient_block["bank_name"] = meta.get('beneficiary_bank_name') or meta.get('beneficiary_bank')
+        if meta.get('beneficiary_name'):
+            recipient_block["beneficiary_name"] = meta['beneficiary_name']
+
+        # === ASSET BLOCK ===
+        asset_block = {}
+        if meta.get('crypto_token'):
+            asset_block["crypto_token"] = meta['crypto_token']
+            asset_block["crypto_network"] = meta.get('crypto_network', '')
+
+        # === PRICING BLOCK ===
+        pricing_version = meta.get('pricing_version', 1)
+        tx_type = txn.type
+
+        if pricing_version >= 2 and tx_type in ('card_to_crypto', 'bank_to_crypto'):
+            pricing_block = {
+                "pricing_version": "v2_crypto_fee_plus_network_fee",
+                "fiat_currency": "AED",
+                "fiat_amount": meta.get('fiat_amount_aed', float(txn.amount)),
+                "exchange_rate": {
+                    "base_currency": "AED",
+                    "quote_currency": "USDT",
+                    "aed_per_1_usdt": meta.get('exchange_rate_aed_per_usdt', float(txn.exchange_rate) if txn.exchange_rate else None),
+                },
+                "fees": {
+                    "service_fee_percent": meta.get('service_fee_percent', 0),
+                    "service_fee_usdt": meta.get('service_fee_usdt', 0),
+                    "network_fee_usdt": meta.get('network_fee_usdt', 0),
+                },
+                "conversion": {
+                    "crypto_to_receive_usdt": meta.get('crypto_send_usdt', 0),
+                    "total_debited_usdt": meta.get('total_debited_usdt', 0),
+                    "total_debited_aed_equivalent": meta.get('total_debited_aed_equivalent', 0),
+                },
+            }
+        elif pricing_version >= 2 and tx_type in ('crypto_to_card', 'crypto_to_iban'):
+            pricing_block = {
+                "pricing_version": "v2_crypto_flat_fee",
+                "crypto_currency": "USDT",
+                "amount_usdt": meta.get('amount_usdt', float(txn.amount)),
+                "exchange_rate": {
+                    "base_currency": "USDT",
+                    "quote_currency": "AED",
+                    "usdt_to_aed": meta.get('exchange_rate_usdt_to_aed', float(txn.exchange_rate) if txn.exchange_rate else None),
+                },
+                "fees": {
+                    "fee_usdt": meta.get('fee_usdt', float(txn.fee) if txn.fee else 0),
+                },
+                "conversion": {
+                    "total_debited_usdt": meta.get('total_debited_usdt', 0),
+                    "credited_aed": meta.get('credited_aed', 0),
+                },
+            }
+        else:
+            # Legacy / non-crypto pricing
+            pricing_block = {
+                "pricing_version": "v1_legacy",
+                "amount": float(txn.amount),
+                "currency": txn.currency,
+                "fee": float(txn.fee) if txn.fee else 0,
+                "exchange_rate": float(txn.exchange_rate) if txn.exchange_rate else None,
+            }
+            # Enrich from sub-tables
+            if tx_type in ['card_transfer', 'internal_transfer']:
+                try:
+                    ct = txn.card_transfer
+                    pricing_block["fee"] = float(ct.fee_amount)
+                    pricing_block["fee_percent"] = float(ct.fee_percent) if ct.fee_percent else None
+                    pricing_block["total_debit"] = float(ct.total_amount)
+                except Exception:
+                    pass
+            elif tx_type in ['bank_withdrawal', 'iban_to_iban', 'transfer_out']:
+                try:
+                    bw = txn.bank_withdrawal
+                    pricing_block["fee"] = float(bw.fee_amount)
+                    pricing_block["fee_percent"] = float(bw.fee_percent) if bw.fee_percent else None
+                    pricing_block["total_debit"] = float(bw.total_debit)
+                except Exception:
+                    pass
+            elif tx_type in ['crypto_withdrawal', 'crypto_to_crypto']:
+                try:
+                    cw = txn.crypto_withdrawal
+                    pricing_block["fee"] = float(cw.fee_amount)
+                    pricing_block["total_debit"] = float(cw.total_debit)
+                    pricing_block["amount_crypto"] = float(cw.amount_crypto)
+                except Exception:
+                    pass
+
+        # === MOVEMENTS ===
+        movements = txn.movements.all()
+        movements_list = None
+        if movements.exists():
+            movements_list = [{
+                "account_type": m.account_type,
+                "amount": float(m.amount),
+                "type": m.type,
+            } for m in movements]
+
+        # === STRUCTURED RECEIPT ===
+        structured = {
+            "transaction": transaction_block,
+            "sender": sender_block,
+            "recipient": recipient_block,
+            "asset": asset_block,
+            "pricing": pricing_block,
+            "movements": movements_list,
+        }
+
+        # === FLAT COMPAT LAYER (so frontend doesn't break) ===
+        flat = {
             "transaction_id": str(txn.id),
             "type": txn.type,
             "direction": direction,
@@ -779,86 +942,76 @@ class TransactionService:
             "sender_avatar": sender_avatar,
             "receiver_avatar": receiver_avatar,
             "operation": txn.type.replace('_', ' ').title(),
-            "receiver_card_mask": TransactionService._mask_card(txn.recipient_card) if txn.recipient_card else None,
+            "receiver_card_mask": receiver_card_mask,
             "receiver_card": txn.recipient_card,
             "recipient_name": txn.receiver_name,
-            "sender_card_mask": TransactionService._mask_card(txn.sender_card) if txn.sender_card else None,
+            "sender_card_mask": sender_card_mask,
             "sender_card": txn.sender_card,
-            "sender_iban": None,
-            "sender_bank": None,
-            "sender_iban_mask": None,
-            "beneficiary_name": None,
-            "beneficiary_iban": None,
-            "beneficiary_bank": None,
-            "beneficiary_bank_name": None, 
-            "beneficiary_swift": None,
-            "iban_mask": None,
-            "amount_crypto": None,
-            "crypto_network": None,
-            "crypto_token": None,
-            "crypto_address": None,
-            "from_address": None,
-            "from_card_id": None,
-            "to_card_id": None,
-            "from_bank_account_id": None,
+            "sender_iban": meta.get('sender_iban'),
+            "sender_bank": meta.get('sender_bank') or meta.get('sender_bank_name'),
+            "sender_iban_mask": meta.get('sender_iban_mask'),
+            "beneficiary_name": meta.get('beneficiary_name'),
+            "beneficiary_iban": meta.get('beneficiary_iban'),
+            "beneficiary_bank": meta.get('beneficiary_bank'),
+            "beneficiary_bank_name": meta.get('beneficiary_bank_name'),
+            "iban_mask": meta.get('iban_mask'),
+            "crypto_network": meta.get('crypto_network'),
+            "crypto_token": meta.get('crypto_token'),
+            "crypto_address": meta.get('crypto_address'),
+            "from_address": meta.get('from_address'),
             "amount_aed": float(txn.amount) if txn.currency == 'AED' else None,
             "fee_amount": float(txn.fee) if txn.fee else 0,
-            "total_debit_aed": None,
-            "movements": None
+            "movements": movements_list,
         }
 
-        if txn.metadata:
-            for key, value in txn.metadata.items():
-                if key in receipt:
-                    receipt[key] = value
-
-        tx_type = txn.type
+        # Enrich flat from sub-tables (same as before)
         if tx_type in ['card_transfer', 'internal_transfer']:
             try:
                 ct = txn.card_transfer
-                receipt["fee_amount"] = float(ct.fee_amount)
-                receipt["total_debit_aed"] = float(ct.total_amount)
-                receipt["from_card_id"] = str(ct.sender_card_id)
-                receipt["to_card_id"] = str(ct.receiver_card_id)
-            except Exception: pass
-                
+                flat["fee_amount"] = float(ct.fee_amount)
+                flat["total_debit_aed"] = float(ct.total_amount)
+                flat["from_card_id"] = str(ct.sender_card_id)
+                flat["to_card_id"] = str(ct.receiver_card_id)
+            except Exception:
+                pass
         elif tx_type in ['bank_withdrawal', 'iban_to_iban', 'transfer_out']:
             try:
                 bw = txn.bank_withdrawal
-                receipt["amount_aed"] = float(bw.amount_aed)
-                receipt["fee_amount"] = float(bw.fee_amount)
-                receipt["total_debit_aed"] = float(bw.total_debit)
-                receipt["from_card_id"] = str(bw.from_card_id) if bw.from_card_id else None
-                receipt["from_bank_account_id"] = str(bw.from_bank_account_id) if bw.from_bank_account_id else None
-            except Exception: pass
-            
+                flat["amount_aed"] = float(bw.amount_aed)
+                flat["fee_amount"] = float(bw.fee_amount)
+                flat["total_debit_aed"] = float(bw.total_debit)
+                flat["from_card_id"] = str(bw.from_card_id) if bw.from_card_id else None
+                flat["from_bank_account_id"] = str(bw.from_bank_account_id) if bw.from_bank_account_id else None
+            except Exception:
+                pass
         elif tx_type in ['crypto_withdrawal', 'crypto_to_crypto']:
             try:
                 cw = txn.crypto_withdrawal
-                receipt["amount_crypto"] = float(cw.amount_crypto)
-                receipt["fee_amount"] = float(cw.fee_amount)
-                receipt["total_debit_aed"] = float(cw.total_debit)
-            except Exception: pass
-
+                flat["amount_crypto"] = float(cw.amount_crypto)
+                flat["fee_amount"] = float(cw.fee_amount)
+                flat["total_debit_aed"] = float(cw.total_debit)
+            except Exception:
+                pass
         elif tx_type in ['top_up', 'bank_topup']:
             try:
                 bt = txn.bank_topup
                 if bt.deposit_account:
-                    receipt["from_bank_account_id"] = str(bt.deposit_account.id)
-            except Exception: pass
-
+                    flat["from_bank_account_id"] = str(bt.deposit_account.id)
+            except Exception:
+                pass
         elif tx_type in ['crypto_deposit', 'crypto_topup']:
             try:
                 ct = txn.crypto_topup
-                receipt["amount_crypto"] = float(ct.amount_crypto) if ct.amount_crypto else None
-            except Exception: pass
+                flat["amount_crypto"] = float(ct.amount_crypto) if ct.amount_crypto else None
+            except Exception:
+                pass
 
-        movements = txn.movements.all()
-        if movements.exists():
-            receipt["movements"] = [{
-                "account_type": m.account_type,
-                "amount": float(m.amount),
-                "type": m.type,
-            } for m in movements]
+        # Merge metadata into flat for backward compat
+        for key, value in meta.items():
+            if key not in flat:
+                flat[key] = value
 
-        return receipt
+        # Return both structured + flat merged
+        result = dict(flat)
+        result["receipt"] = structured
+        return result
