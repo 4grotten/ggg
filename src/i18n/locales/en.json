@@ -711,7 +711,7 @@
     "beneficiary_iban": "Beneficiary IBAN",
     "beneficiary_bank": "Beneficiary Bank",
     "beneficiary_swift": "SWIFT Code",
-    "crypto_address": "Crypto Address",
+    "crypto_address": "USDT Wallet",
     "is_internal": "Internal Transfer",
     "token": "Token",
     "network": "Network",
