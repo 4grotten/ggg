@@ -2395,6 +2395,21 @@ const TransactionDetails = () => {
                 <span className="text-[15px] font-semibold">{receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name}</span>
               </div>
             )}
+            {isCryptoToIban && (() => {
+              const cryptoAddr = (receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || (receipt as any)?.receiver_wallet || (transaction as any)?.cryptoAddress || '';
+              if (!cryptoAddr) return null;
+              return (
+                <div className="flex items-center justify-between py-0.5">
+                  <span className="text-[15px] text-muted-foreground">{t("transaction.cryptoAddress", "Кошелек USDT")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[15px] font-semibold font-mono">{String(cryptoAddr).length > 16 ? `${String(cryptoAddr).slice(0, 8)}...${String(cryptoAddr).slice(-6)}` : cryptoAddr}</span>
+                    <button onClick={() => { navigator.clipboard.writeText(String(cryptoAddr)); toast.success(t("toast.copied", { label: "USDT" })); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
             {(receipt as any).receiver_card_mask && (() => {
               const rMask = String((receipt as any).receiver_card_mask);
               const rFull = (receipt as any).receiver_card ? formatCardNumber((receipt as any).receiver_card) : (transaction.recipientCardFull || resolveFullCard(rMask, 1) || rMask);
