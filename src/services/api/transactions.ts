@@ -527,50 +527,80 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   };
   const merchant = tx.merchant_name || (mappedType !== (typeMap[tx.type] || tx.type) ? merchantByMappedType[mappedType] : undefined) || (tx.operation as string) || merchantFallback[tx.type] || merchantByMappedType[mappedType] || tx.type;
 
-  // Compute USDT equivalent if exchange_rate is available
+  // Compute amounts: prefer display block from API, then calculate
   const absAmount = Math.abs(tx.amount);
   let amountUSDT = absAmount;
   let amountLocal = absAmount;
   
-  const isCryptoToBank = tx.type === 'crypto_to_bank' || (tx.type === 'transfer' && ((tx.operation as string || '').toLowerCase().includes('crypto_to_bank') || (tx as any).beneficiary_iban || (tx as any).to_iban));
-  const isCryptoToCardTx = tx.type === 'crypto_to_card' || (tx.type === 'transfer' && tx.recipient_card && tx.direction === 'outbound');
-  const isCryptoToIbanTx = tx.type === 'crypto_to_iban' || (tx.type === 'transfer' && ((tx.operation as string || '').toLowerCase().includes('crypto_to_iban')));
+  // Use display block from API when available (most reliable)
+  const displayPrimary = tx.display?.primary_amount;
+  const displaySecondary = tx.display?.secondary_amount;
   
-  if (isCryptoToBank || isCryptoToCardTx || isCryptoToIbanTx) {
-    // For crypto-to-bank/card/iban: prefer movements array for precise amounts
-    const movements = (tx as any).movements as Array<{ account_type: string; amount: number; type: string }> | undefined;
-    const cryptoMovement = movements?.find(m => m.account_type === 'crypto');
-    const bankMovement = movements?.find(m => m.account_type === 'bank' || m.account_type === 'card');
-    
-    const rate = tx.exchange_rate ? parseFloat(String(tx.exchange_rate)) : 3.65;
-    const cryptoAmount = cryptoMovement ? Math.abs(cryptoMovement.amount)
-      : (tx as any).amount_crypto ? Math.abs((tx as any).amount_crypto)
-      : tx.original_amount ? Math.abs(tx.original_amount)
-      : null;
-    
-    if (cryptoAmount) {
-      // We have actual crypto amount from movements or backend fields
-      amountUSDT = cryptoAmount;
-      amountLocal = bankMovement ? Math.abs(bankMovement.amount)
-        : (tx as any).amount_aed ? Math.abs((tx as any).amount_aed)
-        : (tx as any).credited_amount_aed ? Math.abs((tx as any).credited_amount_aed)
-        : cryptoAmount * (rate > 1 ? rate : 1 / rate);
-    } else if (rate > 1) {
-      // rate > 1 means tx.amount is USDT, multiply to get AED
-      amountUSDT = absAmount;
-      amountLocal = (tx as any).amount_aed ? Math.abs((tx as any).amount_aed)
-        : (tx as any).credited_amount_aed ? Math.abs((tx as any).credited_amount_aed)
-        : absAmount * rate;
-    } else {
-      // rate < 1 means tx.amount is AED, multiply by rate to get USDT
-      amountLocal = absAmount;
-      amountUSDT = absAmount * rate;
+  if (displayPrimary) {
+    const parsedPrimary = parseFloat(String(displayPrimary.amount).replace(/,/g, ''));
+    if (!isNaN(parsedPrimary)) {
+      if (displayPrimary.currency === 'USDT') {
+        amountUSDT = parsedPrimary;
+        if (displaySecondary) {
+          const parsedSecondary = parseFloat(String(displaySecondary.amount).replace(/,/g, ''));
+          if (!isNaN(parsedSecondary)) amountLocal = parsedSecondary;
+          else amountLocal = absAmount;
+        } else {
+          amountLocal = absAmount;
+        }
+      } else {
+        // Primary is AED
+        amountLocal = parsedPrimary;
+        if (displaySecondary) {
+          const parsedSecondary = parseFloat(String(displaySecondary.amount).replace(/,/g, ''));
+          if (!isNaN(parsedSecondary)) amountUSDT = parsedSecondary;
+          else amountUSDT = absAmount;
+        } else {
+          amountUSDT = absAmount;
+        }
+      }
     }
-  } else if (tx.original_amount != null) {
-    amountUSDT = Math.abs(tx.original_amount);
-  } else if (tx.exchange_rate) {
-    const rate = parseFloat(tx.exchange_rate);
-    if (rate > 0) amountUSDT = absAmount / rate;
+  } else {
+    // Fallback: manual calculation
+    const isCryptoToBank = tx.type === 'crypto_to_bank' || (tx.type === 'transfer' && ((tx.operation as string || '').toLowerCase().includes('crypto_to_bank') || (tx as any).beneficiary_iban || (tx as any).to_iban));
+    const isCryptoToCardTx = tx.type === 'crypto_to_card' || (tx.type === 'transfer' && tx.recipient_card && tx.direction === 'outbound');
+    const isCryptoToIbanTx = tx.type === 'crypto_to_iban' || (tx.type === 'transfer' && ((tx.operation as string || '').toLowerCase().includes('crypto_to_iban')));
+    
+    if (isCryptoToBank || isCryptoToCardTx || isCryptoToIbanTx) {
+      const movements = (tx as any).movements as Array<{ account_type: string; amount: number; type: string }> | undefined;
+      const cryptoMovement = movements?.find(m => m.account_type === 'crypto');
+      const bankMovement = movements?.find(m => m.account_type === 'bank' || m.account_type === 'card');
+      
+      const rate = tx.exchange_rate ? parseFloat(String(tx.exchange_rate)) : 3.65;
+      const cryptoAmount = cryptoMovement ? Math.abs(cryptoMovement.amount)
+        : (tx as any).amount_crypto ? Math.abs((tx as any).amount_crypto)
+        : tx.original_amount ? Math.abs(tx.original_amount)
+        : null;
+      
+      if (cryptoAmount) {
+        amountUSDT = cryptoAmount;
+        amountLocal = bankMovement ? Math.abs(bankMovement.amount)
+          : (tx as any).amount_aed ? Math.abs((tx as any).amount_aed)
+          : (tx as any).credited_amount_aed ? Math.abs((tx as any).credited_amount_aed)
+          : cryptoAmount * (rate > 1 ? rate : 1 / rate);
+      } else if (rate > 1) {
+        amountUSDT = absAmount;
+        amountLocal = (tx as any).amount_aed ? Math.abs((tx as any).amount_aed)
+          : (tx as any).credited_amount_aed ? Math.abs((tx as any).credited_amount_aed)
+          : absAmount * rate;
+      } else {
+        amountLocal = absAmount;
+        amountUSDT = absAmount * rate;
+      }
+    } else if (tx.original_amount != null) {
+      amountUSDT = Math.abs(tx.original_amount);
+    } else if (tx.exchange_rate) {
+      const rate = parseFloat(tx.exchange_rate);
+      // Don't divide if currency is already USDT
+      if (rate > 0 && (tx.currency || '').toUpperCase() !== 'USDT') {
+        amountUSDT = absAmount / rate;
+      }
+    }
   }
 
   return {
