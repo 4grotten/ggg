@@ -520,9 +520,10 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   
   const isCryptoToBank = tx.type === 'crypto_to_bank' || (tx.type === 'transfer' && ((tx.operation as string || '').toLowerCase().includes('crypto_to_bank') || (tx as any).beneficiary_iban || (tx as any).to_iban));
   const isCryptoToCardTx = tx.type === 'crypto_to_card' || (tx.type === 'transfer' && tx.recipient_card && tx.direction === 'outbound');
+  const isCryptoToIbanTx = tx.type === 'crypto_to_iban' || (tx.type === 'transfer' && ((tx.operation as string || '').toLowerCase().includes('crypto_to_iban')));
   
-  if (isCryptoToBank || isCryptoToCardTx) {
-    // For crypto-to-bank/card: amount is in USDT, compute AED via rate
+  if (isCryptoToBank || isCryptoToCardTx || isCryptoToIbanTx) {
+    // For crypto-to-bank/card/iban: amount is in USDT, compute AED via rate
     amountUSDT = absAmount;
     const rate = tx.exchange_rate ? parseFloat(tx.exchange_rate) : 3.65;
     amountLocal = (tx as any).amount_aed ? Math.abs((tx as any).amount_aed) 
