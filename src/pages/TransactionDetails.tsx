@@ -882,6 +882,24 @@ const TransactionDetails = () => {
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
             </p>
+            {isCryptoSend && (transaction.toWalletAddress || (receipt as any)?.crypto_address) && (
+              <p className="text-sm text-muted-foreground mt-1">
+                На {(() => {
+                  const addr = (receipt as any)?.crypto_address || transaction.toWalletAddress || '';
+                  return addr.length > 12 ? `${addr.slice(0, 6)}....${addr.slice(-4)}` : addr;
+                })()}
+              </p>
+            )}
+            {isCryptoSend && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Итого с комиссией: -{(() => {
+                  const sentAmount = receipt?.amount ?? transaction.amountUSDT;
+                  const fee = receipt?.fee ?? receipt?.fee_amount ?? (transaction as any).transferFee ?? 0;
+                  const totalDebit = (receipt as any)?.total_debit ?? (sentAmount + fee);
+                  return Number(totalDebit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                })()} USDT
+              </p>
+            )}
           </div>
         </div>
 
