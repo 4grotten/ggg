@@ -1,4 +1,5 @@
 import { Eye, EyeOff, CreditCard, Landmark } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,6 +52,7 @@ const AnimatedNumber = ({ value, duration = 1000 }: { value: number; duration?: 
 
 export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance = 0, accountBalance = 0, accountIbanLast4 }: BalanceCardProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { isHideDataEnabled, isEnabled } = useScreenLockContext();
   const shouldHide = isHideDataEnabled && isEnabled;
   const [isVisible, setIsVisible] = useState(!shouldHide);
@@ -90,7 +92,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
         {cards.length > 0 && (
           <div className="flex gap-3">
             {cards.map((card) => (
-              <div key={card.id} className="flex-1 rounded-xl bg-secondary/50 p-3">
+              <div key={card.id} className="flex-1 rounded-xl bg-secondary/50 p-3 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => navigate(`/card/${card.type}`)}>
                 <div className="flex items-center gap-1.5 mb-1">
                   <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
@@ -120,7 +122,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
         )}
 
         {/* AED Account Balance */}
-        <div className="rounded-xl bg-secondary/50 p-3">
+        <div className="rounded-xl bg-secondary/50 p-3 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => navigate('/account')}>
           <div className="flex items-center gap-1.5 mb-1">
             <Landmark className="w-3.5 h-3.5 text-muted-foreground" />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
@@ -148,7 +150,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
         </div>
 
         {/* USDT TRC20 Balance */}
-        <div className="rounded-xl bg-secondary/50 p-3">
+        <div className="rounded-xl bg-secondary/50 p-3 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => navigate('/wallet')}>
           <div className="flex items-center gap-1.5 mb-1">
             <UsdtIcon size={14} />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
