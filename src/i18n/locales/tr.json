@@ -521,7 +521,11 @@
     "startDate": "Başlangıç tarihi",
     "endDate": "Bitiş tarihi",
     "done": "Tamam",
-    "show": "Göster"
+    "show": "Göster",
+    "allAssets": "Tümü",
+    "virtualCard": "Virtual",
+    "metalCard": "Metal",
+    "crypto": "Kripto"
   },
   "transaction": {
     "back": "Geri",

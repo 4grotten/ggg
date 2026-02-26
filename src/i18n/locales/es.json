@@ -521,7 +521,11 @@
     "startDate": "Fecha de inicio",
     "endDate": "Fecha de fin",
     "done": "Listo",
-    "show": "Mostrar"
+    "show": "Mostrar",
+    "allAssets": "Todos",
+    "virtualCard": "Virtual",
+    "metalCard": "Metal",
+    "crypto": "Cripto"
   },
   "transaction": {
     "back": "Atrás",

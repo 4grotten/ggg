@@ -521,7 +521,11 @@
     "startDate": "تاريخ البداية",
     "endDate": "تاريخ النهاية",
     "done": "تم",
-    "show": "عرض"
+    "show": "عرض",
+    "allAssets": "الكل",
+    "virtualCard": "Virtual",
+    "metalCard": "Metal",
+    "crypto": "كريبتو"
   },
   "transaction": {
     "back": "رجوع",
