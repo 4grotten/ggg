@@ -527,7 +527,11 @@
     "selectPeriod": "选择时间段",
     "selectStartDate": "选择开始日期",
     "selectEndDate": "选择结束日期",
-    "customPeriod": "自定义时间段"
+    "customPeriod": "自定义时间段",
+    "allAssets": "全部",
+    "virtualCard": "Virtual",
+    "metalCard": "Metal",
+    "crypto": "加密"
   },
   "transaction": {
     "back": "返回",

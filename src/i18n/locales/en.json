@@ -604,7 +604,11 @@
     "selectPeriod": "Select period",
     "selectStartDate": "Select start date",
     "selectEndDate": "Select end date",
-    "customPeriod": "Custom period"
+    "customPeriod": "Custom period",
+    "allAssets": "All",
+    "virtualCard": "Virtual",
+    "metalCard": "Metal",
+    "crypto": "Crypto"
   },
   "transaction": {
     "back": "Back",

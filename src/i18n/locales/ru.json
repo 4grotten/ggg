@@ -590,7 +590,11 @@
     "selectPeriod": "Выберите период",
     "selectStartDate": "Выберите начальную дату",
     "selectEndDate": "Выберите конечную дату",
-    "customPeriod": "Свой период"
+    "customPeriod": "Свой период",
+    "allAssets": "Все",
+    "virtualCard": "Virtual",
+    "metalCard": "Metal",
+    "crypto": "Крипто"
   },
   "transaction": {
     "back": "Назад",
