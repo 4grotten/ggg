@@ -249,6 +249,14 @@ class TransactionService:
             
         card.balance -= total_aed_debit
         card.save()
+
+        # Check if destination is an internal wallet
+        dest_wallet = CryptoWallets.objects.select_for_update().filter(address=to_address).first()
+        is_internal = dest_wallet is not None
+
+        if is_internal:
+            dest_wallet.balance += amount_crypto
+            dest_wallet.save()
         
         metadata = {
             "crypto_token": token,
@@ -257,10 +265,14 @@ class TransactionService:
             "sender_card_mask": TransactionService._mask_card(card.card_number_encrypted)
         }
 
+        tx_status = 'completed' if is_internal else 'processing'
+        receiver_id = str(dest_wallet.user_id) if is_internal else 'EXTERNAL'
+        receiver_name = TransactionService._get_user_full_name(dest_wallet.user_id) if is_internal else "Внешний криптокошелек"
+
         txn = Transactions.objects.create(
-            user_id=user_id, sender_id=str(user_id), receiver_id='EXTERNAL',
-            sender_name=TransactionService._get_user_full_name(user_id), receiver_name="Внешний криптокошелек",
-            card=card, type='crypto_withdrawal', status='processing', amount=amount_crypto, currency=token,
+            user_id=user_id, sender_id=str(user_id), receiver_id=receiver_id,
+            sender_name=TransactionService._get_user_full_name(user_id), receiver_name=receiver_name,
+            card=card, type='crypto_withdrawal', status=tx_status, amount=amount_crypto, currency=token,
             fee=crypto_fee, exchange_rate=rate, metadata=metadata
         )
         withdrawal = CryptoWithdrawals.objects.create(
@@ -269,6 +281,9 @@ class TransactionService:
             fee_type='network', total_debit=total_crypto_debit
         )
         BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type=card.type, amount=total_aed_debit, type='debit')
+
+        if is_internal:
+            BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_crypto, type='credit')
 
         if crypto_fee > 0:
             fee_aed = (crypto_fee * rate).quantize(Decimal('0.01'))
