@@ -31,6 +31,7 @@ class SettingsManager:
                     ('fees', 'bank_transfer_percent'): profile.bank_transfer_percent,
                     ('fees', 'network_fee_percent'): profile.network_fee_percent,
                     ('fees', 'currency_conversion_percent'): profile.currency_conversion_percent,
+                    ('fees', 'top_up_crypto_flat'): getattr(profile, 'top_up_crypto_flat', None),
                 }
                 val = mapping.get((category, key))
                 if val is not None:
@@ -55,11 +56,10 @@ class SettingsManager:
             
         base_query = Transactions.objects.filter(status__in=['completed', 'processing', 'pending'])
         
-        # Обновлено под строгие типы Рината
         if operation_type == 'transfer':
             base_query = base_query.filter(
                 sender_id=str(user_id), 
-                type__in=['card_transfer', 'internal_transfer', 'iban_to_card', 'crypto_to_card', 'crypto_to_crypto']
+                type__in=['card_transfer', 'internal_transfer', 'iban_to_card', 'crypto_to_card', 'crypto_to_crypto', 'card_to_crypto', 'bank_to_crypto']
             )
         elif operation_type == 'withdrawal':
             base_query = base_query.filter(
@@ -118,7 +118,7 @@ class TransactionService:
         amount = Decimal(str(amount))
         SettingsManager.check_limits(sender_id, amount, 'transfer')
 
-        fee_percent = SettingsManager.get_setting('fees', 'card_to_card_percent', Decimal('1.0'))
+        fee_percent = SettingsManager.get_setting('fees', 'card_to_card_percent', Decimal('1.0'), sender_id)
         fee_amount = (amount * fee_percent / Decimal('100')).quantize(Decimal('0.01'))
         total_debit = amount + fee_amount
 
@@ -174,8 +174,8 @@ class TransactionService:
         if not bank_account:
             raise ValueError("У пользователя нет активного банковского счета")
             
-        fee_percent = SettingsManager.get_setting('fees', 'top_up_bank_percent', Decimal('2.0'))
-        min_amount = SettingsManager.get_setting('limits', 'top_up_bank_min', Decimal('100.0'))
+        fee_percent = SettingsManager.get_setting('fees', 'top_up_bank_percent', Decimal('2.0'), user_id)
+        min_amount = SettingsManager.get_setting('limits', 'top_up_bank_min', Decimal('100.0'), user_id)
 
         metadata = {
             "beneficiary_bank": bank_account.bank_name,
@@ -210,7 +210,7 @@ class TransactionService:
         if not crypto_wallet:
             raise ValueError(f"Криптокошелек не найден")
             
-        min_amount = SettingsManager.get_setting('limits', 'top_up_crypto_min', Decimal('10.00'))
+        min_amount = SettingsManager.get_setting('limits', 'top_up_crypto_min', Decimal('10.00'), user_id)
 
         metadata = {
             "crypto_token": token,
@@ -236,7 +236,7 @@ class TransactionService:
         amount_crypto = Decimal(str(amount_crypto))
         SettingsManager.check_limits(user_id, amount_crypto, 'withdrawal')
 
-        fee_percent = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'))
+        fee_percent = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'), user_id)
         crypto_fee = (amount_crypto * fee_percent / Decimal('100')).quantize(Decimal('0.000000'))
         total_crypto_debit = amount_crypto + crypto_fee
 
@@ -261,7 +261,7 @@ class TransactionService:
             user_id=user_id, sender_id=str(user_id), receiver_id='EXTERNAL',
             sender_name=TransactionService._get_user_full_name(user_id), receiver_name="Внешний криптокошелек",
             card=card, type='crypto_withdrawal', status='processing', amount=amount_crypto, currency=token,
-            fee=crypto_fee, metadata=metadata
+            fee=crypto_fee, exchange_rate=rate, metadata=metadata
         )
         withdrawal = CryptoWithdrawals.objects.create(
             transaction=txn, user_id=user_id, token=token, network=network,
@@ -285,7 +285,7 @@ class TransactionService:
         amount_aed = Decimal(str(amount_aed))
         SettingsManager.check_limits(user_id, amount_aed, 'withdrawal')
 
-        fee_percent = SettingsManager.get_setting('fees', 'bank_transfer_percent', Decimal('2.0'))
+        fee_percent = SettingsManager.get_setting('fees', 'bank_transfer_percent', Decimal('2.0'), user_id)
         fee_amount = (amount_aed * fee_percent / Decimal('100')).quantize(Decimal('0.01'))
         total_debit = amount_aed + fee_amount
 
@@ -355,8 +355,8 @@ class TransactionService:
         amount_aed = Decimal(str(amount_aed))
         SettingsManager.check_limits(sender_id, amount_aed, 'transfer')
 
-        sell_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', Decimal('3.69'))
-        conv_fee_pct = SettingsManager.get_setting('fees', 'currency_conversion_percent', Decimal('1.0'))
+        sell_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', Decimal('3.69'), sender_id)
+        conv_fee_pct = SettingsManager.get_setting('fees', 'currency_conversion_percent', Decimal('1.0'), sender_id)
         
         conv_fee_aed = (amount_aed * conv_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
         total_aed_debit = amount_aed + conv_fee_aed
@@ -382,12 +382,11 @@ class TransactionService:
             "crypto_token": dest_wallet.token,
             "crypto_network": dest_wallet.network
         }
-
         txn = Transactions.objects.create(
             user_id=sender_id, sender_id=str(sender_id), receiver_id=str(dest_wallet.user_id),
             sender_name=TransactionService._get_user_full_name(sender_id), receiver_name=TransactionService._get_user_full_name(dest_wallet.user_id),
-            type='crypto_withdrawal', status='completed', amount=amount_aed, currency='AED', fee=conv_fee_aed, 
-            exchange_rate=(Decimal('1.00') / sell_rate), card_id=source_card.id, metadata=metadata
+            type='card_to_crypto', status='completed', amount=amount_aed, currency='AED', fee=conv_fee_aed, 
+            exchange_rate=sell_rate, card_id=source_card.id, metadata=metadata
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='card', amount=total_aed_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
@@ -399,10 +398,11 @@ class TransactionService:
         amount_usdt = Decimal(str(amount_usdt))
         SettingsManager.check_limits(sender_id, amount_usdt, 'transfer')
 
-        buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'))
-        network_fee_pct = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'))
+        buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'), sender_id)
         
-        crypto_fee = (amount_usdt * network_fee_pct / Decimal('100')).quantize(Decimal('0.000000'))
+        # ИСПРАВЛЕНИЕ: Используем плоскую комиссию в USDT вместо процентов
+        crypto_fee = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
+        
         total_deduction = amount_usdt + crypto_fee
         amount_aed = (amount_usdt * buy_rate).quantize(Decimal('0.01'))
         
@@ -443,8 +443,8 @@ class TransactionService:
         amount_aed = Decimal(str(amount_aed))
         SettingsManager.check_limits(sender_id, amount_aed, 'transfer')
 
-        sell_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', Decimal('3.69'))
-        conv_fee_pct = SettingsManager.get_setting('fees', 'currency_conversion_percent', Decimal('1.0'))
+        sell_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', Decimal('3.69'), sender_id)
+        conv_fee_pct = SettingsManager.get_setting('fees', 'currency_conversion_percent', Decimal('1.0'), sender_id)
         
         conv_fee_aed = (amount_aed * conv_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
         total_aed_debit = amount_aed + conv_fee_aed
@@ -473,12 +473,11 @@ class TransactionService:
             "crypto_token": dest_wallet.token,
             "crypto_network": dest_wallet.network
         }
-        
         txn = Transactions.objects.create(
             user_id=sender_id, sender_id=str(sender_id), receiver_id=str(dest_wallet.user_id),
             sender_name=TransactionService._get_user_full_name(sender_id), receiver_name=TransactionService._get_user_full_name(dest_wallet.user_id),
-            type='crypto_to_iban', status='completed', amount=amount_aed, currency='AED', fee=conv_fee_aed, 
-            exchange_rate=(Decimal('1.00') / sell_rate), metadata=metadata
+            type='bank_to_crypto', status='completed', amount=amount_aed, currency='AED', fee=conv_fee_aed, 
+            exchange_rate=sell_rate, metadata=metadata
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='bank', amount=total_aed_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
@@ -489,11 +488,8 @@ class TransactionService:
     def execute_crypto_to_bank(sender_id, from_wallet_id, to_iban, amount_usdt):
         amount_usdt = Decimal(str(amount_usdt))
         SettingsManager.check_limits(sender_id, amount_usdt, 'transfer')
-
-        buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'))
-        network_fee_pct = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'))
-        
-        crypto_fee = (amount_usdt * network_fee_pct / Decimal('100')).quantize(Decimal('0.000000'))
+        buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'), sender_id)
+        crypto_fee = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
         total_deduction = amount_usdt + crypto_fee
         amount_aed = (amount_usdt * buy_rate).quantize(Decimal('0.01'))
         
@@ -538,7 +534,7 @@ class TransactionService:
         amount_aed = Decimal(str(amount_aed))
         SettingsManager.check_limits(sender_id, amount_aed, 'transfer')
 
-        fee_percent = SettingsManager.get_setting('fees', 'card_to_card_percent', Decimal('1.0'))
+        fee_percent = SettingsManager.get_setting('fees', 'card_to_card_percent', Decimal('1.0'), sender_id)
         fee_amount = (amount_aed * fee_percent / Decimal('100')).quantize(Decimal('0.01'))
         total_debit = amount_aed + fee_amount
 
@@ -581,7 +577,7 @@ class TransactionService:
         amount = Decimal(str(amount))
         SettingsManager.check_limits(user_id, amount, 'transfer')
         
-        fee_percent = SettingsManager.get_setting('fees', 'bank_transfer_percent', Decimal('2.0'))
+        fee_percent = SettingsManager.get_setting('fees', 'bank_transfer_percent', Decimal('2.0'), user_id)
         fee_amount = (amount * fee_percent / Decimal('100')).quantize(Decimal('0.01'))
         total_debit = amount + fee_amount
 
@@ -620,7 +616,7 @@ class TransactionService:
         amount_usdt = Decimal(str(amount_usdt))
         SettingsManager.check_limits(user_id, amount_usdt, 'withdrawal')
         
-        fee_percent = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'))
+        fee_percent = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'), user_id)
         crypto_fee = (amount_usdt * fee_percent / Decimal('100')).quantize(Decimal('0.000000'))
         total_deduction = amount_usdt + crypto_fee
 
@@ -696,7 +692,6 @@ class TransactionService:
         else:
             direction = 'outbound'
 
-        # Fetch avatars from Profiles
         sender_avatar = None
         receiver_avatar = None
         try:

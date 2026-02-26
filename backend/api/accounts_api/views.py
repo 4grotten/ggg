@@ -23,6 +23,10 @@ def generate_uid_tail(user_id):
     return str(user_id).zfill(6)[-6:]
 
 def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None):
+    if not apofiz_user_data:
+        status_code, fetched_data = ApofizClient.get_me(apofiz_token)
+        if status_code == 200:
+            apofiz_user_data = fetched_data
     apofiz_id = apofiz_user_data.get('id') if apofiz_user_data else None
     user = User.objects.filter(username=phone_number).first()
     created = False
@@ -32,14 +36,16 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
         else:
             user = User.objects.create(username=phone_number)
         created = True
+    has_init_profile = False
     if apofiz_user_data:
         if 'email' in apofiz_user_data and apofiz_user_data['email']:
             user.email = apofiz_user_data['email']
-        if 'full_name' in apofiz_user_data:
+        if 'full_name' in apofiz_user_data and apofiz_user_data['full_name']:
             names = apofiz_user_data['full_name'].split(' ', 1)
             user.first_name = names[0]
             if len(names) > 1:
                 user.last_name = names[1]
+            has_init_profile = True
         user.save()
     profile, _ = Profiles.objects.get_or_create(user_id=str(user.id), defaults={'phone': phone_number})
     profile_updated = False
@@ -50,34 +56,38 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
             if len(names) > 1:
                 profile.last_name = names[1]
             profile_updated = True
-        if 'avatar' in apofiz_user_data and apofiz_user_data['avatar']:
-            profile.avatar_url = apofiz_user_data['avatar'].get('file')
+        
+        avatar_val = apofiz_user_data.get('avatar') or apofiz_user_data.get('avatar_url')
+        if avatar_val:
+            profile.avatar_url = avatar_val.get('file') if isinstance(avatar_val, dict) else avatar_val
             profile_updated = True
     if profile_updated:
         profile.save()
-    tail = generate_uid_tail(user.id)
-    if not Cards.objects.filter(user_id=str(user.id)).exists():
-        Cards.objects.create(
-            user_id=str(user.id), type='metal', name='Metal Card', status='active',
-            balance=Decimal('50000.00'), last_four_digits=tail[-4:], card_number_encrypted=f"4532112233{tail}",
-        )
-        Cards.objects.create(
-            user_id=str(user.id), type='virtual', name='Virtual Card', status='active',
-            balance=Decimal('50000.00'), last_four_digits=tail[-4:], card_number_encrypted=f"4532112244{tail}",
-        )
-    if not BankDepositAccounts.objects.filter(user_id=str(user.id)).exists():
-        BankDepositAccounts.objects.create(
-            user_id=str(user.id), iban=f"AE070331234567890{tail}", bank_name="EasyCard Default Bank",
-            beneficiary=f"{user.first_name} {user.last_name}".strip() or "EasyCard Client", balance=Decimal('200000.00'), is_active=True
-        )
-    if not CryptoWallets.objects.filter(user_id=str(user.id)).exists():
-        mock_address = f"T{uuid.uuid4().hex[:33]}"
-        CryptoWallets.objects.create(
-            user_id=str(user.id), network="TRC20", token="USDT", address=mock_address, balance=Decimal('200000.000000'), is_active=True
-        )
+    if has_init_profile:
+        tail = generate_uid_tail(user.id)
+        if not Cards.objects.filter(user_id=str(user.id)).exists():
+            Cards.objects.create(
+                user_id=str(user.id), type='metal', name='Metal Card', status='active',
+                balance=Decimal('50000.00'), last_four_digits=tail[-4:], card_number_encrypted=f"4532112233{tail}",
+            )
+            Cards.objects.create(
+                user_id=str(user.id), type='virtual', name='Virtual Card', status='active',
+                balance=Decimal('50000.00'), last_four_digits=tail[-4:], card_number_encrypted=f"4532112244{tail}",
+            )
+        if not BankDepositAccounts.objects.filter(user_id=str(user.id)).exists():
+            BankDepositAccounts.objects.create(
+                user_id=str(user.id), iban=f"AE070331234567890{tail}", bank_name="EasyCard Default Bank",
+                beneficiary=f"{user.first_name} {user.last_name}".strip() or "EasyCard Client", balance=Decimal('200000.00'), is_active=True
+            )
+        if not CryptoWallets.objects.filter(user_id=str(user.id)).exists():
+            mock_address = f"T{uuid.uuid4().hex[:33]}"
+            CryptoWallets.objects.create(
+                user_id=str(user.id), network="TRC20", token="USDT", address=mock_address, balance=Decimal('200000.000000'), is_active=True
+            )
     Token.objects.filter(user=user).delete()
     if apofiz_token:
         Token.objects.create(key=apofiz_token, user=user)
+        
     return user, created
 
 
@@ -318,7 +328,7 @@ class InitProfileView(APIView):
             if data.get('avatar'):
                 profile.avatar_url = data['avatar'].get('file')
             profile.save()
-
+            sync_apofiz_token_and_user(request.user.username, request.auth.key, data.get('user', request.data))
         return Response(data, status=status_code)
 
 
@@ -846,15 +856,23 @@ class AdminUserLimitDetailView(APIView):
         profile = Profiles.objects.filter(user_id=str(user_id)).first()
         if not profile:
             return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
+        
         is_admin_flag = request.data.get('is_admin')
-        serializer = UserLimitsSerializer(profile, data=request.data, partial=True)
+        limit_keys = [
+            'transfer_min', 'transfer_max', 'daily_transfer_limit', 'monthly_transfer_limit', 
+            'withdrawal_min', 'withdrawal_max', 'daily_withdrawal_limit', 'monthly_withdrawal_limit',
+            'card_to_card_percent', 'bank_transfer_percent', 'network_fee_percent', 'currency_conversion_percent'
+        ]
+        data = request.data.copy() if hasattr(request.data, 'copy') else request.data
+        if any(k in data for k in limit_keys):
+            data['custom_settings_enabled'] = True
+        serializer = UserLimitsSerializer(profile, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             is_admin_status = False
             fname = getattr(profile, 'first_name', None) or ''
             lname = getattr(profile, 'last_name', None) or ''
             full_name = f"{fname} {lname}".strip()
-            
             if profile.user_id and str(profile.user_id).isdigit():
                 try:
                     user = User.objects.get(id=int(profile.user_id))

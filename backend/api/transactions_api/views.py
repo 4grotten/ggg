@@ -21,7 +21,7 @@ from .serializers import (
     ErrorResponseSerializer, TransactionFullSerializer, TransferResponseSerializer,
     CryptoWalletWithdrawalRequestSerializer, CryptoWalletWithdrawalResponseSerializer
 )
-from apps.transactions_apps.services import TransactionService
+from apps.transactions_apps.services import SettingsManager, TransactionService
 
 
 class RecipientInfoView(APIView):
@@ -653,3 +653,53 @@ class AdminUserTransactionsView(APIView):
             "count": total_count,
             "results": serializer.data
         }, status=status.HTTP_200_OK)
+
+
+class TransactionInfoView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Инфо по транзакции (Комиссии, Курсы, Лимиты)",
+        manual_parameters=[
+            openapi.Parameter('type', openapi.IN_QUERY, type=openapi.TYPE_STRING, required=True, 
+                description="Типы: card_to_card, bank_to_card, crypto_to_card, card_to_bank, crypto_to_bank, bank_to_crypto, card_to_crypto")
+        ]
+    )
+    def get(self, request):
+        tx_type = request.query_params.get('type')
+        user_id = str(request.user.id)
+        usdt_to_aed_buy = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', 3.65)
+        usdt_to_aed_sell = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_sell', 3.69)
+        transfer_min = SettingsManager.get_setting('limits', 'transfer_min', 1.0, user_id)
+        transfer_max = SettingsManager.get_setting('limits', 'transfer_max', 50000.0, user_id)
+        withdrawal_min = SettingsManager.get_setting('limits', 'withdrawal_min', 50.0, user_id)
+        info = {
+            "fee_type": "percent",
+            "fee_value": 0,
+            "min_amount": float(transfer_min),
+            "max_amount": float(transfer_max),
+            "exchange_rate": None,
+            "currency_from": "AED",
+            "currency_to": "AED"
+        }
+        if tx_type == "card_to_card":
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'card_to_card_percent', 1.0, user_id))
+        elif tx_type in ["crypto_to_card", "crypto_to_bank"]:
+            info["fee_type"] = "flat"
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'top_up_crypto_flat', 5.90, user_id))
+            info["exchange_rate"] = float(usdt_to_aed_buy)
+            info["currency_from"] = "USDT"
+            info["min_amount"] = float(SettingsManager.get_setting('limits', 'top_up_crypto_min', 15.0, user_id))
+        elif tx_type == "bank_to_card":
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'top_up_bank_percent', 1.5, user_id))
+            info["min_amount"] = float(SettingsManager.get_setting('limits', 'top_up_bank_min', 50.0, user_id))
+        elif tx_type == "card_to_bank":
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'bank_transfer_percent', 2.0, user_id))
+            info["min_amount"] = float(withdrawal_min)
+        elif tx_type in ["card_to_crypto", "bank_to_crypto"]:
+            info["fee_value"] = float(SettingsManager.get_setting('fees', 'network_fee_percent', 1.0, user_id))
+            info["exchange_rate"] = float(usdt_to_aed_sell)
+            info["currency_to"] = "USDT"
+            info["min_amount"] = float(withdrawal_min)
+
+        return Response(info, status=status.HTTP_200_OK)
