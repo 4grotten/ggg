@@ -632,7 +632,7 @@ const TransactionDetails = () => {
             <div className="relative">
               <motion.div 
                 className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
-                style={{ backgroundColor: isIncomingCryptoToIban ? "#26A17B" : "#007AFF" }}
+                style={{ backgroundColor: isCryptoToIbanBankSender ? "#007AFF" : "#26A17B" }}
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
@@ -642,17 +642,17 @@ const TransactionDetails = () => {
                   animate={{ y: 0, x: 0, opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
                 >
-                  <UsdtIcon size={40} />
+                  {isCryptoToIbanBankSender ? <Landmark className="w-10 h-10" strokeWidth={2} /> : <UsdtIcon size={40} />}
                 </motion.div>
               </motion.div>
               <motion.div
                 className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-white ring-2 ring-background"
-                style={{ backgroundColor: "#8B5CF6" }}
+                style={{ backgroundColor: isCryptoToIbanBankSender ? "#26A17B" : "#8B5CF6" }}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.4 }}
               >
-                <Landmark className="w-4 h-4" strokeWidth={2} />
+                {isCryptoToIbanBankSender ? <UsdtIcon size={16} /> : <Landmark className="w-4 h-4" strokeWidth={2} />}
               </motion.div>
             </div>
           ) : isCryptoToCard || isCryptoToBank ? (
