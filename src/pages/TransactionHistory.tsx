@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { PoweredByFooter } from "@/components/layout/PoweredByFooter";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
@@ -427,7 +428,12 @@ const TransactionHistory = () => {
           <span className="text-sm">{t("common.back")}</span>
         </button>
       }
-      rightAction={<LanguageSwitcher />}
+      rightAction={
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
+        </div>
+      }
     >
       <PullToRefresh onRefresh={handleRefresh} className="h-full">
         <div className="px-4 py-6 space-y-4 pb-28">
