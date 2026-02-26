@@ -218,7 +218,7 @@ class TransactionFullSerializer(serializers.ModelSerializer):
 
 class AdminTransactionSerializerDirect(serializers.ModelSerializer):
     direction = serializers.SerializerMethodField()
-    fee_details = serializers.SerializerMethodField(help_text="Умная структура комиссий (поддерживает составные списания)")
+    display = serializers.SerializerMethodField()
 
     class Meta:
         model = Transactions
@@ -228,7 +228,6 @@ class AdminTransactionSerializerDirect(serializers.ModelSerializer):
         user_id = self.context.get('target_user_id')
         if not user_id:
             return 'unknown'
-            
         user_id_str = str(user_id)
         if obj.sender_id == user_id_str and obj.receiver_id == user_id_str:
             return 'internal'
@@ -236,79 +235,155 @@ class AdminTransactionSerializerDirect(serializers.ModelSerializer):
             return 'inbound'
         return 'outbound'
 
-    def get_fee_details(self, obj):
-        total_fee = float(obj.fee) if obj.fee is not None else 0.0
-        currency = obj.currency
-        components = []
+    # ---------- DISPLAY BLOCK (receipt-consistent, role-aware) ----------
 
-        fee_revenues = obj.fee_revenues.all()
-        if fee_revenues.exists():
-            for fr in fee_revenues:
-                components.append({
-                    "name": fr.fee_type,
-                    "type": "percent" if fr.fee_percent and fr.fee_percent > 0 else "flat",
-                    "percent": float(fr.fee_percent) if fr.fee_percent else 0.0,
-                    "amount": float(fr.fee_amount),
-                    "currency": fr.fee_currency
-                })
-            return {
-                "total_fee_sum": total_fee,
-                "total_fee_currency": currency,
-                "components": components
-            }
+    TITLE_MAP = {
+        'card_to_crypto': 'Stablecoin Top-Up',
+        'bank_to_crypto': 'Bank → Crypto',
+        'crypto_to_card': 'Crypto → Card',
+        'crypto_to_iban': 'Crypto → Bank',
+        'card_transfer': 'Card Transfer',
+        'internal_transfer': 'Internal Transfer',
+        'bank_withdrawal': 'Bank Withdrawal',
+        'iban_to_iban': 'IBAN Transfer',
+        'crypto_withdrawal': 'Crypto Withdrawal',
+        'crypto_to_crypto': 'Crypto Transfer',
+        'top_up': 'Bank Top-Up',
+        'crypto_deposit': 'Crypto Deposit',
+        'card_payment': 'Card Payment',
+        'refund': 'Refund',
+        'fee': 'Fee',
+        'cashback': 'Cashback',
+        'card_activation': 'Card Activation',
+    }
 
+    SUBTITLE_MAP = {
+        'card_to_crypto': 'Card → USDT (TRC20)',
+        'bank_to_crypto': 'Bank → USDT (TRC20)',
+        'crypto_to_card': 'USDT → Card',
+        'crypto_to_iban': 'USDT → Bank (IBAN)',
+        'card_transfer': 'Card → Card',
+        'internal_transfer': 'Internal',
+        'bank_withdrawal': 'Card → Bank',
+        'iban_to_iban': 'IBAN → IBAN',
+        'crypto_withdrawal': 'Card → USDT',
+        'crypto_to_crypto': 'Wallet → Wallet',
+        'top_up': 'Bank Wire',
+        'crypto_deposit': 'Crypto Deposit',
+    }
+
+    def get_display(self, obj):
+        user_id = self.context.get('target_user_id')
+        direction = self.get_direction(obj)
+        meta = obj.metadata or {}
         tx_type = obj.type
-        base_component = {
-            "name": "processing_fee",
-            "type": "flat",
-            "percent": 0.0,
-            "amount": total_fee,
-            "currency": currency
-        }
 
-        try:
-            if tx_type in ['card_transfer', 'internal_transfer'] and hasattr(obj, 'card_transfer'):
-                ct = obj.card_transfer
-                if ct.fee_percent and ct.fee_percent > 0:
-                    base_component.update({"type": "percent", "percent": float(ct.fee_percent), "amount": float(ct.fee_amount)})
+        title = self.TITLE_MAP.get(tx_type, tx_type.replace('_', ' ').title())
+        subtitle = self._build_subtitle(obj, meta, tx_type)
 
-            elif tx_type in ['bank_withdrawal', 'iban_to_iban', 'transfer_out'] and hasattr(obj, 'bank_withdrawal'):
-                bw = obj.bank_withdrawal
-                if bw.fee_percent and bw.fee_percent > 0:
-                    base_component.update({"type": "percent", "percent": float(bw.fee_percent), "amount": float(bw.fee_amount)})
-
-            elif tx_type in ['crypto_withdrawal', 'crypto_to_crypto'] and hasattr(obj, 'crypto_withdrawal'):
-                cw = obj.crypto_withdrawal
-                if cw.fee_type != 'flat' and obj.amount and float(obj.amount) > 0 and cw.fee_amount:
-                    calc_pct = round(float(cw.fee_amount / obj.amount) * 100, 2)
-                    base_component.update({"name": "network_fee", "type": "percent", "percent": calc_pct, "amount": float(cw.fee_amount)})
-
-            elif tx_type == 'top_up' and hasattr(obj, 'bank_topup'):
-                bt = obj.bank_topup
-                if bt.fee_percent and bt.fee_percent > 0:
-                    base_component.update({"type": "percent", "percent": float(bt.fee_percent)})
-
-            elif tx_type == 'crypto_deposit' and hasattr(obj, 'crypto_topup'):
-                ct = obj.crypto_topup
-                if ct.fee_percent and ct.fee_percent > 0:
-                    base_component.update({"type": "percent", "percent": float(ct.fee_percent)})
-
-            elif tx_type in ['card_to_crypto', 'bank_to_crypto']:
-                if obj.amount and float(obj.amount) > 0 and total_fee > 0:
-                    calc_pct = round((total_fee / float(obj.amount)) * 100, 2)
-                    base_component.update({"name": "currency_conversion", "type": "percent", "percent": calc_pct})
-
-            elif tx_type in ['crypto_to_card', 'crypto_to_iban']:
-                base_component.update({"name": "crypto_flat_fee", "type": "flat", "currency": "USDT", "amount": total_fee})
-
-        except Exception:
-            pass
-
-        if total_fee > 0:
-            components.append(base_component)
+        # --- Determine primary and secondary amounts from stored metadata ---
+        primary, secondary = self._resolve_amounts(obj, meta, tx_type, direction)
 
         return {
-            "total_fee_sum": total_fee,
-            "total_fee_currency": currency,
-            "components": components
+            "title": title,
+            "subtitle": subtitle,
+            "primary_amount": primary,
+            "secondary_amount": secondary,
         }
+
+    def _build_subtitle(self, obj, meta, tx_type):
+        base = self.SUBTITLE_MAP.get(tx_type, '')
+        network = meta.get('crypto_network')
+        token = meta.get('crypto_token')
+        if network and token and not base:
+            base = f"{token} ({network})"
+        return base
+
+    def _resolve_amounts(self, obj, meta, tx_type, direction):
+        """Return (primary_amount, secondary_amount) dicts using stored metadata."""
+
+        # ---- Crypto conversion types with v2 pricing stored in metadata ----
+        if tx_type in ('card_to_crypto', 'bank_to_crypto'):
+            return self._amounts_fiat_to_crypto(meta, direction)
+
+        if tx_type in ('crypto_to_card', 'crypto_to_iban'):
+            return self._amounts_crypto_to_fiat(meta, direction)
+
+        if tx_type in ('crypto_withdrawal', 'crypto_to_crypto'):
+            return self._amounts_crypto_withdrawal(obj, meta, direction)
+
+        # ---- Fiat-only types (card_transfer, bank_withdrawal, iban_to_iban, top_up, etc.) ----
+        return self._amounts_fiat_default(obj, direction)
+
+    # --- card_to_crypto / bank_to_crypto ---
+    def _amounts_fiat_to_crypto(self, meta, direction):
+        crypto_receive = meta.get('crypto_send_usdt') or meta.get('crypto_to_receive_usdt')
+        total_debited_usdt = meta.get('total_debited_usdt')
+        fiat_amount = meta.get('fiat_amount_aed')
+        token = meta.get('crypto_token', 'USDT')
+
+        if direction == 'inbound':
+            primary = {"sign": "+", "amount": self._fmt(crypto_receive), "currency": token}
+        else:
+            primary = {"sign": "-", "amount": self._fmt(total_debited_usdt or crypto_receive), "currency": token}
+
+        secondary = {"amount": self._fmt(fiat_amount), "currency": "AED"} if fiat_amount else None
+        return primary, secondary
+
+    # --- crypto_to_card / crypto_to_iban ---
+    def _amounts_crypto_to_fiat(self, meta, direction):
+        credited_aed = meta.get('credited_amount_aed') or meta.get('fiat_amount_aed')
+        usdt_amount = meta.get('usdt_amount') or meta.get('amount_usdt')
+        total_debited_usdt = meta.get('total_debited_usdt')
+        token = meta.get('crypto_token', 'USDT')
+
+        if direction == 'inbound':
+            primary = {"sign": "+", "amount": self._fmt(credited_aed), "currency": "AED"}
+            secondary = {"amount": self._fmt(usdt_amount), "currency": token} if usdt_amount else None
+        else:
+            primary = {"sign": "-", "amount": self._fmt(total_debited_usdt or usdt_amount), "currency": token}
+            secondary = {"amount": self._fmt(credited_aed), "currency": "AED"} if credited_aed else None
+        return primary, secondary
+
+    # --- crypto_withdrawal / crypto_to_crypto ---
+    def _amounts_crypto_withdrawal(self, obj, meta, direction):
+        token = meta.get('crypto_token', obj.currency or 'USDT')
+        amount = float(obj.amount) if obj.amount else 0
+        fee = float(obj.fee) if obj.fee else 0
+
+        if direction == 'inbound':
+            primary = {"sign": "+", "amount": self._fmt(amount), "currency": token}
+        else:
+            primary = {"sign": "-", "amount": self._fmt(amount + fee), "currency": token}
+
+        # Show AED equivalent if available
+        aed_eq = meta.get('total_debited_aed_equivalent') or meta.get('fiat_amount_aed')
+        secondary = {"amount": self._fmt(aed_eq), "currency": "AED"} if aed_eq else None
+        return primary, secondary
+
+    # --- Fiat default (card_transfer, bank_withdrawal, top_up, etc.) ---
+    def _amounts_fiat_default(self, obj, direction):
+        amount = float(obj.amount) if obj.amount else 0
+        fee = float(obj.fee) if obj.fee else 0
+        currency = obj.currency or 'AED'
+
+        if direction == 'inbound':
+            primary = {"sign": "+", "amount": self._fmt(amount), "currency": currency}
+        elif direction == 'internal':
+            primary = {"sign": "", "amount": self._fmt(amount), "currency": currency}
+        else:
+            total = amount + fee
+            primary = {"sign": "-", "amount": self._fmt(total), "currency": currency}
+
+        secondary = None
+        return primary, secondary
+
+    @staticmethod
+    def _fmt(value):
+        """Format a numeric value to 2 decimal places string, or return '0.00'."""
+        if value is None:
+            return '0.00'
+        try:
+            return f"{float(value):,.2f}"
+        except (ValueError, TypeError):
+            return '0.00'
