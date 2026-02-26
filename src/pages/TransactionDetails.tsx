@@ -315,10 +315,12 @@ const TransactionDetails = () => {
       transferFee: receipt.fee ?? receipt.fee_amount,
       networkFee: receipt.fee ?? receipt.fee_amount,
       bankFee: receipt.fee_amount,
-      recipientIban: receipt.type === 'crypto_to_bank' ? (receipt.beneficiary_iban || (receipt as any).to_iban || resolveFullIban(receipt.iban_mask)) : resolveFullIban(receipt.iban_mask),
-      recipientBankName: receipt.beneficiary_bank_name || receipt.bank_name,
-      senderIban: receipt.iban_mask,
-      senderBankName: receipt.bank_name,
+      recipientIban: receipt.type === 'crypto_to_bank'
+        ? (receipt.beneficiary_iban || (receipt as any).to_iban || (receipt as any)?.metadata?.beneficiary_iban || resolveFullIban(receipt.iban_mask || (receipt as any)?.metadata?.iban_mask))
+        : (receipt.beneficiary_iban || (receipt as any)?.metadata?.beneficiary_iban || resolveFullIban(receipt.iban_mask || (receipt as any)?.metadata?.iban_mask)),
+      recipientBankName: receipt.beneficiary_bank_name || receipt.bank_name || (receipt as any)?.metadata?.beneficiary_bank_name || (receipt as any)?.metadata?.beneficiary_bank,
+      senderIban: receipt.iban_mask || (receipt as any)?.sender_iban_mask || (receipt as any)?.metadata?.sender_iban_mask,
+      senderBankName: receipt.bank_name || (receipt as any)?.sender_bank_name || (receipt as any)?.sender_bank || (receipt as any)?.metadata?.sender_bank_name || (receipt as any)?.metadata?.sender_bank,
       beneficiaryName: receipt.beneficiary_name,
       cardType: senderCardType,
       originalApiType: receipt.type,
@@ -343,8 +345,9 @@ const TransactionDetails = () => {
    const isCryptoToCard = transaction?.type === "crypto_to_card";
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
   const isCryptoToIban = transaction?.type === "crypto_to_iban" || (transaction as any)?.originalApiType === 'crypto_to_iban';
-  // Determine if crypto_to_iban is bank→crypto (sender has IBAN) or crypto→bank (sender has crypto)
-  const isCryptoToIbanBankSender = isCryptoToIban && !!(receipt?.sender_iban || (receipt as any)?.sender_iban_mask || (receipt as any)?.metadata?.sender_iban || (receipt as any)?.metadata?.sender_iban_mask || (transaction as any)?.senderIban);
+  // crypto_to_iban всегда трактуем как crypto -> iban; bank->crypto допускаем только при явном типе/операции
+  const ibanToCryptoByOperation = ((receipt as any)?.operation || '').toLowerCase().includes('iban to crypto');
+  const isCryptoToIbanBankSender = isCryptoToIban && (((receipt as any)?.type === 'iban_to_crypto') || ibanToCryptoByOperation);
   const isCryptoToIbanCryptoSender = isCryptoToIban && !isCryptoToIbanBankSender;
   const isIncomingCryptoToIban = isCryptoToIban && (() => {
     // Receipt direction is source of truth on receipt screen (especially with ?viewAs)
@@ -1300,6 +1303,24 @@ const TransactionDetails = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("transaction.sender")}</span>
                     <span className="font-medium">{receipt?.sender_name || user?.full_name || '—'}</span>
+                  </div>
+                  <div className="flex items-start justify-between">
+                    <span className="text-muted-foreground">{t("transaction.walletAddress", "Крипто-адрес")}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-right text-sm">
+                        {(() => {
+                          const senderAddr = (receipt as any)?.from_address || (receipt as any)?.from_address_mask || (receipt as any)?.metadata?.from_address || (receipt as any)?.metadata?.sender_address || (receipt as any)?.crypto_address || '';
+                          if (!senderAddr) return '—';
+                          return showFromAddress ? senderAddr : `${senderAddr.slice(0, 6)}...${senderAddr.slice(-4)}`;
+                        })()}
+                      </span>
+                      {((receipt as any)?.from_address || (receipt as any)?.metadata?.from_address || (receipt as any)?.metadata?.sender_address || (receipt as any)?.crypto_address) && (
+                        <>
+                          <button onClick={() => { navigator.clipboard.writeText((receipt as any)?.from_address || (receipt as any)?.metadata?.from_address || (receipt as any)?.metadata?.sender_address || (receipt as any)?.crypto_address || ''); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                          <button onClick={() => setShowFromAddress(!showFromAddress)} className="text-muted-foreground hover:text-foreground transition-colors">{showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                        </>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
