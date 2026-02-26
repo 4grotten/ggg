@@ -2290,22 +2290,26 @@ const TransactionDetails = () => {
                 <span className="text-[15px] font-semibold">{receipt.sender_name}</span>
               </div>
             )}
-            {(receipt as any).crypto_address && (
-              <div className="flex items-start justify-between py-0.5">
-                <span className="text-[15px] text-muted-foreground">{t("receiptKeys.crypto_address", "Кошелек USDT")}</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-right text-sm max-w-[160px] break-all">
-                    {showCryptoAddr ? (receipt as any).crypto_address : `${String((receipt as any).crypto_address).slice(0, 6)}...${String((receipt as any).crypto_address).slice(-6)}`}
-                  </span>
-                  <button onClick={() => { navigator.clipboard.writeText(String((receipt as any).crypto_address)); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => setShowCryptoAddr(!showCryptoAddr)} className="text-muted-foreground hover:text-foreground transition-colors">
-                    {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+            {(() => {
+              const senderWalletAddress = (receipt as any)?.from_address || (receipt as any)?.from_address_mask || (receipt as any)?.metadata?.from_address || (receipt as any)?.metadata?.sender_address || '';
+              if (!senderWalletAddress) return null;
+              return (
+                <div className="flex items-start justify-between py-0.5">
+                  <span className="text-[15px] text-muted-foreground">{t("receiptKeys.crypto_address", "Кошелек USDT")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-right text-sm max-w-[160px] break-all">
+                      {showCryptoAddr ? senderWalletAddress : `${String(senderWalletAddress).slice(0, 6)}...${String(senderWalletAddress).slice(-6)}`}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(String(senderWalletAddress)); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setShowCryptoAddr(!showCryptoAddr)} className="text-muted-foreground hover:text-foreground transition-colors">
+                      {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
             {((receipt as any).sender_iban || (receipt as any).sender_iban_mask) && (() => {
               const sIban = String((receipt as any).sender_iban || (receipt as any).sender_iban_mask);
               return (
