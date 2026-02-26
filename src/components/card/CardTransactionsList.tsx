@@ -167,11 +167,7 @@ const handleClick = (transaction: Transaction) => {
           {/* Date Header */}
           <div className="flex items-center justify-between px-4">
             <span className="font-semibold text-base">{formatDateNumeric(group.date)}</span>
-            {group.totalSpend > 0 && !walletView && (
-              <span className="text-[#007AFF] text-sm font-medium">
-                -{group.totalSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
-              </span>
-            )}
+            {/* Daily total hidden */}
           </div>
 
           {/* Transactions */}
