@@ -92,7 +92,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
         {cards.length > 0 && (
           <div className="flex gap-3">
             {cards.map((card) => (
-              <div key={card.id} className="flex-1 rounded-xl bg-secondary/50 p-3 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => navigate(`/card/${card.type}`)}>
+              <div key={card.id} className="flex-1 rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate(`/card/${card.type}`)}>
                 <div className="flex items-center gap-1.5 mb-1">
                   <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
@@ -122,7 +122,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
         )}
 
         {/* AED Account Balance */}
-        <div className="rounded-xl bg-secondary/50 p-3 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => navigate('/account')}>
+        <div className="rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate('/account')}>
           <div className="flex items-center gap-1.5 mb-1">
             <Landmark className="w-3.5 h-3.5 text-muted-foreground" />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
@@ -150,7 +150,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
         </div>
 
         {/* USDT TRC20 Balance */}
-        <div className="rounded-xl bg-secondary/50 p-3 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => navigate('/wallet')}>
+        <div className="rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate('/wallet')}>
           <div className="flex items-center gap-1.5 mb-1">
             <UsdtIcon size={14} />
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
