@@ -523,29 +523,34 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
   const isCryptoToIbanTx = tx.type === 'crypto_to_iban' || (tx.type === 'transfer' && ((tx.operation as string || '').toLowerCase().includes('crypto_to_iban')));
   
   if (isCryptoToBank || isCryptoToCardTx || isCryptoToIbanTx) {
-    // For crypto-to-bank/card/iban: USDT amount comes from amount_crypto or original_amount, 
-    // tx.amount may already be the AED-converted value
+    // For crypto-to-bank/card/iban: prefer movements array for precise amounts
+    const movements = (tx as any).movements as Array<{ account_type: string; amount: number; type: string }> | undefined;
+    const cryptoMovement = movements?.find(m => m.account_type === 'crypto');
+    const bankMovement = movements?.find(m => m.account_type === 'bank' || m.account_type === 'card');
+    
     const rate = tx.exchange_rate ? parseFloat(String(tx.exchange_rate)) : 3.65;
-    const cryptoAmount = (tx as any).amount_crypto ? Math.abs((tx as any).amount_crypto)
+    const cryptoAmount = cryptoMovement ? Math.abs(cryptoMovement.amount)
+      : (tx as any).amount_crypto ? Math.abs((tx as any).amount_crypto)
       : tx.original_amount ? Math.abs(tx.original_amount)
       : null;
     
     if (cryptoAmount) {
-      // Backend provided the actual crypto amount
+      // We have actual crypto amount from movements or backend fields
       amountUSDT = cryptoAmount;
-      amountLocal = (tx as any).amount_aed ? Math.abs((tx as any).amount_aed)
+      amountLocal = bankMovement ? Math.abs(bankMovement.amount)
+        : (tx as any).amount_aed ? Math.abs((tx as any).amount_aed)
         : (tx as any).credited_amount_aed ? Math.abs((tx as any).credited_amount_aed)
-        : cryptoAmount * rate;
-    } else if (absAmount * rate > absAmount) {
-      // tx.amount looks like USDT (small number, rate > 1 means AED = amount * rate)
+        : cryptoAmount * (rate > 1 ? rate : 1 / rate);
+    } else if (rate > 1) {
+      // rate > 1 means tx.amount is USDT, multiply to get AED
       amountUSDT = absAmount;
       amountLocal = (tx as any).amount_aed ? Math.abs((tx as any).amount_aed)
         : (tx as any).credited_amount_aed ? Math.abs((tx as any).credited_amount_aed)
         : absAmount * rate;
     } else {
-      // tx.amount is already AED
+      // rate < 1 means tx.amount is AED, multiply by rate to get USDT
       amountLocal = absAmount;
-      amountUSDT = rate > 0 ? absAmount / rate : absAmount;
+      amountUSDT = absAmount * rate;
     }
   } else if (tx.original_amount != null) {
     amountUSDT = Math.abs(tx.original_amount);
