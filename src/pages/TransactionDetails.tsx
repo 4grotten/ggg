@@ -2395,7 +2395,7 @@ const TransactionDetails = () => {
                 <span className="text-[15px] font-semibold">{receipt.receiver_name || receipt.beneficiary_name || (receipt as any).recipient_name}</span>
               </div>
             )}
-            {isCryptoToIban && (() => {
+            {(() => {
               const cryptoAddr = (receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || (receipt as any)?.receiver_wallet || (transaction as any)?.cryptoAddress || '';
               if (!cryptoAddr) return null;
               return (
