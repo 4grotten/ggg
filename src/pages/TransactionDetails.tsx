@@ -307,14 +307,14 @@ const TransactionDetails = () => {
       senderCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       fromCardFull: resolveFullCard(receipt.sender_card_mask, 0),
       toCardFull: receipt.type === 'crypto_to_card' ? (cachedRecipientCard ? formatCardNumber(cachedRecipientCard) : undefined) : resolveFullCard(receipt.receiver_card_mask, 1),
-      toWalletAddress: receipt.type === 'crypto_to_crypto' ? (receipt as any).crypto_address : (receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address),
+      toWalletAddress: receipt.type === 'crypto_to_crypto' ? (receipt as any).crypto_address : (receipt.to_address_mask || receipt.to_address || (receipt as any).recipient_address || (receipt as any).crypto_address),
       fromWalletAddress: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? ((receipt as any).direction === 'inbound' ? ((receipt as any).from_address || receipt.from_address_mask || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
       fromAddress: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? ((receipt as any).direction === 'inbound' ? ((receipt as any).from_address || receipt.from_address_mask || undefined) : userCryptoWallet?.address) : (receipt.from_address_mask || receipt.from_address || (receipt as any).sender_address),
-      toWalletAddressFull: receipt.type === 'crypto_to_crypto' ? (receipt as any).crypto_address : (receipt.to_address || (receipt as any).recipient_address),
+      toWalletAddressFull: receipt.type === 'crypto_to_crypto' ? (receipt as any).crypto_address : (receipt.to_address || (receipt as any).recipient_address || (receipt as any).crypto_address),
       fromWalletAddressFull: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? userCryptoWallet?.address : (receipt.from_address || (receipt as any).sender_address),
-      tokenNetwork: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto') ? (userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : ((receipt as any).crypto_token && (receipt as any).crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : 'USDT, TRC20')) : (receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : ((receipt as any).crypto_token && (receipt as any).crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : undefined))),
+      tokenNetwork: (receipt.type === 'crypto_to_card' || receipt.type === 'crypto_to_crypto' || receipt.type === 'crypto_withdrawal') ? (userCryptoWallet ? `${userCryptoWallet.token}, ${userCryptoWallet.network}` : ((receipt as any).crypto_token && (receipt as any).crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : 'USDT, TRC20')) : (receipt.network_and_token || ((receipt as any).token && (receipt as any).network ? `${(receipt as any).token}, ${(receipt as any).network}` : ((receipt as any).crypto_token && (receipt as any).crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : undefined))),
       transferFee: receipt.fee ?? receipt.fee_amount,
-      networkFee: receipt.fee ?? receipt.fee_amount,
+      networkFee: receipt.type === 'crypto_withdrawal' || receipt.type === 'crypto_to_crypto' ? 0 : (receipt.fee ?? receipt.fee_amount),
       bankFee: receipt.fee_amount,
       recipientIban: receipt.type === 'crypto_to_bank'
         ? (receipt.beneficiary_iban || (receipt as any).to_iban || (receipt as any)?.metadata?.beneficiary_iban || resolveFullIban(receipt.iban_mask || (receipt as any)?.metadata?.iban_mask))
@@ -2242,24 +2242,28 @@ const TransactionDetails = () => {
               </div>
             </>
           ) : isCryptoSend ? (
-            <>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
-                <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.fee")} (1%)</span>
-                <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
-                <span className="font-medium">{transaction.networkFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
-              </div>
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-muted-foreground">{t("transaction.total")}</span>
-                <span className="font-semibold text-[#007AFF]">-{(transaction.amountUSDT + (transaction.transferFee || 0) + (transaction.networkFee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
-              </div>
-            </>
+            (() => {
+              const sentAmount = receipt?.amount ?? transaction.amountUSDT;
+              const fee = receipt?.fee ?? receipt?.fee_amount ?? transaction.transferFee ?? 0;
+              const feePercent = sentAmount > 0 ? ((fee / sentAmount) * 100).toFixed(0) : '1';
+              const totalDebit = (receipt as any)?.total_debit_aed ?? (receipt as any)?.total_debit ?? (sentAmount + fee);
+              return (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
+                    <span className="font-medium">{Number(sentAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.fee")} ({feePercent}%)</span>
+                    <span className="font-medium">{Number(fee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <span className="text-muted-foreground">{t("transaction.total")}</span>
+                    <span className="font-semibold text-[#007AFF]">-{Number(totalDebit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                </>
+              );
+            })()
           ) : isCryptoDeposit ? (
             <>
               <div className="flex items-center justify-between">
