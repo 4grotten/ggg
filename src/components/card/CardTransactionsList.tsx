@@ -116,7 +116,7 @@ const handleClick = (transaction: Transaction) => {
     const isDeclined = transaction.type === "declined";
     const isCardActivation = transaction.type === "card_activation";
     const isCardTransfer = transaction.type === "card_transfer";
-    const isCryptoSend = transaction.type === "crypto_withdrawal";
+    const isCryptoSend = transaction.type === "crypto_withdrawal" || transaction.type === "crypto_send" || (transaction.metadata as any)?.originalApiType === 'crypto_to_crypto';
     const isCryptoDeposit = transaction.type === "crypto_deposit";
     const isBankTransfer = transaction.type === "bank_transfer";
     const isBankTransferIncoming = transaction.type === "bank_transfer_incoming";
