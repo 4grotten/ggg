@@ -697,7 +697,7 @@
     "beneficiary_iban": "IBAN бенефициара",
     "beneficiary_bank": "Банк бенефициара",
     "beneficiary_swift": "SWIFT-код",
-    "crypto_address": "Крипто-адрес",
+    "crypto_address": "Кошелек USDT",
     "is_internal": "Внутренний перевод",
     "token": "Токен",
     "network": "Сеть",
