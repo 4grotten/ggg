@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -110,15 +110,18 @@ const allTransactionsData: Record<string, TransactionGroup[]> = {
 };
 
 type FilterType = "all" | "income" | "expenses" | "transfers";
+type AssetType = "all" | "virtual" | "metal" | "iban" | "crypto";
 type PeriodPreset = "allTime" | "today" | "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "custom";
 
 const TransactionHistory = () => {
   const navigate = useNavigate();
-  const { type } = useParams<{ type: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
   
-  const cardType = (type === "metal" ? "metal" : "virtual") as "virtual" | "metal";
+  const [activeAsset, setActiveAsset] = useState<AssetType>(() => {
+    const p = searchParams.get("asset");
+    return (["all", "virtual", "metal", "iban", "crypto"] as AssetType[]).includes(p as AssetType) ? p as AssetType : "all";
+  });
   const [activeFilter, setActiveFilter] = useState<FilterType>(() => {
     const p = searchParams.get("filter");
     return (["all", "income", "expenses", "transfers"] as FilterType[]).includes(p as FilterType) ? p as FilterType : "all";
@@ -132,25 +135,31 @@ const TransactionHistory = () => {
   const [tempCustomTo, setTempCustomTo] = useState<Date | undefined>(undefined);
   const [hasSelectedFrom, setHasSelectedFrom] = useState(false);
   
-  // Refs for sliding indicator
+  // Refs for filter sliding indicator
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Map<FilterType, HTMLButtonElement>>(new Map());
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+
+  // Refs for asset sliding indicator
+  const assetContainerRef = useRef<HTMLDivElement>(null);
+  const assetRefs = useRef<Map<AssetType, HTMLButtonElement>>(new Map());
+  const [assetIndicatorStyle, setAssetIndicatorStyle] = useState({ left: 0, width: 0 });
   
-  // Sync filter tab to URL search params so it persists across navigation
+  // Sync filter/asset to URL
   useEffect(() => {
     setSearchParams(prev => {
       const next = new URLSearchParams(prev);
       if (activeFilter !== "all") next.set("filter", activeFilter); else next.delete("filter");
+      if (activeAsset !== "all") next.set("asset", activeAsset); else next.delete("asset");
       return next;
     }, { replace: true });
-  }, [activeFilter, setSearchParams]);
+  }, [activeFilter, activeAsset, setSearchParams]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Update indicator position when active filter changes
+  // Update filter indicator
   useEffect(() => {
     const activeTab = tabRefs.current.get(activeFilter);
     const container = tabsContainerRef.current;
@@ -164,6 +173,20 @@ const TransactionHistory = () => {
     }
   }, [activeFilter]);
 
+  // Update asset indicator
+  useEffect(() => {
+    const activeBtn = assetRefs.current.get(activeAsset);
+    const container = assetContainerRef.current;
+    if (activeBtn && container) {
+      const containerRect = container.getBoundingClientRect();
+      const btnRect = activeBtn.getBoundingClientRect();
+      setAssetIndicatorStyle({
+        left: btnRect.left - containerRect.left,
+        width: btnRect.width,
+      });
+    }
+  }, [activeAsset]);
+
   const handleRefresh = async () => {
     await new Promise(resolve => setTimeout(resolve, 800));
     toast.success(t('toast.dataUpdated'));
@@ -176,13 +199,10 @@ const TransactionHistory = () => {
       "May": 4, "June": 5, "July": 6, "August": 7,
       "September": 8, "October": 9, "November": 10, "December": 11
     };
-    
     const parts = dateStr.split(" ");
     const month = months[parts[0]] ?? 0;
     const day = parseInt(parts[1]) || 1;
-    
     const year = month > new Date().getMonth() ? currentYear - 1 : currentYear;
-    
     return new Date(year, month, day);
   };
 
@@ -207,8 +227,71 @@ const TransactionHistory = () => {
            tx.type === "crypto_withdrawal";
   };
 
+  // Asset filtering for mock data
+  const isAssetMatch = (tx: Transaction, asset: AssetType): boolean => {
+    if (asset === "all") return true;
+    const txType = tx.type || "";
+    if (asset === "crypto") {
+      return txType.includes("crypto") || tx.localCurrency === "USDT";
+    }
+    if (asset === "iban") {
+      return txType.includes("bank_transfer");
+    }
+    // virtual and metal use the data source directly
+    return true;
+  };
+
   const filteredGroups = useMemo(() => {
-    const groups = allTransactionsData[cardType] || [];
+    // Get groups based on asset type
+    let groups: TransactionGroup[] = [];
+    if (activeAsset === "all") {
+      // Merge virtual and metal
+      const virtualGroups = allTransactionsData.virtual || [];
+      const metalGroups = allTransactionsData.metal || [];
+      const allGroups = [...virtualGroups, ...metalGroups];
+      // Merge by date
+      const dateMap = new Map<string, TransactionGroup>();
+      for (const group of allGroups) {
+        if (dateMap.has(group.date)) {
+          const existing = dateMap.get(group.date)!;
+          dateMap.set(group.date, {
+            ...existing,
+            totalSpend: existing.totalSpend + group.totalSpend,
+            transactions: [...existing.transactions, ...group.transactions],
+          });
+        } else {
+          dateMap.set(group.date, { ...group });
+        }
+      }
+      groups = Array.from(dateMap.values());
+    } else if (activeAsset === "virtual" || activeAsset === "metal") {
+      groups = allTransactionsData[activeAsset] || [];
+    } else {
+      // For iban/crypto, filter from all data
+      const virtualGroups = allTransactionsData.virtual || [];
+      const metalGroups = allTransactionsData.metal || [];
+      const allGroups = [...virtualGroups, ...metalGroups];
+      const dateMap = new Map<string, TransactionGroup>();
+      for (const group of allGroups) {
+        const filtered = group.transactions.filter(tx => isAssetMatch(tx, activeAsset));
+        if (filtered.length > 0) {
+          const key = group.date;
+          if (dateMap.has(key)) {
+            const existing = dateMap.get(key)!;
+            dateMap.set(key, {
+              ...existing,
+              transactions: [...existing.transactions, ...filtered],
+            });
+          } else {
+            dateMap.set(key, { ...group, transactions: filtered });
+          }
+        }
+      }
+      groups = Array.from(dateMap.values());
+    }
+
+    // Sort groups by date
+    groups.sort((a, b) => parseTransactionDate(b.date).getTime() - parseTransactionDate(a.date).getTime());
     
     return groups.map(group => {
       const groupDate = parseTransactionDate(group.date);
@@ -231,7 +314,7 @@ const TransactionHistory = () => {
       
       return { ...group, transactions: filteredTxs };
     }).filter(group => group.transactions.length > 0);
-  }, [cardType, activeFilter, dateFrom, dateTo]);
+  }, [activeAsset, activeFilter, dateFrom, dateTo]);
 
   const filterOptions: { key: FilterType; label: string }[] = [
     { key: "all", label: t("history.all") },
@@ -240,29 +323,33 @@ const TransactionHistory = () => {
     { key: "transfers", label: t("history.transfers") },
   ];
 
+  const assetOptions: { key: AssetType; label: string }[] = [
+    { key: "all", label: t("history.allAssets", "Все") },
+    { key: "virtual", label: t("history.virtualCard", "Virtual") },
+    { key: "metal", label: t("history.metalCard", "Metal") },
+    { key: "iban", label: "IBAN" },
+    { key: "crypto", label: t("history.crypto", "Крипто") },
+  ];
+
   const today = new Date();
   
   const getPresetDates = (preset: PeriodPreset): { from: Date | undefined; to: Date | undefined } => {
     switch (preset) {
-      case "allTime":
-        return { from: undefined, to: undefined };
-      case "today":
-        return { from: today, to: today };
-      case "thisWeek":
-        return { from: startOfWeek(today, { weekStartsOn: 1 }), to: today };
-      case "lastWeek":
+      case "allTime": return { from: undefined, to: undefined };
+      case "today": return { from: today, to: today };
+      case "thisWeek": return { from: startOfWeek(today, { weekStartsOn: 1 }), to: today };
+      case "lastWeek": {
         const lastWeekStart = startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
         const lastWeekEnd = endOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
         return { from: lastWeekStart, to: lastWeekEnd };
-      case "thisMonth":
-        return { from: startOfMonth(today), to: today };
-      case "lastMonth":
+      }
+      case "thisMonth": return { from: startOfMonth(today), to: today };
+      case "lastMonth": {
         const lastMonth = subMonths(today, 1);
         return { from: startOfMonth(lastMonth), to: endOfMonth(lastMonth) };
-      case "custom":
-        return { from: tempCustomFrom, to: tempCustomTo };
-      default:
-        return { from: undefined, to: undefined };
+      }
+      case "custom": return { from: tempCustomFrom, to: tempCustomTo };
+      default: return { from: undefined, to: undefined };
     }
   };
 
@@ -301,7 +388,6 @@ const TransactionHistory = () => {
     if (customDateField === "from") {
       setTempCustomFrom(date);
       setHasSelectedFrom(true);
-      // Auto-set end date to today when selecting start date
       if (!tempCustomTo) {
         setTempCustomTo(new Date());
       }
@@ -341,35 +427,7 @@ const TransactionHistory = () => {
           <span className="text-sm">{t("common.back")}</span>
         </button>
       }
-      rightAction={
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
-          <div className="flex bg-secondary rounded-lg p-1">
-            <button
-              onClick={() => navigate("/card/virtual/history", { replace: true })}
-              className={cn(
-                "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-                cardType === "virtual" 
-                  ? "bg-primary text-primary-foreground" 
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Virtual
-            </button>
-            <button
-              onClick={() => navigate("/card/metal/history", { replace: true })}
-              className={cn(
-                "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-                cardType === "metal" 
-                  ? "bg-primary text-primary-foreground" 
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Metal
-            </button>
-          </div>
-        </div>
-      }
+      rightAction={<LanguageSwitcher />}
     >
       <PullToRefresh onRefresh={handleRefresh} className="h-full">
         <div className="px-4 py-6 space-y-4 pb-28">
@@ -383,6 +441,32 @@ const TransactionHistory = () => {
               <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Asset Category Tabs */}
+          <div className="relative" ref={assetContainerRef}>
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 relative">
+              <motion.div
+                className="absolute top-0 h-[calc(100%-4px)] bg-primary rounded-full z-0"
+                animate={{ left: assetIndicatorStyle.left, width: assetIndicatorStyle.width }}
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              />
+              {assetOptions.map((opt) => (
+                <button
+                  key={opt.key}
+                  ref={(el) => { if (el) assetRefs.current.set(opt.key, el); }}
+                  onClick={() => setActiveAsset(opt.key)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors relative z-10",
+                    activeAsset === opt.key
+                      ? "text-primary-foreground"
+                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Filter Tabs - Telegram Style */}
@@ -426,7 +510,7 @@ const TransactionHistory = () => {
           {/* Transactions List */}
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${cardType}-${activeFilter}-${dateFrom?.toISOString()}-${dateTo?.toISOString()}`}
+              key={`${activeAsset}-${activeFilter}-${dateFrom?.toISOString()}-${dateTo?.toISOString()}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

@@ -467,7 +467,7 @@ const AccountPage = () => {
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-bold">{t('dashboard.transactions')}</h2>
                 <button
-                  onClick={() => navigate("/card/virtual/history")}
+                  onClick={() => navigate("/Transaction_History")}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
                 >
                   <Clock className="w-4 h-4" />
