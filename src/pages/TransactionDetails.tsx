@@ -2287,7 +2287,7 @@ const TransactionDetails = () => {
                 <span className="text-[15px] font-semibold">{receipt.sender_name}</span>
               </div>
             )}
-            {(receipt as any).crypto_address && !isCryptoToIban && (
+            {(receipt as any).crypto_address && (
               <div className="flex items-start justify-between py-0.5">
                 <span className="text-[15px] text-muted-foreground">{t("receiptKeys.crypto_address", "Крипто-адрес")}</span>
                 <div className="flex items-center gap-2">
