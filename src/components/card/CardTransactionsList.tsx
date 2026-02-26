@@ -180,6 +180,9 @@ const handleClick = (transaction: Transaction) => {
               const isOutgoingCryptoToBank = (transaction.type as string) === "crypto_to_bank" || (isBankTransfer && (transaction.metadata as any)?.originalApiType === 'crypto_to_bank');
               const isBankToCrypto = (transaction.metadata as any)?.originalApiType === 'bank_to_crypto';
               const isCryptoToIban = (transaction.metadata as any)?.originalApiType === 'crypto_to_iban' || (transaction.type as string) === 'crypto_to_iban';
+              const cryptoToIbanMovements = isCryptoToIban ? (transaction.metadata as any)?.movements as Array<{ account_type: string; amount: number; type: string }> | undefined : undefined;
+              const isIbanToUsdt = isCryptoToIban && cryptoToIbanMovements?.length === 2 && cryptoToIbanMovements[0]?.account_type === 'bank' && cryptoToIbanMovements[0]?.type === 'debit';
+              const isUsdtToIban = isCryptoToIban && !isIbanToUsdt;
               const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction.metadata as any)?.originalApiType || '');
               const isIbanToIban = (transaction.type as string) === 'iban_to_iban' || (transaction.metadata as any)?.originalApiType === 'iban_to_iban';
 
@@ -282,13 +285,13 @@ const handleClick = (transaction: Transaction) => {
                       ) : isCryptoToIban ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm relative"
-                          style={{ backgroundColor: (transaction.metadata as any)?.isIncoming ? "#26A17B" : "#26A17B" }}
+                          style={{ backgroundColor: isIbanToUsdt ? "#007AFF" : "#26A17B" }}
                         >
-                          {(transaction.metadata as any)?.isIncoming ? <Landmark className="w-5 h-5" /> : <UsdtIcon size={20} />}
+                          {isIbanToUsdt ? <Landmark className="w-5 h-5" /> : <UsdtIcon size={20} />}
                           <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-background"
-                            style={{ backgroundColor: (transaction.metadata as any)?.isIncoming ? "#26A17B" : "#007AFF" }}
+                            style={{ backgroundColor: isIbanToUsdt ? "#26A17B" : "#007AFF" }}
                           >
-                            {(transaction.metadata as any)?.isIncoming ? <UsdtIcon size={10} /> : <Landmark className="w-2.5 h-2.5 text-white" />}
+                            {isIbanToUsdt ? <UsdtIcon size={10} /> : <Landmark className="w-2.5 h-2.5 text-white" />}
                           </div>
                         </div>
                       ) : isIbanToIban ? (
@@ -319,7 +322,7 @@ const handleClick = (transaction: Transaction) => {
                           : isIncomingCryptoToBank
                           ? t("transaction.walletToIban")
                           : isCryptoToIban
-                          ? "IBAN → USDT"
+                          ? (isIbanToUsdt ? "IBAN → USDT" : "USDT → IBAN")
                           : walletView && isTopup 
                           ? t("transactions.cardTopUp") 
                           : isCryptoDeposit
