@@ -31,7 +31,7 @@ const mockTransactions: Record<string, {
   cardLast4: string;
   exchangeRate: number;
   status: "settled" | "pending" | "failed" | "processing";
-  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_withdrawal" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer" | "crypto_to_card" | "crypto_to_bank" | "crypto_to_iban";
+  type?: "payment" | "topup" | "declined" | "card_activation" | "card_transfer" | "crypto_send" | "crypto_withdrawal" | "crypto_deposit" | "bank_transfer" | "bank_transfer_incoming" | "internal_transfer" | "crypto_to_card" | "crypto_to_bank" | "crypto_to_iban" | "card_to_crypto";
   fromAddress?: string;
   tokenNetwork?: string;
   kartaFee?: number;
@@ -242,7 +242,8 @@ const TransactionDetails = () => {
           'iban_to_iban': 'bank_transfer',
           'crypto_to_card': 'crypto_to_card',
           'crypto_to_bank': 'crypto_to_bank',
-          'crypto_to_iban': 'crypto_to_iban',
+           'crypto_to_iban': 'crypto_to_iban',
+          'card_to_crypto': 'card_to_crypto',
           'crypto_to_crypto': 'crypto_send',
         };
         let mapped = typeMap[receipt.type] || receipt.type || 'payment';
@@ -342,7 +343,8 @@ const TransactionDetails = () => {
   const isBankTransferIncoming = transaction?.type === "bank_transfer_incoming";
   const isInternalTransfer = transaction?.type === "internal_transfer";
   const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card', 'bank_withdrawal', 'transfer_out'].includes((transaction as any)?.originalApiType || '');
-   const isCryptoToCard = transaction?.type === "crypto_to_card";
+  const isCryptoToCard = transaction?.type === "crypto_to_card";
+  const isCardToCrypto = transaction?.type === "card_to_crypto";
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
   const isCryptoToIban = transaction?.type === "crypto_to_iban" || (transaction as any)?.originalApiType === 'crypto_to_iban';
   // Detect actual flow direction from movements: if bank=debit and crypto=credit, it's IBAN→Crypto
@@ -475,7 +477,7 @@ const TransactionDetails = () => {
     printWindow.close();
   }, [t]);
 
-  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar']);
+  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar', 'pricing_version', 'fiat_amount_aed', 'exchange_rate_aed_per_usdt', 'service_fee_percent', 'network_fee_usdt', 'crypto_send_usdt', 'service_fee_usdt', 'total_debited_usdt', 'total_debited_aed_equivalent']);
 
   const receiptTypeLabels: Record<string, string> = {
     crypto_to_crypto: t("transaction.typeCryptoToCrypto", "Отправка стейблкоинов"),
@@ -486,6 +488,7 @@ const TransactionDetails = () => {
     crypto_withdrawal: t("transaction.typeCryptoWithdrawal", "Вывод крипто"),
     crypto_deposit: t("transaction.typeCryptoDeposit", "Пополнение крипто"),
     crypto_to_card: t("transaction.typeCryptoToCard", "USDT → EasyCard"),
+    card_to_crypto: t("transaction.typeCardToCrypto", "EasyCard → USDT"),
     internal_transfer: t("transaction.typeInternalTransfer", "Внутренний перевод"),
     card_payment: t("transaction.typeCardPayment", "Оплата картой"),
     iban_to_iban: t("transaction.typeIbanToIban", "IBAN → IBAN"),
@@ -655,10 +658,10 @@ const TransactionDetails = () => {
                 {isCryptoToIbanBankSender ? <UsdtIcon size={16} /> : <Landmark className="w-4 h-4" strokeWidth={2} />}
               </motion.div>
             </div>
-          ) : isCryptoToCard || isCryptoToBank ? (
+          ) : isCryptoToCard || isCryptoToBank || isCardToCrypto ? (
             <motion.div 
               className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
-              style={{ backgroundColor: isCryptoToBank ? (isIncomingCryptoToBank ? "#22C55E" : "#8B5CF6") : (isIncomingCryptoToCard ? "#22C55E" : "#007AFF") }}
+              style={{ backgroundColor: isCardToCrypto ? "#007AFF" : isCryptoToBank ? (isIncomingCryptoToBank ? "#22C55E" : "#8B5CF6") : (isIncomingCryptoToCard ? "#22C55E" : "#007AFF") }}
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
@@ -672,7 +675,7 @@ const TransactionDetails = () => {
                   ease: [0.34, 1.56, 0.64, 1]
                 }}
               >
-                {isCryptoToBank ? <Landmark className="w-10 h-10" strokeWidth={2} /> : <CreditCard className="w-10 h-10" strokeWidth={2} />}
+                {isCardToCrypto ? <UsdtIcon size={40} /> : isCryptoToBank ? <Landmark className="w-10 h-10" strokeWidth={2} /> : <CreditCard className="w-10 h-10" strokeWidth={2} />}
               </motion.div>
             </motion.div>
           ) : isCryptoSend ? (
@@ -870,11 +873,11 @@ const TransactionDetails = () => {
           )}
           
           <div className="space-y-1">
-            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank || isIncomingCryptoToIban ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer || isCryptoToCard || isCryptoToBank || isCryptoToIban ? 'text-[#007AFF]' : ''}`}>
-              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank || isIncomingCryptoToIban ? '+' : '-'}{isCryptoToIban ? (isCryptoToIbanCryptoSender ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : isCryptoToBank ? (receipt?.movements?.[1]?.amount || (transaction.amountUSDT * (receipt?.exchange_rate || 3.65))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCryptoToIban ? (isCryptoToIbanCryptoSender ? 'USDT' : 'AED') : isCryptoToBank ? 'AED' : isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
+            <p className={`text-4xl font-bold ${isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank || isIncomingCryptoToIban ? 'text-green-500' : isDeclined ? 'text-red-500' : isOutgoingTransfer || isCryptoSend || isBankTransfer || isInternalTransfer || isCryptoToCard || isCryptoToBank || isCryptoToIban || isCardToCrypto ? 'text-[#007AFF]' : ''}`}>
+              {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank || isIncomingCryptoToIban ? '+' : '-'}{isCardToCrypto ? ((receipt as any)?.crypto_send_usdt || (receipt as any)?.metadata?.crypto_send_usdt || transaction.amountUSDT).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToIban ? (isCryptoToIbanCryptoSender ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : isCryptoToBank ? (receipt?.movements?.[1]?.amount || (transaction.amountUSDT * (receipt?.exchange_rate || 3.65))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCardToCrypto ? 'USDT' : isCryptoToIban ? (isCryptoToIbanCryptoSender ? 'USDT' : 'AED') : isCryptoToBank ? 'AED' : isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isCryptoToBank ? t('transaction.walletToIban') : isCryptoToIban ? (isCryptoToIbanBankSender ? "IBAN → USDT" : "USDT → IBAN") : isIncomingCryptoToCard ? "USDT → EasyCard" : isCryptoToCard ? t('transaction.walletToCard') : isCryptoDeposit ? t('transactions.walletDeposit') : isIncomingIbanToCard ? "IBAN → EasyCard" : isBankTransferIncoming ? "IBAN Bank → IBAN Bank" : isInternalTransfer ? "IBAN → EasyCard" : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' || (transaction as any)?.originalApiType === 'bank_to_card' || (transaction as any)?.originalApiType === 'iban_to_card' ? "IBAN → EasyCard" : "IBAN Bank → IBAN Bank") : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCardToCrypto ? "EasyCard → USDT" : isCryptoToBank ? t('transaction.walletToIban') : isCryptoToIban ? (isCryptoToIbanBankSender ? "IBAN → USDT" : "USDT → IBAN") : isIncomingCryptoToCard ? "USDT → EasyCard" : isCryptoToCard ? t('transaction.walletToCard') : isCryptoDeposit ? t('transactions.walletDeposit') : isIncomingIbanToCard ? "IBAN → EasyCard" : isBankTransferIncoming ? "IBAN Bank → IBAN Bank" : isInternalTransfer ? "IBAN → EasyCard" : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' || (transaction as any)?.originalApiType === 'bank_to_card' || (transaction as any)?.originalApiType === 'iban_to_card' ? "IBAN → EasyCard" : "IBAN Bank → IBAN Bank") : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
@@ -915,7 +918,53 @@ const TransactionDetails = () => {
           </div>
           <div className="px-5 py-4 space-y-4">
           
-          {isIncomingIbanToCard ? (
+          {isCardToCrypto ? (
+            <>
+              {/* Sender (card owner) */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.sender")}</span>
+                <span className="font-medium">{receipt?.sender_name || transaction.senderName || "—"}</span>
+              </div>
+              {/* Sender Card */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromCard", "Карта")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {showFromCard ? `Visa ${resolveCardType((receipt as any)?.sender_card_mask, 0)} ${transaction.fromCardFull || ''}` : `Visa ${resolveCardType((receipt as any)?.sender_card_mask, 0)} ••${(receipt as any)?.sender_card_mask?.slice(-4) || transaction.cardLast4 || ''}`}
+                  </span>
+                  {transaction.fromCardFull && (
+                    <>
+                      <button onClick={() => { navigator.clipboard.writeText(transaction.fromCardFull?.replace(/\s/g, '') || ''); toast.success(t("toast.cardNumberCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                      <button onClick={() => setShowFromCard(!showFromCard)} className="text-muted-foreground hover:text-foreground transition-colors">{showFromCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                    </>
+                  )}
+                </div>
+              </div>
+              {/* Recipient */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.recipient")}</span>
+                <span className="font-medium">{receipt?.receiver_name || (receipt as any)?.recipient_name || transaction.recipientName || "—"}</span>
+              </div>
+              {/* Destination Wallet */}
+              {(receipt as any)?.crypto_address && (
+                <div className="flex items-start justify-between">
+                  <span className="text-muted-foreground">{t("transaction.cryptoAddress", "Кошелек USDT")}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm">
+                      {showWalletAddress ? String((receipt as any).crypto_address) : `${String((receipt as any).crypto_address).slice(0, 6)}...${String((receipt as any).crypto_address).slice(-6)}`}
+                    </span>
+                    <button onClick={() => { navigator.clipboard.writeText(String((receipt as any).crypto_address)); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                    <button onClick={() => setShowWalletAddress(!showWalletAddress)} className="text-muted-foreground hover:text-foreground transition-colors">{showWalletAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                  </div>
+                </div>
+              )}
+              {/* Token & Network */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.tokenNetwork")}</span>
+                <span className="font-medium">{(receipt as any)?.crypto_token && (receipt as any)?.crypto_network ? `${(receipt as any).crypto_token}, ${(receipt as any).crypto_network}` : 'USDT, TRC20'}</span>
+              </div>
+            </>
+          ) : isIncomingIbanToCard ? (
             <>
               {/* Sender info */}
               <div className="flex items-center justify-between">
@@ -1965,7 +2014,51 @@ const TransactionDetails = () => {
 
           {/* Fee details inside first block */}
           <div className="pt-4 mt-4 border-t border-border/40 space-y-4">
-          {isCryptoToCard && isIncomingCryptoToCard ? (
+          {isCardToCrypto ? (
+            (() => {
+              const m = receipt as any;
+              const fiatAed = m?.fiat_amount_aed ?? m?.metadata?.fiat_amount_aed ?? m?.amount ?? transaction.amountLocal;
+              const rate = m?.exchange_rate_aed_per_usdt ?? m?.metadata?.exchange_rate_aed_per_usdt ?? m?.exchange_rate ?? 3.69;
+              const cryptoSend = m?.crypto_send_usdt ?? m?.metadata?.crypto_send_usdt ?? Math.round((fiatAed / rate) * 100) / 100;
+              const svcFeePct = m?.service_fee_percent ?? m?.metadata?.service_fee_percent ?? 0.01;
+              const svcFee = m?.service_fee_usdt ?? m?.metadata?.service_fee_usdt ?? Math.round(cryptoSend * svcFeePct * 100) / 100;
+              const netFee = m?.network_fee_usdt ?? m?.metadata?.network_fee_usdt ?? 5.90;
+              const totalUsdt = m?.total_debited_usdt ?? m?.metadata?.total_debited_usdt ?? Math.round((cryptoSend + svcFee + netFee) * 100) / 100;
+              const totalAed = m?.total_debited_aed_equivalent ?? m?.metadata?.total_debited_aed_equivalent ?? Math.round(totalUsdt * rate * 100) / 100;
+              return (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.exchangeAmount", "Сумма к обмену")}</span>
+                    <span className="font-medium">{Number(fiatAed).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
+                    <span className="font-medium">1 USDT = {Number(rate).toFixed(2)} AED</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.willSend", "Отправим")}</span>
+                    <span className="font-medium">{Number(cryptoSend).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.serviceFee", "Комиссия")} ({(svcFeePct * 100).toFixed(0)}%)</span>
+                    <span className="font-medium">{Number(svcFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
+                    <span className="font-medium">{Number(netFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <span className="text-muted-foreground">{t("transaction.totalDeducted", "Итого списано")}</span>
+                    <span className="font-semibold text-[#007AFF]">-{Number(totalUsdt).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.aedEquivalent", "Эквивалент в AED")}</span>
+                    <span className="font-medium text-muted-foreground">{Number(totalAed).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                  </div>
+                </>
+              );
+            })()
+          ) : isCryptoToCard && isIncomingCryptoToCard ? (
             <>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>

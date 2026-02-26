@@ -376,11 +376,28 @@ class TransactionService:
         dest_wallet.balance += amount_usdt
         dest_wallet.save()
 
+        # Calculate USDT breakdown matching UI exactly
+        crypto_send_usdt = (amount_aed / sell_rate).quantize(Decimal('0.01'))
+        service_fee_usdt = (crypto_send_usdt * conv_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
+        network_fee_usdt = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
+        total_debited_usdt = (crypto_send_usdt + service_fee_usdt + network_fee_usdt).quantize(Decimal('0.01'))
+        total_debited_aed_equiv = (total_debited_usdt * sell_rate).quantize(Decimal('0.01'))
+
         metadata = {
             "sender_card_mask": TransactionService._mask_card(source_card.card_number_encrypted),
             "crypto_address": to_address,
             "crypto_token": dest_wallet.token,
-            "crypto_network": dest_wallet.network
+            "crypto_network": dest_wallet.network,
+            "pricing_version": 2,
+            # Financial breakdown (USDT, matches UI)
+            "fiat_amount_aed": float(amount_aed),
+            "exchange_rate_aed_per_usdt": float(sell_rate),
+            "service_fee_percent": float(conv_fee_pct / Decimal('100')),
+            "network_fee_usdt": float(network_fee_usdt),
+            "crypto_send_usdt": float(crypto_send_usdt),
+            "service_fee_usdt": float(service_fee_usdt),
+            "total_debited_usdt": float(total_debited_usdt),
+            "total_debited_aed_equivalent": float(total_debited_aed_equiv),
         }
         txn = Transactions.objects.create(
             user_id=sender_id, sender_id=str(sender_id), receiver_id=str(dest_wallet.user_id),
