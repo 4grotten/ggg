@@ -261,6 +261,19 @@ export const fetchTransactionGroups = async (
 // =============================================
 
 // Raw transaction from backend GET /transactions/
+export interface ApiDisplayAmount {
+  sign: string;
+  amount: string;
+  currency: string;
+}
+
+export interface ApiDisplay {
+  title: string;
+  subtitle: string;
+  primary_amount: ApiDisplayAmount | null;
+  secondary_amount: ApiDisplayAmount | null;
+}
+
 export interface ApiTransaction {
   id: string;
   type: string;
@@ -283,6 +296,7 @@ export interface ApiTransaction {
     reference_id?: string | null;
   card_id?: string | null;
   direction?: string | null;
+  display?: ApiDisplay | null;
   metadata?: Record<string, unknown> | null;
   // Legacy/extra fields
   card_mask?: string;
