@@ -26,6 +26,7 @@ import { useCards, useIban, useCryptoWallets, useBankAccounts } from "@/hooks/us
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTransactionInfo } from "@/hooks/useTransactionInfo";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -180,15 +181,29 @@ const SendCrypto = () => {
 
   // Use referral balance or selected source balance
   const isCryptoSource = selectedSource?.type === "crypto_wallet";
+  const isBankSource = selectedSource?.type === "bank_account";
   const availableBalance = isReferralWithdrawal ? referralBalance : (selectedSource?.balance ?? 0);
   const inputCurrency = isCryptoSource ? (selectedSource?.token || "USDT") : "AED";
+
+  // Determine transaction type for fee API
+  const txInfoType = isCryptoSource
+    ? "crypto_withdrawal"
+    : isBankSource
+      ? "bank_to_crypto"
+      : "card_to_crypto";
+
+  const { data: txInfo, isLoading: txInfoLoading } = useTransactionInfo(txInfoType);
+
+  // Fee values from API (fallback to hardcoded defaults)
+  const SEND_COMMISSION_PERCENT = txInfo?.fee_value ?? 1; // from API or 1%
+  const API_EXCHANGE_RATE = txInfo?.exchange_rate ?? settings.USDT_TO_AED_SELL;
+  const API_MIN_AMOUNT = txInfo?.min_amount ?? 0;
+  const API_MAX_AMOUNT = txInfo?.max_amount ?? Infinity;
+  const SEND_NETWORK_FEE = 5.90; // flat 5.90 USDT (not from this endpoint)
 
   // Calculations depend on source type
   const amountNum = parseFloat(amountInput) || 0;
   let amountCrypto: string, networkFee: string, amountAfterFee: string;
-
-  const SEND_COMMISSION_PERCENT = 1; // 1%
-  const SEND_NETWORK_FEE = 5.90; // flat 5.90 USDT
 
   if (isCryptoSource) {
     // Input is already in USDT — no conversion needed
@@ -197,15 +212,18 @@ const SendCrypto = () => {
     networkFee = SEND_NETWORK_FEE.toFixed(2);
     amountAfterFee = (amountNum - commission - SEND_NETWORK_FEE).toFixed(2);
   } else {
-    // Input is in AED — convert to crypto
-    amountCrypto = (amountNum * settings.AED_TO_USDT_RATE).toFixed(2);
+    // Input is in AED — convert to crypto using API rate
+    const aedToUsdtRate = API_EXCHANGE_RATE > 0 ? (1 / API_EXCHANGE_RATE) : settings.AED_TO_USDT_RATE;
+    amountCrypto = (amountNum * aedToUsdtRate).toFixed(2);
     const cryptoAmount = parseFloat(amountCrypto);
     const commission = (cryptoAmount * SEND_COMMISSION_PERCENT / 100);
     networkFee = SEND_NETWORK_FEE.toFixed(2);
     amountAfterFee = (cryptoAmount - commission - SEND_NETWORK_FEE).toFixed(2);
   }
 
-  const isValid = walletAddress.length >= 20 && amountNum > 0 && amountNum <= availableBalance;
+  // Validate against API limits
+  const amountInRange = amountNum >= API_MIN_AMOUNT && amountNum <= API_MAX_AMOUNT;
+  const isValid = walletAddress.length >= 20 && amountNum > 0 && amountNum <= availableBalance && amountInRange;
 
   // Verify crypto address when user finishes typing
   const verifyAddress = useCallback(async (address: string) => {
