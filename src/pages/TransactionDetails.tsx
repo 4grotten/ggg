@@ -344,7 +344,7 @@ const TransactionDetails = () => {
   const isCryptoToBank = transaction?.type === "crypto_to_bank";
   const isCryptoToIban = transaction?.type === "crypto_to_iban" || (transaction as any)?.originalApiType === 'crypto_to_iban';
   // Determine if crypto_to_iban is bank→crypto (sender has IBAN) or crypto→bank (sender has crypto)
-  const isCryptoToIbanBankSender = isCryptoToIban && !!(receipt?.sender_iban || (receipt as any)?.sender_iban_mask || (transaction as any)?.senderIban);
+  const isCryptoToIbanBankSender = isCryptoToIban && !!(receipt?.sender_iban || (receipt as any)?.sender_iban_mask || (receipt as any)?.metadata?.sender_iban || (receipt as any)?.metadata?.sender_iban_mask || (transaction as any)?.senderIban);
   const isCryptoToIbanCryptoSender = isCryptoToIban && !isCryptoToIbanBankSender;
   const isIncomingCryptoToIban = isCryptoToIban && (() => {
     // Receipt direction is source of truth on receipt screen (especially with ?viewAs)
@@ -1316,11 +1316,11 @@ const TransactionDetails = () => {
                     <span className="text-muted-foreground">IBAN</span>
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-right text-sm">
-                        {(() => { const sIban = (receipt as any)?.sender_iban || (receipt as any)?.sender_iban_mask || ''; if (!sIban) return '—'; return showSenderIban ? sIban : `${sIban.slice(0, 4)}••••${sIban.slice(-4)}`; })()}
+                        {(() => { const sIban = (receipt as any)?.sender_iban || (receipt as any)?.sender_iban_mask || (receipt as any)?.metadata?.sender_iban || (receipt as any)?.metadata?.sender_iban_mask || ''; if (!sIban) return '—'; return showSenderIban ? sIban : `${sIban.slice(0, 4)}••••${sIban.slice(-4)}`; })()}
                       </span>
-                      {((receipt as any)?.sender_iban || (receipt as any)?.sender_iban_mask) && (
+                      {((receipt as any)?.sender_iban || (receipt as any)?.sender_iban_mask || (receipt as any)?.metadata?.sender_iban || (receipt as any)?.metadata?.sender_iban_mask) && (
                         <>
-                          <button onClick={() => { navigator.clipboard.writeText((receipt as any)?.sender_iban || ''); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                          <button onClick={() => { navigator.clipboard.writeText((receipt as any)?.sender_iban || (receipt as any)?.metadata?.sender_iban || ''); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
                           <button onClick={() => setShowSenderIban(!showSenderIban)} className="text-muted-foreground hover:text-foreground transition-colors">{showSenderIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
                         </>
                       )}
@@ -1328,7 +1328,7 @@ const TransactionDetails = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("transaction.bankName")}</span>
-                    <span className="font-medium">{(receipt as any)?.sender_bank_name || (receipt as any)?.sender_bank || '—'}</span>
+                    <span className="font-medium">{(receipt as any)?.sender_bank_name || (receipt as any)?.sender_bank || (receipt as any)?.metadata?.sender_bank_name || (receipt as any)?.metadata?.sender_bank || '—'}</span>
                   </div>
                 </>
               )}
@@ -1343,15 +1343,15 @@ const TransactionDetails = () => {
                     <span className="text-muted-foreground">IBAN</span>
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-right text-sm">
-                        {showIban ? (receipt?.beneficiary_iban || (receipt as any)?.iban_mask || '—') : `${(receipt?.beneficiary_iban || (receipt as any)?.iban_mask || '').slice(0, 4)}••••${(receipt?.beneficiary_iban || (receipt as any)?.iban_mask || '').slice(-4)}`}
+                        {showIban ? (receipt?.beneficiary_iban || (receipt as any)?.iban_mask || (receipt as any)?.metadata?.beneficiary_iban || (receipt as any)?.metadata?.iban_mask || '—') : `${(receipt?.beneficiary_iban || (receipt as any)?.iban_mask || (receipt as any)?.metadata?.beneficiary_iban || (receipt as any)?.metadata?.iban_mask || '').slice(0, 4)}••••${(receipt?.beneficiary_iban || (receipt as any)?.iban_mask || (receipt as any)?.metadata?.beneficiary_iban || (receipt as any)?.metadata?.iban_mask || '').slice(-4)}`}
                       </span>
-                      <button onClick={() => { navigator.clipboard.writeText(receipt?.beneficiary_iban || ''); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                      <button onClick={() => { navigator.clipboard.writeText(receipt?.beneficiary_iban || (receipt as any)?.metadata?.beneficiary_iban || ''); toast.success(t("toast.copied", { label: "IBAN" })); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
                       <button onClick={() => setShowIban(!showIban)} className="text-muted-foreground hover:text-foreground transition-colors">{showIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t("transaction.bankName")}</span>
-                    <span className="font-medium">{receipt?.beneficiary_bank_name || '—'}</span>
+                    <span className="font-medium">{receipt?.beneficiary_bank_name || (receipt as any)?.metadata?.beneficiary_bank_name || (receipt as any)?.metadata?.beneficiary_bank || '—'}</span>
                   </div>
                 </>
               ) : (
