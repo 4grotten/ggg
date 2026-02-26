@@ -199,7 +199,7 @@ const AppContent = () => {
             <Route path="/partner/bonuses" element={<PartnerBonuses />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/card/:type" element={<CardPage />} />
-            <Route path="/card/:type/history" element={<TransactionHistory />} />
+            <Route path="/Transaction_History" element={<TransactionHistory />} />
             <Route path="/send-to-card" element={<SendToCard />} />
             <Route path="/top-up/crypto" element={<TopUpCrypto />} />
             <Route path="/top-up/bank" element={<TopUpBank />} />

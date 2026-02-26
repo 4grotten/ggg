@@ -288,7 +288,7 @@ const Dashboard = () => {
                   {t('dashboard.transactions')}
                 </motion.h2>
                 <motion.button
-                  onClick={() => navigate("/card/virtual/history")}
+                  onClick={() => navigate("/Transaction_History")}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
                   initial={{ opacity: 0, x: 15, filter: "blur(4px)" }}
                   animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}

@@ -667,7 +667,7 @@ const CardPage = () => {
           {/* Transaction History Button */}
           <motion.button
             key={`history-btn-${activeIndex}`}
-            onClick={() => navigate(`/card/${currentCardType}/history`)}
+            onClick={() => navigate("/Transaction_History")}
             className="w-full rounded-2xl p-3 flex items-center gap-3 bg-gradient-to-r from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-200 active:scale-[0.98]"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
