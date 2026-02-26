@@ -14,8 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { getAuthToken } from "@/services/api/apiClient";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
-import { TOP_UP_CRYPTO_FEE } from "@/lib/fees";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useTransactionInfo } from "@/hooks/useTransactionInfo";
 import { motion } from "framer-motion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -105,7 +104,7 @@ const SendCryptoToCard = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const settings = useSettings();
+  const { data: txInfo, isLoading: txInfoLoading } = useTransactionInfo("crypto_to_card");
 
   const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
   const wallet = cryptoWalletsData?.data?.[0];
@@ -129,14 +128,17 @@ const SendCryptoToCard = () => {
   const isCardValid = cleanCardNumber.length === 16;
   const numericAmount = parseFloat(amount.replace(/,/g, "")) || 0;
   
-  const COMMISSION_PERCENT = 1; // 1%
-  const NETWORK_FEE = TOP_UP_CRYPTO_FEE; // 5.90 USDT
-  const commission = numericAmount * (COMMISSION_PERCENT / 100);
-  const totalDebitUsdt = numericAmount + commission + NETWORK_FEE;
-  const isAmountValid = numericAmount > 0 && totalDebitUsdt <= walletBalance;
+  // Dynamic fee & limits from API
+  const COMMISSION_PERCENT = txInfo?.fee_value ?? 1;
+  const feeIsPercent = (txInfo?.fee_type ?? "percent") === "percent";
+  const commission = feeIsPercent ? numericAmount * (COMMISSION_PERCENT / 100) : COMMISSION_PERCENT;
+  const totalDebitUsdt = numericAmount + commission;
+  const API_MIN_AMOUNT = txInfo?.min_amount ?? 0;
+  const API_MAX_AMOUNT = txInfo?.max_amount ?? Infinity;
+  const isAmountValid = numericAmount >= API_MIN_AMOUNT && numericAmount <= API_MAX_AMOUNT && numericAmount > 0 && totalDebitUsdt <= walletBalance;
   
-  // Exchange rate USDT → AED
-  const usdtToAed = settings.USDT_TO_AED_BUY || 3.65;
+  // Exchange rate USDT → AED from API
+  const usdtToAed = txInfo?.exchange_rate ?? 3.65;
   const recipientGetsAed = numericAmount * usdtToAed;
 
   // Check recipient
@@ -380,9 +382,9 @@ const SendCryptoToCard = () => {
               <div className="flex justify-between text-xs text-muted-foreground px-1">
                 <span>{t("send.available")}: {walletBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                 <button onClick={() => {
-                  // MAX: subtract fees so total doesn't exceed balance
-                  const maxRaw = (walletBalance - NETWORK_FEE) / (1 + COMMISSION_PERCENT / 100);
-                  const maxAmount = Math.max(0, Math.floor(maxRaw * 100) / 100);
+                  const maxRaw = feeIsPercent ? walletBalance / (1 + COMMISSION_PERCENT / 100) : walletBalance - COMMISSION_PERCENT;
+                  const clamped = Math.min(maxRaw, API_MAX_AMOUNT);
+                  const maxAmount = Math.max(0, Math.floor(clamped * 100) / 100);
                   setAmount(maxAmount.toFixed(2));
                 }} className="text-primary font-medium">MAX</button>
               </div>
@@ -394,8 +396,7 @@ const SendCryptoToCard = () => {
                 <div className="flex justify-between"><span className="text-muted-foreground">{t("send.exchangeRate", "Курс обмена")}</span><span>1 USDT = {usdtToAed.toFixed(2)} AED</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">{t("send.recipientGets", "Получатель получит")}</span><span className="font-semibold text-green-600">{recipientGetsAed.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span></div>
                 <div className="h-px bg-border" />
-                <div className="flex justify-between"><span className="text-muted-foreground">{t("send.fee")} ({COMMISSION_PERCENT}%)</span><span>{commission.toFixed(2)} USDT</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span><span>{NETWORK_FEE.toFixed(2)} USDT</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">{t("send.fee")} {feeIsPercent ? `(${COMMISSION_PERCENT}%)` : ""}</span><span>{commission.toFixed(2)} USDT</span></div>
                 <div className="h-px bg-border" />
                 <div className="flex justify-between font-semibold"><span>{t("send.totalDebit", "Итого к списанию")}</span><span>{totalDebitUsdt.toFixed(2)} USDT</span></div>
               </motion.div>
@@ -440,8 +441,7 @@ const SendCryptoToCard = () => {
                   <div className="flex justify-between"><span className="text-muted-foreground">{t("send.exchangeRate", "Курс")}</span><span>1 USDT = {usdtToAed.toFixed(2)} AED</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">{t("send.recipientGets", "Получатель получит")}</span><span className="font-semibold text-green-600">{recipientGetsAed.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span></div>
                   <div className="h-px bg-border" />
-                  <div className="flex justify-between"><span className="text-muted-foreground">{t("send.fee")} ({COMMISSION_PERCENT}%)</span><span>{commission.toFixed(2)} USDT</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">{t("send.networkFee", "Сбор сети")}</span><span>{NETWORK_FEE.toFixed(2)} USDT</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t("send.fee")} {feeIsPercent ? `(${COMMISSION_PERCENT}%)` : ""}</span><span>{commission.toFixed(2)} USDT</span></div>
                   <div className="h-px bg-border" />
                   <div className="flex justify-between font-bold text-base"><span>{t("send.totalDebit", "Итого")}</span><span>{totalDebitUsdt.toFixed(2)} USDT</span></div>
                 </div>
