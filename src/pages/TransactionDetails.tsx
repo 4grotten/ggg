@@ -2263,7 +2263,7 @@ const TransactionDetails = () => {
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border">
                 <span className="text-muted-foreground">{t("transaction.total")}</span>
-                <span className="font-semibold text-[#007AFF]">-{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                <span className="font-semibold text-[#007AFF]">-{(transaction.amountLocal + (transaction.bankFee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
               </div>
             </>
           ) : isBankTransfer && ['bank_to_card', 'iban_to_card', 'transfer_out', 'internal_transfer'].includes((transaction as any)?.originalApiType || '') ? (
