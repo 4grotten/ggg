@@ -185,6 +185,7 @@ const handleClick = (transaction: Transaction) => {
               const isUsdtToIban = isCryptoToIban && !isIbanToUsdt;
               const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction.metadata as any)?.originalApiType || '');
               const isIbanToIban = (transaction.type as string) === 'iban_to_iban' || (transaction.metadata as any)?.originalApiType === 'iban_to_iban';
+              const isInternalCardTransfer = (transaction.metadata as any)?.originalApiType === 'internal_transfer' || (transaction.type as string) === 'internal_transfer';
 
               return (
                 <button
@@ -216,6 +217,13 @@ const handleClick = (transaction: Transaction) => {
                           style={{ backgroundColor: "#22C55E" }}
                         >
                           <Landmark className="w-5 h-5" />
+                        </div>
+                      ) : isInternalCardTransfer ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#007AFF" }}
+                        >
+                          <CreditCard className="w-5 h-5" />
                         </div>
                       ) : isBankTransfer ? (
                         <div 
@@ -329,15 +337,17 @@ const handleClick = (transaction: Transaction) => {
                           ? t("transactions.walletDeposit")
                           : isIncomingCryptoToCard
                            ? "USDT → EasyCard"
-                          : isIncomingIbanToCard
+                           : isIncomingIbanToCard && !isInternalCardTransfer
                            ? "IBAN → EasyCard"
+                           : isInternalCardTransfer
+                           ? "EasyCard → EasyCard"
                            : isBankTransferIncoming
                            ? "IBAN Bank → IBAN Bank"
                            : isIncomingTransfer
                            ? t("transactions.cardReceived")
                            : isOutgoingTransfer
                            ? t("transactions.cardTransfer")
-                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.merchant === 'IBAN to Card'
+                           : isBankTransfer && !isOutgoingCryptoToBank && !isInternalCardTransfer && transaction.merchant === 'IBAN to Card'
                            ? "IBAN → EasyCard"
                            : isBankTransfer
                            ? "IBAN Bank → IBAN Bank"
@@ -346,7 +356,15 @@ const handleClick = (transaction: Transaction) => {
                       </p>
                       <p className="text-sm text-muted-foreground truncate">
                         {transaction.time}
-                        {isIncomingCryptoToBank
+                        {isInternalCardTransfer
+                          ? (() => {
+                              const receiverMask = (transaction.metadata as any)?.receiver_card_mask || transaction.recipientCard || '';
+                              const senderMask = (transaction.metadata as any)?.sender_card_mask || transaction.senderCard || '';
+                              if (receiverMask) return ` · ${t("transactions.to")} •••• ${receiverMask.slice(-4)}`;
+                              if (senderMask) return ` · ${t("transactions.from")} •••• ${senderMask.slice(-4)}`;
+                              return '';
+                            })()
+                          : isIncomingCryptoToBank
                           ? (() => {
                               const wallet = (transaction.metadata as any)?.from_address_mask || (transaction.metadata as any)?.senderWallet || '';
                               if (wallet) return ` · ${t("transactions.from")} ${maskMiddle(wallet)}`;
