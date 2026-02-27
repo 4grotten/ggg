@@ -421,7 +421,11 @@ const handleClick = (transaction: Transaction) => {
                             })()
                           : isTopup && transaction.description
                           ? ` · ${t("transactions.from")} ${maskMiddle(transaction.description)}`
-                          : ""
+                          : (() => {
+                              const sub = (transaction.metadata as any)?.displaySubtitle;
+                              if (sub) return ` · ${sub}`;
+                              return '';
+                            })()
                         }
                       </p>
                     </div>
