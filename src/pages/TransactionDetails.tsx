@@ -836,6 +836,30 @@ const TransactionDetails = () => {
                 <Plus className="w-10 h-10" strokeWidth={2.5} />
               </motion.div>
             </motion.div>
+          ) : isInternalTransfer ? (
+            <motion.div 
+              className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl overflow-hidden relative"
+              style={{ backgroundColor: '#007AFF' }}
+              initial={{ scale: 0.8 }}
+              animate={{ scale: [0.8, 1.15, 1] }}
+              transition={{ duration: 0.5, ease: "easeOut", times: [0, 0.5, 1] }}
+            >
+              <motion.div
+                className="absolute"
+                initial={{ scale: 1, opacity: 1 }}
+                animate={{ scale: 1.5, y: -50, opacity: 0 }}
+                transition={{ duration: 0.4, delay: 0.2, ease: "easeIn" }}
+              >
+                <CheckCircle className="w-8 h-8 text-white" strokeWidth={2.5} />
+              </motion.div>
+              <motion.span
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+              >
+                <CreditCard className="w-10 h-10 text-white" strokeWidth={2} />
+              </motion.span>
+            </motion.div>
           ) : (
             <motion.div 
               className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-3xl overflow-hidden relative"
