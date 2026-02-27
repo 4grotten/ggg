@@ -211,19 +211,19 @@ const handleClick = (transaction: Transaction) => {
                         >
                           <Landmark className="w-5 h-5" />
                         </div>
-                      ) : isBankTransferIncoming ? (
-                        <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                          style={{ backgroundColor: "#22C55E" }}
-                        >
-                          <Landmark className="w-5 h-5" />
-                        </div>
                       ) : isInternalCardTransfer ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{ backgroundColor: "#007AFF" }}
                         >
                           <CreditCard className="w-5 h-5" />
+                        </div>
+                      ) : isBankTransferIncoming ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#22C55E" }}
+                        >
+                          <Landmark className="w-5 h-5" />
                         </div>
                       ) : isBankTransfer ? (
                         <div 
