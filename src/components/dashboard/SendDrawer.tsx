@@ -23,7 +23,7 @@ interface SendDrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type SubMenu = null | "stablecoins" | "bank";
+type SubMenu = null | "card" | "stablecoins" | "bank";
 
 export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
   const navigate = useNavigate();
@@ -61,12 +61,36 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
     },
   ];
 
+  const cardOptions = [
+    {
+      id: "card-send",
+      icon: CreditCard,
+      title: t("wallet.sendFromCard", "Перевод с карты"),
+      subtitle: t("wallet.sendFromCardDesc", "Мгновенный перевод средств с Easy Card"),
+      iconBg: "bg-primary",
+    },
+    {
+      id: "card-wallet",
+      icon: Wallet,
+      title: t("wallet.sendToWallet", "Перевод на Кошелёк USDT"),
+      subtitle: t("wallet.sendToWalletDesc", "Перевод USDT на Кошелек EasyCard так и внешний"),
+      iconBg: "bg-green-500",
+    },
+    {
+      id: "card-bank",
+      icon: Landmark,
+      title: t("drawer.bankTransfer", "Банковский перевод"),
+      subtitle: t("wallet.sendToBankDesc", "Перевод на банковский счет (IBAN)"),
+      iconBg: "bg-purple-500",
+    },
+  ];
+
   const stablecoinOptions = [
     {
       id: "crypto-card",
       icon: CreditCard,
       title: t("wallet.sendFromCard", "Перевод с карты"),
-      subtitle: t("wallet.sendToCardDesc", "Мгновенный перевод средств на Easy Card"),
+      subtitle: t("wallet.sendFromCardDesc", "Мгновенный перевод средств с Easy Card"),
       iconBg: "bg-primary",
     },
     {
@@ -126,9 +150,19 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
     navigate(path);
   };
 
+  const handleCardClick = (optionId: string) => {
+    if (optionId === "card-send") {
+      navigateAuth("/send-to-card");
+    } else if (optionId === "card-wallet") {
+      navigateAuth("/send/crypto");
+    } else if (optionId === "card-bank") {
+      navigateAuth("/send/bank");
+    }
+  };
+
   const handleMainClick = (optionId: string) => {
     if (optionId === "card") {
-      navigateAuth("/send-to-card");
+      setSubMenu("card");
     } else if (optionId === "stablecoins") {
       setSubMenu("stablecoins");
     } else if (optionId === "bank") {
@@ -158,15 +192,18 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
     }
   };
 
-  const currentOptions = subMenu === "stablecoins" ? stablecoinOptions 
+  const currentOptions = subMenu === "card" ? cardOptions
+    : subMenu === "stablecoins" ? stablecoinOptions 
     : subMenu === "bank" ? bankOptions 
     : mainOptions;
 
-  const currentHandler = subMenu === "stablecoins" ? handleStablecoinClick
+  const currentHandler = subMenu === "card" ? handleCardClick
+    : subMenu === "stablecoins" ? handleStablecoinClick
     : subMenu === "bank" ? handleBankClick
     : handleMainClick;
 
-  const currentTitle = subMenu === "stablecoins" ? t("drawer.stablecoins", "Стейблкоины")
+  const currentTitle = subMenu === "card" ? "Easy Card"
+    : subMenu === "stablecoins" ? t("drawer.stablecoins", "Стейблкоины")
     : subMenu === "bank" ? t("drawer.bankTransfer", "Банковский перевод")
     : t("drawer.sendMoneyWith");
 
