@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, QrCode, Landmark, CreditCard, X } from "lucide-react";
+import { ChevronRight, QrCode, Landmark, CreditCard, X, Wallet, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Drawer,
@@ -23,13 +23,21 @@ interface SendDrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
+type SubMenu = null | "stablecoins" | "bank";
+
 export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [authAlertOpen, setAuthAlertOpen] = useState(false);
-  
-  const options = [
+  const [subMenu, setSubMenu] = useState<SubMenu>(null);
+
+  const handleClose = (val: boolean) => {
+    if (!val) setSubMenu(null);
+    onOpenChange(val);
+  };
+
+  const mainOptions = [
     {
       id: "card",
       icon: CreditCard,
@@ -53,30 +61,130 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
     },
   ];
 
-  const handleOptionClick = (optionId: string) => {
+  const stablecoinOptions = [
+    {
+      id: "crypto-card",
+      icon: CreditCard,
+      title: t("wallet.sendToCard", "Перевод на карту"),
+      subtitle: t("wallet.sendToCardDesc", "Мгновенный перевод средств на Easy Card"),
+      iconBg: "bg-primary",
+    },
+    {
+      id: "crypto-wallet",
+      icon: Wallet,
+      title: t("wallet.sendToWallet", "Перевод на Кошелёк USDT"),
+      subtitle: t("wallet.sendToWalletDesc", "Перевод USDT на Кошелек EasyCard так и внешний"),
+      iconBg: "bg-green-500",
+    },
+    {
+      id: "crypto-bank",
+      icon: Landmark,
+      title: t("drawer.bankTransfer", "Банковский перевод"),
+      subtitle: t("wallet.sendToBankDesc", "Перевод на банковский счет (IBAN)"),
+      iconBg: "bg-purple-500",
+    },
+  ];
+
+  const bankOptions = [
+    {
+      id: "bank-own-card",
+      icon: CreditCard,
+      title: t("account.toMyCard", "На свою карту"),
+      subtitle: t("account.toMyCardDesc", "Со счёта на карту"),
+      iconBg: "bg-primary",
+    },
+    {
+      id: "bank-iban-easycard",
+      icon: CreditCard,
+      title: "IBAN → EasyCard",
+      subtitle: t("account.ibanToCardDesc", "Со счёта IBAN на карту"),
+      iconBg: "bg-primary",
+    },
+    {
+      id: "bank-account",
+      icon: Landmark,
+      title: t("account.toAccount", "На счёт"),
+      subtitle: t("account.toAccountDesc", "Банковский перевод"),
+      iconBg: "bg-green-600",
+    },
+    {
+      id: "bank-usdt",
+      icon: Wallet,
+      title: t("account.usdtWallet", "Кошелёк USDT TRC20"),
+      subtitle: t("account.usdtWalletDesc", "Перевод криптовалюты"),
+      iconBg: "bg-green-600",
+    },
+  ];
+
+  const navigateAuth = (path: string) => {
     if (!isAuthenticated) {
-      onOpenChange(false);
+      handleClose(false);
       setTimeout(() => setAuthAlertOpen(true), 300);
       return;
     }
-    
-    onOpenChange(false);
+    handleClose(false);
+    navigate(path);
+  };
+
+  const handleMainClick = (optionId: string) => {
     if (optionId === "card") {
-      navigate("/send-to-card");
+      navigateAuth("/send-to-card");
     } else if (optionId === "stablecoins") {
-      navigate("/send/crypto");
+      setSubMenu("stablecoins");
     } else if (optionId === "bank") {
-      navigate("/send/bank");
+      setSubMenu("bank");
     }
   };
 
+  const handleStablecoinClick = (optionId: string) => {
+    if (optionId === "crypto-card") {
+      navigateAuth("/send/crypto-to-card");
+    } else if (optionId === "crypto-wallet") {
+      navigateAuth("/send/crypto");
+    } else if (optionId === "crypto-bank") {
+      navigateAuth("/send/bank");
+    }
+  };
+
+  const handleBankClick = (optionId: string) => {
+    if (optionId === "bank-own-card") {
+      navigateAuth("/send-IBAN-card");
+    } else if (optionId === "bank-iban-easycard") {
+      navigateAuth("/send-IBAN-external");
+    } else if (optionId === "bank-account") {
+      navigateAuth("/send/bank");
+    } else if (optionId === "bank-usdt") {
+      navigateAuth("/send/crypto");
+    }
+  };
+
+  const currentOptions = subMenu === "stablecoins" ? stablecoinOptions 
+    : subMenu === "bank" ? bankOptions 
+    : mainOptions;
+
+  const currentHandler = subMenu === "stablecoins" ? handleStablecoinClick
+    : subMenu === "bank" ? handleBankClick
+    : handleMainClick;
+
+  const currentTitle = subMenu === "stablecoins" ? t("drawer.stablecoins", "Стейблкоины")
+    : subMenu === "bank" ? t("drawer.bankTransfer", "Банковский перевод")
+    : t("drawer.sendMoneyWith");
+
   return (
     <>
-      <Drawer open={open} onOpenChange={onOpenChange}>
+      <Drawer open={open} onOpenChange={handleClose}>
         <DrawerContent className="bg-background/95 backdrop-blur-xl">
           <DrawerHeader className="relative flex items-center justify-center py-4">
+            {subMenu && (
+              <button 
+                onClick={() => setSubMenu(null)}
+                className="absolute left-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-primary" />
+              </button>
+            )}
             <DrawerTitle className="text-center text-base font-semibold">
-              {t("drawer.sendMoneyWith")}
+              {currentTitle}
             </DrawerTitle>
             <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
               <X className="w-3.5 h-3.5 text-primary" />
@@ -84,13 +192,13 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
           </DrawerHeader>
           
           <div className="px-4 pb-6">
-            <AnimatedDrawerContainer className="bg-muted/50 rounded-xl overflow-hidden">
-              {options.map((option, index) => (
+            <AnimatedDrawerContainer key={subMenu || "main"} className="bg-muted/50 rounded-xl overflow-hidden">
+              {currentOptions.map((option, index) => (
                 <AnimatedDrawerItem key={option.id} index={index}>
                   <button
-                    onClick={() => handleOptionClick(option.id)}
+                    onClick={() => currentHandler(option.id)}
                     className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
-                      index < options.length - 1 ? 'border-b border-border/50' : ''
+                      index < currentOptions.length - 1 ? 'border-b border-border/50' : ''
                     }`}
                   >
                     <div className={`w-10 h-10 rounded-full ${option.iconBg} flex items-center justify-center`}>
