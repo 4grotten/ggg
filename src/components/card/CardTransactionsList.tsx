@@ -479,10 +479,10 @@ const handleClick = (transaction: Transaction) => {
                     ) : isInternalCardTransfer ? (
                       <>
                         <p className="font-semibold text-[#007AFF]">
-                          -{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+                          -{(transaction.amountLocal - (transaction.fee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          -{(transaction.amountLocal + ((transaction as any).transferFee || (transaction.metadata as any)?.fee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+                          -{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                       </>
                     ) : (
