@@ -51,13 +51,17 @@ const TopUpFromUsdtBalance = () => {
   const calculation = useMemo(() => {
     if (amountNum <= 0) return null;
 
-    const networkFee = settings.TOP_UP_CRYPTO_FEE;
-    const rate = settings.USDT_TO_AED_BUY;
-    const totalUsdt = amountNum + networkFee;
+    const commissionPercent = settings.CARD_TO_CARD_FEE_PERCENT; // 1%
+    const networkFee = settings.TOP_UP_CRYPTO_FEE; // 5.90 USDT
+    const rate = settings.USDT_TO_AED_SELL; // 1 USDT = 3.69 AED
+    const commission = amountNum * (commissionPercent / 100);
+    const totalUsdt = amountNum + commission + networkFee;
     const receiveAed = amountNum * rate;
 
     return {
       amountUsdt: amountNum,
+      commissionPercent,
+      commission,
       networkFee,
       totalUsdt,
       rate,
@@ -395,7 +399,15 @@ const TopUpFromUsdtBalance = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
-                        {t("topUpUsdt.networkFee", "Сбор сети")}
+                        {t("topUpUsdt.commission", "Комиссия")} ({calculation.commissionPercent}%)
+                      </span>
+                      <span className="font-medium">
+                        {calculation.commission.toFixed(2)} USDT
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        {t("topUpUsdt.networkFee", "Сетевая комиссия")}
                       </span>
                       <span className="font-medium">
                         {calculation.networkFee.toFixed(2)} USDT
