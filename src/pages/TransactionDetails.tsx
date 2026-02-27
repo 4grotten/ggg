@@ -877,7 +877,7 @@ const TransactionDetails = () => {
               {isTopup || isIncomingTransfer || isBankTransferIncoming || isCryptoDeposit || isIncomingCryptoToCard || isIncomingCryptoToBank || isIncomingCryptoToIban ? '+' : '-'}{isCardToCrypto ? ((receipt as any)?.crypto_send_usdt || (receipt as any)?.metadata?.crypto_send_usdt || transaction.amountUSDT).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToIban ? (isCryptoToIbanCryptoSender ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : isCryptoToBank ? (receipt?.movements?.[1]?.amount || (transaction.amountUSDT * (receipt?.exchange_rate || 3.65))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoToCard ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : isCryptoDeposit || isCryptoSend ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-medium text-muted-foreground">{isCardToCrypto ? 'USDT' : isCryptoToIban ? (isCryptoToIbanCryptoSender ? 'USDT' : 'AED') : isCryptoToBank ? 'AED' : isCryptoToCard || isCryptoDeposit || isCryptoSend ? 'USDT' : 'AED'}</span>
             </p>
             <p className="text-base">
-              {isCardToCrypto ? "EasyCard → USDT" : isCryptoToBank ? t('transaction.walletToIban') : isCryptoToIban ? (isCryptoToIbanBankSender ? "IBAN → USDT" : "USDT → IBAN") : isIncomingCryptoToCard ? "USDT → EasyCard" : isCryptoToCard ? t('transaction.walletToCard') : isCryptoDeposit ? t('transactions.walletDeposit') : isIncomingIbanToCard ? "IBAN → EasyCard" : isBankTransferIncoming ? "IBAN Bank → IBAN Bank" : isInternalTransfer ? "IBAN → EasyCard" : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' || (transaction as any)?.originalApiType === 'bank_to_card' || (transaction as any)?.originalApiType === 'iban_to_card' ? "IBAN → EasyCard" : "IBAN Bank → IBAN Bank") : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
+              {isCardToCrypto ? "EasyCard → USDT" : isCryptoToBank ? t('transaction.walletToIban') : isCryptoToIban ? (isCryptoToIbanBankSender ? "IBAN → USDT" : "USDT → IBAN") : isIncomingCryptoToCard ? "USDT → EasyCard" : isCryptoToCard ? t('transaction.walletToCard') : isCryptoDeposit ? t('transactions.walletDeposit') : isIncomingIbanToCard ? "IBAN → EasyCard" : isBankTransferIncoming ? "IBAN Bank → IBAN Bank" : isInternalTransfer ? "EasyCard → EasyCard" : isBankTransfer ? ((transaction as any)?.originalApiType === 'transfer_out' || (transaction as any)?.originalApiType === 'bank_to_card' || (transaction as any)?.originalApiType === 'iban_to_card' ? "IBAN → EasyCard" : "IBAN Bank → IBAN Bank") : isCryptoSend ? t('transaction.stablecoinSend') : isTopup ? t('transaction.topUp') : isCardActivation ? t('transaction.annualCardFee') : isIncomingTransfer ? t('transaction.received') : isOutgoingTransfer ? t('transaction.cardTransfer') : t('transaction.paymentTo', { merchant: transaction.merchant })}
             </p>
             <p className="text-sm text-muted-foreground">
               {transaction.date}, {transaction.time}
@@ -1153,35 +1153,42 @@ const TransactionDetails = () => {
               {/* Sender name */}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.sender")}</span>
-                <span className="font-medium">{user?.full_name || receipt?.sender_name || "—"}</span>
+                <span className="font-medium">{transaction.senderName || user?.full_name || receipt?.sender_name || "—"}</span>
               </div>
-              {/* Sender IBAN */}
-              <div className="flex items-start justify-between">
-                <span className="text-muted-foreground">IBAN</span>
+              {/* Sender Card */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromCard", "С карты")}</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-right text-sm">
+                  <span className="font-medium">
                     {(() => {
-                      const sIban = userIban || (receipt as any)?.sender_iban || (receipt as any)?.sender_iban_mask || receipt?.iban_mask;
-                      if (!sIban) return "—";
-                      return showIban ? sIban : `${sIban.slice(0, 4)}••••${sIban.slice(-4)}`;
+                      const cardFull = transaction.senderCardFull || transaction.fromCardFull;
+                      const cardLast4 = transaction.senderCard || receipt?.sender_card_mask?.slice(-4);
+                      const cardType = (() => {
+                        const movement = receipt?.movements?.find((m: any) => m.type === 'debit');
+                        if (movement?.account_type === 'virtual') return 'Virtual';
+                        if (movement?.account_type === 'metal') return 'Metal';
+                        return '';
+                      })();
+                      if (showFromCard && cardFull) return `Visa ${cardType} ${cardFull}`;
+                      return `Visa ${cardType} ••${cardLast4 || ''}`;
                     })()}
                   </span>
-                  {(userIban || (receipt as any)?.sender_iban || receipt?.iban_mask) && (
+                  {(transaction.senderCardFull || transaction.fromCardFull) && (
                     <>
                       <button 
                         onClick={() => {
-                          navigator.clipboard.writeText(userIban || (receipt as any)?.sender_iban || receipt?.iban_mask || '');
-                          toast.success(t("toast.copied", { label: "IBAN" }));
+                          navigator.clipboard.writeText((transaction.senderCardFull || transaction.fromCardFull || '').replace(/\s/g, ''));
+                          toast.success(t("toast.cardNumberCopied"));
                         }}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
                       <button 
-                        onClick={() => setShowIban(!showIban)}
+                        onClick={() => setShowFromCard(!showFromCard)}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        {showIban ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showFromCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </>
                   )}
@@ -1190,7 +1197,7 @@ const TransactionDetails = () => {
               {/* Recipient name */}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.recipient")}</span>
-                <span className="font-medium">{transaction.recipientName || receipt?.beneficiary_name || user?.full_name || "—"}</span>
+                <span className="font-medium">{transaction.recipientName || (receipt as any)?.receiver_name || user?.full_name || "—"}</span>
               </div>
               {/* Recipient Card */}
               <div className="flex items-center justify-between">
@@ -1200,8 +1207,14 @@ const TransactionDetails = () => {
                     {(() => {
                       const cardFull = transaction.recipientCardFull || transaction.toCardFull;
                       const cardLast4 = transaction.recipientCard || transaction.cardLast4;
-                      if (showToCard && cardFull) return `Visa ${resolveCardType(cardLast4, 1)} ${cardFull}`;
-                      return `Visa ${resolveCardType(cardLast4, 1)} ••${cardLast4 || ''}`;
+                      const cardType = (() => {
+                        const movement = receipt?.movements?.find((m: any) => m.type === 'credit');
+                        if (movement?.account_type === 'virtual') return 'Virtual';
+                        if (movement?.account_type === 'metal') return 'Metal';
+                        return '';
+                      })();
+                      if (showToCard && cardFull) return `Visa ${cardType} ${cardFull}`;
+                      return `Visa ${cardType} ••${cardLast4 || ''}`;
                     })()}
                   </span>
                   {(transaction.recipientCardFull || transaction.toCardFull) && (
