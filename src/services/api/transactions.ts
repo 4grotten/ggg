@@ -637,6 +637,9 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       cryptoAddress: (tx.metadata as any)?.crypto_address || undefined,
       senderIban: (tx.metadata as any)?.sender_iban || (tx.metadata as any)?.sender_iban_mask || undefined,
       movements: (tx as any).movements || undefined,
+      displaySubtitle: tx.display?.subtitle || undefined,
+      sender_card_mask: (tx as any).sender_card_mask || (tx.metadata as any)?.sender_card_mask || undefined,
+      receiver_card_mask: (tx as any).receiver_card_mask || (tx.metadata as any)?.receiver_card_mask || undefined,
     },
   };
 };

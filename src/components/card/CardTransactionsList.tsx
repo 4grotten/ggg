@@ -359,8 +359,16 @@ const handleClick = (transaction: Transaction) => {
                               if (sender) return ` · ${t("transactions.from")} ${maskMiddle(sender)}`;
                               return ` · Card····${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`;
                             })()
-                          : isIncomingTransfer && (transaction.senderCard || transaction.recipientCard)
-                          ? ` · ${t("transactions.from")} •••• ${(transaction.senderCard || transaction.recipientCard || '').slice(-4)}`
+                          : isIncomingTransfer
+                          ? (() => {
+                              const cardMask = transaction.senderCard || (transaction.metadata as any)?.sender_card_mask || transaction.recipientCard || '';
+                              const senderName = transaction.senderName || '';
+                              if (cardMask) return ` · ${t("transactions.from")} •••• ${cardMask.slice(-4)}`;
+                              if (senderName) return ` · ${t("transactions.from")} ${maskMiddle(senderName)}`;
+                              const subtitle = (transaction.metadata as any)?.displaySubtitle;
+                              if (subtitle) return ` · ${subtitle}`;
+                              return '';
+                            })()
                           : isOutgoingTransfer && (transaction.recipientCard || transaction.senderCard)
                           ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isBankTransferIncoming && ((transaction.metadata as any)?.beneficiary_iban || transaction.senderName || (transaction.metadata as any)?.beneficiary_name)
