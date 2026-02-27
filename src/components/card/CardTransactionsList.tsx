@@ -476,6 +476,15 @@ const handleClick = (transaction: Transaction) => {
                           {prefix}{(isTopup ? (transaction.amountUSDT * 3.65 * 0.98) : transaction.amountLocal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                       </>
+                    ) : isInternalCardTransfer ? (
+                      <>
+                        <p className="font-semibold text-[#007AFF]">
+                          -{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          -{(transaction.amountLocal + ((transaction as any).transferFee || (transaction.metadata as any)?.fee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+                        </p>
+                      </>
                     ) : (
                       <>
                         <p className={`font-semibold ${colorClass}`}>
