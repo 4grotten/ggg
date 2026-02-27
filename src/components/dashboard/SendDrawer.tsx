@@ -65,7 +65,7 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
     {
       id: "crypto-card",
       icon: CreditCard,
-      title: t("wallet.sendToCard", "Перевод на карту"),
+      title: t("wallet.sendFromCard", "Перевод с карты"),
       subtitle: t("wallet.sendToCardDesc", "Мгновенный перевод средств на Easy Card"),
       iconBg: "bg-primary",
     },
