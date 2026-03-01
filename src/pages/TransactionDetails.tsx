@@ -1335,6 +1335,36 @@ const TransactionDetails = () => {
             </>
           ) : isCryptoToCard ? (
             <>
+              {/* Sender info */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t("transaction.sender")}</span>
+                <div className="flex items-center gap-2">
+                  {receipt?.sender_avatar && (
+                    <img src={receipt.sender_avatar} alt="" className="w-6 h-6 rounded-full object-cover" />
+                  )}
+                  <span className="font-medium">{receipt?.sender_name || transaction.senderName || '—'}</span>
+                </div>
+              </div>
+              {/* From Wallet USDT */}
+              <div className="flex items-start justify-between">
+                <span className="text-muted-foreground">{t("transaction.fromWalletUsdt", "С кошелька USDT")}</span>
+                <div className="flex items-center gap-2">
+                  <UsdtIcon size={16} />
+                  <span className="font-medium text-sm">
+                    {(() => {
+                      const addr = (receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || transaction.fromWalletAddress || '';
+                      if (!addr) return '—';
+                      return showFromAddress ? addr : `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+                    })()}
+                  </span>
+                  {((receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || transaction.fromWalletAddress) && (
+                    <>
+                      <button onClick={() => { navigator.clipboard.writeText((receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || transaction.fromWalletAddress || ''); toast.success(t("toast.addressCopied")); }} className="text-muted-foreground hover:text-foreground transition-colors"><Copy className="w-4 h-4" /></button>
+                      <button onClick={() => setShowFromAddress(!showFromAddress)} className="text-muted-foreground hover:text-foreground transition-colors">{showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                    </>
+                  )}
+                </div>
+              </div>
               {/* Recipient with avatar */}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.recipient")}</span>
@@ -1366,31 +1396,6 @@ const TransactionDetails = () => {
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {showToCard ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              {/* From Wallet */}
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{t("transaction.fromWallet", "Кошелёк")}</span>
-                <div className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-medium">
-                    {showFromAddress ? transaction.fromWalletAddress : `${transaction.fromWalletAddress?.slice(0, 6)}...${transaction.fromWalletAddress?.slice(-4)}`}
-                  </span>
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText((transaction as any).fromWalletAddressFull || transaction.fromWalletAddress || '');
-                      toast.success(t("toast.addressCopied"));
-                    }}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => setShowFromAddress(!showFromAddress)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showFromAddress ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
