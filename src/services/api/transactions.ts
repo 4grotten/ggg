@@ -644,7 +644,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       originalApiType: tx.type,
       senderWallet: (tx as any).from_address_mask || (tx as any).from_address || (tx as any).sender_wallet || (tx.metadata as any)?.crypto_address || undefined,
       cryptoAddress: (tx.metadata as any)?.crypto_address || undefined,
-      senderIban: (tx.metadata as any)?.sender_iban || (tx.metadata as any)?.sender_iban_mask || undefined,
+      senderIban: (tx as any).sender_iban_mask || (tx as any).sender_iban || (tx.metadata as any)?.sender_iban || (tx.metadata as any)?.sender_iban_mask || undefined,
       movements: (tx as any).movements || undefined,
       displaySubtitle: tx.display?.subtitle || undefined,
       sender_card_mask: (tx as any).sender_card_mask || (tx.metadata as any)?.sender_card_mask || undefined,

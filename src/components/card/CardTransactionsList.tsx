@@ -184,7 +184,8 @@ const handleClick = (transaction: Transaction) => {
               const isIbanToUsdt = isCryptoToIban && cryptoToIbanMovements?.length === 2 && cryptoToIbanMovements[0]?.account_type === 'bank' && cryptoToIbanMovements[0]?.type === 'debit';
               const isUsdtToIban = isCryptoToIban && !isIbanToUsdt;
               const isIncomingIbanToCard = isBankTransferIncoming && ['internal_transfer', 'bank_to_card', 'iban_to_card'].includes((transaction.metadata as any)?.originalApiType || '');
-              const isIbanToIban = (transaction.type as string) === 'iban_to_iban' || (transaction.metadata as any)?.originalApiType === 'iban_to_iban';
+              const isIbanToIban = ((transaction.type as string) === 'iban_to_iban' || (transaction.metadata as any)?.originalApiType === 'iban_to_iban') && !(transaction.metadata as any)?.isIncoming;
+              const isIncomingIbanToIban = ((transaction.type as string) === 'iban_to_iban' || (transaction.metadata as any)?.originalApiType === 'iban_to_iban') && !!(transaction.metadata as any)?.isIncoming;
               const isInternalCardTransfer = (transaction.metadata as any)?.originalApiType === 'internal_transfer' || (transaction.type as string) === 'internal_transfer';
 
               return (
@@ -302,6 +303,13 @@ const handleClick = (transaction: Transaction) => {
                             {isIbanToUsdt ? <UsdtIcon size={10} /> : <Landmark className="w-2.5 h-2.5 text-white" />}
                           </div>
                         </div>
+                      ) : isIncomingIbanToIban ? (
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                          style={{ backgroundColor: "#22C55E" }}
+                        >
+                          <Landmark className="w-5 h-5" />
+                        </div>
                       ) : isIbanToIban ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
@@ -389,6 +397,16 @@ const handleClick = (transaction: Transaction) => {
                             })()
                           : isOutgoingTransfer && (transaction.recipientCard || transaction.senderCard)
                           ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
+                          : isIncomingIbanToIban
+                          ? (() => {
+                              const senderIban = (transaction.metadata as any)?.senderIban || '';
+                              if (senderIban) {
+                                const display = senderIban.replace(/\s*\*+\s*/g, '••••');
+                                return ` · ${t("transactions.from")} ${display}`;
+                              }
+                              const name = transaction.senderName || (transaction.metadata as any)?.sender_name || '';
+                              return name ? ` · ${t("transactions.from")} ${maskMiddle(name)}` : '';
+                            })()
                           : isBankTransferIncoming && ((transaction.metadata as any)?.beneficiary_iban || transaction.senderName || (transaction.metadata as any)?.beneficiary_name)
                           ? (() => {
                               const iban = (transaction.metadata as any)?.beneficiary_iban;
