@@ -18,8 +18,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
-import { useCards } from "@/hooks/useCards";
-import { useCardTransactionGroups, useTransactionGroups } from "@/hooks/useTransactions";
+import { useCards, useWalletSummary } from "@/hooks/useCards";
+import { useCardTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Animated number component for balance
@@ -83,15 +83,16 @@ const VirtualCard = () => {
   const apiCard = cardsData?.data?.[0];
   const cardId = apiCard?.id;
 
-  // Fetch card transactions from API + mock data
-  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups();
-  const { data: mockData } = useTransactionGroups();
+  // Get card number from wallet summary for transaction filtering
+  const { data: walletSummary } = useWalletSummary();
+  const virtualCardInfo = walletSummary?.data?.cards?.find(c => c.type === 'virtual');
+  const cardNumber = virtualCardInfo?.card_number;
+
+  // Fetch card transactions filtered by this card
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(cardId, cardNumber);
   
-  // Merge: API groups first, then mock groups below
-  const mergedGroups = [
-    ...(cardTxGroups || []),
-    ...(mockData?.groups || []),
-  ];
+  // Only API transactions, no mock data
+  const mergedGroups = cardTxGroups || [];
 
   const cardData = {
     holderName: "RINAT KAMIEV",

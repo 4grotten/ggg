@@ -643,7 +643,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     recipientName: tx.receiver_name || (tx as any).beneficiary_name || (tx as any).recipient_name || undefined,
     description: tx.description || undefined,
     createdAt: tx.created_at,
-    cardId: tx.card_id || undefined,
+    cardId: tx.card_id || (tx as any).card || undefined,
     fee: tx.fee != null ? Number(tx.fee) : undefined,
     metadata: { 
       apiDate: dateStr, 
@@ -783,12 +783,21 @@ export const fetchCardTransactions = async (): Promise<{
       ? result.data
       : (result.data as any)?.results || [];
     
-    // Filter out non-card transaction types that backend may return
-    const cardOnly = transactions.filter(tx => 
-      !['crypto_to_card', 'crypto_to_bank', 'crypto_withdrawal', 'crypto_deposit'].includes(tx.type)
-    );
+    // Include all transactions that involve cards (including crypto_to_card)
+    // Only exclude pure crypto-to-crypto and crypto_deposit with no card involvement
+    const cardRelated = transactions.filter(tx => {
+      // Always include card_transfer, card_activation, card_payment, internal_transfer, iban_to_card, bank_to_card
+      const cardTypes = ['card_transfer', 'card_activation', 'card_payment', 'internal_transfer', 'iban_to_card', 'bank_to_card', 'crypto_to_card'];
+      if (cardTypes.includes(tx.type)) return true;
+      // Include if transaction has a card field set
+      if (tx.card) return true;
+      // Include if has recipient_card or sender_card
+      if (tx.recipient_card || tx.sender_card) return true;
+      // Exclude pure crypto/bank-only types
+      return false;
+    });
     
-    return { data: cardOnly, error: null };
+    return { data: cardRelated, error: null };
   } catch (error) {
     console.error('[Transactions API] Card transactions fetch failed:', error);
     return { data: null, error: error instanceof Error ? error.message : 'Network error' };
