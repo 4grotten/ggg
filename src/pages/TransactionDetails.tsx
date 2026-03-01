@@ -2446,7 +2446,11 @@ const TransactionDetails = () => {
               </div>
             )}
             {(() => {
-              const senderWalletAddress = (receipt as any)?.from_address || (receipt as any)?.from_address_mask || (receipt as any)?.metadata?.from_address || (receipt as any)?.metadata?.sender_address || '';
+              // For crypto_to_card, the sender wallet is in crypto_address (not from_address)
+              const isCryptoToCardType = receipt.type === 'crypto_to_card';
+              const senderWalletAddress = isCryptoToCardType
+                ? ((receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || (receipt as any)?.from_address || '')
+                : ((receipt as any)?.from_address || (receipt as any)?.from_address_mask || (receipt as any)?.metadata?.from_address || (receipt as any)?.metadata?.sender_address || '');
               if (!senderWalletAddress) return null;
               return (
                 <div className="flex items-start justify-between py-0.5">
@@ -2459,7 +2463,7 @@ const TransactionDetails = () => {
                       <Copy className="w-4 h-4" />
                     </button>
                     <button onClick={() => setShowCryptoAddr(!showCryptoAddr)} className="text-muted-foreground hover:text-foreground transition-colors">
-                      {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showCryptoAddr ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
@@ -2555,6 +2559,8 @@ const TransactionDetails = () => {
               </div>
             )}
             {(() => {
+              // For crypto_to_card, crypto_address belongs to sender, not receiver — skip here
+              if (receipt.type === 'crypto_to_card') return null;
               const cryptoAddr = (receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || (receipt as any)?.receiver_wallet || (transaction as any)?.cryptoAddress || '';
               if (!cryptoAddr) return null;
               return (
