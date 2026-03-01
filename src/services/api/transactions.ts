@@ -612,6 +612,21 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     }
   }
 
+  // Post-processing: for crypto_to_card, ensure amountLocal has the AED value from metadata
+  const isCryptoToCardType = tx.type === 'crypto_to_card' || (tx.type === 'transfer' && tx.recipient_card);
+  if (isCryptoToCardType && (amountLocal === absAmount || amountLocal === 0)) {
+    const meta = tx.metadata as Record<string, unknown> | null;
+    const aedFromMeta = meta?.fiat_amount_aed ?? meta?.credited_amount_aed ?? meta?.credited_aed;
+    if (aedFromMeta && Number(aedFromMeta) > 0) {
+      amountLocal = Math.abs(Number(aedFromMeta));
+    } else if (tx.exchange_rate) {
+      const rate = parseFloat(String(tx.exchange_rate));
+      if (rate > 0) {
+        amountLocal = absAmount * rate;
+      }
+    }
+  }
+
   return {
     id: `api_${tx.id}`,
     merchant,
