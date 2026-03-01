@@ -432,8 +432,11 @@ class TransactionService:
 
         buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'), sender_id)
         
-        # ИСПРАВЛЕНИЕ: Используем плоскую комиссию в USDT вместо процентов
-        crypto_fee = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
+        # Service fee (1% of amount) + Network fee (flat 5.90 USDT)
+        service_fee_pct = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'), sender_id)
+        service_fee = (amount_usdt * service_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
+        network_fee = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
+        crypto_fee = service_fee + network_fee
         
         total_deduction = amount_usdt + crypto_fee
         amount_aed = (amount_usdt * buy_rate).quantize(Decimal('0.01'))
@@ -459,6 +462,9 @@ class TransactionService:
             "receiver_card_mask": TransactionService._mask_card(to_card_number),
             "pricing_version": 2,
             "amount_usdt": float(amount_usdt),
+            "service_fee_usdt": float(service_fee),
+            "service_fee_percent": float(service_fee_pct),
+            "network_fee_usdt": float(network_fee),
             "fee_usdt": float(crypto_fee),
             "total_debited_usdt": float(total_deduction),
             "exchange_rate_usdt_to_aed": float(buy_rate),
