@@ -761,18 +761,16 @@ export const fetchCryptoTransactionGroups = async (): Promise<TransactionGroup[]
 
 /**
  * Fetch card-only transactions from backend
- * GET /api/v1/transactions/card-transactions/?card_id=<uuid>
+ * GET /api/v1/transactions/card-transactions/
+ * Returns ALL card transactions; filtering by specific card is done client-side by full card number.
  */
-export const fetchCardTransactions = async (cardId?: string): Promise<{
+export const fetchCardTransactions = async (): Promise<{
   data: ApiTransaction[] | null;
   error: string | null;
 }> => {
   try {
-    const endpoint = cardId
-      ? `/transactions/card-transactions/?card_id=${encodeURIComponent(cardId)}`
-      : `/transactions/card-transactions/`;
     const result = await apiRequest<ApiTransaction[] | { results: ApiTransaction[] }>(
-      endpoint,
+      `/transactions/card-transactions/`,
       { method: 'GET' },
       true
     );
@@ -786,16 +784,7 @@ export const fetchCardTransactions = async (cardId?: string): Promise<{
       ? result.data
       : (result.data as any)?.results || [];
     
-    // Include all transactions that involve cards (including crypto_to_card)
-    const cardRelated = transactions.filter(tx => {
-      const cardTypes = ['card_transfer', 'card_activation', 'card_payment', 'internal_transfer', 'iban_to_card', 'bank_to_card', 'crypto_to_card'];
-      if (cardTypes.includes(tx.type)) return true;
-      if (tx.card) return true;
-      if (tx.recipient_card || tx.sender_card) return true;
-      return false;
-    });
-    
-    return { data: cardRelated, error: null };
+    return { data: transactions, error: null };
   } catch (error) {
     console.error('[Transactions API] Card transactions fetch failed:', error);
     return { data: null, error: error instanceof Error ? error.message : 'Network error' };
@@ -804,10 +793,10 @@ export const fetchCardTransactions = async (cardId?: string): Promise<{
 
 /**
  * Fetch card transactions and group by date
- * Uses /card-transactions/ endpoint with optional card_id filter
+ * Uses /card-transactions/ endpoint, no server-side card filter
  */
-export const fetchCardTransactionGroups = async (cardId?: string): Promise<TransactionGroup[]> => {
-  const { data, error } = await fetchCardTransactions(cardId);
+export const fetchCardTransactionGroups = async (): Promise<TransactionGroup[]> => {
+  const { data, error } = await fetchCardTransactions();
   if (error || !data || data.length === 0) return [];
   return await groupApiTransactions(data);
 };
