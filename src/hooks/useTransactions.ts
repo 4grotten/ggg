@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { 
   fetchTransactions, 
   fetchTransactionGroups, 
@@ -69,17 +70,44 @@ export const useCryptoTransactionGroups = () => {
 };
 
 /**
- * Hook to fetch card-only transactions from API
+ * Hook to fetch card-related transactions from API
+ * Optionally filter by specific card ID and/or card number
  */
-export const useCardTransactionGroups = () => {
+export const useCardTransactionGroups = (cardId?: string, cardNumber?: string) => {
   const token = getAuthToken();
-  return useQuery({
+  const query = useQuery({
     queryKey: transactionKeys.cardGroups(),
     queryFn: fetchCardTransactionGroups,
     enabled: !!token,
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
+
+  // Filter by specific card if cardId or cardNumber provided
+  const filteredData = useMemo(() => {
+    if (!query.data || (!cardId && !cardNumber)) return query.data;
+    
+    const last4 = cardNumber ? cardNumber.slice(-4) : null;
+    
+    return query.data
+      .map(group => {
+        const filtered = group.transactions.filter(tx => {
+          if (cardId && tx.cardId === cardId) return true;
+          if (last4) {
+            const senderMask = (tx.metadata as any)?.sender_card_mask || tx.senderCard || '';
+            const receiverMask = (tx.metadata as any)?.receiver_card_mask || tx.recipientCard || '';
+            if (senderMask.includes(last4) || receiverMask.includes(last4)) return true;
+            if (tx.recipientCard?.includes(last4) || tx.senderCard?.includes(last4)) return true;
+          }
+          return false;
+        });
+        if (filtered.length === 0) return null;
+        return { ...group, transactions: filtered };
+      })
+      .filter(Boolean) as TransactionGroup[];
+  }, [query.data, cardId, cardNumber]);
+
+  return { ...query, data: filteredData };
 };
 
 /**

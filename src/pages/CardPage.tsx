@@ -164,8 +164,12 @@ const CardPage = () => {
   const { data: walletData } = useWalletSummary();
   const apiCards = walletData?.data?.cards || [];
 
-  // Fetch real card transactions from API
-  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups();
+  // Fetch real card transactions from API, filtered by current card
+  const currentCardType = cardTypes[activeIndex];
+  const apiCard = apiCards.find(c => c.type === currentCardType);
+  const currentCardNumber = apiCard?.card_number;
+  const currentCardId = apiCard?.id;
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(currentCardId, currentCardNumber);
 
   const handleUnlock = () => {
     setIsUnlocking(true);
@@ -175,20 +179,11 @@ const CardPage = () => {
     }, 1000);
   };
 
-  const currentCardType = cardTypes[activeIndex];
-  const apiCard = apiCards.find(c => c.type === currentCardType);
-
   // Format card number with spaces: "4532112233000002" → "4532 1122 3300 0002"
   const formatCardNumber = (num: string) =>
     num.replace(/(.{4})/g, '$1 ').trim();
 
-  // Show all API transactions on card pages (card_id is not always set in DB)
-  const filteredApiGroups = cardTxGroups || [];
-
-  const mergedTransactions = [
-    ...filteredApiGroups,
-    ...cardsData[currentCardType].transactions,
-  ];
+  const mergedTransactions = cardTxGroups || [];
 
   const cardData = {
     ...cardsData[currentCardType],
