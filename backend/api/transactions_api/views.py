@@ -137,13 +137,34 @@ class IBANTransactionsListView(APIView):
 class CardTransactionsListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(operation_summary="Транзакции по Картам", tags=["Транзакции (Списки)"])
+    @swagger_auto_schema(
+        operation_summary="Транзакции по Картам",
+        manual_parameters=[
+            openapi.Parameter('card_id', openapi.IN_QUERY, description="UUID конкретной карты для фильтрации", type=openapi.TYPE_STRING, required=False),
+        ],
+        tags=["Транзакции (Списки)"]
+    )
     def get(self, request):
         user_id = str(request.user.id)
         txs = Transactions.objects.filter(
             Q(sender_id=user_id) | Q(receiver_id=user_id),
             movements__user_id=user_id, movements__account_type='card'
         ).distinct().order_by('-created_at')
+
+        # Optional: filter by specific card_id
+        card_id = request.query_params.get('card_id')
+        if card_id:
+            card = Cards.objects.filter(id=card_id, user_id=user_id).first()
+            if card:
+                last4 = card.last_four_digits or ''
+                card_number = card.card_number_encrypted or ''
+                txs = txs.filter(
+                    Q(card_id=card_id) |
+                    Q(recipient_card=card_number) |
+                    Q(sender_card=card_number) |
+                    Q(recipient_card__endswith=last4) |
+                    Q(sender_card__endswith=last4)
+                ).distinct()
         
         serializer = AdminTransactionSerializerDirect(txs, many=True, context={'target_user_id': user_id})
         return Response(serializer.data, status=status.HTTP_200_OK)

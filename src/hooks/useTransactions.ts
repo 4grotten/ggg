@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
 import { 
   fetchTransactions, 
   fetchTransactionGroups, 
@@ -22,7 +21,7 @@ export const transactionKeys = {
   groupsWithParams: (params?: FetchTransactionsParams) => [...transactionKeys.groups(), params] as const,
   apiGroups: () => [...transactionKeys.all, 'apiGroups'] as const,
   cryptoGroups: () => [...transactionKeys.all, 'cryptoGroups'] as const,
-  cardGroups: () => [...transactionKeys.all, 'cardGroups'] as const,
+  cardGroups: (cardId?: string) => [...transactionKeys.all, 'cardGroups', cardId] as const,
   ibanGroups: () => [...transactionKeys.all, 'ibanGroups'] as const,
   details: () => [...transactionKeys.all, 'detail'] as const,
   detail: (id: string) => [...transactionKeys.details(), id] as const,
@@ -71,43 +70,17 @@ export const useCryptoTransactionGroups = () => {
 
 /**
  * Hook to fetch card-related transactions from API
- * Optionally filter by specific card ID and/or card number
+ * Filters server-side by specific card UUID
  */
-export const useCardTransactionGroups = (cardId?: string, cardNumber?: string) => {
+export const useCardTransactionGroups = (cardId?: string) => {
   const token = getAuthToken();
-  const query = useQuery({
-    queryKey: transactionKeys.cardGroups(),
-    queryFn: fetchCardTransactionGroups,
-    enabled: !!token,
+  return useQuery<TransactionGroup[]>({
+    queryKey: transactionKeys.cardGroups(cardId),
+    queryFn: () => fetchCardTransactionGroups(cardId),
+    enabled: !!token && !!cardId,
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
-
-  // Filter by specific card if cardId or cardNumber provided
-  const filteredData = useMemo(() => {
-    if (!query.data || (!cardId && !cardNumber)) return query.data;
-    
-    const last4 = cardNumber ? cardNumber.slice(-4) : null;
-    
-    return query.data
-      .map(group => {
-        const filtered = group.transactions.filter(tx => {
-          if (cardId && tx.cardId === cardId) return true;
-          if (last4) {
-            const senderMask = (tx.metadata as any)?.sender_card_mask || tx.senderCard || '';
-            const receiverMask = (tx.metadata as any)?.receiver_card_mask || tx.recipientCard || '';
-            if (senderMask.includes(last4) || receiverMask.includes(last4)) return true;
-            if (tx.recipientCard?.includes(last4) || tx.senderCard?.includes(last4)) return true;
-          }
-          return false;
-        });
-        if (filtered.length === 0) return null;
-        return { ...group, transactions: filtered };
-      })
-      .filter(Boolean) as TransactionGroup[];
-  }, [query.data, cardId, cardNumber]);
-
-  return { ...query, data: filteredData };
 };
 
 /**

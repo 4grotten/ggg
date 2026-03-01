@@ -83,13 +83,13 @@ const VirtualCard = () => {
   const apiCard = cardsData?.data?.[0];
   const cardId = apiCard?.id;
 
-  // Get card number from wallet summary for transaction filtering
+  // Get card UUID from wallet summary for server-side filtering
   const { data: walletSummary } = useWalletSummary();
   const virtualCardInfo = walletSummary?.data?.cards?.find(c => c.type === 'virtual');
-  const cardNumber = virtualCardInfo?.card_number;
+  const walletCardId = virtualCardInfo?.id || cardId;
 
-  // Fetch card transactions filtered by this card
-  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(cardId, cardNumber);
+  // Fetch card transactions filtered by this card (server-side)
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(walletCardId);
   
   // Only API transactions, no mock data
   const mergedGroups = cardTxGroups || [];
