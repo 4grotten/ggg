@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CARD_TO_CARD_FEE_PERCENT } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import { useWalletSummary } from "@/hooks/useCards";
 import { getAuthToken } from "@/services/api/apiClient";
 
@@ -117,6 +117,7 @@ const SendToCard = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const settings = useSettings();
   
   // Check if this is a referral withdrawal
   const isReferralWithdrawal = location.state?.isReferralWithdrawal || false;
@@ -344,7 +345,8 @@ const SendToCard = () => {
     }
   };
 
-  const fee = numericAmount * (CARD_TO_CARD_FEE_PERCENT / 100);
+  const cardToCardFeePercent = settings.CARD_TO_CARD_FEE_PERCENT;
+  const fee = numericAmount * (cardToCardFeePercent / 100);
   const totalAmount = numericAmount + fee;
 
   return (
@@ -676,7 +678,7 @@ const SendToCard = () => {
                     type="button"
                     onClick={() => {
                       // Max amount considering fee: balance = amount * (1 + fee/100)
-                      const maxAmount = availableBalance / (1 + CARD_TO_CARD_FEE_PERCENT / 100);
+                      const maxAmount = availableBalance / (1 + cardToCardFeePercent / 100);
                       const formatted = maxAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                       setAmount(formatted);
                     }}
@@ -692,7 +694,7 @@ const SendToCard = () => {
               )}
               {numericAmount > 0 && numericAmount <= availableBalance && (
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{t('send.fee')} ({CARD_TO_CARD_FEE_PERCENT}%): {fee.toFixed(2)} AED</span>
+                  <span>{t('send.fee')} ({cardToCardFeePercent}%): {fee.toFixed(2)} AED</span>
                   <span>{t('send.total')}: {totalAmount.toFixed(2)} AED</span>
                 </div>
               )}
@@ -778,7 +780,7 @@ const SendToCard = () => {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('send.fee')} ({CARD_TO_CARD_FEE_PERCENT}%)</span>
+                    <span className="text-muted-foreground">{t('send.fee')} ({cardToCardFeePercent}%)</span>
                     <span>{fee.toFixed(2)} AED</span>
                   </div>
                   <div className="flex justify-between pt-3 border-t border-border">

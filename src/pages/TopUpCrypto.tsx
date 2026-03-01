@@ -12,7 +12,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
-import { TOP_UP_CRYPTO_FEE, TOP_UP_CRYPTO_MIN_AMOUNT } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useCryptoWallets } from "@/hooks/useCards";
@@ -45,6 +45,9 @@ const fallbackAddresses: Record<string, string> = {
 const TopUpCrypto = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const settings = useSettings();
+  const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
+  const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
   const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
 
   // Build a network→address map from real wallets

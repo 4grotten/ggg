@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import { useCards } from "@/hooks/useCards";
 
 const OpenCardPayBalance = () => {
@@ -15,6 +15,9 @@ const OpenCardPayBalance = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const cardType = searchParams.get("type") as "virtual" | "metal" || "virtual";
+  const settings = useSettings();
+  const VIRTUAL_CARD_ANNUAL_FEE = settings.VIRTUAL_CARD_ANNUAL_FEE;
+  const METAL_CARD_ANNUAL_FEE = settings.METAL_CARD_ANNUAL_FEE;
   
   const [selectedPaymentCardId, setSelectedPaymentCardId] = useState<string | null>(null);
   const [showCardSelector, setShowCardSelector] = useState(false);

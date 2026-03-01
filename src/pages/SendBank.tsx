@@ -15,7 +15,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
-import { BANK_TRANSFER_FEE_PERCENT } from "@/lib/fees";
+// fees now from useSettings()
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
@@ -63,7 +63,7 @@ const SendBank = () => {
   const { t } = useTranslation();
   
   const { user } = useAuth();
-  const { USDT_TO_AED_BUY } = useSettings();
+  const { USDT_TO_AED_BUY, BANK_TRANSFER_FEE_PERCENT } = useSettings();
 
   const { data: cardsData } = useCards();
   const { data: bankAccountsData } = useBankAccounts();

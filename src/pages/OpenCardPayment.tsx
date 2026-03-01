@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog,
@@ -20,6 +20,9 @@ const OpenCardPayment = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const settings = useSettings();
+  const VIRTUAL_CARD_ANNUAL_FEE = settings.VIRTUAL_CARD_ANNUAL_FEE;
+  const METAL_CARD_ANNUAL_FEE = settings.METAL_CARD_ANNUAL_FEE;
   const [searchParams] = useSearchParams();
   const initialType = (searchParams.get("type") as CardType) || "virtual";
   const [selectedCard, setSelectedCard] = useState<CardType>(initialType);
