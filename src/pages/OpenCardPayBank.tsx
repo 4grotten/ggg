@@ -6,13 +6,17 @@ import { toast } from "sonner";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE, TOP_UP_BANK_FEE_PERCENT } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const OpenCardPayBank = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const cardType = searchParams.get("type") as "virtual" | "metal" || "virtual";
+  const settings = useSettings();
+  const VIRTUAL_CARD_ANNUAL_FEE = settings.VIRTUAL_CARD_ANNUAL_FEE;
+  const METAL_CARD_ANNUAL_FEE = settings.METAL_CARD_ANNUAL_FEE;
+  const TOP_UP_BANK_FEE_PERCENT = settings.TOP_UP_BANK_FEE_PERCENT;
 
   const cardIssuanceFee = cardType === "virtual" ? VIRTUAL_CARD_ANNUAL_FEE : METAL_CARD_ANNUAL_FEE;
   const bankFee = cardIssuanceFee * (TOP_UP_BANK_FEE_PERCENT / 100);

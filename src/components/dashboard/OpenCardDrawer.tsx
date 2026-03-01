@@ -10,7 +10,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { VIRTUAL_CARD_ANNUAL_FEE, METAL_CARD_ANNUAL_FEE } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import { CardMiniature } from "./CardMiniature";
 import { useCards } from "@/hooks/useCards";
 
@@ -25,6 +25,9 @@ type Step = "selectCard" | "selectPayment" | "payFromBalance";
 export const OpenCardDrawer = ({ open, onOpenChange }: OpenCardDrawerProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const settings = useSettings();
+  const VIRTUAL_CARD_ANNUAL_FEE = settings.VIRTUAL_CARD_ANNUAL_FEE;
+  const METAL_CARD_ANNUAL_FEE = settings.METAL_CARD_ANNUAL_FEE;
   const [step, setStep] = useState<Step>("selectCard");
   const [selectedCard, setSelectedCard] = useState<CardType>(null);
   const [selectedPaymentCardId, setSelectedPaymentCardId] = useState<string | null>(null);

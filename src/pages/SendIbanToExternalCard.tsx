@@ -11,7 +11,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useBankAccounts } from "@/hooks/useCards";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthToken } from "@/services/api/apiClient";
-import { BANK_TRANSFER_FEE_PERCENT } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import aedCurrency from "@/assets/aed-currency.png";
 
 // Format card number with spaces
@@ -100,6 +100,9 @@ const SendIbanToExternalCard = () => {
   const cleanCardNumber = cardNumber.replace(/\s/g, "");
   const isCardValid = cleanCardNumber.length === 16;
   const amountNum = parseFloat(amount) || 0;
+
+  const settings = useSettings();
+  const BANK_TRANSFER_FEE_PERCENT = settings.BANK_TRANSFER_FEE_PERCENT;
 
   const fee = amountNum * (BANK_TRANSFER_FEE_PERCENT / 100);
   const totalDebit = amountNum + fee;

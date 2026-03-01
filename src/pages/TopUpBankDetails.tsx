@@ -7,7 +7,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { TOP_UP_BANK_FEE_PERCENT, TOP_UP_BANK_MIN_AMOUNT } from "@/lib/fees";
+import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIban } from "@/hooks/useCards";
 
@@ -21,6 +21,9 @@ const TopUpBankDetails = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
+  const settings = useSettings();
+  const TOP_UP_BANK_FEE_PERCENT = settings.TOP_UP_BANK_FEE_PERCENT;
+  const TOP_UP_BANK_MIN_AMOUNT = settings.TOP_UP_BANK_MIN_AMOUNT;
 
   const userFullName = user?.full_name || "—";
 
