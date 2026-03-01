@@ -657,25 +657,36 @@ const TransactionDetails = () => {
               </motion.div>
             </div>
           ) : isCryptoToCard || isCryptoToBank || isCardToCrypto ? (
-            <motion.div 
-              className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
-              style={{ backgroundColor: isCardToCrypto ? "#007AFF" : isCryptoToBank ? (isIncomingCryptoToBank ? "#22C55E" : "#8B5CF6") : (isIncomingCryptoToCard ? "#22C55E" : "#007AFF") }}
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            >
-              <motion.div
-                initial={{ y: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? -80 : 80, x: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 80 : -80, opacity: 0 }}
-                animate={{ y: 0, x: 0, opacity: 1 }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: 0.15, 
-                  ease: [0.34, 1.56, 0.64, 1]
-                }}
+            <div className="relative">
+              <motion.div 
+                className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
+                style={{ backgroundColor: isCardToCrypto ? "#007AFF" : isCryptoToBank ? (isIncomingCryptoToBank ? "#22C55E" : "#8B5CF6") : (isIncomingCryptoToCard ? "#22C55E" : "#007AFF") }}
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               >
-                {isCardToCrypto ? <UsdtIcon size={40} /> : isCryptoToBank ? <Landmark className="w-10 h-10" strokeWidth={2} /> : <CreditCard className="w-10 h-10" strokeWidth={2} />}
+                <motion.div
+                  initial={{ y: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? -80 : 80, x: (isIncomingCryptoToCard || isIncomingCryptoToBank) ? 80 : -80, opacity: 0 }}
+                  animate={{ y: 0, x: 0, opacity: 1 }}
+                  transition={{ 
+                    duration: 0.6, 
+                    delay: 0.15, 
+                    ease: [0.34, 1.56, 0.64, 1]
+                  }}
+                >
+                  {isCardToCrypto ? <UsdtIcon size={40} /> : isCryptoToBank ? <Landmark className="w-10 h-10" strokeWidth={2} /> : <CreditCard className="w-10 h-10" strokeWidth={2} />}
+                </motion.div>
               </motion.div>
-            </motion.div>
+              {/* Crypto badge bottom-right */}
+              <motion.div
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-background border-2 border-background flex items-center justify-center shadow-sm"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, type: "spring", stiffness: 300 }}
+              >
+                <UsdtIcon size={16} />
+              </motion.div>
+            </div>
           ) : isCryptoSend ? (
             <motion.div 
               className="w-20 h-20 rounded-full flex items-center justify-center text-white overflow-hidden"
