@@ -439,6 +439,15 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     }
   }
 
+  // For iban_to_iban, use direction to determine incoming/outgoing
+  if (tx.type === 'iban_to_iban') {
+    if (tx.direction === 'inbound' || tx.amount > 0) {
+      mappedType = 'bank_transfer_incoming';
+    } else {
+      mappedType = 'bank_transfer';
+    }
+  }
+
   // For card_transfer: API always returns positive amount, use direction or operation or sender/recipient fields
   let isIncoming: boolean;
   if (mappedType === 'card_transfer') {
