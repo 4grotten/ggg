@@ -167,9 +167,8 @@ const CardPage = () => {
   // Fetch real card transactions from API, filtered by current card
   const currentCardType = cardTypes[activeIndex];
   const apiCard = apiCards.find(c => c.type === currentCardType);
-  const currentCardNumber = apiCard?.card_number;
   const currentCardId = apiCard?.id;
-  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(currentCardId, currentCardNumber);
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(currentCardId);
 
   const handleUnlock = () => {
     setIsUnlocking(true);
