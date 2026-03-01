@@ -21,6 +21,40 @@ import {
 import { useCards, useWalletSummary } from "@/hooks/useCards";
 import { useCardTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
+
+// Mock transactions for metal card
+const metalMockGroups = [
+  {
+    date: "January 12",
+    totalSpend: 250.00,
+    transactions: [
+      { id: "17", merchant: "Card Transfer", time: "15:30", amountUSDT: 250.00, amountLocal: 250.00, localCurrency: "AED", color: "#007AFF", type: "card_transfer" as const, recipientCard: "4521", status: "processing" as const },
+    ],
+  },
+  {
+    date: "January 10",
+    totalSpend: 193.60,
+    transactions: [
+      { id: "3", merchant: "Ongaku", time: "00:17", amountUSDT: 54.05, amountLocal: 193.60, localCurrency: "AED", color: "#F97316" },
+    ],
+  },
+  {
+    date: "January 02",
+    totalSpend: 225.00,
+    transactions: [
+      { id: "4", merchant: "OPERA", time: "20:20", amountUSDT: 62.82, amountLocal: 225.00, localCurrency: "AED", color: "#A855F7" },
+    ],
+  },
+  {
+    date: "December 30",
+    totalSpend: 996.50,
+    transactions: [
+      { id: "7", merchant: "BHPC", time: "20:16", amountUSDT: 125.64, amountLocal: 450.00, localCurrency: "AED", color: "#EAB308" },
+      { id: "11", merchant: "Service CEO", time: "07:58", amountUSDT: 11.59, amountLocal: 41.50, localCurrency: "AED", color: "#06B6D4" },
+      { id: "13", merchant: "Top up", time: "02:30", amountUSDT: 494.10, amountLocal: 500.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as const },
+    ],
+  },
+];
 // Animated number component for balance
 const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -79,18 +113,17 @@ const MetalCard = () => {
   // Fetch real balance from API
   const { data: cardsData } = useCards({ type: 'metal' });
   const apiCard = cardsData?.data?.[0];
-  const cardId = apiCard?.id;
 
-  // Get card UUID from wallet summary for server-side filtering
+  // Get full card number from wallet summary for client-side filtering
   const { data: walletSummary } = useWalletSummary();
   const metalCardInfo = walletSummary?.data?.cards?.find(c => c.type === 'metal');
-  const walletCardId = metalCardInfo?.id || cardId;
+  const cardNumber = metalCardInfo?.card_number;
 
-  // Fetch card transactions filtered by this card (server-side)
-  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(walletCardId);
+  // Fetch card transactions filtered by full card number (client-side)
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(cardNumber);
   
-  // Only API transactions, no mock data
-  const mergedGroups = cardTxGroups || [];
+  // Merge API transactions with mock data
+  const mergedGroups = [...(cardTxGroups || []), ...metalMockGroups];
 
   const cardData = {
     holderName: "RINAT KAMIEV",

@@ -164,11 +164,14 @@ const CardPage = () => {
   const { data: walletData } = useWalletSummary();
   const apiCards = walletData?.data?.cards || [];
 
-  // Fetch real card transactions from API, filtered by current card
+  // Fetch real card transactions from API, filtered by full card number
   const currentCardType = cardTypes[activeIndex];
   const apiCard = apiCards.find(c => c.type === currentCardType);
-  const currentCardId = apiCard?.id;
-  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(currentCardId);
+  const currentCardNumber = apiCard?.card_number;
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(currentCardNumber);
+
+  // Merge API transactions with mock data for current card
+  const mockGroups = cardsData[currentCardType].transactions;
 
   const handleUnlock = () => {
     setIsUnlocking(true);
@@ -182,7 +185,7 @@ const CardPage = () => {
   const formatCardNumber = (num: string) =>
     num.replace(/(.{4})/g, '$1 ').trim();
 
-  const mergedTransactions = cardTxGroups || [];
+  const mergedTransactions = [...(cardTxGroups || []), ...mockGroups];
 
   const cardData = {
     ...cardsData[currentCardType],

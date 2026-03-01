@@ -48,6 +48,34 @@ const AnimatedNumber = ({ value, duration = 800 }: { value: number; duration?: n
   return <>{displayValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>;
 };
 
+// Mock transactions for this card
+const virtualMockGroups = [
+  {
+    date: "January 10",
+    totalSpend: 125.87,
+    transactions: [
+      { id: "1", merchant: "LIFE", time: "13:02", amountUSDT: 8.34, amountLocal: 29.87, localCurrency: "AED", color: "#3B82F6" },
+      { id: "2", merchant: "ALAYA", time: "00:59", amountUSDT: 26.80, amountLocal: 96.00, localCurrency: "AED", color: "#22C55E" },
+    ],
+  },
+  {
+    date: "December 31",
+    totalSpend: 101.06,
+    transactions: [
+      { id: "5", merchant: "CELLAR", time: "20:48", amountUSDT: 22.06, amountLocal: 79.00, localCurrency: "AED", color: "#EAB308" },
+      { id: "6", merchant: "Top up", time: "20:46", amountUSDT: 194.10, amountLocal: 200.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as const },
+    ],
+  },
+  {
+    date: "December 21",
+    totalSpend: 204.55,
+    transactions: [
+      { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", type: "card_activation" as const },
+      { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup" as const },
+    ],
+  },
+];
+
 // Virtual card transactions (using IDs from TransactionDetails)
 const VirtualCard = () => {
   const navigate = useNavigate();
@@ -81,18 +109,17 @@ const VirtualCard = () => {
   // Fetch real balance from API
   const { data: cardsData } = useCards({ type: 'virtual' });
   const apiCard = cardsData?.data?.[0];
-  const cardId = apiCard?.id;
 
-  // Get card UUID from wallet summary for server-side filtering
+  // Get full card number from wallet summary for client-side filtering
   const { data: walletSummary } = useWalletSummary();
   const virtualCardInfo = walletSummary?.data?.cards?.find(c => c.type === 'virtual');
-  const walletCardId = virtualCardInfo?.id || cardId;
+  const cardNumber = virtualCardInfo?.card_number;
 
-  // Fetch card transactions filtered by this card (server-side)
-  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(walletCardId);
+  // Fetch card transactions filtered by full card number (client-side)
+  const { data: cardTxGroups, isLoading: txLoading } = useCardTransactionGroups(cardNumber);
   
-  // Only API transactions, no mock data
-  const mergedGroups = cardTxGroups || [];
+  // Merge API transactions with mock data
+  const mergedGroups = [...(cardTxGroups || []), ...virtualMockGroups];
 
   const cardData = {
     holderName: "RINAT KAMIEV",

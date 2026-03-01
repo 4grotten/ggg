@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { 
   fetchTransactions, 
   fetchTransactionGroups, 
@@ -21,7 +22,7 @@ export const transactionKeys = {
   groupsWithParams: (params?: FetchTransactionsParams) => [...transactionKeys.groups(), params] as const,
   apiGroups: () => [...transactionKeys.all, 'apiGroups'] as const,
   cryptoGroups: () => [...transactionKeys.all, 'cryptoGroups'] as const,
-  cardGroups: (cardId?: string) => [...transactionKeys.all, 'cardGroups', cardId] as const,
+  cardGroups: () => [...transactionKeys.all, 'cardGroups'] as const,
   ibanGroups: () => [...transactionKeys.all, 'ibanGroups'] as const,
   details: () => [...transactionKeys.all, 'detail'] as const,
   detail: (id: string) => [...transactionKeys.details(), id] as const,
@@ -70,17 +71,60 @@ export const useCryptoTransactionGroups = () => {
 
 /**
  * Hook to fetch card-related transactions from API
- * Filters server-side by specific card UUID
+ * Fetches ALL card transactions, then filters client-side by full card number.
  */
-export const useCardTransactionGroups = (cardId?: string) => {
+export const useCardTransactionGroups = (cardNumber?: string) => {
   const token = getAuthToken();
-  return useQuery<TransactionGroup[]>({
-    queryKey: transactionKeys.cardGroups(cardId),
-    queryFn: () => fetchCardTransactionGroups(cardId),
-    enabled: !!token && !!cardId,
+  const query = useQuery<TransactionGroup[]>({
+    queryKey: transactionKeys.cardGroups(),
+    queryFn: () => fetchCardTransactionGroups(),
+    enabled: !!token,
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
+
+  // Filter client-side by full card number
+  const filteredData = useMemo(() => {
+    if (!query.data || !cardNumber) return query.data;
+
+    // Remove spaces from the card number for comparison
+    const cleanCardNumber = cardNumber.replace(/\s/g, '');
+
+    return query.data
+      .map(group => ({
+        ...group,
+        transactions: group.transactions.filter(tx => {
+          // Check if this transaction involves this specific card (full number match)
+          const senderClean = tx.senderCard?.replace(/\s/g, '') || '';
+          const recipientClean = tx.recipientCard?.replace(/\s/g, '') || '';
+          const txCardId = tx.cardId || '';
+
+          // Match by full card number
+          if (senderClean === cleanCardNumber || recipientClean === cleanCardNumber) return true;
+
+          // Also check metadata for card masks that contain the full number
+          const meta = tx.metadata as Record<string, unknown> | undefined;
+          const senderMask = String(meta?.sender_card_mask || '').replace(/\s/g, '');
+          const receiverMask = String(meta?.receiver_card_mask || '').replace(/\s/g, '');
+          if (senderMask === cleanCardNumber || receiverMask === cleanCardNumber) return true;
+
+          // For card_activation or payment types, match by card_id if present
+          if (tx.type === 'card_activation' || tx.type === 'payment') {
+            // These may not have sender/recipient card but belong to a specific card
+            // We can't filter these without card_id, so include them if no card number info
+            if (!tx.senderCard && !tx.recipientCard && !senderMask && !receiverMask) return true;
+          }
+
+          return false;
+        }),
+      }))
+      .filter(group => group.transactions.length > 0);
+  }, [query.data, cardNumber]);
+
+  return {
+    ...query,
+    data: filteredData,
+  };
 };
 
 /**
