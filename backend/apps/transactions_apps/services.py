@@ -468,7 +468,8 @@ class TransactionService:
             "fee_usdt": float(crypto_fee),
             "total_debited_usdt": float(total_deduction),
             "exchange_rate_usdt_to_aed": float(buy_rate),
-            "credited_aed": float(amount_aed),
+            "credited_amount_aed": float(amount_aed),
+            "fiat_amount_aed": float(amount_aed),
         }
         
         txn = Transactions.objects.create(
