@@ -399,13 +399,16 @@ const handleClick = (transaction: Transaction) => {
                           ? ` · ${t("transactions.to")} •••• ${(transaction.recipientCard || transaction.senderCard || '').slice(-4)}`
                           : isIncomingIbanToIban
                           ? (() => {
+                              const sender = transaction.senderName || (transaction.metadata as any)?.sender_name || '';
+                              const receiver = transaction.recipientName || (transaction.metadata as any)?.beneficiary_name || '';
+                              if (sender && receiver) return ` · ${sender} → ${receiver}`;
+                              if (sender) return ` · ${t("transactions.from")} ${sender}`;
                               const senderIban = (transaction.metadata as any)?.senderIban || '';
                               if (senderIban) {
                                 const display = senderIban.replace(/\s*\*+\s*/g, '••••');
                                 return ` · ${t("transactions.from")} ${display}`;
                               }
-                              const name = transaction.senderName || (transaction.metadata as any)?.sender_name || '';
-                              return name ? ` · ${t("transactions.from")} ${maskMiddle(name)}` : '';
+                              return '';
                             })()
                           : isBankTransferIncoming && ((transaction.metadata as any)?.beneficiary_iban || transaction.senderName || (transaction.metadata as any)?.beneficiary_name)
                           ? (() => {
@@ -426,6 +429,19 @@ const handleClick = (transaction: Transaction) => {
                               }
                               const name = (transaction.metadata as any)?.beneficiary_name || transaction.recipientName;
                               if (name) return ` · ${t("transactions.to")} ${maskMiddle(name)}`;
+                              return '';
+                            })()
+                          : isIbanToIban
+                          ? (() => {
+                              const sender = transaction.senderName || (transaction.metadata as any)?.sender_name || '';
+                              const receiver = transaction.recipientName || (transaction.metadata as any)?.beneficiary_name || '';
+                              if (sender && receiver) return ` · ${sender} → ${receiver}`;
+                              if (receiver) return ` · ${t("transactions.to")} ${receiver}`;
+                              const iban = (transaction.metadata as any)?.beneficiary_iban;
+                              if (iban) {
+                                const display = `${iban.slice(0, 4)}••••${iban.slice(-4)}`;
+                                return ` · ${t("transactions.to")} ${display}`;
+                              }
                               return '';
                             })()
                           : isBankTransfer && !isOutgoingCryptoToBank && transaction.merchant === 'IBAN to Card'
