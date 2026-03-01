@@ -594,7 +594,8 @@ class TransactionInfoView(APIView):
             info["exchange_rate"] = usdt_to_aed_sell
             info["currency_to"] = "USDT"
         elif tx_type in ["crypto_to_card", "crypto_to_bank", "crypto_to_iban"]:
-            info["service_fee_flat"] = float(SettingsManager.get_setting('fees', 'top_up_crypto_flat', 5.90, user_id))
+            info["service_fee_percent"] = float(SettingsManager.get_setting('fees', 'network_fee_percent', 1.0, user_id))
+            info["network_fee_flat"] = float(SettingsManager.get_setting('fees', 'top_up_crypto_flat', 5.90, user_id))
             info["exchange_rate"] = usdt_to_aed_buy
             info["currency_from"] = "USDT"
         elif tx_type in ["crypto_to_crypto", "crypto_withdrawal"]:

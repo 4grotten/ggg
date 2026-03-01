@@ -129,9 +129,13 @@ const SendCryptoToCard = () => {
   const numericAmount = parseFloat(amount.replace(/,/g, "")) || 0;
   
   // Dynamic fee & limits from API
-  const COMMISSION_PERCENT = txInfo?.fee_value ?? 1;
-  const feeIsPercent = (txInfo?.fee_type ?? "percent") === "percent";
-  const commission = feeIsPercent ? numericAmount * (COMMISSION_PERCENT / 100) : COMMISSION_PERCENT;
+  const serviceFeePercent = txInfo?.service_fee_percent ?? txInfo?.fee_value ?? 1;
+  const networkFeeFlat = txInfo?.network_fee_flat ?? 0;
+  const feeIsComposite = txInfo?.fee_type === "composite";
+  const feeIsPercent = feeIsComposite || (txInfo?.fee_type ?? "percent") === "percent";
+  const COMMISSION_PERCENT = serviceFeePercent;
+  const serviceFee = feeIsPercent ? numericAmount * (serviceFeePercent / 100) : 0;
+  const commission = serviceFee + networkFeeFlat;
   const totalDebitUsdt = numericAmount + commission;
   const API_MIN_AMOUNT = txInfo?.min_amount ?? 0;
   const API_MAX_AMOUNT = txInfo?.max_amount ?? Infinity;
@@ -382,7 +386,7 @@ const SendCryptoToCard = () => {
               <div className="flex justify-between text-xs text-muted-foreground px-1">
                 <span>{t("send.available")}: {walletBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                 <button onClick={() => {
-                  const maxRaw = feeIsPercent ? walletBalance / (1 + COMMISSION_PERCENT / 100) : walletBalance - COMMISSION_PERCENT;
+                  const maxRaw = walletBalance / (1 + serviceFeePercent / 100) - networkFeeFlat;
                   const clamped = Math.min(maxRaw, API_MAX_AMOUNT);
                   const maxAmount = Math.max(0, Math.floor(clamped * 100) / 100);
                   setAmount(maxAmount.toFixed(2));
@@ -396,7 +400,10 @@ const SendCryptoToCard = () => {
                 <div className="flex justify-between"><span className="text-muted-foreground">{t("send.exchangeRate", "Курс обмена")}</span><span>1 USDT = {usdtToAed.toFixed(2)} AED</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">{t("send.recipientGets", "Получатель получит")}</span><span className="font-semibold text-green-600">{recipientGetsAed.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span></div>
                 <div className="h-px bg-border" />
-                <div className="flex justify-between"><span className="text-muted-foreground">{t("send.fee")} {feeIsPercent ? `(${COMMISSION_PERCENT}%)` : ""}</span><span>{commission.toFixed(2)} USDT</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">{t("send.fee")} ({serviceFeePercent}%)</span><span>{serviceFee.toFixed(2)} USDT</span></div>
+                {networkFeeFlat > 0 && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t("transaction.networkFeeFlat", "Сбор сети")}</span><span>{networkFeeFlat.toFixed(2)} USDT</span></div>
+                )}
                 <div className="h-px bg-border" />
                 <div className="flex justify-between font-semibold"><span>{t("send.totalDebit", "Итого к списанию")}</span><span>{totalDebitUsdt.toFixed(2)} USDT</span></div>
               </motion.div>
@@ -441,7 +448,10 @@ const SendCryptoToCard = () => {
                   <div className="flex justify-between"><span className="text-muted-foreground">{t("send.exchangeRate", "Курс")}</span><span>1 USDT = {usdtToAed.toFixed(2)} AED</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">{t("send.recipientGets", "Получатель получит")}</span><span className="font-semibold text-green-600">{recipientGetsAed.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span></div>
                   <div className="h-px bg-border" />
-                  <div className="flex justify-between"><span className="text-muted-foreground">{t("send.fee")} {feeIsPercent ? `(${COMMISSION_PERCENT}%)` : ""}</span><span>{commission.toFixed(2)} USDT</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t("send.fee")} ({serviceFeePercent}%)</span><span>{serviceFee.toFixed(2)} USDT</span></div>
+                  {networkFeeFlat > 0 && (
+                    <div className="flex justify-between"><span className="text-muted-foreground">{t("transaction.networkFeeFlat", "Сбор сети")}</span><span>{networkFeeFlat.toFixed(2)} USDT</span></div>
+                  )}
                   <div className="h-px bg-border" />
                   <div className="flex justify-between font-bold text-base"><span>{t("send.totalDebit", "Итого")}</span><span>{totalDebitUsdt.toFixed(2)} USDT</span></div>
                 </div>
