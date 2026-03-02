@@ -1744,6 +1744,7 @@
       "txHistoryAlertTitle": "Warning",
       "txHistoryAlertDesc": "Viewing the transaction history will be logged in the audit system. All Admins and Root users will be notified. This record will remain in the audit history.",
       "txHistoryAlertConfirm": "Continue",
+      "whoEntered": "Who entered",
       "blockUserTitle": "Block User",
       "unblockUserTitle": "Unblock User",
       "blockUserDesc": "User {{name}} will be blocked. They won't be able to send/receive transfers, top up, or perform any operations. This action will be logged in the audit system. All Admins and Root users will be notified. The record will remain in the audit history.",

@@ -1674,6 +1674,7 @@
       "txHistoryAlertTitle": "Achtung",
       "txHistoryAlertDesc": "Das Aufrufen des Transaktionsverlaufs wird im Audit-System protokolliert. Alle Admins und Root-Benutzer werden benachrichtigt. Der Eintrag bleibt in der Audit-Historie.",
       "txHistoryAlertConfirm": "Fortfahren",
+      "whoEntered": "Wer hat zugegriffen",
       "blockUserTitle": "Benutzer sperren",
       "unblockUserTitle": "Benutzer entsperren",
       "blockUserDesc": "Benutzer {{name}} wird gesperrt. Er kann keine Überweisungen senden/empfangen, kein Guthaben aufladen oder andere Operationen durchführen. Diese Aktion wird im Audit-System protokolliert. Alle Admins und Root-Benutzer werden benachrichtigt. Der Eintrag bleibt in der Audit-Historie.",

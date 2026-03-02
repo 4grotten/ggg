@@ -1674,6 +1674,7 @@
       "txHistoryAlertTitle": "Uyarı",
       "txHistoryAlertDesc": "İşlem geçmişini görüntüleme, denetim sistemine kaydedilecektir. Tüm Yöneticiler ve Root kullanıcıları bilgilendirilecektir. Bu kayıt denetim geçmişinde kalacaktır.",
       "txHistoryAlertConfirm": "Devam et",
+      "whoEntered": "Kim girdi",
       "blockUserTitle": "Kullanıcıyı engelle",
       "unblockUserTitle": "Kullanıcı engelini kaldır",
       "blockUserDesc": "Kullanıcı {{name}} engellenecek. Transfer gönderip alamayacak, bakiye yükleyemeyecek veya herhangi bir işlem yapamayacak. Bu işlem denetim sistemine kaydedilecektir. Tüm Yöneticiler ve Root kullanıcıları bilgilendirilecektir. Kayıt denetim geçmişinde kalacaktır.",
