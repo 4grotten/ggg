@@ -951,18 +951,8 @@ class AdminUserLimitDetailView(APIView):
         old_state = UserLimitsSerializer(profile).data
         old_state['role'] = target_role
 
-        # Normalize None -> 0 for numeric fields so audit log always shows real values
-        numeric_limit_fields = [
-            'transfer_min', 'transfer_max', 'daily_transfer_limit', 'monthly_transfer_limit',
-            'withdrawal_min', 'withdrawal_max', 'daily_withdrawal_limit', 'monthly_withdrawal_limit',
-            'daily_top_up_limit', 'monthly_top_up_limit',
-            'daily_usdt_send_limit', 'monthly_usdt_send_limit',
-            'daily_usdt_receive_limit', 'monthly_usdt_receive_limit',
-            'card_to_card_percent', 'bank_transfer_percent', 'network_fee_percent', 'currency_conversion_percent',
-        ]
-        for nf in numeric_limit_fields:
-            if nf in old_state and old_state[nf] is None:
-                old_state[nf] = 0
+
+
 
         limit_keys = [
             'transfer_min', 'transfer_max', 'daily_transfer_limit', 'monthly_transfer_limit', 
@@ -1003,9 +993,8 @@ class AdminUserLimitDetailView(APIView):
 
             new_state = UserLimitsSerializer(profile).data
             new_state['role'] = target_role
-            for nf in numeric_limit_fields:
-                if nf in new_state and new_state[nf] is None:
-                    new_state[nf] = 0
+
+
 
             changes = {}
             for key in set(old_state.keys()) | set(new_state.keys()):
