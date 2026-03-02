@@ -997,6 +997,7 @@
     "transferInitiated": "Transfer initiated"
   },
   "auth": {
+    "enterPasswordToAccess": "Enter your account password to access",
     "resetPassword": {
       "title": "Forgot password?",
       "description": "Enter your phone number to recover access",

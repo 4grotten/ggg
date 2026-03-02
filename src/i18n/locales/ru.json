@@ -983,6 +983,7 @@
     "transferInitiated": "Перевод инициирован"
   },
   "auth": {
+    "enterPasswordToAccess": "Введите пароль аккаунта для доступа",
     "resetPassword": {
       "title": "Забыли пароль?",
       "description": "Введите номер телефона для восстановления",

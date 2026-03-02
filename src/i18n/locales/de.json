@@ -908,6 +908,7 @@
     "transferInitiated": "Überweisung eingeleitet"
   },
   "auth": {
+    "enterPasswordToAccess": "Geben Sie Ihr Kontopasswort ein, um fortzufahren",
     "resetPassword": {
       "title": "Passwort vergessen?",
       "description": "Geben Sie Ihre Telefonnummer ein, um den Zugang wiederherzustellen",
