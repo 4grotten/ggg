@@ -5,6 +5,8 @@ from apps.cards_apps.models import Cards
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from decimal import Decimal
+from apps.transactions_apps.models import Transactions
+from django.db.models import Q
 
 def get_user_tail(user_id):
     return str(user_id).zfill(6)[-6:]
@@ -118,3 +120,43 @@ class WalletSummaryView(APIView):
             },
             "cards": cards_data
         }, status=status.HTTP_200_OK)
+    
+
+class CardTransactionsListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="История транзакций по ID карты",
+        operation_description="Возвращает список всех транзакций, привязанных к конкретной карте (пополнения, списания, переводы).",
+        tags=["Cards"]
+    )
+    def get(self, request, card_id):
+        card = Cards.objects.filter(id=card_id, user_id=str(request.user.id)).first()
+        if not card:
+            return Response({"error": "Карта не найдена или доступ запрещен"}, status=status.HTTP_404_NOT_FOUND)
+        transactions_qs = Transactions.objects.filter(
+            Q(card_id=card.id) | 
+            Q(sender_card=card.card_number_encrypted) | 
+            Q(recipient_card=card.card_number_encrypted)
+        ).order_by('-created_at').values()
+
+        transactions = []
+        uid = str(request.user.id)
+
+        for tx in transactions_qs:
+            tx['amount'] = float(tx.get('amount') or 0)
+            tx['fee'] = float(tx.get('fee') or 0) if tx.get('fee') is not None else None
+            tx['exchange_rate'] = float(tx.get('exchange_rate') or 0) if tx.get('exchange_rate') is not None else None
+            tx['original_amount'] = float(tx.get('original_amount') or 0) if tx.get('original_amount') is not None else None
+            sender_id = str(tx.get('sender_id')) if tx.get('sender_id') else None
+            receiver_id = str(tx.get('receiver_id')) if tx.get('receiver_id') else None
+            if sender_id == uid and receiver_id == uid:
+                tx['direction'] = 'internal'
+            elif receiver_id == uid or tx.get('recipient_card') == card.card_number_encrypted:
+                tx['direction'] = 'inbound'
+            else:
+                tx['direction'] = 'outbound'
+                
+            transactions.append(tx)
+
+        return Response({"card_id": card_id, "transactions": transactions}, status=status.HTTP_200_OK)

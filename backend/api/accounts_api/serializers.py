@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from apps.accounts_apps.models import Profiles, Contacts, AdminSettings
-
+from apps.accounts_apps.models import AdminActionHistory
 
 class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -55,3 +55,9 @@ class UserLimitsSerializer(serializers.ModelSerializer):
             'is_blocked', 'is_vip', 'subscription_type', 'referral_level',
             'first_name', 'last_name', 'gender', 'language', 'avatar_url'
         ]
+
+
+class AdminActionHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminActionHistory
+        fields = '__all__'

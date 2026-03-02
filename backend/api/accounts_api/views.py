@@ -5,7 +5,7 @@ import requests
 from django.db.models import Q
 from apps.cards_apps.models import Cards
 from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets, Transactions
-from api.accounts_api.serializers import AdminSettingsSerializer, ContactSerializer, UserLimitsSerializer
+from api.accounts_api.serializers import AdminActionHistorySerializer, AdminSettingsSerializer, ContactSerializer, UserLimitsSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -18,6 +18,8 @@ from apps.accounts_apps.models import AdminSettings, Contacts, Profiles
 from .apofiz_client import ApofizClient
 from django.db.models import Sum, Count
 from apps.accounts_apps.models import UserRoles
+from apps.accounts_apps.models import AdminActionHistory, UserRoles
+
 
 def generate_uid_tail(user_id):
     return str(user_id).zfill(6)[-6:]
@@ -651,47 +653,42 @@ class AdminUserLimitsListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
     @swagger_auto_schema(
-        operation_summary="Список пользователей с полной информацией (Админ)",
+        operation_summary="Список пользователей с полной информацией (Админ/Root)",
         tags=["Админ: Управление пользователями"]
     )
     def get(self, request):
         profiles = Profiles.objects.all().order_by('-created_at')
         serializer = UserLimitsSerializer(profiles, many=True)
-
-        # Prefetch aggregated data for all users at once
         user_ids = [p.user_id for p in profiles]
 
-        # Cards: count and total balance per user
         cards_agg = {}
         for row in Cards.objects.filter(user_id__in=user_ids).values('user_id').annotate(
             cards_count=Count('id'), total_cards_balance=Sum('balance')
         ):
             cards_agg[row['user_id']] = row
 
-        # Bank accounts count per user
         accounts_agg = {}
         for row in BankDepositAccounts.objects.filter(user_id__in=user_ids).values('user_id').annotate(
             accounts_count=Count('id'), total_bank_balance=Sum('balance')
         ):
             accounts_agg[row['user_id']] = row
-
-        # Crypto wallets per user
         crypto_agg = {}
         for row in CryptoWallets.objects.filter(user_id__in=user_ids).values('user_id').annotate(
             wallets_count=Count('id'), total_crypto_balance=Sum('balance')
         ):
             crypto_agg[row['user_id']] = row
-
-        # Roles per user (highest priority role)
         roles_map = {}
         for role_row in UserRoles.objects.filter(user_id__in=user_ids).values('user_id', 'role'):
             uid = role_row['user_id']
             role = role_row['role']
-            # Priority: admin > moderator > user
-            if uid not in roles_map or (role == 'admin') or (role == 'moderator' and roles_map[uid] != 'admin'):
+            if uid not in roles_map:
                 roles_map[uid] = role
-
-        # Prefetch User objects for name fallback
+            else:
+                current_role = roles_map[uid]
+                if role == 'root':
+                    roles_map[uid] = 'root'
+                elif role == 'admin' and current_role != 'root':
+                    roles_map[uid] = 'admin'
         numeric_uids = [uid for uid in user_ids if str(uid).isdigit()]
         users_map = {}
         if numeric_uids:
@@ -700,7 +697,6 @@ class AdminUserLimitsListView(APIView):
 
         data = []
         for i, profile in enumerate(profiles):
-            # Try profile first, then User model
             fname = getattr(profile, 'first_name', None) or ''
             lname = getattr(profile, 'last_name', None) or ''
             full_name = f"{fname} {lname}".strip()
@@ -714,11 +710,8 @@ class AdminUserLimitsListView(APIView):
             c = cards_agg.get(uid, {})
             a = accounts_agg.get(uid, {})
             w = crypto_agg.get(uid, {})
-
-            # Simple verification check: has name + avatar
             is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
 
-            # Get email from User model
             user_obj = users_map.get(uid)
             email = user_obj.email if user_obj else ''
 
@@ -731,9 +724,9 @@ class AdminUserLimitsListView(APIView):
                 "language": getattr(profile, 'language', None),
                 "avatar_url": getattr(profile, 'avatar_url', None),
                 "created_at": profile.created_at.isoformat() if profile.created_at else None,
-                "role": roles_map.get(uid, 'user'),
+                "role": roles_map.get(uid, 'user'), # <-- Возвращает root, admin или user
                 "is_verified": is_verified,
-                "referral_level": None,  # TODO: add when referral model exists
+                "referral_level": getattr(profile, 'referral_level', 'r1'),  # <-- Убрал твою заглушку null, берет из БД
                 "cards_count": c.get('cards_count', 0),
                 "total_cards_balance": float(c.get('total_cards_balance', 0) or 0),
                 "accounts_count": a.get('accounts_count', 0),
@@ -751,7 +744,7 @@ class AdminUserDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Полная информация о пользователе (Админ)",
+        operation_summary="Полная информация о пользователе (Админ/Root)",
         tags=["Админ: Управление пользователями"]
     )
     def get(self, request, user_id):
@@ -759,8 +752,9 @@ class AdminUserDetailView(APIView):
         profile = Profiles.objects.filter(user_id=uid).first()
         if not profile:
             return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
+        user_role_obj = UserRoles.objects.filter(user_id=uid).first()
+        current_role = user_role_obj.role if user_role_obj else 'user'
 
-        is_admin_status = False
         fname = getattr(profile, 'first_name', None) or ''
         lname = getattr(profile, 'last_name', None) or ''
         full_name = f"{fname} {lname}".strip()
@@ -772,7 +766,6 @@ class AdminUserDetailView(APIView):
                 if not full_name:
                     full_name = f"{user_obj.first_name or ''} {user_obj.last_name or ''}".strip()
                 email = user_obj.email or ''
-                is_admin_status = user_obj.is_staff or user_obj.is_superuser 
             except User.DoesNotExist:
                 pass
 
@@ -831,7 +824,7 @@ class AdminUserDetailView(APIView):
             "avatar_url": getattr(profile, 'avatar_url', None),
             "created_at": profile.created_at.isoformat() if profile.created_at else None,
             "is_verified": is_verified,
-            "is_admin": is_admin_status,
+            "role": current_role,
             "is_blocked": profile.is_blocked,
             "is_vip": profile.is_vip,
             "subscription_type": profile.subscription_type,
@@ -849,19 +842,31 @@ class AdminUserLimitDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Изменить лимиты и данные конкретного пользователя (PATCH)",
+        operation_summary="Изменить лимиты, роли и данные пользователя (Root/Admin)",
         tags=["Админ: Управление пользователями"]
     )
     def patch(self, request, user_id):
         profile = Profiles.objects.filter(user_id=str(user_id)).first()
         if not profile:
             return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
-        
-        is_admin_flag = request.data.get('is_admin')
+        acting_user_role_obj = UserRoles.objects.filter(user_id=str(request.user.id)).first()
+        acting_role = acting_user_role_obj.role if acting_user_role_obj else 'user'
+        if acting_role not in ['root', 'admin']:
+            return Response({"error": "У вас нет прав для выполнения этой операции"}, status=status.HTTP_403_FORBIDDEN)
+        new_role = request.data.get('role')
+        target_user_role_obj = UserRoles.objects.filter(user_id=profile.user_id).first()
+        target_role = target_user_role_obj.role if target_user_role_obj else 'user'
+
+        if new_role and new_role != target_role:
+            if acting_role != 'root':
+                return Response({"error": "Только Root может назначать или изменять роли"}, status=status.HTTP_403_FORBIDDEN)
+        old_state = UserLimitsSerializer(profile).data
+        old_state['role'] = target_role
         limit_keys = [
             'transfer_min', 'transfer_max', 'daily_transfer_limit', 'monthly_transfer_limit', 
             'withdrawal_min', 'withdrawal_max', 'daily_withdrawal_limit', 'monthly_withdrawal_limit',
-            'card_to_card_percent', 'bank_transfer_percent', 'network_fee_percent', 'currency_conversion_percent'
+            'card_to_card_percent', 'bank_transfer_percent', 'network_fee_percent', 'currency_conversion_percent',
+            'is_blocked', 'is_vip', 'subscription_type', 'referral_level'
         ]
         data = request.data.copy() if hasattr(request.data, 'copy') else request.data
         if any(k in data for k in limit_keys):
@@ -869,34 +874,54 @@ class AdminUserLimitDetailView(APIView):
         serializer = UserLimitsSerializer(profile, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            is_admin_status = False
+            if new_role and new_role != target_role:
+                if target_user_role_obj:
+                    target_user_role_obj.role = new_role
+                    target_user_role_obj.save()
+                else:
+                    UserRoles.objects.create(user_id=profile.user_id, role=new_role)
+                target_role = new_role
+                if profile.user_id.isdigit():
+                    try:
+                        django_user = User.objects.get(id=int(profile.user_id))
+                        is_admin_val = (new_role in ['root', 'admin'])
+                        django_user.is_staff = is_admin_val
+                        django_user.is_superuser = (new_role == 'root')
+                        django_user.save()
+                    except User.DoesNotExist:
+                        pass
             fname = getattr(profile, 'first_name', None) or ''
             lname = getattr(profile, 'last_name', None) or ''
-            full_name = f"{fname} {lname}".strip()
-            if profile.user_id and str(profile.user_id).isdigit():
-                try:
-                    user = User.objects.get(id=int(profile.user_id))
-                    if not full_name:
-                        full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
+            full_name = f"{fname} {lname}".strip() or "Unknown User"
+            new_state = UserLimitsSerializer(profile).data
+            new_state['role'] = target_role
+            changes = {}
+            for key in set(old_state.keys()) | set(new_state.keys()):
+                old_val = old_state.get(key)
+                new_val = new_state.get(key)
+                if str(old_val) != str(new_val):
+                    changes[key] = {'было': old_val, 'стало': new_val}
+            if changes:
+                action_type = "UPDATE_USER_DATA"
+                if new_role and new_role != old_state['role']:
+                    action_type = "ROLE_CHANGED"
+                
+                AdminActionHistory.objects.create(
+                    admin_id=str(request.user.id),
+                    admin_name=request.user.get_full_name() or request.user.username,
+                    action=action_type,
+                    target_user_id=profile.user_id,
+                    target_user_name=full_name,
+                    details={"changes": changes, "acting_role": acting_role},
+                    ip_address=request.META.get('REMOTE_ADDR'),
+                    user_agent=request.META.get('HTTP_USER_AGENT')
+                )
 
-                    if is_admin_flag is not None:
-                        is_admin_val = str(is_admin_flag).lower() == 'true' if isinstance(is_admin_flag, str) else bool(is_admin_flag)
-                        user.is_staff = is_admin_val
-                        user.is_superuser = is_admin_val
-                        user.save()
-                        
-                    is_admin_status = user.is_staff
-                except User.DoesNotExist:
-                    pass
-            
             return Response({
                 "user_id": profile.user_id,
-                "full_name": full_name or "Unknown User",
+                "full_name": full_name,
                 "phone": getattr(profile, 'phone', ''),
-                "gender": getattr(profile, 'gender', ''),
-                "language": getattr(profile, 'language', 'en'),
-                "avatar_url": getattr(profile, 'avatar_url', None),
-                "is_admin": is_admin_status,
+                "role": target_role,
                 "is_blocked": profile.is_blocked,
                 "is_vip": profile.is_vip,
                 "subscription_type": profile.subscription_type,
@@ -905,3 +930,28 @@ class AdminUserLimitDetailView(APIView):
             }, status=status.HTTP_200_OK)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class AdminActionHistoryView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="История действий администраторов (Аудит)",
+        operation_description="Получить общий список логов или отфильтровать по конкретному админу (передав параметр ?admin_id=... в URL).",
+        manual_parameters=[
+            openapi.Parameter('admin_id', openapi.IN_QUERY, description="ID администратора для фильтрации", type=openapi.TYPE_STRING)
+        ],
+        tags=["Админ: Аудит"]
+    )
+    def get(self, request):
+        acting_user_role_obj = UserRoles.objects.filter(user_id=str(request.user.id)).first()
+        acting_role = acting_user_role_obj.role if acting_user_role_obj else 'user'
+        if acting_role not in ['root', 'admin']:
+            return Response({"error": "Доступ запрещен. Только администраторы могут просматривать аудит."}, status=status.HTTP_403_FORBIDDEN)
+        admin_id_filter = request.query_params.get('admin_id')
+        queryset = AdminActionHistory.objects.all().order_by('-created_at')
+        if admin_id_filter:
+            queryset = queryset.filter(admin_id=admin_id_filter)
+        queryset = queryset[:200]
+        serializer = AdminActionHistorySerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

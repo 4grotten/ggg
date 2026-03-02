@@ -71,20 +71,22 @@ class Profiles(models.Model):
     is_vip = models.BooleanField(default=False, help_text="VIP статус")
     
     SUBSCRIPTION_CHOICES = [
-        ('default', 'Бесплатная (Дефолт)'),
-        ('standard', 'Стандартная'),
-        ('premium', 'Премиум'),
+        ('smart', 'Smart'),
+        ('agent', 'Agent'),
+        ('pro', 'PRO'),
         ('vip', 'VIP'),
+        ('partner', 'Партнер'),
     ]
     subscription_type = models.CharField(max_length=50, choices=SUBSCRIPTION_CHOICES, default='default')
     
     REFERRAL_CHOICES = [
-        ('R1(DEFAULT)', 'R1 (Default)'),
-        ('R2', 'R2'),
-        ('R3', 'R3'),
-        ('R4', 'R4'),
-        ('Partner', 'Partner'),
+        ('r1', 'R1 (Default)'),
+        ('r2', 'R2'),
+        ('r3', 'R3'),
+        ('r4', 'R4'),
+        ('partner', 'Partner'),
     ]
+    
     referral_level = models.CharField(max_length=50, choices=REFERRAL_CHOICES, default='R1(DEFAULT)')
 
     class Meta:
