@@ -19,7 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
 import { cn } from "@/lib/utils";
-import { apiRequest } from "@/services/api/apiClient";
+import { apiRequest, apiPost } from "@/services/api/apiClient";
 import { BackendClientDetail } from "@/hooks/useAdminManagement";
 import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
 import { ApiTransaction, mapApiTransactionToLocal } from "@/services/api/transactions";
@@ -205,6 +205,18 @@ export default function AdminClientTransactionHistory() {
   });
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  // Log that admin/root viewed this user's transaction history
+  useEffect(() => {
+    if (!userId) return;
+    apiPost('/admin/audit-history/log/', {
+      action: 'VIEW_TRANSACTION_HISTORY',
+      target_user_id: userId,
+      details: { page: 'transaction_history' },
+    }).catch(() => {
+      // Silent fail — logging should not block the UI
+    });
+  }, [userId]);
 
   useEffect(() => {
     const activeTab = tabRefs.current.get(activeFilter);
