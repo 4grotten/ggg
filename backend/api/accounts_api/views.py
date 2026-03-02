@@ -284,13 +284,92 @@ class CurrentUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Получить текущего пользователя (Apofiz)",
-        operation_description="**[Прокси на Apofiz: GET /users/me/]**\nЗабирает свежие данные профиля с сервера Apofiz.",
+        operation_summary="Получить текущего пользователя (Детально)",
+        operation_description="Синхронизируется с Apofiz и возвращает полную сводку по текущему пользователю (карты, счета, кошельки, лимиты, роль). Аналогично AdminUserDetailView.",
         tags=["Профиль пользователя"]
     )
     def get(self, request):
-        status_code, data = ApofizClient.get_me(request.auth.key)
-        return Response(data, status=status_code)
+        uid = str(request.user.id)
+        status_code, apofiz_data = ApofizClient.get_me(request.auth.key)
+        if status_code == 200 and apofiz_data:
+            sync_apofiz_token_and_user(request.user.username, request.auth.key, apofiz_data)
+        profile = Profiles.objects.filter(user_id=uid).first()
+        if not profile:
+            return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
+        user_role_obj = UserRoles.objects.filter(user_id=uid).first()
+        current_role = user_role_obj.role if user_role_obj else 'user'
+
+        fname = getattr(profile, 'first_name', None) or ''
+        lname = getattr(profile, 'last_name', None) or ''
+        full_name = f"{fname} {lname}".strip()
+        
+        if not full_name:
+            full_name = f"{request.user.first_name or ''} {request.user.last_name or ''}".strip()
+        cards_qs = Cards.objects.filter(user_id=uid).values()
+        cards = []
+        for c in cards_qs:
+            c.pop('cvv', None)
+            c.pop('cvc', None)
+            c['balance'] = float(c.get('balance') or 0)
+            cards.append(c)
+        accounts_qs = BankDepositAccounts.objects.filter(user_id=uid).values()
+        accounts = []
+        for a in accounts_qs:
+            a['balance'] = float(a.get('balance') or 0)
+            accounts.append(a)
+        wallets_qs = CryptoWallets.objects.filter(user_id=uid).values()
+        wallets = []
+        for w in wallets_qs:
+            w['balance'] = float(w.get('balance') or 0)
+            wallets.append(w)
+        transactions_qs = Transactions.objects.filter(
+            Q(user_id=uid) | Q(sender_id=uid) | Q(receiver_id=uid)
+        ).order_by('-created_at')[:5].values()
+        
+        transactions = []
+        for tx in transactions_qs:
+            tx['amount'] = float(tx.get('amount') or 0)
+            tx['fee'] = float(tx.get('fee') or 0) if tx.get('fee') is not None else None
+            tx['exchange_rate'] = float(tx.get('exchange_rate') or 0) if tx.get('exchange_rate') is not None else None
+            tx['original_amount'] = float(tx.get('original_amount') or 0) if tx.get('original_amount') is not None else None
+
+            sender_id = str(tx.get('sender_id')) if tx.get('sender_id') else None
+            receiver_id = str(tx.get('receiver_id')) if tx.get('receiver_id') else None
+            
+            if sender_id == uid and receiver_id == uid:
+                tx['direction'] = 'internal'
+            elif receiver_id == uid:
+                tx['direction'] = 'inbound'
+            else:
+                tx['direction'] = 'outbound'
+                
+            transactions.append(tx)
+
+        limits_serializer = UserLimitsSerializer(profile)
+        is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
+        
+        return Response({
+            "user_id": uid,
+            "full_name": full_name or "Unknown User",
+            "phone": getattr(profile, 'phone', ''),
+            "email": request.user.email or '',
+            "gender": getattr(profile, 'gender', None),
+            "language": getattr(profile, 'language', None),
+            "avatar_url": getattr(profile, 'avatar_url', None),
+            "created_at": profile.created_at.isoformat() if profile.created_at else None,
+            "is_verified": is_verified,
+            "role": current_role,
+            "is_blocked": profile.is_blocked,
+            "is_vip": profile.is_vip,
+            "subscription_type": profile.subscription_type,
+            "referral_level": profile.referral_level,
+            "cards": cards,
+            "accounts": accounts,
+            "wallets": wallets,
+            "transactions": transactions,
+            "limits_and_settings": limits_serializer.data,
+            "apofiz_data": apofiz_data if status_code == 200 else None
+        }, status=status.HTTP_200_OK)
 
 
 class InitProfileView(APIView):
@@ -846,22 +925,32 @@ class AdminUserLimitDetailView(APIView):
         tags=["Админ: Управление пользователями"]
     )
     def patch(self, request, user_id):
-        profile = Profiles.objects.filter(user_id=str(user_id)).first()
+        uid_str = str(user_id)
+        
+        profile = Profiles.objects.filter(user_id=uid_str).first()
         if not profile:
             return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
-        acting_user_role_obj = UserRoles.objects.filter(user_id=str(request.user.id)).first()
+        
+        acting_user_id = str(request.user.id)
+        acting_user_role_obj = UserRoles.objects.filter(user_id=acting_user_id).first()
         acting_role = acting_user_role_obj.role if acting_user_role_obj else 'user'
+
         if acting_role not in ['root', 'admin']:
             return Response({"error": "У вас нет прав для выполнения этой операции"}, status=status.HTTP_403_FORBIDDEN)
+
+     
         new_role = request.data.get('role')
-        target_user_role_obj = UserRoles.objects.filter(user_id=profile.user_id).first()
+        target_user_role_obj = UserRoles.objects.filter(user_id=uid_str).first()
         target_role = target_user_role_obj.role if target_user_role_obj else 'user'
 
         if new_role and new_role != target_role:
             if acting_role != 'root':
                 return Response({"error": "Только Root может назначать или изменять роли"}, status=status.HTTP_403_FORBIDDEN)
+
+
         old_state = UserLimitsSerializer(profile).data
         old_state['role'] = target_role
+
         limit_keys = [
             'transfer_min', 'transfer_max', 'daily_transfer_limit', 'monthly_transfer_limit', 
             'withdrawal_min', 'withdrawal_max', 'daily_withdrawal_limit', 'monthly_withdrawal_limit',
@@ -871,6 +960,7 @@ class AdminUserLimitDetailView(APIView):
         data = request.data.copy() if hasattr(request.data, 'copy') else request.data
         if any(k in data for k in limit_keys):
             data['custom_settings_enabled'] = True
+            
         serializer = UserLimitsSerializer(profile, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -879,22 +969,25 @@ class AdminUserLimitDetailView(APIView):
                     target_user_role_obj.role = new_role
                     target_user_role_obj.save()
                 else:
-                    UserRoles.objects.create(user_id=profile.user_id, role=new_role)
+                    UserRoles.objects.create(user_id=uid_str, role=new_role)
                 target_role = new_role
-                if profile.user_id.isdigit():
+                if uid_str.isdigit():
                     try:
-                        django_user = User.objects.get(id=int(profile.user_id))
+                        django_user = User.objects.get(id=int(uid_str))
                         is_admin_val = (new_role in ['root', 'admin'])
                         django_user.is_staff = is_admin_val
                         django_user.is_superuser = (new_role == 'root')
                         django_user.save()
                     except User.DoesNotExist:
                         pass
+
             fname = getattr(profile, 'first_name', None) or ''
             lname = getattr(profile, 'last_name', None) or ''
             full_name = f"{fname} {lname}".strip() or "Unknown User"
+
             new_state = UserLimitsSerializer(profile).data
             new_state['role'] = target_role
+
             changes = {}
             for key in set(old_state.keys()) | set(new_state.keys()):
                 old_val = old_state.get(key)
@@ -903,22 +996,24 @@ class AdminUserLimitDetailView(APIView):
                     changes[key] = {'было': old_val, 'стало': new_val}
             if changes:
                 action_type = "UPDATE_USER_DATA"
-                if new_role and new_role != old_state['role']:
+                if new_role and new_role != old_state.get('role'):
                     action_type = "ROLE_CHANGED"
                 
-                AdminActionHistory.objects.create(
-                    admin_id=str(request.user.id),
-                    admin_name=request.user.get_full_name() or request.user.username,
-                    action=action_type,
-                    target_user_id=profile.user_id,
-                    target_user_name=full_name,
-                    details={"changes": changes, "acting_role": acting_role},
-                    ip_address=request.META.get('REMOTE_ADDR'),
-                    user_agent=request.META.get('HTTP_USER_AGENT')
-                )
-
+                try:
+                    AdminActionHistory.objects.create(
+                        admin_id=acting_user_id,                     
+                        admin_name=request.user.get_full_name() or request.user.username,
+                        action=action_type,
+                        target_user_id=uid_str,                        
+                        target_user_name=full_name,
+                        details={"changes": changes, "acting_role": acting_role},
+                        ip_address=request.META.get('REMOTE_ADDR'),
+                        user_agent=request.META.get('HTTP_USER_AGENT')
+                    )
+                except Exception as e:
+                    print(f"ОШИБКА АУДИТ-ЛОГА: {e}")
             return Response({
-                "user_id": profile.user_id,
+                "user_id": uid_str,
                 "full_name": full_name,
                 "phone": getattr(profile, 'phone', ''),
                 "role": target_role,
