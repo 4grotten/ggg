@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Phone, Mail, Shield, Clock, User, FileText, ArrowRight, ChevronRight, Crown, Loader2, Calendar, CheckCircle } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -128,6 +130,7 @@ export default function AdminStaffDetail() {
       title={member?.full_name || "Детали"}
       showBackButton
       onBack={() => navigate(-1)}
+      rightAction={<div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>}
     >
       <div className="px-4 pb-8 pt-4 space-y-5">
         {/* Profile Card */}
