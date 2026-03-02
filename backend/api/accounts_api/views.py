@@ -999,15 +999,22 @@ class AdminUserLimitDetailView(APIView):
                 if new_role and new_role != old_state.get('role'):
                     action_type = "ROLE_CHANGED"
                 
+                # Достаем чистый IP-адрес (отрезая лишние хвосты от Nginx/Kong)
+                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+                if x_forwarded_for:
+                    ip_addr = x_forwarded_for.split(',')[0].strip()
+                else:
+                    ip_addr = request.META.get('REMOTE_ADDR')
+                
                 try:
                     AdminActionHistory.objects.create(
-                        admin_id=acting_user_id,                     
+                        admin_id=acting_user_id,
                         admin_name=request.user.get_full_name() or request.user.username,
                         action=action_type,
-                        target_user_id=uid_str,                        
+                        target_user_id=uid_str,
                         target_user_name=full_name,
                         details={"changes": changes, "acting_role": acting_role},
-                        ip_address=request.META.get('REMOTE_ADDR'),
+                        ip_address=ip_addr,  # <-- Передаем очищенный IP
                         user_agent=request.META.get('HTTP_USER_AGENT')
                     )
                 except Exception as e:
