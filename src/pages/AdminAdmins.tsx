@@ -553,12 +553,16 @@ export default function AdminAdmins() {
                                                 key={k}
                                                 className={cn(
                                                   "inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm",
-                                                  k === 'is_blocked'
+                                                  k === 'is_blocked' && mappedAction === 'block_client'
                                                     ? "bg-destructive/20 border border-destructive/30 text-destructive"
-                                                    : "bg-primary/20 border border-primary/20 text-primary-foreground"
+                                                    : k === 'is_blocked' && mappedAction === 'unblock_client'
+                                                      ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
+                                                      : "bg-primary/20 border border-primary/20 text-primary-foreground"
                                                 )}
                                               >
-                                                {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                                {k === 'is_blocked' && mappedAction === 'unblock_client'
+                                                  ? t('admin.audit.fields.is_unblocked', 'Разблокировка')
+                                                  : t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
                                               </span>
                                             ))}
                                           </div>
