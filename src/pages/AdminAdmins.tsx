@@ -419,8 +419,8 @@ export default function AdminAdmins() {
                         let mappedAction: AdminAction['action'] = 'update_setting';
                         if (actionType.includes('add_role') || actionType.includes('role_add')) mappedAction = 'add_role';
                         else if (actionType.includes('remove_role') || actionType.includes('role_remove')) mappedAction = 'remove_role';
-                        else if (actionType.includes('block')) mappedAction = 'block_client';
                         else if (actionType.includes('unblock')) mappedAction = 'unblock_client';
+                        else if (actionType.includes('block')) mappedAction = 'block_client';
                         else if (actionType.includes('update_user_data') || actionType.includes('user_data')) mappedAction = 'update_user_data';
                         else if (actionType.includes('client') || actionType.includes('user')) mappedAction = 'update_client';
 
