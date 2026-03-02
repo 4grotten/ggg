@@ -702,7 +702,12 @@ const Settings = () => {
             </button>
             <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
             {user?.id && (
-              <p className="text-xs text-muted-foreground/60 mt-0.5 font-mono">ID: {user.id}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-muted-foreground/60 font-mono">ID: {user.id}</p>
+                {isAdmin && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">Admin</span>
+                )}
+              </div>
             )}
             {displayPhone && (
               <p className="text-sm text-muted-foreground mt-1">{displayPhone}</p>
