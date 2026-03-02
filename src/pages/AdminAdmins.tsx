@@ -554,43 +554,61 @@ export default function AdminAdmins() {
                                   </div>
                                 )}
                               </div>
+                              {/* Target client block with changes */}
                               {(() => {
                                 const rawDet = item.details;
-                                if (typeof rawDet === 'object' && rawDet?.changes) {
-                                  const keys = Object.keys(rawDet.changes);
+                                const hasChanges = typeof rawDet === 'object' && rawDet?.changes;
+                                const keys = hasChanges ? Object.keys(rawDet.changes) : [];
+
+                                if (targetName || hasChanges) {
                                   return (
-                                    <div className="pl-11 pt-1 space-y-1.5">
-                                      <p className="text-xs text-muted-foreground font-medium">Было изменено:</p>
-                                      <div className="flex flex-wrap gap-1.5">
-                                      {keys.map((k) => (
-                                        <span
-                                          key={k}
-                                          className="inline-block text-[11px] px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/30 text-primary-foreground font-medium"
-                                        >
-                                          {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
-                                        </span>
-                                      ))}
-                                    </div>
+                                    <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
+                                      {/* Client header */}
+                                      {targetName && (
+                                        <div className="flex items-center gap-3 px-4 py-3 border-b border-border/20">
+                                          <Avatar className="w-10 h-10 rounded-xl shrink-0 ring-2 ring-primary/10">
+                                            <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
+                                            <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-[11px] font-semibold">
+                                              {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2">
+                                              <p className="text-sm font-semibold truncate">{targetName}</p>
+                                              {targetUserId && (
+                                                <span className="text-[10px] text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded-md">UID:{targetUserId}</span>
+                                              )}
+                                            </div>
+                                            {targetPhone && (
+                                              <p className="text-xs text-muted-foreground mt-0.5">{targetPhone}</p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                      {/* Changes section */}
+                                      {hasChanges && keys.length > 0 && (
+                                        <div className="px-4 py-3 space-y-2">
+                                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Были изменены данные</p>
+                                          <div className="flex flex-wrap gap-1.5">
+                                            {keys.map((k) => (
+                                              <span
+                                                key={k}
+                                                className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg bg-primary/15 border border-primary/20 text-primary font-medium backdrop-blur-sm"
+                                              >
+                                                {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
                                   );
                                 }
-                                return <p className="text-sm text-foreground/80 pl-11">{details}</p>;
+                                if (!hasChanges) {
+                                  return <p className="text-sm text-foreground/80 pl-11">{details}</p>;
+                                }
+                                return null;
                               })()}
-                              {targetName && (
-                                <div className="flex items-center gap-2 pl-11">
-                                  <Avatar className="w-7 h-7 rounded-lg shrink-0">
-                                    <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
-                                    <AvatarFallback className="rounded-lg bg-muted text-[10px] font-medium">
-                                      {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
-                                    <span className="font-medium">{targetName}</span>
-                                    {targetUserId && <span className="text-muted-foreground font-mono">UID:{targetUserId}</span>}
-                                    {targetPhone && <span className="text-muted-foreground">{targetPhone}</span>}
-                                  </div>
-                                </div>
-                              )}
                             </motion.div>
                           </div>
                         );
