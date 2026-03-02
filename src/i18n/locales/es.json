@@ -909,6 +909,11 @@
   },
   "auth": {
     "enterPasswordToAccess": "Ingrese la contraseña de su cuenta para acceder",
+    "verifyPassword": "Verificar Contraseña",
+    "enterAccountPassword": "Ingrese la contraseña de su cuenta para continuar",
+    "password": "Contraseña",
+    "wrongPassword": "Contraseña incorrecta",
+    "userNotFound": "Usuario no encontrado",
     "resetPassword": {
       "title": "¿Olvidaste tu contraseña?",
       "description": "Ingresa tu número de teléfono para recuperar el acceso",

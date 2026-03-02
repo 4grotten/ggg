@@ -909,6 +909,11 @@
   },
   "auth": {
     "enterPasswordToAccess": "أدخل كلمة مرور الحساب للوصول",
+    "verifyPassword": "تحقق من كلمة المرور",
+    "enterAccountPassword": "أدخل كلمة مرور حسابك للمتابعة",
+    "password": "كلمة المرور",
+    "wrongPassword": "كلمة مرور خاطئة",
+    "userNotFound": "المستخدم غير موجود",
     "resetPassword": {
       "title": "نسيت كلمة المرور؟",
       "description": "أدخل رقم هاتفك لاستعادة الوصول",

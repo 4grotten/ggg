@@ -909,6 +909,11 @@
   },
   "auth": {
     "enterPasswordToAccess": "Erişim için hesap şifrenizi girin",
+    "verifyPassword": "Şifreyi Doğrula",
+    "enterAccountPassword": "Devam etmek için hesap şifrenizi girin",
+    "password": "Şifre",
+    "wrongPassword": "Yanlış şifre",
+    "userNotFound": "Kullanıcı bulunamadı",
     "resetPassword": {
       "title": "Şifrenizi mi unuttunuz?",
       "description": "Erişimi kurtarmak için telefon numaranızı girin",
