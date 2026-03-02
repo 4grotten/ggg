@@ -523,9 +523,11 @@ export default function AdminAdmins() {
                               </div>
                             </div>
                             {timestamp && (
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 shrink-0">
                                 <span className="text-xs text-muted-foreground">
-                                  {formatRelativeTime(new Date(timestamp))}
+                                  <span className="font-bold">{new Date(timestamp).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                                  {' '}
+                                  <span className="font-normal">{new Date(timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
                                 </span>
                                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
                               </div>
