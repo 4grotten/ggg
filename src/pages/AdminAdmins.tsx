@@ -399,7 +399,7 @@ export default function AdminAdmins() {
               >
                 <GlassCard
                   title={t("admin.history.title")}
-                  description={auditLoading ? "Загрузка..." : `${Math.min(visibleCount, auditHistory.length)} из ${auditHistory.length} ${t("admin.history.actions")}`}
+                  description={auditLoading ? t("common.loading", "Загрузка...") : `${Math.min(visibleCount, auditHistory.length)} из ${auditHistory.length} ${t("admin.history.actions")}`}
                   icon={History}
                   iconColor="text-violet-500"
                 >
@@ -576,7 +576,7 @@ export default function AdminAdmins() {
                     {visibleCount < auditHistory.length && (
                       <div ref={historyBottomRef} className="flex items-center justify-center py-4">
                         <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground ml-2">Загрузка ещё...</span>
+                        <span className="text-xs text-muted-foreground ml-2">{t("common.loadingMore", "Загрузка ещё...")}</span>
                       </div>
                     )}
                     {visibleCount >= auditHistory.length && auditHistory.length > 0 && (

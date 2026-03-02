@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnimatedBotHead } from "./AnimatedBotHead";
@@ -19,6 +20,7 @@ interface ChatMessageProps {
 export const ChatMessage = ({ role, content, periodSelect }: ChatMessageProps) => {
   const isUser = role === 'user';
   const { avatarUrl } = useAvatar();
+  const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -163,7 +165,7 @@ export const ChatMessage = ({ role, content, periodSelect }: ChatMessageProps) =
                 "flex-shrink-0 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors",
                 isPlaying && "text-primary"
               )}
-              title={isLoading ? "Загрузка..." : isPlaying ? "Стоп" : "Озвучить"}
+              title={isLoading ? t("common.loading", "Загрузка...") : isPlaying ? t("common.stop", "Стоп") : t("common.listen", "Озвучить")}
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
