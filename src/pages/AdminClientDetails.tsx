@@ -554,6 +554,11 @@ export default function AdminClientDetails() {
                   onClick={() => {
                     setIsBlocked(pendingBlockValue);
                     setShowBlockAlert(false);
+                    apiPost('/admin/audit-history/log/', {
+                      action: pendingBlockValue ? 'BLOCK_USER' : 'UNBLOCK_USER',
+                      target_user_id: userId,
+                      details: { target_name: client?.full_name || '', new_value: pendingBlockValue },
+                    }).catch(() => {});
                   }}
                 >
                   {pendingBlockValue ? t("admin.clients.block") : t("admin.clients.unblock")}

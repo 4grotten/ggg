@@ -1065,7 +1065,68 @@ class AdminActionHistoryView(APIView):
         queryset = queryset[:200]
         serializer = AdminActionHistorySerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+    @swagger_auto_schema(
+        operation_summary="Записать действие администратора в аудит-лог",
+        operation_description="Создает запись в admin_action_history. Используется фронтендом для логирования действий типа VIEW_TRANSACTION_HISTORY, BLOCK_USER и т.д.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['action'],
+            properties={
+                'action': openapi.Schema(type=openapi.TYPE_STRING, description="Тип действия"),
+                'target_user_id': openapi.Schema(type=openapi.TYPE_STRING, description="ID целевого пользователя"),
+                'details': openapi.Schema(type=openapi.TYPE_OBJECT, description="Дополнительные данные"),
+            }
+        ),
+        tags=["Админ: Аудит"]
+    )
+    def post(self, request):
+        acting_user_role_obj = UserRoles.objects.filter(user_id=str(request.user.id)).first()
+        acting_role = acting_user_role_obj.role if acting_user_role_obj else 'user'
+        if acting_role not in ['root', 'admin']:
+            return Response({"error": "Доступ запрещен"}, status=status.HTTP_403_FORBIDDEN)
+
+        action = request.data.get('action')
+        if not action:
+            return Response({"error": "action is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        target_user_id = request.data.get('target_user_id')
+        details = request.data.get('details', {})
+
+        # Resolve target user name
+        target_user_name = details.get('target_name', '')
+        if not target_user_name and target_user_id:
+            try:
+                tp = Profiles.objects.get(user_id=str(target_user_id))
+                target_user_name = f"{tp.first_name or ''} {tp.last_name or ''}".strip()
+            except Profiles.DoesNotExist:
+                pass
+
+        # Clean IP
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip_addr = x_forwarded_for.split(',')[0].strip()
+        else:
+            ip_addr = request.META.get('REMOTE_ADDR')
+
+        details['acting_role'] = acting_role
+
+        try:
+            AdminActionHistory.objects.create(
+                admin_id=str(request.user.id),
+                admin_name=request.user.get_full_name() or request.user.username,
+                action=action,
+                target_user_id=str(target_user_id) if target_user_id else None,
+                target_user_name=target_user_name or None,
+                details=details,
+                ip_address=ip_addr,
+                user_agent=request.META.get('HTTP_USER_AGENT')
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({"status": "ok"}, status=status.HTTP_201_CREATED)
+
 
 
 class AdminStaffListView(APIView):
