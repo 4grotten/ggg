@@ -703,11 +703,11 @@ const Settings = () => {
               </motion.div>
             </button>
             <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
-            {user?.id && (
+            {(user?.id || (user as any)?.user_id) && (
               <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-xs text-muted-foreground/60 font-mono">ID: {user.id}</p>
-                {user.role && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium capitalize">{user.role}</span>
+                <p className="text-xs text-muted-foreground/60 font-mono">ID: {user?.id || (user as any)?.user_id}</p>
+                {(user as any)?.role && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium capitalize">{(user as any).role}</span>
                 )}
               </div>
             )}

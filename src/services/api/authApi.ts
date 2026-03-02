@@ -57,6 +57,7 @@ export interface AvatarData {
 
 export interface UserProfile {
   id: number;
+  user_id?: string;
   full_name: string;
   phone_number: string;
   email: string | null;
