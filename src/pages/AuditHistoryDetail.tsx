@@ -23,6 +23,8 @@ const FIELD_LABELS: Record<string, string> = {
   withdrawal_max: "Макс. вывод",
   daily_withdrawal_limit: "Дневной лимит вывода",
   monthly_withdrawal_limit: "Месячный лимит вывода",
+  daily_top_up_limit: "Дневной лимит пополнения",
+  monthly_top_up_limit: "Месячный лимит пополнения",
   daily_usdt_send_limit: "Дневной лимит USDT (отправка)",
   monthly_usdt_send_limit: "Месячный лимит USDT (отправка)",
   daily_usdt_receive_limit: "Дневной лимит USDT (получение)",
@@ -223,13 +225,13 @@ export default function AuditHistoryDetail() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 + i * 0.05 }}
-                    className="rounded-2xl bg-card border border-border/50 p-4 space-y-1.5"
+                    className="rounded-2xl bg-card border border-border/50 p-4 space-y-2"
                   >
-                    <p className="text-sm font-medium">{label}</p>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="text-muted-foreground line-through">{oldVal}</span>
+                    <p className="text-sm font-semibold text-foreground">{label}</p>
+                    <div className="flex items-center gap-2 text-sm flex-wrap">
+                      <span className="text-destructive/70 line-through">{oldVal}</span>
                       <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                      <span className="text-primary font-medium">{newVal}</span>
+                      <span className="text-primary font-semibold">{newVal}</span>
                     </div>
                   </motion.div>
                 );
