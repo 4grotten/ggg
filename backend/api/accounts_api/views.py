@@ -1057,3 +1057,73 @@ class AdminActionHistoryView(APIView):
         queryset = queryset[:200]
         serializer = AdminActionHistorySerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class AdminStaffListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Список персонала (Админы и Руты)",
+        operation_description="Возвращает список пользователей, у которых есть права admin или root. Без тяжелых финансовых данных.",
+        tags=["Админ: Управление пользователями"]
+    )
+    def get(self, request):
+        acting_user_role_obj = UserRoles.objects.filter(user_id=str(request.user.id)).first()
+        acting_role = acting_user_role_obj.role if acting_user_role_obj else 'user'
+
+        if acting_role not in ['root', 'admin']:
+            return Response({"error": "Доступ запрещен"}, status=status.HTTP_403_FORBIDDEN)
+        staff_roles = UserRoles.objects.filter(role__in=['root', 'admin'])
+        
+        if not staff_roles.exists():
+            return Response([], status=status.HTTP_200_OK)
+
+        roles_map = {}
+        for role_record in staff_roles:
+            uid = role_record.user_id
+            r = role_record.role
+            if uid not in roles_map:
+                roles_map[uid] = r
+            else:
+                if r == 'root':
+                    roles_map[uid] = 'root'
+        
+        user_ids = list(roles_map.keys())
+        
+        profiles = Profiles.objects.filter(user_id__in=user_ids).order_by('-created_at')
+        
+        numeric_uids = [uid for uid in user_ids if str(uid).isdigit()]
+        users_map = {}
+        if numeric_uids:
+            for u in User.objects.filter(id__in=[int(uid) for uid in numeric_uids]):
+                users_map[str(u.id)] = u
+        data = []
+        for profile in profiles:
+            uid = profile.user_id
+            role = roles_map.get(uid, 'user')
+            
+            fname = getattr(profile, 'first_name', None) or ''
+            lname = getattr(profile, 'last_name', None) or ''
+            full_name = f"{fname} {lname}".strip()
+            
+            user_obj = users_map.get(uid)
+            if not full_name and user_obj:
+                full_name = f"{user_obj.first_name or ''} {user_obj.last_name or ''}".strip()
+                
+            email = user_obj.email if user_obj else ''
+            is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
+
+            data.append({
+                "user_id": uid,
+                "full_name": full_name or "Unknown User",
+                "phone": getattr(profile, 'phone', ''),
+                "email": email,
+                "avatar_url": getattr(profile, 'avatar_url', None),
+                "role": role,
+                "is_verified": is_verified,
+                "is_blocked": profile.is_blocked,
+                "created_at": profile.created_at.isoformat() if profile.created_at else None,
+            })
+            
+        return Response(data, status=status.HTTP_200_OK)

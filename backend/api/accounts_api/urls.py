@@ -50,4 +50,6 @@ urlpatterns = [
     path('admin/users/<str:user_id>/limits/', views.AdminUserLimitDetailView.as_view(), name='admin-user-limit-detail'),
 
     path('admin/audit-history/', views.AdminActionHistoryView.as_view(), name='admin-audit-history'),
+
+    path('admin/staff/', views.AdminStaffListView.as_view(), name='admin-staff-list'),
 ]
