@@ -984,6 +984,11 @@
   },
   "auth": {
     "enterPasswordToAccess": "Введите пароль аккаунта для доступа",
+    "verifyPassword": "Подтверждение пароля",
+    "enterAccountPassword": "Введите пароль аккаунта для продолжения",
+    "password": "Пароль",
+    "wrongPassword": "Неверный пароль",
+    "userNotFound": "Пользователь не найден",
     "resetPassword": {
       "title": "Забыли пароль?",
       "description": "Введите номер телефона для восстановления",

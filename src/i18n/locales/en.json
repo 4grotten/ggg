@@ -998,6 +998,11 @@
   },
   "auth": {
     "enterPasswordToAccess": "Enter your account password to access",
+    "verifyPassword": "Verify Password",
+    "enterAccountPassword": "Enter your account password to continue",
+    "password": "Password",
+    "wrongPassword": "Wrong password",
+    "userNotFound": "User not found",
     "resetPassword": {
       "title": "Forgot password?",
       "description": "Enter your phone number to recover access",
