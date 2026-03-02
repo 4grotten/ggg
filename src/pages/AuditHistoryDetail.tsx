@@ -42,9 +42,44 @@ const FIELD_LABELS: Record<string, string> = {
   full_name: "Полное имя",
 };
 
-function formatValue(val: any): string {
+// Fields that represent monetary amounts
+const MONETARY_FIELDS = new Set([
+  "transfer_min", "transfer_max", "daily_transfer_limit", "monthly_transfer_limit",
+  "withdrawal_min", "withdrawal_max", "daily_withdrawal_limit", "monthly_withdrawal_limit",
+  "daily_top_up_limit", "monthly_top_up_limit",
+  "daily_usdt_send_limit", "monthly_usdt_send_limit",
+  "daily_usdt_receive_limit", "monthly_usdt_receive_limit",
+]);
+
+const USDT_FIELDS = new Set([
+  "daily_usdt_send_limit", "monthly_usdt_send_limit",
+  "daily_usdt_receive_limit", "monthly_usdt_receive_limit",
+]);
+
+const PERCENT_FIELDS = new Set([
+  "card_to_card_percent", "bank_transfer_percent",
+  "network_fee_percent", "currency_conversion_percent",
+]);
+
+function formatValue(val: any, fieldKey?: string): string {
   if (val === null || val === undefined) return "—";
   if (typeof val === "boolean") return val ? "Да" : "Нет";
+
+  const num = Number(val);
+  if (fieldKey && !isNaN(num)) {
+    if (PERCENT_FIELDS.has(fieldKey)) {
+      return `${num.toFixed(2)}%`;
+    }
+    if (MONETARY_FIELDS.has(fieldKey)) {
+      const currency = USDT_FIELDS.has(fieldKey) ? "USDT" : "AED";
+      return `${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
+    }
+    // Generic number formatting for other numeric fields
+    if (typeof val === "number" || (typeof val === "string" && /^\d+(\.\d+)?$/.test(val.trim()))) {
+      return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+
   return String(val);
 }
 
@@ -179,8 +214,8 @@ export default function AuditHistoryDetail() {
             <div className="space-y-2">
               {changeEntries.map(([key, val], i) => {
                 const label = FIELD_LABELS[key] || key;
-                const oldVal = formatValue((val as any)?.было ?? (val as any)?.old ?? (val as any)?.from);
-                const newVal = formatValue((val as any)?.стало ?? (val as any)?.new ?? (val as any)?.to);
+                const oldVal = formatValue((val as any)?.было ?? (val as any)?.old ?? (val as any)?.from, key);
+                const newVal = formatValue((val as any)?.стало ?? (val as any)?.new ?? (val as any)?.to, key);
 
                 return (
                   <motion.div
