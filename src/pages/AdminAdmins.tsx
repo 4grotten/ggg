@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,15 +28,7 @@ interface AdminAction {
   timestamp: Date;
 }
 
-const MOCK_ADMIN_HISTORY: AdminAction[] = [
-  { id: '1', adminName: 'Александр Петров', adminPhone: '+971 58 533 3939', action: 'add_role', targetName: 'Мария Иванова', targetPhone: '+971 50 123 4567', details: 'Назначена роль "Модератор"', timestamp: new Date(Date.now() - 1000 * 60 * 15) },
-  { id: '2', adminName: 'Дмитрий Козлов', adminPhone: '+996 555 214 242', action: 'update_setting', details: 'Изменён курс USDT → AED: 3.67 → 3.68', timestamp: new Date(Date.now() - 1000 * 60 * 45) },
-  { id: '3', adminName: 'Александр Петров', adminPhone: '+971 58 533 3939', action: 'block_client', targetName: 'Иван Сидоров', targetPhone: '+971 55 987 6543', details: 'Клиент заблокирован: подозрительная активность', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) },
-  { id: '4', adminName: 'Дмитрий Козлов', adminPhone: '+996 555 214 242', action: 'update_client', targetName: 'Анна Смирнова', targetPhone: '+971 52 456 7890', details: 'Повышен реферальный уровень: R1 → R2', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5) },
-  { id: '5', adminName: 'Александр Петров', adminPhone: '+971 58 533 3939', action: 'remove_role', targetName: 'Олег Николаев', targetPhone: '+971 54 321 0987', details: 'Снята роль "Модератор"', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24) },
-  { id: '6', adminName: 'Дмитрий Козлов', adminPhone: '+996 555 214 242', action: 'update_setting', details: 'Изменена комиссия на пополнение: 1.5% → 1.2%', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2) },
-  { id: '7', adminName: 'Александр Петров', adminPhone: '+971 58 533 3939', action: 'unblock_client', targetName: 'Елена Волкова', targetPhone: '+971 56 789 0123', details: 'Клиент разблокирован после проверки', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3) },
-];
+const MOCK_ADMIN_HISTORY: AdminAction[] = [];
 
 const getActionIcon = (action: AdminAction['action']) => {
   switch (action) {
@@ -119,13 +111,16 @@ export default function AdminAdmins() {
   const [isSearching, setIsSearching] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<"admins" | "history">("admins");
 
-  // Real audit history from API
+  // Real audit history from API with pagination
   const [auditHistory, setAuditHistory] = useState<any[]>([]);
   const [auditLoading, setAuditLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
+  const historyBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (activeSubTab === "history") {
       setAuditLoading(true);
+      setVisibleCount(20);
       apiGet<any>("/admin/audit-history/")
         .then((res) => {
           if (res.data) {
@@ -137,6 +132,28 @@ export default function AdminAdmins() {
         .finally(() => setAuditLoading(false));
     }
   }, [activeSubTab]);
+
+  // Infinite scroll for audit history
+  useEffect(() => {
+    if (activeSubTab !== "history" || !historyBottomRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && visibleCount < auditHistory.length) {
+          setVisibleCount((prev) => Math.min(prev + 20, auditHistory.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(historyBottomRef.current);
+    return () => observer.disconnect();
+  }, [activeSubTab, visibleCount, auditHistory.length]);
+
+  // Build a map of staff user_id -> staff member for avatars/roles
+  const staffMap = useMemo(() => {
+    const map = new Map<string, typeof staff extends (infer T)[] ? T : never>();
+    staff?.forEach((s) => map.set(s.user_id, s));
+    return map;
+  }, [staff]);
 
   const handleSearchUser = async () => {
     if (!searchQuery.trim()) return;
@@ -387,7 +404,7 @@ export default function AdminAdmins() {
               >
                 <GlassCard
                   title={t("admin.history.title")}
-                  description={auditLoading ? "Загрузка..." : `${auditHistory.length + MOCK_ADMIN_HISTORY.length} ${t("admin.history.actions")}`}
+                  description={auditLoading ? "Загрузка..." : `${Math.min(visibleCount, auditHistory.length)} из ${auditHistory.length} ${t("admin.history.actions")}`}
                   icon={History}
                   iconColor="text-violet-500"
                 >
@@ -398,7 +415,7 @@ export default function AdminAdmins() {
                         <Loader2 className="w-6 h-6 animate-spin text-primary" />
                       </div>
                     )}
-                    {auditHistory.map((item: any, index: number) => {
+                    {auditHistory.slice(0, visibleCount).map((item: any, index: number) => {
                       const actionType = (item.action || item.action_type || '').toLowerCase();
                       let mappedAction: AdminAction['action'] = 'update_setting';
                       if (actionType.includes('add_role') || actionType.includes('role_add')) mappedAction = 'add_role';
@@ -412,6 +429,8 @@ export default function AdminAdmins() {
                       const [iconColor, bgColor] = colorClasses.split(' ');
                       const adminName = item.admin_name || item.performed_by_name || item.admin?.name || 'Admin';
                       const adminPhone = item.admin_phone || item.performed_by_phone || item.admin?.phone || '';
+                      const staffMember = staffMap.get(String(item.admin_id));
+                      const adminRole = staffMember?.role || (item.details?.acting_role);
                       const rawDetails = item.description || item.details || item.message || item;
                       const details = typeof rawDetails === 'object' ? JSON.stringify(rawDetails) : String(rawDetails);
                       const targetName = item.target_name || item.target_user_name || item.target?.name;
@@ -429,13 +448,22 @@ export default function AdminAdmins() {
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", bgColor)}>
-                                <ActionIcon className={cn("w-4 h-4", iconColor)} />
-                              </div>
+                              <Avatar className="w-9 h-9 rounded-xl shrink-0">
+                                <AvatarImage src={staffMember?.avatar_url || undefined} alt={adminName} />
+                                <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-xs font-medium">
+                                  {adminName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                                </AvatarFallback>
+                              </Avatar>
                               <div>
                                 <div className="flex items-center gap-1.5">
                                   <p className="text-sm font-medium">{adminName}</p>
-                                  <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground">API</Badge>
+                                  {adminRole === 'root' ? (
+                                    <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
+                                      <Crown className="w-2.5 h-2.5" />Root
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground">Admin</Badge>
+                                  )}
                                 </div>
                                 {adminPhone && <p className="text-xs text-muted-foreground">{adminPhone}</p>}
                               </div>
@@ -476,56 +504,16 @@ export default function AdminAdmins() {
                       );
                     })}
 
-                    {/* Divider if both exist */}
-                    {auditHistory.length > 0 && MOCK_ADMIN_HISTORY.length > 0 && (
-                      <div className="flex items-center gap-2 py-2">
-                        <div className="flex-1 h-px bg-border/50" />
-                        <span className="text-xs text-muted-foreground">Мок-данные</span>
-                        <div className="flex-1 h-px bg-border/50" />
+                    {/* Scroll sentinel for infinite pagination */}
+                    {visibleCount < auditHistory.length && (
+                      <div ref={historyBottomRef} className="flex items-center justify-center py-4">
+                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground ml-2">Загрузка ещё...</span>
                       </div>
                     )}
-
-                    {/* Mock history below */}
-                    {MOCK_ADMIN_HISTORY.map((action, index) => {
-                      const ActionIcon = getActionIcon(action.action);
-                      const colorClasses = getActionColor(action.action);
-                      const [iconColor, bgColor] = colorClasses.split(' ');
-                      return (
-                        <motion.div
-                          key={action.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: (auditHistory.length + index) * 0.05 }}
-                          className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-2"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", bgColor)}>
-                                <ActionIcon className={cn("w-4 h-4", iconColor)} />
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-1.5">
-                                  <p className="text-sm font-medium">{action.adminName}</p>
-                                  <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground">Admin</Badge>
-                                </div>
-                                <p className="text-xs text-muted-foreground">{action.adminPhone}</p>
-                              </div>
-                            </div>
-                            <span className="text-xs text-muted-foreground">{formatRelativeTime(action.timestamp)}</span>
-                          </div>
-                          <p className="text-sm text-foreground/80 pl-10">{action.details}</p>
-                          {action.targetName && (
-                            <div className="flex items-center gap-2 pl-10">
-                              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
-                                <Users className="w-3 h-3 text-muted-foreground" />
-                                <span className="font-medium">{action.targetName}</span>
-                                {action.targetPhone && <span className="text-muted-foreground">{action.targetPhone}</span>}
-                              </div>
-                            </div>
-                          )}
-                        </motion.div>
-                      );
-                    })}
+                    {visibleCount >= auditHistory.length && auditHistory.length > 0 && (
+                      <p className="text-xs text-muted-foreground text-center py-2">Показано {auditHistory.length} записей</p>
+                    )}
                   </div>
                 </GlassCard>
               </motion.div>
