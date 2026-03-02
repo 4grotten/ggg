@@ -64,6 +64,8 @@ export interface BackendClient {
     withdrawal_max: string | null;
     daily_withdrawal_limit: string | null;
     monthly_withdrawal_limit: string | null;
+    daily_top_up_limit: string | null;
+    monthly_top_up_limit: string | null;
     daily_usdt_send_limit: string | null;
     monthly_usdt_send_limit: string | null;
     daily_usdt_receive_limit: string | null;
@@ -141,6 +143,8 @@ export interface BackendClientDetail extends BackendClient {
     withdrawal_max: string | null;
     daily_withdrawal_limit: string | null;
     monthly_withdrawal_limit: string | null;
+    daily_top_up_limit: string | null;
+    monthly_top_up_limit: string | null;
     daily_usdt_send_limit: string | null;
     monthly_usdt_send_limit: string | null;
     daily_usdt_receive_limit: string | null;

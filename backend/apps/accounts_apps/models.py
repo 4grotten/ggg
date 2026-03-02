@@ -56,6 +56,10 @@ class Profiles(models.Model):
     daily_withdrawal_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
     monthly_withdrawal_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
 
+    # Top-up limits
+    daily_top_up_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+    monthly_top_up_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
+
     # USDT limits
     daily_usdt_send_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
     monthly_usdt_send_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
