@@ -210,7 +210,7 @@ export default function AuditHistoryDetail() {
               )}
               <div className="flex items-center gap-2">
                 <FileText className="w-3.5 h-3.5" />
-                <span>{t('admin.audit.detail.action', 'Действие')}: <span className="font-medium text-green-500">{String(t(`admin.actions.${actionType === 'UPDATE_USER_DATA' ? 'updateUserData' : actionType.toLowerCase().includes('update') ? 'updateClient' : actionType.toLowerCase().includes('block') ? 'blockClient' : actionType.toLowerCase().includes('unblock') ? 'unblockClient' : actionType.toLowerCase().includes('add_role') ? 'addRole' : actionType.toLowerCase().includes('remove_role') ? 'removeRole' : 'updateSetting'}`, actionType || "update"))}</span></span>
+                <span>{t('admin.audit.detail.action', 'Действие')}: <span className="font-medium text-green-500">{String(t(`admin.audit.actions.${actionType === 'UPDATE_USER_DATA' ? 'updateUserData' : actionType.toLowerCase().includes('update') ? 'updateClient' : actionType.toLowerCase().includes('block') ? 'blockClient' : actionType.toLowerCase().includes('unblock') ? 'unblockClient' : actionType.toLowerCase().includes('add_role') ? 'addRole' : actionType.toLowerCase().includes('remove_role') ? 'removeRole' : 'updateSetting'}`, actionType || "update"))}</span></span>
               </div>
             </div>
 
