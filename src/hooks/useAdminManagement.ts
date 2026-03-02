@@ -31,8 +31,9 @@ export interface BackendClient {
   language?: string | null;
   avatar_url: string | null;
   created_at: string | null;
-  role: 'admin' | 'moderator' | 'user';
+  role: 'root' | 'admin' | 'moderator' | 'user';
   is_verified: boolean;
+  subscription_type?: string | null;
   referral_level: string | null;
   cards_count: number;
   total_cards_balance: number;

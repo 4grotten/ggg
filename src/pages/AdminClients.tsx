@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, RefreshCw, UsersRound, Phone, Hash, CreditCard, Wallet, Zap, Users, Shield, CheckCircle, Sparkles, Filter, X } from "lucide-react";
+import { ArrowLeft, Search, RefreshCw, UsersRound, Phone, Hash, CreditCard, Wallet, Zap, Users, Shield, CheckCircle, Sparkles, Filter, X, Calendar } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAdminManagement, BackendClient } from "@/hooks/useAdminManagement";
 
-type RoleFilter = "all" | "admin" | "moderator" | "user";
+type RoleFilter = "all" | "root" | "admin" | "moderator" | "user";
 type VerificationFilter = "all" | "verified" | "unverified";
 type AssetsFilter = "all" | "has_cards" | "has_accounts" | "has_crypto";
 
@@ -170,6 +170,7 @@ export default function AdminClients() {
                     <p className="text-[11px] text-muted-foreground mb-1.5 font-medium">Роль</p>
                     <div className="flex gap-1.5 flex-wrap">
                       <FilterChip label="Все" active={roleFilter === "all"} onClick={() => setRoleFilter("all")} />
+                      <FilterChip label="Root" active={roleFilter === "root"} onClick={() => setRoleFilter("root")} />
                       <FilterChip label="Админ" active={roleFilter === "admin"} onClick={() => setRoleFilter("admin")} />
                       <FilterChip label="Модератор" active={roleFilter === "moderator"} onClick={() => setRoleFilter("moderator")} />
                       <FilterChip label="Пользователь" active={roleFilter === "user"} onClick={() => setRoleFilter("user")} />
@@ -261,6 +262,9 @@ export default function AdminClients() {
                           {client.limits?.custom_settings_enabled && (
                             <Badge className="bg-cyan-500/10 text-cyan-500 border-0 text-[9px] px-1.5 py-0 h-4">Custom</Badge>
                           )}
+                          {(client.role || "user") === "root" && (
+                            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-0 text-[9px] px-1.5 py-0 h-4">Root</Badge>
+                          )}
                           {(client.role || "user") === "admin" && (
                             <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 border-0">Admin</Badge>
                           )}
@@ -272,13 +276,21 @@ export default function AdminClients() {
 
                     </div>
 
-                    {/* Phone */}
-                    {client.phone && (
-                      <div className="flex items-center gap-2 bg-muted/40 rounded-lg px-2.5 py-1.5 mb-3 w-fit">
-                        <Phone className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-xs font-medium">{client.phone}</span>
-                      </div>
-                    )}
+                    {/* Phone + Registration date */}
+                    <div className="flex items-center gap-2 flex-wrap mb-3">
+                      {client.phone && (
+                        <div className="flex items-center gap-2 bg-muted/40 rounded-lg px-2.5 py-1.5 w-fit">
+                          <Phone className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-xs font-medium">{client.phone}</span>
+                        </div>
+                      )}
+                      {client.created_at && (
+                        <div className="flex items-center gap-2 bg-muted/40 rounded-lg px-2.5 py-1.5 w-fit">
+                          <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                          <span className="text-xs font-medium text-muted-foreground">{new Date(client.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Tags */}
                     <div className="flex items-center gap-1.5 flex-wrap mb-3">
@@ -293,13 +305,28 @@ export default function AdminClients() {
                       )}
                       <span className={cn(
                         "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+                        (client.role || "user") === "root" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" :
                         (client.role || "user") === "admin" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
                         (client.role || "user") === "moderator" ? "bg-violet-500/10 text-violet-600 dark:text-violet-400" :
                         "bg-muted text-muted-foreground"
                       )}>
                         <Users className="w-3 h-3" />
-                        {(client.role || "user") === "admin" ? "Админ" : (client.role || "user") === "moderator" ? "Модератор" : "Пользователь"}
+                        {(client.role || "user") === "root" ? "Root" : (client.role || "user") === "admin" ? "Админ" : (client.role || "user") === "moderator" ? "Модератор" : "Пользователь"}
                       </span>
+                      {client.subscription_type && client.subscription_type !== "free" && (
+                        <span className={cn(
+                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+                          client.subscription_type === "partner" ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400" :
+                          client.subscription_type === "vip" ? "bg-purple-500/10 text-purple-600 dark:text-purple-400" :
+                          client.subscription_type === "pro" ? "bg-blue-500/10 text-blue-600 dark:text-blue-400" :
+                          client.subscription_type === "agent" ? "bg-teal-500/10 text-teal-600 dark:text-teal-400" :
+                          client.subscription_type === "smart" ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" :
+                          "bg-muted text-muted-foreground"
+                        )}>
+                          <Sparkles className="w-3 h-3" />
+                          {client.subscription_type.charAt(0).toUpperCase() + client.subscription_type.slice(1)}
+                        </span>
+                      )}
                       {client.referral_level && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
                           <Sparkles className="w-3 h-3" /> {client.referral_level}

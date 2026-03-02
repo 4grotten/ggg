@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp } from "lucide-react";
+import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp, Calendar } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,10 +32,17 @@ const REFERRAL_LEVELS = [
 ];
 
 const SUBSCRIPTION_TYPES = [
-  { id: "free", icon: "🆓", color: "from-gray-400 to-gray-500", nameKey: "free", descKey: "freeDesc" },
-  { id: "standard", icon: "⭐", color: "from-blue-400 to-blue-500", nameKey: "standard", descKey: "standardDesc" },
-  { id: "premium", icon: "💎", color: "from-purple-400 to-purple-500", nameKey: "premium", descKey: "premiumDesc" },
-  { id: "vip", icon: "👑", color: "from-amber-400 to-amber-500", nameKey: "vip", descKey: "vipDesc" },
+  { id: "smart", icon: "🧠", color: "from-cyan-400 to-cyan-500", label: "Smart" },
+  { id: "agent", icon: "🕵️", color: "from-teal-400 to-teal-500", label: "Agent" },
+  { id: "pro", icon: "⚡", color: "from-blue-400 to-blue-500", label: "Pro" },
+  { id: "vip", icon: "👑", color: "from-purple-400 to-purple-500", label: "VIP" },
+  { id: "partner", icon: "🚀", color: "from-amber-400 to-amber-500", label: "Partner" },
+];
+
+const ROLE_OPTIONS = [
+  { id: "root", icon: "🛡️", color: "from-amber-500 to-amber-600", label: "Root" },
+  { id: "admin", icon: "⚙️", color: "from-red-400 to-red-500", label: "Admin" },
+  { id: "user", icon: "👤", color: "from-blue-400 to-blue-500", label: "User" },
 ];
 
 const isIncomeTx = (type: string): boolean => {
@@ -105,7 +112,8 @@ export default function AdminClientDetails() {
   });
 
   const [selectedLevel, setSelectedLevel] = useState("R1");
-  const [selectedSubscription, setSelectedSubscription] = useState("free");
+  const [selectedSubscription, setSelectedSubscription] = useState("smart");
+  const [selectedRole, setSelectedRole] = useState("user");
   const [isVIP, setIsVIP] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [showAllTx, setShowAllTx] = useState(false);
@@ -119,6 +127,8 @@ export default function AdminClientDetails() {
     dailyTransfer: "25000", monthlyTransfer: "250000",
     dailyWithdraw: "20000", monthlyWithdraw: "200000",
     singleTransaction: "10000",
+    transferMin: "1",
+    withdrawalMin: "50", withdrawalMax: "50000",
     dailyUsdtSend: "50000", monthlyUsdtSend: "500000",
     dailyUsdtReceive: "100000", monthlyUsdtReceive: "1000000",
   });
@@ -138,10 +148,11 @@ export default function AdminClientDetails() {
   // Initial values for change detection
   const initialValues = useRef({
     selectedLevel: "R1",
-    selectedSubscription: "free",
+    selectedSubscription: "smart",
+    selectedRole: "user",
     isVIP: false,
     isBlocked: false,
-    limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000", dailyUsdtSend: "50000", monthlyUsdtSend: "500000", dailyUsdtReceive: "100000", monthlyUsdtReceive: "1000000" },
+    limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000", transferMin: "1", withdrawalMin: "50", withdrawalMax: "50000", dailyUsdtSend: "50000", monthlyUsdtSend: "500000", dailyUsdtReceive: "100000", monthlyUsdtReceive: "1000000" },
     fees: { topUpPercent: "2.5", transferPercent: "1.5", withdrawPercent: "2.0", conversionPercent: "1.0" },
     rates: { usdtAedBuy: "3.65", usdtAedSell: "3.69", usdAedBuy: "3.68", usdAedSell: "3.67" },
   });
@@ -153,7 +164,8 @@ export default function AdminClientDetails() {
     // Set root-level fields
     setIsVIP(client.is_vip ?? false);
     setIsBlocked(client.is_blocked ?? false);
-    if (client.subscription_type) setSelectedSubscription(client.subscription_type === 'default' ? 'free' : client.subscription_type);
+    if (client.role) setSelectedRole(client.role);
+    if (client.subscription_type) setSelectedSubscription(client.subscription_type === 'default' ? 'smart' : client.subscription_type);
     if (client.referral_level) {
       // Strip "(DEFAULT)" suffix if present
       const level = client.referral_level.replace(/\(DEFAULT\)/i, '').trim();
@@ -179,6 +191,9 @@ export default function AdminClientDetails() {
       dailyWithdraw: l.daily_withdrawal_limit != null ? String(l.daily_withdrawal_limit) : limits.dailyWithdraw,
       monthlyWithdraw: l.monthly_withdrawal_limit != null ? String(l.monthly_withdrawal_limit) : limits.monthlyWithdraw,
       singleTransaction: l.transfer_max != null ? String(l.transfer_max) : limits.singleTransaction,
+      transferMin: l.transfer_min != null ? String(l.transfer_min) : limits.transferMin,
+      withdrawalMin: l.withdrawal_min != null ? String(l.withdrawal_min) : limits.withdrawalMin,
+      withdrawalMax: l.withdrawal_max != null ? String(l.withdrawal_max) : limits.withdrawalMax,
       dailyUsdtSend: l.daily_usdt_send_limit != null ? String(l.daily_usdt_send_limit) : limits.dailyUsdtSend,
       monthlyUsdtSend: l.monthly_usdt_send_limit != null ? String(l.monthly_usdt_send_limit) : limits.monthlyUsdtSend,
       dailyUsdtReceive: l.daily_usdt_receive_limit != null ? String(l.daily_usdt_receive_limit) : limits.dailyUsdtReceive,
@@ -192,7 +207,8 @@ export default function AdminClientDetails() {
       limits: newLimits,
       isVIP: client.is_vip ?? false,
       isBlocked: client.is_blocked ?? false,
-      selectedSubscription: client.subscription_type === 'default' ? 'free' : (client.subscription_type || 'free'),
+      selectedRole: client.role || 'user',
+      selectedSubscription: client.subscription_type === 'default' ? 'smart' : (client.subscription_type || 'smart'),
       selectedLevel: selectedLevel,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -203,6 +219,11 @@ export default function AdminClientDetails() {
     mutationFn: async () => {
       if (!userId) throw new Error("No user ID");
       const body: Record<string, unknown> = {
+        role: selectedRole,
+        subscription_type: selectedSubscription,
+        referral_level: selectedLevel.toLowerCase(),
+        is_blocked: isBlocked,
+        is_vip: isVIP,
         custom_settings_enabled: true,
         card_to_card_percent: fees.transferPercent,
         bank_transfer_percent: fees.withdrawPercent,
@@ -212,8 +233,10 @@ export default function AdminClientDetails() {
         monthly_transfer_limit: limits.monthlyTransfer,
         daily_withdrawal_limit: limits.dailyWithdraw,
         monthly_withdrawal_limit: limits.monthlyWithdraw,
-        transfer_min: "1",
+        transfer_min: limits.transferMin,
         transfer_max: limits.singleTransaction,
+        withdrawal_min: limits.withdrawalMin,
+        withdrawal_max: limits.withdrawalMax,
         daily_usdt_send_limit: limits.dailyUsdtSend,
         monthly_usdt_send_limit: limits.monthlyUsdtSend,
         daily_usdt_receive_limit: limits.dailyUsdtReceive,
@@ -230,7 +253,7 @@ export default function AdminClientDetails() {
       queryClient.invalidateQueries({ queryKey: ["admin-client-detail", userId] });
       toast.success("Настройки клиента сохранены");
       // Update initial values so change detection resets
-      initialValues.current = { ...initialValues.current, fees: { ...fees }, limits: { ...limits } };
+      initialValues.current = { ...initialValues.current, fees: { ...fees }, limits: { ...limits }, selectedRole, selectedSubscription, selectedLevel, isVIP, isBlocked };
     },
     onError: (err) => {
       toast.error(`Ошибка: ${err.message}`);
@@ -241,6 +264,7 @@ export default function AdminClientDetails() {
     const changes: { label: string; from: string; to: string }[] = [];
     const init = initialValues.current;
 
+    if (selectedRole !== init.selectedRole) changes.push({ label: "Роль", from: init.selectedRole, to: selectedRole });
     if (selectedLevel !== init.selectedLevel) changes.push({ label: t("admin.clients.referralLevel") || "Реферальный уровень", from: init.selectedLevel, to: selectedLevel });
     if (selectedSubscription !== init.selectedSubscription) changes.push({ label: t("admin.clients.subscriptionType") || "Подписка", from: init.selectedSubscription, to: selectedSubscription });
     if (isVIP !== init.isVIP) changes.push({ label: "VIP", from: init.isVIP ? "Да" : "Нет", to: isVIP ? "Да" : "Нет" });
@@ -251,7 +275,7 @@ export default function AdminClientDetails() {
       if (fees[key] !== init.fees[key]) changes.push({ label: `${t("admin.clients.personalFees") || "Комиссия"}: ${feeLabels[key]}`, from: `${init.fees[key]}%`, to: `${fees[key]}%` });
     }
 
-    const limitLabels: Record<string, string> = { dailyTopUp: "Daily Top Up", monthlyTopUp: "Monthly Top Up", dailyTransfer: "Daily Transfer", monthlyTransfer: "Monthly Transfer", dailyWithdraw: "Daily Withdraw", monthlyWithdraw: "Monthly Withdraw", singleTransaction: "Single TX", dailyUsdtSend: "Daily USDT Send", monthlyUsdtSend: "Monthly USDT Send", dailyUsdtReceive: "Daily USDT Receive", monthlyUsdtReceive: "Monthly USDT Receive" };
+    const limitLabels: Record<string, string> = { dailyTopUp: "Daily Top Up", monthlyTopUp: "Monthly Top Up", dailyTransfer: "Daily Transfer", monthlyTransfer: "Monthly Transfer", dailyWithdraw: "Daily Withdraw", monthlyWithdraw: "Monthly Withdraw", singleTransaction: "Макс. перевод", transferMin: "Мин. перевод", withdrawalMin: "Мин. вывод", withdrawalMax: "Макс. вывод", dailyUsdtSend: "Daily USDT Send", monthlyUsdtSend: "Monthly USDT Send", dailyUsdtReceive: "Daily USDT Receive", monthlyUsdtReceive: "Monthly USDT Receive" };
     for (const key of Object.keys(limits) as (keyof typeof limits)[]) {
       const suffix = key.includes("Usdt") ? "USDT" : "AED";
       if (limits[key] !== init.limits[key]) changes.push({ label: `${t("admin.clients.personalLimits") || "Лимит"}: ${limitLabels[key]}`, from: `${init.limits[key]} ${suffix}`, to: `${limits[key]} ${suffix}` });
@@ -439,6 +463,12 @@ export default function AdminClientDetails() {
                   )}
                 </div>
               )}
+              {client.created_at && (
+                <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>{t("admin.clients.registrationDate")}: {new Date(client.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -461,23 +491,76 @@ export default function AdminClientDetails() {
               </a>
             )}
           </div>
-        </div>
 
-        {/* Quick Status Toggles */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border/50">
-            <div className="flex items-center gap-2">
-              <Crown className="w-4 h-4 text-amber-500" />
-              <span className="text-sm font-medium">{t("admin.clients.vipStatus")}</span>
-            </div>
-            <Switch checked={isVIP} onCheckedChange={setIsVIP} />
-          </div>
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border/50">
+          {/* Block toggle */}
+          <div className="px-5 pb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-destructive" />
               <span className="text-sm font-medium">{t("admin.clients.blockStatus")}</span>
             </div>
             <Switch checked={isBlocked} onCheckedChange={setIsBlocked} />
+          </div>
+        </div>
+
+        {/* Financial Summary */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Wallet className="w-5 h-5 text-primary" />
+            <h4 className="font-semibold">Финансовая сводка</h4>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { 
+                label: "Карты", 
+                value: client.cards?.reduce((s, c) => s + c.balance, 0) || 0, 
+                count: client.cards?.length || 0, 
+                currency: "AED",
+                icon: <CreditCard className="w-4 h-4" />,
+              },
+              { 
+                label: "Банк. счета", 
+                value: client.accounts?.reduce((s, a) => s + a.balance, 0) || 0, 
+                count: client.accounts?.length || 0, 
+                currency: "AED",
+                icon: <Landmark className="w-4 h-4" />,
+              },
+              { 
+                label: "Крипто", 
+                value: client.wallets?.reduce((s, w) => s + w.balance, 0) || 0, 
+                count: client.wallets?.length || 0, 
+                currency: "USDT",
+                icon: <Bitcoin className="w-4 h-4" />,
+              },
+              { 
+                label: "Транзакции", 
+                value: null, 
+                count: clientTransactions.length || client.transactions?.length || 0, 
+                currency: "",
+                icon: <Receipt className="w-4 h-4" />,
+              },
+            ].map((item) => (
+              <div key={item.label} className="p-3 rounded-xl bg-muted/30 border border-border/50">
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  {item.icon}
+                  <span className="text-[10px] font-medium uppercase tracking-wider">{item.label}</span>
+                  <Badge variant="secondary" className="text-[10px] ml-auto">{item.count}</Badge>
+                </div>
+                {item.value !== null ? (
+                  <p className="text-sm font-bold text-emerald-500">{item.value.toLocaleString()} {item.currency}</p>
+                ) : (
+                  <p className="text-sm font-bold">{item.count} шт.</p>
+                )}
+              </div>
+            ))}
+          </div>
+          {/* Total */}
+          <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">Общий баланс (AED)</span>
+              <span className="text-lg font-bold text-primary">
+                {((client.cards?.reduce((s, c) => s + c.balance, 0) || 0) + (client.accounts?.reduce((s, a) => s + a.balance, 0) || 0)).toLocaleString()} AED
+              </span>
+            </div>
           </div>
         </div>
 
@@ -651,35 +734,60 @@ export default function AdminClientDetails() {
 
 
 
+        {/* Role Selector */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-primary" />
+            <h4 className="font-semibold">Роль</h4>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {ROLE_OPTIONS.map((role) => (
+              <button
+                key={role.id}
+                onClick={() => setSelectedRole(role.id)}
+                className={cn(
+                  "relative p-3 rounded-xl border-2 transition-all duration-200 text-center",
+                  selectedRole === role.id
+                    ? "border-primary bg-primary/10"
+                    : "border-border/50 bg-muted/30 hover:border-border"
+                )}
+              >
+                <div className={cn("w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center text-xl", role.color)}>
+                  {role.icon}
+                </div>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <span className="font-semibold text-sm">{role.label}</span>
+                  {selectedRole === role.id && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Subscription Type */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <h4 className="font-semibold">{t("admin.clients.subscriptionType")}</h4>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {SUBSCRIPTION_TYPES.map((sub) => (
               <button
                 key={sub.id}
                 onClick={() => setSelectedSubscription(sub.id)}
                 className={cn(
-                  "relative p-3 rounded-xl border-2 transition-all duration-200 text-left",
+                  "relative p-3 rounded-xl border-2 transition-all duration-200 text-center",
                   selectedSubscription === sub.id
                     ? "border-primary bg-primary/10"
                     : "border-border/50 bg-muted/30 hover:border-border"
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <div className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-xl shrink-0", sub.color)}>
-                    {sub.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-sm">{t(`admin.clients.subscriptions.${sub.nameKey}`)}</span>
-                      {selectedSubscription === sub.id && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
-                    </div>
-                    <p className="text-[10px] text-muted-foreground line-clamp-1">{t(`admin.clients.subscriptions.${sub.descKey}`)}</p>
-                  </div>
+                <div className={cn("w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center text-xl", sub.color)}>
+                  {sub.icon}
+                </div>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <span className="font-semibold text-xs">{sub.label}</span>
+                  {selectedSubscription === sub.id && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
                 </div>
               </button>
             ))}
@@ -895,11 +1003,24 @@ export default function AdminClientDetails() {
             </div>
           </div>
 
+          {/* Transfer & Withdrawal Min/Max */}
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("admin.clients.transactionLimit")}</p>
-            <div className="relative">
-              <Input type="number" value={limits.singleTransaction} onChange={(e) => setLimits({ ...limits, singleTransaction: e.target.value })} className="pr-12 rounded-xl" />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">AED</span>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Мин / Макс суммы</p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { key: "transferMin", label: "Мин. перевод" },
+                { key: "singleTransaction", label: "Макс. перевод" },
+                { key: "withdrawalMin", label: "Мин. вывод" },
+                { key: "withdrawalMax", label: "Макс. вывод" },
+              ].map(({ key, label }) => (
+                <div key={key} className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground">{label}</Label>
+                  <div className="relative">
+                    <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-10 rounded-xl h-9" />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">AED</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
