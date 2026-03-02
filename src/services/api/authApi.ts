@@ -57,6 +57,7 @@ export interface AvatarData {
 
 export interface UserProfile {
   id: number;
+  user_id?: string;
   full_name: string;
   phone_number: string;
   email: string | null;
@@ -65,6 +66,7 @@ export interface UserProfile {
   date_of_birth: string | null;
   gender: 'male' | 'female' | null;
   has_empty_fields: boolean;
+  role: string | null;
 }
 
 export interface LoginResponse {

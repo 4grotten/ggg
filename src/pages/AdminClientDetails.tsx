@@ -429,7 +429,13 @@ export default function AdminClientDetails() {
                   <CheckCircle className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
-              <div className="flex items-center gap-1.5 mt-2 flex-wrap justify-center">
+              {client.gender && (
+                <div className="flex items-center justify-center gap-1 mt-2 text-[11px] text-muted-foreground">
+                  <User className="w-3 h-3" />
+                  <span className="capitalize">{client.gender}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap justify-center">
                 {isVIP && (
                   <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] px-2.5 py-0.5 border-0 shadow-sm">
                     <Crown className="w-3 h-3 mr-1" /> VIP
@@ -450,17 +456,10 @@ export default function AdminClientDetails() {
                   {client.role}
                 </Badge>
               </div>
-              {client.gender && (
+              {client.language && (
                 <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
-                  <User className="w-3.5 h-3.5" />
-                  <span className="capitalize">{client.gender}</span>
-                  {client.language && (
-                    <>
-                      <span className="mx-1">·</span>
-                      <Globe className="w-3.5 h-3.5" />
-                      <span className="uppercase">{client.language}</span>
-                    </>
-                  )}
+                  <Globe className="w-3.5 h-3.5" />
+                  <span className="uppercase">{client.language}</span>
                 </div>
               )}
               {client.created_at && (

@@ -545,6 +545,7 @@ const Settings = () => {
         date_of_birth: null,
         gender: null,
         has_empty_fields: false,
+        role: null,
       },
       isMock: true,
     },
@@ -560,6 +561,7 @@ const Settings = () => {
         date_of_birth: null,
         gender: null,
         has_empty_fields: false,
+        role: null,
       },
       isMock: true,
     },
@@ -701,8 +703,13 @@ const Settings = () => {
               </motion.div>
             </button>
             <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
-            {user?.id && (
-              <p className="text-xs text-muted-foreground/60 mt-0.5 font-mono">ID: {user.id}</p>
+            {((user as any)?.user_id || user?.id) && (
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-muted-foreground/60 font-mono">ID: {(user as any)?.user_id || user?.id}</p>
+                {(user as any)?.role && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium capitalize">{(user as any).role}</span>
+                )}
+              </div>
             )}
             {displayPhone && (
               <p className="text-sm text-muted-foreground mt-1">{displayPhone}</p>
@@ -993,8 +1000,8 @@ const Settings = () => {
               onClick={() => navigate("/limits-settings")}
             />
 
-            {/* Admin Panel - only for admins */}
-            {isAdmin && (
+            {/* Admin Panel - only for admins/root */}
+            {(user as any)?.role && ['admin', 'root'].includes((user as any).role.toLowerCase()) && (
               <SettingsItem
                 icon={<ColoredIcon colorKey="admin"><ShieldCheck className="w-4 h-4" /></ColoredIcon>}
                 label={t("settings.adminPanel") || "Административная панель"}
