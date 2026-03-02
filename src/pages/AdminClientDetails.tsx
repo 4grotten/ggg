@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp } from "lucide-react";
+import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp, Calendar } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -454,6 +454,12 @@ export default function AdminClientDetails() {
                       <span className="uppercase">{client.language}</span>
                     </>
                   )}
+                </div>
+              )}
+              {client.created_at && (
+                <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>{new Date(client.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                 </div>
               )}
             </div>
