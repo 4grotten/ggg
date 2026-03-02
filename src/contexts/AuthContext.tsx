@@ -338,7 +338,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(userData);
     // 4. Sync with Apofiz
     syncWithApofiz(token, userData);
-    console.log('[AuthContext] Switched to user:', userData.id, userData.full_name);
+    console.log('[AuthContext] Switched to user:', (userData as any).user_id || userData.id, userData.full_name);
+    // 5. Refresh user data from API to get latest fields (role, user_id, etc.)
+    getCurrentUser().then(res => {
+      if (res.data) {
+        setUser(res.data);
+        console.log('[AuthContext] Refreshed user after switch:', (res.data as any).user_id, (res.data as any).role);
+      }
+    }).catch(() => {});
   }, []);
 
   const value: AuthContextType = {
