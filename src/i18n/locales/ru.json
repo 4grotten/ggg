@@ -1774,7 +1774,12 @@
       "created": "Создано",
       "active": "Активна",
       "inactive": "Неактивна",
-      "roleLabel": "Роль"
+      "roleLabel": "Роль",
+      "transactionHistory": "История транзакций",
+      "cards": "Карты",
+      "bankAccounts": "Банковские счета",
+      "cryptoWallets": "Крипто кошельки",
+      "personalRates": "Персональные курсы"
     },
     "roles": {
       "addRole": "Добавить роль",

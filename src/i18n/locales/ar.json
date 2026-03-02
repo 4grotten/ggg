@@ -1705,7 +1705,12 @@
       "created": "تاريخ الإنشاء",
       "active": "نشط",
       "inactive": "غير نشط",
-      "roleLabel": "الدور"
+      "roleLabel": "الدور",
+      "transactionHistory": "سجل المعاملات",
+      "cards": "البطاقات",
+      "bankAccounts": "الحسابات البنكية",
+      "cryptoWallets": "محافظ العملات الرقمية",
+      "personalRates": "أسعار الصرف الشخصية"
     },
     "roles": {
       "addRole": "إضافة دور",

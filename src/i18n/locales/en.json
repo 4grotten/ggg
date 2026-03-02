@@ -1775,7 +1775,12 @@
       "created": "Created",
       "active": "Active",
       "inactive": "Inactive",
-      "roleLabel": "Role"
+      "roleLabel": "Role",
+      "transactionHistory": "Transaction History",
+      "cards": "Cards",
+      "bankAccounts": "Bank Accounts",
+      "cryptoWallets": "Crypto Wallets",
+      "personalRates": "Personal Exchange Rates"
     },
     "roles": {
       "addRole": "Add Role",

@@ -1712,7 +1712,12 @@
       "created": "创建时间",
       "active": "活跃",
       "inactive": "未活跃",
-      "roleLabel": "角色"
+      "roleLabel": "角色",
+      "transactionHistory": "交易历史",
+      "cards": "卡片",
+      "bankAccounts": "银行账户",
+      "cryptoWallets": "加密钱包",
+      "personalRates": "个人汇率"
     },
     "roles": {
       "addRole": "添加角色",

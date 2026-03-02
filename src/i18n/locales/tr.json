@@ -1705,7 +1705,12 @@
       "created": "Oluşturulma",
       "active": "Aktif",
       "inactive": "Pasif",
-      "roleLabel": "Rol"
+      "roleLabel": "Rol",
+      "transactionHistory": "İşlem Geçmişi",
+      "cards": "Kartlar",
+      "bankAccounts": "Banka Hesapları",
+      "cryptoWallets": "Kripto Cüzdanlar",
+      "personalRates": "Kişisel Döviz Kurları"
     },
     "roles": {
       "addRole": "Rol Ekle",
