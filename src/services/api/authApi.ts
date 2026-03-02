@@ -65,6 +65,7 @@ export interface UserProfile {
   date_of_birth: string | null;
   gender: 'male' | 'female' | null;
   has_empty_fields: boolean;
+  role: string | null;
 }
 
 export interface LoginResponse {
