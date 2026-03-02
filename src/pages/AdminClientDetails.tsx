@@ -459,7 +459,7 @@ export default function AdminClientDetails() {
               {client.created_at && (
                 <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
                   <Calendar className="w-3.5 h-3.5" />
-                  <span>{new Date(client.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                  <span>{t("admin.clients.registrationDate")}: {new Date(client.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                 </div>
               )}
             </div>
