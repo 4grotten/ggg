@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Search, RefreshCw, Users, UserPlus, Trash2, Phone, Hash, Shield, CheckCircle, History, Activity, TrendingUp, Loader2, ChevronRight, Crown } from "lucide-react";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { apiGet } from "@/services/api/apiClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -255,6 +257,10 @@ export default function AdminAdmins() {
               <div className="flex-1 min-w-0">
                 <h1 className="text-lg font-bold">{t("admin.tabs.admins")}</h1>
                 <p className="text-xs text-muted-foreground">{staff?.length || 0} {t("admin.roles.usersWithRoles")}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <ThemeSwitcher />
+                <LanguageSwitcher />
               </div>
             </div>
           </div>

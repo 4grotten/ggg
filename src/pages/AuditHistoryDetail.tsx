@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, User, Shield, FileText, ArrowRight, Crown, Hash, Phone } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -101,6 +103,7 @@ export default function AuditHistoryDetail() {
         title="Детали изменения"
         showBackButton
         onBack={() => navigate(-1)}
+        rightAction={<div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>}
       >
         <div className="px-4 py-20 text-center text-muted-foreground">
           Данные не найдены
@@ -149,6 +152,7 @@ export default function AuditHistoryDetail() {
       title="Детали изменения"
       showBackButton
       onBack={() => navigate(-1)}
+      rightAction={<div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>}
     >
       <div className="px-4 pb-8 pt-4 space-y-5">
         {/* Header info card */}

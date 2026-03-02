@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Search, RefreshCw, UsersRound, Phone, Hash, CreditCard, Wallet, Zap, Users, Shield, CheckCircle, Sparkles, Filter, X, Calendar } from "lucide-react";
+import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -112,9 +114,13 @@ export default function AdminClients() {
                 <h1 className="text-lg font-bold">{t("admin.clients.title", "Клиенты")}</h1>
                 <p className="text-xs text-muted-foreground">{displayedClients.length} {t("admin.roles.usersWithRoles", "пользователей")}</p>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => refetchClients()} className="rounded-xl bg-muted/50 hover:bg-muted">
-                <RefreshCw className="w-4 h-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <ThemeSwitcher />
+                <LanguageSwitcher />
+                <Button variant="ghost" size="icon" onClick={() => refetchClients()} className="rounded-xl bg-muted/50 hover:bg-muted">
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
