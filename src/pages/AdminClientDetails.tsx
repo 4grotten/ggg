@@ -32,10 +32,17 @@ const REFERRAL_LEVELS = [
 ];
 
 const SUBSCRIPTION_TYPES = [
-  { id: "free", icon: "🆓", color: "from-gray-400 to-gray-500", nameKey: "free", descKey: "freeDesc" },
-  { id: "standard", icon: "⭐", color: "from-blue-400 to-blue-500", nameKey: "standard", descKey: "standardDesc" },
-  { id: "premium", icon: "💎", color: "from-purple-400 to-purple-500", nameKey: "premium", descKey: "premiumDesc" },
-  { id: "vip", icon: "👑", color: "from-amber-400 to-amber-500", nameKey: "vip", descKey: "vipDesc" },
+  { id: "smart", icon: "🧠", color: "from-cyan-400 to-cyan-500", label: "Smart" },
+  { id: "agent", icon: "🕵️", color: "from-teal-400 to-teal-500", label: "Agent" },
+  { id: "pro", icon: "⚡", color: "from-blue-400 to-blue-500", label: "Pro" },
+  { id: "vip", icon: "👑", color: "from-purple-400 to-purple-500", label: "VIP" },
+  { id: "partner", icon: "🚀", color: "from-amber-400 to-amber-500", label: "Partner" },
+];
+
+const ROLE_OPTIONS = [
+  { id: "root", icon: "🛡️", color: "from-amber-500 to-amber-600", label: "Root" },
+  { id: "admin", icon: "⚙️", color: "from-red-400 to-red-500", label: "Admin" },
+  { id: "user", icon: "👤", color: "from-blue-400 to-blue-500", label: "User" },
 ];
 
 const isIncomeTx = (type: string): boolean => {
@@ -105,7 +112,8 @@ export default function AdminClientDetails() {
   });
 
   const [selectedLevel, setSelectedLevel] = useState("R1");
-  const [selectedSubscription, setSelectedSubscription] = useState("free");
+  const [selectedSubscription, setSelectedSubscription] = useState("smart");
+  const [selectedRole, setSelectedRole] = useState("user");
   const [isVIP, setIsVIP] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [showAllTx, setShowAllTx] = useState(false);
@@ -138,7 +146,8 @@ export default function AdminClientDetails() {
   // Initial values for change detection
   const initialValues = useRef({
     selectedLevel: "R1",
-    selectedSubscription: "free",
+    selectedSubscription: "smart",
+    selectedRole: "user",
     isVIP: false,
     isBlocked: false,
     limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000", dailyUsdtSend: "50000", monthlyUsdtSend: "500000", dailyUsdtReceive: "100000", monthlyUsdtReceive: "1000000" },
@@ -153,7 +162,8 @@ export default function AdminClientDetails() {
     // Set root-level fields
     setIsVIP(client.is_vip ?? false);
     setIsBlocked(client.is_blocked ?? false);
-    if (client.subscription_type) setSelectedSubscription(client.subscription_type === 'default' ? 'free' : client.subscription_type);
+    if (client.role) setSelectedRole(client.role);
+    if (client.subscription_type) setSelectedSubscription(client.subscription_type === 'default' ? 'smart' : client.subscription_type);
     if (client.referral_level) {
       // Strip "(DEFAULT)" suffix if present
       const level = client.referral_level.replace(/\(DEFAULT\)/i, '').trim();
@@ -192,7 +202,8 @@ export default function AdminClientDetails() {
       limits: newLimits,
       isVIP: client.is_vip ?? false,
       isBlocked: client.is_blocked ?? false,
-      selectedSubscription: client.subscription_type === 'default' ? 'free' : (client.subscription_type || 'free'),
+      selectedRole: client.role || 'user',
+      selectedSubscription: client.subscription_type === 'default' ? 'smart' : (client.subscription_type || 'smart'),
       selectedLevel: selectedLevel,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -203,6 +214,11 @@ export default function AdminClientDetails() {
     mutationFn: async () => {
       if (!userId) throw new Error("No user ID");
       const body: Record<string, unknown> = {
+        role: selectedRole,
+        subscription_type: selectedSubscription,
+        referral_level: selectedLevel.toLowerCase(),
+        is_blocked: isBlocked,
+        is_vip: isVIP,
         custom_settings_enabled: true,
         card_to_card_percent: fees.transferPercent,
         bank_transfer_percent: fees.withdrawPercent,
@@ -230,7 +246,7 @@ export default function AdminClientDetails() {
       queryClient.invalidateQueries({ queryKey: ["admin-client-detail", userId] });
       toast.success("Настройки клиента сохранены");
       // Update initial values so change detection resets
-      initialValues.current = { ...initialValues.current, fees: { ...fees }, limits: { ...limits } };
+      initialValues.current = { ...initialValues.current, fees: { ...fees }, limits: { ...limits }, selectedRole, selectedSubscription, selectedLevel, isVIP, isBlocked };
     },
     onError: (err) => {
       toast.error(`Ошибка: ${err.message}`);
@@ -241,6 +257,7 @@ export default function AdminClientDetails() {
     const changes: { label: string; from: string; to: string }[] = [];
     const init = initialValues.current;
 
+    if (selectedRole !== init.selectedRole) changes.push({ label: "Роль", from: init.selectedRole, to: selectedRole });
     if (selectedLevel !== init.selectedLevel) changes.push({ label: t("admin.clients.referralLevel") || "Реферальный уровень", from: init.selectedLevel, to: selectedLevel });
     if (selectedSubscription !== init.selectedSubscription) changes.push({ label: t("admin.clients.subscriptionType") || "Подписка", from: init.selectedSubscription, to: selectedSubscription });
     if (isVIP !== init.isVIP) changes.push({ label: "VIP", from: init.isVIP ? "Да" : "Нет", to: isVIP ? "Да" : "Нет" });
@@ -651,35 +668,60 @@ export default function AdminClientDetails() {
 
 
 
+        {/* Role Selector */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-primary" />
+            <h4 className="font-semibold">Роль</h4>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {ROLE_OPTIONS.map((role) => (
+              <button
+                key={role.id}
+                onClick={() => setSelectedRole(role.id)}
+                className={cn(
+                  "relative p-3 rounded-xl border-2 transition-all duration-200 text-center",
+                  selectedRole === role.id
+                    ? "border-primary bg-primary/10"
+                    : "border-border/50 bg-muted/30 hover:border-border"
+                )}
+              >
+                <div className={cn("w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center text-xl", role.color)}>
+                  {role.icon}
+                </div>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <span className="font-semibold text-sm">{role.label}</span>
+                  {selectedRole === role.id && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Subscription Type */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <h4 className="font-semibold">{t("admin.clients.subscriptionType")}</h4>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {SUBSCRIPTION_TYPES.map((sub) => (
               <button
                 key={sub.id}
                 onClick={() => setSelectedSubscription(sub.id)}
                 className={cn(
-                  "relative p-3 rounded-xl border-2 transition-all duration-200 text-left",
+                  "relative p-3 rounded-xl border-2 transition-all duration-200 text-center",
                   selectedSubscription === sub.id
                     ? "border-primary bg-primary/10"
                     : "border-border/50 bg-muted/30 hover:border-border"
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <div className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-xl shrink-0", sub.color)}>
-                    {sub.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-sm">{t(`admin.clients.subscriptions.${sub.nameKey}`)}</span>
-                      {selectedSubscription === sub.id && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
-                    </div>
-                    <p className="text-[10px] text-muted-foreground line-clamp-1">{t(`admin.clients.subscriptions.${sub.descKey}`)}</p>
-                  </div>
+                <div className={cn("w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center text-xl", sub.color)}>
+                  {sub.icon}
+                </div>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <span className="font-semibold text-xs">{sub.label}</span>
+                  {selectedSubscription === sub.id && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
                 </div>
               </button>
             ))}
