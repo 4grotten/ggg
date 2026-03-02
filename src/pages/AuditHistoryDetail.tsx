@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { ru } from "date-fns/locale";
 
 // Human-readable labels for known field keys
 const FIELD_LABELS: Record<string, string> = {
@@ -206,7 +205,7 @@ export default function AuditHistoryDetail() {
               {timestamp && (
                 <div className="flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>{format(new Date(timestamp), "dd MMMM yyyy, HH:mm:ss", { locale: ru })}</span>
+                  <span><span className="font-bold">{format(new Date(timestamp), "dd.MM.yyyy")}</span>{' '}{format(new Date(timestamp), "HH:mm:ss")}</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
