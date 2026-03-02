@@ -202,8 +202,8 @@ export default function AdminClientDetails() {
     };
     const clean = (v: string | null | undefined, fallback: string) => v != null ? String(parseFloat(String(v))) : fallback;
     const newLimits = {
-      dailyTopUp: limits.dailyTopUp,
-      monthlyTopUp: limits.monthlyTopUp,
+      dailyTopUp: clean(l.daily_top_up_limit, limits.dailyTopUp),
+      monthlyTopUp: clean(l.monthly_top_up_limit, limits.monthlyTopUp),
       dailyTransfer: clean(l.daily_transfer_limit, limits.dailyTransfer),
       monthlyTransfer: clean(l.monthly_transfer_limit, limits.monthlyTransfer),
       dailyWithdraw: clean(l.daily_withdrawal_limit, limits.dailyWithdraw),
@@ -247,6 +247,8 @@ export default function AdminClientDetails() {
         bank_transfer_percent: fees.withdrawPercent,
         network_fee_percent: fees.topUpPercent,
         currency_conversion_percent: fees.conversionPercent,
+        daily_top_up_limit: limits.dailyTopUp,
+        monthly_top_up_limit: limits.monthlyTopUp,
         daily_transfer_limit: limits.dailyTransfer,
         monthly_transfer_limit: limits.monthlyTransfer,
         daily_withdrawal_limit: limits.dailyWithdraw,
