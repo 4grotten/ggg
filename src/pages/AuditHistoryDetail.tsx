@@ -64,7 +64,17 @@ const PERCENT_FIELDS = new Set([
 ]);
 
 function formatValue(val: any, fieldKey?: string): string {
-  if (val === null || val === undefined) return "—";
+  if (val === null || val === undefined) {
+    // For monetary/percent fields, show 0 instead of dash
+    if (fieldKey) {
+      if (MONETARY_FIELDS.has(fieldKey)) {
+        const currency = USDT_FIELDS.has(fieldKey) ? "USDT" : "AED";
+        return `0.00 ${currency}`;
+      }
+      if (PERCENT_FIELDS.has(fieldKey)) return "0.00%";
+    }
+    return "—";
+  }
   if (typeof val === "boolean") return val ? "Да" : "Нет";
 
   const num = Number(val);
