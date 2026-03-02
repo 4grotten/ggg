@@ -1705,7 +1705,12 @@
       "created": "Creado",
       "active": "Activa",
       "inactive": "Inactiva",
-      "roleLabel": "Rol"
+      "roleLabel": "Rol",
+      "transactionHistory": "Historial de Transacciones",
+      "cards": "Tarjetas",
+      "bankAccounts": "Cuentas Bancarias",
+      "cryptoWallets": "Billeteras Cripto",
+      "personalRates": "Tasas de Cambio Personales"
     },
     "roles": {
       "addRole": "Agregar Rol",
