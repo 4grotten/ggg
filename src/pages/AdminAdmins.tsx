@@ -413,7 +413,8 @@ export default function AdminAdmins() {
                       const [iconColor, bgColor] = colorClasses.split(' ');
                       const adminName = item.admin_name || item.performed_by_name || item.admin?.name || 'Admin';
                       const adminPhone = item.admin_phone || item.performed_by_phone || item.admin?.phone || '';
-                      const details = item.description || item.details || item.message || JSON.stringify(item);
+                      const rawDetails = item.description || item.details || item.message || item;
+                      const details = typeof rawDetails === 'object' ? JSON.stringify(rawDetails) : String(rawDetails);
                       const targetName = item.target_name || item.target_user_name || item.target?.name;
                       const targetPhone = item.target_phone || item.target_user_phone || item.target?.phone;
                       const timestamp = item.created_at || item.timestamp || item.date;
