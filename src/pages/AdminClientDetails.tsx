@@ -52,7 +52,11 @@ const formatLimitValue = (val: string): string => {
   return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 const rawLimitValue = (val: string): string => {
-  return val.replace(/,/g, "");
+  const cleaned = val.replace(/,/g, "");
+  // Strip trailing zeros: "50005.000000" → "50005"
+  const num = parseFloat(cleaned);
+  if (isNaN(num)) return cleaned;
+  return String(num);
 };
 
 const isIncomeTx = (type: string): boolean => {
@@ -133,6 +137,7 @@ export default function AdminClientDetails() {
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
   const [expandedWallet, setExpandedWallet] = useState<string | null>(null);
   const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [focusedLimitKey, setFocusedLimitKey] = useState<string | null>(null);
 
   const [limits, setLimits] = useState({
     dailyTopUp: "50000", monthlyTopUp: "500000",
@@ -195,21 +200,22 @@ export default function AdminClientDetails() {
       withdrawPercent: l.bank_transfer_percent != null ? String(l.bank_transfer_percent) : fees.withdrawPercent,
       conversionPercent: l.currency_conversion_percent != null ? String(l.currency_conversion_percent) : fees.conversionPercent,
     };
+    const clean = (v: string | null | undefined, fallback: string) => v != null ? String(parseFloat(String(v))) : fallback;
     const newLimits = {
       dailyTopUp: limits.dailyTopUp,
       monthlyTopUp: limits.monthlyTopUp,
-      dailyTransfer: l.daily_transfer_limit != null ? String(l.daily_transfer_limit) : limits.dailyTransfer,
-      monthlyTransfer: l.monthly_transfer_limit != null ? String(l.monthly_transfer_limit) : limits.monthlyTransfer,
-      dailyWithdraw: l.daily_withdrawal_limit != null ? String(l.daily_withdrawal_limit) : limits.dailyWithdraw,
-      monthlyWithdraw: l.monthly_withdrawal_limit != null ? String(l.monthly_withdrawal_limit) : limits.monthlyWithdraw,
-      singleTransaction: l.transfer_max != null ? String(l.transfer_max) : limits.singleTransaction,
-      transferMin: l.transfer_min != null ? String(l.transfer_min) : limits.transferMin,
-      withdrawalMin: l.withdrawal_min != null ? String(l.withdrawal_min) : limits.withdrawalMin,
-      withdrawalMax: l.withdrawal_max != null ? String(l.withdrawal_max) : limits.withdrawalMax,
-      dailyUsdtSend: l.daily_usdt_send_limit != null ? String(l.daily_usdt_send_limit) : limits.dailyUsdtSend,
-      monthlyUsdtSend: l.monthly_usdt_send_limit != null ? String(l.monthly_usdt_send_limit) : limits.monthlyUsdtSend,
-      dailyUsdtReceive: l.daily_usdt_receive_limit != null ? String(l.daily_usdt_receive_limit) : limits.dailyUsdtReceive,
-      monthlyUsdtReceive: l.monthly_usdt_receive_limit != null ? String(l.monthly_usdt_receive_limit) : limits.monthlyUsdtReceive,
+      dailyTransfer: clean(l.daily_transfer_limit, limits.dailyTransfer),
+      monthlyTransfer: clean(l.monthly_transfer_limit, limits.monthlyTransfer),
+      dailyWithdraw: clean(l.daily_withdrawal_limit, limits.dailyWithdraw),
+      monthlyWithdraw: clean(l.monthly_withdrawal_limit, limits.monthlyWithdraw),
+      singleTransaction: clean(l.transfer_max, limits.singleTransaction),
+      transferMin: clean(l.transfer_min, limits.transferMin),
+      withdrawalMin: clean(l.withdrawal_min, limits.withdrawalMin),
+      withdrawalMax: clean(l.withdrawal_max, limits.withdrawalMax),
+      dailyUsdtSend: clean(l.daily_usdt_send_limit, limits.dailyUsdtSend),
+      monthlyUsdtSend: clean(l.monthly_usdt_send_limit, limits.monthlyUsdtSend),
+      dailyUsdtReceive: clean(l.daily_usdt_receive_limit, limits.dailyUsdtReceive),
+      monthlyUsdtReceive: clean(l.monthly_usdt_receive_limit, limits.monthlyUsdtReceive),
     };
     setFees(newFees);
     setLimits(newLimits);
@@ -989,9 +995,10 @@ export default function AdminClientDetails() {
                     <Input
                       type="text"
                       inputMode="decimal"
-                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
-                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
-                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      value={focusedLimitKey === key ? limits[key as keyof typeof limits] : formatLimitValue(limits[key as keyof typeof limits])}
+                      onChange={(e) => setLimits(prev => ({ ...prev, [key]: rawLimitValue(e.target.value) }))}
+                      onFocus={() => setFocusedLimitKey(key)}
+                      onBlur={() => setFocusedLimitKey(null)}
                       className="text-xs pr-10 rounded-xl h-9"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">AED</span>
@@ -1015,9 +1022,10 @@ export default function AdminClientDetails() {
                     <Input
                       type="text"
                       inputMode="decimal"
-                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
-                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
-                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      value={focusedLimitKey === key ? limits[key as keyof typeof limits] : formatLimitValue(limits[key as keyof typeof limits])}
+                      onChange={(e) => setLimits(prev => ({ ...prev, [key]: rawLimitValue(e.target.value) }))}
+                      onFocus={() => setFocusedLimitKey(key)}
+                      onBlur={() => setFocusedLimitKey(null)}
                       className="text-xs pr-10 rounded-xl h-9"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">AED</span>
@@ -1041,9 +1049,10 @@ export default function AdminClientDetails() {
                     <Input
                       type="text"
                       inputMode="decimal"
-                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
-                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
-                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      value={focusedLimitKey === key ? limits[key as keyof typeof limits] : formatLimitValue(limits[key as keyof typeof limits])}
+                      onChange={(e) => setLimits(prev => ({ ...prev, [key]: rawLimitValue(e.target.value) }))}
+                      onFocus={() => setFocusedLimitKey(key)}
+                      onBlur={() => setFocusedLimitKey(null)}
                       className="text-xs pr-14 rounded-xl h-9"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">USDT</span>
@@ -1066,9 +1075,10 @@ export default function AdminClientDetails() {
                     <Input
                       type="text"
                       inputMode="decimal"
-                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
-                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
-                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      value={focusedLimitKey === key ? limits[key as keyof typeof limits] : formatLimitValue(limits[key as keyof typeof limits])}
+                      onChange={(e) => setLimits(prev => ({ ...prev, [key]: rawLimitValue(e.target.value) }))}
+                      onFocus={() => setFocusedLimitKey(key)}
+                      onBlur={() => setFocusedLimitKey(null)}
                       className="text-xs pr-14 rounded-xl h-9"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">USDT</span>
@@ -1094,9 +1104,10 @@ export default function AdminClientDetails() {
                     <Input
                       type="text"
                       inputMode="decimal"
-                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
-                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
-                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      value={focusedLimitKey === key ? limits[key as keyof typeof limits] : formatLimitValue(limits[key as keyof typeof limits])}
+                      onChange={(e) => setLimits(prev => ({ ...prev, [key]: rawLimitValue(e.target.value) }))}
+                      onFocus={() => setFocusedLimitKey(key)}
+                      onBlur={() => setFocusedLimitKey(null)}
                       className="text-xs pr-10 rounded-xl h-9"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">AED</span>
