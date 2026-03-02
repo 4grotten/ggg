@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Search, RefreshCw, Users, UserPlus, Trash2, Phone, Hash, Shield, CheckCircle, History, Activity, TrendingUp, Loader2, ChevronRight, Crown } from "lucide-react";
@@ -97,6 +97,7 @@ function GlassCard({ children, title, description, icon: Icon, iconColor = "text
 
 export default function AdminAdmins() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
   const { admins, isLoading: adminsLoading, staff, staffLoading, clients, searchUser, addAdmin, removeAdmin } = useAdminManagement();
 
@@ -109,16 +110,23 @@ export default function AdminAdmins() {
   } | null>(null);
   const [selectedRole, setSelectedRole] = useState<AppRole>("admin");
   const [isSearching, setIsSearching] = useState(false);
-  const [activeSubTab, setActiveSubTab] = useState<"admins" | "history">("admins");
+  
+  // Persist active sub-tab in URL so navigating back restores it
+  const activeSubTab = (searchParams.get("tab") === "history" ? "history" : "admins") as "admins" | "history";
+  const setActiveSubTab = useCallback((tab: "admins" | "history") => {
+    setSearchParams({ tab }, { replace: true });
+  }, [setSearchParams]);
 
-  // Real audit history from API with pagination
+  // Real audit history from API with pagination — cached in state, only fetch once
   const [auditHistory, setAuditHistory] = useState<any[]>([]);
   const [auditLoading, setAuditLoading] = useState(false);
+  const auditLoadedRef = useRef(false);
   const [visibleCount, setVisibleCount] = useState(20);
   const historyBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (activeSubTab === "history") {
+    if (activeSubTab === "history" && !auditLoadedRef.current) {
+      auditLoadedRef.current = true;
       setAuditLoading(true);
       setVisibleCount(20);
       apiGet<any>("/admin/audit-history/")
@@ -132,6 +140,15 @@ export default function AdminAdmins() {
         .finally(() => setAuditLoading(false));
     }
   }, [activeSubTab]);
+
+  // Pull-to-refresh: fetch only new items and prepend
+  const refreshAuditHistory = useCallback(async () => {
+    const res = await apiGet<any>("/admin/audit-history/");
+    if (res.data) {
+      const items = Array.isArray(res.data) ? res.data : (res.data as any).results || [];
+      setAuditHistory(items);
+    }
+  }, []);
 
   // Infinite scroll for audit history
   useEffect(() => {
@@ -212,7 +229,7 @@ export default function AdminAdmins() {
           <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
           <div className="relative px-4 py-4">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate("/settings/admin")} className="shrink-0 rounded-xl bg-muted/50 hover:bg-muted">
+              <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="shrink-0 rounded-xl bg-muted/50 hover:bg-muted">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div className="flex-1 min-w-0">
