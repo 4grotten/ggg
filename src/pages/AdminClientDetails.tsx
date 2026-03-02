@@ -116,6 +116,8 @@ export default function AdminClientDetails() {
   const [selectedRole, setSelectedRole] = useState("user");
   const [isVIP, setIsVIP] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [showBlockAlert, setShowBlockAlert] = useState(false);
+  const [pendingBlockValue, setPendingBlockValue] = useState(false);
   const [showAllTx, setShowAllTx] = useState(false);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
@@ -491,14 +493,50 @@ export default function AdminClientDetails() {
             )}
           </div>
 
-          {/* Block toggle */}
-          <div className="px-5 pb-4 flex items-center justify-between">
+          {/* Block toggle - moved under user data */}
+          <div className="px-5 pb-4 flex items-center justify-between border-t border-border/30 pt-3">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-destructive" />
               <span className="text-sm font-medium">{t("admin.clients.blockStatus")}</span>
             </div>
-            <Switch checked={isBlocked} onCheckedChange={setIsBlocked} />
+            <Switch checked={isBlocked} onCheckedChange={(val) => {
+              setPendingBlockValue(val);
+              setShowBlockAlert(true);
+            }} />
           </div>
+
+          {/* Block confirmation alert */}
+          <AlertDialog open={showBlockAlert} onOpenChange={setShowBlockAlert}>
+            <AlertDialogContent className="max-w-[320px] rounded-2xl">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-base">
+                  {pendingBlockValue ? "Блокировка пользователя" : "Разблокировка пользователя"}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-sm space-y-2">
+                  <span className="block">
+                    {pendingBlockValue
+                      ? `Пользователь ${client?.full_name || ''} будет заблокирован. Он не сможет отправлять и принимать переводы, пополнять счёт и совершать любые операции.`
+                      : `Пользователь ${client?.full_name || ''} будет разблокирован и сможет снова совершать операции.`}
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    Роль: <span className="font-medium capitalize">{selectedRole}</span> • Изменил: <span className="font-medium">{client?.full_name || 'Admin'}</span>
+                  </span>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-row gap-3">
+                <AlertDialogCancel className="flex-1 rounded-xl mt-0">Отмена</AlertDialogCancel>
+                <AlertDialogAction
+                  className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 text-white"
+                  onClick={() => {
+                    setIsBlocked(pendingBlockValue);
+                    setShowBlockAlert(false);
+                  }}
+                >
+                  {pendingBlockValue ? "Заблокировать" : "Разблокировать"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         {/* Financial Summary */}
