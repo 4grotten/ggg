@@ -342,7 +342,7 @@ export default function AdminAdmins() {
                             className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 group hover:border-border transition-colors cursor-pointer active:scale-[0.98]"
                             onClick={() => navigate(`/settings/admin/staff/${member.user_id}`)}
                           >
-                            <Avatar className="w-12 h-12 rounded-2xl shrink-0">
+                            <Avatar className="w-14 h-14 rounded-2xl shrink-0">
                               <AvatarImage src={member.avatar_url || undefined} alt={member.full_name} />
                               <AvatarFallback className="rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 text-sm font-medium">
                                 {initials || '??'}
