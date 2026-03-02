@@ -435,6 +435,12 @@ export default function AdminClientDetails() {
                   <span className="capitalize">{client.gender}</span>
                 </div>
               )}
+              {/* Block toggle */}
+              <div className="flex items-center justify-center gap-1.5 mt-2">
+                <Shield className="w-3 h-3 text-destructive" />
+                <span className="text-[11px] font-medium">{t("admin.clients.blockStatus")}</span>
+                <Switch checked={isBlocked} onCheckedChange={setIsBlocked} className="scale-75" />
+              </div>
               <div className="flex items-center gap-1.5 mt-1.5 flex-wrap justify-center">
                 {isVIP && (
                   <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] px-2.5 py-0.5 border-0 shadow-sm">
@@ -489,15 +495,6 @@ export default function AdminClientDetails() {
                 </Button>
               </a>
             )}
-          </div>
-
-          {/* Block toggle */}
-          <div className="px-5 pb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-destructive" />
-              <span className="text-sm font-medium">{t("admin.clients.blockStatus")}</span>
-            </div>
-            <Switch checked={isBlocked} onCheckedChange={setIsBlocked} />
           </div>
         </div>
 
