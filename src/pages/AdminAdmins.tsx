@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, RefreshCw, Users, UserPlus, Trash2, Phone, Hash, Shield, CheckCircle, History, Activity, TrendingUp, Loader2 } from "lucide-react";
+import { ArrowLeft, Search, RefreshCw, Users, UserPlus, Trash2, Phone, Hash, Shield, CheckCircle, History, Activity, TrendingUp, Loader2, ChevronRight } from "lucide-react";
 import { apiGet } from "@/services/api/apiClient";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Input } from "@/components/ui/input";
@@ -425,7 +425,8 @@ export default function AdminAdmins() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-2"
+                          className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-2 cursor-pointer active:scale-[0.98] transition-transform"
+                          onClick={() => navigate(`/settings/admin/audit/${item.id || index}`, { state: { auditItem: item } })}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -441,12 +442,28 @@ export default function AdminAdmins() {
                               </div>
                             </div>
                             {timestamp && (
-                              <span className="text-xs text-muted-foreground">
-                                {formatRelativeTime(new Date(timestamp))}
-                              </span>
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs text-muted-foreground">
+                                  {formatRelativeTime(new Date(timestamp))}
+                                </span>
+                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                              </div>
                             )}
                           </div>
-                          <p className="text-sm text-foreground/80 pl-10">{details}</p>
+                          {/* Show short summary instead of raw JSON */}
+                          {(() => {
+                            const rawDet = item.details;
+                            if (typeof rawDet === 'object' && rawDet?.changes) {
+                              const keys = Object.keys(rawDet.changes);
+                              const labels: Record<string, string> = {
+                                subscription_type: "Подписка", role: "Роль", referral_level: "Реф. уровень",
+                                is_blocked: "Блокировка", is_vip: "VIP",
+                              };
+                              const summary = keys.map(k => labels[k] || k).join(", ");
+                              return <p className="text-sm text-foreground/80 pl-10">Изменено: {summary}</p>;
+                            }
+                            return <p className="text-sm text-foreground/80 pl-10">{details}</p>;
+                          })()}
                           {targetName && (
                             <div className="flex items-center gap-2 pl-10">
                               <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
