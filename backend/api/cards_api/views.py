@@ -1,4 +1,4 @@
-from backend.api.transactions_api.serializers import AdminTransactionSerializerDirect
+from api.transactions_api.serializers import AdminTransactionSerializerDirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
