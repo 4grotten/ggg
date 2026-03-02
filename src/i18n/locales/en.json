@@ -1761,6 +1761,16 @@
         "phone": "Phone",
         "email": "Email",
         "full_name": "Full Name"
+      },
+      "detail": {
+        "title": "Change Details",
+        "notFound": "Data not found",
+        "notSet": "Not set",
+        "yes": "Yes",
+        "no": "No",
+        "action": "Action",
+        "changedParams": "Changed Parameters",
+        "rawData": "Change data"
       }
     },
     "changedFor": "Changed for",

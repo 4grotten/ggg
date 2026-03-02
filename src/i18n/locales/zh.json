@@ -1695,6 +1695,16 @@
         "phone": "电话",
         "email": "邮箱",
         "full_name": "全名"
+      },
+      "detail": {
+        "title": "变更详情",
+        "notFound": "未找到数据",
+        "notSet": "未设置",
+        "yes": "是",
+        "no": "否",
+        "action": "操作",
+        "changedParams": "已更改参数",
+        "rawData": "变更数据"
       }
     },
     "changedFor": "变更对象",
