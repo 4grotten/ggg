@@ -553,10 +553,10 @@ export default function AdminAdmins() {
                                                 key={k}
                                                 className={cn(
                                                   "inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm",
-                                                  k === 'is_blocked' && mappedAction === 'block_client'
-                                                    ? "bg-destructive/20 border border-destructive/30 text-destructive"
-                                                    : k === 'is_blocked' && mappedAction === 'unblock_client'
-                                                      ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
+                                                  k === 'is_blocked' && mappedAction === 'unblock_client'
+                                                    ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
+                                                    : k === 'is_blocked'
+                                                      ? "bg-destructive/20 border border-destructive/30 text-destructive"
                                                       : "bg-primary/20 border border-primary/20 text-primary-foreground"
                                                 )}
                                               >
