@@ -1688,6 +1688,16 @@
         "phone": "Telefon",
         "email": "E-Mail",
         "full_name": "Vollständiger Name"
+      },
+      "detail": {
+        "title": "Änderungsdetails",
+        "notFound": "Daten nicht gefunden",
+        "notSet": "Nicht festgelegt",
+        "yes": "Ja",
+        "no": "Nein",
+        "action": "Aktion",
+        "changedParams": "Geänderte Parameter",
+        "rawData": "Änderungsdaten"
       }
     },
     "changedFor": "Geändert für",

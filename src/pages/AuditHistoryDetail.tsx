@@ -67,11 +67,11 @@ const PERCENT_FIELDS = new Set([
   "network_fee_percent", "currency_conversion_percent",
 ]);
 
-function formatValue(val: any, fieldKey?: string): string {
+function formatValue(val: any, fieldKey?: string, tFn?: (key: string, fallback?: string) => string): string {
   if (val === null || val === undefined) {
-    return "Не задано";
+    return tFn?.('admin.audit.detail.notSet', 'Не задано') || 'Не задано';
   }
-  if (typeof val === "boolean") return val ? "Да" : "Нет";
+  if (typeof val === "boolean") return val ? (tFn?.('admin.audit.detail.yes', 'Да') || 'Да') : (tFn?.('admin.audit.detail.no', 'Нет') || 'Нет');
 
   const num = Number(val);
   if (fieldKey && !isNaN(num)) {
@@ -100,13 +100,13 @@ export default function AuditHistoryDetail() {
   if (!item) {
     return (
       <MobileLayout
-        title="Детали изменения"
+        title={t('admin.audit.detail.title', 'Детали изменения')}
         showBackButton
         onBack={() => navigate(-1)}
         rightAction={<div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>}
       >
         <div className="px-4 py-20 text-center text-muted-foreground">
-          Данные не найдены
+          {t('admin.audit.detail.notFound', 'Данные не найдены')}
         </div>
       </MobileLayout>
     );
@@ -149,7 +149,7 @@ export default function AuditHistoryDetail() {
 
   return (
     <MobileLayout
-      title="Детали изменения"
+      title={t('admin.audit.detail.title', 'Детали изменения')}
       showBackButton
       onBack={() => navigate(-1)}
       rightAction={<div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>}
@@ -164,7 +164,7 @@ export default function AuditHistoryDetail() {
           <div className="p-4 space-y-4">
             {/* Admin info */}
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Кто изменил</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{t('admin.audit.whoChanged', 'Кто изменил')}</p>
               <div className="flex items-center gap-3">
                 <Avatar className="w-11 h-11 rounded-xl shrink-0">
                   <AvatarImage src={adminAvatar || undefined} alt={adminName} />
@@ -211,7 +211,7 @@ export default function AuditHistoryDetail() {
               )}
               <div className="flex items-center gap-2">
                 <FileText className="w-3.5 h-3.5" />
-                <span>Действие: <span className="font-medium text-green-500">{String(t(`admin.actions.${actionType === 'UPDATE_USER_DATA' ? 'updateUserData' : actionType.toLowerCase().includes('update') ? 'updateClient' : actionType.toLowerCase().includes('block') ? 'blockClient' : actionType.toLowerCase().includes('unblock') ? 'unblockClient' : actionType.toLowerCase().includes('add_role') ? 'addRole' : actionType.toLowerCase().includes('remove_role') ? 'removeRole' : 'updateSetting'}`, actionType || "update"))}</span></span>
+                <span>{t('admin.audit.detail.action', 'Действие')}: <span className="font-medium text-green-500">{String(t(`admin.actions.${actionType === 'UPDATE_USER_DATA' ? 'updateUserData' : actionType.toLowerCase().includes('update') ? 'updateClient' : actionType.toLowerCase().includes('block') ? 'blockClient' : actionType.toLowerCase().includes('unblock') ? 'unblockClient' : actionType.toLowerCase().includes('add_role') ? 'addRole' : actionType.toLowerCase().includes('remove_role') ? 'removeRole' : 'updateSetting'}`, actionType || "update"))}</span></span>
               </div>
             </div>
 
@@ -268,13 +268,13 @@ export default function AuditHistoryDetail() {
             className="space-y-3"
           >
             <h3 className="text-sm font-semibold text-muted-foreground px-1">
-              Изменённые параметры ({changeEntries.length})
+              {t('admin.audit.detail.changedParams', 'Изменённые параметры')} ({changeEntries.length})
             </h3>
             <div className="space-y-2">
               {changeEntries.map(([key, val], i) => {
-                const label = FIELD_LABELS[key] || key;
-                const oldVal = formatValue((val as any)?.было ?? (val as any)?.old ?? (val as any)?.from, key);
-                const newVal = formatValue((val as any)?.стало ?? (val as any)?.new ?? (val as any)?.to, key);
+                const label = t(`admin.audit.fields.${key}`, FIELD_LABELS[key] || key);
+                const oldVal = formatValue((val as any)?.было ?? (val as any)?.old ?? (val as any)?.from, key, (k, f) => String(t(k, f)));
+                const newVal = formatValue((val as any)?.стало ?? (val as any)?.new ?? (val as any)?.to, key, (k, f) => String(t(k, f)));
 
                 return (
                   <motion.div
@@ -305,7 +305,7 @@ export default function AuditHistoryDetail() {
             transition={{ delay: 0.15 }}
             className="rounded-2xl bg-card border border-border/50 p-4"
           >
-            <p className="text-xs text-muted-foreground mb-2">Данные изменения:</p>
+            <p className="text-xs text-muted-foreground mb-2">{t('admin.audit.detail.rawData', 'Данные изменения')}:</p>
             <pre className="text-xs text-foreground/70 whitespace-pre-wrap break-all">
               {JSON.stringify(item, null, 2)}
             </pre>

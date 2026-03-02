@@ -1688,6 +1688,16 @@
         "phone": "Teléfono",
         "email": "Email",
         "full_name": "Nombre Completo"
+      },
+      "detail": {
+        "title": "Detalles del cambio",
+        "notFound": "Datos no encontrados",
+        "notSet": "No establecido",
+        "yes": "Sí",
+        "no": "No",
+        "action": "Acción",
+        "changedParams": "Parámetros modificados",
+        "rawData": "Datos del cambio"
       }
     },
     "changedFor": "Cambiado para",

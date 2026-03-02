@@ -1688,6 +1688,16 @@
         "phone": "Telefon",
         "email": "E-posta",
         "full_name": "Tam Ad"
+      },
+      "detail": {
+        "title": "Değişiklik Detayları",
+        "notFound": "Veri bulunamadı",
+        "notSet": "Belirlenmemiş",
+        "yes": "Evet",
+        "no": "Hayır",
+        "action": "İşlem",
+        "changedParams": "Değiştirilen Parametreler",
+        "rawData": "Değişiklik verisi"
       }
     },
     "changedFor": "Değiştirilen",
