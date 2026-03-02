@@ -559,7 +559,9 @@ export default function AdminAdmins() {
                                 if (typeof rawDet === 'object' && rawDet?.changes) {
                                   const keys = Object.keys(rawDet.changes);
                                   return (
-                                    <div className="flex flex-wrap gap-1.5 pl-11 pt-1">
+                                    <div className="pl-11 pt-1 space-y-1.5">
+                                      <p className="text-xs text-muted-foreground font-medium">Было изменено:</p>
+                                      <div className="flex flex-wrap gap-1.5">
                                       {keys.map((k) => (
                                         <span
                                           key={k}
@@ -568,6 +570,7 @@ export default function AdminAdmins() {
                                           {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
                                         </span>
                                       ))}
+                                    </div>
                                     </div>
                                   );
                                 }
