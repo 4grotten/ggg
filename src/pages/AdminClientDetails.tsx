@@ -491,6 +491,15 @@ export default function AdminClientDetails() {
               </a>
             )}
           </div>
+
+          {/* Block toggle */}
+          <div className="px-5 pb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-destructive" />
+              <span className="text-sm font-medium">{t("admin.clients.blockStatus")}</span>
+            </div>
+            <Switch checked={isBlocked} onCheckedChange={setIsBlocked} />
+          </div>
         </div>
 
         {/* Financial Summary */}
@@ -552,22 +561,6 @@ export default function AdminClientDetails() {
                 {((client.cards?.reduce((s, c) => s + c.balance, 0) || 0) + (client.accounts?.reduce((s, a) => s + a.balance, 0) || 0)).toLocaleString()} AED
               </span>
             </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border/50">
-            <div className="flex items-center gap-2">
-              <Crown className="w-4 h-4 text-amber-500" />
-              <span className="text-sm font-medium">{t("admin.clients.vipStatus")}</span>
-            </div>
-            <Switch checked={isVIP} onCheckedChange={setIsVIP} />
-          </div>
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border/50">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-destructive" />
-              <span className="text-sm font-medium">{t("admin.clients.blockStatus")}</span>
-            </div>
-            <Switch checked={isBlocked} onCheckedChange={setIsBlocked} />
           </div>
         </div>
 
