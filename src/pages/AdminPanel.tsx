@@ -1,5 +1,6 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings, Key, Copy, Check, ChevronDown, Bot } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings, Key, Copy, Check, ChevronDown, Bot, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -367,6 +368,7 @@ function GlassCard({ children, title, description, icon: Icon, iconColor = "text
 export default function AdminPanel() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { settings, isLoading, updateSetting, getSettingsByCategory } = useAdminSettings();
   const { admins, isLoading: adminsLoading, clients, clientsLoading, searchUser, searchClients, addAdmin, removeAdmin } = useAdminManagement();
@@ -632,16 +634,18 @@ export default function AdminPanel() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               
-                <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-lg font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    {t("admin.title")}
-                  </h1>
-                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                  <span className="text-sm font-semibold truncate">{user?.full_name || 'Admin'}</span>
+                  {user?.role === 'root' ? (
+                    <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5 shrink-0">
+                      <Crown className="w-2.5 h-2.5" />Root
+                    </Badge>
+                  ) : (
+                    <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground shrink-0">Admin</Badge>
+                  )}
                 </div>
-                <p className="text-xs text-muted-foreground truncate">
-                  {t("admin.subtitle")}
-                </p>
+                <p className="text-[11px] text-muted-foreground truncate">{user?.phone_number}</p>
               </div>
               
               <div className="flex items-center gap-1">
@@ -650,6 +654,19 @@ export default function AdminPanel() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Title section below header */}
+        <div className="px-4 pt-2 pb-3">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              {t("admin.title")}
+            </h1>
+            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {t("admin.subtitle")}
+          </p>
         </div>
 
         {/* Content - Stats and Tabs scroll with content, lower z-index */}
