@@ -1,3 +1,4 @@
+from backend.api.transactions_api.serializers import AdminTransactionSerializerDirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -127,7 +128,7 @@ class CardTransactionsListView(APIView):
 
     @swagger_auto_schema(
         operation_summary="История транзакций по ID карты",
-        operation_description="Возвращает список всех транзакций, привязанных к конкретной карте (пополнения, списания, переводы).",
+        operation_description="Возвращает список всех транзакций, привязанных к конкретной карте (пополнения, списания, переводы), используя умный форматтер данных.",
         tags=["Cards"]
     )
     def get(self, request, card_id):
@@ -138,25 +139,14 @@ class CardTransactionsListView(APIView):
             Q(card_id=card.id) | 
             Q(sender_card=card.card_number_encrypted) | 
             Q(recipient_card=card.card_number_encrypted)
-        ).order_by('-created_at').values()
+        ).order_by('-created_at')
+        serializer = AdminTransactionSerializerDirect(
+            transactions_qs, 
+            many=True, 
+            context={'target_user_id': str(request.user.id)}
+        )
 
-        transactions = []
-        uid = str(request.user.id)
-
-        for tx in transactions_qs:
-            tx['amount'] = float(tx.get('amount') or 0)
-            tx['fee'] = float(tx.get('fee') or 0) if tx.get('fee') is not None else None
-            tx['exchange_rate'] = float(tx.get('exchange_rate') or 0) if tx.get('exchange_rate') is not None else None
-            tx['original_amount'] = float(tx.get('original_amount') or 0) if tx.get('original_amount') is not None else None
-            sender_id = str(tx.get('sender_id')) if tx.get('sender_id') else None
-            receiver_id = str(tx.get('receiver_id')) if tx.get('receiver_id') else None
-            if sender_id == uid and receiver_id == uid:
-                tx['direction'] = 'internal'
-            elif receiver_id == uid or tx.get('recipient_card') == card.card_number_encrypted:
-                tx['direction'] = 'inbound'
-            else:
-                tx['direction'] = 'outbound'
-                
-            transactions.append(tx)
-
-        return Response({"card_id": card_id, "transactions": transactions}, status=status.HTTP_200_OK)
+        return Response({
+            "card_id": card_id, 
+            "transactions": serializer.data
+        }, status=status.HTTP_200_OK)
