@@ -21,6 +21,7 @@ import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
 import { ApiTransaction, mapApiTransactionToLocal } from "@/services/api/transactions";
 import { format } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Referral levels configuration
 const REFERRAL_LEVELS = [
@@ -69,6 +70,7 @@ export default function AdminClientDetails() {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const { t } = useTranslation();
+  const { user: currentUser } = useAuth();
 
   // Fetch full client detail from backend
   const { data: client, isLoading } = useQuery({
@@ -538,7 +540,7 @@ export default function AdminClientDetails() {
                       : t("admin.clients.unblockUserDesc", { name: client?.full_name || '' })}
                   </span>
                   <span className="block text-xs text-muted-foreground">
-                    {t("admin.clients.whoChanged", "Кто изменил")}: <span className="font-medium">Admin</span> · <span className="font-medium capitalize">{selectedRole}</span>
+                    {t("admin.clients.whoChanged", "Кто изменил")}: <span className="font-medium">{currentUser?.full_name || '—'}</span> · <span className="font-medium capitalize">{(currentUser as any)?.role || 'admin'}</span>
                   </span>
                   <span className="block text-xs text-muted-foreground">
                     {t("admin.clients.changedFor", "Кому изменил")}: <span className="font-medium">{client?.full_name || '—'}</span>
