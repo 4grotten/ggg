@@ -339,7 +339,8 @@ export default function AdminAdmins() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.05 }}
-                            className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 group hover:border-border transition-colors"
+                            className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 group hover:border-border transition-colors cursor-pointer active:scale-[0.98]"
+                            onClick={() => navigate(`/settings/admin/staff/${member.user_id}`)}
                           >
                             <Avatar className="w-12 h-12 rounded-2xl shrink-0">
                               <AvatarImage src={member.avatar_url || undefined} alt={member.full_name} />
@@ -366,6 +367,7 @@ export default function AdminAdmins() {
                               {isRoot && <Crown className="w-3 h-3" />}
                               {isRoot ? 'Root' : 'Admin'}
                             </Badge>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                           </motion.div>
                         );
                       })}
