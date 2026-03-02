@@ -914,6 +914,7 @@
     "transferInitiated": "转账已发起"
   },
   "auth": {
+    "enterPasswordToAccess": "请输入账户密码以访问",
     "resetPassword": {
       "title": "忘记密码？",
       "description": "输入您的手机号码以恢复访问权限",

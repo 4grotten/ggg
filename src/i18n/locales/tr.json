@@ -908,6 +908,7 @@
     "transferInitiated": "Transfer başlatıldı"
   },
   "auth": {
+    "enterPasswordToAccess": "Erişim için hesap şifrenizi girin",
     "resetPassword": {
       "title": "Şifrenizi mi unuttunuz?",
       "description": "Erişimi kurtarmak için telefon numaranızı girin",

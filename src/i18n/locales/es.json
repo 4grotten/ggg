@@ -908,6 +908,7 @@
     "transferInitiated": "Transferencia iniciada"
   },
   "auth": {
+    "enterPasswordToAccess": "Ingrese la contraseña de su cuenta para acceder",
     "resetPassword": {
       "title": "¿Olvidaste tu contraseña?",
       "description": "Ingresa tu número de teléfono para recuperar el acceso",
