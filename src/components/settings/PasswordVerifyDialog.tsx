@@ -45,8 +45,8 @@ export const PasswordVerifyDialog = ({
       return;
     }
 
-    // Get phone number from current user
-    const phoneNumber = user?.phone_number;
+    // Get phone number from current user (API may return as 'phone' or 'phone_number')
+    const phoneNumber = user?.phone_number || (user as any)?.phone;
     if (!phoneNumber) {
       setError(t('auth.userNotFound', 'User not found'));
       return;
