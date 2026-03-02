@@ -254,7 +254,14 @@ export default function AdminStaffDetail() {
                     className="rounded-2xl bg-card border border-border/50 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() =>
                       navigate(`/settings/admin/audit/${entry.id || index}`, {
-                        state: { auditItem: entry },
+                        state: { auditItem: {
+                          ...entry,
+                          _enriched_admin_phone: member?.phone || '',
+                          _enriched_admin_avatar: member?.avatar_url || null,
+                          _enriched_admin_role: member?.role || 'admin',
+                          _enriched_admin_id: entry.admin_id,
+                          _enriched_target_id: entry.target_user_id,
+                        } },
                       })
                     }
                   >

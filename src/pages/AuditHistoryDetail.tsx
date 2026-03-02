@@ -1,8 +1,9 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, User, Shield, FileText, ArrowRight } from "lucide-react";
+import { ArrowLeft, Clock, User, Shield, FileText, ArrowRight, Crown, Hash, Phone } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -115,11 +116,15 @@ export default function AuditHistoryDetail() {
   }
 
   const adminName = item.admin_name || item.performed_by_name || item.admin?.name || "Admin";
-  const adminPhone = item.admin_phone || item.performed_by_phone || item.admin?.phone || "";
+  const adminPhone = item._enriched_admin_phone || item.admin_phone || item.performed_by_phone || item.admin?.phone || "";
+  const adminAvatar = item._enriched_admin_avatar || item.admin_avatar || null;
+  const adminId = item._enriched_admin_id || item.admin_id || "";
   const targetName = item.target_name || item.target_user_name || item.target?.name;
-  const targetPhone = item.target_phone || item.target_user_phone || item.target?.phone;
+  const targetPhone = item._enriched_target_phone || item.target_phone || item.target_user_phone || item.target?.phone;
+  const targetAvatar = item._enriched_target_avatar || item.target_avatar || null;
+  const targetId = item._enriched_target_id || item.target_user_id || item.target_id || "";
   const actionType = item.action || item.action_type || "";
-  const actingRole = item.acting_role || (typeof item.details === "object" ? item.details?.acting_role : null) || "admin";
+  const actingRole = item._enriched_admin_role || item.acting_role || (typeof item.details === "object" ? item.details?.acting_role : null) || "admin";
   const timestamp = item.created_at || item.timestamp || item.date;
 
   // Parse changes from the item
@@ -158,42 +163,86 @@ export default function AuditHistoryDetail() {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl bg-card border border-border/50 overflow-hidden"
         >
-          <div className="p-4 space-y-3">
+          <div className="p-4 space-y-4">
             {/* Admin info */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Кто изменил</p>
+              <div className="flex items-center gap-3">
+                <Avatar className="w-11 h-11 rounded-xl shrink-0">
+                  <AvatarImage src={adminAvatar || undefined} alt={adminName} />
+                  <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-xs font-semibold">
+                    {adminName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-semibold truncate">{adminName}</p>
+                    {actingRole === 'root' ? (
+                      <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5 shrink-0">
+                        <Crown className="w-2.5 h-2.5" />Root
+                      </Badge>
+                    ) : (
+                      <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground shrink-0 capitalize">
+                        {actingRole}
+                      </Badge>
+                    )}
+                  </div>
+                  {adminPhone && (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Phone className="w-3 h-3 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">{adminPhone}</p>
+                    </div>
+                  )}
+                  {adminId && (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Hash className="w-3 h-3 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground font-mono">UID:{adminId}</p>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">{adminName}</p>
-                {adminPhone && <p className="text-xs text-muted-foreground">{adminPhone}</p>}
-              </div>
-              <Badge variant="outline" className="text-[10px] capitalize shrink-0">
-                {actingRole}
-              </Badge>
             </div>
 
-            {/* Timestamp */}
-            {timestamp && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Clock className="w-3.5 h-3.5" />
-                <span>{format(new Date(timestamp), "dd MMMM yyyy, HH:mm:ss", { locale: ru })}</span>
+            {/* Timestamp & Action */}
+            <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
+              {timestamp && (
+                <div className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{format(new Date(timestamp), "dd MMMM yyyy, HH:mm:ss", { locale: ru })}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <FileText className="w-3.5 h-3.5" />
+                <span>Действие: <span className="font-medium text-foreground">{actionType || "update"}</span></span>
               </div>
-            )}
-
-            {/* Action type */}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <FileText className="w-3.5 h-3.5" />
-              <span>Действие: <span className="font-medium text-foreground">{actionType || "update"}</span></span>
             </div>
 
             {/* Target user */}
             {targetName && (
-              <div className="flex items-center gap-2 pt-2 border-t border-border/30">
-                <User className="w-4 h-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">{targetName}</p>
-                  {targetPhone && <p className="text-xs text-muted-foreground">{targetPhone}</p>}
+              <div className="pt-3 border-t border-border/30">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Клиент</p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-11 h-11 rounded-xl shrink-0">
+                    <AvatarImage src={targetAvatar || undefined} alt={targetName} />
+                    <AvatarFallback className="rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 text-xs font-semibold">
+                      {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">{targetName}</p>
+                    {targetPhone && (
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <Phone className="w-3 h-3 text-muted-foreground" />
+                        <p className="text-xs text-muted-foreground">{targetPhone}</p>
+                      </div>
+                    )}
+                    {targetId && (
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <Hash className="w-3 h-3 text-muted-foreground" />
+                        <p className="text-xs text-muted-foreground font-mono">UID:{targetId}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

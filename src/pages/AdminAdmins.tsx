@@ -157,10 +157,10 @@ export default function AdminAdmins() {
 
   // Build a map of clients by user_id for target user avatars
   const clientsMap = useMemo(() => {
-    const map = new Map<string, { avatar_url: string | null; full_name: string }>();
-    clients?.forEach((c) => map.set(c.user_id, { avatar_url: c.avatar_url, full_name: c.full_name }));
+    const map = new Map<string, { avatar_url: string | null; full_name: string; phone?: string }>();
+    clients?.forEach((c) => map.set(c.user_id, { avatar_url: c.avatar_url, full_name: c.full_name, phone: c.phone }));
     // Also add staff members
-    staff?.forEach((s) => map.set(s.user_id, { avatar_url: s.avatar_url, full_name: s.full_name }));
+    staff?.forEach((s) => map.set(s.user_id, { avatar_url: s.avatar_url, full_name: s.full_name, phone: s.phone }));
     return map;
   }, [clients, staff]);
 
@@ -455,7 +455,16 @@ export default function AdminAdmins() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
                           className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-2 cursor-pointer active:scale-[0.98] transition-transform"
-                          onClick={() => navigate(`/settings/admin/audit/${item.id || index}`, { state: { auditItem: item } })}
+                          onClick={() => navigate(`/settings/admin/audit/${item.id || index}`, { state: { auditItem: {
+                            ...item,
+                            _enriched_admin_phone: staffMember?.phone || adminPhone,
+                            _enriched_admin_avatar: staffMember?.avatar_url || null,
+                            _enriched_admin_role: adminRole,
+                            _enriched_target_phone: targetClient?.phone || targetPhone,
+                            _enriched_target_avatar: targetClient?.avatar_url || null,
+                            _enriched_target_id: targetUserId,
+                            _enriched_admin_id: item.admin_id,
+                          } } })}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
