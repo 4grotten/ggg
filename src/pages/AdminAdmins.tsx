@@ -524,6 +524,7 @@ export default function AdminAdmins() {
                                 _enriched_admin_id: item.admin_id,
                               } } })}
                             >
+                              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 ml-0.5">{t('admin.audit.whoChanged', 'Кто изменил')}</p>
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <Avatar className="w-9 h-9 rounded-xl shrink-0">

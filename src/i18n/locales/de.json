@@ -1691,6 +1691,7 @@
       }
     },
     "changedFor": "Geändert für",
+    "whoChanged": "Wer hat geändert",
     "changedData": "Daten wurden geändert",
     "actions": {
       "addRole": "Rolle zugewiesen",

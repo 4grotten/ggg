@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, User, Shield, FileText, ArrowRight, Crown, Hash, Phone } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -91,6 +92,7 @@ function formatValue(val: any, fieldKey?: string): string {
 export default function AuditHistoryDetail() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const item = location.state?.auditItem;
 
   if (!item) {
@@ -205,14 +207,14 @@ export default function AuditHistoryDetail() {
               )}
               <div className="flex items-center gap-2">
                 <FileText className="w-3.5 h-3.5" />
-                <span>Действие: <span className="font-medium text-foreground">{actionType || "update"}</span></span>
+                <span>Действие: <span className="font-medium text-green-500">{String(t(`admin.actions.${actionType === 'UPDATE_USER_DATA' ? 'updateUserData' : actionType.toLowerCase().includes('update') ? 'updateClient' : actionType.toLowerCase().includes('block') ? 'blockClient' : actionType.toLowerCase().includes('unblock') ? 'unblockClient' : actionType.toLowerCase().includes('add_role') ? 'addRole' : actionType.toLowerCase().includes('remove_role') ? 'removeRole' : 'updateSetting'}`, actionType || "update"))}</span></span>
               </div>
             </div>
 
             {/* Target user */}
             {targetName && (
               <div className="pt-3 border-t border-border/30">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Клиент</p>
+                <p className="text-[10px] uppercase tracking-wider text-green-500 font-semibold mb-2">{t('admin.audit.changedFor', 'Кому изменили')}</p>
                 <div className="flex items-center gap-3">
                   <Avatar className="w-11 h-11 rounded-xl shrink-0">
                     <AvatarImage src={targetAvatar || undefined} alt={targetName} />

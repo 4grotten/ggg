@@ -1763,6 +1763,7 @@
       }
     },
     "changedFor": "Changed for",
+    "whoChanged": "Who changed",
     "changedData": "Data was changed",
     "actions": {
       "addRole": "Role assigned",
