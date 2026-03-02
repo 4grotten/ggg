@@ -67,6 +67,23 @@ const formatRelativeTime = (date: Date) => {
   return `${diffDays} дн. назад`;
 };
 
+const FIELD_LABELS_FALLBACK: Record<string, string> = {
+  subscription_type: "Подписка", role: "Роль", referral_level: "Реф. уровень",
+  is_blocked: "Блокировка", is_vip: "VIP", is_verified: "Верификация",
+  transfer_min: "Мин. перевод", transfer_max: "Макс. перевод",
+  daily_transfer_limit: "Дн. лимит переводов", monthly_transfer_limit: "Мес. лимит переводов",
+  withdrawal_min: "Мин. вывод", withdrawal_max: "Макс. вывод",
+  daily_withdrawal_limit: "Дн. лимит вывода", monthly_withdrawal_limit: "Мес. лимит вывода",
+  daily_top_up_limit: "Дн. лимит пополнения", monthly_top_up_limit: "Мес. лимит пополнения",
+  daily_usdt_send_limit: "Дн. USDT отправка", monthly_usdt_send_limit: "Мес. USDT отправка",
+  daily_usdt_receive_limit: "Дн. USDT получение", monthly_usdt_receive_limit: "Мес. USDT получение",
+  card_to_card_percent: "Card→Card %", bank_transfer_percent: "Банк. перевод %",
+  network_fee_percent: "Сетевая комиссия %", currency_conversion_percent: "Конвертация %",
+  custom_settings_enabled: "Персональные настройки",
+  first_name: "Имя", last_name: "Фамилия", gender: "Пол", language: "Язык",
+  avatar_url: "Аватар", phone: "Телефон", email: "Email", full_name: "Полное имя",
+};
+
 interface GlassCardProps {
   children: React.ReactNode;
   title: string;
@@ -519,14 +536,20 @@ export default function AdminAdmins() {
                             const rawDet = item.details;
                             if (typeof rawDet === 'object' && rawDet?.changes) {
                               const keys = Object.keys(rawDet.changes);
-                              const labels: Record<string, string> = {
-                                subscription_type: "Подписка", role: "Роль", referral_level: "Реф. уровень",
-                                is_blocked: "Блокировка", is_vip: "VIP",
-                              };
-                              const summary = keys.map(k => labels[k] || k).join(", ");
-                              return <p className="text-sm text-foreground/80 pl-10">Изменено: {summary}</p>;
+                              return (
+                                <div className="flex flex-wrap gap-1.5 pl-11 pt-1">
+                                  {keys.map((k) => (
+                                    <span
+                                      key={k}
+                                      className="inline-block text-[11px] px-2.5 py-1 rounded-lg bg-muted/80 border border-border/30 text-foreground/80 font-medium"
+                                    >
+                                      {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                    </span>
+                                  ))}
+                                </div>
+                              );
                             }
-                            return <p className="text-sm text-foreground/80 pl-10">{details}</p>;
+                            return <p className="text-sm text-foreground/80 pl-11">{details}</p>;
                           })()}
                           {targetName && (
                             <div className="flex items-center gap-2 pl-11">
