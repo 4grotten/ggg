@@ -134,7 +134,7 @@ export default function AdminAdmins() {
   const [isSearching, setIsSearching] = useState(false);
   
   // Persist active sub-tab in URL so navigating back restores it
-  const activeSubTab = (searchParams.get("tab") === "history" ? "history" : "admins") as "admins" | "history";
+  const activeSubTab = (searchParams.get("tab") === "admins" ? "admins" : "history") as "admins" | "history";
   const setActiveSubTab = useCallback((tab: "admins" | "history") => {
     setSearchParams({ tab }, { replace: true });
   }, [setSearchParams]);
