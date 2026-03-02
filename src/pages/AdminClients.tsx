@@ -313,6 +313,20 @@ export default function AdminClients() {
                         <Users className="w-3 h-3" />
                         {(client.role || "user") === "root" ? "Root" : (client.role || "user") === "admin" ? "Админ" : (client.role || "user") === "moderator" ? "Модератор" : "Пользователь"}
                       </span>
+                      {client.subscription_type && client.subscription_type !== "free" && (
+                        <span className={cn(
+                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+                          client.subscription_type === "partner" ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400" :
+                          client.subscription_type === "vip" ? "bg-purple-500/10 text-purple-600 dark:text-purple-400" :
+                          client.subscription_type === "pro" ? "bg-blue-500/10 text-blue-600 dark:text-blue-400" :
+                          client.subscription_type === "agent" ? "bg-teal-500/10 text-teal-600 dark:text-teal-400" :
+                          client.subscription_type === "smart" ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" :
+                          "bg-muted text-muted-foreground"
+                        )}>
+                          <Sparkles className="w-3 h-3" />
+                          {client.subscription_type.charAt(0).toUpperCase() + client.subscription_type.slice(1)}
+                        </span>
+                      )}
                       {client.referral_level && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
                           <Sparkles className="w-3 h-3" /> {client.referral_level}
