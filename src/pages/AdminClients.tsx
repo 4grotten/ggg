@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAdminManagement, BackendClient } from "@/hooks/useAdminManagement";
 
-type RoleFilter = "all" | "admin" | "moderator" | "user";
+type RoleFilter = "all" | "root" | "admin" | "moderator" | "user";
 type VerificationFilter = "all" | "verified" | "unverified";
 type AssetsFilter = "all" | "has_cards" | "has_accounts" | "has_crypto";
 
@@ -170,6 +170,7 @@ export default function AdminClients() {
                     <p className="text-[11px] text-muted-foreground mb-1.5 font-medium">Роль</p>
                     <div className="flex gap-1.5 flex-wrap">
                       <FilterChip label="Все" active={roleFilter === "all"} onClick={() => setRoleFilter("all")} />
+                      <FilterChip label="Root" active={roleFilter === "root"} onClick={() => setRoleFilter("root")} />
                       <FilterChip label="Админ" active={roleFilter === "admin"} onClick={() => setRoleFilter("admin")} />
                       <FilterChip label="Модератор" active={roleFilter === "moderator"} onClick={() => setRoleFilter("moderator")} />
                       <FilterChip label="Пользователь" active={roleFilter === "user"} onClick={() => setRoleFilter("user")} />
@@ -261,6 +262,9 @@ export default function AdminClients() {
                           {client.limits?.custom_settings_enabled && (
                             <Badge className="bg-cyan-500/10 text-cyan-500 border-0 text-[9px] px-1.5 py-0 h-4">Custom</Badge>
                           )}
+                          {(client.role || "user") === "root" && (
+                            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-0 text-[9px] px-1.5 py-0 h-4">Root</Badge>
+                          )}
                           {(client.role || "user") === "admin" && (
                             <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 border-0">Admin</Badge>
                           )}
@@ -293,12 +297,13 @@ export default function AdminClients() {
                       )}
                       <span className={cn(
                         "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+                        (client.role || "user") === "root" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" :
                         (client.role || "user") === "admin" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
                         (client.role || "user") === "moderator" ? "bg-violet-500/10 text-violet-600 dark:text-violet-400" :
                         "bg-muted text-muted-foreground"
                       )}>
                         <Users className="w-3 h-3" />
-                        {(client.role || "user") === "admin" ? "Админ" : (client.role || "user") === "moderator" ? "Модератор" : "Пользователь"}
+                        {(client.role || "user") === "root" ? "Root" : (client.role || "user") === "admin" ? "Админ" : (client.role || "user") === "moderator" ? "Модератор" : "Пользователь"}
                       </span>
                       {client.referral_level && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
