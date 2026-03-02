@@ -14,6 +14,19 @@ interface AdminUser {
   last_name: string | null;
 }
 
+/** Shape returned by GET /admin/staff/ */
+export interface StaffMember {
+  user_id: string;
+  full_name: string;
+  phone: string;
+  email: string;
+  avatar_url: string | null;
+  role: 'root' | 'admin';
+  is_verified: boolean;
+  is_blocked: boolean;
+  created_at: string;
+}
+
 interface ProfileSearchResult {
   user_id: string;
   phone: string | null;
@@ -142,7 +155,7 @@ export interface BackendClientDetail extends BackendClient {
 export function useAdminManagement() {
   const queryClient = useQueryClient();
 
-  // Fetch all admins with their profile info
+  // Fetch all admins with their profile info (legacy Supabase)
   const { data: admins, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
@@ -169,6 +182,23 @@ export function useAdminManagement() {
         } as AdminUser;
       });
     },
+  });
+
+  // Fetch staff (admins + roots) from backend API
+  const { data: staff, isLoading: staffLoading, refetch: refetchStaff } = useQuery({
+    queryKey: ["admin-staff"],
+    queryFn: async () => {
+      const res = await apiRequest<StaffMember[]>("/admin/staff/");
+      if (res.error || !res.data) {
+        const msg = res.error?.detail || res.error?.message || "Failed to fetch staff";
+        if (msg.includes('Connection refused') || msg.includes('tcp connect error')) {
+          return [] as StaffMember[];
+        }
+        throw new Error(msg);
+      }
+      return res.data;
+    },
+    retry: 1,
   });
 
   // Fetch all clients from backend API
@@ -273,6 +303,9 @@ export function useAdminManagement() {
   return {
     admins,
     isLoading,
+    staff,
+    staffLoading,
+    refetchStaff,
     clients,
     clientsLoading,
     clientsError,

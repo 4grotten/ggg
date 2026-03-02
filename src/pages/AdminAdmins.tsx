@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, RefreshCw, Users, UserPlus, Trash2, Phone, Hash, Shield, CheckCircle, History, Activity, TrendingUp, Loader2, ChevronRight } from "lucide-react";
+import { ArrowLeft, Search, RefreshCw, Users, UserPlus, Trash2, Phone, Hash, Shield, CheckCircle, History, Activity, TrendingUp, Loader2, ChevronRight, Crown } from "lucide-react";
 import { apiGet } from "@/services/api/apiClient";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -105,7 +106,7 @@ function GlassCard({ children, title, description, icon: Icon, iconColor = "text
 export default function AdminAdmins() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { admins, isLoading: adminsLoading, searchUser, addAdmin, removeAdmin } = useAdminManagement();
+  const { admins, isLoading: adminsLoading, staff, staffLoading, searchUser, addAdmin, removeAdmin } = useAdminManagement();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState<{
@@ -190,7 +191,7 @@ export default function AdminAdmins() {
               </Button>
               <div className="flex-1 min-w-0">
                 <h1 className="text-lg font-bold">{t("admin.tabs.admins")}</h1>
-                <p className="text-xs text-muted-foreground">{admins?.length || 0} {t("admin.roles.usersWithRoles")}</p>
+                <p className="text-xs text-muted-foreground">{staff?.length || 0} {t("admin.roles.usersWithRoles")}</p>
               </div>
             </div>
           </div>
@@ -311,63 +312,63 @@ export default function AdminAdmins() {
                   )}
                 </GlassCard>
 
-                {/* Current Roles Card */}
+                {/* Staff from API */}
                 <GlassCard
                   title={t("admin.roles.currentRoles")}
-                  description={`${admins?.length || 0} ${t("admin.roles.usersWithRoles")}`}
+                  description={`${staff?.length || 0} ${t("admin.roles.usersWithRoles")}`}
                   icon={Shield}
                   iconColor="text-blue-500"
                 >
-                  {adminsLoading ? (
+                  {staffLoading ? (
                     <div className="space-y-3">
                       {[1, 2].map((i) => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
                     </div>
-                  ) : admins && admins.length > 0 ? (
+                  ) : staff && staff.length > 0 ? (
                     <div className="space-y-2">
-                      {admins.map((admin, index) => (
-                        <motion.div
-                          key={admin.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 group hover:border-border transition-colors"
-                        >
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center shrink-0">
-                            <Users className="w-5 h-5 text-muted-foreground" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">
-                              {admin.first_name || admin.last_name
-                                ? `${admin.first_name || ""} ${admin.last_name || ""}`.trim()
-                                : t("admin.roles.noName")}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              {admin.phone && (
+                      {staff.map((member, index) => {
+                        const isRoot = member.role === 'root';
+                        const initials = member.full_name
+                          .split(' ')
+                          .map(n => n[0])
+                          .join('')
+                          .toUpperCase()
+                          .slice(0, 2);
+                        return (
+                          <motion.div
+                            key={member.user_id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="flex items-center gap-3 p-4 rounded-2xl bg-muted/50 border border-border/50 group hover:border-border transition-colors"
+                          >
+                            <Avatar className="w-12 h-12 rounded-2xl shrink-0">
+                              <AvatarImage src={member.avatar_url || undefined} alt={member.full_name} />
+                              <AvatarFallback className="rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 text-sm font-medium">
+                                {initials || '??'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{member.full_name}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <span className="flex items-center gap-1">
                                   <Phone className="w-3 h-3" />
-                                  {admin.phone}
+                                  {member.phone}
                                 </span>
-                              )}
-                              <span className="flex items-center gap-1">
-                                <Hash className="w-3 h-3" />
-                                {admin.user_id.slice(0, 8)}...
-                              </span>
+                                {member.email && (
+                                  <span className="truncate">{member.email}</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                          <Badge variant={getRoleBadgeVariant(admin.role)} className="shrink-0">
-                            {getRoleLabel(admin.role)}
-                          </Badge>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="shrink-0 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => removeAdmin.mutate(admin.id)}
-                            disabled={removeAdmin.isPending}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </motion.div>
-                      ))}
+                            <Badge
+                              variant={isRoot ? "destructive" : "default"}
+                              className={cn("shrink-0 gap-1", isRoot && "bg-amber-500 hover:bg-amber-600")}
+                            >
+                              {isRoot && <Crown className="w-3 h-3" />}
+                              {isRoot ? 'Root' : 'Admin'}
+                            </Badge>
+                          </motion.div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center py-8 text-muted-foreground">
