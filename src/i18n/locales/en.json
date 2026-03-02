@@ -1706,6 +1706,7 @@
       "currentRoles": "Current Roles",
       "usersWithRoles": "users with roles",
       "noUsersWithRoles": "No users with roles",
+      "searchStaff": "Search by name, phone, UID",
       "userNotFound": "User not found",
       "noName": "No name",
       "admin": "Administrator",
