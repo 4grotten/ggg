@@ -1761,11 +1761,14 @@
         "full_name": "Полное имя"
       }
     },
+    "changedFor": "Кому изменили",
+    "changedData": "Были изменены данные",
     "actions": {
       "addRole": "Назначена роль",
       "removeRole": "Снята роль",
       "updateSetting": "Изменена настройка",
       "updateClient": "Обновлён клиент",
+      "updateUserData": "Обновлены данные пользователя",
       "blockClient": "Клиент заблокирован",
       "unblockClient": "Клиент разблокирован"
     },

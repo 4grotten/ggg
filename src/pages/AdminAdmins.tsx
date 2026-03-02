@@ -21,7 +21,7 @@ interface AdminAction {
   id: string;
   adminName: string;
   adminPhone: string;
-  action: 'add_role' | 'remove_role' | 'update_setting' | 'update_client' | 'block_client' | 'unblock_client';
+  action: 'add_role' | 'remove_role' | 'update_setting' | 'update_client' | 'update_user_data' | 'block_client' | 'unblock_client';
   targetName?: string;
   targetPhone?: string;
   details: string;
@@ -36,6 +36,7 @@ const getActionIcon = (action: AdminAction['action']) => {
     case 'remove_role': return Trash2;
     case 'update_setting': return TrendingUp;
     case 'update_client': return Users;
+    case 'update_user_data': return Users;
     case 'block_client': return Shield;
     case 'unblock_client': return CheckCircle;
     default: return Activity;
@@ -48,6 +49,7 @@ const getActionColor = (action: AdminAction['action']) => {
     case 'remove_role': return 'text-red-500 bg-red-500/10';
     case 'update_setting': return 'text-blue-500 bg-blue-500/10';
     case 'update_client': return 'text-violet-500 bg-violet-500/10';
+    case 'update_user_data': return 'text-green-500 bg-green-500/10';
     case 'block_client': return 'text-orange-500 bg-orange-500/10';
     case 'unblock_client': return 'text-emerald-500 bg-emerald-500/10';
     default: return 'text-muted-foreground bg-muted';
@@ -469,6 +471,7 @@ export default function AdminAdmins() {
                         else if (actionType.includes('remove_role') || actionType.includes('role_remove')) mappedAction = 'remove_role';
                         else if (actionType.includes('block')) mappedAction = 'block_client';
                         else if (actionType.includes('unblock')) mappedAction = 'unblock_client';
+                        else if (actionType.includes('update_user_data') || actionType.includes('user_data')) mappedAction = 'update_user_data';
                         else if (actionType.includes('client') || actionType.includes('user')) mappedAction = 'update_client';
 
                         const ActionIcon = getActionIcon(mappedAction);
@@ -562,10 +565,13 @@ export default function AdminAdmins() {
 
                                 if (targetName || hasChanges) {
                                   return (
-                                    <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
-                                      {/* Client header */}
-                                      {targetName && (
-                                        <div className="flex items-center gap-3 px-4 py-3 border-b border-border/20">
+                                     <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
+                                       {/* Target user label */}
+                                       <div className="px-4 pt-3 pb-1">
+                                         <p className="text-[11px] uppercase tracking-wider text-green-500 font-semibold">{t('admin.audit.changedFor', 'Кому изменили')}</p>
+                                       </div>
+                                       {targetName && (
+                                         <div className="flex items-center gap-3 px-4 py-3 border-b border-border/20">
                                           <Avatar className="w-10 h-10 rounded-xl shrink-0 ring-2 ring-primary/10">
                                             <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
                                             <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-[11px] font-semibold">
@@ -588,7 +594,7 @@ export default function AdminAdmins() {
                                       {/* Changes section */}
                                       {hasChanges && keys.length > 0 && (
                                         <div className="px-4 py-3 space-y-2">
-                                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Были изменены данные</p>
+                                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{t('admin.audit.changedData', 'Были изменены данные')}</p>
                                           <div className="flex flex-wrap gap-1.5">
                                             {keys.map((k) => (
                                               <span

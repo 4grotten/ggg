@@ -1690,11 +1690,14 @@
         "full_name": "Tam Ad"
       }
     },
+    "changedFor": "Değiştirilen",
+    "changedData": "Veriler değiştirildi",
     "actions": {
       "addRole": "Rol atandı",
       "removeRole": "Rol kaldırıldı",
       "updateSetting": "Ayar güncellendi",
       "updateClient": "Müşteri güncellendi",
+      "updateUserData": "Kullanıcı verileri güncellendi",
       "blockClient": "Müşteri engellendi",
       "unblockClient": "Müşteri engeli kaldırıldı"
     },

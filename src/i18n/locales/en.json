@@ -1762,11 +1762,14 @@
         "full_name": "Full Name"
       }
     },
+    "changedFor": "Changed for",
+    "changedData": "Data was changed",
     "actions": {
       "addRole": "Role assigned",
       "removeRole": "Role removed",
       "updateSetting": "Setting updated",
       "updateClient": "Client updated",
+      "updateUserData": "User data updated",
       "blockClient": "Client blocked",
       "unblockClient": "Client unblocked"
     },
