@@ -1000,8 +1000,8 @@ const Settings = () => {
               onClick={() => navigate("/limits-settings")}
             />
 
-            {/* Admin Panel - only for admins */}
-            {isAdmin && (
+            {/* Admin Panel - only for admins/root */}
+            {(user as any)?.role && ['admin', 'root'].includes((user as any).role.toLowerCase()) && (
               <SettingsItem
                 icon={<ColoredIcon colorKey="admin"><ShieldCheck className="w-4 h-4" /></ColoredIcon>}
                 label={t("settings.adminPanel") || "Административная панель"}
