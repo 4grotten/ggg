@@ -208,10 +208,25 @@ export default function AuditHistoryDetail() {
                   <span><span className="font-bold">{format(new Date(timestamp), "dd.MM.yyyy")}</span>{' '}{format(new Date(timestamp), "HH:mm:ss")}</span>
                 </div>
               )}
-              <div className="flex items-center gap-2">
-                <FileText className="w-3.5 h-3.5" />
-                <span>{t('admin.audit.detail.action', 'Действие')}: <span className="font-medium text-green-500">{String(t(`admin.audit.actions.${actionType === 'UPDATE_USER_DATA' ? 'updateUserData' : actionType.toLowerCase().includes('update') ? 'updateClient' : actionType.toLowerCase().includes('block') ? 'blockClient' : actionType.toLowerCase().includes('unblock') ? 'unblockClient' : actionType.toLowerCase().includes('add_role') ? 'addRole' : actionType.toLowerCase().includes('remove_role') ? 'removeRole' : 'updateSetting'}`, actionType || "update"))}</span></span>
-              </div>
+              {(() => {
+                const at = actionType.toLowerCase();
+                const actionKey = actionType === 'UPDATE_USER_DATA' ? 'updateUserData'
+                  : at.includes('unblock') ? 'unblockClient'
+                  : at.includes('block') ? 'blockClient'
+                  : at.includes('update') ? 'updateClient'
+                  : at.includes('add_role') ? 'addRole'
+                  : at.includes('remove_role') ? 'removeRole'
+                  : 'updateSetting';
+                const isBlock = at.includes('block') && !at.includes('unblock');
+                const isUnblock = at.includes('unblock');
+                const actionColorClass = isBlock ? 'text-destructive' : isUnblock ? 'text-emerald-500' : 'text-green-500';
+                return (
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>{t('admin.audit.detail.action', 'Действие')}: <span className={cn("font-medium", actionColorClass)}>{String(t(`admin.audit.actions.${actionKey}`, actionType || "update"))}</span></span>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Target user */}
