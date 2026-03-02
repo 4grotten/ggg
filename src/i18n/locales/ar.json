@@ -1691,6 +1691,7 @@
       }
     },
     "changedFor": "تم التغيير لـ",
+    "whoChanged": "من قام بالتغيير",
     "changedData": "تم تغيير البيانات",
     "actions": {
       "addRole": "تم تعيين الدور",

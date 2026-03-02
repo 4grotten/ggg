@@ -1762,6 +1762,7 @@
       }
     },
     "changedFor": "Кому изменили",
+    "whoChanged": "Кто изменил",
     "changedData": "Были изменены данные",
     "actions": {
       "addRole": "Назначена роль",

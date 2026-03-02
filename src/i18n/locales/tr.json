@@ -1691,6 +1691,7 @@
       }
     },
     "changedFor": "Değiştirilen",
+    "whoChanged": "Kim değiştirdi",
     "changedData": "Veriler değiştirildi",
     "actions": {
       "addRole": "Rol atandı",

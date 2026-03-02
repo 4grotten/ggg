@@ -1698,6 +1698,7 @@
       }
     },
     "changedFor": "变更对象",
+    "whoChanged": "谁做了更改",
     "changedData": "数据已更改",
     "actions": {
       "addRole": "角色已分配",
