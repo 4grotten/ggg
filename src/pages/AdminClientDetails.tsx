@@ -696,7 +696,7 @@ export default function AdminClientDetails() {
                       <div><span className="text-muted-foreground">{t("admin.clients.balanceLabel")}:</span> {card.balance.toLocaleString()} AED</div>
                       {card.last_four_digits && <div><span className="text-muted-foreground">{t("admin.clients.last4")}:</span> {card.last_four_digits}</div>}
                       <div className="col-span-2"><span className="text-muted-foreground">ID:</span> <span className="font-mono text-[10px]">{card.id}</span></div>
-                      <div className="col-span-2"><span className="text-muted-foreground">Created:</span> {new Date(card.created_at).toLocaleString()}</div>
+                      <div className="col-span-2"><span className="text-muted-foreground">{t("admin.clients.created")}:</span> {new Date(card.created_at).toLocaleString()}</div>
                     </div>
                   )}
                 </button>
