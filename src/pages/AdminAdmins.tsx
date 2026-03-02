@@ -350,6 +350,7 @@ export default function AdminAdmins() {
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">{member.full_name}</p>
+                              <p className="text-[10px] text-muted-foreground/60 font-mono truncate">ID: {member.user_id}</p>
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <span className="flex items-center gap-1">
                                   <Phone className="w-3 h-3" />
