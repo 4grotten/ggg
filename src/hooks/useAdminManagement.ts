@@ -33,6 +33,7 @@ export interface BackendClient {
   created_at: string | null;
   role: 'root' | 'admin' | 'moderator' | 'user';
   is_verified: boolean;
+  subscription_type?: string | null;
   referral_level: string | null;
   cards_count: number;
   total_cards_balance: number;
