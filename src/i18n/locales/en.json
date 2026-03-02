@@ -1849,19 +1849,19 @@
         "action": "Action",
         "changedParams": "Changed Parameters",
         "rawData": "Change data"
+      },
+      "changedFor": "Changed for",
+      "whoChanged": "Who changed",
+      "changedData": "Data was changed",
+      "actions": {
+        "addRole": "Role assigned",
+        "removeRole": "Role removed",
+        "updateSetting": "Setting updated",
+        "updateClient": "Client updated",
+        "updateUserData": "User data updated",
+        "blockClient": "Client blocked",
+        "unblockClient": "Client unblocked"
       }
-    },
-    "changedFor": "Changed for",
-    "whoChanged": "Who changed",
-    "changedData": "Data was changed",
-    "actions": {
-      "addRole": "Role assigned",
-      "removeRole": "Role removed",
-      "updateSetting": "Setting updated",
-      "updateClient": "Client updated",
-      "updateUserData": "User data updated",
-      "blockClient": "Client blocked",
-      "unblockClient": "Client unblocked"
     },
     "common": {
       "loading": "Loading settings...",

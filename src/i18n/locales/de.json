@@ -1778,19 +1778,19 @@
         "action": "Aktion",
         "changedParams": "Geänderte Parameter",
         "rawData": "Änderungsdaten"
+      },
+      "changedFor": "Geändert für",
+      "whoChanged": "Wer hat geändert",
+      "changedData": "Daten wurden geändert",
+      "actions": {
+        "addRole": "Rolle zugewiesen",
+        "removeRole": "Rolle entfernt",
+        "updateSetting": "Einstellung aktualisiert",
+        "updateClient": "Kunde aktualisiert",
+        "updateUserData": "Benutzerdaten aktualisiert",
+        "blockClient": "Kunde gesperrt",
+        "unblockClient": "Kunde entsperrt"
       }
-    },
-    "changedFor": "Geändert für",
-    "whoChanged": "Wer hat geändert",
-    "changedData": "Daten wurden geändert",
-    "actions": {
-      "addRole": "Rolle zugewiesen",
-      "removeRole": "Rolle entfernt",
-      "updateSetting": "Einstellung aktualisiert",
-      "updateClient": "Kunde aktualisiert",
-      "updateUserData": "Benutzerdaten aktualisiert",
-      "blockClient": "Kunde gesperrt",
-      "unblockClient": "Kunde entsperrt"
     },
     "common": {
       "loading": "Einstellungen laden...",

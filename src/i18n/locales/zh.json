@@ -1785,19 +1785,19 @@
         "action": "操作",
         "changedParams": "已更改参数",
         "rawData": "变更数据"
+      },
+      "changedFor": "变更对象",
+      "whoChanged": "谁做了更改",
+      "changedData": "数据已更改",
+      "actions": {
+        "addRole": "角色已分配",
+        "removeRole": "角色已移除",
+        "updateSetting": "设置已更新",
+        "updateClient": "客户已更新",
+        "updateUserData": "用户数据已更新",
+        "blockClient": "客户已封禁",
+        "unblockClient": "客户已解封"
       }
-    },
-    "changedFor": "变更对象",
-    "whoChanged": "谁做了更改",
-    "changedData": "数据已更改",
-    "actions": {
-      "addRole": "角色已分配",
-      "removeRole": "角色已移除",
-      "updateSetting": "设置已更新",
-      "updateClient": "客户已更新",
-      "updateUserData": "用户数据已更新",
-      "blockClient": "客户已封禁",
-      "unblockClient": "客户已解封"
     },
     "common": {
       "loading": "加载设置中...",
