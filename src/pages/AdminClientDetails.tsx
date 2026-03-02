@@ -45,6 +45,16 @@ const ROLE_OPTIONS = [
   { id: "user", icon: "👤", color: "from-blue-400 to-blue-500", label: "User" },
 ];
 
+/** Format a numeric string as "50,000.00"; on focus return raw number */
+const formatLimitValue = (val: string): string => {
+  const num = parseFloat(val);
+  if (isNaN(num)) return val;
+  return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+const rawLimitValue = (val: string): string => {
+  return val.replace(/,/g, "");
+};
+
 const isIncomeTx = (type: string): boolean => {
   const t = type.toLowerCase();
   return t.includes("topup") || t.includes("top_up") || t.includes("transfer_in") ||
@@ -976,7 +986,14 @@ export default function AdminClientDetails() {
                 <div key={key} className="space-y-1.5">
                   <Label className="text-[10px] text-muted-foreground">{label}</Label>
                   <div className="relative">
-                    <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-10 rounded-xl h-9" />
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
+                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
+                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      className="text-xs pr-10 rounded-xl h-9"
+                    />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">AED</span>
                   </div>
                 </div>
@@ -995,7 +1012,14 @@ export default function AdminClientDetails() {
                 <div key={key} className="space-y-1.5">
                   <Label className="text-[10px] text-muted-foreground">{label}</Label>
                   <div className="relative">
-                    <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-10 rounded-xl h-9" />
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
+                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
+                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      className="text-xs pr-10 rounded-xl h-9"
+                    />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">AED</span>
                   </div>
                 </div>
@@ -1014,7 +1038,14 @@ export default function AdminClientDetails() {
                 <div key={key} className="space-y-1.5">
                   <Label className="text-[10px] text-muted-foreground">{label}</Label>
                   <div className="relative">
-                    <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-14 rounded-xl h-9" />
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
+                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
+                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      className="text-xs pr-14 rounded-xl h-9"
+                    />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">USDT</span>
                   </div>
                 </div>
@@ -1032,7 +1063,14 @@ export default function AdminClientDetails() {
                 <div key={key} className="space-y-1.5">
                   <Label className="text-[10px] text-muted-foreground">{label}</Label>
                   <div className="relative">
-                    <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-14 rounded-xl h-9" />
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
+                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
+                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      className="text-xs pr-14 rounded-xl h-9"
+                    />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">USDT</span>
                   </div>
                 </div>
@@ -1053,7 +1091,14 @@ export default function AdminClientDetails() {
                 <div key={key} className="space-y-1.5">
                   <Label className="text-[10px] text-muted-foreground">{label}</Label>
                   <div className="relative">
-                    <Input type="number" value={limits[key as keyof typeof limits]} onChange={(e) => setLimits({ ...limits, [key]: e.target.value })} className="text-xs pr-10 rounded-xl h-9" />
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      defaultValue={formatLimitValue(limits[key as keyof typeof limits])}
+                      onFocus={(e) => { e.target.value = rawLimitValue(limits[key as keyof typeof limits]); }}
+                      onBlur={(e) => { const raw = rawLimitValue(e.target.value); setLimits(prev => ({ ...prev, [key]: raw })); e.target.value = formatLimitValue(raw); }}
+                      className="text-xs pr-10 rounded-xl h-9"
+                    />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">AED</span>
                   </div>
                 </div>
