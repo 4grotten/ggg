@@ -491,16 +491,7 @@ export default function AdminAdmins() {
                         let dateLabel = '';
                         if (timestamp) {
                           const d = new Date(timestamp);
-                          const today = new Date();
-                          const yesterday = new Date();
-                          yesterday.setDate(yesterday.getDate() - 1);
-                          const isToday = d.toDateString() === today.toDateString();
-                          const isYesterday = d.toDateString() === yesterday.toDateString();
-                          dateLabel = isToday
-                            ? t('admin.history.today', 'Сегодня')
-                            : isYesterday
-                              ? t('admin.history.yesterdayLabel', 'Вчера')
-                              : d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' });
+                          dateLabel = d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
                           if (dateLabel !== lastDateLabel) {
                             showDateSeparator = true;
                             lastDateLabel = dateLabel;
@@ -510,10 +501,8 @@ export default function AdminAdmins() {
                         return (
                           <div key={`api-${item.id || index}`}>
                             {showDateSeparator && (
-                              <div className="flex items-center gap-3 py-2 pt-4 first:pt-0">
-                                <div className="h-px flex-1 bg-border/50" />
-                                <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">{dateLabel}</span>
-                                <div className="h-px flex-1 bg-border/50" />
+                              <div className="py-2 pt-4 first:pt-0">
+                                <span className="text-xs font-semibold text-primary">{dateLabel}</span>
                               </div>
                             )}
                             <motion.div
