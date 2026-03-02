@@ -545,6 +545,7 @@ const Settings = () => {
         date_of_birth: null,
         gender: null,
         has_empty_fields: false,
+        role: null,
       },
       isMock: true,
     },
@@ -560,6 +561,7 @@ const Settings = () => {
         date_of_birth: null,
         gender: null,
         has_empty_fields: false,
+        role: null,
       },
       isMock: true,
     },
@@ -704,8 +706,8 @@ const Settings = () => {
             {user?.id && (
               <div className="flex items-center gap-2 mt-0.5">
                 <p className="text-xs text-muted-foreground/60 font-mono">ID: {user.id}</p>
-                {isAdmin && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">Admin</span>
+                {user.role && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium capitalize">{user.role}</span>
                 )}
               </div>
             )}
