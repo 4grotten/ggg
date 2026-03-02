@@ -98,7 +98,7 @@ function GlassCard({ children, title, description, icon: Icon, iconColor = "text
 export default function AdminAdmins() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { admins, isLoading: adminsLoading, staff, staffLoading, searchUser, addAdmin, removeAdmin } = useAdminManagement();
+  const { admins, isLoading: adminsLoading, staff, staffLoading, clients, searchUser, addAdmin, removeAdmin } = useAdminManagement();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState<{
@@ -154,6 +154,15 @@ export default function AdminAdmins() {
     staff?.forEach((s) => map.set(s.user_id, s));
     return map;
   }, [staff]);
+
+  // Build a map of clients by user_id for target user avatars
+  const clientsMap = useMemo(() => {
+    const map = new Map<string, { avatar_url: string | null; full_name: string }>();
+    clients?.forEach((c) => map.set(c.user_id, { avatar_url: c.avatar_url, full_name: c.full_name }));
+    // Also add staff members
+    staff?.forEach((s) => map.set(s.user_id, { avatar_url: s.avatar_url, full_name: s.full_name }));
+    return map;
+  }, [clients, staff]);
 
   const handleSearchUser = async () => {
     if (!searchQuery.trim()) return;
@@ -434,6 +443,8 @@ export default function AdminAdmins() {
                       const rawDetails = item.description || item.details || item.message || item;
                       const details = typeof rawDetails === 'object' ? JSON.stringify(rawDetails) : String(rawDetails);
                       const targetName = item.target_name || item.target_user_name || item.target?.name;
+                      const targetUserId = item.target_user_id || item.target_id;
+                      const targetClient = targetUserId ? clientsMap.get(String(targetUserId)) : null;
                       const targetPhone = item.target_phone || item.target_user_phone || item.target?.phone;
                       const timestamp = item.created_at || item.timestamp || item.date;
 
@@ -492,10 +503,16 @@ export default function AdminAdmins() {
                             return <p className="text-sm text-foreground/80 pl-10">{details}</p>;
                           })()}
                           {targetName && (
-                            <div className="flex items-center gap-2 pl-10">
+                            <div className="flex items-center gap-2 pl-11">
+                              <Avatar className="w-7 h-7 rounded-lg shrink-0">
+                                <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
+                                <AvatarFallback className="rounded-lg bg-muted text-[10px] font-medium">
+                                  {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                                </AvatarFallback>
+                              </Avatar>
                               <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
-                                <Users className="w-3 h-3 text-muted-foreground" />
                                 <span className="font-medium">{targetName}</span>
+                                {targetUserId && <span className="text-muted-foreground font-mono">#{targetUserId}</span>}
                                 {targetPhone && <span className="text-muted-foreground">{targetPhone}</span>}
                               </div>
                             </div>
