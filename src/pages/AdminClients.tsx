@@ -131,7 +131,7 @@ export default function AdminClients() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Поиск по имени, телефону, ID…"
+                placeholder={t("admin.clients.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-11 rounded-xl bg-card border-border/50"
