@@ -544,7 +544,7 @@ export default function AdminAdmins() {
                                             {keys.map((k) => (
                                               <span
                                                 key={k}
-                                                className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg bg-primary/15 border border-primary/20 text-primary font-medium backdrop-blur-sm"
+                                                className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/20 text-primary-foreground font-medium backdrop-blur-sm"
                                               >
                                                 {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
                                               </span>
