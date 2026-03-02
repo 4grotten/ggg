@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Phone, Mail, Shield, Clock, User, FileText, ArrowRight, ChevronRight, Crown, Loader2, Calendar, CheckCircle } from "lucide-react";
+import { Phone, Mail, Shield, Clock, User, FileText, ArrowRight, ChevronRight, Crown, Loader2, Calendar, CheckCircle, Hash } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -13,7 +14,6 @@ import { cn } from "@/lib/utils";
 import { apiRequest } from "@/services/api/apiClient";
 import { StaffMember } from "@/hooks/useAdminManagement";
 import { format } from "date-fns";
-import { ru } from "date-fns/locale";
 
 interface AuditEntry {
   id: string;
@@ -31,7 +31,7 @@ interface AuditEntry {
   created_at: string;
 }
 
-const FIELD_LABELS: Record<string, string> = {
+const FIELD_LABELS_FALLBACK: Record<string, string> = {
   subscription_type: "Подписка",
   referral_level: "Реф. уровень",
   role: "Роль",
@@ -61,31 +61,11 @@ const FIELD_LABELS: Record<string, string> = {
   language: "Язык",
 };
 
-function formatValue(val: any): string {
-  if (val === null || val === undefined) return "—";
-  if (typeof val === "boolean") return val ? "Да" : "Нет";
-  return String(val);
-}
-
-function formatRelativeTime(date: Date) {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffMins < 1) return "только что";
-  if (diffMins < 60) return `${diffMins} мин. назад`;
-  if (diffHours < 24) return `${diffHours} ч. назад`;
-  if (diffDays === 1) return "вчера";
-  if (diffDays < 30) return `${diffDays} дн. назад`;
-  return format(date, "dd.MM.yyyy");
-}
-
 export default function AdminStaffDetail() {
   const navigate = useNavigate();
   const { staffId } = useParams<{ staffId: string }>();
+  const { t } = useTranslation();
 
-  // Fetch staff list to get this member's info
   const { data: staffList } = useQuery({
     queryKey: ["admin-staff"],
     queryFn: async () => {
@@ -97,7 +77,6 @@ export default function AdminStaffDetail() {
 
   const member = staffList?.find((s) => s.user_id === staffId);
 
-  // Fetch audit history for this admin
   const { data: auditHistory = [], isLoading: auditLoading } = useQuery({
     queryKey: ["admin-audit-history", staffId],
     queryFn: async () => {
@@ -110,6 +89,17 @@ export default function AdminStaffDetail() {
       return [];
     },
     enabled: !!staffId,
+  });
+
+  // Build a clients map from audit target data for avatars
+  const clientsMap = new Map<string, { avatar_url?: string; phone?: string }>();
+  auditHistory.forEach((entry: any) => {
+    if (entry.target_user_id) {
+      clientsMap.set(String(entry.target_user_id), {
+        avatar_url: entry.target_avatar || undefined,
+        phone: entry.target_phone || entry.target_user_phone || undefined,
+      });
+    }
   });
 
   if (!staffId) {
@@ -127,7 +117,7 @@ export default function AdminStaffDetail() {
 
   return (
     <MobileLayout
-      title={member?.full_name || "Детали"}
+      title={member?.full_name || t('admin.audit.detail.title', 'Детали')}
       showBackButton
       onBack={() => navigate(-1)}
       rightAction={<div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>}
@@ -178,18 +168,12 @@ export default function AdminStaffDetail() {
                 {member.created_at && (
                   <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
                     <Calendar className="w-3.5 h-3.5" />
-                    <span>
-                      {new Date(member.created_at).toLocaleDateString("ru-RU", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
-                    </span>
+                    <span>{format(new Date(member.created_at), "dd.MM.yyyy")}</span>
                   </div>
                 )}
                 {member.is_blocked && (
                   <Badge variant="destructive" className="mt-1.5 text-[10px]">
-                    Заблокирован
+                    {t('admin.clients.blocked', 'Заблокирован')}
                   </Badge>
                 )}
               </div>
@@ -221,7 +205,7 @@ export default function AdminStaffDetail() {
         <div className="space-y-3">
           <div className="flex items-center gap-2 px-1">
             <FileText className="w-5 h-5 text-primary" />
-            <h4 className="font-semibold">История изменений</h4>
+            <h4 className="font-semibold">{t('admin.history.title', 'История изменений')}</h4>
             {!auditLoading && (
               <Badge variant="secondary" className="text-xs ml-auto">
                 {auditHistory.length}
@@ -236,114 +220,155 @@ export default function AdminStaffDetail() {
           ) : auditHistory.length === 0 ? (
             <div className="rounded-2xl bg-muted/30 border border-border/50 p-8 text-center">
               <FileText className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
-              <p className="text-sm text-muted-foreground">Нет записей</p>
+              <p className="text-sm text-muted-foreground">{t('admin.history.empty', 'Нет записей')}</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {auditHistory.map((entry: any, index: number) => {
-                const details = typeof entry.details === "object" ? entry.details : null;
-                const changes = details?.changes || {};
-                const changeKeys = Object.keys(changes);
-                const summary = changeKeys
-                  .map((k) => FIELD_LABELS[k] || k)
-                  .join(", ");
+            <div className="space-y-3">
+              {(() => {
+                let lastDateLabel = '';
 
-                return (
-                  <motion.div
-                    key={entry.id || index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.04 }}
-                    className="rounded-2xl bg-card border border-border/50 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
-                    onClick={() =>
-                      navigate(`/settings/admin/audit/${entry.id || index}`, {
-                        state: { auditItem: {
-                          ...entry,
-                          _enriched_admin_phone: member?.phone || '',
-                          _enriched_admin_avatar: member?.avatar_url || null,
-                          _enriched_admin_role: member?.role || 'admin',
-                          _enriched_admin_id: entry.admin_id,
-                          _enriched_target_id: entry.target_user_id,
-                        } },
-                      })
+                return auditHistory.map((entry: any, index: number) => {
+                  const details = typeof entry.details === "object" ? entry.details : null;
+                  const hasChanges = details?.changes && typeof details.changes === 'object';
+                  const keys = hasChanges ? Object.keys(details.changes) : [];
+                  const targetName = entry.target_user_name || entry.target_name || entry.target?.name;
+                  const targetUserId = entry.target_user_id || entry.target_id;
+                  const targetClient = targetUserId ? clientsMap.get(String(targetUserId)) : null;
+                  const targetPhone = entry.target_phone || entry.target_user_phone || entry.target?.phone;
+                  const timestamp = entry.created_at || entry.timestamp || entry.date;
+
+                  // Date separator
+                  let showDateSeparator = false;
+                  let dateLabel = '';
+                  if (timestamp) {
+                    const d = new Date(timestamp);
+                    dateLabel = format(d, 'dd.MM.yyyy');
+                    if (dateLabel !== lastDateLabel) {
+                      showDateSeparator = true;
+                      lastDateLabel = dateLabel;
                     }
-                  >
-                    <div className="p-4 space-y-2">
-                      {/* Target user + time */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                            <User className="w-4 h-4 text-primary" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium truncate">
-                              {entry.target_user_name || "Пользователь"}
-                            </p>
-                            <p className="text-[11px] text-muted-foreground">
-                              ID: {entry.target_user_id}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <span className="text-[11px] text-muted-foreground">
-                            {entry.created_at
-                              ? formatRelativeTime(new Date(entry.created_at))
-                              : ""}
-                          </span>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      </div>
+                  }
 
-                      {/* Action badge */}
-                      <div className="flex items-center gap-2 pl-10">
-                        <Badge variant="outline" className="text-[10px] capitalize">
-                          {(entry.action || "update").replace(/_/g, " ").toLowerCase()}
-                        </Badge>
-                        {details?.acting_role && (
-                          <Badge variant="secondary" className="text-[10px] capitalize">
-                            {details.acting_role}
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Changes summary */}
-                      {changeKeys.length > 0 && (
-                        <div className="pl-10 space-y-1">
-                          <p className="text-xs text-muted-foreground">
-                            Изменено: {summary}
-                          </p>
-                          {/* Show first 2 changes inline */}
-                          {changeKeys.slice(0, 2).map((key) => {
-                            const ch = changes[key];
-                            return (
-                              <div
-                                key={key}
-                                className="flex items-center gap-1.5 text-xs"
-                              >
-                                <span className="text-muted-foreground">
-                                  {FIELD_LABELS[key] || key}:
-                                </span>
-                                <span className="line-through text-muted-foreground/70">
-                                  {formatValue(ch?.было ?? ch?.old)}
-                                </span>
-                                <ArrowRight className="w-3 h-3 text-muted-foreground/50" />
-                                <span className="text-primary font-medium">
-                                  {formatValue(ch?.стало ?? ch?.new)}
-                                </span>
-                              </div>
-                            );
-                          })}
-                          {changeKeys.length > 2 && (
-                            <p className="text-[11px] text-primary">
-                              +{changeKeys.length - 2} ещё...
-                            </p>
-                          )}
+                  return (
+                    <div key={`audit-${entry.id || index}`}>
+                      {showDateSeparator && (
+                        <div className="py-2 pt-4 first:pt-0">
+                          <span className="text-base font-semibold text-primary">{dateLabel}</span>
                         </div>
                       )}
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: Math.min(index * 0.05, 0.5) }}
+                        className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-2 cursor-pointer active:scale-[0.98] transition-transform"
+                        onClick={() =>
+                          navigate(`/settings/admin/audit/${entry.id || index}`, {
+                            state: { auditItem: {
+                              ...entry,
+                              _enriched_admin_phone: member?.phone || '',
+                              _enriched_admin_avatar: member?.avatar_url || null,
+                              _enriched_admin_role: member?.role || 'admin',
+                              _enriched_admin_id: entry.admin_id,
+                              _enriched_target_id: targetUserId,
+                              _enriched_target_phone: targetClient?.phone || targetPhone,
+                              _enriched_target_avatar: targetClient?.avatar_url || null,
+                            } },
+                          })
+                        }
+                      >
+                        {/* Who changed label */}
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 ml-0.5">
+                          {t('admin.audit.whoChanged', 'Кто изменил')}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-9 h-9 rounded-xl shrink-0">
+                              <AvatarImage src={member?.avatar_url || undefined} alt={member?.full_name || 'Admin'} />
+                              <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-xs font-medium">
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-sm font-medium">{member?.full_name || entry.admin_name || 'Admin'}</p>
+                                {isRoot ? (
+                                  <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
+                                    <Crown className="w-2.5 h-2.5" />Root
+                                  </Badge>
+                                ) : (
+                                  <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground">Admin</Badge>
+                                )}
+                              </div>
+                              {member?.phone && <p className="text-xs text-muted-foreground">{member.phone}</p>}
+                            </div>
+                          </div>
+                          {timestamp && (
+                            <div className="flex items-center gap-1 shrink-0">
+                              <span className="text-xs text-muted-foreground">
+                                <span className="font-bold">{format(new Date(timestamp), 'dd.MM.yyyy')}</span>
+                                {' '}
+                                <span className="font-normal">{format(new Date(timestamp), 'HH:mm')}</span>
+                              </span>
+                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Target client block with changes */}
+                        {(targetName || hasChanges) && (
+                          <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
+                            {/* Target user label */}
+                            <div className="px-4 pt-3 pb-1">
+                              <p className="text-[11px] uppercase tracking-wider text-green-500 font-semibold">
+                                {t('admin.audit.changedFor', 'Кому изменили')}
+                              </p>
+                            </div>
+                            {targetName && (
+                              <div className="flex items-center gap-3 px-4 py-3 border-b border-border/20">
+                                <Avatar className="w-10 h-10 rounded-xl shrink-0 ring-2 ring-primary/10">
+                                  <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
+                                  <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-[11px] font-semibold">
+                                    {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-sm font-semibold truncate">{targetName}</p>
+                                    {targetUserId && (
+                                      <span className="text-[10px] text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded-md">UID:{targetUserId}</span>
+                                    )}
+                                  </div>
+                                  {targetPhone && (
+                                    <p className="text-xs text-muted-foreground mt-0.5">{targetPhone}</p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            {/* Changes section */}
+                            {hasChanges && keys.length > 0 && (
+                              <div className="px-4 py-3 space-y-2">
+                                <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
+                                  {t('admin.audit.changedData', 'Были изменены данные')}
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {keys.map((k) => (
+                                    <span
+                                      key={k}
+                                      className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/20 text-primary-foreground font-medium backdrop-blur-sm"
+                                    >
+                                      {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </motion.div>
                     </div>
-                  </motion.div>
-                );
-              })}
+                  );
+                });
+              })()}
             </div>
           )}
         </div>
