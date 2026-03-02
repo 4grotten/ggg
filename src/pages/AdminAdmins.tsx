@@ -512,7 +512,7 @@ export default function AdminAdmins() {
                               </Avatar>
                               <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
                                 <span className="font-medium">{targetName}</span>
-                                {targetUserId && <span className="text-muted-foreground font-mono">UID: {targetUserId}</span>}
+                                {targetUserId && <span className="text-muted-foreground font-mono">UID:{targetUserId}</span>}
                                 {targetPhone && <span className="text-muted-foreground">{targetPhone}</span>}
                               </div>
                             </div>
