@@ -206,17 +206,6 @@ export default function AdminClientTransactionHistory() {
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  // Log that admin/root viewed this user's transaction history
-  useEffect(() => {
-    if (!userId) return;
-    apiPost('/admin/audit-history/log/', {
-      action: 'VIEW_TRANSACTION_HISTORY',
-      target_user_id: userId,
-      details: { page: 'transaction_history' },
-    }).catch(() => {
-      // Silent fail — logging should not block the UI
-    });
-  }, [userId]);
 
   useEffect(() => {
     const activeTab = tabRefs.current.get(activeFilter);

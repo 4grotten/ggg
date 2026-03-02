@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { apiRequest } from "@/services/api/apiClient";
+import { apiRequest, apiPost } from "@/services/api/apiClient";
 import { BackendClientDetail } from "@/hooks/useAdminManagement";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
@@ -1198,6 +1198,11 @@ export default function AdminClientDetails() {
               className="flex-1 bg-red-500 hover:bg-red-600"
               onClick={() => {
                 setShowTxHistoryAlert(false);
+                apiPost('/admin/audit-history/log/', {
+                  action: 'VIEW_TRANSACTION_HISTORY',
+                  target_user_id: userId,
+                  details: { page: 'transaction_history', target_name: client?.full_name || '' },
+                }).catch(() => {});
                 navigate(`/settings/admin/clients/details/${userId}/history`);
               }}
             >
