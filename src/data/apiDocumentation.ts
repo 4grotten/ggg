@@ -2576,6 +2576,431 @@ export const apiCategories: ApiCategory[] = [
         ]
       }
     ]
+  },
+  // ============ АДМИН-ПАНЕЛЬ (ПОЛЬЗОВАТЕЛИ) ============
+  {
+    id: 'admin-users',
+    title: 'Админ: Пользователи',
+    titleKey: 'api.categories.adminUsers',
+    icon: '👥',
+    endpoints: [
+      // 61. Список пользователей
+      {
+        id: 'admin-users-list',
+        method: 'GET',
+        path: '/accounts/admin/users/',
+        title: 'Список пользователей',
+        description: 'Возвращает список всех пользователей с основной информацией, балансами и лимитами.',
+        category: 'admin-users',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        queryParams: [
+          { name: 'search', type: 'string', required: false, description: 'Поиск по имени, телефону или email' },
+          { name: 'role', type: 'string', required: false, description: 'Фильтр по роли (root, admin, moderator, user)' },
+          { name: 'is_verified', type: 'boolean', required: false, description: 'Фильтр по верификации' },
+          { name: 'limit', type: 'number', required: false, description: 'Количество записей (по умолчанию 50)' },
+          { name: 'offset', type: 'number', required: false, description: 'Смещение (по умолчанию 0)' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url '${API_BASE_URL}/accounts/admin/users/?limit=50' \\
+  --header 'Authorization: Token admin_token_here'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "user_id": "105",
+    "full_name": "Barsbek Almanbekov",
+    "phone": "+996777123456",
+    "email": "b.almanbekov@gf.kg",
+    "gender": "male",
+    "language": "ru",
+    "avatar_url": "https://apofiz.../avatar.jpg",
+    "created_at": "2026-02-10T14:00:00Z",
+    "role": "root",
+    "is_verified": true,
+    "referral_level": "partner",
+    "cards_count": 2,
+    "total_cards_balance": 1500.50,
+    "accounts_count": 1,
+    "total_bank_balance": 5000.00,
+    "crypto_wallets_count": 1,
+    "total_crypto_balance": 1200.00,
+    "limits": {
+      "custom_settings_enabled": true,
+      "daily_transfer_limit": 10000.00,
+      "subscription_type": "partner"
+    }
+  }
+]`
+        },
+        responseParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' },
+          { name: 'full_name', type: 'string', required: true, description: 'Полное имя' },
+          { name: 'phone', type: 'string', required: true, description: 'Номер телефона' },
+          { name: 'email', type: 'string', required: false, description: 'Email' },
+          { name: 'gender', type: 'string', required: false, description: 'Пол (male/female)' },
+          { name: 'language', type: 'string', required: false, description: 'Язык интерфейса' },
+          { name: 'avatar_url', type: 'string', required: false, description: 'URL аватара' },
+          { name: 'created_at', type: 'string', required: true, description: 'Дата регистрации (ISO 8601)' },
+          { name: 'role', type: 'string', required: true, description: 'Роль: root, admin, moderator, user' },
+          { name: 'is_verified', type: 'boolean', required: true, description: 'Статус верификации' },
+          { name: 'referral_level', type: 'string', required: false, description: 'Реферальный уровень (partner, r3 и т.д.)' },
+          { name: 'cards_count', type: 'number', required: true, description: 'Количество карт' },
+          { name: 'total_cards_balance', type: 'number', required: true, description: 'Суммарный баланс карт' },
+          { name: 'accounts_count', type: 'number', required: true, description: 'Количество банковских счетов' },
+          { name: 'total_bank_balance', type: 'number', required: true, description: 'Суммарный баланс счетов' },
+          { name: 'crypto_wallets_count', type: 'number', required: true, description: 'Количество крипто-кошельков' },
+          { name: 'total_crypto_balance', type: 'number', required: true, description: 'Суммарный баланс крипто' },
+          { name: 'limits', type: 'object', required: false, description: 'Персональные лимиты и настройки' }
+        ]
+      },
+      // 62. Детальный профиль пользователя
+      {
+        id: 'admin-user-detail',
+        method: 'GET',
+        path: '/accounts/admin/users/{user_id}/',
+        title: 'Детальный профиль пользователя',
+        description: 'Полная информация о пользователе: карты, счета, кошельки, транзакции, лимиты и настройки.',
+        category: 'admin-users',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        pathParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url '${API_BASE_URL}/accounts/admin/users/105/' \\
+  --header 'Authorization: Token admin_token_here'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "user_id": "105",
+  "full_name": "Barsbek Almanbekov",
+  "phone": "+996777123456",
+  "email": "b.almanbekov@gf.kg",
+  "gender": "male",
+  "language": "ru",
+  "avatar_url": "https://apofiz.../avatar.jpg",
+  "created_at": "2026-02-10T14:00:00Z",
+  "is_verified": true,
+  "role": "admin",
+  "is_blocked": false,
+  "is_vip": false,
+  "subscription_type": "pro",
+  "referral_level": "r3",
+  "cards": [
+    { "id": "uuid", "type": "metal", "balance": 100.0 }
+  ],
+  "accounts": [],
+  "wallets": [],
+  "transactions": [],
+  "limits_and_settings": {
+    "card_to_card_percent": 1.5
+  }
+}`
+        },
+        responseParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' },
+          { name: 'full_name', type: 'string', required: true, description: 'Полное имя' },
+          { name: 'phone', type: 'string', required: true, description: 'Номер телефона' },
+          { name: 'email', type: 'string', required: false, description: 'Email' },
+          { name: 'is_verified', type: 'boolean', required: true, description: 'Верифицирован ли' },
+          { name: 'role', type: 'string', required: true, description: 'Роль в системе' },
+          { name: 'is_blocked', type: 'boolean', required: true, description: 'Заблокирован ли' },
+          { name: 'is_vip', type: 'boolean', required: true, description: 'VIP статус' },
+          { name: 'subscription_type', type: 'string', required: false, description: 'Тип подписки (free, pro, partner)' },
+          { name: 'referral_level', type: 'string', required: false, description: 'Уровень реферальной программы' },
+          { name: 'cards', type: 'array', required: true, description: 'Список карт пользователя (id, type, balance)' },
+          { name: 'accounts', type: 'array', required: true, description: 'Банковские счета' },
+          { name: 'wallets', type: 'array', required: true, description: 'Крипто-кошельки' },
+          { name: 'transactions', type: 'array', required: true, description: 'Последние транзакции' },
+          { name: 'limits_and_settings', type: 'object', required: true, description: 'Все лимиты и персональные настройки' }
+        ],
+        notes: [
+          'Только для пользователей с ролью admin или root',
+          'Поля cards, accounts, wallets содержат вложенные объекты с балансами',
+          'transactions возвращает последние 20 транзакций пользователя'
+        ]
+      },
+      // 63. Управление ролями
+      {
+        id: 'admin-user-role',
+        method: 'PATCH',
+        path: '/accounts/admin/users/{user_id}/role/',
+        title: 'Изменить роль пользователя',
+        description: 'Назначает или изменяет роль пользователя (admin, moderator, user).',
+        category: 'admin-users',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        pathParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' }
+        ],
+        bodyParams: [
+          { name: 'role', type: 'string', required: true, description: 'Новая роль', enum: ['root', 'admin', 'moderator', 'user'] }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/users/105/role/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{"role": "admin"}'`,
+          json: `{
+  "role": "admin"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "user_id": "105",
+  "role": "admin",
+  "updated_at": "2026-03-02T12:00:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' },
+          { name: 'role', type: 'string', required: true, description: 'Новая роль' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ],
+        notes: [
+          'Только root может назначать роль admin',
+          'Admin может назначать роли moderator и user'
+        ]
+      },
+      // 64. Верификация пользователя
+      {
+        id: 'admin-user-verify',
+        method: 'PATCH',
+        path: '/accounts/admin/users/{user_id}/verify/',
+        title: 'Верификация пользователя',
+        description: 'Подтверждает или отклоняет верификацию пользователя.',
+        category: 'admin-users',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        pathParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' }
+        ],
+        bodyParams: [
+          { name: 'is_verified', type: 'boolean', required: true, description: 'true — подтвердить, false — отозвать' }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/users/105/verify/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{"is_verified": true}'`,
+          json: `{
+  "is_verified": true
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "user_id": "105",
+  "is_verified": true,
+  "updated_at": "2026-03-02T12:00:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' },
+          { name: 'is_verified', type: 'boolean', required: true, description: 'Новый статус верификации' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ]
+      },
+      // 65. Блокировка / VIP
+      {
+        id: 'admin-user-status',
+        method: 'PATCH',
+        path: '/accounts/admin/users/{user_id}/status/',
+        title: 'Блокировка / VIP статус',
+        description: 'Управление блокировкой и VIP-статусом пользователя.',
+        category: 'admin-users',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        pathParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' }
+        ],
+        bodyParams: [
+          { name: 'is_blocked', type: 'boolean', required: false, description: 'Заблокировать / разблокировать' },
+          { name: 'is_vip', type: 'boolean', required: false, description: 'Включить / выключить VIP' }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/users/105/status/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{"is_blocked": true}'`,
+          json: `{
+  "is_blocked": true
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "user_id": "105",
+  "is_blocked": true,
+  "is_vip": false,
+  "updated_at": "2026-03-02T12:00:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' },
+          { name: 'is_blocked', type: 'boolean', required: true, description: 'Статус блокировки' },
+          { name: 'is_vip', type: 'boolean', required: true, description: 'VIP статус' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ]
+      },
+      // 66. Подписка и реферальная программа
+      {
+        id: 'admin-user-subscription',
+        method: 'PATCH',
+        path: '/accounts/admin/users/{user_id}/subscription/',
+        title: 'Подписка и реферальная программа',
+        description: 'Обновляет тип подписки и уровень реферальной программы пользователя.',
+        category: 'admin-users',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        pathParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' }
+        ],
+        bodyParams: [
+          { name: 'subscription_type', type: 'string', required: false, description: 'Тип подписки', enum: ['free', 'pro', 'partner'] },
+          { name: 'referral_level', type: 'string', required: false, description: 'Уровень реферальной программы', enum: ['none', 'r1', 'r2', 'r3', 'partner'] }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/users/105/subscription/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{"subscription_type": "pro", "referral_level": "r3"}'`,
+          json: `{
+  "subscription_type": "pro",
+  "referral_level": "r3"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "user_id": "105",
+  "subscription_type": "pro",
+  "referral_level": "r3",
+  "updated_at": "2026-03-02T12:00:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' },
+          { name: 'subscription_type', type: 'string', required: true, description: 'Текущий тип подписки' },
+          { name: 'referral_level', type: 'string', required: true, description: 'Текущий реферальный уровень' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ]
+      },
+      // 67. Персональные лимиты пользователя
+      {
+        id: 'admin-user-limits',
+        method: 'PATCH',
+        path: '/accounts/admin/users/{user_id}/limits/',
+        title: 'Персональные лимиты',
+        description: 'Установка индивидуальных лимитов и комиссий для пользователя.',
+        category: 'admin-users',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        pathParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' }
+        ],
+        bodyParams: [
+          { name: 'custom_settings_enabled', type: 'boolean', required: false, description: 'Включить персональные настройки' },
+          { name: 'daily_transfer_limit', type: 'number', required: false, description: 'Дневной лимит переводов' },
+          { name: 'monthly_transfer_limit', type: 'number', required: false, description: 'Месячный лимит переводов' },
+          { name: 'card_to_card_percent', type: 'number', required: false, description: 'Комиссия за card-to-card (%)' }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/users/105/limits/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{"custom_settings_enabled": true, "daily_transfer_limit": 10000}'`,
+          json: `{
+  "custom_settings_enabled": true,
+  "daily_transfer_limit": 10000
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "user_id": "105",
+  "limits_and_settings": {
+    "custom_settings_enabled": true,
+    "daily_transfer_limit": 10000.00,
+    "monthly_transfer_limit": 100000.00,
+    "card_to_card_percent": 1.5
+  },
+  "updated_at": "2026-03-02T12:00:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' },
+          { name: 'limits_and_settings', type: 'object', required: true, description: 'Все текущие лимиты и комиссии' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ],
+        notes: [
+          'Если custom_settings_enabled = false, применяются глобальные настройки из admin_settings',
+          'Частичное обновление — передавайте только изменяемые поля'
+        ]
+      },
+      // 68. История действий пользователя
+      {
+        id: 'admin-user-history',
+        method: 'GET',
+        path: '/accounts/admin/users/{user_id}/history/',
+        title: 'История изменений профиля',
+        description: 'Аудит-лог всех изменений профиля пользователя: смена роли, верификация, блокировка, лимиты.',
+        category: 'admin-users',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        pathParams: [
+          { name: 'user_id', type: 'string', required: true, description: 'ID пользователя' }
+        ],
+        queryParams: [
+          { name: 'limit', type: 'number', required: false, description: 'Количество записей (по умолчанию 50)' },
+          { name: 'offset', type: 'number', required: false, description: 'Смещение (по умолчанию 0)' }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url '${API_BASE_URL}/accounts/admin/users/105/history/' \\
+  --header 'Authorization: Token admin_token_here'`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "count": 15,
+  "results": [
+    {
+      "id": "uuid",
+      "action": "role_changed",
+      "old_value": "user",
+      "new_value": "admin",
+      "changed_by": "101",
+      "changed_by_name": "Root Admin",
+      "created_at": "2026-03-01T10:00:00Z"
+    },
+    {
+      "id": "uuid",
+      "action": "verified",
+      "old_value": "false",
+      "new_value": "true",
+      "changed_by": "101",
+      "changed_by_name": "Root Admin",
+      "created_at": "2026-02-28T15:30:00Z"
+    }
+  ]
+}`
+        },
+        responseParams: [
+          { name: 'count', type: 'number', required: true, description: 'Общее количество записей' },
+          { name: 'results', type: 'array', required: true, description: 'Массив записей аудит-лога' },
+          { name: 'results[].action', type: 'string', required: true, description: 'Тип действия: role_changed, verified, blocked, vip_changed, limits_updated, subscription_changed' },
+          { name: 'results[].old_value', type: 'string', required: false, description: 'Предыдущее значение' },
+          { name: 'results[].new_value', type: 'string', required: true, description: 'Новое значение' },
+          { name: 'results[].changed_by', type: 'string', required: true, description: 'ID администратора, внёсшего изменение' },
+          { name: 'results[].changed_by_name', type: 'string', required: true, description: 'Имя администратора' },
+          { name: 'results[].created_at', type: 'string', required: true, description: 'Дата и время изменения (ISO 8601)' }
+        ]
+      }
+    ]
   }
 ];
 
