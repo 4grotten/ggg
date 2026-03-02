@@ -502,7 +502,7 @@ export default function AdminAdmins() {
                           <div key={`api-${item.id || index}`}>
                             {showDateSeparator && (
                               <div className="py-2 pt-4 first:pt-0">
-                                <span className="text-xs font-semibold text-primary">{dateLabel}</span>
+                                <span className="text-base font-semibold text-primary">{dateLabel}</span>
                               </div>
                             )}
                             <motion.div
