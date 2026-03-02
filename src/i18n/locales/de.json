@@ -1679,6 +1679,8 @@
       "blockUserDesc": "Benutzer {{name}} wird gesperrt. Er kann keine Überweisungen senden/empfangen, kein Guthaben aufladen oder andere Operationen durchführen. Diese Aktion wird im Audit-System protokolliert. Alle Admins und Root-Benutzer werden benachrichtigt. Der Eintrag bleibt in der Audit-Historie.",
       "unblockUserDesc": "Benutzer {{name}} wird entsperrt und kann wieder Operationen durchführen. Diese Aktion wird im Audit-System protokolliert. Alle Admins und Root-Benutzer werden benachrichtigt. Der Eintrag bleibt in der Audit-Historie.",
       "changedBy": "Geändert von",
+      "whoChanged": "Wer geändert hat",
+      "changedFor": "Für wen geändert",
       "block": "Sperren",
       "unblock": "Entsperren",
       "saving": "Speichern...",

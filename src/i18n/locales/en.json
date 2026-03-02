@@ -1749,6 +1749,8 @@
       "blockUserDesc": "User {{name}} will be blocked. They won't be able to send/receive transfers, top up, or perform any operations. This action will be logged in the audit system. All Admins and Root users will be notified. The record will remain in the audit history.",
       "unblockUserDesc": "User {{name}} will be unblocked and will be able to perform operations again. This action will be logged in the audit system. All Admins and Root users will be notified. The record will remain in the audit history.",
       "changedBy": "Changed by",
+      "whoChanged": "Changed by",
+      "changedFor": "Changed for",
       "block": "Block",
       "unblock": "Unblock",
       "saving": "Saving...",

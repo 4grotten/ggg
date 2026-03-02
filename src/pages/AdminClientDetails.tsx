@@ -538,7 +538,10 @@ export default function AdminClientDetails() {
                       : t("admin.clients.unblockUserDesc", { name: client?.full_name || '' })}
                   </span>
                   <span className="block text-xs text-muted-foreground">
-                    {t("admin.clients.roleLabel")}: <span className="font-medium capitalize">{selectedRole}</span> • {t("admin.clients.changedBy")}: <span className="font-medium">{client?.full_name || 'Admin'}</span>
+                    {t("admin.clients.whoChanged", "Кто изменил")}: <span className="font-medium">Admin</span> · <span className="font-medium capitalize">{selectedRole}</span>
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    {t("admin.clients.changedFor", "Кому изменил")}: <span className="font-medium">{client?.full_name || '—'}</span>
                   </span>
                 </AlertDialogDescription>
               </AlertDialogHeader>
