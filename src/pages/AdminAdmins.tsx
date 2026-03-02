@@ -550,7 +550,12 @@ export default function AdminAdmins() {
                                             {keys.map((k) => (
                                               <span
                                                 key={k}
-                                                className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/20 text-primary-foreground font-medium backdrop-blur-sm"
+                                                className={cn(
+                                                  "inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm",
+                                                  k === 'is_blocked'
+                                                    ? "bg-destructive/20 border border-destructive/30 text-destructive"
+                                                    : "bg-primary/20 border border-primary/20 text-primary-foreground"
+                                                )}
                                               >
                                                 {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
                                               </span>
