@@ -458,119 +458,152 @@ export default function AdminAdmins() {
                         <Loader2 className="w-6 h-6 animate-spin text-primary" />
                       </div>
                     )}
-                    {auditHistory.slice(0, visibleCount).map((item: any, index: number) => {
-                      const actionType = (item.action || item.action_type || '').toLowerCase();
-                      let mappedAction: AdminAction['action'] = 'update_setting';
-                      if (actionType.includes('add_role') || actionType.includes('role_add')) mappedAction = 'add_role';
-                      else if (actionType.includes('remove_role') || actionType.includes('role_remove')) mappedAction = 'remove_role';
-                      else if (actionType.includes('block')) mappedAction = 'block_client';
-                      else if (actionType.includes('unblock')) mappedAction = 'unblock_client';
-                      else if (actionType.includes('client') || actionType.includes('user')) mappedAction = 'update_client';
+                    {(() => {
+                      const visibleItems = auditHistory.slice(0, visibleCount);
+                      let lastDateLabel = '';
 
-                      const ActionIcon = getActionIcon(mappedAction);
-                      const colorClasses = getActionColor(mappedAction);
-                      const [iconColor, bgColor] = colorClasses.split(' ');
-                      const adminName = item.admin_name || item.performed_by_name || item.admin?.name || 'Admin';
-                      const adminPhone = item.admin_phone || item.performed_by_phone || item.admin?.phone || '';
-                      const staffMember = staffMap.get(String(item.admin_id));
-                      const adminRole = staffMember?.role || (item.details?.acting_role);
-                      const rawDetails = item.description || item.details || item.message || item;
-                      const details = typeof rawDetails === 'object' ? JSON.stringify(rawDetails) : String(rawDetails);
-                      const targetName = item.target_name || item.target_user_name || item.target?.name;
-                      const targetUserId = item.target_user_id || item.target_id;
-                      const targetClient = targetUserId ? clientsMap.get(String(targetUserId)) : null;
-                      const targetPhone = item.target_phone || item.target_user_phone || item.target?.phone;
-                      const timestamp = item.created_at || item.timestamp || item.date;
+                      return visibleItems.map((item: any, index: number) => {
+                        const actionType = (item.action || item.action_type || '').toLowerCase();
+                        let mappedAction: AdminAction['action'] = 'update_setting';
+                        if (actionType.includes('add_role') || actionType.includes('role_add')) mappedAction = 'add_role';
+                        else if (actionType.includes('remove_role') || actionType.includes('role_remove')) mappedAction = 'remove_role';
+                        else if (actionType.includes('block')) mappedAction = 'block_client';
+                        else if (actionType.includes('unblock')) mappedAction = 'unblock_client';
+                        else if (actionType.includes('client') || actionType.includes('user')) mappedAction = 'update_client';
 
-                      return (
-                        <motion.div
-                          key={`api-${item.id || index}`}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-2 cursor-pointer active:scale-[0.98] transition-transform"
-                          onClick={() => navigate(`/settings/admin/audit/${item.id || index}`, { state: { auditItem: {
-                            ...item,
-                            _enriched_admin_phone: staffMember?.phone || adminPhone,
-                            _enriched_admin_avatar: staffMember?.avatar_url || null,
-                            _enriched_admin_role: adminRole,
-                            _enriched_target_phone: targetClient?.phone || targetPhone,
-                            _enriched_target_avatar: targetClient?.avatar_url || null,
-                            _enriched_target_id: targetUserId,
-                            _enriched_admin_id: item.admin_id,
-                          } } })}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Avatar className="w-9 h-9 rounded-xl shrink-0">
-                                <AvatarImage src={staffMember?.avatar_url || undefined} alt={adminName} />
-                                <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-xs font-medium">
-                                  {adminName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <div className="flex items-center gap-1.5">
-                                  <p className="text-sm font-medium">{adminName}</p>
-                                  {adminRole === 'root' ? (
-                                    <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
-                                      <Crown className="w-2.5 h-2.5" />Root
-                                    </Badge>
-                                  ) : (
-                                    <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground">Admin</Badge>
-                                  )}
-                                </div>
-                                {adminPhone && <p className="text-xs text-muted-foreground">{adminPhone}</p>}
-                              </div>
-                            </div>
-                            {timestamp && (
-                              <div className="flex items-center gap-1 shrink-0">
-                                <span className="text-xs text-muted-foreground">
-                                  <span className="font-bold">{new Date(timestamp).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
-                                  {' '}
-                                  <span className="font-normal">{new Date(timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
-                                </span>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        const ActionIcon = getActionIcon(mappedAction);
+                        const colorClasses = getActionColor(mappedAction);
+                        const [iconColor, bgColor] = colorClasses.split(' ');
+                        const adminName = item.admin_name || item.performed_by_name || item.admin?.name || 'Admin';
+                        const adminPhone = item.admin_phone || item.performed_by_phone || item.admin?.phone || '';
+                        const staffMember = staffMap.get(String(item.admin_id));
+                        const adminRole = staffMember?.role || (item.details?.acting_role);
+                        const rawDetails = item.description || item.details || item.message || item;
+                        const details = typeof rawDetails === 'object' ? JSON.stringify(rawDetails) : String(rawDetails);
+                        const targetName = item.target_name || item.target_user_name || item.target?.name;
+                        const targetUserId = item.target_user_id || item.target_id;
+                        const targetClient = targetUserId ? clientsMap.get(String(targetUserId)) : null;
+                        const targetPhone = item.target_phone || item.target_user_phone || item.target?.phone;
+                        const timestamp = item.created_at || item.timestamp || item.date;
+
+                        // Date separator logic
+                        let showDateSeparator = false;
+                        let dateLabel = '';
+                        if (timestamp) {
+                          const d = new Date(timestamp);
+                          const today = new Date();
+                          const yesterday = new Date();
+                          yesterday.setDate(yesterday.getDate() - 1);
+                          const isToday = d.toDateString() === today.toDateString();
+                          const isYesterday = d.toDateString() === yesterday.toDateString();
+                          dateLabel = isToday
+                            ? t('admin.history.today', 'Сегодня')
+                            : isYesterday
+                              ? t('admin.history.yesterdayLabel', 'Вчера')
+                              : d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' });
+                          if (dateLabel !== lastDateLabel) {
+                            showDateSeparator = true;
+                            lastDateLabel = dateLabel;
+                          }
+                        }
+
+                        return (
+                          <div key={`api-${item.id || index}`}>
+                            {showDateSeparator && (
+                              <div className="flex items-center gap-3 py-2 pt-4 first:pt-0">
+                                <div className="h-px flex-1 bg-border/50" />
+                                <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">{dateLabel}</span>
+                                <div className="h-px flex-1 bg-border/50" />
                               </div>
                             )}
-                          </div>
-                          {/* Show short summary instead of raw JSON */}
-                          {(() => {
-                            const rawDet = item.details;
-                            if (typeof rawDet === 'object' && rawDet?.changes) {
-                              const keys = Object.keys(rawDet.changes);
-                              return (
-                                <div className="flex flex-wrap gap-1.5 pl-11 pt-1">
-                                  {keys.map((k) => (
-                                    <span
-                                      key={k}
-                                      className="inline-block text-[11px] px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/30 text-primary-foreground font-medium"
-                                    >
-                                      {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
-                                    </span>
-                                  ))}
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: Math.min(index * 0.05, 0.5) }}
+                              className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-2 cursor-pointer active:scale-[0.98] transition-transform"
+                              onClick={() => navigate(`/settings/admin/audit/${item.id || index}`, { state: { auditItem: {
+                                ...item,
+                                _enriched_admin_phone: staffMember?.phone || adminPhone,
+                                _enriched_admin_avatar: staffMember?.avatar_url || null,
+                                _enriched_admin_role: adminRole,
+                                _enriched_target_phone: targetClient?.phone || targetPhone,
+                                _enriched_target_avatar: targetClient?.avatar_url || null,
+                                _enriched_target_id: targetUserId,
+                                _enriched_admin_id: item.admin_id,
+                              } } })}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="w-9 h-9 rounded-xl shrink-0">
+                                    <AvatarImage src={staffMember?.avatar_url || undefined} alt={adminName} />
+                                    <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-xs font-medium">
+                                      {adminName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <div className="flex items-center gap-1.5">
+                                      <p className="text-sm font-medium">{adminName}</p>
+                                      {adminRole === 'root' ? (
+                                        <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
+                                          <Crown className="w-2.5 h-2.5" />Root
+                                        </Badge>
+                                      ) : (
+                                        <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground">Admin</Badge>
+                                      )}
+                                    </div>
+                                    {adminPhone && <p className="text-xs text-muted-foreground">{adminPhone}</p>}
+                                  </div>
                                 </div>
-                              );
-                            }
-                            return <p className="text-sm text-foreground/80 pl-11">{details}</p>;
-                          })()}
-                          {targetName && (
-                            <div className="flex items-center gap-2 pl-11">
-                              <Avatar className="w-7 h-7 rounded-lg shrink-0">
-                                <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
-                                <AvatarFallback className="rounded-lg bg-muted text-[10px] font-medium">
-                                  {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
-                                <span className="font-medium">{targetName}</span>
-                                {targetUserId && <span className="text-muted-foreground font-mono">UID:{targetUserId}</span>}
-                                {targetPhone && <span className="text-muted-foreground">{targetPhone}</span>}
+                                {timestamp && (
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    <span className="text-xs text-muted-foreground">
+                                      <span className="font-bold">{new Date(timestamp).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                                      {' '}
+                                      <span className="font-normal">{new Date(timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
+                                    </span>
+                                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          )}
-                        </motion.div>
-                      );
-                    })}
+                              {(() => {
+                                const rawDet = item.details;
+                                if (typeof rawDet === 'object' && rawDet?.changes) {
+                                  const keys = Object.keys(rawDet.changes);
+                                  return (
+                                    <div className="flex flex-wrap gap-1.5 pl-11 pt-1">
+                                      {keys.map((k) => (
+                                        <span
+                                          key={k}
+                                          className="inline-block text-[11px] px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/30 text-primary-foreground font-medium"
+                                        >
+                                          {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  );
+                                }
+                                return <p className="text-sm text-foreground/80 pl-11">{details}</p>;
+                              })()}
+                              {targetName && (
+                                <div className="flex items-center gap-2 pl-11">
+                                  <Avatar className="w-7 h-7 rounded-lg shrink-0">
+                                    <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
+                                    <AvatarFallback className="rounded-lg bg-muted text-[10px] font-medium">
+                                      {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
+                                    <span className="font-medium">{targetName}</span>
+                                    {targetUserId && <span className="text-muted-foreground font-mono">UID:{targetUserId}</span>}
+                                    {targetPhone && <span className="text-muted-foreground">{targetPhone}</span>}
+                                  </div>
+                                </div>
+                              )}
+                            </motion.div>
+                          </div>
+                        );
+                      });
+                    })()}
 
                     {/* Scroll sentinel for infinite pagination */}
                     {visibleCount < auditHistory.length && (
