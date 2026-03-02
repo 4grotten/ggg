@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, RefreshCw, UsersRound, Phone, Hash, CreditCard, Wallet, Zap, Users, Shield, CheckCircle, Sparkles, Filter, X } from "lucide-react";
+import { ArrowLeft, Search, RefreshCw, UsersRound, Phone, Hash, CreditCard, Wallet, Zap, Users, Shield, CheckCircle, Sparkles, Filter, X, Calendar } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -276,13 +276,21 @@ export default function AdminClients() {
 
                     </div>
 
-                    {/* Phone */}
-                    {client.phone && (
-                      <div className="flex items-center gap-2 bg-muted/40 rounded-lg px-2.5 py-1.5 mb-3 w-fit">
-                        <Phone className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-xs font-medium">{client.phone}</span>
-                      </div>
-                    )}
+                    {/* Phone + Registration date */}
+                    <div className="flex items-center gap-2 flex-wrap mb-3">
+                      {client.phone && (
+                        <div className="flex items-center gap-2 bg-muted/40 rounded-lg px-2.5 py-1.5 w-fit">
+                          <Phone className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-xs font-medium">{client.phone}</span>
+                        </div>
+                      )}
+                      {client.created_at && (
+                        <div className="flex items-center gap-2 bg-muted/40 rounded-lg px-2.5 py-1.5 w-fit">
+                          <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                          <span className="text-xs font-medium text-muted-foreground">{new Date(client.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Tags */}
                     <div className="flex items-center gap-1.5 flex-wrap mb-3">
