@@ -270,16 +270,6 @@ export default function AdminAdmins() {
           {/* Sub-tabs */}
           <div className="flex gap-2 p-1 bg-muted/50 rounded-xl">
             <button
-              onClick={() => setActiveSubTab("admins")}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all",
-                activeSubTab === "admins" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Users className="w-4 h-4" />
-              {t("admin.subtabs.admins")}
-            </button>
-            <button
               onClick={() => setActiveSubTab("history")}
               className={cn(
                 "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all",
@@ -288,6 +278,16 @@ export default function AdminAdmins() {
             >
               <History className="w-4 h-4" />
               {t("admin.subtabs.history")}
+            </button>
+            <button
+              onClick={() => setActiveSubTab("admins")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all",
+                activeSubTab === "admins" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Users className="w-4 h-4" />
+              {t("admin.subtabs.admins")}
             </button>
           </div>
 
