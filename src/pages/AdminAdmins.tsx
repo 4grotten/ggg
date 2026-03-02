@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, RefreshCw, Users, UserPlus, Trash2, Phone, Hash, Shield, CheckCircle, History, Activity, TrendingUp } from "lucide-react";
+import { ArrowLeft, Search, RefreshCw, Users, UserPlus, Trash2, Phone, Hash, Shield, CheckCircle, History, Activity, TrendingUp, Loader2 } from "lucide-react";
+import { apiGet } from "@/services/api/apiClient";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -116,6 +117,25 @@ export default function AdminAdmins() {
   const [selectedRole, setSelectedRole] = useState<AppRole>("admin");
   const [isSearching, setIsSearching] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<"admins" | "history">("admins");
+
+  // Real audit history from API
+  const [auditHistory, setAuditHistory] = useState<any[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeSubTab === "history") {
+      setAuditLoading(true);
+      apiGet<any>("/admin/audit-history/")
+        .then((res) => {
+          if (res.data) {
+            const items = Array.isArray(res.data) ? res.data : (res.data as any).results || [];
+            setAuditHistory(items);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setAuditLoading(false));
+    }
+  }, [activeSubTab]);
 
   const handleSearchUser = async () => {
     if (!searchQuery.trim()) return;
@@ -368,11 +388,87 @@ export default function AdminAdmins() {
               >
                 <GlassCard
                   title={t("admin.history.title")}
-                  description={`${MOCK_ADMIN_HISTORY.length} ${t("admin.history.actions")}`}
+                  description={auditLoading ? "Загрузка..." : `${auditHistory.length + MOCK_ADMIN_HISTORY.length} ${t("admin.history.actions")}`}
                   icon={History}
                   iconColor="text-violet-500"
                 >
                   <div className="space-y-3">
+                    {/* Real audit history from API */}
+                    {auditLoading && (
+                      <div className="flex items-center justify-center py-6">
+                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      </div>
+                    )}
+                    {auditHistory.map((item: any, index: number) => {
+                      const actionType = (item.action || item.action_type || '').toLowerCase();
+                      let mappedAction: AdminAction['action'] = 'update_setting';
+                      if (actionType.includes('add_role') || actionType.includes('role_add')) mappedAction = 'add_role';
+                      else if (actionType.includes('remove_role') || actionType.includes('role_remove')) mappedAction = 'remove_role';
+                      else if (actionType.includes('block')) mappedAction = 'block_client';
+                      else if (actionType.includes('unblock')) mappedAction = 'unblock_client';
+                      else if (actionType.includes('client') || actionType.includes('user')) mappedAction = 'update_client';
+
+                      const ActionIcon = getActionIcon(mappedAction);
+                      const colorClasses = getActionColor(mappedAction);
+                      const [iconColor, bgColor] = colorClasses.split(' ');
+                      const adminName = item.admin_name || item.performed_by_name || item.admin?.name || 'Admin';
+                      const adminPhone = item.admin_phone || item.performed_by_phone || item.admin?.phone || '';
+                      const details = item.description || item.details || item.message || JSON.stringify(item);
+                      const targetName = item.target_name || item.target_user_name || item.target?.name;
+                      const targetPhone = item.target_phone || item.target_user_phone || item.target?.phone;
+                      const timestamp = item.created_at || item.timestamp || item.date;
+
+                      return (
+                        <motion.div
+                          key={`api-${item.id || index}`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", bgColor)}>
+                                <ActionIcon className={cn("w-4 h-4", iconColor)} />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <p className="text-sm font-medium">{adminName}</p>
+                                  <Badge className="text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary text-primary-foreground">API</Badge>
+                                </div>
+                                {adminPhone && <p className="text-xs text-muted-foreground">{adminPhone}</p>}
+                              </div>
+                            </div>
+                            {timestamp && (
+                              <span className="text-xs text-muted-foreground">
+                                {formatRelativeTime(new Date(timestamp))}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-foreground/80 pl-10">{details}</p>
+                          {targetName && (
+                            <div className="flex items-center gap-2 pl-10">
+                              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-background/50 text-xs">
+                                <Users className="w-3 h-3 text-muted-foreground" />
+                                <span className="font-medium">{targetName}</span>
+                                {targetPhone && <span className="text-muted-foreground">{targetPhone}</span>}
+                              </div>
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+
+                    {/* Divider if both exist */}
+                    {auditHistory.length > 0 && MOCK_ADMIN_HISTORY.length > 0 && (
+                      <div className="flex items-center gap-2 py-2">
+                        <div className="flex-1 h-px bg-border/50" />
+                        <span className="text-xs text-muted-foreground">Мок-данные</span>
+                        <div className="flex-1 h-px bg-border/50" />
+                      </div>
+                    )}
+
+                    {/* Mock history below */}
                     {MOCK_ADMIN_HISTORY.map((action, index) => {
                       const ActionIcon = getActionIcon(action.action);
                       const colorClasses = getActionColor(action.action);
@@ -382,7 +478,7 @@ export default function AdminAdmins() {
                           key={action.id}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
+                          transition={{ delay: (auditHistory.length + index) * 0.05 }}
                           className="p-4 rounded-2xl bg-muted/50 border border-border/50 space-y-2"
                         >
                           <div className="flex items-center justify-between">
