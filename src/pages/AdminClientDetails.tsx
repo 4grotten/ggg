@@ -1181,8 +1181,13 @@ export default function AdminClientDetails() {
             <AlertDialogTitle className="text-base">
               ⚠️ {t("admin.clients.txHistoryAlertTitle", "Внимание")}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-muted-foreground">
-              {t("admin.clients.txHistoryAlertDesc", "При входе в историю транзакций это действие будет записано в систему логирования. Все Админы и Root будут проинформированы. Запись останется в истории аудита.")}
+            <AlertDialogDescription className="text-sm text-muted-foreground space-y-2">
+              <span className="block">
+                {t("admin.clients.txHistoryAlertDesc", "При входе в историю транзакций это действие будет записано в систему логирования. Все Админы и Root будут проинформированы. Запись останется в истории аудита.")}
+              </span>
+              <span className="block text-xs text-muted-foreground">
+                {t("admin.clients.whoEntered", "Кто входил")}: <span className="font-medium">{currentUser?.full_name || '—'}</span> · <span className="font-medium capitalize">{(currentUser as any)?.role || 'admin'}</span>
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3">
