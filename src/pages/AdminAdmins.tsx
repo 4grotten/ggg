@@ -511,8 +511,9 @@ export default function AdminAdmins() {
                               {/* Target client block with changes */}
                               {(() => {
                                 const rawDet = item.details;
-                                const hasChanges = typeof rawDet === 'object' && rawDet?.changes;
-                                const keys = hasChanges ? Object.keys(rawDet.changes) : [];
+                                const isBlockAction = mappedAction === 'block_client' || mappedAction === 'unblock_client';
+                                const hasChanges = typeof rawDet === 'object' && (rawDet?.changes || isBlockAction);
+                                const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (isBlockAction ? ['is_blocked'] : []);
 
                                 if (targetName || hasChanges) {
                                   return (
