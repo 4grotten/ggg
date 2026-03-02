@@ -271,12 +271,12 @@ export default function AdminClientDetails() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-client-detail", userId] });
-      toast.success("Настройки клиента сохранены");
+      toast.success(t("admin.clients.settingsSaved"));
       // Update initial values so change detection resets
       initialValues.current = { ...initialValues.current, fees: { ...fees }, limits: { ...limits }, selectedRole, selectedSubscription, selectedLevel, isVIP, isBlocked };
     },
     onError: (err) => {
-      toast.error(`Ошибка: ${err.message}`);
+      toast.error(`${t("admin.clients.error")}: ${err.message}`);
     },
   });
 
@@ -284,21 +284,21 @@ export default function AdminClientDetails() {
     const changes: { label: string; from: string; to: string }[] = [];
     const init = initialValues.current;
 
-    if (selectedRole !== init.selectedRole) changes.push({ label: "Роль", from: init.selectedRole, to: selectedRole });
-    if (selectedLevel !== init.selectedLevel) changes.push({ label: t("admin.clients.referralLevel") || "Реферальный уровень", from: init.selectedLevel, to: selectedLevel });
-    if (selectedSubscription !== init.selectedSubscription) changes.push({ label: t("admin.clients.subscriptionType") || "Подписка", from: init.selectedSubscription, to: selectedSubscription });
-    if (isVIP !== init.isVIP) changes.push({ label: "VIP", from: init.isVIP ? "Да" : "Нет", to: isVIP ? "Да" : "Нет" });
-    if (isBlocked !== init.isBlocked) changes.push({ label: t("admin.clients.blockStatus") || "Блокировка", from: init.isBlocked ? "Да" : "Нет", to: isBlocked ? "Да" : "Нет" });
+    if (selectedRole !== init.selectedRole) changes.push({ label: t("admin.clients.roleLabel"), from: init.selectedRole, to: selectedRole });
+    if (selectedLevel !== init.selectedLevel) changes.push({ label: t("admin.clients.referralLevel"), from: init.selectedLevel, to: selectedLevel });
+    if (selectedSubscription !== init.selectedSubscription) changes.push({ label: t("admin.clients.subscriptionType"), from: init.selectedSubscription, to: selectedSubscription });
+    if (isVIP !== init.isVIP) changes.push({ label: "VIP", from: init.isVIP ? t("common.yes") : t("common.no"), to: isVIP ? t("common.yes") : t("common.no") });
+    if (isBlocked !== init.isBlocked) changes.push({ label: t("admin.clients.blockStatus"), from: init.isBlocked ? t("common.yes") : t("common.no"), to: isBlocked ? t("common.yes") : t("common.no") });
 
-    const feeLabels: Record<string, string> = { topUpPercent: t("admin.clients.topUp") || "Top Up", transferPercent: t("admin.clients.transfers") || "Переводы", withdrawPercent: t("admin.clients.withdrawal") || "Вывод", conversionPercent: t("admin.clients.conversion") || "Конвертация" };
+    const feeLabels: Record<string, string> = { topUpPercent: t("admin.clients.topUp"), transferPercent: t("admin.clients.transfers"), withdrawPercent: t("admin.clients.withdrawal"), conversionPercent: t("admin.clients.conversion") };
     for (const key of Object.keys(fees) as (keyof typeof fees)[]) {
-      if (fees[key] !== init.fees[key]) changes.push({ label: `${t("admin.clients.personalFees") || "Комиссия"}: ${feeLabels[key]}`, from: `${init.fees[key]}%`, to: `${fees[key]}%` });
+      if (fees[key] !== init.fees[key]) changes.push({ label: `${t("admin.clients.personalFees")}: ${feeLabels[key]}`, from: `${init.fees[key]}%`, to: `${fees[key]}%` });
     }
 
-    const limitLabels: Record<string, string> = { dailyTopUp: "Daily Top Up", monthlyTopUp: "Monthly Top Up", dailyTransfer: "Daily Transfer", monthlyTransfer: "Monthly Transfer", dailyWithdraw: "Daily Withdraw", monthlyWithdraw: "Monthly Withdraw", singleTransaction: "Макс. перевод", transferMin: "Мин. перевод", withdrawalMin: "Мин. вывод", withdrawalMax: "Макс. вывод", dailyUsdtSend: "Daily USDT Send", monthlyUsdtSend: "Monthly USDT Send", dailyUsdtReceive: "Daily USDT Receive", monthlyUsdtReceive: "Monthly USDT Receive" };
+    const limitLabels: Record<string, string> = { dailyTopUp: "Daily Top Up", monthlyTopUp: "Monthly Top Up", dailyTransfer: "Daily Transfer", monthlyTransfer: "Monthly Transfer", dailyWithdraw: "Daily Withdraw", monthlyWithdraw: "Monthly Withdraw", singleTransaction: t("admin.clients.maxTransfer"), transferMin: t("admin.clients.minTransfer"), withdrawalMin: t("admin.clients.minWithdrawal"), withdrawalMax: t("admin.clients.maxWithdrawal"), dailyUsdtSend: "Daily USDT Send", monthlyUsdtSend: "Monthly USDT Send", dailyUsdtReceive: "Daily USDT Receive", monthlyUsdtReceive: "Monthly USDT Receive" };
     for (const key of Object.keys(limits) as (keyof typeof limits)[]) {
       const suffix = key.includes("Usdt") ? "USDT" : "AED";
-      if (limits[key] !== init.limits[key]) changes.push({ label: `${t("admin.clients.personalLimits") || "Лимит"}: ${limitLabels[key]}`, from: `${init.limits[key]} ${suffix}`, to: `${limits[key]} ${suffix}` });
+      if (limits[key] !== init.limits[key]) changes.push({ label: `${t("admin.clients.personalLimits")}: ${limitLabels[key]}`, from: `${init.limits[key]} ${suffix}`, to: `${limits[key]} ${suffix}` });
     }
 
     const rateLabels: Record<string, string> = { usdtAedBuy: "USDT→AED Buy", usdtAedSell: "USDT→AED Sell", usdAedBuy: "USD→AED Buy", usdAedSell: "USD→AED Sell" };
@@ -312,7 +312,7 @@ export default function AdminClientDetails() {
   const handleSaveClick = () => {
     const changes = getChanges();
     if (changes.length === 0) {
-      toast.info(t("admin.clients.noChanges") || "Нет изменений для сохранения");
+      toast.info(t("admin.clients.noChanges"));
       return;
     }
     setShowSaveAlert(true);
@@ -410,7 +410,7 @@ export default function AdminClientDetails() {
   if (!client) {
     return (
       <MobileLayout title={t("admin.clients.settingsTitle")} showBackButton onBack={() => navigate(-1)}>
-        <div className="px-4 pt-20 text-center text-muted-foreground">Клиент не найден</div>
+        <div className="px-4 pt-20 text-center text-muted-foreground">{t("admin.clients.clientNotFound")}</div>
       </MobileLayout>
     );
   }
@@ -485,7 +485,7 @@ export default function AdminClientDetails() {
               {client.created_at && (
                 <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
                   <Calendar className="w-3.5 h-3.5" />
-                  <span>{t("admin.clients.registrationDate")}: {new Date(client.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                  <span>{t("admin.clients.registrationDate")}: {new Date(client.created_at).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                 </div>
               )}
             </div>
@@ -528,21 +528,21 @@ export default function AdminClientDetails() {
             <AlertDialogContent className="max-w-[320px] rounded-2xl">
               <AlertDialogHeader>
                 <AlertDialogTitle className="text-base">
-                  {pendingBlockValue ? "Блокировка пользователя" : "Разблокировка пользователя"}
+                  {pendingBlockValue ? t("admin.clients.blockUserTitle") : t("admin.clients.unblockUserTitle")}
                 </AlertDialogTitle>
                 <AlertDialogDescription className="text-sm space-y-2">
                   <span className="block">
                     {pendingBlockValue
-                      ? `Пользователь ${client?.full_name || ''} будет заблокирован. Он не сможет отправлять и принимать переводы, пополнять счёт и совершать любые операции.`
-                      : `Пользователь ${client?.full_name || ''} будет разблокирован и сможет снова совершать операции.`}
+                      ? t("admin.clients.blockUserDesc", { name: client?.full_name || '' })
+                      : t("admin.clients.unblockUserDesc", { name: client?.full_name || '' })}
                   </span>
                   <span className="block text-xs text-muted-foreground">
-                    Роль: <span className="font-medium capitalize">{selectedRole}</span> • Изменил: <span className="font-medium">{client?.full_name || 'Admin'}</span>
+                    {t("admin.clients.roleLabel")}: <span className="font-medium capitalize">{selectedRole}</span> • {t("admin.clients.changedBy")}: <span className="font-medium">{client?.full_name || 'Admin'}</span>
                   </span>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter className="flex-row gap-3">
-                <AlertDialogCancel className="flex-1 rounded-xl mt-0">Отмена</AlertDialogCancel>
+                <AlertDialogCancel className="flex-1 rounded-xl mt-0">{t("common.cancel")}</AlertDialogCancel>
                 <AlertDialogAction
                   className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 text-white"
                   onClick={() => {
@@ -550,7 +550,7 @@ export default function AdminClientDetails() {
                     setShowBlockAlert(false);
                   }}
                 >
-                  {pendingBlockValue ? "Заблокировать" : "Разблокировать"}
+                  {pendingBlockValue ? t("admin.clients.block") : t("admin.clients.unblock")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -561,33 +561,33 @@ export default function AdminClientDetails() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Wallet className="w-5 h-5 text-primary" />
-            <h4 className="font-semibold">Финансовая сводка</h4>
+            <h4 className="font-semibold">{t("admin.clients.financialSummary")}</h4>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {[
               { 
-                label: "Карты", 
+                label: t("admin.clients.cardsLabel"), 
                 value: client.cards?.reduce((s, c) => s + c.balance, 0) || 0, 
                 count: client.cards?.length || 0, 
                 currency: "AED",
                 icon: <CreditCard className="w-4 h-4" />,
               },
               { 
-                label: "Банк. счета", 
+                label: t("admin.clients.bankAccountsShort"), 
                 value: client.accounts?.reduce((s, a) => s + a.balance, 0) || 0, 
                 count: client.accounts?.length || 0, 
                 currency: "AED",
                 icon: <Landmark className="w-4 h-4" />,
               },
               { 
-                label: "Крипто", 
+                label: t("admin.clients.cryptoShort"), 
                 value: client.wallets?.reduce((s, w) => s + w.balance, 0) || 0, 
                 count: client.wallets?.length || 0, 
                 currency: "USDT",
                 icon: <Bitcoin className="w-4 h-4" />,
               },
               { 
-                label: "Транзакции", 
+                label: t("admin.clients.transactionsLabel"), 
                 value: null, 
                 count: clientTransactions.length || client.transactions?.length || 0, 
                 currency: "",
@@ -603,7 +603,7 @@ export default function AdminClientDetails() {
                 {item.value !== null ? (
                   <p className="text-sm font-bold text-emerald-500">{item.value.toLocaleString()} {item.currency}</p>
                 ) : (
-                  <p className="text-sm font-bold">{item.count} шт.</p>
+                  <p className="text-sm font-bold">{item.count} {t("admin.clients.items")}</p>
                 )}
               </div>
             ))}
@@ -611,7 +611,7 @@ export default function AdminClientDetails() {
           {/* Total */}
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Общий баланс (AED)</span>
+              <span className="text-xs font-medium text-muted-foreground">{t("admin.clients.totalBalanceAed")}</span>
               <span className="text-lg font-bold text-primary">
                 {((client.cards?.reduce((s, c) => s + c.balance, 0) || 0) + (client.accounts?.reduce((s, a) => s + a.balance, 0) || 0)).toLocaleString()} AED
               </span>
@@ -631,14 +631,14 @@ export default function AdminClientDetails() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Receipt className="w-5 h-5 text-primary" />
-                <h4 className="font-semibold">{t("admin.clients.transactionHistory") || "История транзакций"}</h4>
-                <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions", "последние 3 транзакции")}</span>
+                <h4 className="font-semibold">{t("admin.clients.transactionHistory")}</h4>
+                <span className="text-xs text-muted-foreground">{t("admin.clients.lastTransactions")}</span>
               </div>
               <CardTransactionsList groups={txGroups} viewAsUserId={userId} />
               {showAllTx && totalCount > 3 && (
                 <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAllTx(false)}>
                   <ChevronUp className="w-4 h-4 mr-1" />
-                  Свернуть
+                  {t("admin.clients.collapse")}
                 </Button>
               )}
               <Button
@@ -647,7 +647,7 @@ export default function AdminClientDetails() {
                 onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
               >
                 <Receipt className="w-4 h-4 mr-2" />
-                {t("admin.clients.fullHistory", "История транзакций")}
+                {t("admin.clients.fullHistory")}
               </Button>
             </div>
           );
@@ -657,7 +657,7 @@ export default function AdminClientDetails() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">{t("admin.clients.cards") || "Карты"}</h4>
+              <h4 className="font-semibold">{t("admin.clients.cards")}</h4>
               <Badge variant="secondary" className="text-[10px]">{client.cards.length}</Badge>
             </div>
             <div className="space-y-2">
@@ -688,13 +688,13 @@ export default function AdminClientDetails() {
                   </div>
                   {expandedCard === card.id && (
                     <div className="mt-3 pt-3 border-t border-border/30 grid grid-cols-2 gap-2 text-xs">
-                      {card.card_number && <div className="col-span-2"><span className="text-muted-foreground">Card Number:</span> <span className="font-mono">{card.card_number}</span></div>}
-                      {card.cardholder_name && <div className="col-span-2"><span className="text-muted-foreground">Cardholder:</span> {card.cardholder_name}</div>}
-                      {card.expiry_date && <div><span className="text-muted-foreground">Expiry:</span> {card.expiry_date}</div>}
-                      <div><span className="text-muted-foreground">Type:</span> <span className="capitalize">{card.type}</span></div>
-                      <div><span className="text-muted-foreground">Status:</span> <Badge variant={card.status === "active" ? "default" : "destructive"} className="text-[10px]">{card.status === "active" ? "Active" : card.status}</Badge></div>
-                      <div><span className="text-muted-foreground">Balance:</span> {card.balance.toLocaleString()} AED</div>
-                      {card.last_four_digits && <div><span className="text-muted-foreground">Last 4:</span> {card.last_four_digits}</div>}
+                      {card.card_number && <div className="col-span-2"><span className="text-muted-foreground">{t("admin.clients.cardNumber")}:</span> <span className="font-mono">{card.card_number}</span></div>}
+                      {card.cardholder_name && <div className="col-span-2"><span className="text-muted-foreground">{t("admin.clients.cardholder")}:</span> {card.cardholder_name}</div>}
+                      {card.expiry_date && <div><span className="text-muted-foreground">{t("admin.clients.expiry")}:</span> {card.expiry_date}</div>}
+                      <div><span className="text-muted-foreground">{t("admin.clients.type")}:</span> <span className="capitalize">{card.type}</span></div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.status")}:</span> <Badge variant={card.status === "active" ? "default" : "destructive"} className="text-[10px]">{card.status === "active" ? t("admin.clients.active") : card.status}</Badge></div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.balanceLabel")}:</span> {card.balance.toLocaleString()} AED</div>
+                      {card.last_four_digits && <div><span className="text-muted-foreground">{t("admin.clients.last4")}:</span> {card.last_four_digits}</div>}
                       <div className="col-span-2"><span className="text-muted-foreground">ID:</span> <span className="font-mono text-[10px]">{card.id}</span></div>
                       <div className="col-span-2"><span className="text-muted-foreground">Created:</span> {new Date(card.created_at).toLocaleString()}</div>
                     </div>
@@ -710,7 +710,7 @@ export default function AdminClientDetails() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Landmark className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">{t("admin.clients.bankAccounts") || "Банк. счета"}</h4>
+              <h4 className="font-semibold">{t("admin.clients.bankAccounts")}</h4>
               <Badge variant="secondary" className="text-[10px]">{client.accounts.length}</Badge>
             </div>
             <div className="space-y-2">
@@ -733,10 +733,10 @@ export default function AdminClientDetails() {
                   {expandedAccount === acc.id && (
                     <div className="mt-3 pt-3 border-t border-border/30 space-y-1.5 text-xs">
                       <div><span className="text-muted-foreground">IBAN:</span> <span className="font-mono">{acc.iban}</span></div>
-                      <div><span className="text-muted-foreground">Bank:</span> {acc.bank_name}</div>
-                      <div><span className="text-muted-foreground">Beneficiary:</span> {acc.beneficiary}</div>
-                      <div><span className="text-muted-foreground">Balance:</span> {acc.balance.toLocaleString()} AED</div>
-                      <div><span className="text-muted-foreground">Status:</span> <Badge variant={acc.is_active ? "default" : "destructive"} className="text-[10px]">{acc.is_active ? "Active" : "Inactive"}</Badge></div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.bank")}:</span> {acc.bank_name}</div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.beneficiary")}:</span> {acc.beneficiary}</div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.balanceLabel")}:</span> {acc.balance.toLocaleString()} AED</div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.status")}:</span> <Badge variant={acc.is_active ? "default" : "destructive"} className="text-[10px]">{acc.is_active ? t("admin.clients.active") : t("admin.clients.inactive")}</Badge></div>
                     </div>
                   )}
                 </button>
@@ -750,7 +750,7 @@ export default function AdminClientDetails() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Bitcoin className="w-5 h-5 text-primary" />
-              <h4 className="font-semibold">{t("admin.clients.cryptoWallets") || "Крипто кошельки"}</h4>
+              <h4 className="font-semibold">{t("admin.clients.cryptoWallets")}</h4>
               <Badge variant="secondary" className="text-[10px]">{client.wallets.length}</Badge>
             </div>
             <div className="space-y-2">
@@ -772,12 +772,12 @@ export default function AdminClientDetails() {
                   </div>
                   {expandedWallet === w.id && (
                     <div className="mt-3 pt-3 border-t border-border/30 space-y-1.5 text-xs">
-                      <div><span className="text-muted-foreground">Network:</span> {w.network}</div>
-                      <div><span className="text-muted-foreground">Token:</span> {w.token}</div>
-                      <div className="break-all"><span className="text-muted-foreground">Address:</span> <span className="font-mono text-[10px]">{w.address}</span></div>
-                      <div><span className="text-muted-foreground">Balance:</span> {w.balance.toLocaleString()} {w.token}</div>
-                      <div><span className="text-muted-foreground">Status:</span> <Badge variant={w.is_active ? "default" : "destructive"} className="text-[10px]">{w.is_active ? "Active" : "Inactive"}</Badge></div>
-                      <div><span className="text-muted-foreground">Created:</span> {new Date(w.created_at).toLocaleString()}</div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.network")}:</span> {w.network}</div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.token")}:</span> {w.token}</div>
+                      <div className="break-all"><span className="text-muted-foreground">{t("admin.clients.address")}:</span> <span className="font-mono text-[10px]">{w.address}</span></div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.balanceLabel")}:</span> {w.balance.toLocaleString()} {w.token}</div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.status")}:</span> <Badge variant={w.is_active ? "default" : "destructive"} className="text-[10px]">{w.is_active ? t("admin.clients.active") : t("admin.clients.inactive")}</Badge></div>
+                      <div><span className="text-muted-foreground">{t("admin.clients.created")}:</span> {new Date(w.created_at).toLocaleString()}</div>
                     </div>
                   )}
                 </button>
@@ -793,7 +793,7 @@ export default function AdminClientDetails() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            <h4 className="font-semibold">Роль</h4>
+            <h4 className="font-semibold">{t("admin.clients.roleLabel")}</h4>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {ROLE_OPTIONS.map((role) => (
@@ -1042,8 +1042,8 @@ export default function AdminClientDetails() {
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">💰 USDT — {t("admin.clients.dailyLimits", "Дневные лимиты")}</p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { key: "dailyUsdtSend", label: "Отправка" },
-                { key: "dailyUsdtReceive", label: "Приём" },
+                { key: "dailyUsdtSend", label: t("admin.clients.usdtSend") },
+                { key: "dailyUsdtReceive", label: t("admin.clients.usdtReceive") },
               ].map(({ key, label }) => (
                 <div key={key} className="space-y-1.5">
                   <Label className="text-[10px] text-muted-foreground">{label}</Label>
@@ -1068,8 +1068,8 @@ export default function AdminClientDetails() {
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">💰 USDT — {t("admin.clients.monthlyLimits", "Месячные лимиты")}</p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { key: "monthlyUsdtSend", label: "Отправка" },
-                { key: "monthlyUsdtReceive", label: "Приём" },
+                { key: "monthlyUsdtSend", label: t("admin.clients.usdtSend") },
+                { key: "monthlyUsdtReceive", label: t("admin.clients.usdtReceive") },
               ].map(({ key, label }) => (
                 <div key={key} className="space-y-1.5">
                   <Label className="text-[10px] text-muted-foreground">{label}</Label>
@@ -1092,13 +1092,13 @@ export default function AdminClientDetails() {
 
           {/* Transfer & Withdrawal Min/Max */}
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Мин / Макс суммы</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("admin.clients.minMaxAmounts")}</p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { key: "transferMin", label: "Мин. перевод" },
-                { key: "singleTransaction", label: "Макс. перевод" },
-                { key: "withdrawalMin", label: "Мин. вывод" },
-                { key: "withdrawalMax", label: "Макс. вывод" },
+                { key: "transferMin", label: t("admin.clients.minTransfer") },
+                { key: "singleTransaction", label: t("admin.clients.maxTransfer") },
+                { key: "withdrawalMin", label: t("admin.clients.minWithdrawal") },
+                { key: "withdrawalMax", label: t("admin.clients.maxWithdrawal") },
               ].map(({ key, label }) => (
                 <div key={key} className="space-y-1.5">
                   <Label className="text-[10px] text-muted-foreground">{label}</Label>
@@ -1131,7 +1131,7 @@ export default function AdminClientDetails() {
           ) : (
             <Save className="w-5 h-5 mr-2" />
           )}
-          {saveLimitsMutation.isPending ? "Сохранение..." : t("admin.clients.saveChanges")}
+          {saveLimitsMutation.isPending ? t("admin.clients.saving") : t("admin.clients.saveChanges")}
         </Button>
       </div>
 
@@ -1139,10 +1139,10 @@ export default function AdminClientDetails() {
       <AlertDialog open={showSaveAlert} onOpenChange={setShowSaveAlert}>
         <AlertDialogContent className="max-w-[90vw] w-auto min-w-[320px] rounded-2xl backdrop-blur-md bg-background/95 border border-border/60">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base">Подтвердить изменения</AlertDialogTitle>
+            <AlertDialogTitle className="text-base">{t("admin.clients.confirmChanges")}</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3 pt-2">
-                <p className="text-sm text-muted-foreground">Следующие параметры будут изменены:</p>
+                <p className="text-sm text-muted-foreground">{t("admin.clients.followingParamsChanged")}</p>
                 <div className="space-y-2 max-h-[40vh] overflow-y-auto">
                   {getChanges().map((change, i) => (
                     <div key={i} className="flex flex-col gap-0.5 p-2.5 rounded-xl bg-muted/50 border border-border/50">
@@ -1159,10 +1159,10 @@ export default function AdminClientDetails() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3 mt-4">
-            <AlertDialogCancel className="flex-1 mt-0 h-11 rounded-2xl">{t("common.cancel") || "Отмена"}</AlertDialogCancel>
+            <AlertDialogCancel className="flex-1 mt-0 h-11 rounded-2xl">{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmSave} className="flex-1 h-11 rounded-2xl bg-primary text-primary-foreground font-semibold">
               <Save className="w-4 h-4 mr-1.5" />
-              Сохранить изменения
+              {t("admin.clients.saveChanges")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
