@@ -137,6 +137,7 @@ export default function AdminClientDetails() {
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
   const [expandedWallet, setExpandedWallet] = useState<string | null>(null);
   const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [showTxHistoryAlert, setShowTxHistoryAlert] = useState(false);
   const [focusedLimitKey, setFocusedLimitKey] = useState<string | null>(null);
 
   const [limits, setLimits] = useState({
@@ -644,7 +645,7 @@ export default function AdminClientDetails() {
               <Button
                 variant="default"
                 className="w-full rounded-xl mt-2"
-                onClick={() => navigate(`/settings/admin/clients/details/${userId}/history`)}
+                onClick={() => setShowTxHistoryAlert(true)}
               >
                 <Receipt className="w-4 h-4 mr-2" />
                 {t("admin.clients.fullHistory")}
@@ -1163,6 +1164,34 @@ export default function AdminClientDetails() {
             <AlertDialogAction onClick={handleConfirmSave} className="flex-1 h-11 rounded-2xl bg-primary text-primary-foreground font-semibold">
               <Save className="w-4 h-4 mr-1.5" />
               {t("admin.clients.saveChanges")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Transaction History Logging Alert */}
+      <AlertDialog open={showTxHistoryAlert} onOpenChange={setShowTxHistoryAlert}>
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base">
+              ⚠️ {t("admin.clients.txHistoryAlertTitle", "Внимание")}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground">
+              {t("admin.clients.txHistoryAlertDesc", "При входе в историю транзакций это действие будет записано в систему логирования. Все Админы и Root будут проинформированы. Запись останется в истории аудита.")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3">
+            <AlertDialogCancel className="flex-1 mt-0">
+              {t("common.cancel", "Отмена")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="flex-1 bg-red-500 hover:bg-red-600"
+              onClick={() => {
+                setShowTxHistoryAlert(false);
+                navigate(`/settings/admin/clients/details/${userId}/history`);
+              }}
+            >
+              {t("admin.clients.txHistoryAlertConfirm", "Продолжить")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
