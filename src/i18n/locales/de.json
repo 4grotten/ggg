@@ -1690,11 +1690,14 @@
         "full_name": "Vollständiger Name"
       }
     },
+    "changedFor": "Geändert für",
+    "changedData": "Daten wurden geändert",
     "actions": {
       "addRole": "Rolle zugewiesen",
       "removeRole": "Rolle entfernt",
       "updateSetting": "Einstellung aktualisiert",
       "updateClient": "Kunde aktualisiert",
+      "updateUserData": "Benutzerdaten aktualisiert",
       "blockClient": "Kunde gesperrt",
       "unblockClient": "Kunde entsperrt"
     },

@@ -1690,11 +1690,14 @@
         "full_name": "الاسم الكامل"
       }
     },
+    "changedFor": "تم التغيير لـ",
+    "changedData": "تم تغيير البيانات",
     "actions": {
       "addRole": "تم تعيين الدور",
       "removeRole": "تم إزالة الدور",
       "updateSetting": "تم تحديث الإعداد",
       "updateClient": "تم تحديث العميل",
+      "updateUserData": "تم تحديث بيانات المستخدم",
       "blockClient": "تم حظر العميل",
       "unblockClient": "تم إلغاء حظر العميل"
     },
