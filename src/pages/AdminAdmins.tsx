@@ -233,17 +233,12 @@ export default function AdminAdmins() {
                 className="space-y-4"
               >
                 {/* Add Role Card */}
-                <GlassCard
-                  title={t("admin.roles.addRole")}
-                  description={t("admin.roles.searchByPhoneOrId")}
-                  icon={UserPlus}
-                  iconColor="text-blue-500"
-                >
+                <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
-                        placeholder={t("admin.roles.searchPlaceholder")}
+                        placeholder="Поиск Админов и Ротов по номеру телефона, UID и по имени"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleSearchUser()}
@@ -310,7 +305,7 @@ export default function AdminAdmins() {
                       {t("admin.roles.userNotFound")}
                     </motion.p>
                   )}
-                </GlassCard>
+                </div>
 
                 {/* Staff from API */}
                 <GlassCard
