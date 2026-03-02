@@ -121,6 +121,7 @@ export default function AdminAdmins() {
   const { admins, isLoading: adminsLoading, staff, staffLoading, clients, searchUser, addAdmin, removeAdmin } = useAdminManagement();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [staffSearchQuery, setStaffSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState<{
     user_id: string;
     phone: string | null;
@@ -376,13 +377,30 @@ export default function AdminAdmins() {
                   icon={Shield}
                   iconColor="text-blue-500"
                 >
+                  {/* Staff search */}
+                  <div className="relative mb-2">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder={t("admin.roles.searchStaff", "Поиск по имени, телефону, UID")}
+                      value={staffSearchQuery}
+                      onChange={(e) => setStaffSearchQuery(e.target.value)}
+                      className="pl-10 h-11 rounded-xl bg-background/50"
+                    />
+                  </div>
                   {staffLoading ? (
                     <div className="space-y-3">
                       {[1, 2].map((i) => <Skeleton key={i} className="h-20 w-full rounded-2xl" />)}
                     </div>
                   ) : staff && staff.length > 0 ? (
                     <div className="space-y-2">
-                      {staff.map((member, index) => {
+                      {staff.filter((member) => {
+                        if (!staffSearchQuery.trim()) return true;
+                        const q = staffSearchQuery.toLowerCase();
+                        return member.full_name?.toLowerCase().includes(q) ||
+                          member.phone?.toLowerCase().includes(q) ||
+                          member.user_id?.toLowerCase().includes(q) ||
+                          member.email?.toLowerCase().includes(q);
+                      }).map((member, index) => {
                         const isRoot = member.role === 'root';
                         const initials = member.full_name
                           .split(' ')

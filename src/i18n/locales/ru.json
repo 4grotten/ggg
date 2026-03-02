@@ -1705,6 +1705,7 @@
       "currentRoles": "Текущие роли",
       "usersWithRoles": "пользователей с ролями",
       "noUsersWithRoles": "Нет пользователей с ролями",
+      "searchStaff": "Поиск по имени, телефону, UID",
       "userNotFound": "Пользователь не найден",
       "noName": "Без имени",
       "admin": "Администратор",
