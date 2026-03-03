@@ -417,7 +417,8 @@ export default function AdminAdmins() {
                       return visibleItems.map((item: any, index: number) => {
                         const actionType = (item.action || item.action_type || '').toLowerCase();
                         let mappedAction: AdminAction['action'] = 'update_setting';
-                        if (actionType.includes('add_role') || actionType.includes('role_add')) mappedAction = 'add_role';
+                        if (actionType.includes('view_transaction_history')) mappedAction = 'update_setting';
+                        else if (actionType.includes('add_role') || actionType.includes('role_add')) mappedAction = 'add_role';
                         else if (actionType.includes('remove_role') || actionType.includes('role_remove')) mappedAction = 'remove_role';
                         else if (actionType.includes('unblock')) mappedAction = 'unblock_client';
                         else if (actionType.includes('block')) mappedAction = 'block_client';
