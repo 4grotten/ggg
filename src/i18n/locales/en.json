@@ -1881,7 +1881,8 @@
         "updateClient": "Client updated",
         "updateUserData": "User data updated",
         "blockClient": "Client blocked",
-        "unblockClient": "Client unblocked"
+        "unblockClient": "Client unblocked",
+        "updateAdminSetting": "Admin setting changed"
       }
     },
     "common": {

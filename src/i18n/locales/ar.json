@@ -1810,7 +1810,8 @@
         "updateClient": "تم تحديث العميل",
         "updateUserData": "تم تحديث بيانات المستخدم",
         "blockClient": "تم حظر العميل",
-        "unblockClient": "تم إلغاء حظر العميل"
+        "unblockClient": "تم إلغاء حظر العميل",
+        "updateAdminSetting": "تم تغيير الإعداد العام"
       }
     },
     "common": {

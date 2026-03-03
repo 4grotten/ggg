@@ -141,6 +141,15 @@ export default function AuditHistoryDetail() {
           }
         };
       }
+    } else if (actionType.toLowerCase().includes('update_admin_setting')) {
+      // UPDATE_ADMIN_SETTING has {key, category, old_value, new_value, description, category_label}
+      const settingDesc = rawDetails.description || rawDetails.key || 'setting';
+      changes = {
+        [settingDesc]: {
+          было: rawDetails.old_value,
+          стало: rawDetails.new_value,
+        }
+      };
     } else {
       // Maybe the details object itself has changes-like structure
       Object.entries(rawDetails).forEach(([key, val]) => {
@@ -226,6 +235,7 @@ export default function AuditHistoryDetail() {
                 const actionKey = actionType === 'UPDATE_USER_DATA' ? 'updateUserData'
                   : at.includes('admin_panel_login') ? 'adminPanelLogin'
                   : at.includes('view_transaction_history') ? 'viewTransactionHistory'
+                  : at.includes('update_admin_setting') ? 'updateAdminSetting'
                   : at.includes('unblock') ? 'unblockClient'
                   : at.includes('block') ? 'blockClient'
                   : at.includes('update') ? 'updateClient'
@@ -236,7 +246,8 @@ export default function AuditHistoryDetail() {
                 const isUnblock = at.includes('unblock');
                 const isView = at.includes('view_transaction_history');
                 const isLogin = at.includes('admin_panel_login');
-                const actionColorClass = isBlock ? 'text-destructive' : isUnblock ? 'text-emerald-500' : isView ? 'text-blue-400' : isLogin ? 'text-amber-400' : 'text-green-500';
+                const isSettingUpdate = at.includes('update_admin_setting');
+                const actionColorClass = isBlock ? 'text-destructive' : isUnblock ? 'text-emerald-500' : isView ? 'text-blue-400' : isLogin ? 'text-amber-400' : isSettingUpdate ? 'text-violet-500' : 'text-green-500';
                 return (
                   <div className="flex items-center gap-2">
                     <FileText className="w-3.5 h-3.5" />
@@ -247,7 +258,7 @@ export default function AuditHistoryDetail() {
             </div>
 
             {/* Target user - hide for admin_panel_login */}
-            {targetName && !actionType.toLowerCase().includes('admin_panel_login') && (
+            {targetName && !actionType.toLowerCase().includes('admin_panel_login') && !actionType.toLowerCase().includes('update_admin_setting') && (
               <div className="pt-3 border-t border-border/30">
                 <p className="text-[10px] uppercase tracking-wider text-green-500 font-semibold mb-2">{t('admin.audit.changedFor', 'Кому изменили')}</p>
                 <div className="flex items-center gap-3">
@@ -287,6 +298,20 @@ export default function AuditHistoryDetail() {
             className="rounded-2xl bg-card border border-border/50 p-4"
           >
             <p className="text-sm text-foreground/80">{descriptionText}</p>
+          </motion.div>
+        )}
+
+        {/* Setting update category badge */}
+        {actionType.toLowerCase().includes('update_admin_setting') && rawDetails && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex flex-wrap gap-2"
+          >
+            <span className="inline-flex items-center text-xs px-3 py-1.5 rounded-xl font-medium bg-violet-500/20 border border-violet-500/30 text-violet-400">
+              {rawDetails.category_label || rawDetails.category || ''}
+            </span>
           </motion.div>
         )}
 
@@ -424,7 +449,7 @@ export default function AuditHistoryDetail() {
         )}
 
         {/* Raw data fallback if no changes parsed */}
-        {changeEntries.length === 0 && !descriptionText && !actionType.toLowerCase().includes('view_transaction_history') && !actionType.toLowerCase().includes('admin_panel_login') && (
+        {changeEntries.length === 0 && !descriptionText && !actionType.toLowerCase().includes('view_transaction_history') && !actionType.toLowerCase().includes('admin_panel_login') && !actionType.toLowerCase().includes('update_admin_setting') && (
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}

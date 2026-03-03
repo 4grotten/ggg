@@ -516,8 +516,9 @@ export default function AdminAdmins() {
                                 const isBlockAction = mappedAction === 'block_client' || mappedAction === 'unblock_client';
                                 const isViewHistory = actionType.includes('view_transaction_history');
                                 const isAdminLogin = actionType.includes('admin_panel_login');
-                                const hasChanges = typeof rawDet === 'object' && (rawDet?.changes || isBlockAction) || isViewHistory || isAdminLogin;
-                                const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (isBlockAction ? ['is_blocked'] : (isViewHistory ? ['view_transaction_history'] : (isAdminLogin ? ['admin_panel_login'] : [])));
+                                const isSettingUpdate = actionType.includes('update_admin_setting');
+                                const hasChanges = typeof rawDet === 'object' && (rawDet?.changes || isBlockAction) || isViewHistory || isAdminLogin || isSettingUpdate;
+                                const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (isBlockAction ? ['is_blocked'] : (isViewHistory ? ['view_transaction_history'] : (isAdminLogin ? ['admin_panel_login'] : (isSettingUpdate ? ['setting_change'] : []))));
 
                                 if (targetName || hasChanges) {
                                   // For admin_panel_login, skip target user block entirely
@@ -529,6 +530,36 @@ export default function AdminAdmins() {
                                             <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm bg-amber-500/20 border border-amber-500/30 text-amber-400">
                                               {t('admin.audit.actions.adminPanelLogin', 'Вход в админ-панель')}
                                             </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                  // For UPDATE_ADMIN_SETTING, show setting change info
+                                  if (isSettingUpdate) {
+                                    const categoryLabel = rawDet?.category_label || rawDet?.category || '';
+                                    const settingKey = rawDet?.key || '';
+                                    const oldVal = rawDet?.old_value;
+                                    const newVal = rawDet?.new_value;
+                                    const desc = rawDet?.description || settingKey;
+                                    return (
+                                      <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
+                                        <div className="px-4 pt-3 pb-1">
+                                          <p className="text-[11px] uppercase tracking-wider text-violet-500 font-semibold">{t('admin.audit.settingChanged', 'Изменена настройка')}</p>
+                                        </div>
+                                        <div className="px-4 py-3 space-y-2">
+                                          <div className="flex flex-wrap gap-1.5">
+                                            <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm bg-violet-500/20 border border-violet-500/30 text-violet-400">
+                                              {categoryLabel}
+                                            </span>
+                                            <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm bg-primary/10 border border-primary/20 text-foreground">
+                                              {desc}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-2 text-xs">
+                                            <span className="text-destructive font-medium">{oldVal ?? '—'}</span>
+                                            <span className="text-muted-foreground">→</span>
+                                            <span className="text-emerald-500 font-medium">{newVal ?? '—'}</span>
                                           </div>
                                         </div>
                                       </div>

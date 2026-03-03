@@ -1880,7 +1880,8 @@
         "updateClient": "Обновлён клиент",
         "updateUserData": "Обновлены данные пользователя",
         "blockClient": "Клиент заблокирован",
-        "unblockClient": "Клиент разблокирован"
+        "unblockClient": "Клиент разблокирован",
+        "updateAdminSetting": "Изменена общая настройка"
       }
     },
     "common": {

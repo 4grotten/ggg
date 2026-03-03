@@ -1810,7 +1810,8 @@
         "updateClient": "Müşteri güncellendi",
         "updateUserData": "Kullanıcı verileri güncellendi",
         "blockClient": "Müşteri engellendi",
-        "unblockClient": "Müşteri engeli kaldırıldı"
+        "unblockClient": "Müşteri engeli kaldırıldı",
+        "updateAdminSetting": "Genel ayar değiştirildi"
       }
     },
     "common": {

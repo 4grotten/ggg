@@ -1817,7 +1817,8 @@
         "updateClient": "客户已更新",
         "updateUserData": "用户数据已更新",
         "blockClient": "客户已封禁",
-        "unblockClient": "客户已解封"
+        "unblockClient": "客户已解封",
+        "updateAdminSetting": "通用设置已更改"
       }
     },
     "common": {
