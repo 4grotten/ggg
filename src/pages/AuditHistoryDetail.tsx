@@ -222,6 +222,7 @@ export default function AuditHistoryDetail() {
               {(() => {
                 const at = actionType.toLowerCase();
                 const actionKey = actionType === 'UPDATE_USER_DATA' ? 'updateUserData'
+                  : at.includes('view_transaction_history') ? 'viewTransactionHistory'
                   : at.includes('unblock') ? 'unblockClient'
                   : at.includes('block') ? 'blockClient'
                   : at.includes('update') ? 'updateClient'
@@ -230,7 +231,8 @@ export default function AuditHistoryDetail() {
                   : 'updateSetting';
                 const isBlock = at.includes('block') && !at.includes('unblock');
                 const isUnblock = at.includes('unblock');
-                const actionColorClass = isBlock ? 'text-destructive' : isUnblock ? 'text-emerald-500' : 'text-green-500';
+                const isView = at.includes('view_transaction_history');
+                const actionColorClass = isBlock ? 'text-destructive' : isUnblock ? 'text-emerald-500' : isView ? 'text-blue-400' : 'text-green-500';
                 return (
                   <div className="flex items-center gap-2">
                     <FileText className="w-3.5 h-3.5" />
@@ -322,8 +324,28 @@ export default function AuditHistoryDetail() {
           </motion.div>
         )}
 
+        {/* View action info card */}
+        {changeEntries.length === 0 && !descriptionText && actionType.toLowerCase().includes('view_transaction_history') && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="rounded-2xl bg-card border border-border/50 p-4 space-y-2"
+          >
+            <p className="text-sm font-semibold text-foreground">{t('admin.audit.actions.viewTransactionHistory', 'Просмотр истории транзакций')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('admin.audit.detail.viewedHistory', 'Администратор просмотрел историю транзакций пользователя')} <span className="font-semibold text-foreground">{targetName}</span>
+            </p>
+            {timestamp && (
+              <p className="text-xs text-muted-foreground">
+                {format(new Date(timestamp), "dd.MM.yyyy")} в {format(new Date(timestamp), "HH:mm:ss")}
+              </p>
+            )}
+          </motion.div>
+        )}
+
         {/* Raw data fallback if no changes parsed */}
-        {changeEntries.length === 0 && !descriptionText && (
+        {changeEntries.length === 0 && !descriptionText && !actionType.toLowerCase().includes('view_transaction_history') && (
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
