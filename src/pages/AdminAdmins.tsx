@@ -548,23 +548,36 @@ export default function AdminAdmins() {
                                         <div className="px-4 py-3 space-y-2">
                                           <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{t('admin.audit.changedData', 'Были изменены данные')}</p>
                                           <div className="flex flex-wrap gap-1.5">
-                                            {keys.map((k) => (
-                                              <span
-                                                key={k}
-                                                className={cn(
-                                                  "inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm",
-                                                  k === 'is_blocked' && mappedAction === 'unblock_client'
-                                                    ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
-                                                    : k === 'is_blocked'
-                                                      ? "bg-destructive/20 border border-destructive/30 text-destructive"
-                                                      : "bg-primary/20 border border-primary/20 text-primary-foreground"
-                                                )}
-                                              >
-                                                {k === 'is_blocked' && mappedAction === 'unblock_client'
-                                                  ? t('admin.audit.fields.is_unblocked', 'Разблокировка')
-                                                  : t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
-                                              </span>
-                                            ))}
+                                            {keys.map((k) => {
+                                              // Determine if this is_blocked change is actually an unblock
+                                              const isUnblockChange = k === 'is_blocked' && (
+                                                mappedAction === 'unblock_client' ||
+                                                (rawDet?.changes?.is_blocked?.стало === false) ||
+                                                (rawDet?.changes?.is_blocked?.new === false) ||
+                                                (rawDet?.changes?.is_blocked?.to === false)
+                                              );
+                                              const isBlockChange = k === 'is_blocked' && !isUnblockChange;
+
+                                              return (
+                                                <span
+                                                  key={k}
+                                                  className={cn(
+                                                    "inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm",
+                                                    isUnblockChange
+                                                      ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
+                                                      : isBlockChange
+                                                        ? "bg-destructive/20 border border-destructive/30 text-destructive"
+                                                        : "bg-primary/20 border border-primary/20 text-primary-foreground"
+                                                  )}
+                                                >
+                                                  {isUnblockChange
+                                                    ? t('admin.audit.fields.is_unblocked', 'Разблокировка')
+                                                    : isBlockChange
+                                                      ? t('admin.audit.fields.is_blocked', 'Блокировка')
+                                                      : t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                                </span>
+                                              );
+                                            })}
                                           </div>
                                         </div>
                                       )}
