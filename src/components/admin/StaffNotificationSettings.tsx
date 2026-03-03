@@ -115,11 +115,11 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
     upsertMutation.mutate({ channel, contact_value: value });
   };
 
-  // Show mock data when no real settings exist
-  const displaySettings = settings.length > 0 ? settings : (isLoading ? [] : MOCK_SETTINGS);
-  const isMockData = settings.length === 0 && !isLoading;
+  // Show mock data when no real settings exist and user is readOnly
+  const displaySettings = settings.length > 0 ? settings : (isLoading ? [] : (readOnly ? MOCK_SETTINGS : []));
+  const isMockData = settings.length === 0 && !isLoading && readOnly;
 
-  const configuredChannels = displaySettings.map((s) => s.channel);
+  const configuredChannels = settings.map((s) => s.channel);
   const availableChannels = CHANNELS.filter((c) => !configuredChannels.includes(c.key));
 
   return (
