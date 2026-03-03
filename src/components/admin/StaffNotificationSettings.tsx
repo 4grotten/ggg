@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   staffUserId: string;
+  readOnly?: boolean;
 }
 
 interface NotifSetting {
@@ -30,7 +31,13 @@ const CHANNELS = [
   { key: "email" as const, icon: Mail, label: "Email", placeholder: "admin@example.com", color: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
 ];
 
-export default function StaffNotificationSettings({ staffUserId }: Props) {
+const MOCK_SETTINGS: NotifSetting[] = [
+  { id: "mock-wa", staff_user_id: "", channel: "whatsapp", contact_value: "+971 50 XXX XXXX", is_enabled: true, created_at: "", updated_at: "" },
+  { id: "mock-tg", staff_user_id: "", channel: "telegram", contact_value: "@username", is_enabled: false, created_at: "", updated_at: "" },
+  { id: "mock-email", staff_user_id: "", channel: "email", contact_value: "admin@example.com", is_enabled: true, created_at: "", updated_at: "" },
+];
+
+export default function StaffNotificationSettings({ staffUserId, readOnly = false }: Props) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
@@ -108,7 +115,11 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
     upsertMutation.mutate({ channel, contact_value: value });
   };
 
-  const configuredChannels = settings.map((s) => s.channel);
+  // Show mock data when no real settings exist
+  const displaySettings = settings.length > 0 ? settings : (isLoading ? [] : MOCK_SETTINGS);
+  const isMockData = settings.length === 0 && !isLoading;
+
+  const configuredChannels = displaySettings.map((s) => s.channel);
   const availableChannels = CHANNELS.filter((c) => !configuredChannels.includes(c.key));
 
   return (
@@ -122,9 +133,15 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-primary" />
           <h4 className="font-semibold text-sm">Рассылка логов</h4>
+          {readOnly && (
+            <Badge variant="outline" className="text-[10px] ml-1 text-muted-foreground border-muted-foreground/30">Только просмотр</Badge>
+          )}
           <Badge variant="secondary" className="text-[10px] ml-auto">
-            {settings.filter((s) => s.is_enabled).length} активных
+            {displaySettings.filter((s) => s.is_enabled).length} активных
           </Badge>
+          {isMockData && (
+            <Badge variant="outline" className="text-[10px] text-amber-500 border-amber-500/30">Пример</Badge>
+          )}
         </div>
         <p className="text-xs text-muted-foreground mt-1">
           Настройте каналы для отправки истории действий
@@ -140,7 +157,7 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
           <>
             {/* Existing channels */}
             <AnimatePresence mode="popLayout">
-              {settings.map((setting) => {
+              {displaySettings.map((setting) => {
                 const ch = CHANNELS.find((c) => c.key === setting.channel)!;
                 const Icon = ch.icon;
                 return (
@@ -152,7 +169,8 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
                     exit={{ opacity: 0, scale: 0.95 }}
                     className={cn(
                       "flex items-center gap-3 p-3 rounded-xl border transition-colors",
-                      setting.is_enabled ? ch.bg : "bg-muted/30 border-border/30 opacity-60"
+                      setting.is_enabled ? ch.bg : "bg-muted/30 border-border/30 opacity-60",
+                      isMockData && "opacity-50"
                     )}
                   >
                     <Icon className={cn("w-5 h-5 shrink-0", setting.is_enabled ? ch.color : "text-muted-foreground")} />
@@ -160,29 +178,33 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
                       <p className="text-xs font-medium text-muted-foreground">{ch.label}</p>
                       <p className="text-sm font-medium truncate">{setting.contact_value}</p>
                     </div>
-                    <button
-                      onClick={() => toggleMutation.mutate({ id: setting.id, is_enabled: !setting.is_enabled })}
-                      className="shrink-0"
-                    >
-                      {setting.is_enabled ? (
-                        <ToggleRight className="w-6 h-6 text-primary" />
-                      ) : (
-                        <ToggleLeft className="w-6 h-6 text-muted-foreground" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => deleteMutation.mutate(setting.id)}
-                      className="shrink-0 p-1.5 rounded-lg hover:bg-destructive/10 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </button>
+                    {!readOnly && !isMockData && (
+                      <>
+                        <button
+                          onClick={() => toggleMutation.mutate({ id: setting.id, is_enabled: !setting.is_enabled })}
+                          className="shrink-0"
+                        >
+                          {setting.is_enabled ? (
+                            <ToggleRight className="w-6 h-6 text-primary" />
+                          ) : (
+                            <ToggleLeft className="w-6 h-6 text-muted-foreground" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => deleteMutation.mutate(setting.id)}
+                          className="shrink-0 p-1.5 rounded-lg hover:bg-destructive/10 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </button>
+                      </>
+                    )}
                   </motion.div>
                 );
               })}
             </AnimatePresence>
 
-            {/* Add new channel */}
-            {availableChannels.length > 0 && !adding && (
+            {/* Add new channel - only for root */}
+            {!readOnly && availableChannels.length > 0 && !adding && (
               <div className="flex flex-wrap gap-2 pt-1">
                 {availableChannels.map((ch) => {
                   const Icon = ch.icon;
@@ -207,8 +229,8 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
               </div>
             )}
 
-            {/* Adding form */}
-            {adding && (() => {
+            {/* Adding form - only for root */}
+            {!readOnly && adding && (() => {
               const ch = CHANNELS.find((c) => c.key === adding)!;
               const Icon = ch.icon;
               return (
