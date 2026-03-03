@@ -174,7 +174,9 @@ export default function AuditHistoryDetail() {
           <div className="p-4 space-y-4">
             {/* Admin info */}
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{t('admin.audit.whoChanged', 'Кто изменил')}</p>
+              {!actionType.toLowerCase().includes('admin_panel_login') && (
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{t('admin.audit.whoChanged', 'Кто изменил')}</p>
+              )}
               <div className="flex items-center gap-3">
                 <Avatar className="w-11 h-11 rounded-xl shrink-0">
                   <AvatarImage src={adminAvatar || undefined} alt={adminName} />
@@ -244,8 +246,8 @@ export default function AuditHistoryDetail() {
               })()}
             </div>
 
-            {/* Target user */}
-            {targetName && (
+            {/* Target user - hide for admin_panel_login */}
+            {targetName && !actionType.toLowerCase().includes('admin_panel_login') && (
               <div className="pt-3 border-t border-border/30">
                 <p className="text-[10px] uppercase tracking-wider text-green-500 font-semibold mb-2">{t('admin.audit.changedFor', 'Кому изменили')}</p>
                 <div className="flex items-center gap-3">
