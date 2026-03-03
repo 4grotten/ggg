@@ -1778,7 +1778,7 @@
       "token": "Токен",
       "address": "Адрес",
       "created": "Создано",
-      "active": "Активна",
+      "active": "Активен",
       "inactive": "Неактивна",
       "roleLabel": "Роль",
       "transactionHistory": "История транзакций",
