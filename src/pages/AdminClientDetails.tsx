@@ -74,44 +74,51 @@ export default function AdminClientDetails() {
   const { user: currentUser } = useAuth();
   const settings = useSettings();
 
-  const resetFees = () => {
-    setFees({
-      topUpPercent: String(settings.NETWORK_FEE_PERCENT),
-      transferPercent: String(settings.CARD_TO_CARD_FEE_PERCENT),
-      withdrawPercent: String(settings.BANK_TRANSFER_FEE_PERCENT),
-      conversionPercent: String(settings.CURRENCY_CONVERSION_FEE_PERCENT),
-    });
+  const [showResetAlert, setShowResetAlert] = useState<'fees' | 'rates' | 'limits' | null>(null);
+
+  const doReset = (type: 'fees' | 'rates' | 'limits') => {
+    if (type === 'fees') {
+      setFees({
+        topUpPercent: String(settings.NETWORK_FEE_PERCENT),
+        transferPercent: String(settings.CARD_TO_CARD_FEE_PERCENT),
+        withdrawPercent: String(settings.BANK_TRANSFER_FEE_PERCENT),
+        conversionPercent: String(settings.CURRENCY_CONVERSION_FEE_PERCENT),
+      });
+    } else if (type === 'rates') {
+      setRates({
+        usdtAedBuy: String(settings.USDT_TO_AED_BUY),
+        usdtAedSell: String(settings.USDT_TO_AED_SELL),
+        usdAedBuy: String(settings.USD_TO_AED_BUY),
+        usdAedSell: String(settings.USD_TO_AED_SELL),
+      });
+    } else {
+      setLimits({
+        dailyTopUp: String(settings.DAILY_TOP_UP_LIMIT),
+        monthlyTopUp: String(settings.MONTHLY_TOP_UP_LIMIT),
+        dailyTransfer: String(settings.DAILY_TRANSFER_LIMIT),
+        monthlyTransfer: String(settings.MONTHLY_TRANSFER_LIMIT),
+        dailyWithdraw: String(settings.DAILY_WITHDRAWAL_LIMIT),
+        monthlyWithdraw: String(settings.MONTHLY_WITHDRAWAL_LIMIT),
+        singleTransaction: String(settings.TRANSFER_MAX_AMOUNT),
+        transferMin: String(settings.TRANSFER_MIN_AMOUNT),
+        withdrawalMin: String(settings.WITHDRAWAL_MIN_AMOUNT),
+        withdrawalMax: String(settings.WITHDRAWAL_MAX_AMOUNT),
+        dailyUsdtSend: String(settings.DAILY_CRYPTO_SEND_LIMIT),
+        monthlyUsdtSend: String(settings.MONTHLY_CRYPTO_SEND_LIMIT),
+        dailyUsdtReceive: String(settings.DAILY_CRYPTO_RECEIVE_LIMIT),
+        monthlyUsdtReceive: String(settings.MONTHLY_CRYPTO_RECEIVE_LIMIT),
+      });
+    }
     toast.success(t("admin.clients.resetSuccess", "Сброшено к общим настройкам"));
   };
 
-  const resetRates = () => {
-    setRates({
-      usdtAedBuy: String(settings.USDT_TO_AED_BUY),
-      usdtAedSell: String(settings.USDT_TO_AED_SELL),
-      usdAedBuy: String(settings.USD_TO_AED_BUY),
-      usdAedSell: String(settings.USD_TO_AED_SELL),
-    });
-    toast.success(t("admin.clients.resetSuccess", "Сброшено к общим настройкам"));
+  const handleResetClick = (type: 'fees' | 'rates' | 'limits') => {
+    setShowResetAlert(type);
   };
 
-  const resetLimits = () => {
-    setLimits({
-      dailyTopUp: String(settings.DAILY_TOP_UP_LIMIT),
-      monthlyTopUp: String(settings.MONTHLY_TOP_UP_LIMIT),
-      dailyTransfer: String(settings.DAILY_TRANSFER_LIMIT),
-      monthlyTransfer: String(settings.MONTHLY_TRANSFER_LIMIT),
-      dailyWithdraw: String(settings.DAILY_WITHDRAWAL_LIMIT),
-      monthlyWithdraw: String(settings.MONTHLY_WITHDRAWAL_LIMIT),
-      singleTransaction: String(settings.TRANSFER_MAX_AMOUNT),
-      transferMin: String(settings.TRANSFER_MIN_AMOUNT),
-      withdrawalMin: String(settings.WITHDRAWAL_MIN_AMOUNT),
-      withdrawalMax: String(settings.WITHDRAWAL_MAX_AMOUNT),
-      dailyUsdtSend: String(settings.DAILY_CRYPTO_SEND_LIMIT),
-      monthlyUsdtSend: String(settings.MONTHLY_CRYPTO_SEND_LIMIT),
-      dailyUsdtReceive: String(settings.DAILY_CRYPTO_RECEIVE_LIMIT),
-      monthlyUsdtReceive: String(settings.MONTHLY_CRYPTO_RECEIVE_LIMIT),
-    });
-    toast.success(t("admin.clients.resetSuccess", "Сброшено к общим настройкам"));
+  const handleConfirmReset = () => {
+    if (showResetAlert) doReset(showResetAlert);
+    setShowResetAlert(null);
   };
 
   // Fetch full client detail from backend
@@ -967,7 +974,7 @@ export default function AdminClientDetails() {
               <Percent className="w-5 h-5 text-primary" />
               <h4 className="font-semibold">{t("admin.clients.personalFees")}</h4>
             </div>
-            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={resetFees}>
+            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={() => handleResetClick('fees')}>
               <RotateCcw className="w-3.5 h-3.5" />
               {t("admin.clients.reset", "Сбросить")}
             </Button>
@@ -1002,7 +1009,7 @@ export default function AdminClientDetails() {
               <RefreshCw className="w-5 h-5 text-primary" />
               <h4 className="font-semibold">{t("admin.clients.personalRates")}</h4>
             </div>
-            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={resetRates}>
+            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={() => handleResetClick('rates')}>
               <RotateCcw className="w-3.5 h-3.5" />
               {t("admin.clients.reset", "Сбросить")}
             </Button>
@@ -1048,7 +1055,7 @@ export default function AdminClientDetails() {
               <ArrowUpDown className="w-5 h-5 text-primary" />
               <h4 className="font-semibold">{t("admin.clients.personalLimits")}</h4>
             </div>
-            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={resetLimits}>
+            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={() => handleResetClick('limits')}>
               <RotateCcw className="w-3.5 h-3.5" />
               {t("admin.clients.reset", "Сбросить")}
             </Button>
@@ -1272,6 +1279,28 @@ export default function AdminClientDetails() {
               }}
             >
               {t("admin.clients.txHistoryAlertConfirm", "Продолжить")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reset Confirmation Alert */}
+      <AlertDialog open={!!showResetAlert} onOpenChange={(open) => !open && setShowResetAlert(null)}>
+        <AlertDialogContent className="max-w-[320px] rounded-2xl backdrop-blur-md bg-background/95 border border-border/60">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base flex items-center gap-2">
+              <RotateCcw className="w-4 h-4 text-primary" />
+              {t("admin.clients.resetAlertTitle", "Сброс к общим настройкам")}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground">
+              {t("admin.clients.resetAlertDesc", "Персональные значения будут заменены на общие из настроек системы. Изменения вступят в силу только после нажатия «Сохранить изменения».")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3">
+            <AlertDialogCancel className="flex-1 mt-0 h-11 rounded-2xl">{t("common.cancel", "Отмена")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmReset} className="flex-1 h-11 rounded-2xl bg-primary text-primary-foreground font-semibold">
+              <RotateCcw className="w-4 h-4 mr-1.5" />
+              {t("admin.clients.reset", "Сбросить")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
