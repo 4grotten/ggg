@@ -1685,6 +1685,8 @@
       "monthlyLimits": "Месячные лимиты",
       "transactionLimit": "Лимит на транзакцию",
       "saveChanges": "Сохранить изменения",
+      "reset": "Сбросить",
+      "resetSuccess": "Сброшено к общим настройкам",
       "cards": "Карты",
       "bankAccounts": "Банковские счета",
       "cryptoWallets": "Крипто кошельки",
