@@ -76,6 +76,7 @@ export default function AdminStaffDetail() {
     return null;
   })();
   const isCurrentUserRoot = currentUserRole === 'root';
+  console.log('[StaffDetail] currentUserRole:', currentUserRole, 'isRoot:', isCurrentUserRoot);
 
   const { data: staffList } = useQuery({
     queryKey: ["admin-staff"],
