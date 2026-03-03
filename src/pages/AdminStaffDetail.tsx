@@ -11,9 +11,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { apiRequest } from "@/services/api/apiClient";
+import { apiRequest, AUTH_USER_KEY } from "@/services/api/apiClient";
 import { StaffMember } from "@/hooks/useAdminManagement";
 import { format } from "date-fns";
+import StaffNotificationSettings from "@/components/admin/StaffNotificationSettings";
 
 interface AuditEntry {
   id: string;
@@ -65,6 +66,16 @@ export default function AdminStaffDetail() {
   const navigate = useNavigate();
   const { staffId } = useParams<{ staffId: string }>();
   const { t } = useTranslation();
+
+  // Check if current logged-in user is root
+  const currentUserRole = (() => {
+    try {
+      const cached = localStorage.getItem(AUTH_USER_KEY);
+      if (cached) return JSON.parse(cached)?.role || null;
+    } catch { /* ignore */ }
+    return null;
+  })();
+  const isCurrentUserRoot = currentUserRole === 'root';
 
   const { data: staffList } = useQuery({
     queryKey: ["admin-staff"],
@@ -199,6 +210,11 @@ export default function AdminStaffDetail() {
               )}
             </div>
           </motion.div>
+        )}
+
+        {/* Notification Settings - only for Root users */}
+        {isCurrentUserRoot && staffId && (
+          <StaffNotificationSettings staffUserId={staffId} />
         )}
 
         {/* Audit History */}
