@@ -1789,7 +1789,8 @@
         "action": "Aktion",
         "changedParams": "Geänderte Parameter",
         "rawData": "Änderungsdaten",
-        "viewedHistory": "Administrator hat die Transaktionshistorie des Benutzers eingesehen"
+        "viewedHistory": "Administrator hat die Transaktionshistorie des Benutzers eingesehen",
+        "viewedHistoryAction": "hat die Transaktionshistorie eingesehen von"
       },
       "changedFor": "Geändert für",
       "whoChanged": "Wer hat geändert",
