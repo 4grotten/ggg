@@ -320,3 +320,15 @@ volumes:
 networks:
   default:
     name: easycard_network
+
+
+waha:
+    image: devlikeapro/waha
+    container_name: easycard_waha
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - WAHA_HTTP_CORS=*
+    networks:
+      - default
