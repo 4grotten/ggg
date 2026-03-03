@@ -520,6 +520,20 @@ export default function AdminAdmins() {
                                 const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (isBlockAction ? ['is_blocked'] : (isViewHistory ? ['view_transaction_history'] : (isAdminLogin ? ['admin_panel_login'] : [])));
 
                                 if (targetName || hasChanges) {
+                                  // For admin_panel_login, skip target user block entirely
+                                  if (isAdminLogin) {
+                                    return (
+                                      <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
+                                        <div className="px-4 py-3 space-y-2">
+                                          <div className="flex flex-wrap gap-1.5">
+                                            <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm bg-amber-500/20 border border-amber-500/30 text-amber-400">
+                                              {t('admin.audit.actions.adminPanelLogin', 'Вход в админ-панель')}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
                                   return (
                                      <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
                                        {/* Target user label */}
@@ -546,9 +560,9 @@ export default function AdminAdmins() {
                                             )}
                                           </div>
                                         </div>
-                                      )}
-                                      {/* Changes section */}
-                                      {hasChanges && keys.length > 0 && (
+                                       )}
+                                       {/* Changes section */}
+                                       {hasChanges && keys.length > 0 && (
                                         <div className="px-4 py-3 space-y-2">
                                           <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{t('admin.audit.changedData', 'Были изменены данные')}</p>
                                           <div className="flex flex-wrap gap-1.5">
