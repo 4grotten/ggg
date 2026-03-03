@@ -228,9 +228,19 @@ export default function AdminStaffDetail() {
                 let lastDateLabel = '';
 
                 return auditHistory.map((entry: any, index: number) => {
-                  const details = typeof entry.details === "object" ? entry.details : null;
-                  const hasChanges = details?.changes && typeof details.changes === 'object';
-                  const keys = hasChanges ? Object.keys(details.changes) : [];
+                  const rawDet = typeof entry.details === "object" ? entry.details : null;
+                  const actionType = (entry.action || entry.action_type || '').toLowerCase();
+                  const isBlockAction = actionType.includes('block') && !actionType.includes('unblock');
+                  const isUnblockAction = actionType.includes('unblock');
+                  const isViewHistory = actionType.includes('view_transaction_history');
+                  const isAdminLogin = actionType.includes('admin_panel_login');
+
+                  const hasChanges = (rawDet?.changes && typeof rawDet.changes === 'object') || isBlockAction || isUnblockAction || isViewHistory || isAdminLogin;
+                  const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (
+                    (isBlockAction || isUnblockAction) ? ['is_blocked'] :
+                    isViewHistory ? ['view_transaction_history'] :
+                    isAdminLogin ? ['admin_panel_login'] : []
+                  );
                   const targetName = entry.target_user_name || entry.target_name || entry.target?.name;
                   const targetUserId = entry.target_user_id || entry.target_id;
                   const targetClient = targetUserId ? clientsMap.get(String(targetUserId)) : null;
@@ -276,10 +286,12 @@ export default function AdminStaffDetail() {
                           })
                         }
                       >
-                        {/* Who changed label */}
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 ml-0.5">
-                          {t('admin.audit.whoChanged', 'Кто изменил')}
-                        </p>
+                        {/* Who changed label - hide for admin_panel_login */}
+                        {!isAdminLogin && (
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 ml-0.5">
+                            {t('admin.audit.whoChanged', 'Кто изменил')}
+                          </p>
+                        )}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Avatar className="w-9 h-9 rounded-xl shrink-0">
@@ -315,55 +327,100 @@ export default function AdminStaffDetail() {
                         </div>
 
                         {/* Target client block with changes */}
-                        {(targetName || hasChanges) && (
-                          <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
-                            {/* Target user label */}
-                            <div className="px-4 pt-3 pb-1">
-                              <p className="text-[11px] uppercase tracking-wider text-green-500 font-semibold">
-                                {t('admin.audit.changedFor', 'Кому изменили')}
-                              </p>
-                            </div>
-                            {targetName && (
-                              <div className="flex items-center gap-3 px-4 py-3 border-b border-border/20">
-                                <Avatar className="w-10 h-10 rounded-xl shrink-0 ring-2 ring-primary/10">
-                                  <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
-                                  <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-[11px] font-semibold">
-                                    {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
-                                    <p className="text-sm font-semibold truncate">{targetName}</p>
-                                    {targetUserId && (
-                                      <span className="text-[10px] text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded-md">UID:{targetUserId}</span>
-                                    )}
+                        {(() => {
+                          if (targetName || hasChanges) {
+                            // For admin_panel_login, skip target user block
+                            if (isAdminLogin) {
+                              return (
+                                <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
+                                  <div className="px-4 py-3 space-y-2">
+                                    <div className="flex flex-wrap gap-1.5">
+                                      <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm bg-amber-500/20 border border-amber-500/30 text-amber-400">
+                                        {t('admin.audit.actions.adminPanelLogin', 'Вход в админ-панель')}
+                                      </span>
+                                    </div>
                                   </div>
-                                  {targetPhone && (
-                                    <p className="text-xs text-muted-foreground mt-0.5">{targetPhone}</p>
-                                  )}
                                 </div>
-                              </div>
-                            )}
-                            {/* Changes section */}
-                            {hasChanges && keys.length > 0 && (
-                              <div className="px-4 py-3 space-y-2">
-                                <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
-                                  {t('admin.audit.changedData', 'Были изменены данные')}
-                                </p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {keys.map((k) => (
-                                    <span
-                                      key={k}
-                                      className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg bg-primary/20 border border-primary/20 text-primary-foreground font-medium backdrop-blur-sm"
-                                    >
-                                      {t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
-                                    </span>
-                                  ))}
+                              );
+                            }
+                            return (
+                              <div className="mt-3 ml-11 rounded-2xl bg-gradient-to-br from-card to-muted/30 border border-border/40 overflow-hidden">
+                                {/* Target user label */}
+                                <div className="px-4 pt-3 pb-1">
+                                  <p className="text-[11px] uppercase tracking-wider text-green-500 font-semibold">
+                                    {t('admin.audit.changedFor', 'Кому изменили')}
+                                  </p>
                                 </div>
+                                {targetName && (
+                                  <div className="flex items-center gap-3 px-4 py-3 border-b border-border/20">
+                                    <Avatar className="w-10 h-10 rounded-xl shrink-0 ring-2 ring-primary/10">
+                                      <AvatarImage src={targetClient?.avatar_url || undefined} alt={targetName} />
+                                      <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-[11px] font-semibold">
+                                        {targetName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2">
+                                        <p className="text-sm font-semibold truncate">{targetName}</p>
+                                        {targetUserId && (
+                                          <span className="text-[10px] text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded-md">UID:{targetUserId}</span>
+                                        )}
+                                      </div>
+                                      {targetPhone && (
+                                        <p className="text-xs text-muted-foreground mt-0.5">{targetPhone}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                {/* Changes section */}
+                                {hasChanges && keys.length > 0 && (
+                                  <div className="px-4 py-3 space-y-2">
+                                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
+                                      {t('admin.audit.changedData', 'Были изменены данные')}
+                                    </p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {keys.map((k) => {
+                                        const isViewHistoryChange = k === 'view_transaction_history';
+                                        const isUnblockChange = k === 'is_blocked' && (
+                                          isUnblockAction ||
+                                          (rawDet?.changes?.is_blocked?.стало === false) ||
+                                          (rawDet?.changes?.is_blocked?.new === false) ||
+                                          (rawDet?.changes?.is_blocked?.to === false)
+                                        );
+                                        const isBlockChange = k === 'is_blocked' && !isUnblockChange;
+
+                                        return (
+                                          <span
+                                            key={k}
+                                            className={cn(
+                                              "inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm",
+                                              isViewHistoryChange
+                                                ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
+                                                : isUnblockChange
+                                                  ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
+                                                  : isBlockChange
+                                                    ? "bg-destructive/20 border border-destructive/30 text-destructive"
+                                                    : "bg-primary/20 border border-primary/20 text-primary-foreground"
+                                            )}
+                                          >
+                                            {isViewHistoryChange
+                                              ? t('admin.audit.actions.viewTransactionHistory', 'Просмотр истории транзакций')
+                                              : isUnblockChange
+                                                ? t('admin.audit.fields.is_unblocked', 'Разблокировка')
+                                                : isBlockChange
+                                                  ? t('admin.audit.fields.is_blocked', 'Блокировка')
+                                                  : t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                          </span>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        )}
+                            );
+                          }
+                          return null;
+                        })()}
                       </motion.div>
                     </div>
                   );
