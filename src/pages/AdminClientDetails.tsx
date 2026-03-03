@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp, Calendar } from "lucide-react";
+import { Phone, CreditCard, TrendingUp, Percent, Shield, Award, Save, ArrowUpDown, CheckCircle, Crown, Sparkles, RefreshCw, Mail, Globe, User, Wallet, Landmark, Bitcoin, Receipt, ChevronDown, ChevronUp, Calendar, RotateCcw } from "lucide-react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup 
 import { ApiTransaction, mapApiTransactionToLocal } from "@/services/api/transactions";
 import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 // Referral levels configuration
 const REFERRAL_LEVELS = [
@@ -71,6 +72,47 @@ export default function AdminClientDetails() {
   const { userId } = useParams<{ userId: string }>();
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
+  const settings = useSettings();
+
+  const resetFees = () => {
+    setFees({
+      topUpPercent: String(settings.NETWORK_FEE_PERCENT),
+      transferPercent: String(settings.CARD_TO_CARD_FEE_PERCENT),
+      withdrawPercent: String(settings.BANK_TRANSFER_FEE_PERCENT),
+      conversionPercent: String(settings.CURRENCY_CONVERSION_FEE_PERCENT),
+    });
+    toast.success(t("admin.clients.resetSuccess", "Сброшено к общим настройкам"));
+  };
+
+  const resetRates = () => {
+    setRates({
+      usdtAedBuy: String(settings.USDT_TO_AED_BUY),
+      usdtAedSell: String(settings.USDT_TO_AED_SELL),
+      usdAedBuy: String(settings.USD_TO_AED_BUY),
+      usdAedSell: String(settings.USD_TO_AED_SELL),
+    });
+    toast.success(t("admin.clients.resetSuccess", "Сброшено к общим настройкам"));
+  };
+
+  const resetLimits = () => {
+    setLimits({
+      dailyTopUp: String(settings.DAILY_TOP_UP_LIMIT),
+      monthlyTopUp: String(settings.MONTHLY_TOP_UP_LIMIT),
+      dailyTransfer: String(settings.DAILY_TRANSFER_LIMIT),
+      monthlyTransfer: String(settings.MONTHLY_TRANSFER_LIMIT),
+      dailyWithdraw: String(settings.DAILY_WITHDRAWAL_LIMIT),
+      monthlyWithdraw: String(settings.MONTHLY_WITHDRAWAL_LIMIT),
+      singleTransaction: String(settings.TRANSFER_MAX_AMOUNT),
+      transferMin: String(settings.TRANSFER_MIN_AMOUNT),
+      withdrawalMin: String(settings.WITHDRAWAL_MIN_AMOUNT),
+      withdrawalMax: String(settings.WITHDRAWAL_MAX_AMOUNT),
+      dailyUsdtSend: String(settings.DAILY_CRYPTO_SEND_LIMIT),
+      monthlyUsdtSend: String(settings.MONTHLY_CRYPTO_SEND_LIMIT),
+      dailyUsdtReceive: String(settings.DAILY_CRYPTO_RECEIVE_LIMIT),
+      monthlyUsdtReceive: String(settings.MONTHLY_CRYPTO_RECEIVE_LIMIT),
+    });
+    toast.success(t("admin.clients.resetSuccess", "Сброшено к общим настройкам"));
+  };
 
   // Fetch full client detail from backend
   const { data: client, isLoading } = useQuery({
@@ -920,9 +962,15 @@ export default function AdminClientDetails() {
 
         {/* Personal Fees */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Percent className="w-5 h-5 text-primary" />
-            <h4 className="font-semibold">{t("admin.clients.personalFees")}</h4>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Percent className="w-5 h-5 text-primary" />
+              <h4 className="font-semibold">{t("admin.clients.personalFees")}</h4>
+            </div>
+            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={resetFees}>
+              <RotateCcw className="w-3.5 h-3.5" />
+              {t("admin.clients.reset", "Сбросить")}
+            </Button>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
@@ -949,9 +997,15 @@ export default function AdminClientDetails() {
 
         {/* Personal Exchange Rates */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="w-5 h-5 text-primary" />
-            <h4 className="font-semibold">{t("admin.clients.personalRates")}</h4>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <RefreshCw className="w-5 h-5 text-primary" />
+              <h4 className="font-semibold">{t("admin.clients.personalRates")}</h4>
+            </div>
+            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={resetRates}>
+              <RotateCcw className="w-3.5 h-3.5" />
+              {t("admin.clients.reset", "Сбросить")}
+            </Button>
           </div>
           <div className="space-y-3">
             {[
@@ -989,9 +1043,15 @@ export default function AdminClientDetails() {
 
         {/* Personal Limits */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <ArrowUpDown className="w-5 h-5 text-primary" />
-            <h4 className="font-semibold">{t("admin.clients.personalLimits")}</h4>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ArrowUpDown className="w-5 h-5 text-primary" />
+              <h4 className="font-semibold">{t("admin.clients.personalLimits")}</h4>
+            </div>
+            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-muted-foreground" onClick={resetLimits}>
+              <RotateCcw className="w-3.5 h-3.5" />
+              {t("admin.clients.reset", "Сбросить")}
+            </Button>
           </div>
 
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/50 space-y-3">
