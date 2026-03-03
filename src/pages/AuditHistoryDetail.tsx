@@ -334,7 +334,11 @@ export default function AuditHistoryDetail() {
           >
             <p className="text-sm font-semibold text-foreground">{t('admin.audit.actions.viewTransactionHistory', 'Просмотр истории транзакций')}</p>
             <p className="text-xs text-muted-foreground">
-              {t('admin.audit.detail.viewedHistory', 'Администратор просмотрел историю транзакций пользователя')} <span className="font-semibold text-foreground">{targetName}</span>
+              <span className="font-semibold text-foreground">{adminName}</span>
+              {actingRole === 'root' && <Badge className="text-[8px] px-1 py-0 h-3.5 bg-amber-500 hover:bg-amber-600 text-white gap-0.5 ml-1 inline-flex align-middle"><Crown className="w-2 h-2" />Root</Badge>}
+              {actingRole !== 'root' && <Badge className="text-[8px] px-1 py-0 h-3.5 bg-primary hover:bg-primary text-primary-foreground ml-1 inline-flex align-middle capitalize">{actingRole}</Badge>}
+              {' '}{t('admin.audit.detail.viewedHistoryAction', 'просмотрел историю транзакций пользователя')}{' '}
+              <span className="font-semibold text-foreground">{targetName}</span>
             </p>
             {timestamp && (
               <p className="text-xs text-muted-foreground">

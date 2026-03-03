@@ -1860,7 +1860,8 @@
         "action": "Action",
         "changedParams": "Changed Parameters",
         "rawData": "Change data",
-        "viewedHistory": "Administrator viewed user's transaction history"
+        "viewedHistory": "Administrator viewed user's transaction history",
+        "viewedHistoryAction": "viewed transaction history of user"
       },
       "changedFor": "Changed for",
       "whoChanged": "Who changed",
