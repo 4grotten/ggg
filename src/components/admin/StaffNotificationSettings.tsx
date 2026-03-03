@@ -4,10 +4,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { MessageCircle, Send, Mail, Bell, Plus, Trash2, Check, Loader2, ToggleLeft, ToggleRight } from "lucide-react";
+import { MessageCircle, Send, Mail, Bell, Plus, Trash2, Check, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -184,11 +185,11 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
                           onClick={() => toggleMutation.mutate({ id: setting.id, is_enabled: !setting.is_enabled })}
                           className="shrink-0"
                         >
-                          {setting.is_enabled ? (
-                            <ToggleRight className="w-6 h-6 text-primary" />
-                          ) : (
-                            <ToggleLeft className="w-6 h-6 text-muted-foreground" />
-                          )}
+                          <Switch
+                            checked={setting.is_enabled}
+                            onCheckedChange={() => {}}
+                            className="pointer-events-none"
+                          />
                         </button>
                         <button
                           onClick={() => deleteMutation.mutate(setting.id)}
