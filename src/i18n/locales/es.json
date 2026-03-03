@@ -1810,7 +1810,8 @@
         "updateClient": "Cliente actualizado",
         "updateUserData": "Datos de usuario actualizados",
         "blockClient": "Cliente bloqueado",
-        "unblockClient": "Cliente desbloqueado"
+        "unblockClient": "Cliente desbloqueado",
+        "updateAdminSetting": "Configuración general cambiada"
       }
     },
     "common": {

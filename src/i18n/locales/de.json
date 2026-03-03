@@ -1810,7 +1810,8 @@
         "updateClient": "Kunde aktualisiert",
         "updateUserData": "Benutzerdaten aktualisiert",
         "blockClient": "Kunde gesperrt",
-        "unblockClient": "Kunde entsperrt"
+        "unblockClient": "Kunde entsperrt",
+        "updateAdminSetting": "Allgemeine Einstellung geändert"
       }
     },
     "common": {
