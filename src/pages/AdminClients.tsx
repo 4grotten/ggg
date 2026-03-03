@@ -255,7 +255,7 @@ export default function AdminClients() {
                             </div>
                           )}
                         </div>
-                        <div className={cn("absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-card", client.is_blocked ? "bg-destructive" : "bg-emerald-500")} />
+                        <div className={cn("absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-card", (client.is_blocked || (client.limits as any)?.is_blocked) ? "bg-destructive" : "bg-emerald-500")} />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -265,7 +265,7 @@ export default function AdminClients() {
                             <Hash className="w-3 h-3" />
                             {client.user_id.length > 8 ? `${client.user_id.slice(0, 8)}…` : client.user_id}
                           </span>
-                          {client.is_blocked ? (
+                          {(client.is_blocked || (client.limits as any)?.is_blocked) ? (
                             <Badge className="bg-destructive/10 text-destructive border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.blocked', 'Заблокирован')}</Badge>
                           ) : (
                             <Badge className="bg-emerald-500/10 text-emerald-500 border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.active', 'Активен')}</Badge>
