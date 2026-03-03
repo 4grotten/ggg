@@ -222,6 +222,7 @@ export default function AuditHistoryDetail() {
               {(() => {
                 const at = actionType.toLowerCase();
                 const actionKey = actionType === 'UPDATE_USER_DATA' ? 'updateUserData'
+                  : at.includes('admin_panel_login') ? 'adminPanelLogin'
                   : at.includes('view_transaction_history') ? 'viewTransactionHistory'
                   : at.includes('unblock') ? 'unblockClient'
                   : at.includes('block') ? 'blockClient'
@@ -232,7 +233,8 @@ export default function AuditHistoryDetail() {
                 const isBlock = at.includes('block') && !at.includes('unblock');
                 const isUnblock = at.includes('unblock');
                 const isView = at.includes('view_transaction_history');
-                const actionColorClass = isBlock ? 'text-destructive' : isUnblock ? 'text-emerald-500' : isView ? 'text-blue-400' : 'text-green-500';
+                const isLogin = at.includes('admin_panel_login');
+                const actionColorClass = isBlock ? 'text-destructive' : isUnblock ? 'text-emerald-500' : isView ? 'text-blue-400' : isLogin ? 'text-amber-400' : 'text-green-500';
                 return (
                   <div className="flex items-center gap-2">
                     <FileText className="w-3.5 h-3.5" />
@@ -348,8 +350,78 @@ export default function AuditHistoryDetail() {
           </motion.div>
         )}
 
+        {/* Admin panel login info card */}
+        {changeEntries.length === 0 && !descriptionText && actionType.toLowerCase().includes('admin_panel_login') && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="rounded-2xl bg-card border border-border/50 p-4 space-y-3"
+          >
+            <p className="text-sm font-semibold text-foreground">{t('admin.audit.actions.adminPanelLogin', 'Вход в админ-панель')}</p>
+            <p className="text-xs text-muted-foreground">
+              <span className="font-semibold text-foreground">{adminName}</span>
+              {actingRole === 'root' && <Badge className="text-[8px] px-1 py-0 h-3.5 bg-amber-500 hover:bg-amber-600 text-white gap-0.5 ml-1 inline-flex align-middle"><Crown className="w-2 h-2" />Root</Badge>}
+              {actingRole !== 'root' && <Badge className="text-[8px] px-1 py-0 h-3.5 bg-primary hover:bg-primary text-primary-foreground ml-1 inline-flex align-middle capitalize">{actingRole}</Badge>}
+              {' '}{t('admin.audit.detail.loggedInAction', 'вошёл в административную панель')}
+            </p>
+            {/* Device details */}
+            {typeof item.details === 'object' && item.details && (
+              <div className="space-y-1.5 pt-2 border-t border-border/30">
+                {item.details.browser && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground/60">🌐</span>
+                    <span>{t('admin.audit.detail.browser', 'Браузер')}:</span>
+                    <span className="text-foreground font-medium">{item.details.browser}</span>
+                  </div>
+                )}
+                {item.details.os && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground/60">💻</span>
+                    <span>{t('admin.audit.detail.os', 'ОС')}:</span>
+                    <span className="text-foreground font-medium">{item.details.os}</span>
+                  </div>
+                )}
+                {item.details.device && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground/60">📱</span>
+                    <span>{t('admin.audit.detail.device', 'Устройство')}:</span>
+                    <span className="text-foreground font-medium">{item.details.device}</span>
+                  </div>
+                )}
+                {item.details.screen && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground/60">🖥</span>
+                    <span>{t('admin.audit.detail.screen', 'Экран')}:</span>
+                    <span className="text-foreground font-medium">{item.details.screen}</span>
+                  </div>
+                )}
+                {item.details.language && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground/60">🌍</span>
+                    <span>{t('admin.audit.detail.lang', 'Язык')}:</span>
+                    <span className="text-foreground font-medium">{item.details.language}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            {item.ip_address && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="text-muted-foreground/60">📍</span>
+                <span>IP:</span>
+                <span className="text-foreground font-medium font-mono">{item.ip_address}</span>
+              </div>
+            )}
+            {timestamp && (
+              <p className="text-xs text-muted-foreground">
+                {format(new Date(timestamp), "dd.MM.yyyy")} в {format(new Date(timestamp), "HH:mm:ss")}
+              </p>
+            )}
+          </motion.div>
+        )}
+
         {/* Raw data fallback if no changes parsed */}
-        {changeEntries.length === 0 && !descriptionText && !actionType.toLowerCase().includes('view_transaction_history') && (
+        {changeEntries.length === 0 && !descriptionText && !actionType.toLowerCase().includes('view_transaction_history') && !actionType.toLowerCase().includes('admin_panel_login') && (
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}

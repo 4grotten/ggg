@@ -417,7 +417,8 @@ export default function AdminAdmins() {
                       return visibleItems.map((item: any, index: number) => {
                         const actionType = (item.action || item.action_type || '').toLowerCase();
                         let mappedAction: AdminAction['action'] = 'update_setting';
-                        if (actionType.includes('view_transaction_history')) mappedAction = 'update_setting';
+                        if (actionType.includes('admin_panel_login')) mappedAction = 'update_setting';
+                        else if (actionType.includes('view_transaction_history')) mappedAction = 'update_setting';
                         else if (actionType.includes('add_role') || actionType.includes('role_add')) mappedAction = 'add_role';
                         else if (actionType.includes('remove_role') || actionType.includes('role_remove')) mappedAction = 'remove_role';
                         else if (actionType.includes('unblock')) mappedAction = 'unblock_client';
@@ -514,8 +515,9 @@ export default function AdminAdmins() {
                         const rawDet = item.details;
                                 const isBlockAction = mappedAction === 'block_client' || mappedAction === 'unblock_client';
                                 const isViewHistory = actionType.includes('view_transaction_history');
-                                const hasChanges = typeof rawDet === 'object' && (rawDet?.changes || isBlockAction) || isViewHistory;
-                                const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (isBlockAction ? ['is_blocked'] : (isViewHistory ? ['view_transaction_history'] : []));
+                                const isAdminLogin = actionType.includes('admin_panel_login');
+                                const hasChanges = typeof rawDet === 'object' && (rawDet?.changes || isBlockAction) || isViewHistory || isAdminLogin;
+                                const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (isBlockAction ? ['is_blocked'] : (isViewHistory ? ['view_transaction_history'] : (isAdminLogin ? ['admin_panel_login'] : [])));
 
                                 if (targetName || hasChanges) {
                                   return (
@@ -553,6 +555,7 @@ export default function AdminAdmins() {
                                             {keys.map((k) => {
                                               // Determine if this is_blocked change is actually an unblock
                                               const isViewHistoryChange = k === 'view_transaction_history';
+                                              const isAdminLoginChange = k === 'admin_panel_login';
                                               const isUnblockChange = k === 'is_blocked' && (
                                                 mappedAction === 'unblock_client' ||
                                                 (rawDet?.changes?.is_blocked?.стало === false) ||
@@ -566,22 +569,26 @@ export default function AdminAdmins() {
                                                   key={k}
                                                   className={cn(
                                                     "inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm",
-                                                    isViewHistoryChange
-                                                      ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
-                                                      : isUnblockChange
-                                                        ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
-                                                        : isBlockChange
-                                                          ? "bg-destructive/20 border border-destructive/30 text-destructive"
-                                                          : "bg-primary/20 border border-primary/20 text-primary-foreground"
+                                                    isAdminLoginChange
+                                                      ? "bg-amber-500/20 border border-amber-500/30 text-amber-400"
+                                                      : isViewHistoryChange
+                                                        ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
+                                                        : isUnblockChange
+                                                          ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
+                                                          : isBlockChange
+                                                            ? "bg-destructive/20 border border-destructive/30 text-destructive"
+                                                            : "bg-primary/20 border border-primary/20 text-primary-foreground"
                                                   )}
                                                 >
-                                                  {isViewHistoryChange
-                                                    ? t('admin.audit.actions.viewTransactionHistory', 'Просмотр истории транзакций')
-                                                    : isUnblockChange
-                                                      ? t('admin.audit.fields.is_unblocked', 'Разблокировка')
-                                                      : isBlockChange
-                                                        ? t('admin.audit.fields.is_blocked', 'Блокировка')
-                                                        : t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                                  {isAdminLoginChange
+                                                    ? t('admin.audit.actions.adminPanelLogin', 'Вход в админ-панель')
+                                                    : isViewHistoryChange
+                                                      ? t('admin.audit.actions.viewTransactionHistory', 'Просмотр истории транзакций')
+                                                      : isUnblockChange
+                                                        ? t('admin.audit.fields.is_unblocked', 'Разблокировка')
+                                                        : isBlockChange
+                                                          ? t('admin.audit.fields.is_blocked', 'Блокировка')
+                                                          : t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
                                                 </span>
                                               );
                                             })}

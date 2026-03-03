@@ -1861,7 +1861,13 @@
         "changedParams": "Changed Parameters",
         "rawData": "Change data",
         "viewedHistory": "Administrator viewed user's transaction history",
-        "viewedHistoryAction": "viewed transaction history of user"
+        "viewedHistoryAction": "viewed transaction history of user",
+        "loggedInAction": "logged into the admin panel",
+        "browser": "Browser",
+        "os": "OS",
+        "device": "Device",
+        "screen": "Screen",
+        "lang": "Language"
       },
       "changedFor": "Changed for",
       "whoChanged": "Who changed",
@@ -1871,6 +1877,7 @@
         "removeRole": "Role removed",
         "updateSetting": "Setting updated",
         "viewTransactionHistory": "Transaction history viewed",
+        "adminPanelLogin": "Admin panel login",
         "updateClient": "Client updated",
         "updateUserData": "User data updated",
         "blockClient": "Client blocked",

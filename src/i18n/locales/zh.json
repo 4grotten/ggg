@@ -1797,7 +1797,13 @@
         "changedParams": "已更改参数",
         "rawData": "变更数据",
         "viewedHistory": "管理员查看了用户的交易记录",
-        "viewedHistoryAction": "查看了用户的交易记录"
+        "viewedHistoryAction": "查看了用户的交易记录",
+        "loggedInAction": "登录了管理面板",
+        "browser": "浏览器",
+        "os": "操作系统",
+        "device": "设备",
+        "screen": "屏幕",
+        "lang": "语言"
       },
       "changedFor": "变更对象",
       "whoChanged": "谁做了更改",
@@ -1807,6 +1813,7 @@
         "removeRole": "角色已移除",
         "updateSetting": "设置已更新",
         "viewTransactionHistory": "查看交易记录",
+        "adminPanelLogin": "管理面板登录",
         "updateClient": "客户已更新",
         "updateUserData": "用户数据已更新",
         "blockClient": "客户已封禁",

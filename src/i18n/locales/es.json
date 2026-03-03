@@ -1790,7 +1790,13 @@
         "changedParams": "Parámetros modificados",
         "rawData": "Datos del cambio",
         "viewedHistory": "El administrador revisó el historial de transacciones del usuario",
-        "viewedHistoryAction": "revisó el historial de transacciones del usuario"
+        "viewedHistoryAction": "revisó el historial de transacciones del usuario",
+        "loggedInAction": "inició sesión en el panel de administración",
+        "browser": "Navegador",
+        "os": "SO",
+        "device": "Dispositivo",
+        "screen": "Pantalla",
+        "lang": "Idioma"
       },
       "changedFor": "Cambiado para",
       "whoChanged": "Quién cambió",
@@ -1800,6 +1806,7 @@
         "removeRole": "Rol eliminado",
         "updateSetting": "Configuración actualizada",
         "viewTransactionHistory": "Historial de transacciones visto",
+        "adminPanelLogin": "Inicio de sesión en panel admin",
         "updateClient": "Cliente actualizado",
         "updateUserData": "Datos de usuario actualizados",
         "blockClient": "Cliente bloqueado",
