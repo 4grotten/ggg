@@ -268,7 +268,7 @@ export default function AdminClients() {
                           {client.is_blocked ? (
                             <Badge className="bg-destructive/10 text-destructive border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.blocked', 'Заблокирован')}</Badge>
                           ) : (
-                            <Badge className="bg-emerald-500/10 text-emerald-500 border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.active', 'Активна')}</Badge>
+                            <Badge className="bg-emerald-500/10 text-emerald-500 border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.active', 'Активен')}</Badge>
                           )}
                           {(client.role || "user") === "root" && (
                             <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-0 text-[9px] px-1.5 py-0 h-4">Root</Badge>
