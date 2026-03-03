@@ -212,9 +212,9 @@ export default function AdminStaffDetail() {
           </motion.div>
         )}
 
-        {/* Notification Settings - only for Root users */}
-        {isCurrentUserRoot && staffId && (
-          <StaffNotificationSettings staffUserId={staffId} />
+        {/* Notification Settings - visible to admins (read-only) and root (editable) */}
+        {(isCurrentUserRoot || currentUserRole === 'admin') && staffId && (
+          <StaffNotificationSettings staffUserId={staffId} readOnly={!isCurrentUserRoot} />
         )}
 
         {/* Audit History */}
