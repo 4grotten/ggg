@@ -131,6 +131,36 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_notification_settings: {
+        Row: {
+          channel: string
+          contact_value: string
+          created_at: string
+          id: string
+          is_enabled: boolean
+          staff_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          channel: string
+          contact_value: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          staff_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          contact_value?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          staff_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
