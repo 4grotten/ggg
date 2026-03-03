@@ -1210,6 +1210,21 @@ class IsAdminOrRoot(IsAuthenticated):
             role__in=['admin', 'root']
         ).exists()
 
+
+class IsRoot(IsAuthenticated):
+    def has_permission(self, request, view):
+        if not super().has_permission(request, view):
+            return False
+        return UserRoles.objects.filter(
+            user_id=request.user.id,
+            role='root'
+        ).exists()
+
+
+def _is_root(user):
+    return UserRoles.objects.filter(user_id=user.id, role='root').exists()
+
+
 class AdminNotificationSettingsView(APIView):
     permission_classes = [IsAdminOrRoot]
 
@@ -1218,22 +1233,48 @@ class AdminNotificationSettingsView(APIView):
         return obj
 
     def get(self, request):
-        settings_obj = self.get_object(request.user.id)
+        # Admin/Root can view any staff member's settings via ?user_id=
+        target_user_id = request.query_params.get('user_id', request.user.id)
+        settings_obj = self.get_object(target_user_id)
         serializer = AdminNotificationSettingsSerializer(settings_obj)
         return Response(serializer.data)
 
     def put(self, request):
-        settings_obj = self.get_object(request.user.id)
+        # Only Root can edit settings
+        if not _is_root(request.user):
+            return Response(
+                {"detail": "Только Root может изменять настройки уведомлений."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        target_user_id = request.data.get('user_id', request.user.id)
+        settings_obj = self.get_object(target_user_id)
         serializer = AdminNotificationSettingsSerializer(settings_obj, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def patch(self, request):
+        # Only Root can edit settings
+        if not _is_root(request.user):
+            return Response(
+                {"detail": "Только Root может изменять настройки уведомлений."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        target_user_id = request.data.get('user_id', request.user.id)
+        settings_obj = self.get_object(target_user_id)
+        serializer = AdminNotificationSettingsSerializer(settings_obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class TestNotificationView(APIView):
     permission_classes = [IsAdminOrRoot]
 
     def post(self, request):
-        settings_obj, _ = AdminNotificationSettings.objects.get_or_create(user_id=request.user.id)
+        target_user_id = request.data.get('user_id', request.user.id)
+        settings_obj, _ = AdminNotificationSettings.objects.get_or_create(user_id=target_user_id)
         dispatch_test_notification(settings_obj)
         return Response({"detail": "Тестовое уведомление отправлено на активные каналы."}, status=status.HTTP_200_OK)
