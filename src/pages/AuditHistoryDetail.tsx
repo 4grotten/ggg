@@ -415,9 +415,10 @@ export default function AuditHistoryDetail() {
               </div>
             )}
             {timestamp && (
-              <p className="text-xs text-muted-foreground">
-                Дата: {format(new Date(timestamp), "dd.MM.yyyy")} в {format(new Date(timestamp), "HH:mm:ss")}
-              </p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Дата: <span className="font-bold">{format(new Date(timestamp), "dd.MM.yyyy")}</span> в {format(new Date(timestamp), "HH:mm:ss")}</span>
+              </div>
             )}
           </motion.div>
         )}
