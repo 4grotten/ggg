@@ -5,7 +5,8 @@ import requests
 from django.db.models import Q
 from apps.cards_apps.models import Cards
 from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets, Transactions
-from api.accounts_api.serializers import AdminActionHistorySerializer, AdminSettingsSerializer, ContactSerializer, UserLimitsSerializer
+from api.accounts_api.serializers import AdminActionHistorySerializer, AdminNotificationSettingsSerializer, AdminSettingsSerializer, ContactSerializer, UserLimitsSerializer
+from apps.accounts_apps.notifications import dispatch_test_notification
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -14,11 +15,12 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from apps.accounts_apps.models import AdminSettings, Contacts, Profiles
+from apps.accounts_apps.models import AdminNotificationSettings, AdminSettings, Contacts, Profiles
 from .apofiz_client import ApofizClient
 from django.db.models import Sum, Count
 from apps.accounts_apps.models import UserRoles
 from apps.accounts_apps.models import AdminActionHistory, UserRoles
+from rest_framework.permissions import IsAuthenticated
 
 
 def generate_uid_tail(user_id):
@@ -1196,3 +1198,42 @@ class AdminStaffListView(APIView):
             })
             
         return Response(data, status=status.HTTP_200_OK)
+    
+
+
+class IsAdminOrRoot(IsAuthenticated):
+    def has_permission(self, request, view):
+        if not super().has_permission(request, view):
+            return False
+        return UserRoles.objects.filter(
+            user_id=request.user.id, 
+            role__in=['admin', 'root']
+        ).exists()
+
+class AdminNotificationSettingsView(APIView):
+    permission_classes = [IsAdminOrRoot]
+
+    def get_object(self, user_id):
+        obj, created = AdminNotificationSettings.objects.get_or_create(user_id=user_id)
+        return obj
+
+    def get(self, request):
+        settings_obj = self.get_object(request.user.id)
+        serializer = AdminNotificationSettingsSerializer(settings_obj)
+        return Response(serializer.data)
+
+    def put(self, request):
+        settings_obj = self.get_object(request.user.id)
+        serializer = AdminNotificationSettingsSerializer(settings_obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TestNotificationView(APIView):
+    permission_classes = [IsAdminOrRoot]
+
+    def post(self, request):
+        settings_obj, _ = AdminNotificationSettings.objects.get_or_create(user_id=request.user.id)
+        dispatch_test_notification(settings_obj)
+        return Response({"detail": "Тестовое уведомление отправлено на активные каналы."}, status=status.HTTP_200_OK)

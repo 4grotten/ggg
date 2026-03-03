@@ -53,4 +53,7 @@ urlpatterns = [
     path('admin/audit-history/log/', views.AdminActionHistoryView.as_view(), name='admin-audit-history-log'),
 
     path('admin/staff/', views.AdminStaffListView.as_view(), name='admin-staff-list'),
+
+    path('admin/notifications/settings/', views.AdminNotificationSettingsView.as_view(), name='admin-notification-settings'),
+    path('admin/notifications/test/', views.TestNotificationView.as_view(), name='admin-notification-test'),
 ]

@@ -90,7 +90,7 @@ class Profiles(models.Model):
         ('r4', 'R4'),
         ('partner', 'Partner'),
     ]
-    
+
     referral_level = models.CharField(max_length=50, choices=REFERRAL_CHOICES, default='R1(DEFAULT)')
 
     class Meta:
@@ -135,3 +135,27 @@ class Contacts(models.Model):
     class Meta:
         db_table = 'contacts'
         unique_together = ('user', 'apofiz_id')
+
+
+
+
+class AdminNotificationSettings(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=50, unique=True, db_index=True)
+    
+    telegram_chat_id = models.CharField(max_length=100, blank=True, null=True, help_text="ID чата в Telegram")
+    telegram_enabled = models.BooleanField(default=False)
+    
+    whatsapp_number = models.CharField(max_length=50, blank=True, null=True, help_text="Номер в формате 996555123456")
+    whatsapp_enabled = models.BooleanField(default=False)
+    
+    email_address = models.EmailField(blank=True, null=True)
+    email_enabled = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'admin_notification_settings'
+        verbose_name = 'Настройка уведомлений админа'
+        verbose_name_plural = 'Настройки уведомлений админов'

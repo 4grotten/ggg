@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from apps.accounts_apps.models import Profiles, Contacts, AdminSettings
+from apps.accounts_apps.models import AdminNotificationSettings, Profiles, Contacts, AdminSettings
 from apps.accounts_apps.models import AdminActionHistory
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -62,3 +62,14 @@ class AdminActionHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminActionHistory
         fields = '__all__'
+
+
+
+class AdminNotificationSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminNotificationSettings
+        fields = [
+            'telegram_chat_id', 'telegram_enabled', 
+            'whatsapp_number', 'whatsapp_enabled', 
+            'email_address', 'email_enabled'
+        ]
