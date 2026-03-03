@@ -130,10 +130,21 @@ export default function AuditHistoryDetail() {
   if (typeof rawDetails === "object" && rawDetails !== null) {
     if (rawDetails.changes && typeof rawDetails.changes === "object") {
       changes = rawDetails.changes;
+    } else if (actionType.toLowerCase().includes('unblock') || actionType.toLowerCase().includes('block')) {
+      // BLOCK_USER / UNBLOCK_USER have {new_value: bool} without changes object
+      const newVal = rawDetails.new_value;
+      if (typeof newVal === "boolean") {
+        changes = {
+          is_blocked: {
+            было: !newVal,
+            стало: newVal,
+          }
+        };
+      }
     } else {
       // Maybe the details object itself has changes-like structure
       Object.entries(rawDetails).forEach(([key, val]) => {
-        if (key === "acting_role") return;
+        if (key === "acting_role" || key === "target_name") return;
         if (typeof val === "object" && val !== null && ("было" in (val as any) || "стало" in (val as any))) {
           changes[key] = val as { было: any; стало: any };
         }
