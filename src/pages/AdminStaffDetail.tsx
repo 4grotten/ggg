@@ -71,12 +71,13 @@ export default function AdminStaffDetail() {
   const currentUserRole = (() => {
     try {
       const cached = localStorage.getItem(AUTH_USER_KEY);
-      if (cached) return JSON.parse(cached)?.role || null;
+      const parsed = cached ? JSON.parse(cached) : null;
+      console.log('[StaffDetail] AUTH_USER_KEY parsed:', parsed, 'role:', parsed?.role);
+      return parsed?.role || null;
     } catch { /* ignore */ }
     return null;
   })();
   const isCurrentUserRoot = currentUserRole === 'root';
-  console.log('[StaffDetail] currentUserRole:', currentUserRole, 'isRoot:', isCurrentUserRoot);
 
   const { data: staffList } = useQuery({
     queryKey: ["admin-staff"],
@@ -213,8 +214,8 @@ export default function AdminStaffDetail() {
           </motion.div>
         )}
 
-        {/* Notification Settings - visible to admins (read-only) and root (editable) */}
-        {(isCurrentUserRoot || currentUserRole === 'admin') && staffId && (
+        {/* Notification Settings - always visible, readOnly for non-root */}
+        {staffId && (
           <StaffNotificationSettings staffUserId={staffId} readOnly={!isCurrentUserRoot} />
         )}
 
