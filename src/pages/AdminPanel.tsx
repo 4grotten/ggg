@@ -27,8 +27,6 @@ import { apiPost } from "@/services/api/apiClient";
 const exchangeRateFields = [
   { key: "usdt_to_aed_buy", labelKey: "usdtToAedBuy", suffix: "AED", icon: TrendingUp },
   { key: "usdt_to_aed_sell", labelKey: "usdtToAedSell", suffix: "AED", icon: TrendingUp },
-  { key: "usd_to_aed_buy", labelKey: "usdToAedBuy", suffix: "AED", icon: DollarSign },
-  { key: "usd_to_aed_sell", labelKey: "usdToAedSell", suffix: "AED", icon: DollarSign },
   { key: "aed_to_usd_buy", labelKey: "aedToUsdBuy", suffix: "USD", icon: DollarSign },
   { key: "aed_to_usd_sell", labelKey: "aedToUsdSell", suffix: "USD", icon: DollarSign },
 ];
