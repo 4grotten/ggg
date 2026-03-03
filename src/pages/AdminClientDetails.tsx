@@ -258,36 +258,46 @@ export default function AdminClientDetails() {
 
     // Use limits_and_settings if available, fallback to limits
     const l = client.limits_and_settings || client.limits;
+    
+    // Only use personal values if custom_settings_enabled is true AND the value is not null
+    const isCustom = !!(l as any)?.custom_settings_enabled;
+    
+    // Helper: use personal value only when custom settings are ON and value is a real non-null number
+    const customVal = (v: string | null | undefined, fallback: string): string => {
+      if (!isCustom || v == null || v === '') return fallback;
+      const num = parseFloat(String(v));
+      if (isNaN(num)) return fallback;
+      return String(num);
+    };
 
     const newFees = {
-      topUpPercent: l?.network_fee_percent != null ? String(l.network_fee_percent) : defaultFees.topUpPercent,
-      transferPercent: l?.card_to_card_percent != null ? String(l.card_to_card_percent) : defaultFees.transferPercent,
-      withdrawPercent: l?.bank_transfer_percent != null ? String(l.bank_transfer_percent) : defaultFees.withdrawPercent,
-      conversionPercent: l?.currency_conversion_percent != null ? String(l.currency_conversion_percent) : defaultFees.conversionPercent,
+      topUpPercent: customVal(l?.network_fee_percent, defaultFees.topUpPercent),
+      transferPercent: customVal(l?.card_to_card_percent, defaultFees.transferPercent),
+      withdrawPercent: customVal(l?.bank_transfer_percent, defaultFees.withdrawPercent),
+      conversionPercent: customVal(l?.currency_conversion_percent, defaultFees.conversionPercent),
     };
-    const clean = (v: string | null | undefined, fallback: string) => v != null ? String(parseFloat(String(v))) : fallback;
     const newLimits = {
-      dailyTopUp: clean(l?.daily_top_up_limit, defaultLimits.dailyTopUp),
-      monthlyTopUp: clean(l?.monthly_top_up_limit, defaultLimits.monthlyTopUp),
-      dailyTransfer: clean(l?.daily_transfer_limit, defaultLimits.dailyTransfer),
-      monthlyTransfer: clean(l?.monthly_transfer_limit, defaultLimits.monthlyTransfer),
-      dailyWithdraw: clean(l?.daily_withdrawal_limit, defaultLimits.dailyWithdraw),
-      monthlyWithdraw: clean(l?.monthly_withdrawal_limit, defaultLimits.monthlyWithdraw),
-      singleTransaction: clean(l?.transfer_max, defaultLimits.singleTransaction),
-      transferMin: clean(l?.transfer_min, defaultLimits.transferMin),
-      withdrawalMin: clean(l?.withdrawal_min, defaultLimits.withdrawalMin),
-      withdrawalMax: clean(l?.withdrawal_max, defaultLimits.withdrawalMax),
-      dailyUsdtSend: clean(l?.daily_usdt_send_limit, defaultLimits.dailyUsdtSend),
-      monthlyUsdtSend: clean(l?.monthly_usdt_send_limit, defaultLimits.monthlyUsdtSend),
-      dailyUsdtReceive: clean(l?.daily_usdt_receive_limit, defaultLimits.dailyUsdtReceive),
-      monthlyUsdtReceive: clean(l?.monthly_usdt_receive_limit, defaultLimits.monthlyUsdtReceive),
+      dailyTopUp: customVal(l?.daily_top_up_limit, defaultLimits.dailyTopUp),
+      monthlyTopUp: customVal(l?.monthly_top_up_limit, defaultLimits.monthlyTopUp),
+      dailyTransfer: customVal(l?.daily_transfer_limit, defaultLimits.dailyTransfer),
+      monthlyTransfer: customVal(l?.monthly_transfer_limit, defaultLimits.monthlyTransfer),
+      dailyWithdraw: customVal(l?.daily_withdrawal_limit, defaultLimits.dailyWithdraw),
+      monthlyWithdraw: customVal(l?.monthly_withdrawal_limit, defaultLimits.monthlyWithdraw),
+      singleTransaction: customVal(l?.transfer_max, defaultLimits.singleTransaction),
+      transferMin: customVal(l?.transfer_min, defaultLimits.transferMin),
+      withdrawalMin: customVal(l?.withdrawal_min, defaultLimits.withdrawalMin),
+      withdrawalMax: customVal(l?.withdrawal_max, defaultLimits.withdrawalMax),
+      dailyUsdtSend: customVal(l?.daily_usdt_send_limit, defaultLimits.dailyUsdtSend),
+      monthlyUsdtSend: customVal(l?.monthly_usdt_send_limit, defaultLimits.monthlyUsdtSend),
+      dailyUsdtReceive: customVal(l?.daily_usdt_receive_limit, defaultLimits.dailyUsdtReceive),
+      monthlyUsdtReceive: customVal(l?.monthly_usdt_receive_limit, defaultLimits.monthlyUsdtReceive),
     };
     const la = l as any;
     const newRates = {
-      usdtAedBuy: la?.usdt_to_aed_buy != null ? String(la.usdt_to_aed_buy) : defaultRates.usdtAedBuy,
-      usdtAedSell: la?.usdt_to_aed_sell != null ? String(la.usdt_to_aed_sell) : defaultRates.usdtAedSell,
-      usdAedBuy: la?.usd_to_aed_buy != null ? String(la.usd_to_aed_buy) : defaultRates.usdAedBuy,
-      usdAedSell: la?.usd_to_aed_sell != null ? String(la.usd_to_aed_sell) : defaultRates.usdAedSell,
+      usdtAedBuy: customVal(la?.usdt_to_aed_buy, defaultRates.usdtAedBuy),
+      usdtAedSell: customVal(la?.usdt_to_aed_sell, defaultRates.usdtAedSell),
+      usdAedBuy: customVal(la?.usd_to_aed_buy, defaultRates.usdAedBuy),
+      usdAedSell: customVal(la?.usd_to_aed_sell, defaultRates.usdAedSell),
     };
     setFees(newFees);
     setLimits(newLimits);
