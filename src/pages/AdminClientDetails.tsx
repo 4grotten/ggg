@@ -191,26 +191,40 @@ export default function AdminClientDetails() {
   const [showTxHistoryAlert, setShowTxHistoryAlert] = useState(false);
   const [focusedLimitKey, setFocusedLimitKey] = useState<string | null>(null);
 
-  const [limits, setLimits] = useState({
-    dailyTopUp: "50000", monthlyTopUp: "500000",
-    dailyTransfer: "25000", monthlyTransfer: "250000",
-    dailyWithdraw: "20000", monthlyWithdraw: "200000",
-    singleTransaction: "10000",
-    transferMin: "1",
-    withdrawalMin: "50", withdrawalMax: "50000",
-    dailyUsdtSend: "50000", monthlyUsdtSend: "500000",
-    dailyUsdtReceive: "100000", monthlyUsdtReceive: "1000000",
-  });
+  const defaultFees = useMemo(() => ({
+    topUpPercent: String(settings.NETWORK_FEE_PERCENT),
+    transferPercent: String(settings.CARD_TO_CARD_FEE_PERCENT),
+    withdrawPercent: String(settings.BANK_TRANSFER_FEE_PERCENT),
+    conversionPercent: String(settings.CURRENCY_CONVERSION_FEE_PERCENT),
+  }), [settings]);
 
-  const [fees, setFees] = useState({
-    topUpPercent: "2.5", transferPercent: "1.5",
-    withdrawPercent: "2.0", conversionPercent: "1.0",
-  });
+  const defaultRates = useMemo(() => ({
+    usdtAedBuy: String(settings.USDT_TO_AED_BUY),
+    usdtAedSell: String(settings.USDT_TO_AED_SELL),
+    usdAedBuy: String(settings.USD_TO_AED_BUY),
+    usdAedSell: String(settings.USD_TO_AED_SELL),
+  }), [settings]);
 
-  const [rates, setRates] = useState({
-    usdtAedBuy: "3.65", usdtAedSell: "3.69",
-    usdAedBuy: "3.68", usdAedSell: "3.67",
-  });
+  const defaultLimits = useMemo(() => ({
+    dailyTopUp: String(settings.DAILY_TOP_UP_LIMIT),
+    monthlyTopUp: String(settings.MONTHLY_TOP_UP_LIMIT),
+    dailyTransfer: String(settings.DAILY_TRANSFER_LIMIT),
+    monthlyTransfer: String(settings.MONTHLY_TRANSFER_LIMIT),
+    dailyWithdraw: String(settings.DAILY_WITHDRAWAL_LIMIT),
+    monthlyWithdraw: String(settings.MONTHLY_WITHDRAWAL_LIMIT),
+    singleTransaction: String(settings.TRANSFER_MAX_AMOUNT),
+    transferMin: String(settings.TRANSFER_MIN_AMOUNT),
+    withdrawalMin: String(settings.WITHDRAWAL_MIN_AMOUNT),
+    withdrawalMax: String(settings.WITHDRAWAL_MAX_AMOUNT),
+    dailyUsdtSend: String(settings.DAILY_CRYPTO_SEND_LIMIT),
+    monthlyUsdtSend: String(settings.MONTHLY_CRYPTO_SEND_LIMIT),
+    dailyUsdtReceive: String(settings.DAILY_CRYPTO_RECEIVE_LIMIT),
+    monthlyUsdtReceive: String(settings.MONTHLY_CRYPTO_RECEIVE_LIMIT),
+  }), [settings]);
+
+  const [limits, setLimits] = useState(defaultLimits);
+  const [fees, setFees] = useState(defaultFees);
+  const [rates, setRates] = useState(defaultRates);
 
   const queryClient = useQueryClient();
 
@@ -221,9 +235,9 @@ export default function AdminClientDetails() {
     selectedRole: "user",
     isVIP: false,
     isBlocked: false,
-    limits: { dailyTopUp: "50000", monthlyTopUp: "500000", dailyTransfer: "25000", monthlyTransfer: "250000", dailyWithdraw: "20000", monthlyWithdraw: "200000", singleTransaction: "10000", transferMin: "1", withdrawalMin: "50", withdrawalMax: "50000", dailyUsdtSend: "50000", monthlyUsdtSend: "500000", dailyUsdtReceive: "100000", monthlyUsdtReceive: "1000000" },
-    fees: { topUpPercent: "2.5", transferPercent: "1.5", withdrawPercent: "2.0", conversionPercent: "1.0" },
-    rates: { usdtAedBuy: "3.65", usdtAedSell: "3.69", usdAedBuy: "3.68", usdAedSell: "3.67" },
+    limits: defaultLimits,
+    fees: defaultFees,
+    rates: defaultRates,
   });
 
   // Initialize state from backend data
@@ -244,37 +258,45 @@ export default function AdminClientDetails() {
 
     // Use limits_and_settings if available, fallback to limits
     const l = client.limits_and_settings || client.limits;
-    if (!l) return;
 
     const newFees = {
-      topUpPercent: l.network_fee_percent != null ? String(l.network_fee_percent) : fees.topUpPercent,
-      transferPercent: l.card_to_card_percent != null ? String(l.card_to_card_percent) : fees.transferPercent,
-      withdrawPercent: l.bank_transfer_percent != null ? String(l.bank_transfer_percent) : fees.withdrawPercent,
-      conversionPercent: l.currency_conversion_percent != null ? String(l.currency_conversion_percent) : fees.conversionPercent,
+      topUpPercent: l?.network_fee_percent != null ? String(l.network_fee_percent) : defaultFees.topUpPercent,
+      transferPercent: l?.card_to_card_percent != null ? String(l.card_to_card_percent) : defaultFees.transferPercent,
+      withdrawPercent: l?.bank_transfer_percent != null ? String(l.bank_transfer_percent) : defaultFees.withdrawPercent,
+      conversionPercent: l?.currency_conversion_percent != null ? String(l.currency_conversion_percent) : defaultFees.conversionPercent,
     };
     const clean = (v: string | null | undefined, fallback: string) => v != null ? String(parseFloat(String(v))) : fallback;
     const newLimits = {
-      dailyTopUp: clean(l.daily_top_up_limit, limits.dailyTopUp),
-      monthlyTopUp: clean(l.monthly_top_up_limit, limits.monthlyTopUp),
-      dailyTransfer: clean(l.daily_transfer_limit, limits.dailyTransfer),
-      monthlyTransfer: clean(l.monthly_transfer_limit, limits.monthlyTransfer),
-      dailyWithdraw: clean(l.daily_withdrawal_limit, limits.dailyWithdraw),
-      monthlyWithdraw: clean(l.monthly_withdrawal_limit, limits.monthlyWithdraw),
-      singleTransaction: clean(l.transfer_max, limits.singleTransaction),
-      transferMin: clean(l.transfer_min, limits.transferMin),
-      withdrawalMin: clean(l.withdrawal_min, limits.withdrawalMin),
-      withdrawalMax: clean(l.withdrawal_max, limits.withdrawalMax),
-      dailyUsdtSend: clean(l.daily_usdt_send_limit, limits.dailyUsdtSend),
-      monthlyUsdtSend: clean(l.monthly_usdt_send_limit, limits.monthlyUsdtSend),
-      dailyUsdtReceive: clean(l.daily_usdt_receive_limit, limits.dailyUsdtReceive),
-      monthlyUsdtReceive: clean(l.monthly_usdt_receive_limit, limits.monthlyUsdtReceive),
+      dailyTopUp: clean(l?.daily_top_up_limit, defaultLimits.dailyTopUp),
+      monthlyTopUp: clean(l?.monthly_top_up_limit, defaultLimits.monthlyTopUp),
+      dailyTransfer: clean(l?.daily_transfer_limit, defaultLimits.dailyTransfer),
+      monthlyTransfer: clean(l?.monthly_transfer_limit, defaultLimits.monthlyTransfer),
+      dailyWithdraw: clean(l?.daily_withdrawal_limit, defaultLimits.dailyWithdraw),
+      monthlyWithdraw: clean(l?.monthly_withdrawal_limit, defaultLimits.monthlyWithdraw),
+      singleTransaction: clean(l?.transfer_max, defaultLimits.singleTransaction),
+      transferMin: clean(l?.transfer_min, defaultLimits.transferMin),
+      withdrawalMin: clean(l?.withdrawal_min, defaultLimits.withdrawalMin),
+      withdrawalMax: clean(l?.withdrawal_max, defaultLimits.withdrawalMax),
+      dailyUsdtSend: clean(l?.daily_usdt_send_limit, defaultLimits.dailyUsdtSend),
+      monthlyUsdtSend: clean(l?.monthly_usdt_send_limit, defaultLimits.monthlyUsdtSend),
+      dailyUsdtReceive: clean(l?.daily_usdt_receive_limit, defaultLimits.dailyUsdtReceive),
+      monthlyUsdtReceive: clean(l?.monthly_usdt_receive_limit, defaultLimits.monthlyUsdtReceive),
+    };
+    const la = l as any;
+    const newRates = {
+      usdtAedBuy: la?.usdt_to_aed_buy != null ? String(la.usdt_to_aed_buy) : defaultRates.usdtAedBuy,
+      usdtAedSell: la?.usdt_to_aed_sell != null ? String(la.usdt_to_aed_sell) : defaultRates.usdtAedSell,
+      usdAedBuy: la?.usd_to_aed_buy != null ? String(la.usd_to_aed_buy) : defaultRates.usdAedBuy,
+      usdAedSell: la?.usd_to_aed_sell != null ? String(la.usd_to_aed_sell) : defaultRates.usdAedSell,
     };
     setFees(newFees);
     setLimits(newLimits);
+    setRates(newRates);
     initialValues.current = { 
       ...initialValues.current, 
       fees: newFees, 
       limits: newLimits,
+      rates: newRates,
       isVIP: client.is_vip ?? false,
       isBlocked: client.is_blocked ?? false,
       selectedRole: client.role || 'user',
@@ -282,7 +304,7 @@ export default function AdminClientDetails() {
       selectedLevel: selectedLevel,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client]);
+  }, [client, defaultFees, defaultLimits, defaultRates]);
 
   // Mutation to save personal limits/fees
   const saveLimitsMutation = useMutation({
