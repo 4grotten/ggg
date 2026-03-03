@@ -21,6 +21,7 @@ import { AdminSetting, AppRole } from "@/types/admin";
 import { cn } from "@/lib/utils";
 import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
 import { useOpenAISettings } from "@/hooks/useOpenAISettings";
+import { apiPost } from "@/services/api/apiClient";
 
 // Settings field configuration with i18n keys
 const exchangeRateFields = [
@@ -417,7 +418,56 @@ export default function AdminPanel() {
       fetchOpenAIStatus();
     }
   }, [activeTab, openaiStatus, openaiLoading, fetchOpenAIStatus]);
-  
+
+  // Log admin panel entry to audit history
+  useEffect(() => {
+    const logAdminEntry = async () => {
+      try {
+        const ua = navigator.userAgent;
+        // Parse browser info
+        let browser = 'Unknown';
+        if (ua.includes('Firefox/')) browser = 'Firefox ' + ua.split('Firefox/')[1]?.split(' ')[0];
+        else if (ua.includes('Edg/')) browser = 'Edge ' + ua.split('Edg/')[1]?.split(' ')[0];
+        else if (ua.includes('Chrome/')) browser = 'Chrome ' + ua.split('Chrome/')[1]?.split(' ')[0];
+        else if (ua.includes('Safari/') && !ua.includes('Chrome')) browser = 'Safari ' + (ua.split('Version/')[1]?.split(' ')[0] || '');
+        
+        // Parse OS
+        let os = 'Unknown';
+        if (ua.includes('Windows')) os = 'Windows';
+        else if (ua.includes('Mac OS')) os = 'macOS';
+        else if (ua.includes('Linux')) os = 'Linux';
+        else if (ua.includes('Android')) os = 'Android';
+        else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+
+        // Device type
+        const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
+        const device = isMobile ? 'Mobile' : 'Desktop';
+
+        const details: Record<string, any> = {
+          page: 'admin_panel',
+          browser,
+          os,
+          device,
+          user_agent: ua,
+          screen: `${window.screen.width}x${window.screen.height}`,
+          language: navigator.language,
+        };
+
+        await apiPost('/admin/audit-history/log/', {
+          action: 'ADMIN_PANEL_LOGIN',
+          target_user_id: (user as any)?.user_id || '',
+          details,
+        });
+      } catch {
+        // silent fail
+      }
+    };
+    
+    if (user && (user as any)?.role && ['admin', 'root'].includes((user as any).role.toLowerCase())) {
+      logAdminEntry();
+    }
+  }, []); // only on mount
+
   // Sync selected model with status
   useEffect(() => {
     if (openaiStatus?.currentModel && !selectedModel) {

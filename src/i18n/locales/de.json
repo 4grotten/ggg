@@ -1790,7 +1790,13 @@
         "changedParams": "Geänderte Parameter",
         "rawData": "Änderungsdaten",
         "viewedHistory": "Administrator hat die Transaktionshistorie des Benutzers eingesehen",
-        "viewedHistoryAction": "hat die Transaktionshistorie eingesehen von"
+        "viewedHistoryAction": "hat die Transaktionshistorie eingesehen von",
+        "loggedInAction": "hat sich im Admin-Panel angemeldet",
+        "browser": "Browser",
+        "os": "Betriebssystem",
+        "device": "Gerät",
+        "screen": "Bildschirm",
+        "lang": "Sprache"
       },
       "changedFor": "Geändert für",
       "whoChanged": "Wer hat geändert",
@@ -1800,6 +1806,7 @@
         "removeRole": "Rolle entfernt",
         "updateSetting": "Einstellung aktualisiert",
         "viewTransactionHistory": "Transaktionshistorie angesehen",
+        "adminPanelLogin": "Admin-Panel Anmeldung",
         "updateClient": "Kunde aktualisiert",
         "updateUserData": "Benutzerdaten aktualisiert",
         "blockClient": "Kunde gesperrt",
