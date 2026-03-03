@@ -416,7 +416,7 @@ export default function AuditHistoryDetail() {
             )}
             {timestamp && (
               <p className="text-xs text-muted-foreground">
-                {format(new Date(timestamp), "dd.MM.yyyy")} в {format(new Date(timestamp), "HH:mm:ss")}
+                Дата: {format(new Date(timestamp), "dd.MM.yyyy")} в {format(new Date(timestamp), "HH:mm:ss")}
               </p>
             )}
           </motion.div>
