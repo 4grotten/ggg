@@ -511,10 +511,11 @@ export default function AdminAdmins() {
                               </div>
                               {/* Target client block with changes */}
                               {(() => {
-                                const rawDet = item.details;
+                        const rawDet = item.details;
                                 const isBlockAction = mappedAction === 'block_client' || mappedAction === 'unblock_client';
-                                const hasChanges = typeof rawDet === 'object' && (rawDet?.changes || isBlockAction);
-                                const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (isBlockAction ? ['is_blocked'] : []);
+                                const isViewHistory = actionType.includes('view_transaction_history');
+                                const hasChanges = typeof rawDet === 'object' && (rawDet?.changes || isBlockAction) || isViewHistory;
+                                const keys = rawDet?.changes ? Object.keys(rawDet.changes) : (isBlockAction ? ['is_blocked'] : (isViewHistory ? ['view_transaction_history'] : []));
 
                                 if (targetName || hasChanges) {
                                   return (
@@ -551,6 +552,7 @@ export default function AdminAdmins() {
                                           <div className="flex flex-wrap gap-1.5">
                                             {keys.map((k) => {
                                               // Determine if this is_blocked change is actually an unblock
+                                              const isViewHistoryChange = k === 'view_transaction_history';
                                               const isUnblockChange = k === 'is_blocked' && (
                                                 mappedAction === 'unblock_client' ||
                                                 (rawDet?.changes?.is_blocked?.стало === false) ||
@@ -564,18 +566,22 @@ export default function AdminAdmins() {
                                                   key={k}
                                                   className={cn(
                                                     "inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg font-medium backdrop-blur-sm",
-                                                    isUnblockChange
-                                                      ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
-                                                      : isBlockChange
-                                                        ? "bg-destructive/20 border border-destructive/30 text-destructive"
-                                                        : "bg-primary/20 border border-primary/20 text-primary-foreground"
+                                                    isViewHistoryChange
+                                                      ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
+                                                      : isUnblockChange
+                                                        ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-500"
+                                                        : isBlockChange
+                                                          ? "bg-destructive/20 border border-destructive/30 text-destructive"
+                                                          : "bg-primary/20 border border-primary/20 text-primary-foreground"
                                                   )}
                                                 >
-                                                  {isUnblockChange
-                                                    ? t('admin.audit.fields.is_unblocked', 'Разблокировка')
-                                                    : isBlockChange
-                                                      ? t('admin.audit.fields.is_blocked', 'Блокировка')
-                                                      : t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
+                                                  {isViewHistoryChange
+                                                    ? t('admin.audit.actions.viewTransactionHistory', 'Просмотр истории транзакций')
+                                                    : isUnblockChange
+                                                      ? t('admin.audit.fields.is_unblocked', 'Разблокировка')
+                                                      : isBlockChange
+                                                        ? t('admin.audit.fields.is_blocked', 'Блокировка')
+                                                        : t(`admin.audit.fields.${k}`, FIELD_LABELS_FALLBACK[k] || k)}
                                                 </span>
                                               );
                                             })}
