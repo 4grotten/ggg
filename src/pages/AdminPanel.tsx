@@ -521,7 +521,32 @@ export default function AdminPanel() {
   };
 
   const handleUpdate = (category: string) => (key: string, value: number) => {
-    updateSetting.mutate({ category, key, value });
+    // Find old value for audit logging
+    const oldSetting = settings?.find((s) => s.category === category && s.key === key);
+    const oldValue = oldSetting?.value;
+
+    updateSetting.mutate({ category, key, value }, {
+      onSuccess: () => {
+        // Log the change to audit history
+        const categoryLabels: Record<string, string> = {
+          exchange_rates: 'Курсы обмена',
+          fees: 'Комиссии',
+          limits: 'Лимиты',
+        };
+        apiPost('/admin/audit-history/log/', {
+          action: 'UPDATE_ADMIN_SETTING',
+          target_user_id: (user as any)?.user_id || '',
+          details: {
+            category,
+            category_label: categoryLabels[category] || category,
+            key,
+            old_value: oldValue ?? null,
+            new_value: value,
+            description: oldSetting?.description || null,
+          },
+        }).catch((err) => console.error('Audit log failed:', err));
+      },
+    });
   };
 
   const handleSearchUser = async () => {
