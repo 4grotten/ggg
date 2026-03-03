@@ -178,9 +178,9 @@ export default function AuditHistoryDetail() {
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{t('admin.audit.whoChanged', 'Кто изменил')}</p>
               )}
               <div className="flex items-center gap-3">
-                <Avatar className="w-11 h-11 rounded-xl shrink-0">
+                <Avatar className="w-14 h-14 rounded-xl shrink-0">
                   <AvatarImage src={adminAvatar || undefined} alt={adminName} />
-                  <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-xs font-semibold">
+                  <AvatarFallback className="rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-sm font-semibold">
                     {adminName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
                   </AvatarFallback>
                 </Avatar>
