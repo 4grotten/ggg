@@ -41,11 +41,11 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
     queryKey: ["staff-notifications", staffUserId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("staff_notification_settings" as any)
+        .from("staff_notification_settings")
         .select("*")
         .eq("staff_user_id", staffUserId);
       if (error) throw error;
-      return (data || []) as unknown as NotifSetting[];
+      return (data || []) as NotifSetting[];
     },
     enabled: !!staffUserId,
   });
@@ -55,14 +55,14 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
       const existing = settings.find((s) => s.channel === channel);
       if (existing) {
         const { error } = await supabase
-          .from("staff_notification_settings" as any)
-          .update({ contact_value, updated_at: new Date().toISOString() } as any)
+          .from("staff_notification_settings")
+          .update({ contact_value, updated_at: new Date().toISOString() })
           .eq("id", existing.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
-          .from("staff_notification_settings" as any)
-          .insert({ staff_user_id: staffUserId, channel, contact_value } as any);
+          .from("staff_notification_settings")
+          .insert({ staff_user_id: staffUserId, channel, contact_value });
         if (error) throw error;
       }
     },
@@ -77,8 +77,8 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
   const toggleMutation = useMutation({
     mutationFn: async ({ id, is_enabled }: { id: string; is_enabled: boolean }) => {
       const { error } = await supabase
-        .from("staff_notification_settings" as any)
-        .update({ is_enabled, updated_at: new Date().toISOString() } as any)
+        .from("staff_notification_settings")
+        .update({ is_enabled, updated_at: new Date().toISOString() })
         .eq("id", id);
       if (error) throw error;
     },
@@ -90,7 +90,7 @@ export default function StaffNotificationSettings({ staffUserId }: Props) {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from("staff_notification_settings" as any)
+        .from("staff_notification_settings")
         .delete()
         .eq("id", id);
       if (error) throw error;
