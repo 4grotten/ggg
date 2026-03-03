@@ -41,7 +41,7 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   const { data: settings, isLoading } = useQuery({
     queryKey: ["staff-notifications", staffUserId],
     queryFn: async () => {
-      const res = await apiGet<NotifApiResponse>(`/admin/notifications/settings/${staffUserId}/`);
+      const res = await apiGet<NotifApiResponse>(`/admin/notifications/settings/`);
       if (res.error) throw new Error(res.error.detail || res.error.message);
       return res.data;
     },
@@ -50,7 +50,7 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
 
   const updateMutation = useMutation({
     mutationFn: async (patch: Partial<NotifApiResponse>) => {
-      const res = await apiPatch<NotifApiResponse>(`/admin/notifications/settings/${staffUserId}/`, patch);
+      const res = await apiPatch<NotifApiResponse>(`/admin/notifications/settings/`, patch);
       if (res.error) throw new Error(res.error.detail || res.error.message);
       return res.data;
     },
