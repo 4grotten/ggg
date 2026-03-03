@@ -271,13 +271,16 @@ export default function AdminClients() {
                             <Badge className="bg-emerald-500/10 text-emerald-500 border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.active', 'Активен')}</Badge>
                           )}
                           {(client.role || "user") === "root" && (
-                            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-0 text-[9px] px-1.5 py-0 h-4">Root</Badge>
+                            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-0 text-[9px] px-1.5 py-0 h-4 gap-0.5"><Shield className="w-2.5 h-2.5" /> Root</Badge>
                           )}
                           {(client.role || "user") === "admin" && (
-                            <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 border-0">Admin</Badge>
+                            <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 border-0 gap-0.5"><Shield className="w-2.5 h-2.5" /> Admin</Badge>
                           )}
                           {(client.role || "user") === "moderator" && (
-                            <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4 border-0">Mod</Badge>
+                            <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4 border-0 gap-0.5"><Shield className="w-2.5 h-2.5" /> Mod</Badge>
+                          )}
+                          {(client.role || "user") === "user" && (
+                            <Badge className="bg-muted text-muted-foreground border-0 text-[9px] px-1.5 py-0 h-4 gap-0.5"><Users className="w-2.5 h-2.5" /> User</Badge>
                           )}
                         </div>
                       </div>
@@ -311,16 +314,6 @@ export default function AdminClients() {
                           <Shield className="w-3 h-3" /> {t("admin.clients.notVerified")}
                         </span>
                       )}
-                      <span className={cn(
-                        "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
-                        (client.role || "user") === "root" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" :
-                        (client.role || "user") === "admin" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
-                        (client.role || "user") === "moderator" ? "bg-violet-500/10 text-violet-600 dark:text-violet-400" :
-                        "bg-muted text-muted-foreground"
-                      )}>
-                        <Users className="w-3 h-3" />
-                        {(client.role || "user") === "root" ? "Root" : (client.role || "user") === "admin" ? t("admin.clients.adminRole") : (client.role || "user") === "moderator" ? t("admin.clients.moderatorRole") : t("admin.clients.userRole")}
-                      </span>
                       {client.subscription_type && client.subscription_type !== "free" && (
                         <span className={cn(
                           "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
