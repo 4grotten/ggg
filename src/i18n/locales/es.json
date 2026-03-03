@@ -1788,7 +1788,8 @@
         "no": "No",
         "action": "Acción",
         "changedParams": "Parámetros modificados",
-        "rawData": "Datos del cambio"
+        "rawData": "Datos del cambio",
+        "viewedHistory": "El administrador revisó el historial de transacciones del usuario"
       },
       "changedFor": "Cambiado para",
       "whoChanged": "Quién cambió",
@@ -1797,6 +1798,7 @@
         "addRole": "Rol asignado",
         "removeRole": "Rol eliminado",
         "updateSetting": "Configuración actualizada",
+        "viewTransactionHistory": "Historial de transacciones visto",
         "updateClient": "Cliente actualizado",
         "updateUserData": "Datos de usuario actualizados",
         "blockClient": "Cliente bloqueado",

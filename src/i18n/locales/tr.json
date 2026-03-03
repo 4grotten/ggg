@@ -1788,7 +1788,8 @@
         "no": "Hayır",
         "action": "İşlem",
         "changedParams": "Değiştirilen Parametreler",
-        "rawData": "Değişiklik verisi"
+        "rawData": "Değişiklik verisi",
+        "viewedHistory": "Yönetici kullanıcının işlem geçmişini görüntüledi"
       },
       "changedFor": "Değiştirilen",
       "whoChanged": "Kim değiştirdi",
@@ -1797,6 +1798,7 @@
         "addRole": "Rol atandı",
         "removeRole": "Rol kaldırıldı",
         "updateSetting": "Ayar güncellendi",
+        "viewTransactionHistory": "İşlem geçmişi görüntülendi",
         "updateClient": "Müşteri güncellendi",
         "updateUserData": "Kullanıcı verileri güncellendi",
         "blockClient": "Müşteri engellendi",

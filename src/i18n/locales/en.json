@@ -1859,7 +1859,8 @@
         "no": "No",
         "action": "Action",
         "changedParams": "Changed Parameters",
-        "rawData": "Change data"
+        "rawData": "Change data",
+        "viewedHistory": "Administrator viewed user's transaction history"
       },
       "changedFor": "Changed for",
       "whoChanged": "Who changed",
@@ -1868,6 +1869,7 @@
         "addRole": "Role assigned",
         "removeRole": "Role removed",
         "updateSetting": "Setting updated",
+        "viewTransactionHistory": "Transaction history viewed",
         "updateClient": "Client updated",
         "updateUserData": "User data updated",
         "blockClient": "Client blocked",

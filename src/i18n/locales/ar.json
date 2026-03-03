@@ -1788,7 +1788,8 @@
         "no": "لا",
         "action": "الإجراء",
         "changedParams": "المعلمات المتغيرة",
-        "rawData": "بيانات التغيير"
+        "rawData": "بيانات التغيير",
+        "viewedHistory": "قام المسؤول بعرض سجل معاملات المستخدم"
       },
       "changedFor": "تم التغيير لـ",
       "whoChanged": "من قام بالتغيير",
@@ -1797,6 +1798,7 @@
         "addRole": "تم تعيين الدور",
         "removeRole": "تم إزالة الدور",
         "updateSetting": "تم تحديث الإعداد",
+        "viewTransactionHistory": "عرض سجل المعاملات",
         "updateClient": "تم تحديث العميل",
         "updateUserData": "تم تحديث بيانات المستخدم",
         "blockClient": "تم حظر العميل",
