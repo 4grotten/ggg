@@ -231,6 +231,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Save to multi-account storage
       saveCurrentAccount(userData);
     }
+
+    // Refresh user data from API to get role, user_id, etc.
+    getCurrentUser().then(res => {
+      if (res.data) {
+        setUser(res.data);
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.data));
+        saveCurrentAccount(res.data);
+        console.log('[AuthContext] Refreshed user after login:', (res.data as any).user_id, (res.data as any).role);
+      }
+    }).catch(() => {});
   }, []);
 
   const logout = useCallback(async () => {
