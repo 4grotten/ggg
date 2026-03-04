@@ -202,18 +202,27 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
 
                 {/* Telegram hint */}
                 {ch.key === "telegram" && (
-                  <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">
-                    Чтобы получать уведомления в Telegram, перейдите в{" "}
-                    <a
-                      href="https://t.me/uEasyCardLOGS_Bot"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:underline font-medium"
-                    >
-                      @uEasyCardLOGS_Bot
-                    </a>{" "}
-                    и нажмите <span className="font-medium">Start</span>
-                  </p>
+                  <div className="mt-2.5 p-2.5 rounded-lg bg-blue-500/5 border border-blue-500/15">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      📌 Чтобы получать уведомления в Telegram:
+                    </p>
+                    <ol className="text-[11px] text-muted-foreground leading-relaxed mt-1 ml-4 list-decimal space-y-0.5">
+                      <li>
+                        Перейдите в бот{" "}
+                        <a
+                          href="https://t.me/uEasyCardLOGS_Bot"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:underline font-semibold"
+                        >
+                          @uEasyCardLOGS_Bot
+                        </a>
+                      </li>
+                      <li>
+                        Нажмите кнопку <span className="font-semibold">Start</span>
+                      </li>
+                    </ol>
+                  </div>
                 )}
               </motion.div>
             );
