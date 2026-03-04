@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { apiGet, apiPatch } from "@/services/api/apiClient";
+import { apiGet, apiPut } from "@/services/api/apiClient";
 
 interface Props {
   staffUserId: string;
@@ -17,7 +17,7 @@ interface Props {
 }
 
 interface NotifApiResponse {
-  telegram_chat_id: string | number | null;
+  telegram_username: string | null;
   telegram_enabled: boolean;
   whatsapp_number: string | null;
   whatsapp_enabled: boolean;
@@ -27,7 +27,7 @@ interface NotifApiResponse {
 
 const CHANNELS = [
   { key: "whatsapp" as const, valueField: "whatsapp_number" as const, enabledField: "whatsapp_enabled" as const, icon: MessageCircle, label: "WhatsApp", placeholder: "+971 50 123 4567", color: "text-green-500", bg: "bg-green-500/10 border-green-500/20" },
-  { key: "telegram" as const, valueField: "telegram_chat_id" as const, enabledField: "telegram_enabled" as const, icon: Send, label: "Telegram", placeholder: "Chat ID или @username", color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/20" },
+  { key: "telegram" as const, valueField: "telegram_username" as const, enabledField: "telegram_enabled" as const, icon: Send, label: "Telegram", placeholder: "@username", color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/20" },
   { key: "email" as const, valueField: "email_address" as const, enabledField: "email_enabled" as const, icon: Mail, label: "Email", placeholder: "admin@example.com", color: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
 ];
 
@@ -41,7 +41,7 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   const { data: settings, isLoading } = useQuery({
     queryKey: ["staff-notifications", staffUserId],
     queryFn: async () => {
-      const res = await apiGet<NotifApiResponse>(`/admin/notifications/settings/?user_id=${staffUserId}`);
+      const res = await apiGet<NotifApiResponse>(`/admin/notifications/settings/${staffUserId}/`);
       if (res.error) throw new Error(res.error.detail || res.error.message);
       return res.data;
     },
@@ -50,7 +50,16 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
 
   const updateMutation = useMutation({
     mutationFn: async (patch: Partial<NotifApiResponse>) => {
-      const res = await apiPatch<NotifApiResponse>(`/admin/notifications/settings/`, { ...patch, user_id: staffUserId });
+      const fullBody = {
+        telegram_username: settings?.telegram_username || "",
+        telegram_enabled: settings?.telegram_enabled || false,
+        whatsapp_number: settings?.whatsapp_number || "",
+        whatsapp_enabled: settings?.whatsapp_enabled || false,
+        email_address: settings?.email_address || "",
+        email_enabled: settings?.email_enabled || false,
+        ...patch,
+      };
+      const res = await apiPut<NotifApiResponse>(`/admin/notifications/settings/${staffUserId}/`, fullBody);
       if (res.error) throw new Error(res.error.detail || res.error.message);
       return res.data;
     },
