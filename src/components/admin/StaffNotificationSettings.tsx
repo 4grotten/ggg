@@ -203,7 +203,7 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
                 {/* Telegram hint */}
                 {ch.key === "telegram" && (
                   <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">
-                    Чтобы получать уведомления, перейдите в{" "}
+                    Чтобы получать уведомления в Telegram, перейдите в{" "}
                     <a
                       href="https://t.me/uEasyCardLOGS_Bot"
                       target="_blank"
