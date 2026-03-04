@@ -199,6 +199,22 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
                     </Button>
                   </motion.div>
                 )}
+
+                {/* Telegram hint */}
+                {ch.key === "telegram" && (
+                  <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">
+                    Чтобы получать уведомления, перейдите в{" "}
+                    <a
+                      href="https://t.me/uEasyCardLOGS_Bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:underline font-medium"
+                    >
+                      @uEasyCardLOGS_Bot
+                    </a>{" "}
+                    и нажмите <span className="font-medium">Start</span>
+                  </p>
+                )}
               </motion.div>
             );
           })
