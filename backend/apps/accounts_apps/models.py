@@ -142,8 +142,8 @@ class Contacts(models.Model):
 class AdminNotificationSettings(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_id = models.CharField(max_length=50, unique=True, db_index=True)
-    
-    telegram_chat_id = models.CharField(max_length=100, blank=True, null=True, help_text="ID чата в Telegram")
+    telegram_username = models.CharField(max_length=100, blank=True, null=True, help_text="Username (например, @username)")
+    telegram_chat_id = models.CharField(max_length=100, blank=True, null=True)
     telegram_enabled = models.BooleanField(default=False)
     
     whatsapp_number = models.CharField(max_length=50, blank=True, null=True, help_text="Номер в формате 996555123456")

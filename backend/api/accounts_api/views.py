@@ -21,7 +21,7 @@ from django.db.models import Sum, Count
 from apps.accounts_apps.models import UserRoles
 from apps.accounts_apps.models import AdminActionHistory, UserRoles
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.exceptions import PermissionDenied
 
 def generate_uid_tail(user_id):
     return str(user_id).zfill(6)[-6:]
@@ -1226,43 +1226,34 @@ def _is_root(user):
 
 
 class AdminNotificationSettingsView(APIView):
-    permission_classes = [IsAdminOrRoot]
+    permission_classes = [IsAuthenticated]
+
+    def check_permissions_and_roles(self, request, method):
+        requester_roles = UserRoles.objects.filter(user_id=request.user.id).values_list('role', flat=True)
+        
+        if 'root' not in requester_roles and 'admin' not in requester_roles:
+            raise PermissionDenied("Доступ запрещен. Требуется роль Admin или Root.")
+
+        if method in ['PUT', 'PATCH'] and 'root' not in requester_roles:
+            raise PermissionDenied("Изменять настройки уведомлений может только пользователь с ролью Root.")
 
     def get_object(self, user_id):
-        obj, created = AdminNotificationSettings.objects.get_or_create(user_id=user_id)
+        target_roles = UserRoles.objects.filter(user_id=user_id).values_list('role', flat=True)
+        if 'admin' not in target_roles and 'root' not in target_roles:
+            raise PermissionDenied("Указанный пользователь не является Admin или Root.")
+            
+        obj, _ = AdminNotificationSettings.objects.get_or_create(user_id=user_id)
         return obj
 
-    def get(self, request):
-        # Admin/Root can view any staff member's settings via ?user_id=
-        target_user_id = request.query_params.get('user_id', request.user.id)
-        settings_obj = self.get_object(target_user_id)
+    def get(self, request, user_id):
+        self.check_permissions_and_roles(request, request.method)
+        settings_obj = self.get_object(user_id)
         serializer = AdminNotificationSettingsSerializer(settings_obj)
         return Response(serializer.data)
 
-    def put(self, request):
-        # Only Root can edit settings
-        if not _is_root(request.user):
-            return Response(
-                {"detail": "Только Root может изменять настройки уведомлений."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        target_user_id = request.data.get('user_id', request.user.id)
-        settings_obj = self.get_object(target_user_id)
-        serializer = AdminNotificationSettingsSerializer(settings_obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request):
-        # Only Root can edit settings
-        if not _is_root(request.user):
-            return Response(
-                {"detail": "Только Root может изменять настройки уведомлений."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        target_user_id = request.data.get('user_id', request.user.id)
-        settings_obj = self.get_object(target_user_id)
+    def put(self, request, user_id):
+        self.check_permissions_and_roles(request, request.method)
+        settings_obj = self.get_object(user_id)
         serializer = AdminNotificationSettingsSerializer(settings_obj, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -1271,10 +1262,9 @@ class AdminNotificationSettingsView(APIView):
 
 
 class TestNotificationView(APIView):
-    permission_classes = [IsAdminOrRoot]
+    permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        target_user_id = request.data.get('user_id', request.user.id)
-        settings_obj, _ = AdminNotificationSettings.objects.get_or_create(user_id=target_user_id)
+    def post(self, request, user_id):
+        settings_obj, _ = AdminNotificationSettings.objects.get_or_create(user_id=user_id)
         dispatch_test_notification(settings_obj)
-        return Response({"detail": "Тестовое уведомление отправлено на активные каналы."}, status=status.HTTP_200_OK)
+        return Response({"detail": "Тестовое уведомление отправлено."}, status=status.HTTP_200_OK)

@@ -69,7 +69,7 @@ class AdminNotificationSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminNotificationSettings
         fields = [
-            'telegram_chat_id', 'telegram_enabled', 
+            'telegram_username', 'telegram_enabled', 
             'whatsapp_number', 'whatsapp_enabled', 
             'email_address', 'email_enabled'
         ]
