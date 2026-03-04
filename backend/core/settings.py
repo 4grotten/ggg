@@ -86,6 +86,7 @@ ROOT_URLCONF = 'core.urls'
 TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
 WAHA_API_URL = config('WAHA_API_URL', default='http://localhost:3000')
 WAHA_SESSION_NAME = config('WAHA_SESSION_NAME', default='default')
+WHATSAPP_API_KEY = config('WHATSAPP_API_KEY', default='5f0ed637143a4fddac67e3108cfd80ed')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
