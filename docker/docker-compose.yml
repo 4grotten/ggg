@@ -312,10 +312,10 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-    env_file:
-      - ../backend/.env
     environment:
       - WAHA_HTTP_CORS=*
+      - WHATSAPP_API_KEY=5f0ed637143a4fddac67e3108cfd80ed
+      - WAHA_API_KEY=5f0ed637143a4fddac67e3108cfd80ed
     volumes:                 
       - waha_data:/app/.waha
     networks:

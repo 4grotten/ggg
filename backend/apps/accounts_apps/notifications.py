@@ -55,7 +55,7 @@ def send_whatsapp(phone, text):
         }
         headers = {
             "Content-Type": "application/json",
-            "X-Api-Key": getattr(settings, 'WHATSAPP_API_KEY', 'easycard_secret_token')
+            "X-Api-Key": "5f0ed637143a4fddac67e3108cfd80ed"
         }
         
         resp = requests.post(url, json=payload, headers=headers, timeout=15)
