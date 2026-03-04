@@ -82,9 +82,12 @@ export default function AdminStaffDetail() {
   const { data: staffList } = useQuery({
     queryKey: ["admin-staff"],
     queryFn: async () => {
-      const res = await apiRequest<StaffMember[]>("/admin/staff/");
+      const res = await apiRequest<StaffMember[] | { results: StaffMember[] }>("/admin/staff/");
       if (res.error || !res.data) return [];
-      return res.data;
+      const data = res.data;
+      if (Array.isArray(data)) return data;
+      if (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) return data.results;
+      return [];
     },
   });
 
