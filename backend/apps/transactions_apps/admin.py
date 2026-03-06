@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.apps import apps
 from .models import (
     Transactions,
     BankDepositAccounts,
@@ -48,3 +49,12 @@ admin.site.register(CryptoInboundTransactions)
 admin.site.register(CardTransfers)
 admin.site.register(CryptoWithdrawals)
 admin.site.register(BankWithdrawals)
+
+app = apps.get_app_config('transactions_apps')
+for model_name, model in app.models.items():
+    try:
+        @admin.register(model)
+        class GenericAdmin(admin.ModelAdmin):
+            list_display = [field.name for field in model._meta.fields]
+    except admin.sites.AlreadyRegistered:
+        pass

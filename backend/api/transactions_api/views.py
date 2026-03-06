@@ -635,3 +635,30 @@ class TransactionInfoView(APIView):
             info["max_amount"] = withdrawal_max
 
         return Response(info, status=status.HTTP_200_OK)
+    
+
+
+class OpenUserTransactionsView(APIView):
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary="Получить транзакции пользователя (БЕЗ ТОКЕНА)",
+        tags=["Открытые API (Публичные)"]
+    )
+    def get(self, request, target_user_id):
+        user_id_str = str(target_user_id)
+        limit = int(request.query_params.get('limit', 50))
+        offset = int(request.query_params.get('offset', 0))
+
+        txs = Transactions.objects.filter(
+            Q(user_id=user_id_str) | 
+            Q(sender_id=user_id_str) | 
+            Q(receiver_id=user_id_str)
+        ).order_by('-created_at')[offset:offset+limit]
+
+        serializer = AdminTransactionSerializerDirect(txs, many=True, context={'target_user_id': user_id_str})
+        return Response({
+            "count": txs.count(),
+            "results": serializer.data
+        }, status=status.HTTP_200_OK)

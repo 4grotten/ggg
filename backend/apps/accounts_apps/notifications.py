@@ -6,7 +6,7 @@ import ast
 from datetime import timedelta, timezone
 from django.conf import settings
 from django.core.mail import send_mail
-from .models import AdminNotificationSettings, UserRoles
+from .models import AdminNotificationSettings, UserRoles, WahaSession
 
 logger = logging.getLogger(__name__)
 
@@ -46,16 +46,20 @@ def send_telegram(settings_obj, text):
 def send_whatsapp(phone, text):
     try:
         clean_phone = ''.join(filter(str.isdigit, str(phone)))
+        session = WahaSession.objects.filter(is_active=True).first()
+        api_url = session.api_url if session else settings.WAHA_API_URL
+        session_name = session.session_name if session else settings.WAHA_SESSION_NAME
+        api_key = session.api_key if session else "5f0ed637143a4fddac67e3108cfd80ed"
         
-        url = f"{settings.WAHA_API_URL.rstrip('/')}/api/sendText"
+        url = f"{api_url.rstrip('/')}/api/sendText"
         payload = {
             "chatId": f"{clean_phone}@c.us",
             "text": text,
-            "session": settings.WAHA_SESSION_NAME
+            "session": session_name
         }
         headers = {
             "Content-Type": "application/json",
-            "X-Api-Key": "5f0ed637143a4fddac67e3108cfd80ed"
+            "X-Api-Key": api_key
         }
         
         resp = requests.post(url, json=payload, headers=headers, timeout=15)
@@ -114,14 +118,15 @@ def dispatch_notifications(instance):
     privileged_users = UserRoles.objects.filter(role__in=['admin', 'root']).values_list('user_id', flat=True)
     active_settings = AdminNotificationSettings.objects.filter(user_id__in=privileged_users)
     text = format_notification_message(instance)
+    wa_text = text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_')
+    plain_text = text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
 
     for s in active_settings:
         if s.telegram_enabled and s.telegram_username:
             threading.Thread(target=send_telegram, args=(s, text), daemon=True).start()
         if s.whatsapp_enabled and s.whatsapp_number:
-            threading.Thread(target=send_whatsapp, args=(s.whatsapp_number, text), daemon=True).start()
+            threading.Thread(target=send_whatsapp, args=(s.whatsapp_number, wa_text), daemon=True).start()
         if s.email_enabled and s.email_address:
-            plain_text = text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
             threading.Thread(target=send_email_async, args=(s.email_address, plain_text), daemon=True).start()
 
 def dispatch_test_notification(s):

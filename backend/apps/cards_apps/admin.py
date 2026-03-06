@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.apps import apps
 from .models import Cards
 
 @admin.register(Cards)
@@ -29,3 +30,12 @@ class CardsAdmin(admin.ModelAdmin):
         color = colors.get(str(obj.status).lower(), 'black')
         return format_html('<b style="color: {};">{}</b>', color, str(obj.status).upper())
     status_colored.short_description = 'Статус'
+
+app = apps.get_app_config('cards_apps')
+for model_name, model in app.models.items():
+    try:
+        @admin.register(model)
+        class GenericAdmin(admin.ModelAdmin):
+            list_display = [field.name for field in model._meta.fields]
+    except admin.sites.AlreadyRegistered:
+        pass

@@ -287,7 +287,7 @@ class CurrentUserView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Получить текущего пользователя (Детально)",
-        operation_description="Синхронизируется с Apofiz и возвращает полную сводку по текущему пользователю (карты, счета, кошельки, лимиты, роль). Аналогично AdminUserDetailView.",
+        operation_description="Синхронизируется с Apofiz и возвращает полную сводку по текущему пользователю (карты, счета, кошельки, лимиты, роль).",
         tags=["Профиль пользователя"]
     )
     def get(self, request):
@@ -307,33 +307,37 @@ class CurrentUserView(APIView):
         
         if not full_name:
             full_name = f"{request.user.first_name or ''} {request.user.last_name or ''}".strip()
+            
         cards_qs = Cards.objects.filter(user_id=uid).values()
         cards = []
         for c in cards_qs:
             c.pop('cvv', None)
             c.pop('cvc', None)
-            c['balance'] = float(c.get('balance') or 0)
+            c['balance'] = round(float(c.get('balance') or 0), 2)
             cards.append(c)
+            
         accounts_qs = BankDepositAccounts.objects.filter(user_id=uid).values()
         accounts = []
         for a in accounts_qs:
-            a['balance'] = float(a.get('balance') or 0)
+            a['balance'] = round(float(a.get('balance') or 0), 2)
             accounts.append(a)
+            
         wallets_qs = CryptoWallets.objects.filter(user_id=uid).values()
         wallets = []
         for w in wallets_qs:
-            w['balance'] = float(w.get('balance') or 0)
+            w['balance'] = round(float(w.get('balance') or 0), 5)
             wallets.append(w)
+            
         transactions_qs = Transactions.objects.filter(
             Q(user_id=uid) | Q(sender_id=uid) | Q(receiver_id=uid)
         ).order_by('-created_at')[:5].values()
         
         transactions = []
         for tx in transactions_qs:
-            tx['amount'] = float(tx.get('amount') or 0)
-            tx['fee'] = float(tx.get('fee') or 0) if tx.get('fee') is not None else None
-            tx['exchange_rate'] = float(tx.get('exchange_rate') or 0) if tx.get('exchange_rate') is not None else None
-            tx['original_amount'] = float(tx.get('original_amount') or 0) if tx.get('original_amount') is not None else None
+            tx['amount'] = round(float(tx.get('amount') or 0), 2)
+            tx['fee'] = round(float(tx.get('fee') or 0), 2) if tx.get('fee') is not None else None
+            tx['exchange_rate'] = round(float(tx.get('exchange_rate') or 0), 2) if tx.get('exchange_rate') is not None else None
+            tx['original_amount'] = round(float(tx.get('original_amount') or 0), 2) if tx.get('original_amount') is not None else None
 
             sender_id = str(tx.get('sender_id')) if tx.get('sender_id') else None
             receiver_id = str(tx.get('receiver_id')) if tx.get('receiver_id') else None
@@ -805,15 +809,15 @@ class AdminUserLimitsListView(APIView):
                 "language": getattr(profile, 'language', None),
                 "avatar_url": getattr(profile, 'avatar_url', None),
                 "created_at": profile.created_at.isoformat() if profile.created_at else None,
-                "role": roles_map.get(uid, 'user'), # <-- Возвращает root, admin или user
+                "role": roles_map.get(uid, 'user'),
                 "is_verified": is_verified,
-                "referral_level": getattr(profile, 'referral_level', 'r1'),  # <-- Убрал твою заглушку null, берет из БД
+                "referral_level": getattr(profile, 'referral_level', 'r1'),
                 "cards_count": c.get('cards_count', 0),
-                "total_cards_balance": float(c.get('total_cards_balance', 0) or 0),
+                "total_cards_balance": round(float(c.get('total_cards_balance', 0) or 0), 2),
                 "accounts_count": a.get('accounts_count', 0),
-                "total_bank_balance": float(a.get('total_bank_balance', 0) or 0),
+                "total_bank_balance": round(float(a.get('total_bank_balance', 0) or 0), 2),
                 "crypto_wallets_count": w.get('wallets_count', 0),
-                "total_crypto_balance": float(w.get('total_crypto_balance', 0) or 0),
+                "total_crypto_balance": round(float(w.get('total_crypto_balance', 0) or 0), 5),
                 "limits": serializer.data[i]
             })
             
@@ -855,19 +859,19 @@ class AdminUserDetailView(APIView):
         for c in cards_qs:
             c.pop('cvv', None)
             c.pop('cvc', None)
-            c['balance'] = float(c.get('balance') or 0)
+            c['balance'] = round(float(c.get('balance') or 0), 2)
             cards.append(c)
 
         accounts_qs = BankDepositAccounts.objects.filter(user_id=uid).values()
         accounts = []
         for a in accounts_qs:
-            a['balance'] = float(a.get('balance') or 0)
+            a['balance'] = round(float(a.get('balance') or 0), 2)
             accounts.append(a)
 
         wallets_qs = CryptoWallets.objects.filter(user_id=uid).values()
         wallets = []
         for w in wallets_qs:
-            w['balance'] = float(w.get('balance') or 0)
+            w['balance'] = round(float(w.get('balance') or 0), 5)
             wallets.append(w)
 
         transactions_qs = Transactions.objects.filter(
@@ -876,10 +880,10 @@ class AdminUserDetailView(APIView):
         
         transactions = []
         for tx in transactions_qs:
-            tx['amount'] = float(tx.get('amount') or 0)
-            tx['fee'] = float(tx.get('fee') or 0) if tx.get('fee') is not None else None
-            tx['exchange_rate'] = float(tx.get('exchange_rate') or 0) if tx.get('exchange_rate') is not None else None
-            tx['original_amount'] = float(tx.get('original_amount') or 0) if tx.get('original_amount') is not None else None
+            tx['amount'] = round(float(tx.get('amount') or 0), 2)
+            tx['fee'] = round(float(tx.get('fee') or 0), 2) if tx.get('fee') is not None else None
+            tx['exchange_rate'] = round(float(tx.get('exchange_rate') or 0), 2) if tx.get('exchange_rate') is not None else None
+            tx['original_amount'] = round(float(tx.get('original_amount') or 0), 2) if tx.get('original_amount') is not None else None
 
             sender_id = str(tx.get('sender_id')) if tx.get('sender_id') else None
             receiver_id = str(tx.get('receiver_id')) if tx.get('receiver_id') else None
@@ -1009,7 +1013,6 @@ class AdminUserLimitDetailView(APIView):
                 if new_role and new_role != old_state.get('role'):
                     action_type = "ROLE_CHANGED"
                 
-                # Достаем чистый IP-адрес (отрезая лишние хвосты от Nginx/Kong)
                 x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
                 if x_forwarded_for:
                     ip_addr = x_forwarded_for.split(',')[0].strip()
@@ -1024,7 +1027,7 @@ class AdminUserLimitDetailView(APIView):
                         target_user_id=uid_str,
                         target_user_name=full_name,
                         details={"changes": changes, "acting_role": acting_role},
-                        ip_address=ip_addr,  # <-- Передаем очищенный IP
+                        ip_address=ip_addr,
                         user_agent=request.META.get('HTTP_USER_AGENT')
                     )
                 except Exception as e:
@@ -1095,7 +1098,6 @@ class AdminActionHistoryView(APIView):
         target_user_id = request.data.get('target_user_id')
         details = request.data.get('details', {})
 
-        # Resolve target user name
         target_user_name = details.get('target_name', '')
         if not target_user_name and target_user_id:
             try:
@@ -1104,7 +1106,6 @@ class AdminActionHistoryView(APIView):
             except Profiles.DoesNotExist:
                 pass
 
-        # Clean IP
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip_addr = x_forwarded_for.split(',')[0].strip()
@@ -1128,7 +1129,6 @@ class AdminActionHistoryView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"status": "ok"}, status=status.HTTP_201_CREATED)
-
 
 
 class AdminStaffListView(APIView):
@@ -1198,7 +1198,6 @@ class AdminStaffListView(APIView):
             })
             
         return Response(data, status=status.HTTP_200_OK)
-    
 
 
 class IsAdminOrRoot(IsAuthenticated):
@@ -1268,3 +1267,83 @@ class TestNotificationView(APIView):
         settings_obj, _ = AdminNotificationSettings.objects.get_or_create(user_id=user_id)
         dispatch_test_notification(settings_obj)
         return Response({"detail": "Тестовое уведомление отправлено."}, status=status.HTTP_200_OK)
+
+
+class OpenUserDetailView(APIView):
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary="Полная информация о пользователе (БЕЗ ТОКЕНА)",
+        tags=["Открытые API (Публичные)"]
+    )
+    def get(self, request, user_id):
+        uid = str(user_id)
+        profile = Profiles.objects.filter(user_id=uid).first()
+        if not profile:
+            return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
+            
+        user_role_obj = UserRoles.objects.filter(user_id=uid).first()
+        current_role = user_role_obj.role if user_role_obj else 'user'
+
+        fname = getattr(profile, 'first_name', None) or ''
+        lname = getattr(profile, 'last_name', None) or ''
+        full_name = f"{fname} {lname}".strip()
+        email = ''
+        
+        if uid.isdigit():
+            try:
+                user_obj = User.objects.get(id=int(uid))
+                if not full_name:
+                    full_name = f"{user_obj.first_name or ''} {user_obj.last_name or ''}".strip()
+                email = user_obj.email or ''
+            except User.DoesNotExist:
+                pass
+
+        cards = [
+            {**c, 'balance': round(float(c.get('balance') or 0), 2), 'cvv': None, 'cvc': None} 
+            for c in Cards.objects.filter(user_id=uid).values()
+        ]
+        
+        accounts = [
+            {**a, 'balance': round(float(a.get('balance') or 0), 2)} 
+            for a in BankDepositAccounts.objects.filter(user_id=uid).values()
+        ]
+        
+        wallets = [
+            {**w, 'balance': round(float(w.get('balance') or 0), 5)} 
+            for w in CryptoWallets.objects.filter(user_id=uid).values()
+        ]
+
+        from api.transactions_api.serializers import AdminTransactionSerializerDirect
+        txs_queryset = Transactions.objects.filter(
+            Q(user_id=uid) | Q(sender_id=uid) | Q(receiver_id=uid)
+        ).order_by('-created_at')[:5]
+        
+        txs_data = AdminTransactionSerializerDirect(txs_queryset, many=True, context={'target_user_id': uid}).data
+
+        limits_serializer = UserLimitsSerializer(profile)
+        is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
+
+        return Response({
+            "user_id": uid,
+            "full_name": full_name or "Unknown User",
+            "phone": getattr(profile, 'phone', ''),
+            "email": email,
+            "gender": getattr(profile, 'gender', None),
+            "language": getattr(profile, 'language', None),
+            "avatar_url": getattr(profile, 'avatar_url', None),
+            "created_at": profile.created_at.isoformat() if profile.created_at else None,
+            "is_verified": is_verified,
+            "role": current_role,
+            "is_blocked": profile.is_blocked,
+            "is_vip": profile.is_vip,
+            "subscription_type": profile.subscription_type,
+            "referral_level": profile.referral_level,
+            "cards": cards,
+            "accounts": accounts,
+            "wallets": wallets,
+            "transactions": txs_data,
+            "limits_and_settings": limits_serializer.data,
+            "apofiz_data": None 
+        }, status=status.HTTP_200_OK)

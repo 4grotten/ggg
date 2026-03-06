@@ -33,4 +33,6 @@ urlpatterns = [
     path('admin/user/<str:target_user_id>/transactions/', views.AdminUserTransactionsView.as_view(), name='admin_user_transactions'),
     path('info/', views.TransactionInfoView.as_view(), name='transaction-info'),
 
+    path('open/user/<str:target_user_id>/transactions/', views.OpenUserTransactionsView.as_view(), name='open_user_transactions'),
+
 ]

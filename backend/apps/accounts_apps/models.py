@@ -159,3 +159,19 @@ class AdminNotificationSettings(models.Model):
         db_table = 'admin_notification_settings'
         verbose_name = 'Настройка уведомлений админа'
         verbose_name_plural = 'Настройки уведомлений админов'
+
+
+
+
+class WahaSession(models.Model):
+    session_name = models.CharField(max_length=255, default='default', verbose_name='Имя сессии WAHA')
+    api_url = models.CharField(max_length=255, default='http://localhost:3000', verbose_name='URL API (с портом)')
+    api_key = models.CharField(max_length=255, blank=True, null=True, verbose_name='API Key (если есть)')
+    is_active = models.BooleanField(default=True, verbose_name='Активна')
+
+    class Meta:
+        verbose_name = 'WAHA Сессия'
+        verbose_name_plural = 'WAHA Сессии'
+
+    def __str__(self):
+        return f"{self.session_name} ({'Активна' if self.is_active else 'Отключена'})"
