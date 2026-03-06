@@ -944,7 +944,6 @@ class AdminUserLimitDetailView(APIView):
         if acting_role not in ['root', 'admin']:
             return Response({"error": "У вас нет прав для выполнения этой операции"}, status=status.HTTP_403_FORBIDDEN)
 
-     
         new_role = request.data.get('role')
         target_user_role_obj = UserRoles.objects.filter(user_id=uid_str).first()
         target_role = target_user_role_obj.role if target_user_role_obj else 'user'
@@ -953,12 +952,8 @@ class AdminUserLimitDetailView(APIView):
             if acting_role != 'root':
                 return Response({"error": "Только Root может назначать или изменять роли"}, status=status.HTTP_403_FORBIDDEN)
 
-
         old_state = UserLimitsSerializer(profile).data
         old_state['role'] = target_role
-
-
-
 
         limit_keys = [
             'transfer_min', 'transfer_max', 'daily_transfer_limit', 'monthly_transfer_limit', 
@@ -1000,14 +995,19 @@ class AdminUserLimitDetailView(APIView):
             new_state = UserLimitsSerializer(profile).data
             new_state['role'] = target_role
 
-
-
             changes = {}
+            from decimal import Decimal
             for key in set(old_state.keys()) | set(new_state.keys()):
                 old_val = old_state.get(key)
                 new_val = new_state.get(key)
+                if isinstance(old_val, Decimal):
+                    old_val = float(old_val)
+                if isinstance(new_val, Decimal):
+                    new_val = float(new_val)
+                
                 if str(old_val) != str(new_val):
                     changes[key] = {'было': old_val, 'стало': new_val}
+                    
             if changes:
                 action_type = "UPDATE_USER_DATA"
                 if new_role and new_role != old_state.get('role'):
