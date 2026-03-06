@@ -1,8 +1,7 @@
-
 import threading
 import requests
 import logging
-import ast
+import json
 from datetime import timedelta, timezone
 from django.conf import settings
 from django.core.mail import send_mail
@@ -35,7 +34,7 @@ def send_telegram(settings_obj, text):
                 settings_obj.save(update_fields=['telegram_chat_id'])
         
         if not chat_id:
-            logger.error(f"TG: Не найден chat_id для {settings_obj.telegram_username}. Пользователь должен нажать /start в боте!")
+            logger.error(f"TG: Не найден chat_id для {settings_obj.telegram_username}")
             return
 
         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -48,7 +47,7 @@ def send_whatsapp(phone, text):
         clean_phone = ''.join(filter(str.isdigit, str(phone)))
         session = WahaSession.objects.filter(is_active=True).first()
         api_url = session.api_url if session else settings.WAHA_API_URL
-        session_name = session.session_name if session else settings.WAHA_SESSION_NAME
+        session_name = session.session_name if session else getattr(settings, 'WAHA_SESSION_NAME', 'default')
         api_key = session.api_key if session else "5f0ed637143a4fddac67e3108cfd80ed"
         
         url = f"{api_url.rstrip('/')}/api/sendText"
@@ -80,25 +79,41 @@ def send_email_async(email, text):
     except Exception as e:
         logger.error(f"Email Notification Error: {e}")
 
-def format_human_readable_details(details_str):
-    if not details_str:
+def format_human_readable_details(details_obj):
+    if not details_obj:
         return "Нет деталей"
     try:
-        data = ast.literal_eval(details_str) if isinstance(details_str, str) else details_str
+        data = details_obj
+        if isinstance(data, str):
+            try:
+                data = json.loads(data.replace("'", '"'))
+            except Exception:
+                pass
         if isinstance(data, dict):
             lines = []
             if 'acting_role' in data:
                 lines.append(f"<b>Роль исполнителя:</b> {data['acting_role']}")
-            if 'changes' in data:
+                
+            changes = data.get('changes')
+            if changes and isinstance(changes, dict):
                 lines.append("<b>Изменения:</b>")
-                for field, values in data['changes'].items():
-                    old_v = values.get('было', 'Пусто')
-                    new_v = values.get('стало', 'Пусто')
-                    lines.append(f" └ <i>{field}</i>: {old_v} ➔ {new_v}")
-            return "\n".join(lines) if lines else str(data)
-        return str(details_str)
-    except Exception:
-        return str(details_str)
+                for field, values in changes.items():
+                    if isinstance(values, dict):
+                        old_v = str(values.get('было', 'Пусто')).replace('<', '&lt;').replace('>', '&gt;')
+                        new_v = str(values.get('стало', 'Пусто')).replace('<', '&lt;').replace('>', '&gt;')
+                        lines.append(f" └ <i>{field}</i>: {old_v} ➔ {new_v}")
+                    else:
+                        lines.append(f" └ <i>{field}</i>: {values}")
+            elif changes:
+                lines.append(f"<b>Изменения:</b> {changes}")
+            if not lines:
+                formatted = json.dumps(data, ensure_ascii=False, indent=2)
+                return f"<pre>{formatted}</pre>"
+            return "\n".join(lines)
+        return str(details_obj)
+    except Exception as e:
+        logger.error(f"Format Details Error: {e}")
+        return str(details_obj)
 
 def format_notification_message(instance):
     tz_utc_4 = timezone(timedelta(hours=4))
@@ -117,24 +132,26 @@ def format_notification_message(instance):
 def dispatch_notifications(instance):
     privileged_users = UserRoles.objects.filter(role__in=['admin', 'root']).values_list('user_id', flat=True)
     active_settings = AdminNotificationSettings.objects.filter(user_id__in=privileged_users)
-    text = format_notification_message(instance)
-    wa_text = text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_')
-    plain_text = text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
-
+    html_text = format_notification_message(instance)
+    wa_text = html_text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_').replace('<pre>', '').replace('</pre>', '')
+    plain_text = html_text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '').replace('<pre>', '').replace('</pre>', '')
     for s in active_settings:
         if s.telegram_enabled and s.telegram_username:
-            threading.Thread(target=send_telegram, args=(s, text), daemon=True).start()
+            threading.Thread(target=send_telegram, args=(s, html_text), daemon=True).start()
         if s.whatsapp_enabled and s.whatsapp_number:
             threading.Thread(target=send_whatsapp, args=(s.whatsapp_number, wa_text), daemon=True).start()
         if s.email_enabled and s.email_address:
             threading.Thread(target=send_email_async, args=(s.email_address, plain_text), daemon=True).start()
 
 def dispatch_test_notification(s):
-    text = "🔧 <b>Тестовое уведомление из системы uEasyCard</b>\nЕсли вы это читаете, интеграция работает успешно!"
+    html_text = "🔧 <b>Тестовое уведомление из системы uEasyCard</b>\nЕсли вы это читаете, интеграция работает успешно!"
+    
+    wa_text = html_text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_')
+    plain_text = html_text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
+
     if s.telegram_enabled and s.telegram_username:
-        threading.Thread(target=send_telegram, args=(s, text), daemon=True).start()
+        threading.Thread(target=send_telegram, args=(s, html_text), daemon=True).start()
     if s.whatsapp_enabled and s.whatsapp_number:
-        threading.Thread(target=send_whatsapp, args=(s.whatsapp_number, text), daemon=True).start()
+        threading.Thread(target=send_whatsapp, args=(s.whatsapp_number, wa_text), daemon=True).start()
     if s.email_enabled and s.email_address:
-        plain_text = text.replace('<b>', '').replace('</b>', '')
         threading.Thread(target=send_email_async, args=(s.email_address, plain_text), daemon=True).start()
