@@ -1,11 +1,13 @@
 import threading
 import requests
 import logging
+import ast
 import json
 from datetime import timedelta, timezone
 from django.conf import settings
 from django.core.mail import send_mail
-from .models import AdminNotificationSettings, UserRoles, WahaSession
+from .models import AdminNotificationSettings, UserRoles
+from django.apps import apps
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +36,7 @@ def send_telegram(settings_obj, text):
                 settings_obj.save(update_fields=['telegram_chat_id'])
         
         if not chat_id:
-            logger.error(f"TG: Не найден chat_id для {settings_obj.telegram_username}")
+            logger.error(f"TG: Не найден chat_id для {settings_obj.telegram_username}. Пользователь должен нажать /start в боте!")
             return
 
         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -45,7 +47,12 @@ def send_telegram(settings_obj, text):
 def send_whatsapp(phone, text):
     try:
         clean_phone = ''.join(filter(str.isdigit, str(phone)))
-        session = WahaSession.objects.filter(is_active=True).first()
+        try:
+            WahaSession = apps.get_model('accounts_apps', 'WahaSession')
+            session = WahaSession.objects.filter(is_active=True).first()
+        except Exception:
+            session = None
+
         api_url = session.api_url if session else settings.WAHA_API_URL
         session_name = session.session_name if session else getattr(settings, 'WAHA_SESSION_NAME', 'default')
         api_key = session.api_key if session else "5f0ed637143a4fddac67e3108cfd80ed"
@@ -79,21 +86,26 @@ def send_email_async(email, text):
     except Exception as e:
         logger.error(f"Email Notification Error: {e}")
 
-def format_human_readable_details(details_obj):
-    if not details_obj:
+def format_human_readable_details(details_raw):
+    if not details_raw:
         return "Нет деталей"
+    
     try:
-        data = details_obj
+        data = details_raw
         if isinstance(data, str):
             try:
-                data = json.loads(data.replace("'", '"'))
+                json_str = data.replace("'", '"').replace("None", "null").replace("True", "true").replace("False", "false")
+                data = json.loads(json_str)
             except Exception:
-                pass
+                try:
+                    data = ast.literal_eval(data)
+                except Exception:
+                    pass
         if isinstance(data, dict):
             lines = []
             if 'acting_role' in data:
                 lines.append(f"<b>Роль исполнителя:</b> {data['acting_role']}")
-                
+            
             changes = data.get('changes')
             if changes and isinstance(changes, dict):
                 lines.append("<b>Изменения:</b>")
@@ -103,17 +115,17 @@ def format_human_readable_details(details_obj):
                         new_v = str(values.get('стало', 'Пусто')).replace('<', '&lt;').replace('>', '&gt;')
                         lines.append(f" └ <i>{field}</i>: {old_v} ➔ {new_v}")
                     else:
-                        lines.append(f" └ <i>{field}</i>: {values}")
+                        val = str(values).replace('<', '&lt;').replace('>', '&gt;')
+                        lines.append(f" └ <i>{field}</i>: {val}")
             elif changes:
                 lines.append(f"<b>Изменения:</b> {changes}")
-            if not lines:
-                formatted = json.dumps(data, ensure_ascii=False, indent=2)
-                return f"<pre>{formatted}</pre>"
-            return "\n".join(lines)
-        return str(details_obj)
+            
+            return "\n".join(lines) if lines else "Детали есть, но список изменений пуст."
+        return str(details_raw).replace('<', '&lt;').replace('>', '&gt;')
+
     except Exception as e:
-        logger.error(f"Format Details Error: {e}")
-        return str(details_obj)
+        logger.error(f"Detail Parse Error: {e}")
+        return str(details_raw).replace('<', '&lt;').replace('>', '&gt;')
 
 def format_notification_message(instance):
     tz_utc_4 = timezone(timedelta(hours=4))
@@ -133,8 +145,9 @@ def dispatch_notifications(instance):
     privileged_users = UserRoles.objects.filter(role__in=['admin', 'root']).values_list('user_id', flat=True)
     active_settings = AdminNotificationSettings.objects.filter(user_id__in=privileged_users)
     html_text = format_notification_message(instance)
-    wa_text = html_text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_').replace('<pre>', '').replace('</pre>', '')
-    plain_text = html_text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '').replace('<pre>', '').replace('</pre>', '')
+    wa_text = html_text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_').replace('&lt;', '<').replace('&gt;', '>')
+    plain_text = html_text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '').replace('&lt;', '<').replace('&gt;', '>')
+
     for s in active_settings:
         if s.telegram_enabled and s.telegram_username:
             threading.Thread(target=send_telegram, args=(s, html_text), daemon=True).start()
@@ -145,9 +158,8 @@ def dispatch_notifications(instance):
 
 def dispatch_test_notification(s):
     html_text = "🔧 <b>Тестовое уведомление из системы uEasyCard</b>\nЕсли вы это читаете, интеграция работает успешно!"
-    
     wa_text = html_text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_')
-    plain_text = html_text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
+    plain_text = html_text.replace('<b>', '').replace('</b>', '')
 
     if s.telegram_enabled and s.telegram_username:
         threading.Thread(target=send_telegram, args=(s, html_text), daemon=True).start()
