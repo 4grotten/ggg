@@ -7,6 +7,7 @@ from datetime import timedelta, timezone
 from django.conf import settings
 from django.core.mail import send_mail
 from .models import AdminNotificationSettings, UserRoles, WahaSession
+from django.apps import apps
 
 logger = logging.getLogger(__name__)
 
@@ -46,11 +47,14 @@ def send_telegram(settings_obj, text):
 def send_whatsapp(phone, text):
     try:
         clean_phone = ''.join(filter(str.isdigit, str(phone)))
-        session = WahaSession.objects.filter(is_active=True).first()
-        api_url = session.api_url if session else settings.WAHA_API_URL
-        session_name = session.session_name if session else settings.WAHA_SESSION_NAME
-        api_key = session.api_key if session else "5f0ed637143a4fddac67e3108cfd80ed"
-        
+        try:
+            WahaSession = apps.get_model('accounts_apps', 'WahaSession')
+            session = WahaSession.objects.filter(is_active=True).first()
+        except Exception:
+            session = None
+        api_url = session.api_url if session else getattr(settings, 'WAHA_API_URL', 'http://waha:3000')
+        session_name = session.session_name if session else getattr(settings, 'WAHA_SESSION_NAME', 'default')
+        api_key = session.api_key if session else getattr(settings, 'WAHA_API_KEY', '5f0ed637143a4fddac67e3108cfd80ed')
         url = f"{api_url.rstrip('/')}/api/sendText"
         payload = {
             "chatId": f"{clean_phone}@c.us",
@@ -61,12 +65,15 @@ def send_whatsapp(phone, text):
             "Content-Type": "application/json",
             "X-Api-Key": api_key
         }
+        resp = requests.post(url, json=payload, headers=headers, timeout=30)
         
-        resp = requests.post(url, json=payload, headers=headers, timeout=15)
         if resp.status_code not in [200, 201]:
             logger.error(f"WAHA Error: {resp.status_code} - {resp.text}")
+        else:
+            logger.info(f"WhatsApp message sent to {clean_phone} successfully.")
     except Exception as e:
-        logger.error(f"WhatsApp Notification Error: {e}")
+        logger.error(f"WhatsApp Notification Error: {str(e)}")
+
 
 def send_email_async(email, text):
     try:

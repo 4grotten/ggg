@@ -639,15 +639,14 @@ class TransactionInfoView(APIView):
 
 
 class OpenUserTransactionsView(APIView):
-    authentication_classes = []
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Получить транзакции пользователя (БЕЗ ТОКЕНА)",
+        operation_summary="Получить транзакции пользователя",
         tags=["Открытые API (Публичные)"]
     )
-    def get(self, request, target_user_id):
-        user_id_str = str(target_user_id)
+    def get(self, request):
+        user_id_str = str(request.user.id)
         limit = int(request.query_params.get('limit', 50))
         offset = int(request.query_params.get('offset', 0))
 
