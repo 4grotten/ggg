@@ -19,7 +19,7 @@ export const ActionButtons = ({ onTopUp, onSend }: ActionButtonsProps) => {
     >
       <motion.button
         onClick={onTopUp}
-        className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3.5 rounded-xl hover:opacity-90 transition-all"
+        className="flex-1 flex items-center justify-center gap-2 bg-[#27AE60] hover:bg-[#219653] text-white font-semibold py-3.5 rounded-xl transition-all"
         whileTap={{ scale: 0.97 }}
         whileHover={{ scale: 1.02 }}
       >
