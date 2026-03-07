@@ -76,8 +76,8 @@ type CardLineType = 'card' | 'metal_card' | 'bank' | 'crypto' | 'total' | null;
 function detectCardLineType(children: ReactNode): CardLineType {
   const text = extractText(children).trim();
   if (/^💰/.test(text) || /итого/i.test(text)) return 'total';
-  if (/^🪙|usdt|крипто.*кошел/i.test(text)) return 'crypto';
-  if (/^🏦|iban|банк.*счёт|банк.*счет|bank/i.test(text)) return 'bank';
+  if (/🪙|usdt|крипто.*кошел|crypto/i.test(text)) return 'crypto';
+  if (/🏦|iban|банк.*счёт|банк.*счет|\bbank\b/i.test(text)) return 'bank';
   if (/^💳/.test(text)) {
     return /метал|metal/i.test(text) ? 'metal_card' : 'card';
   }
@@ -145,6 +145,10 @@ const markdownComponents = {
     return <strong className="font-bold text-foreground">{processChildren(children)}</strong>;
   },
   li: ({ children }: { children?: ReactNode }) => {
+    const lineType = detectCardLineType(children);
+    if (lineType) {
+      return <BalanceCard lineType={lineType}>{children}</BalanceCard>;
+    }
     return <li className="my-1 text-sm leading-relaxed">{processChildren(children)}</li>;
   },
   ul: ({ children }: { children?: ReactNode }) => {
