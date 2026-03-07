@@ -148,24 +148,26 @@ async function fetchAllBalances(userToken?: string): Promise<string> {
     console.error("Error parsing crypto wallets:", e);
   }
 
-  // Compose structured output
+  // Compose structured output - each card on separate line
   const result: string[] = [];
   
   if (cardLines.length > 0) {
-    result.push('КАРТЫ:');
-    result.push(...cardLines);
-    if (cardsTotal > 0) result.push(`💰 Итого на картах: ${cardsTotal.toFixed(2)} AED`);
+    cardLines.forEach(line => {
+      result.push(line);
+      result.push(''); // empty line between cards
+    });
+    if (cardsTotal > 0) {
+      result.push(`💰 Итого на картах: ${cardsTotal.toFixed(2)} AED`);
+      result.push('');
+    }
   }
   
   if (bankLines.length > 0) {
-    result.push('');
-    result.push('БАНКОВСКИЙ СЧЁТ:');
     result.push(...bankLines);
+    result.push('');
   }
   
   if (cryptoLines.length > 0) {
-    result.push('');
-    result.push('КРИПТО КОШЕЛЁК:');
     result.push(...cryptoLines);
   }
 
