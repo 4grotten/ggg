@@ -209,7 +209,7 @@ const ReportDownloadButton = ({ dateRange }: { dateRange: string }) => {
       a.href = url;
       
       const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      a.download = `EasyCard_Report_${fileDate}.csv`;
+      a.download = `uEasyCard_Report_${fileDate}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
