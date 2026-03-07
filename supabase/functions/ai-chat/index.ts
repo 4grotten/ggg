@@ -62,7 +62,11 @@ async function fetchUserAccountDetail(userToken: string, userId: string | number
     if (data.created_at) lines.push(`📅 Дата регистрации: ${formatDate(data.created_at)}`);
 
     // Include any IBAN/bank details
-    if (data.iban) lines.push(`🏦 IBAN: ${data.iban}`);
+    if (data.iban) {
+      const iban = String(data.iban);
+      const masked = iban.slice(0, 4) + '••••' + iban.slice(-4);
+      lines.push(`🏦 IBAN: ${masked}`);
+    }
     if (data.bank_name) lines.push(`🏦 Банк: ${data.bank_name}`);
     if (data.account_number) lines.push(`🔢 Номер счёта: ${data.account_number}`);
 
