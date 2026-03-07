@@ -1,47 +1,19 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark, Eye, EyeOff, Wallet, DollarSign } from "lucide-react";
+import { Copy, Upload, MessageSquare, Check, Wallet } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerClose,
-} from "@/components/ui/drawer";
 import { useSettings } from "@/contexts/SettingsContext";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
-import { useCryptoWallets, useCards } from "@/hooks/useCards";
+import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface Destination {
-  id: string;
-  type: "card" | "bank" | "wallet";
-  cardType?: "virtual" | "metal";
-  name: string;
-  subtitle: string;
-  fullNumber: string;
-  balance?: number;
-}
+const defaultNetwork = { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", apiValue: "TRC20" as const };
 
-const networks = [
-  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", apiValue: "TRC20" as const },
-  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20", apiValue: "ERC20" as const },
-  { id: "bep20", name: "BNB Chain (BEP20)", shortName: "BEP20", apiValue: "BEP20" as const },
-  { id: "sol", name: "Solana (SOL)", shortName: "SOL", apiValue: "SOL" as const },
-];
-
-// Fallback addresses for networks without a real wallet
-const fallbackAddresses: Record<string, string> = {
-  trc20: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc",
-  erc20: "0x4A8b2e1F7cD9E3a6B5f0C2d8E9F1a3B4c5D6e7F8",
-  bep20: "0x7F2c9A3d5E8b1C4f6D0a2B9e7F3c5A8d1E4b6C9D",
-  sol: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgHkv",
-};
+const fallbackTrc20Address = "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc";
 
 const TopUpCrypto = () => {
   const navigate = useNavigate();
@@ -50,78 +22,24 @@ const TopUpCrypto = () => {
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
   const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
-  const { data: cardsData } = useCards();
 
-  // Build a network→address map from real wallets
-  const walletAddressMap = useMemo(() => {
-    const map: Record<string, string> = { ...fallbackAddresses };
+  const walletAddress = useMemo(() => {
     if (cryptoWalletsData?.data) {
-      for (const w of cryptoWalletsData.data) {
-        const key = w.network.toLowerCase();
-        map[key] = w.address;
-      }
+      const trc20Wallet = cryptoWalletsData.data.find(w => w.network.toLowerCase() === "trc20");
+      if (trc20Wallet) return trc20Wallet.address;
     }
-    return map;
+    return fallbackTrc20Address;
   }, [cryptoWalletsData]);
 
   const walletLabel = t("drawer.usdtBalance", "USDT TRC20 Кошелек");
-  const primaryWalletAddress = walletAddressMap.trc20;
-
-  const destinations = useMemo((): Destination[] => {
-    const dests: Destination[] = [];
-    
-    // Add real cards from API
-    if (cardsData?.data) {
-      for (const card of cardsData.data) {
-        dests.push({
-          id: card.id,
-          type: "card",
-          cardType: card.type === "metal" ? "metal" : "virtual",
-          name: card.name,
-          subtitle: `•••• ${card.lastFourDigits || "0000"}`,
-          fullNumber: `**** **** **** ${card.lastFourDigits || "0000"}`,
-          balance: card.balance,
-        });
-      }
-    }
-    
-    // Bank account
-    dests.push({ 
-      id: "bank", type: "bank", name: t("topUp.bankAccountAed", "Bank Account AED"), 
-      subtitle: "•••• 3456", fullNumber: "AE070331234567893456" 
-    });
-    
-    // Wallet
-    dests.push({ 
-      id: "wallet", type: "wallet", name: walletLabel, 
-      subtitle: `${primaryWalletAddress.slice(0, 6)}...${primaryWalletAddress.slice(-4)}`, 
-      fullNumber: primaryWalletAddress 
-    });
-    
-    return dests;
-  }, [cardsData, t, walletLabel, primaryWalletAddress]);
+  const selectedNetwork = defaultNetwork;
 
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedDest, setSelectedDest] = useState<Destination | null>(null);
-  const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
-  const [destDrawerOpen, setDestDrawerOpen] = useState(false);
-  const [revealedId, setRevealedId] = useState<string | null>(null);
-  const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
-
-  // Set default destination to wallet when destinations load
-  useEffect(() => {
-    if (!selectedDest && destinations.length > 0) {
-      setSelectedDest(destinations.find(d => d.type === "wallet") || destinations[0]);
-    }
-  }, [destinations, selectedDest]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  
-  // Use real wallet address for selected network
-  const walletAddress = walletAddressMap[selectedNetwork.id] || fallbackAddresses.trc20;
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
@@ -174,7 +92,7 @@ const TopUpCrypto = () => {
         {/* Title */}
         <div className="pt-4 pb-6">
           <h1 className="text-2xl font-bold text-center text-foreground">
-            {t("topUp.yourAddress")}
+            {t("topUp.topUpToUsdt", "Пополнить на USDT")}
           </h1>
         </div>
 
@@ -212,34 +130,16 @@ const TopUpCrypto = () => {
 
         {/* Info Cards */}
         <div className="px-6 space-y-3 flex-1">
-          {selectedDest && (
-            <button 
-              onClick={() => setDestDrawerOpen(true)}
-              className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between"
-            >
-              <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
-              <div className="flex items-center gap-2">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                  selectedDest.type === "bank"
-                    ? "bg-purple-500"
-                    : selectedDest.type === "wallet"
-                      ? "bg-[#26A17B]"
-                      : selectedDest.cardType === "metal" 
-                        ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                        : "bg-primary"
-                }`}>
-                  {selectedDest.type === "bank" 
-                    ? <Landmark className="w-3.5 h-3.5 text-primary-foreground" />
-                    : selectedDest.type === "wallet"
-                      ? <Wallet className="w-3.5 h-3.5 text-white" />
-                      : <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
-                  }
-                </div>
-                <span className="font-semibold text-foreground">{selectedDest.name}</span>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          {/* Destination: USDT wallet (fixed) */}
+          <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
+            <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center bg-[#26A17B]">
+                <Wallet className="w-3.5 h-3.5 text-white" />
               </div>
-            </button>
-          )}
+              <span className="font-semibold text-foreground">{walletLabel}</span>
+            </div>
+          </div>
 
           {/* Receive Token */}
           <div className="bg-muted rounded-2xl p-4 flex items-center justify-between">
@@ -252,20 +152,16 @@ const TopUpCrypto = () => {
             </div>
           </div>
 
-          {/* Network */}
-          <button 
-            onClick={() => setNetworkDrawerOpen(true)}
-            className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between"
-          >
+          {/* Network (fixed: Tron) */}
+          <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
             <span className="text-muted-foreground">{t("topUp.network")}</span>
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-foreground" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <span className="font-semibold text-foreground">{selectedNetwork.name}</span>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </div>
-          </button>
+          </div>
 
           {/* Fees */}
           <div className="bg-muted rounded-2xl p-4 space-y-2">
@@ -324,135 +220,6 @@ const TopUpCrypto = () => {
         </button>
       </div>
 
-      {/* Destination Selection Drawer */}
-      <Drawer open={destDrawerOpen} onOpenChange={setDestDrawerOpen}>
-        <DrawerContent className="bg-background/95 backdrop-blur-xl">
-          <DrawerHeader className="relative flex items-center justify-center py-4">
-            <DrawerTitle className="text-center text-base font-semibold">
-              {t("topUp.topUpTo")}
-            </DrawerTitle>
-            <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-              <X className="w-3.5 h-3.5 text-primary" />
-            </DrawerClose>
-          </DrawerHeader>
-          
-          <div className="px-4 pb-6">
-            <div className="bg-muted/50 rounded-xl overflow-hidden">
-              {destinations.map((dest, index) => (
-                <button
-                  key={dest.id}
-                  onClick={() => {
-                    setSelectedDest(dest);
-                    setDestDrawerOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
-                    index < destinations.length - 1 ? 'border-b border-border/50' : ''
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    dest.type === "bank"
-                      ? "bg-purple-500"
-                      : dest.type === "wallet"
-                        ? "bg-[#26A17B]"
-                        : dest.cardType === "metal" 
-                          ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                          : "bg-primary"
-                  }`}>
-                    {dest.type === "bank" 
-                      ? <Landmark className="w-5 h-5 text-primary-foreground" />
-                      : dest.type === "wallet"
-                        ? <Wallet className="w-5 h-5 text-white" />
-                        : <CreditCard className="w-5 h-5 text-primary-foreground" />
-                    }
-                  </div>
-                  <div className="flex-1 text-left">
-                    <div className="flex items-center gap-2">
-                      <p className="text-base font-medium text-foreground">{dest.name}</p>
-                      {dest.type === "card" && dest.cardType && (
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                          dest.cardType === "metal" 
-                            ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300" 
-                            : "bg-primary/10 text-primary"
-                        }`}>
-                          {dest.cardType === "metal" ? "Metal" : "Virtual"}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground font-mono">
-                        {revealedId === dest.id ? dest.fullNumber : dest.subtitle}
-                      </p>
-                      {dest.type === "card" && dest.balance !== undefined && (
-                        <span className="text-xs text-muted-foreground">
-                          · {dest.balance.toFixed(2)} AED
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {selectedDest?.id === dest.id && (
-                    <Check className="w-5 h-5 text-primary" />
-                  )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setRevealedId(revealedId === dest.id ? null : dest.id);
-                    }}
-                    className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-                  >
-                    {revealedId === dest.id
-                      ? <EyeOff className="w-4 h-4 text-muted-foreground" />
-                      : <Eye className="w-4 h-4 text-muted-foreground" />
-                    }
-                  </button>
-                </button>
-              ))}
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
-
-      {/* Network Selection Drawer */}
-      <Drawer open={networkDrawerOpen} onOpenChange={setNetworkDrawerOpen}>
-        <DrawerContent className="bg-background/95 backdrop-blur-xl">
-          <DrawerHeader className="relative flex items-center justify-center py-4">
-            <DrawerTitle className="text-center text-base font-semibold">
-              {t("topUp.selectNetwork")}
-            </DrawerTitle>
-            <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-              <X className="w-3.5 h-3.5 text-primary" />
-            </DrawerClose>
-          </DrawerHeader>
-          
-          <div className="px-4 pb-6">
-            <div className="bg-muted/50 rounded-xl overflow-hidden">
-              {networks.map((network, index) => (
-                <button
-                  key={network.id}
-                  onClick={() => {
-                    setSelectedNetwork(network);
-                    setNetworkDrawerOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-4 hover:bg-muted/80 transition-colors ${
-                    index < networks.length - 1 ? 'border-b border-border/50' : ''
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-                    <svg className="w-5 h-5 text-foreground" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="text-base font-medium text-foreground">{network.name}</p>
-                  </div>
-                  {selectedNetwork.id === network.id && (
-                    <Check className="w-5 h-5 text-primary" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
     </MobileLayout>
   );
 };
