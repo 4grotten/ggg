@@ -106,9 +106,9 @@ const cardLineStyles: Record<Exclude<CardLineType, null>, { bg: string; iconBg: 
   },
   crypto: {
     bg: "bg-muted/80 border border-border/30",
-    iconBg: "bg-orange-500/15",
-    icon: Bitcoin,
-    iconColor: "text-orange-500",
+    iconBg: "bg-[#26A17B]/15",
+    icon: ({ className }: { className?: string }) => <UsdtIcon size={20} className={className} />,
+    iconColor: "",
   },
   total: {
     bg: "bg-primary/15 border border-primary/20",
