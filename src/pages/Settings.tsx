@@ -1830,7 +1830,7 @@ const Settings = () => {
                     📌 {t("settings.telegramHint") || "Чтобы получать уведомления в Telegram:"}
                   </p>
                   <ol className="text-[11px] text-muted-foreground leading-relaxed mt-1 ml-4 list-decimal space-y-0.5">
-                    <li>{t("settings.telegramStep1") || "Перейдите в бот"} <a href="https://t.me/uEasyCardLOGS_Bot" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-semibold">@uEasyCardLOGS_Bot</a></li>
+                    <li>{t("settings.telegramStep1") || "Перейдите в бот"} <a href="https://t.me/uEasyCard" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-semibold">@uEasyCard</a></li>
                     <li>{t("settings.telegramStep2") || "Нажмите кнопку"} <span className="font-semibold">Start</span></li>
                   </ol>
                 </div>
