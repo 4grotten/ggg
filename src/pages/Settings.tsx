@@ -33,6 +33,7 @@ import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { isHapticEnabled, setHapticEnabled, useHapticFeedback } from "@/hooks/useHapticFeedback";
+import { NotificationChannelItem } from "@/components/settings/NotificationChannelItem";
 
 // Telegram-style colored icon backgrounds with gradients
 const iconGradients: Record<string, string> = {
