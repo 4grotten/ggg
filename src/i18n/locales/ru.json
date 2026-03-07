@@ -964,7 +964,9 @@
     "limitResetsIn": "Лимит обновится через"
   },
   "drawer": {
-    "addMoneyWith": "Пополнить через",
+    "addMoneyWith": "Куда пополнить",
+    "shareCardDetails": "Поделиться данными карты",
+    "shareCardDetailsDesc": "Отправить реквизиты",
     "sendMoneyWith": "Отправить через",
     "stablecoins": "Стейблкоины",
     "bankTransfer": "Банковский перевод",
