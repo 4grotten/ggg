@@ -779,6 +779,8 @@
     "workingDays": "1-2 рабочих дня",
     "shareAedDetails": "Поделиться реквизитами AED",
     "yourAddress": "Ваш адрес",
+    "topUpToUsdt": "Пополнить на USDT",
+    "usdtWallet": "Кошелек USDT",
     "topUpTo": "Пополнить на",
     "receiveToken": "Получаемый токен",
     "network": "Сеть",

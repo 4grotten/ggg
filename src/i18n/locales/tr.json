@@ -712,6 +712,8 @@
     "workingDays": "1-2 iş günü",
     "shareAedDetails": "AED Hesap Bilgilerini Paylaş",
     "yourAddress": "Adresiniz",
+    "topUpToUsdt": "USDT'ye yükle",
+    "usdtWallet": "USDT Cüzdanı",
     "topUpTo": "Yüklenecek kart",
     "receiveToken": "Alınacak token",
     "network": "Ağ",

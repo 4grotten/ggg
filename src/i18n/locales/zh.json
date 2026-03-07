@@ -718,6 +718,8 @@
     "workingDays": "1-2个工作日",
     "shareAedDetails": "分享AED账户信息",
     "yourAddress": "您的地址",
+    "topUpToUsdt": "充值到USDT",
+    "usdtWallet": "USDT钱包",
     "topUpTo": "充值到",
     "receiveToken": "接收代币",
     "network": "网络",
