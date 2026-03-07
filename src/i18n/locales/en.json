@@ -1956,7 +1956,13 @@
       "sms": "SMS Notifications",
       "smsDesc": "Critical SMS notifications",
       "enabledMultiple": "Enabled",
-      "disabledMultiple": "Disabled"
+      "disabledMultiple": "Disabled",
+      "empty": "No notifications",
+      "clearAll": "Clear",
+      "justNow": "Just now",
+      "minAgo": "min ago",
+      "transferSent": "Transfer sent",
+      "profileUpdated": "Profile updated"
     }
   },
   "contacts": {

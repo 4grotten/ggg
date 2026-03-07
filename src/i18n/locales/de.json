@@ -1885,7 +1885,13 @@
       "sms": "SMS-Benachrichtigungen",
       "smsDesc": "Kritische SMS-Benachrichtigungen",
       "enabledMultiple": "Aktiviert",
-      "disabledMultiple": "Deaktiviert"
+      "disabledMultiple": "Deaktiviert",
+      "empty": "Keine Benachrichtigungen",
+      "clearAll": "Löschen",
+      "justNow": "Gerade eben",
+      "minAgo": "Min. her",
+      "transferSent": "Überweisung gesendet",
+      "profileUpdated": "Profil aktualisiert"
     }
   },
   "contacts": {

@@ -1885,7 +1885,13 @@
       "sms": "SMS Bildirimleri",
       "smsDesc": "Kritik SMS bildirimleri",
       "enabledMultiple": "Etkin",
-      "disabledMultiple": "Devre Dışı"
+      "disabledMultiple": "Devre Dışı",
+      "empty": "Bildirim yok",
+      "clearAll": "Temizle",
+      "justNow": "Şimdi",
+      "minAgo": "dk önce",
+      "transferSent": "Transfer gönderildi",
+      "profileUpdated": "Profil güncellendi"
     }
   },
   "contacts": {

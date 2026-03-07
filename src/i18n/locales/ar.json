@@ -1885,7 +1885,13 @@
       "sms": "إشعارات SMS",
       "smsDesc": "إشعارات SMS الحرجة",
       "enabledMultiple": "مفعلة",
-      "disabledMultiple": "معطلة"
+      "disabledMultiple": "معطلة",
+      "empty": "لا توجد إشعارات",
+      "clearAll": "مسح",
+      "justNow": "الآن",
+      "minAgo": "دقيقة مضت",
+      "transferSent": "تم إرسال التحويل",
+      "profileUpdated": "تم تحديث الملف الشخصي"
     }
   },
   "contacts": {

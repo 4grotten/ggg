@@ -1892,7 +1892,13 @@
       "sms": "短信通知",
       "smsDesc": "关键短信通知",
       "enabledMultiple": "已启用",
-      "disabledMultiple": "已禁用"
+      "disabledMultiple": "已禁用",
+      "empty": "暂无通知",
+      "clearAll": "清除",
+      "justNow": "刚刚",
+      "minAgo": "分钟前",
+      "transferSent": "转账已发送",
+      "profileUpdated": "个人资料已更新"
     }
   },
   "contacts": {
