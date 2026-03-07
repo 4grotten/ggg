@@ -1,6 +1,6 @@
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
-import { CreditCard, Wallet } from "lucide-react";
+import { CreditCard, Wallet, Landmark, Bitcoin } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface ChatMessageContentProps {
@@ -67,36 +67,60 @@ function extractText(children: ReactNode): string {
   return "";
 }
 
-function isBalanceLine(children: ReactNode): boolean {
-  return /^(💳|💰)/.test(extractText(children).trim());
+type CardLineType = 'card' | 'metal_card' | 'bank' | 'crypto' | 'total' | null;
+
+function detectCardLineType(children: ReactNode): CardLineType {
+  const text = extractText(children).trim();
+  if (/^💰/.test(text) || /итого/i.test(text)) return 'total';
+  if (/^🪙|usdt|крипто.*кошел/i.test(text)) return 'crypto';
+  if (/^🏦|iban|банк.*счёт|банк.*счет|bank/i.test(text)) return 'bank';
+  if (/^💳/.test(text)) {
+    return /метал|metal/i.test(text) ? 'metal_card' : 'card';
+  }
+  return null;
 }
 
-function isTotalLine(children: ReactNode): boolean {
-  return /^💰/.test(extractText(children).trim());
-}
+const cardLineStyles: Record<Exclude<CardLineType, null>, { bg: string; iconBg: string; icon: typeof CreditCard; iconColor: string }> = {
+  card: {
+    bg: "bg-muted/80 border border-border/30",
+    iconBg: "bg-primary/10",
+    icon: CreditCard,
+    iconColor: "text-primary",
+  },
+  metal_card: {
+    bg: "bg-muted/80 border border-border/30",
+    iconBg: "bg-amber-500/15",
+    icon: CreditCard,
+    iconColor: "text-amber-500",
+  },
+  bank: {
+    bg: "bg-muted/80 border border-border/30",
+    iconBg: "bg-emerald-500/15",
+    icon: Landmark,
+    iconColor: "text-emerald-500",
+  },
+  crypto: {
+    bg: "bg-muted/80 border border-border/30",
+    iconBg: "bg-orange-500/15",
+    icon: Bitcoin,
+    iconColor: "text-orange-500",
+  },
+  total: {
+    bg: "bg-primary/15 border border-primary/20",
+    iconBg: "bg-primary/20",
+    icon: Wallet,
+    iconColor: "text-primary",
+  },
+};
 
-function isMetalCard(children: ReactNode): boolean {
-  const text = extractText(children).toLowerCase();
-  return /метал|metal/i.test(text);
-}
+const BalanceCard = ({ children, lineType }: { children: ReactNode; lineType: Exclude<CardLineType, null> }) => {
+  const style = cardLineStyles[lineType];
+  const Icon = style.icon;
 
-const BalanceCard = ({ children, isTotal, isMetal }: { children: ReactNode; isTotal: boolean; isMetal: boolean }) => {
   return (
-    <div className={cn(
-      "my-1.5 px-3 py-3 rounded-xl text-sm leading-relaxed flex items-center gap-3",
-      isTotal
-        ? "bg-primary/15 border border-primary/20"
-        : "bg-muted/80 border border-border/30"
-    )}>
-      <div className={cn(
-        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
-        isTotal ? "bg-primary/20" : isMetal ? "bg-amber-500/15" : "bg-primary/10"
-      )}>
-        {isTotal ? (
-          <Wallet className={cn("w-5 h-5", "text-primary")} />
-        ) : (
-          <CreditCard className={cn("w-5 h-5", isMetal ? "text-amber-500" : "text-primary")} />
-        )}
+    <div className={cn("my-1.5 px-3 py-3 rounded-xl text-sm leading-relaxed flex items-center gap-3", style.bg)}>
+      <div className={cn("w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0", style.iconBg)}>
+        <Icon className={cn("w-5 h-5", style.iconColor)} />
       </div>
       <div className="flex-1 min-w-0">
         {processChildren(children)}
@@ -107,15 +131,9 @@ const BalanceCard = ({ children, isTotal, isMetal }: { children: ReactNode; isTo
 
 const markdownComponents = {
   p: ({ children }: { children?: ReactNode }) => {
-    if (isBalanceLine(children)) {
-      return (
-        <BalanceCard
-          isTotal={isTotalLine(children)}
-          isMetal={isMetalCard(children)}
-        >
-          {children}
-        </BalanceCard>
-      );
+    const lineType = detectCardLineType(children);
+    if (lineType) {
+      return <BalanceCard lineType={lineType}>{children}</BalanceCard>;
     }
     return <p className="my-1.5 text-sm leading-relaxed">{processChildren(children)}</p>;
   },
