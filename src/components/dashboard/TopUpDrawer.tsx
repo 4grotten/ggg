@@ -75,7 +75,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     } else if (optionId === "bank") {
       navigate("/top-up/bank");
     } else if (optionId === "share-card") {
-      navigate("/top-up/share-card");
+      navigate("/card/virtual");
     }
   };
 
