@@ -894,6 +894,7 @@
     "recipientGets": "Получатель получит",
     "networkFee": "Сбор сети",
     "sendToStablecoins": "Отправить AED в стейблкоины",
+    "sendUsdt": "Отправить USDT",
     "withdrawToWallet": "Вывод на внешний кошелёк",
     "stepOf": "Шаг {{step}} из {{total}}",
     "cardNumber": "Номер карты",

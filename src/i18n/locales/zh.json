@@ -830,6 +830,7 @@
     "totalDebit": "总扣款",
     "checkingRecipient": "正在验证收款人…",
     "sendToStablecoins": "将AED发送到稳定币",
+    "sendUsdt": "发送USDT",
     "withdrawToWallet": "提现到外部钱包",
     "stepOf": "第 {{step}} 步，共 {{total}} 步",
     "cardNumber": "卡号",

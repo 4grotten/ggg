@@ -824,6 +824,7 @@
     "totalDebit": "Toplam borç",
     "checkingRecipient": "Alıcı kontrol ediliyor…",
     "sendToStablecoins": "AED'yi Stablecoin'lere Gönder",
+    "sendUsdt": "USDT Gönder",
     "withdrawToWallet": "Harici cüzdana çek",
     "stepOf": "Adım {{step}} / {{total}}",
     "cardNumber": "Kart Numarası",
