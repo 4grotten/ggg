@@ -278,8 +278,8 @@ serve(async (req) => {
 ### Информация об аккаунте:
 ${accountDetailText}
 
-### Балансы карт:
-${cardBalancesText}`;
+### Все балансы (карты, счета, крипто):
+${allBalancesText}`;
 
     if (financialData) {
       userDataContext += `
