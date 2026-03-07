@@ -10,7 +10,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { useSettings } from "@/contexts/SettingsContext";
 import { UsdtIcon } from "@/components/icons/CryptoIcons";
-import { useCards } from "@/hooks/useCards";
+import { useCards, useWalletSummary } from "@/hooks/useCards";
 import { useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
 import { Card } from "@/types/card";
 import { useAuth } from "@/contexts/AuthContext";
