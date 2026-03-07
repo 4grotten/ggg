@@ -81,7 +81,7 @@ export async function requestPushPermission(): Promise<boolean> {
 }
 
 export function isPushEnabled(): boolean {
-  return localStorage.getItem('notif_push_enabled') === 'true';
+  return localStorage.getItem('push_notifications_enabled') === 'true';
 }
 
 // Send both browser push (local) and in-app notification
