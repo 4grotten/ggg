@@ -1,6 +1,10 @@
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
-import { CreditCard, Wallet, Landmark, Bitcoin } from "lucide-react";
+import { CreditCard, Wallet, Landmark, Bitcoin, FileDown, Loader2, CheckCircle } from "lucide-react";
+import { getAuthToken } from "@/services/api/apiClient";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import type { ReactNode } from "react";
 
 interface ChatMessageContentProps {
