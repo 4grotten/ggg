@@ -48,7 +48,7 @@ const TopUpCrypto = () => {
   const settings = useSettings();
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
-  const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
+  const { data: cardsData } = useCards();
 
   // Build a network→address map from real wallets
   const walletAddressMap = useMemo(() => {
@@ -65,24 +65,55 @@ const TopUpCrypto = () => {
   const walletLabel = t("drawer.usdtBalance", "USDT TRC20 Кошелек");
   const primaryWalletAddress = walletAddressMap.trc20;
 
-  const getDestinations = (): Destination[] => [
-    { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
-    { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
-    { id: "bank", type: "bank", name: t("topUp.bankAccountAed", "Bank Account AED"), subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
-    { id: "wallet", type: "wallet", name: walletLabel, subtitle: `${primaryWalletAddress.slice(0, 6)}...${primaryWalletAddress.slice(-4)}`, fullNumber: primaryWalletAddress },
-  ];
+  const destinations = useMemo((): Destination[] => {
+    const dests: Destination[] = [];
+    
+    // Add real cards from API
+    if (cardsData?.data) {
+      for (const card of cardsData.data) {
+        dests.push({
+          id: card.id,
+          type: "card",
+          cardType: card.type === "metal" ? "metal" : "virtual",
+          name: card.name,
+          subtitle: `•••• ${card.lastFourDigits || "0000"}`,
+          fullNumber: `**** **** **** ${card.lastFourDigits || "0000"}`,
+          balance: card.balance,
+        });
+      }
+    }
+    
+    // Bank account
+    dests.push({ 
+      id: "bank", type: "bank", name: t("topUp.bankAccountAed", "Bank Account AED"), 
+      subtitle: "•••• 3456", fullNumber: "AE070331234567893456" 
+    });
+    
+    // Wallet
+    dests.push({ 
+      id: "wallet", type: "wallet", name: walletLabel, 
+      subtitle: `${primaryWalletAddress.slice(0, 6)}...${primaryWalletAddress.slice(-4)}`, 
+      fullNumber: primaryWalletAddress 
+    });
+    
+    return dests;
+  }, [cardsData, t, walletLabel, primaryWalletAddress]);
 
-  const destinations = getDestinations();
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedDest, setSelectedDest] = useState<Destination>(() => {
-    return destinations.find(d => d.type === "wallet") || destinations[0];
-  });
+  const [selectedDest, setSelectedDest] = useState<Destination | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
   const [destDrawerOpen, setDestDrawerOpen] = useState(false);
   const [revealedId, setRevealedId] = useState<string | null>(null);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
-  
+
+  // Set default destination to wallet when destinations load
+  useEffect(() => {
+    if (!selectedDest && destinations.length > 0) {
+      setSelectedDest(destinations.find(d => d.type === "wallet") || destinations[0]);
+    }
+  }, [destinations, selectedDest]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
