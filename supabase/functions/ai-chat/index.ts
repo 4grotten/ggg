@@ -232,32 +232,17 @@ serve(async (req) => {
   try {
     const { messages, user_id, external_user_id, backend_token } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
     
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY is not configured");
       throw new Error("AI service is not configured");
     }
 
-    // Determine user ID for fetching financial data
-    // Priority: explicit user_id > external_user_id mapping > demo user
-    let effectiveUserId = user_id || '00000000-0000-0000-0000-000000000001';
+    console.log(`Fetching data for external_user_id: ${external_user_id}`);
     
-    if (external_user_id && !user_id) {
-      // Map external user ID to Supabase UUID (same mapping as get-transactions)
-      const externalUserMapping: Record<number, string> = {
-        1: '00000000-0000-0000-0000-000000000001',
-      };
-      effectiveUserId = externalUserMapping[parseInt(external_user_id)] || effectiveUserId;
-    }
-
-    console.log(`Fetching financial data for user: ${effectiveUserId}, external_user_id: ${external_user_id}`);
-    
-    // Fetch user's financial data, card balances, and account detail in parallel
-    const [financialData, allBalancesText, accountDetailText] = await Promise.all([
-      fetchUserFinancialData(supabase, effectiveUserId),
+    // Fetch all data from backend API in parallel
+    const [transactionsText, allBalancesText, accountDetailText] = await Promise.all([
+      fetchTransactionsFromApi(backend_token),
       fetchAllBalances(backend_token),
       backend_token && external_user_id 
         ? fetchUserAccountDetail(backend_token, external_user_id)
@@ -272,19 +257,10 @@ serve(async (req) => {
 ${accountDetailText}
 
 ### Все балансы (карты, счета, крипто):
-${allBalancesText}`;
+${allBalancesText}
 
-    if (financialData) {
-      userDataContext += `
-
-### Последние транзакции:
-${financialData.transactions}
-
-### Расходы по категориям:
-${financialData.categories || 'Нет данных по категориям'}
-
-Всего транзакций: ${financialData.transactionCount}`;
-    }
+### История транзакций:
+${transactionsText}`;
 
     console.log("Sending request to AI gateway with", messages.length, "messages");
 
