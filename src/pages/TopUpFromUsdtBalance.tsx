@@ -10,7 +10,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { CardMiniature } from "@/components/dashboard/CardMiniature";
 import { useSettings } from "@/contexts/SettingsContext";
 import { UsdtIcon } from "@/components/icons/CryptoIcons";
-import { useCards } from "@/hooks/useCards";
+import { useCards, useWalletSummary } from "@/hooks/useCards";
 import { useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
 import { Card } from "@/types/card";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,6 +24,7 @@ const TopUpFromUsdtBalance = () => {
   const { t } = useTranslation();
   const settings = useSettings();
   const { data: cardsData } = useCards();
+  const { data: walletSummary } = useWalletSummary();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   
@@ -35,6 +36,7 @@ const TopUpFromUsdtBalance = () => {
   const cryptoWalletId = cryptoWalletsData?.data?.[0]?.id;
   const cryptoBalance = parseFloat(cryptoWalletsData?.data?.[0]?.balance || '0');
   const bankAccountId = bankAccountsData?.data?.[0]?.id;
+  const bankIban = bankAccountsData?.data?.[0]?.iban || walletSummary?.data?.physical_account?.iban;
 
   const uid = user?.id?.toString() ?? "000";
   const beneficiaryName = user?.full_name || "—";
@@ -84,9 +86,24 @@ const TopUpFromUsdtBalance = () => {
   const handleConfirm = async () => {
     if (!isReadyToConfirm || !cryptoWalletId) return;
     
-    // Determine to_type and to_id based on destination
-    const toType = destination === "card" ? "card" : "bank";
-    const toId = destination === "card" ? selectedCard!.id : bankAccountId;
+    // For crypto→card: backend expects full card_number, not card ID
+    // For crypto→bank: backend expects IBAN
+    let toId: string | undefined;
+    let toType: "card" | "bank" | "crypto";
+    
+    if (destination === "card") {
+      toType = "card";
+      // Get full card number from wallet summary
+      const summaryCard = walletSummary?.data?.cards?.find(c => c.id === selectedCard!.id);
+      toId = summaryCard?.card_number;
+      if (!toId) {
+        toast.error(t("topUpUsdt.noDestinationAccount", "Номер карты не найден"));
+        return;
+      }
+    } else {
+      toType = "bank";
+      toId = bankIban;
+    }
     
     if (!toId) {
       toast.error(t("topUpUsdt.noDestinationAccount", "Счёт назначения не найден"));
