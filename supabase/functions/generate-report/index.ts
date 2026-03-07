@@ -78,34 +78,57 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     // Build masked account details for sender
     const senderDetails: string[] = [];
     if (tx.sender_card_mask) senderDetails.push(`•••• ${tx.sender_card_mask.slice(-4)}`);
-    if (tx.metadata?.sender_iban_mask) senderDetails.push(tx.metadata.sender_iban_mask);
-    else if (tx.metadata?.sender_iban) {
-      const iban = String(tx.metadata.sender_iban);
-      senderDetails.push(`${iban.slice(0, 4)}••••${iban.slice(-4)}`);
+    // IBAN
+    const sIban = tx.metadata?.sender_iban_mask || tx.metadata?.sender_iban || tx.metadata?.from_iban;
+    if (sIban) {
+      const s = String(sIban);
+      senderDetails.push(s.length > 8 ? `${s.slice(0, 4)}••••${s.slice(-4)}` : s);
     }
-    if (tx.metadata?.from_address) {
-      const addr = String(tx.metadata.from_address);
-      senderDetails.push(`${addr.slice(0, 6)}••••${addr.slice(-4)}`);
+    // Crypto address
+    const sAddr = tx.metadata?.from_address || tx.metadata?.from_wallet_address || tx.metadata?.crypto_address || tx.metadata?.sender_crypto_address;
+    if (sAddr) {
+      const a = String(sAddr);
+      senderDetails.push(`${a.slice(0, 6)}••••${a.slice(-4)}`);
     }
-    if (tx.metadata?.from_wallet_address) {
-      const addr = String(tx.metadata.from_wallet_address);
-      senderDetails.push(`${addr.slice(0, 6)}••••${addr.slice(-4)}`);
+    // Card number from metadata
+    if (tx.metadata?.from_card_number || tx.metadata?.sender_card_number) {
+      const c = String(tx.metadata?.from_card_number || tx.metadata?.sender_card_number);
+      senderDetails.push(`•••• ${c.slice(-4)}`);
+    }
+    // Movements fallback (index 0 = sender)
+    if (senderDetails.length === 0 && tx.movements && Array.isArray(tx.movements) && tx.movements[0]) {
+      const m = tx.movements[0];
+      if (m.card_mask) senderDetails.push(`•••• ${m.card_mask.slice(-4)}`);
+      else if (m.iban) { const i = String(m.iban); senderDetails.push(`${i.slice(0, 4)}••••${i.slice(-4)}`); }
+      else if (m.address) { const a = String(m.address); senderDetails.push(`${a.slice(0, 6)}••••${a.slice(-4)}`); }
     }
     
     // Build masked account details for receiver
     const receiverDetails: string[] = [];
     if (tx.receiver_card_mask) receiverDetails.push(`•••• ${tx.receiver_card_mask.slice(-4)}`);
-    if (tx.metadata?.receiver_iban_mask || tx.metadata?.beneficiary_iban) {
-      const iban = String(tx.metadata?.receiver_iban_mask || tx.metadata?.beneficiary_iban);
-      receiverDetails.push(iban.length > 8 ? `${iban.slice(0, 4)}••••${iban.slice(-4)}` : iban);
+    // IBAN
+    const rIban = tx.metadata?.receiver_iban_mask || tx.metadata?.beneficiary_iban || tx.metadata?.receiver_iban || tx.metadata?.to_iban;
+    if (rIban) {
+      const s = String(rIban);
+      receiverDetails.push(s.length > 8 ? `${s.slice(0, 4)}••••${s.slice(-4)}` : s);
     }
-    if (tx.metadata?.to_address || tx.metadata?.to_wallet_address) {
-      const addr = String(tx.metadata?.to_address || tx.metadata?.to_wallet_address);
-      receiverDetails.push(`${addr.slice(0, 6)}••••${addr.slice(-4)}`);
+    // Crypto address
+    const rAddr = tx.metadata?.to_address || tx.metadata?.to_wallet_address || tx.metadata?.receiver_crypto_address;
+    if (rAddr) {
+      const a = String(rAddr);
+      receiverDetails.push(`${a.slice(0, 6)}••••${a.slice(-4)}`);
     }
-    if (tx.metadata?.receiver_card_number) {
-      const card = String(tx.metadata.receiver_card_number);
-      receiverDetails.push(`•••• ${card.slice(-4)}`);
+    // Card number
+    if (tx.metadata?.receiver_card_number || tx.metadata?.to_card_number) {
+      const c = String(tx.metadata?.receiver_card_number || tx.metadata?.to_card_number);
+      receiverDetails.push(`•••• ${c.slice(-4)}`);
+    }
+    // Movements fallback (index 1 = receiver)
+    if (receiverDetails.length === 0 && tx.movements && Array.isArray(tx.movements) && tx.movements[1]) {
+      const m = tx.movements[1];
+      if (m.card_mask) receiverDetails.push(`•••• ${m.card_mask.slice(-4)}`);
+      else if (m.iban) { const i = String(m.iban); receiverDetails.push(`${i.slice(0, 4)}••••${i.slice(-4)}`); }
+      else if (m.address) { const a = String(m.address); receiverDetails.push(`${a.slice(0, 6)}••••${a.slice(-4)}`); }
     }
     
     const senderMask = senderDetails.length > 0 ? esc(senderDetails.join(' · ')) : '—';
