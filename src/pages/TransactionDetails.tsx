@@ -2430,7 +2430,7 @@ const TransactionDetails = () => {
         </div>
 
         {/* Sender block */}
-        {receipt && (receipt.sender_name || (receipt as any).sender_card_mask || (receipt as any).sender_iban || (receipt as any).sender_iban_mask || (receipt as any).sender_bank || transaction.fromWalletAddress) && (
+        {receipt && (receipt.sender_name || (receipt as any).sender_card_mask || (receipt as any).sender_iban || (receipt as any).sender_iban_mask || (receipt as any).sender_bank || transaction.fromWalletAddress || (isCryptoToIbanCryptoSender && (receipt as any).crypto_address)) && (
           <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/30">
             <div className="flex items-center justify-between px-5 py-3.5 bg-[#007AFF]/10 border-b border-[#007AFF]/15">
               <div className="flex items-center gap-2.5">
