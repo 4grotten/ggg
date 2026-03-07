@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, QrCode, Landmark, Wallet, X } from "lucide-react";
+import { ChevronRight, QrCode, Landmark, Wallet, X, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Drawer,
@@ -51,6 +51,13 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
       subtitle: "AED Wire",
       iconBg: "bg-purple-500",
     },
+    {
+      id: "share-card",
+      icon: Share2,
+      title: t("drawer.shareCardDetails", "Поделиться данными карты"),
+      subtitle: t("drawer.shareCardDetailsDesc", "Отправить реквизиты"),
+      iconBg: "bg-orange-500",
+    },
   ];
 
   const handleOptionClick = (optionId: string) => {
@@ -67,6 +74,8 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
       navigate("/top-up/crypto");
     } else if (optionId === "bank") {
       navigate("/top-up/bank");
+    } else if (optionId === "share-card") {
+      navigate("/top-up/share-card");
     }
   };
 
