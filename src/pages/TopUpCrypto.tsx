@@ -5,13 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerClose,
-} from "@/components/ui/drawer";
+import { useSettings } from "@/contexts/SettingsContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
