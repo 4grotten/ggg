@@ -181,6 +181,7 @@ const Dashboard = () => {
           <div className="flex items-center gap-2">
             <ThemeSwitcher />
             <LanguageSwitcher />
+            {isAuthenticated && <NotificationBell />}
             <DashboardHeader
               isAuthenticated={isAuthenticated}
               displayName={displayName}
