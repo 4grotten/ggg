@@ -89,7 +89,7 @@ const TopUpFromUsdtBalance = () => {
     // For crypto→card: backend expects full card_number, not card ID
     // For crypto→bank: backend expects IBAN
     let toId: string | undefined;
-    let toType: string;
+    let toType: "card" | "bank" | "crypto";
     
     if (destination === "card") {
       toType = "card";
