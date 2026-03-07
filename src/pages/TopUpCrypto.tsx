@@ -10,8 +10,6 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCryptoWallets, useCards } from "@/hooks/useCards";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface Destination {
   id: string;
