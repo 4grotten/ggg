@@ -99,10 +99,8 @@ const TopUpCrypto = () => {
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
   const [selectedDest, setSelectedDest] = useState<Destination | null>(null);
-  const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
-  const [destDrawerOpen, setDestDrawerOpen] = useState(false);
+  const selectedNetwork = defaultNetwork;
   const [revealedId, setRevealedId] = useState<string | null>(null);
-  const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
 
   // Set default destination to wallet when destinations load
   useEffect(() => {
