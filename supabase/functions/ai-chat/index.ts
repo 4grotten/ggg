@@ -30,6 +30,58 @@ function formatDate(dateStr: string): string {
   return `${day}.${month}.${year}`;
 }
 
+async function fetchUserAccountDetail(userToken: string, userId: string | number): Promise<string> {
+  try {
+    const url = `https://ueasycard.com/api/v1/accounts/open/users/${userId}/detail/`;
+    console.log("Fetching user account detail from:", url);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Token ${userToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error("User detail API error:", response.status);
+      return "Данные аккаунта временно недоступны.";
+    }
+
+    const data = await response.json();
+    console.log("User account detail keys:", Object.keys(data));
+
+    const lines: string[] = [];
+
+    if (data.first_name || data.last_name) {
+      lines.push(`👤 Имя: ${[data.first_name, data.last_name].filter(Boolean).join(' ')}`);
+    }
+    if (data.email) lines.push(`📧 Email: ${data.email}`);
+    if (data.phone) lines.push(`📱 Телефон: ${data.phone}`);
+    if (data.balance !== undefined) lines.push(`💰 Баланс счёта: ${data.balance} AED`);
+    if (data.status) lines.push(`📋 Статус аккаунта: ${data.status}`);
+    if (data.is_verified !== undefined) lines.push(`✅ Верификация: ${data.is_verified ? 'Пройдена' : 'Не пройдена'}`);
+    if (data.created_at) lines.push(`📅 Дата регистрации: ${formatDate(data.created_at)}`);
+
+    // Include any IBAN/bank details
+    if (data.iban) lines.push(`🏦 IBAN: ${data.iban}`);
+    if (data.bank_name) lines.push(`🏦 Банк: ${data.bank_name}`);
+    if (data.account_number) lines.push(`🔢 Номер счёта: ${data.account_number}`);
+
+    // Include any additional fields dynamically
+    const knownKeys = new Set(['first_name', 'last_name', 'email', 'phone', 'balance', 'status', 'is_verified', 'created_at', 'iban', 'bank_name', 'account_number', 'id', 'avatar', 'avatar_url', 'password', 'token']);
+    for (const [key, value] of Object.entries(data)) {
+      if (!knownKeys.has(key) && value !== null && value !== undefined && typeof value !== 'object') {
+        lines.push(`ℹ️ ${key}: ${value}`);
+      }
+    }
+
+    return lines.length > 0 ? lines.join('\n') : 'Нет данных аккаунта.';
+  } catch (err) {
+    console.error("Error fetching user account detail:", err);
+    return "Ошибка при получении данных аккаунта.";
+  }
+}
+
 async function fetchCardBalances(userToken?: string): Promise<string> {
   try {
     const BACKEND_BASE = "https://ueasycard.com/api/v1";
