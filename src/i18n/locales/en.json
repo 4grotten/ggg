@@ -345,7 +345,11 @@
     "appAlreadyInstalled": "App is already installed",
     "installInstructions": "Tap Share → Add to Home Screen to install",
     "appIconChanged": "App icon updated",
-    "reinstallForIcon": "Reinstall the app to apply the new icon"
+    "reinstallForIcon": "Reinstall the app to apply the new icon",
+    "pushEnabled": "Push notifications enabled",
+    "pushDisabled": "Push notifications disabled",
+    "pushDenied": "Notification permission denied. Allow in browser settings.",
+    "pushNotSupported": "Push notifications are not supported in this browser"
   },
   "share": {
     "cardDetails": "Card Details",

@@ -332,7 +332,11 @@
     "appAlreadyInstalled": "التطبيق مثبت بالفعل",
     "installInstructions": "اضغط على مشاركة → إضافة إلى الشاشة الرئيسية للتثبيت",
     "appIconChanged": "تم تحديث أيقونة التطبيق",
-    "reinstallForIcon": "أعد تثبيت التطبيق لتطبيق الأيقونة الجديدة"
+    "reinstallForIcon": "أعد تثبيت التطبيق لتطبيق الأيقونة الجديدة",
+    "pushEnabled": "تم تفعيل إشعارات Push",
+    "pushDisabled": "تم تعطيل إشعارات Push",
+    "pushDenied": "تم رفض إذن الإشعارات. اسمح بها في إعدادات المتصفح.",
+    "pushNotSupported": "إشعارات Push غير مدعومة في هذا المتصفح"
   },
   "share": {
     "cardDetails": "تفاصيل البطاقة",

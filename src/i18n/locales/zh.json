@@ -334,7 +334,11 @@
     "appAlreadyInstalled": "应用已安装",
     "installInstructions": "点击分享 → 添加到主屏幕进行安装",
     "appIconChanged": "应用图标已更新",
-    "reinstallForIcon": "重新安装应用以应用新图标"
+    "reinstallForIcon": "重新安装应用以应用新图标",
+    "pushEnabled": "推送通知已启用",
+    "pushDisabled": "推送通知已禁用",
+    "pushDenied": "通知权限被拒绝。请在浏览器设置中允许。",
+    "pushNotSupported": "此浏览器不支持推送通知"
   },
   "share": {
     "cardDetails": "卡片详情",
