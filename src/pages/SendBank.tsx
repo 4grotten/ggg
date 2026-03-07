@@ -258,6 +258,7 @@ const SendBank = () => {
 
         if (result.success) {
           toast.success(t("send.transferSuccess", "Перевод отправлен"));
+          sendNotification({ title: t("notifications.transferSent") || "Перевод отправлен", body: t("send.transferSuccess", "Перевод отправлен"), type: "transaction" });
           queryClient.invalidateQueries({ queryKey: ["cards"] });
           queryClient.invalidateQueries({ queryKey: ["transactions"] });
           queryClient.invalidateQueries({ queryKey: ["cryptoWallets"] });
