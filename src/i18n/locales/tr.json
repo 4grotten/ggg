@@ -2007,6 +2007,11 @@
     "notFound": "Hesap bulunamadı"
   },
   "notifications": {
+    "title": "Bildirimler",
+    "clearAll": "Tümünü temizle",
+    "empty": "Bildirim yok",
+    "justNow": "Şimdi",
+    "minAgo": "dk önce",
     "transferSent": "Transfer gönderildi",
     "profileUpdated": "Profil güncellendi"
   }

@@ -2007,6 +2007,11 @@
     "notFound": "Cuenta no encontrada"
   },
   "notifications": {
+    "title": "Notificaciones",
+    "clearAll": "Borrar todo",
+    "empty": "Sin notificaciones",
+    "justNow": "Ahora mismo",
+    "minAgo": "min atrás",
     "transferSent": "Transferencia enviada",
     "profileUpdated": "Perfil actualizado"
   }

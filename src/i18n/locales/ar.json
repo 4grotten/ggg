@@ -2007,6 +2007,11 @@
     "notFound": "الحساب غير موجود"
   },
   "notifications": {
+    "title": "الإشعارات",
+    "clearAll": "مسح الكل",
+    "empty": "لا توجد إشعارات",
+    "justNow": "الآن",
+    "minAgo": "دقيقة مضت",
     "transferSent": "تم إرسال التحويل",
     "profileUpdated": "تم تحديث الملف الشخصي"
   }

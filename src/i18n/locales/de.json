@@ -2007,6 +2007,11 @@
     "notFound": "Konto nicht gefunden"
   },
   "notifications": {
+    "title": "Benachrichtigungen",
+    "clearAll": "Alle löschen",
+    "empty": "Keine Benachrichtigungen",
+    "justNow": "Gerade eben",
+    "minAgo": "Min. her",
     "transferSent": "Überweisung gesendet",
     "profileUpdated": "Profil aktualisiert"
   }
