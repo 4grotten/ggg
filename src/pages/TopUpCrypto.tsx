@@ -49,6 +49,7 @@ const TopUpCrypto = () => {
   const settings = useSettings();
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
+  const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
   const { data: cardsData } = useCards();
 
   // Build a network→address map from real wallets
