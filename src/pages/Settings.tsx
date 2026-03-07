@@ -56,7 +56,7 @@ const iconGradients: Record<string, string> = {
   vibrate: 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)',
   contacts: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
   eyeoff: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
-  bell: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+  bell: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
 };
 
 interface ColoredIconProps {
