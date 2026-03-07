@@ -2005,5 +2005,9 @@
     "copy": "نسخ",
     "shareMessage": "IBAN الحساب البنكي: {{iban}}",
     "notFound": "الحساب غير موجود"
+  },
+  "notifications": {
+    "transferSent": "تم إرسال التحويل",
+    "profileUpdated": "تم تحديث الملف الشخصي"
   }
 }

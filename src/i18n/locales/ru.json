@@ -2112,5 +2112,9 @@
     "copy": "Копировать",
     "shareMessage": "IBAN банковского счёта: {{iban}}",
     "notFound": "Счёт не найден"
+  },
+  "notifications": {
+    "transferSent": "Перевод отправлен",
+    "profileUpdated": "Профиль обновлён"
   }
 }
