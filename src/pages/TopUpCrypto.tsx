@@ -205,34 +205,16 @@ const TopUpCrypto = () => {
 
         {/* Info Cards */}
         <div className="px-6 space-y-3 flex-1">
-          {selectedDest && (
-            <button 
-              onClick={() => setDestDrawerOpen(true)}
-              className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between"
-            >
-              <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
-              <div className="flex items-center gap-2">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                  selectedDest.type === "bank"
-                    ? "bg-purple-500"
-                    : selectedDest.type === "wallet"
-                      ? "bg-[#26A17B]"
-                      : selectedDest.cardType === "metal" 
-                        ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                        : "bg-primary"
-                }`}>
-                  {selectedDest.type === "bank" 
-                    ? <Landmark className="w-3.5 h-3.5 text-primary-foreground" />
-                    : selectedDest.type === "wallet"
-                      ? <Wallet className="w-3.5 h-3.5 text-white" />
-                      : <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
-                  }
-                </div>
-                <span className="font-semibold text-foreground">{selectedDest.name}</span>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          {/* Destination: USDT wallet (fixed) */}
+          <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
+            <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center bg-[#26A17B]">
+                <Wallet className="w-3.5 h-3.5 text-white" />
               </div>
-            </button>
-          )}
+              <span className="font-semibold text-foreground">{walletLabel}</span>
+            </div>
+          </div>
 
           {/* Receive Token */}
           <div className="bg-muted rounded-2xl p-4 flex items-center justify-between">
