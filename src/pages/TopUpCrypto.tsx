@@ -25,6 +25,7 @@ interface Destination {
   name: string;
   subtitle: string;
   fullNumber: string;
+  balance?: number;
 }
 
 const networks = [
