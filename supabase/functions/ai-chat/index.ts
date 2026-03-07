@@ -90,59 +90,48 @@ async function fetchAllBalances(userToken?: string): Promise<string> {
     "Authorization": `Token ${userToken}`,
   };
 
-  const [walletRes, bankRes, cryptoRes] = await Promise.allSettled([
+  const [walletRes, cryptoRes] = await Promise.allSettled([
     fetch(`${BACKEND_BASE}/cards/wallet/summary/`, { method: "GET", headers }),
-    fetch(`${BACKEND_BASE}/transactions/bank-accounts/`, { method: "GET", headers }),
     fetch(`${BACKEND_BASE}/transactions/crypto-wallets/`, { method: "GET", headers }),
   ]);
 
-  const lines: string[] = [];
+  const cardLines: string[] = [];
+  const bankLines: string[] = [];
+  const cryptoLines: string[] = [];
+  let cardsTotal = 0;
 
-  // 1. Cards from wallet summary
+  // 1. Cards and bank account from wallet summary
   try {
     if (walletRes.status === 'fulfilled' && walletRes.value.ok) {
       const wallet = await walletRes.value.json();
       const data = wallet.data || wallet;
 
-      if (data.physical_account) {
-        const pa = data.physical_account;
-        lines.push(`🏦 **Счёт (IBAN)**: ${pa.balance} ${pa.currency || 'AED'}`);
-        if (pa.iban) lines.push(`   IBAN: ${pa.iban}`);
-      }
-
+      // Cards first
       if (data.cards && Array.isArray(data.cards)) {
         data.cards.forEach((card: any) => {
           const typeName = card.type === 'metal' ? 'Металлическая карта' : 'Виртуальная карта';
           const last4 = card.card_number ? ` (****${card.card_number.slice(-4)})` : '';
-          lines.push(`💳 ${typeName}${last4}: ${card.balance} ${card.currency || 'AED'}`);
+          const balance = parseFloat(card.balance) || 0;
+          cardsTotal += balance;
+          cardLines.push(`💳 ${typeName}${last4}: ${card.balance} ${card.currency || 'AED'}`);
         });
       }
+
+      // Bank account (IBAN)
+      if (data.physical_account) {
+        const pa = data.physical_account;
+        const iban = pa.iban ? ` | IBAN: ${pa.iban}` : '';
+        bankLines.push(`🏦 Банковский счёт: ${pa.balance} ${pa.currency || 'AED'}${iban}`);
+      }
     } else {
-      lines.push('💳 Данные о картах временно недоступны.');
+      cardLines.push('💳 Данные о картах временно недоступны.');
     }
   } catch (e) {
     console.error("Error parsing wallet summary:", e);
-    lines.push('💳 Ошибка при получении данных о картах.');
+    cardLines.push('💳 Ошибка при получении данных о картах.');
   }
 
-  // 2. Bank accounts
-  try {
-    if (bankRes.status === 'fulfilled' && bankRes.value.ok) {
-      const bankData = await bankRes.value.json();
-      const accounts = bankData.data || bankData;
-      if (Array.isArray(accounts) && accounts.length > 0) {
-        accounts.forEach((acc: any) => {
-          const name = acc.bank_name || acc.account_name || 'Банковский счёт';
-          const iban = acc.iban ? ` (${acc.iban})` : '';
-          lines.push(`🏦 ${name}${iban}: ${acc.balance} ${acc.currency || 'AED'}`);
-        });
-      }
-    }
-  } catch (e) {
-    console.error("Error parsing bank accounts:", e);
-  }
-
-  // 3. Crypto wallets
+  // 2. Crypto wallets
   try {
     if (cryptoRes.status === 'fulfilled' && cryptoRes.value.ok) {
       const cryptoData = await cryptoRes.value.json();
@@ -151,7 +140,7 @@ async function fetchAllBalances(userToken?: string): Promise<string> {
         wallets.forEach((w: any) => {
           const network = w.network || 'TRC20';
           const token = w.token || 'USDT';
-          lines.push(`🪙 ${token} (${network}): ${w.balance} ${token}`);
+          cryptoLines.push(`🪙 ${token} (${network}): ${w.balance} ${token}`);
         });
       }
     }
@@ -159,7 +148,28 @@ async function fetchAllBalances(userToken?: string): Promise<string> {
     console.error("Error parsing crypto wallets:", e);
   }
 
-  return lines.length > 0 ? lines.join('\n') : 'Балансы не найдены.';
+  // Compose structured output
+  const result: string[] = [];
+  
+  if (cardLines.length > 0) {
+    result.push('КАРТЫ:');
+    result.push(...cardLines);
+    if (cardsTotal > 0) result.push(`💰 Итого на картах: ${cardsTotal.toFixed(2)} AED`);
+  }
+  
+  if (bankLines.length > 0) {
+    result.push('');
+    result.push('БАНКОВСКИЙ СЧЁТ:');
+    result.push(...bankLines);
+  }
+  
+  if (cryptoLines.length > 0) {
+    result.push('');
+    result.push('КРИПТО КОШЕЛЁК:');
+    result.push(...cryptoLines);
+  }
+
+  return result.length > 0 ? result.join('\n') : 'Балансы не найдены.';
 }
 
 async function fetchTransactionsFromApi(userToken?: string): Promise<string> {
