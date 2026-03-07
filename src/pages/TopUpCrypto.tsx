@@ -15,7 +15,7 @@ import {
 import { useSettings } from "@/contexts/SettingsContext";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
-import { useCryptoWallets } from "@/hooks/useCards";
+import { useCryptoWallets, useCards } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Destination {
