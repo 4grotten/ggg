@@ -824,6 +824,7 @@
     "totalDebit": "إجمالي الخصم",
     "checkingRecipient": "جاري التحقق من المستلم…",
     "sendToStablecoins": "إرسال AED إلى العملات المستقرة",
+    "sendUsdt": "إرسال USDT",
     "withdrawToWallet": "سحب إلى محفظة خارجية",
     "stepOf": "الخطوة {{step}} من {{total}}",
     "cardNumber": "رقم البطاقة",

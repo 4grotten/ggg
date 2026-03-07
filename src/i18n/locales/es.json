@@ -824,6 +824,7 @@
     "totalDebit": "Total a debitar",
     "checkingRecipient": "Verificando destinatario…",
     "sendToStablecoins": "Enviar AED a Stablecoins",
+    "sendUsdt": "Enviar USDT",
     "withdrawToWallet": "Retirar a billetera externa",
     "stepOf": "Paso {{step}} de {{total}}",
     "cardNumber": "Número de Tarjeta",

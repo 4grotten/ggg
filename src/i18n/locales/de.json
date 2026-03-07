@@ -824,6 +824,7 @@
     "totalDebit": "Gesamtbelastung",
     "checkingRecipient": "Empfänger wird geprüft…",
     "sendToStablecoins": "AED an Stablecoins senden",
+    "sendUsdt": "USDT senden",
     "withdrawToWallet": "Auf externe Wallet abheben",
     "stepOf": "Schritt {{step}} von {{total}}",
     "cardNumber": "Kartennummer",

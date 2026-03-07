@@ -908,6 +908,7 @@
     "recipientGets": "Recipient gets",
     "networkFee": "Network fee",
     "sendToStablecoins": "Send AED to Stablecoins",
+    "sendUsdt": "Send USDT",
     "withdrawToWallet": "Withdraw to external wallet",
     "stepOf": "Step {{step}} of {{total}}",
     "cardNumber": "Card Number",
