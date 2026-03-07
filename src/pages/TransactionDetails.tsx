@@ -2430,7 +2430,7 @@ const TransactionDetails = () => {
         </div>
 
         {/* Sender block */}
-        {receipt && (receipt.sender_name || (receipt as any).sender_card_mask || (receipt as any).sender_iban || (receipt as any).sender_iban_mask || (receipt as any).sender_bank || transaction.fromWalletAddress) && (
+        {receipt && (receipt.sender_name || (receipt as any).sender_card_mask || (receipt as any).sender_iban || (receipt as any).sender_iban_mask || (receipt as any).sender_bank || transaction.fromWalletAddress || (isCryptoToIbanCryptoSender && (receipt as any).crypto_address)) && (
           <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/30">
             <div className="flex items-center justify-between px-5 py-3.5 bg-[#007AFF]/10 border-b border-[#007AFF]/15">
               <div className="flex items-center gap-2.5">
@@ -2470,9 +2470,10 @@ const TransactionDetails = () => {
               </div>
             )}
             {(() => {
-              // For crypto_to_card, the sender wallet is in crypto_address (not from_address)
+              // For crypto_to_card and crypto_to_iban (crypto sender), the sender wallet is in crypto_address
               const isCryptoToCardType = receipt.type === 'crypto_to_card';
-              const senderWalletAddress = isCryptoToCardType
+              const isCryptoToIbanType = receipt.type === 'crypto_to_iban' && isCryptoToIbanCryptoSender;
+              const senderWalletAddress = (isCryptoToCardType || isCryptoToIbanType)
                 ? ((receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || (receipt as any)?.from_address || '')
                 : ((receipt as any)?.from_address || (receipt as any)?.from_address_mask || (receipt as any)?.metadata?.from_address || (receipt as any)?.metadata?.sender_address || '');
               if (!senderWalletAddress) return null;
@@ -2583,8 +2584,8 @@ const TransactionDetails = () => {
               </div>
             )}
             {(() => {
-              // For crypto_to_card, crypto_address belongs to sender, not receiver — skip here
-              if (receipt.type === 'crypto_to_card') return null;
+              // For crypto_to_card and crypto_to_iban (crypto sender), crypto_address belongs to sender — skip here
+              if (receipt.type === 'crypto_to_card' || (receipt.type === 'crypto_to_iban' && isCryptoToIbanCryptoSender)) return null;
               const cryptoAddr = (receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || (receipt as any)?.receiver_wallet || (transaction as any)?.cryptoAddress || '';
               if (!cryptoAddr) return null;
               return (
