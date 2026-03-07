@@ -28,12 +28,7 @@ interface Destination {
   balance?: number;
 }
 
-const networks = [
-  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", apiValue: "TRC20" as const },
-  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20", apiValue: "ERC20" as const },
-  { id: "bep20", name: "BNB Chain (BEP20)", shortName: "BEP20", apiValue: "BEP20" as const },
-  { id: "sol", name: "Solana (SOL)", shortName: "SOL", apiValue: "SOL" as const },
-];
+const defaultNetwork = { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", apiValue: "TRC20" as const };
 
 // Fallback addresses for networks without a real wallet
 const fallbackAddresses: Record<string, string> = {
