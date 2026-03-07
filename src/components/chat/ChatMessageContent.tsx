@@ -159,20 +159,137 @@ const markdownComponents = {
   hr: () => <hr className="my-2 border-border/40" />,
 };
 
-export const ChatMessageContent = ({ content }: ChatMessageContentProps) => {
-  const hasMarkdown = /\*\*|#{1,3}\s|^- /m.test(content);
+const REPORT_PATTERN = /\[DOWNLOAD_REPORT:([^\]]+)\]/g;
 
-  if (hasMarkdown) {
-    return (
-      <div className="text-sm">
-        <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
-      </div>
-    );
+const ReportDownloadButton = ({ dateRange }: { dateRange: string }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDone, setIsDone] = useState(false);
+  const { user } = useAuth();
+
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        toast.error("Необходима авторизация");
+        return;
+      }
+
+      let start_date: string | undefined;
+      let end_date: string | undefined;
+
+      if (dateRange !== 'ALL') {
+        const parts = dateRange.split(':');
+        start_date = parts[0];
+        end_date = parts[1];
+      }
+
+      const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(' ') : '';
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ backend_token: token, start_date, end_date, user_name: userName }),
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || "Ошибка генерации отчёта");
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      
+      const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      a.download = `EasyCard_Report_${fileDate}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setIsDone(true);
+      toast.success("Отчёт скачан!");
+    } catch (error) {
+      console.error("Report download error:", error);
+      toast.error(error instanceof Error ? error.message : "Ошибка скачивания");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  // Format label
+  let label = "Скачать отчёт";
+  if (dateRange !== 'ALL') {
+    const parts = dateRange.split(':');
+    if (parts.length === 2) {
+      const formatD = (d: string) => {
+        const dt = new Date(d);
+        return `${dt.getDate().toString().padStart(2, '0')}.${(dt.getMonth() + 1).toString().padStart(2, '0')}.${dt.getFullYear()}`;
+      };
+      label = `Скачать отчёт (${formatD(parts[0])} — ${formatD(parts[1])})`;
+    }
+  } else {
+    label = "Скачать отчёт за всё время";
   }
 
   return (
-    <p className="text-sm whitespace-pre-wrap leading-relaxed">
-      {formatAmountInText(content)}
-    </p>
+    <button
+      onClick={handleDownload}
+      disabled={isDownloading || isDone}
+      className={cn(
+        "my-2 w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+        isDone
+          ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/20"
+          : "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 active:scale-[0.98]",
+        (isDownloading) && "opacity-70 cursor-wait"
+      )}
+    >
+      <div className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+        isDone ? "bg-emerald-500/15" : "bg-primary/15"
+      )}>
+        {isDownloading ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : isDone ? (
+          <CheckCircle className="w-5 h-5 text-emerald-500" />
+        ) : (
+          <FileDown className="w-5 h-5" />
+        )}
+      </div>
+      <span>{isDone ? "Отчёт скачан ✓" : isDownloading ? "Формирую отчёт..." : label}</span>
+    </button>
+  );
+};
+
+export const ChatMessageContent = ({ content }: ChatMessageContentProps) => {
+  // Extract report commands and split content
+  const reportMatches = [...content.matchAll(REPORT_PATTERN)];
+  const cleanContent = content.replace(REPORT_PATTERN, '').trim();
+  
+  const hasMarkdown = /\*\*|#{1,3}\s|^- /m.test(cleanContent);
+
+  return (
+    <div className="text-sm">
+      {hasMarkdown ? (
+        <ReactMarkdown components={markdownComponents}>{cleanContent}</ReactMarkdown>
+      ) : (
+        cleanContent && (
+          <p className="whitespace-pre-wrap leading-relaxed">
+            {formatAmountInText(cleanContent)}
+          </p>
+        )
+      )}
+      {reportMatches.map((match, i) => (
+        <ReportDownloadButton key={i} dateRange={match[1]} />
+      ))}
+    </div>
   );
 };
