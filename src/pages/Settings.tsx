@@ -15,7 +15,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode, Contact, BookUser, EyeOff } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode, Contact, BookUser, EyeOff, Bell } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -55,6 +55,7 @@ const iconGradients: Record<string, string> = {
   vibrate: 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)',
   contacts: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
   eyeoff: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
+  bell: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
 };
 
 interface ColoredIconProps {
@@ -313,6 +314,8 @@ const Settings = () => {
   const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused, isHideDataEnabled, setHideDataEnabled } = useScreenLockContext();
   const { isAdmin } = useUserRole();
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
+  const [isPushEnabled, setIsPushEnabled] = useState(() => localStorage.getItem('push_notifications_enabled') === 'true');
+  const [isPushDrawerOpen, setIsPushDrawerOpen] = useState(false);
   const { tap } = useHapticFeedback();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -882,6 +885,23 @@ const Settings = () => {
                 </button>
               );
             })()}
+
+            {/* PUSH Notifications */}
+            <button
+              onClick={() => setIsPushDrawerOpen(true)}
+              className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <ColoredIcon colorKey="bell"><Bell className="w-4 h-4" /></ColoredIcon>
+                <span className="text-foreground font-medium">{t("settings.pushNotifications") || "PUSH уведомления"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-medium ${isPushEnabled ? 'text-green-500' : 'text-muted-foreground'}`}>
+                  {isPushEnabled ? (t("settings.enabled") || "Вкл") : (t("settings.disabled") || "Выкл")}
+                </span>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+            </button>
 
             {/* Personal Details / Verification */}
             {(() => {
@@ -1725,6 +1745,68 @@ const Settings = () => {
                   )}
                 </button>
               ))}
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* PUSH Notifications Drawer */}
+      <Drawer open={isPushDrawerOpen} onOpenChange={setIsPushDrawerOpen}>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader className="flex items-center justify-between px-6 pb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: iconGradients.bell }}>
+                <Bell className="w-5 h-5 text-white" />
+              </div>
+              <DrawerTitle className="text-lg font-semibold">{t("settings.pushNotifications") || "PUSH уведомления"}</DrawerTitle>
+            </div>
+            <button onClick={() => setIsPushDrawerOpen(false)} className="p-1.5 rounded-full hover:bg-muted transition-colors">
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </DrawerHeader>
+          <div className="px-6 pb-8 space-y-6">
+            <p className="text-sm text-muted-foreground">
+              {t("settings.pushDescription") || "Получайте мгновенные уведомления о транзакциях, входах в аккаунт и важных событиях."}
+            </p>
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/50 border border-border/50">
+              <div className="flex items-center gap-3">
+                <Bell className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">{t("settings.enablePush") || "Включить PUSH"}</p>
+                  <p className="text-xs text-muted-foreground">{t("settings.pushSubtitle") || "Уведомления на это устройство"}</p>
+                </div>
+              </div>
+              <Switch
+                checked={isPushEnabled}
+                onCheckedChange={(checked) => {
+                  setIsPushEnabled(checked);
+                  localStorage.setItem('push_notifications_enabled', String(checked));
+                  if (checked) {
+                    if ('Notification' in window) {
+                      Notification.requestPermission().then((permission) => {
+                        if (permission === 'granted') {
+                          toast.success(t("toast.pushEnabled") || "PUSH уведомления включены");
+                        } else {
+                          toast.error(t("toast.pushDenied") || "Разрешение на уведомления отклонено");
+                          setIsPushEnabled(false);
+                          localStorage.setItem('push_notifications_enabled', 'false');
+                        }
+                      });
+                    } else {
+                      toast.error(t("toast.pushNotSupported") || "Уведомления не поддерживаются в этом браузере");
+                      setIsPushEnabled(false);
+                      localStorage.setItem('push_notifications_enabled', 'false');
+                    }
+                  } else {
+                    toast.success(t("toast.pushDisabled") || "PUSH уведомления выключены");
+                  }
+                }}
+              />
+            </div>
+            <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/15">
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                📌 {t("settings.pushHint") || "Для работы PUSH уведомлений необходимо разрешить уведомления в настройках браузера. На iOS добавьте приложение на домашний экран."}
+              </p>
             </div>
           </div>
         </DrawerContent>
