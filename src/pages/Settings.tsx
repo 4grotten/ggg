@@ -886,19 +886,16 @@ const Settings = () => {
               );
             })()}
 
-            {/* PUSH Notifications */}
+            {/* Notifications Settings */}
             <button
               onClick={() => setIsPushDrawerOpen(true)}
               className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <ColoredIcon colorKey="bell"><Bell className="w-4 h-4" /></ColoredIcon>
-                <span className="text-foreground font-medium">{t("settings.pushNotifications") || "PUSH уведомления"}</span>
+                <span className="text-foreground font-medium">{t("settings.notifications") || "Уведомления"}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`text-xs font-medium ${isPushEnabled ? 'text-green-500' : 'text-muted-foreground'}`}>
-                  {isPushEnabled ? (t("settings.enabled") || "Вкл") : (t("settings.disabled") || "Выкл")}
-                </span>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
             </button>
