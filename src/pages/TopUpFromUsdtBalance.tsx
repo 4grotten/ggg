@@ -14,7 +14,7 @@ import { useCards, useWalletSummary } from "@/hooks/useCards";
 import { useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
 import { Card } from "@/types/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { submitInternalTransfer } from "@/services/api/transactions";
+import { submitInternalTransfer, submitCryptoToBank } from "@/services/api/transactions";
 import { useQueryClient } from "@tanstack/react-query";
 
 type Destination = "card" | "account";
@@ -86,54 +86,68 @@ const TopUpFromUsdtBalance = () => {
   const handleConfirm = async () => {
     if (!isReadyToConfirm || !cryptoWalletId) return;
     
-    // For crypto→card: backend expects full card_number, not card ID
-    // For crypto→bank: backend expects IBAN
-    let toId: string | undefined;
-    let toType: "card" | "bank" | "crypto";
-    
-    if (destination === "card") {
-      toType = "card";
-      // Get full card number from wallet summary
-      const summaryCard = walletSummary?.data?.cards?.find(c => c.id === selectedCard!.id);
-      toId = summaryCard?.card_number;
-      if (!toId) {
-        toast.error(t("topUpUsdt.noDestinationAccount", "Номер карты не найден"));
-        return;
-      }
-    } else {
-      toType = "bank";
-      toId = bankIban;
-    }
-    
-    if (!toId) {
-      toast.error(t("topUpUsdt.noDestinationAccount", "Счёт назначения не найден"));
-      return;
-    }
-    
     setIsSubmitting(true);
     
     try {
-      const result = await submitInternalTransfer({
-        from_type: "crypto",
-        from_id: cryptoWalletId,
-        to_type: toType,
-        to_id: toId,
-        amount: amountNum.toFixed(2),
-      });
-      
-      if (result.success && result.data) {
-        toast.success(t("topUpUsdt.transferSuccess", "Перевод выполнен успешно"), {
-          description: `${result.data.credited_amount} AED`,
+      if (destination === "card") {
+        // crypto→card via submitInternalTransfer
+        const summaryCard = walletSummary?.data?.cards?.find(c => c.id === selectedCard!.id);
+        const cardNumber = summaryCard?.card_number;
+        if (!cardNumber) {
+          toast.error(t("topUpUsdt.noDestinationAccount", "Номер карты не найден"));
+          setIsSubmitting(false);
+          return;
+        }
+        
+        const result = await submitInternalTransfer({
+          from_type: "crypto",
+          from_id: cryptoWalletId,
+          to_type: "card",
+          to_id: cardNumber,
+          amount: amountNum.toFixed(2),
         });
         
-        // Invalidate caches
-        queryClient.invalidateQueries({ queryKey: ['cards'] });
-        
-        navigate("/");
+        if (result.success && result.data) {
+          toast.success(t("topUpUsdt.transferSuccess", "Перевод выполнен успешно"), {
+            description: `${result.data.credited_amount} AED`,
+          });
+          queryClient.invalidateQueries({ queryKey: ['cards'] });
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
+          queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+          navigate("/");
+        } else {
+          toast.error(t("topUpUsdt.transferFailed", "Ошибка перевода"), {
+            description: result.error,
+          });
+        }
       } else {
-        toast.error(t("topUpUsdt.transferFailed", "Ошибка перевода"), {
-          description: result.error,
+        // crypto→bank (account/IBAN) via dedicated crypto-to-bank API
+        const iban = bankIban;
+        if (!iban) {
+          toast.error(t("topUpUsdt.noDestinationAccount", "Счёт назначения не найден"));
+          setIsSubmitting(false);
+          return;
+        }
+        
+        const result = await submitCryptoToBank({
+          from_wallet_id: cryptoWalletId,
+          to_iban: iban,
+          amount_usdt: amountNum.toFixed(2),
         });
+        
+        if (result.success && result.data) {
+          toast.success(t("topUpUsdt.transferSuccess", "Перевод выполнен успешно"), {
+            description: `${result.data.credited_amount} AED`,
+          });
+          queryClient.invalidateQueries({ queryKey: ['cards'] });
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
+          queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+          navigate("/");
+        } else {
+          toast.error(t("topUpUsdt.transferFailed", "Ошибка перевода"), {
+            description: result.error,
+          });
+        }
       }
     } catch {
       toast.error(t("topUpUsdt.transferFailed", "Ошибка перевода"));
