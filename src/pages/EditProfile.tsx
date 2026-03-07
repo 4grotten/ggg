@@ -173,6 +173,7 @@ const EditProfile = () => {
         setTimeout(() => setShowFlash(false), 400);
         
         toast.success(t("toast.avatarUpdated"));
+        sendNotification({ title: t("notifications.profileUpdated") || "Профиль обновлён", body: t("toast.avatarUpdated"), type: "profile" });
       } catch (error) {
         console.error('Failed to upload avatar:', error);
         toast.error(t("toast.avatarUploadFailed") || "Failed to upload avatar");
