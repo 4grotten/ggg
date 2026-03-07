@@ -793,6 +793,8 @@
     "workingDays": "1-2 working days",
     "shareAedDetails": "Share AED Account Details",
     "yourAddress": "Your Address",
+    "topUpToUsdt": "Top Up to USDT",
+    "usdtWallet": "USDT Wallet",
     "topUpTo": "Top up to",
     "receiveToken": "Receive token",
     "network": "Network",
