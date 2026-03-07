@@ -31,7 +31,7 @@ const TopUpCrypto = () => {
     return fallbackTrc20Address;
   }, [cryptoWalletsData]);
 
-  const walletLabel = t("drawer.usdtBalance", "USDT TRC20 Кошелек");
+  const walletLabel = t("topUp.usdtWallet", "Кошелек USDT");
   const selectedNetwork = defaultNetwork;
 
   const [selectedToken] = useState("USDT");
