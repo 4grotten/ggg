@@ -366,12 +366,30 @@ const TopUpCrypto = () => {
                     }
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="text-base font-medium text-foreground">{dest.name}</p>
-                    <p className="text-sm text-muted-foreground font-mono">
-                      {revealedId === dest.id ? dest.fullNumber : dest.subtitle}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-base font-medium text-foreground">{dest.name}</p>
+                      {dest.type === "card" && dest.cardType && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                          dest.cardType === "metal" 
+                            ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300" 
+                            : "bg-primary/10 text-primary"
+                        }`}>
+                          {dest.cardType === "metal" ? "Metal" : "Virtual"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground font-mono">
+                        {revealedId === dest.id ? dest.fullNumber : dest.subtitle}
+                      </p>
+                      {dest.type === "card" && dest.balance !== undefined && (
+                        <span className="text-xs text-muted-foreground">
+                          · {dest.balance.toFixed(2)} AED
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {selectedDest.id === dest.id && (
+                  {selectedDest?.id === dest.id && (
                     <Check className="w-5 h-5 text-primary" />
                   )}
                   <button
