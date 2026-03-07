@@ -39,12 +39,15 @@ const Chat = () => {
     return STATE_EMOJIS.idle;
   }, [isDancing, isLoading, isUserTyping]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const isInitialLoad = useRef(true);
+
+  const scrollToBottom = (instant = false) => {
+    messagesEndRef.current?.scrollIntoView({ behavior: instant ? "instant" : "smooth" });
   };
 
   useEffect(() => {
-    scrollToBottom();
+    scrollToBottom(isInitialLoad.current);
+    isInitialLoad.current = false;
   }, [messages]);
 
   // Detect mobile keyboard open/close
