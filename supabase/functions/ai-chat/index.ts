@@ -263,9 +263,9 @@ serve(async (req) => {
     console.log(`Fetching financial data for user: ${effectiveUserId}, external_user_id: ${external_user_id}`);
     
     // Fetch user's financial data, card balances, and account detail in parallel
-    const [financialData, cardBalancesText, accountDetailText] = await Promise.all([
+    const [financialData, allBalancesText, accountDetailText] = await Promise.all([
       fetchUserFinancialData(supabase, effectiveUserId),
-      fetchCardBalances(backend_token),
+      fetchAllBalances(backend_token),
       backend_token && external_user_id 
         ? fetchUserAccountDetail(backend_token, external_user_id)
         : Promise.resolve("Данные аккаунта недоступны (нет токена)."),
