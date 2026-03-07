@@ -85,7 +85,7 @@ function detectCardLineType(children: ReactNode): CardLineType {
   return null;
 }
 
-const cardLineStyles: Record<Exclude<CardLineType, null>, { bg: string; iconBg: string; icon: typeof CreditCard; iconColor: string }> = {
+const cardLineStyles: Record<Exclude<CardLineType, null>, { bg: string; iconBg: string; icon: React.ComponentType<{ className?: string }>; iconColor: string }> = {
   card: {
     bg: "bg-muted/80 border border-border/30",
     iconBg: "bg-primary/10",
