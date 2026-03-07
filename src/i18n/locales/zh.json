@@ -2012,5 +2012,9 @@
     "copy": "复制",
     "shareMessage": "银行账户 IBAN：{{iban}}",
     "notFound": "未找到账户"
+  },
+  "notifications": {
+    "transferSent": "转账已发送",
+    "profileUpdated": "个人资料已更新"
   }
 }

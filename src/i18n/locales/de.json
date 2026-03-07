@@ -2005,5 +2005,9 @@
     "copy": "Kopieren",
     "shareMessage": "Bankkonto IBAN: {{iban}}",
     "notFound": "Konto nicht gefunden"
+  },
+  "notifications": {
+    "transferSent": "Überweisung gesendet",
+    "profileUpdated": "Profil aktualisiert"
   }
 }

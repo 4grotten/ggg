@@ -2103,5 +2103,9 @@
     "copy": "Copy",
     "shareMessage": "Bank Account IBAN: {{iban}}",
     "notFound": "Account not found"
+  },
+  "notifications": {
+    "transferSent": "Transfer sent",
+    "profileUpdated": "Profile updated"
   }
 }
