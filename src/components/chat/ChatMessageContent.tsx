@@ -184,7 +184,7 @@ const ReportDownloadButton = ({ dateRange }: { dateRange: string }) => {
         end_date = parts[1];
       }
 
-      const userName = user ? [user.first_name, user.last_name].filter(Boolean).join(' ') : '';
+      const userName = user?.full_name || '';
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
