@@ -314,6 +314,8 @@ const Settings = () => {
   const { isEnabled: isScreenLockEnabled, isPaused: isScreenLockPaused, isHideDataEnabled, setHideDataEnabled } = useScreenLockContext();
   const { isAdmin } = useUserRole();
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled());
+  const [isPushEnabled, setIsPushEnabled] = useState(() => localStorage.getItem('push_notifications_enabled') === 'true');
+  const [isPushDrawerOpen, setIsPushDrawerOpen] = useState(false);
   const { tap } = useHapticFeedback();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
