@@ -2470,9 +2470,10 @@ const TransactionDetails = () => {
               </div>
             )}
             {(() => {
-              // For crypto_to_card, the sender wallet is in crypto_address (not from_address)
+              // For crypto_to_card and crypto_to_iban (crypto sender), the sender wallet is in crypto_address
               const isCryptoToCardType = receipt.type === 'crypto_to_card';
-              const senderWalletAddress = isCryptoToCardType
+              const isCryptoToIbanType = receipt.type === 'crypto_to_iban' && isCryptoToIbanCryptoSender;
+              const senderWalletAddress = (isCryptoToCardType || isCryptoToIbanType)
                 ? ((receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || (receipt as any)?.from_address || '')
                 : ((receipt as any)?.from_address || (receipt as any)?.from_address_mask || (receipt as any)?.metadata?.from_address || (receipt as any)?.metadata?.sender_address || '');
               if (!senderWalletAddress) return null;
