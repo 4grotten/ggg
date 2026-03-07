@@ -910,7 +910,7 @@ const Settings = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium ${anyEnabled ? "text-green-500" : "text-muted-foreground"}`}>
+                    <span className={`text-sm font-medium ${anyEnabled ? "text-green-500" : "text-muted-foreground"}`}>
                       {anyEnabled ? (t("settings.enabled") || "Вкл") : (t("settings.disabled") || "Выкл")}
                     </span>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
