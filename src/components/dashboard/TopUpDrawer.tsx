@@ -51,6 +51,13 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
       subtitle: "AED Wire",
       iconBg: "bg-purple-500",
     },
+    {
+      id: "share-card",
+      icon: Share2,
+      title: t("drawer.shareCardDetails", "Поделиться данными карты"),
+      subtitle: t("drawer.shareCardDetailsDesc", "Отправить реквизиты"),
+      iconBg: "bg-orange-500",
+    },
   ];
 
   const handleOptionClick = (optionId: string) => {
