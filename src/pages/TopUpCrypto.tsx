@@ -227,20 +227,16 @@ const TopUpCrypto = () => {
             </div>
           </div>
 
-          {/* Network */}
-          <button 
-            onClick={() => setNetworkDrawerOpen(true)}
-            className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between"
-          >
+          {/* Network (fixed: Tron) */}
+          <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
             <span className="text-muted-foreground">{t("topUp.network")}</span>
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-foreground" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <span className="font-semibold text-foreground">{selectedNetwork.name}</span>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </div>
-          </button>
+          </div>
 
           {/* Fees */}
           <div className="bg-muted rounded-2xl p-4 space-y-2">
