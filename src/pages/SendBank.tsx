@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { sendNotification } from "@/services/notificationService";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, ArrowRight, ClipboardPaste, ChevronDown, Check, CreditCard, X, Wallet, Landmark, CheckCircle, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -257,6 +258,7 @@ const SendBank = () => {
 
         if (result.success) {
           toast.success(t("send.transferSuccess", "Перевод отправлен"));
+          sendNotification({ title: t("notifications.transferSent") || "Перевод отправлен", body: t("send.transferSuccess", "Перевод отправлен"), type: "transaction" });
           queryClient.invalidateQueries({ queryKey: ["cards"] });
           queryClient.invalidateQueries({ queryKey: ["transactions"] });
           queryClient.invalidateQueries({ queryKey: ["cryptoWallets"] });
@@ -283,6 +285,7 @@ const SendBank = () => {
 
         if (result.success) {
           toast.success(t("send.transferSuccess", "Перевод отправлен"));
+          sendNotification({ title: t("notifications.transferSent") || "Перевод отправлен", body: t("send.transferSuccess", "Перевод отправлен"), type: "transaction" });
           queryClient.invalidateQueries({ queryKey: ["cards"] });
           queryClient.invalidateQueries({ queryKey: ["transactions"] });
           queryClient.invalidateQueries({ queryKey: ["bankAccounts"] });

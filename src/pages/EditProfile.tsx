@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { sendNotification } from "@/services/notificationService";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
@@ -172,6 +173,7 @@ const EditProfile = () => {
         setTimeout(() => setShowFlash(false), 400);
         
         toast.success(t("toast.avatarUpdated"));
+        sendNotification({ title: t("notifications.profileUpdated") || "Профиль обновлён", body: t("toast.avatarUpdated"), type: "profile" });
       } catch (error) {
         console.error('Failed to upload avatar:', error);
         toast.error(t("toast.avatarUploadFailed") || "Failed to upload avatar");
@@ -393,6 +395,7 @@ const EditProfile = () => {
       }
       
       toast.success(t("editProfile.socialLinks.saved") || "Social links saved");
+      sendNotification({ title: t("notifications.profileUpdated") || "Профиль обновлён", body: t("editProfile.socialLinks.saved") || "Social links saved", type: "profile" });
       setIsSocialDrawerOpen(false);
     } catch (error) {
       console.error('Failed to save social links:', error);

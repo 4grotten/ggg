@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { sendNotification } from "@/services/notificationService";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, CreditCard, Check, ClipboardPaste, X, Loader2, CheckCircle2, AlertCircle, Wallet } from "lucide-react";
@@ -307,6 +308,7 @@ const SendToCard = () => {
       
       if (response.success) {
         setTransferSuccess(true);
+        sendNotification({ title: t("notifications.transferSent") || "Перевод выполнен", body: t('send.transferSuccessDescription', { amount: numericAmount.toFixed(2), recipient: recipientName }), type: "transaction" });
         
         // Invalidate all card/balance and transaction caches
         queryClient.invalidateQueries({ queryKey: ['cards'] });

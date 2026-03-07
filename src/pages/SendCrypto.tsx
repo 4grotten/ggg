@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { sendNotification } from "@/services/notificationService";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, ChevronDown, Check, CreditCard, ClipboardPaste, X, Wallet, Landmark, CheckCircle2, Loader2, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -407,6 +408,7 @@ const SendCrypto = () => {
           : t("send.transferPending", "Перевод в обработке");
 
         toast.success(statusMsg);
+        sendNotification({ title: t("notifications.transferSent") || "Перевод отправлен", body: statusMsg, type: "transaction" });
         navigate(isReferralWithdrawal ? "/partner" : "/");
       }
     } catch (err) {

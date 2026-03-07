@@ -1957,7 +1957,13 @@
       "sms": "SMS-уведомления",
       "smsDesc": "Критические уведомления по SMS",
       "enabledMultiple": "Включены",
-      "disabledMultiple": "Выключены"
+      "disabledMultiple": "Выключены",
+      "empty": "Нет уведомлений",
+      "clearAll": "Очистить",
+      "justNow": "Только что",
+      "minAgo": "мин назад",
+      "transferSent": "Перевод отправлен",
+      "profileUpdated": "Профиль обновлён"
     }
   },
   "contacts": {
