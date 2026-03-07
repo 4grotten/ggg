@@ -408,6 +408,7 @@ const SendCrypto = () => {
           : t("send.transferPending", "Перевод в обработке");
 
         toast.success(statusMsg);
+        sendNotification({ title: t("notifications.transferSent") || "Перевод отправлен", body: statusMsg, type: "transaction" });
         navigate(isReferralWithdrawal ? "/partner" : "/");
       }
     } catch (err) {

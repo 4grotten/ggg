@@ -308,6 +308,7 @@ const SendToCard = () => {
       
       if (response.success) {
         setTransferSuccess(true);
+        sendNotification({ title: t("notifications.transferSent") || "Перевод выполнен", body: t('send.transferSuccessDescription', { amount: numericAmount.toFixed(2), recipient: recipientName }), type: "transaction" });
         
         // Invalidate all card/balance and transaction caches
         queryClient.invalidateQueries({ queryKey: ['cards'] });

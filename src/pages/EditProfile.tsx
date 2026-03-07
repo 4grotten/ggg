@@ -394,6 +394,7 @@ const EditProfile = () => {
       }
       
       toast.success(t("editProfile.socialLinks.saved") || "Social links saved");
+      sendNotification({ title: t("notifications.profileUpdated") || "Профиль обновлён", body: t("editProfile.socialLinks.saved") || "Social links saved", type: "profile" });
       setIsSocialDrawerOpen(false);
     } catch (error) {
       console.error('Failed to save social links:', error);

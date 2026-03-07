@@ -82,6 +82,7 @@ const SendIbanToCard = () => {
         toast.success(t("sendIban.transferSuccess", "Перевод выполнен"), {
           description: `${result.data.credited_amount} AED → ${selectedCard.name}`,
         });
+        sendNotification({ title: t("notifications.transferSent") || "Перевод выполнен", body: `${result.data.credited_amount} AED → ${selectedCard.name}`, type: "transaction" });
         queryClient.invalidateQueries({ queryKey: ["cards"] });
         queryClient.invalidateQueries({ queryKey: ["transactions"] });
         navigate("/account");
