@@ -73,9 +73,43 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
 
     const st = statusMap[tx.status] || { label: tx.status || '—', color: '#6b7280' };
     const senderName = esc(tx.sender_name || tx.metadata?.sender_name || '—');
-    const senderCard = esc(tx.sender_card_mask || '—');
     const receiverName = esc(tx.receiver_name || tx.metadata?.beneficiary_name || tx.metadata?.receiver_name || '—');
-    const receiverCard = esc(tx.receiver_card_mask || '—');
+    
+    // Build masked account details for sender
+    const senderDetails: string[] = [];
+    if (tx.sender_card_mask) senderDetails.push(`•••• ${tx.sender_card_mask.slice(-4)}`);
+    if (tx.metadata?.sender_iban_mask) senderDetails.push(tx.metadata.sender_iban_mask);
+    else if (tx.metadata?.sender_iban) {
+      const iban = String(tx.metadata.sender_iban);
+      senderDetails.push(`${iban.slice(0, 4)}••••${iban.slice(-4)}`);
+    }
+    if (tx.metadata?.from_address) {
+      const addr = String(tx.metadata.from_address);
+      senderDetails.push(`${addr.slice(0, 6)}••••${addr.slice(-4)}`);
+    }
+    if (tx.metadata?.from_wallet_address) {
+      const addr = String(tx.metadata.from_wallet_address);
+      senderDetails.push(`${addr.slice(0, 6)}••••${addr.slice(-4)}`);
+    }
+    
+    // Build masked account details for receiver
+    const receiverDetails: string[] = [];
+    if (tx.receiver_card_mask) receiverDetails.push(`•••• ${tx.receiver_card_mask.slice(-4)}`);
+    if (tx.metadata?.receiver_iban_mask || tx.metadata?.beneficiary_iban) {
+      const iban = String(tx.metadata?.receiver_iban_mask || tx.metadata?.beneficiary_iban);
+      receiverDetails.push(iban.length > 8 ? `${iban.slice(0, 4)}••••${iban.slice(-4)}` : iban);
+    }
+    if (tx.metadata?.to_address || tx.metadata?.to_wallet_address) {
+      const addr = String(tx.metadata?.to_address || tx.metadata?.to_wallet_address);
+      receiverDetails.push(`${addr.slice(0, 6)}••••${addr.slice(-4)}`);
+    }
+    if (tx.metadata?.receiver_card_number) {
+      const card = String(tx.metadata.receiver_card_number);
+      receiverDetails.push(`•••• ${card.slice(-4)}`);
+    }
+    
+    const senderMask = senderDetails.length > 0 ? esc(senderDetails.join(' · ')) : '—';
+    const receiverMask = receiverDetails.length > 0 ? esc(receiverDetails.join(' · ')) : '—';
     const fee = tx.fee !== undefined && tx.fee !== null ? `${tx.fee} ${currency}` : '—';
 
     return `<tr>
@@ -85,8 +119,8 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
       <td class="desc">${description || '—'}</td>
       <td class="amount ${amountClass}">${esc(amount)} ${esc(currency)}</td>
       <td><span class="status-dot" style="background:${st.color}"></span>${esc(st.label)}</td>
-      <td class="participant">${senderName}<br><span class="card-mask">${senderCard}</span></td>
-      <td class="participant">${receiverName}<br><span class="card-mask">${receiverCard}</span></td>
+      <td class="participant">${senderName}<br><span class="card-mask">${senderMask}</span></td>
+      <td class="participant">${receiverName}<br><span class="card-mask">${receiverMask}</span></td>
       <td class="fee">${esc(fee)}</td>
     </tr>`;
   }).join('\n');
