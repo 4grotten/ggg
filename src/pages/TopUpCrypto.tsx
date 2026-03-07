@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark, Eye, EyeOff, Wallet } from "lucide-react";
+import { Copy, Upload, ChevronRight, MessageSquare, Check, CreditCard, X, Landmark, Eye, EyeOff, Wallet, DollarSign } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import {
 import { useSettings } from "@/contexts/SettingsContext";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
-import { useCryptoWallets } from "@/hooks/useCards";
+import { useCryptoWallets, useCards } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Destination {
@@ -25,6 +25,7 @@ interface Destination {
   name: string;
   subtitle: string;
   fullNumber: string;
+  balance?: number;
 }
 
 const networks = [
@@ -49,6 +50,7 @@ const TopUpCrypto = () => {
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
   const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
+  const { data: cardsData } = useCards();
 
   // Build a network→address map from real wallets
   const walletAddressMap = useMemo(() => {
@@ -65,24 +67,55 @@ const TopUpCrypto = () => {
   const walletLabel = t("drawer.usdtBalance", "USDT TRC20 Кошелек");
   const primaryWalletAddress = walletAddressMap.trc20;
 
-  const getDestinations = (): Destination[] => [
-    { id: "1", type: "card", cardType: "virtual", name: "Visa Virtual", subtitle: "•••• 4532", fullNumber: "4532 8801 2345 4532" },
-    { id: "2", type: "card", cardType: "metal", name: "Visa Metal", subtitle: "•••• 8901", fullNumber: "4532 7712 6789 8901" },
-    { id: "bank", type: "bank", name: t("topUp.bankAccountAed", "Bank Account AED"), subtitle: "•••• 3456", fullNumber: "AE070331234567893456" },
-    { id: "wallet", type: "wallet", name: walletLabel, subtitle: `${primaryWalletAddress.slice(0, 6)}...${primaryWalletAddress.slice(-4)}`, fullNumber: primaryWalletAddress },
-  ];
+  const destinations = useMemo((): Destination[] => {
+    const dests: Destination[] = [];
+    
+    // Add real cards from API
+    if (cardsData?.data) {
+      for (const card of cardsData.data) {
+        dests.push({
+          id: card.id,
+          type: "card",
+          cardType: card.type === "metal" ? "metal" : "virtual",
+          name: card.name,
+          subtitle: `•••• ${card.lastFourDigits || "0000"}`,
+          fullNumber: `**** **** **** ${card.lastFourDigits || "0000"}`,
+          balance: card.balance,
+        });
+      }
+    }
+    
+    // Bank account
+    dests.push({ 
+      id: "bank", type: "bank", name: t("topUp.bankAccountAed", "Bank Account AED"), 
+      subtitle: "•••• 3456", fullNumber: "AE070331234567893456" 
+    });
+    
+    // Wallet
+    dests.push({ 
+      id: "wallet", type: "wallet", name: walletLabel, 
+      subtitle: `${primaryWalletAddress.slice(0, 6)}...${primaryWalletAddress.slice(-4)}`, 
+      fullNumber: primaryWalletAddress 
+    });
+    
+    return dests;
+  }, [cardsData, t, walletLabel, primaryWalletAddress]);
 
-  const destinations = getDestinations();
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedDest, setSelectedDest] = useState<Destination>(() => {
-    return destinations.find(d => d.type === "wallet") || destinations[0];
-  });
+  const [selectedDest, setSelectedDest] = useState<Destination | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
   const [destDrawerOpen, setDestDrawerOpen] = useState(false);
   const [revealedId, setRevealedId] = useState<string | null>(null);
   const [networkDrawerOpen, setNetworkDrawerOpen] = useState(false);
-  
+
+  // Set default destination to wallet when destinations load
+  useEffect(() => {
+    if (!selectedDest && destinations.length > 0) {
+      setSelectedDest(destinations.find(d => d.type === "wallet") || destinations[0]);
+    }
+  }, [destinations, selectedDest]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -179,33 +212,34 @@ const TopUpCrypto = () => {
 
         {/* Info Cards */}
         <div className="px-6 space-y-3 flex-1">
-          {/* Select Destination */}
-          <button 
-            onClick={() => setDestDrawerOpen(true)}
-            className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between"
-          >
-            <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
-            <div className="flex items-center gap-2">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                selectedDest.type === "bank"
-                  ? "bg-purple-500"
-                  : selectedDest.type === "wallet"
-                    ? "bg-[#26A17B]"
-                    : selectedDest.cardType === "metal" 
-                      ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
-                      : "bg-primary"
-              }`}>
-                {selectedDest.type === "bank" 
-                  ? <Landmark className="w-3.5 h-3.5 text-primary-foreground" />
-                  : selectedDest.type === "wallet"
-                    ? <Wallet className="w-3.5 h-3.5 text-white" />
-                    : <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
-                }
+          {selectedDest && (
+            <button 
+              onClick={() => setDestDrawerOpen(true)}
+              className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between"
+            >
+              <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
+              <div className="flex items-center gap-2">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                  selectedDest.type === "bank"
+                    ? "bg-purple-500"
+                    : selectedDest.type === "wallet"
+                      ? "bg-[#26A17B]"
+                      : selectedDest.cardType === "metal" 
+                        ? "bg-gradient-to-br from-zinc-400 to-zinc-600" 
+                        : "bg-primary"
+                }`}>
+                  {selectedDest.type === "bank" 
+                    ? <Landmark className="w-3.5 h-3.5 text-primary-foreground" />
+                    : selectedDest.type === "wallet"
+                      ? <Wallet className="w-3.5 h-3.5 text-white" />
+                      : <CreditCard className="w-3.5 h-3.5 text-primary-foreground" />
+                  }
+                </div>
+                <span className="font-semibold text-foreground">{selectedDest.name}</span>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
-              <span className="font-semibold text-foreground">{selectedDest.name}</span>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-          </button>
+            </button>
+          )}
 
           {/* Receive Token */}
           <div className="bg-muted rounded-2xl p-4 flex items-center justify-between">
@@ -332,12 +366,30 @@ const TopUpCrypto = () => {
                     }
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="text-base font-medium text-foreground">{dest.name}</p>
-                    <p className="text-sm text-muted-foreground font-mono">
-                      {revealedId === dest.id ? dest.fullNumber : dest.subtitle}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-base font-medium text-foreground">{dest.name}</p>
+                      {dest.type === "card" && dest.cardType && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                          dest.cardType === "metal" 
+                            ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300" 
+                            : "bg-primary/10 text-primary"
+                        }`}>
+                          {dest.cardType === "metal" ? "Metal" : "Virtual"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground font-mono">
+                        {revealedId === dest.id ? dest.fullNumber : dest.subtitle}
+                      </p>
+                      {dest.type === "card" && dest.balance !== undefined && (
+                        <span className="text-xs text-muted-foreground">
+                          · {dest.balance.toFixed(2)} AED
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {selectedDest.id === dest.id && (
+                  {selectedDest?.id === dest.id && (
                     <Check className="w-5 h-5 text-primary" />
                   )}
                   <button
