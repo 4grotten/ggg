@@ -86,9 +86,24 @@ const TopUpFromUsdtBalance = () => {
   const handleConfirm = async () => {
     if (!isReadyToConfirm || !cryptoWalletId) return;
     
-    // Determine to_type and to_id based on destination
-    const toType = destination === "card" ? "card" : "bank";
-    const toId = destination === "card" ? selectedCard!.id : bankAccountId;
+    // For crypto→card: backend expects full card_number, not card ID
+    // For crypto→bank: backend expects IBAN
+    let toId: string | undefined;
+    let toType: string;
+    
+    if (destination === "card") {
+      toType = "card";
+      // Get full card number from wallet summary
+      const summaryCard = walletSummary?.data?.cards?.find(c => c.id === selectedCard!.id);
+      toId = summaryCard?.card_number;
+      if (!toId) {
+        toast.error(t("topUpUsdt.noDestinationAccount", "Номер карты не найден"));
+        return;
+      }
+    } else {
+      toType = "bank";
+      toId = bankIban;
+    }
     
     if (!toId) {
       toast.error(t("topUpUsdt.noDestinationAccount", "Счёт назначения не найден"));
