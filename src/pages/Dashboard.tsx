@@ -50,6 +50,7 @@ import { preloadTgs } from "@/components/ui/TgsPlayer";
 import partnerNetworkHero from "@/assets/partner-network-hero.png";
 import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { AccountWalletButtons } from "@/components/dashboard/AccountWalletButtons";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 const Dashboard = () => {
   const navigate = useNavigate();
