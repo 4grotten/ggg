@@ -108,9 +108,9 @@ export const TonIcon = ({ className, size = 20 }: CryptoIconProps) => (
 );
 
 // USDT icon
-export const UsdtIcon = ({ className, size = 24 }: CryptoIconProps) => (
+export const UsdtIcon = ({ className, size = 20 }: CryptoIconProps) => (
   <svg viewBox="0 0 32 32" width={size} height={size} className={className}>
-    <circle cx="16" cy="16" r="16" fill="#26A17B" />
+    <circle cx="42" cy="42" r="42" fill="#26A17B" />
     <path
       fill="#fff"
       d="M17.922 17.383v-.002c-.11.008-.677.042-1.942.042-1.01 0-1.721-.03-1.971-.042v.003c-3.888-.171-6.79-.848-6.79-1.658 0-.809 2.902-1.486 6.79-1.66v2.644c.254.018.982.061 1.988.061 1.207 0 1.812-.05 1.925-.06v-2.643c3.88.173 6.775.85 6.775 1.658 0 .81-2.895 1.485-6.775 1.657m0-3.59v-2.366h5.414V7.819H8.595v3.608h5.414v2.365c-4.4.202-7.709 1.074-7.709 2.118 0 1.044 3.309 1.915 7.709 2.118v7.582h3.913v-7.584c4.393-.202 7.694-1.073 7.694-2.116 0-1.043-3.301-1.914-7.694-2.117"
@@ -119,19 +119,19 @@ export const UsdtIcon = ({ className, size = 24 }: CryptoIconProps) => (
 );
 
 // Generic crypto icon with network initial
-export const GenericCryptoIcon = ({ 
-  className, 
-  size = 20, 
-  label, 
-  color 
+export const GenericCryptoIcon = ({
+  className,
+  size = 20,
+  label,
+  color,
 }: CryptoIconProps & { label: string; color: string }) => (
-  <div 
+  <div
     className={cn("rounded-full flex items-center justify-center font-bold text-white", className)}
-    style={{ 
-      width: size, 
-      height: size, 
+    style={{
+      width: size,
+      height: size,
       backgroundColor: color,
-      fontSize: size * 0.4
+      fontSize: size * 0.4,
     }}
   >
     {label.charAt(0).toUpperCase()}
@@ -141,25 +141,25 @@ export const GenericCryptoIcon = ({
 // Get icon component by network value
 export const getCryptoIcon = (network: string, size = 20) => {
   switch (network.toLowerCase()) {
-    case 'trc20':
+    case "trc20":
       return <TronIcon size={size} />;
-    case 'erc20':
+    case "erc20":
       return <EthereumIcon size={size} />;
-    case 'bep20':
+    case "bep20":
       return <BscIcon size={size} />;
-    case 'polygon':
+    case "polygon":
       return <PolygonIcon size={size} />;
-    case 'solana':
+    case "solana":
       return <SolanaIcon size={size} />;
-    case 'btc':
-    case 'bitcoin':
+    case "btc":
+    case "bitcoin":
       return <BitcoinIcon size={size} />;
-    case 'ltc':
-    case 'litecoin':
+    case "ltc":
+    case "litecoin":
       return <LitecoinIcon size={size} />;
-    case 'ton':
+    case "ton":
       return <TonIcon size={size} />;
-    case 'usdt':
+    case "usdt":
       return <UsdtIcon size={size} />;
     default:
       return <BitcoinIcon size={size} />;
