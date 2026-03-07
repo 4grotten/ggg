@@ -149,7 +149,7 @@ export const VerifyIdentityCard = ({
     <>
       <button
         onClick={handleClick}
-        className="w-full rounded-2xl p-4 text-left group bg-[#007AFF]"
+        className={`w-full rounded-2xl p-4 text-left group ${needsPassportUpdate ? 'bg-[#27AE60]' : 'bg-[#007AFF]'}`}
       >
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
