@@ -332,7 +332,11 @@
     "appAlreadyInstalled": "La app ya está instalada",
     "installInstructions": "Toca Compartir → Añadir a pantalla de inicio para instalar",
     "appIconChanged": "Icono de la app actualizado",
-    "reinstallForIcon": "Reinstala la app para aplicar el nuevo icono"
+    "reinstallForIcon": "Reinstala la app para aplicar el nuevo icono",
+    "pushEnabled": "Notificaciones push activadas",
+    "pushDisabled": "Notificaciones push desactivadas",
+    "pushDenied": "Permiso de notificación denegado. Permítelo en la configuración del navegador.",
+    "pushNotSupported": "Las notificaciones push no son compatibles con este navegador"
   },
   "share": {
     "cardDetails": "Detalles de Tarjeta",

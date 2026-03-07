@@ -332,7 +332,11 @@
     "appAlreadyInstalled": "Uygulama zaten yüklü",
     "installInstructions": "Yüklemek için Paylaş → Ana Ekrana Ekle'ye dokunun",
     "appIconChanged": "Uygulama simgesi güncellendi",
-    "reinstallForIcon": "Yeni simgeyi uygulamak için uygulamayı yeniden yükleyin"
+    "reinstallForIcon": "Yeni simgeyi uygulamak için uygulamayı yeniden yükleyin",
+    "pushEnabled": "Push bildirimleri etkinleştirildi",
+    "pushDisabled": "Push bildirimleri devre dışı bırakıldı",
+    "pushDenied": "Bildirim izni reddedildi. Tarayıcı ayarlarından izin verin.",
+    "pushNotSupported": "Push bildirimleri bu tarayıcıda desteklenmiyor"
   },
   "share": {
     "cardDetails": "Kart Bilgileri",

@@ -332,7 +332,11 @@
     "appAlreadyInstalled": "App ist bereits installiert",
     "installInstructions": "Tippen Sie auf Teilen → Zum Home-Bildschirm zur Installation",
     "appIconChanged": "App-Symbol aktualisiert",
-    "reinstallForIcon": "Installieren Sie die App neu, um das neue Symbol anzuwenden"
+    "reinstallForIcon": "Installieren Sie die App neu, um das neue Symbol anzuwenden",
+    "pushEnabled": "Push-Benachrichtigungen aktiviert",
+    "pushDisabled": "Push-Benachrichtigungen deaktiviert",
+    "pushDenied": "Benachrichtigungsberechtigung verweigert. Erlauben Sie es in den Browsereinstellungen.",
+    "pushNotSupported": "Push-Benachrichtigungen werden in diesem Browser nicht unterstützt"
   },
   "share": {
     "cardDetails": "Kartendetails",
