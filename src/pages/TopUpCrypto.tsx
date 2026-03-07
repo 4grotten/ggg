@@ -11,25 +11,9 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface Destination {
-  id: string;
-  type: "card" | "bank" | "wallet";
-  cardType?: "virtual" | "metal";
-  name: string;
-  subtitle: string;
-  fullNumber: string;
-  balance?: number;
-}
-
 const defaultNetwork = { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", apiValue: "TRC20" as const };
 
-// Fallback addresses for networks without a real wallet
-const fallbackAddresses: Record<string, string> = {
-  trc20: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc",
-  erc20: "0x4A8b2e1F7cD9E3a6B5f0C2d8E9F1a3B4c5D6e7F8",
-  bep20: "0x7F2c9A3d5E8b1C4f6D0a2B9e7F3c5A8d1E4b6C9D",
-  sol: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgHkv",
-};
+const fallbackTrc20Address = "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc";
 
 const TopUpCrypto = () => {
   const navigate = useNavigate();
@@ -38,76 +22,24 @@ const TopUpCrypto = () => {
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
   const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
-  const { data: cardsData } = useCards();
 
-  // Build a network→address map from real wallets
-  const walletAddressMap = useMemo(() => {
-    const map: Record<string, string> = { ...fallbackAddresses };
+  const walletAddress = useMemo(() => {
     if (cryptoWalletsData?.data) {
-      for (const w of cryptoWalletsData.data) {
-        const key = w.network.toLowerCase();
-        map[key] = w.address;
-      }
+      const trc20Wallet = cryptoWalletsData.data.find(w => w.network.toLowerCase() === "trc20");
+      if (trc20Wallet) return trc20Wallet.address;
     }
-    return map;
+    return fallbackTrc20Address;
   }, [cryptoWalletsData]);
 
   const walletLabel = t("drawer.usdtBalance", "USDT TRC20 Кошелек");
-  const primaryWalletAddress = walletAddressMap.trc20;
-
-  const destinations = useMemo((): Destination[] => {
-    const dests: Destination[] = [];
-    
-    // Add real cards from API
-    if (cardsData?.data) {
-      for (const card of cardsData.data) {
-        dests.push({
-          id: card.id,
-          type: "card",
-          cardType: card.type === "metal" ? "metal" : "virtual",
-          name: card.name,
-          subtitle: `•••• ${card.lastFourDigits || "0000"}`,
-          fullNumber: `**** **** **** ${card.lastFourDigits || "0000"}`,
-          balance: card.balance,
-        });
-      }
-    }
-    
-    // Bank account
-    dests.push({ 
-      id: "bank", type: "bank", name: t("topUp.bankAccountAed", "Bank Account AED"), 
-      subtitle: "•••• 3456", fullNumber: "AE070331234567893456" 
-    });
-    
-    // Wallet
-    dests.push({ 
-      id: "wallet", type: "wallet", name: walletLabel, 
-      subtitle: `${primaryWalletAddress.slice(0, 6)}...${primaryWalletAddress.slice(-4)}`, 
-      fullNumber: primaryWalletAddress 
-    });
-    
-    return dests;
-  }, [cardsData, t, walletLabel, primaryWalletAddress]);
+  const selectedNetwork = defaultNetwork;
 
   const [selectedToken] = useState("USDT");
   const [copied, setCopied] = useState(false);
-  const [selectedDest, setSelectedDest] = useState<Destination | null>(null);
-  const selectedNetwork = defaultNetwork;
-  const [revealedId, setRevealedId] = useState<string | null>(null);
-
-  // Set default destination to wallet when destinations load
-  useEffect(() => {
-    if (!selectedDest && destinations.length > 0) {
-      setSelectedDest(destinations.find(d => d.type === "wallet") || destinations[0]);
-    }
-  }, [destinations, selectedDest]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  
-  // Use real wallet address for selected network
-  const walletAddress = walletAddressMap[selectedNetwork.id] || fallbackAddresses.trc20;
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
