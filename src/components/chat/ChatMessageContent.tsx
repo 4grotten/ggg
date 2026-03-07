@@ -1,7 +1,8 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
-import { CreditCard, Wallet, Landmark, Bitcoin, FileDown, Loader2, CheckCircle } from "lucide-react";
+import { CreditCard, Wallet, Landmark, FileDown, Loader2, CheckCircle } from "lucide-react";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { getAuthToken } from "@/services/api/apiClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -84,7 +85,7 @@ function detectCardLineType(children: ReactNode): CardLineType {
   return null;
 }
 
-const cardLineStyles: Record<Exclude<CardLineType, null>, { bg: string; iconBg: string; icon: typeof CreditCard; iconColor: string }> = {
+const cardLineStyles: Record<Exclude<CardLineType, null>, { bg: string; iconBg: string; icon: React.ComponentType<{ className?: string }>; iconColor: string }> = {
   card: {
     bg: "bg-muted/80 border border-border/30",
     iconBg: "bg-primary/10",
@@ -105,9 +106,9 @@ const cardLineStyles: Record<Exclude<CardLineType, null>, { bg: string; iconBg: 
   },
   crypto: {
     bg: "bg-muted/80 border border-border/30",
-    iconBg: "bg-orange-500/15",
-    icon: Bitcoin,
-    iconColor: "text-orange-500",
+    iconBg: "bg-[#26A17B]/15",
+    icon: ({ className }: { className?: string }) => <UsdtIcon size={20} className={className} />,
+    iconColor: "",
   },
   total: {
     bg: "bg-primary/15 border border-primary/20",
