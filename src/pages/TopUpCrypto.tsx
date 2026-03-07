@@ -295,6 +295,7 @@ const TopUpCrypto = () => {
         </button>
       </div>
 
+    </MobileLayout>
   );
 };
 
