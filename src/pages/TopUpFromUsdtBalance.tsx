@@ -24,6 +24,7 @@ const TopUpFromUsdtBalance = () => {
   const { t } = useTranslation();
   const settings = useSettings();
   const { data: cardsData } = useCards();
+  const { data: walletSummary } = useWalletSummary();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   
@@ -35,6 +36,7 @@ const TopUpFromUsdtBalance = () => {
   const cryptoWalletId = cryptoWalletsData?.data?.[0]?.id;
   const cryptoBalance = parseFloat(cryptoWalletsData?.data?.[0]?.balance || '0');
   const bankAccountId = bankAccountsData?.data?.[0]?.id;
+  const bankIban = bankAccountsData?.data?.[0]?.iban || walletSummary?.data?.physical_account?.iban;
 
   const uid = user?.id?.toString() ?? "000";
   const beneficiaryName = user?.full_name || "—";
