@@ -1089,12 +1089,24 @@ export const submitInternalTransfer = async (
   const key = `${request.from_type}-${request.to_type}`;
   const endpoint = endpointMap[key] || `/transactions/transfer/internal/`;
 
+  // Map generic fields to endpoint-specific field names
+  const bodyMap: Record<string, (r: InternalTransferRequest) => Record<string, string>> = {
+    'crypto-card': (r) => ({ from_wallet_id: r.from_id, to_card_number: r.to_id, amount_usdt: r.amount }),
+    'bank-card': (r) => ({ from_bank_account_id: r.from_id, receiver_card_number: r.to_id, amount: r.amount }),
+    'card-crypto': (r) => ({ from_card_id: r.from_id, to_wallet_id: r.to_id, amount_aed: r.amount }),
+    'card-bank': (r) => ({ from_card_id: r.from_id, to_iban: r.to_id, amount_aed: r.amount }),
+    'bank-crypto': (r) => ({ from_bank_account_id: r.from_id, to_crypto_address: r.to_id, amount_aed: r.amount }),
+    'crypto-bank': (r) => ({ from_wallet_id: r.from_id, to_iban: r.to_id, amount_usdt: r.amount }),
+  };
+  const mapBody = bodyMap[key];
+  const body = mapBody ? mapBody(request) : request;
+
   try {
     const result = await apiRequest<InternalTransferResponse>(
       endpoint,
       {
         method: 'POST',
-        body: JSON.stringify(request),
+        body: JSON.stringify(body),
       },
       true // rawEndpoint
     );
