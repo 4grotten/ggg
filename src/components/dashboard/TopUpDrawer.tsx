@@ -33,8 +33,8 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     {
       id: "usdt-balance",
       icon: Wallet,
-      title: t("drawer.usdtBalance", "USDT TRC20 Кошелек"),
-      subtitle: t("drawer.usdtBalanceDesc", "С вашего баланса"),
+      title: t("drawer.usdtBalance", "Пополнить с USDT"),
+      subtitle: t("drawer.usdtBalanceDesc", "Перевод USDT на карты и IBAN"),
       iconBg: "bg-[#26A17B]",
     },
     {
