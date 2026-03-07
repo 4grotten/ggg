@@ -56,7 +56,7 @@ const iconGradients: Record<string, string> = {
   vibrate: 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)',
   contacts: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
   eyeoff: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
-  bell: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+  bell: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
 };
 
 interface ColoredIconProps {
@@ -888,18 +888,36 @@ const Settings = () => {
             })()}
 
             {/* Notifications Settings */}
-            <button
-              onClick={() => setIsPushDrawerOpen(true)}
-              className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <ColoredIcon colorKey="bell"><Bell className="w-4 h-4" /></ColoredIcon>
-                <span className="text-foreground font-medium">{t("settings.notifications") || "Уведомления"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
-              </div>
-            </button>
+            {(() => {
+              const channels: string[] = [];
+              if (isPushEnabled) channels.push("Push");
+              if (localStorage.getItem('notif_whatsapp_enabled') === 'true') channels.push("WA");
+              if (localStorage.getItem('notif_telegram_enabled') === 'true') channels.push("TG");
+              if (localStorage.getItem('notif_email_enabled') === 'true') channels.push("Mail");
+              const anyEnabled = channels.length > 0;
+              return (
+                <button
+                  onClick={() => setIsPushDrawerOpen(true)}
+                  className="w-full flex items-center justify-between py-4 px-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <ColoredIcon colorKey="bell"><Bell className="w-4 h-4" /></ColoredIcon>
+                    <div className="text-left">
+                      <span className="text-foreground font-medium">{t("settings.pushNotifications") || "Push Уведомления"}</span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {channels.length > 0 ? channels.join(", ") : t("settings.noActiveChannels") || "Нет активных каналов"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-medium ${anyEnabled ? "text-green-500" : "text-muted-foreground"}`}>
+                      {anyEnabled ? (t("settings.enabled") || "Вкл") : (t("settings.disabled") || "Выкл")}
+                    </span>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </button>
+              );
+            })()}
 
             {/* Personal Details / Verification */}
             {(() => {
