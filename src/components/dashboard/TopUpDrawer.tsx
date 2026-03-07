@@ -56,7 +56,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
       icon: CreditCard,
       title: t("drawer.shareCardDetails", "Поделиться данными карты"),
       subtitle: t("drawer.shareCardDetailsDesc", "Отправить реквизиты"),
-      iconBg: "bg-orange-500",
+      iconBg: "bg-green-500",
     },
   ];
 
