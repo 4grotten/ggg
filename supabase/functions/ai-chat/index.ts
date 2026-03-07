@@ -163,71 +163,64 @@ async function fetchAllBalances(userToken?: string): Promise<string> {
   return lines.length > 0 ? lines.join('\n') : 'Балансы не найдены.';
 }
 
-async function fetchUserFinancialData(supabase: any, userId: string) {
-  // Fetch recent transactions
-  const { data: transactions, error } = await supabase
-    .from('transactions')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(20);
+async function fetchTransactionsFromApi(userToken?: string): Promise<string> {
+  if (!userToken) return "Данные о транзакциях недоступны (нет токена).";
 
-  if (error || !transactions?.length) {
-    return null;
-  }
-
-  // Calculate summary
-  const income = transactions
-    .filter((tx: any) => tx.amount > 0)
-    .reduce((sum: number, tx: any) => sum + parseFloat(tx.amount), 0);
-  
-  const expenses = transactions
-    .filter((tx: any) => tx.amount < 0)
-    .reduce((sum: number, tx: any) => sum + Math.abs(parseFloat(tx.amount)), 0);
-
-  // Group by category
-  const categoryTotals: Record<string, number> = {};
-  transactions
-    .filter((tx: any) => tx.amount < 0 && tx.merchant_category)
-    .forEach((tx: any) => {
-      const cat = tx.merchant_category;
-      categoryTotals[cat] = (categoryTotals[cat] || 0) + Math.abs(parseFloat(tx.amount));
+  try {
+    const BACKEND_BASE = "https://ueasycard.com/api/v1";
+    const response = await fetch(`${BACKEND_BASE}/transactions/all/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Token ${userToken}`,
+      },
     });
 
-  // Format transactions for context with full details
-  const formattedTransactions = transactions.slice(0, 10).map((tx: any, idx: number) => {
-    const num = idx + 1;
-    const date = formatDate(tx.created_at);
-    const type = formatTransactionType(tx.type);
-    const sign = tx.amount > 0 ? '+' : '';
-    const amount = `${sign}${tx.amount} AED`;
-    const merchant = tx.merchant_name || '';
-    const category = tx.merchant_category || '';
-    const desc = tx.description || '';
-    const ref = tx.reference_id ? `ref:${tx.reference_id}` : '';
-    const cardId = tx.card_id ? `card:${tx.card_id.slice(-4)}` : '';
-    const status = tx.status || 'completed';
-    
-    return `- [#${num}] ${date} | ${type} | ${amount} | ${status}${merchant ? ` | ${merchant}` : ''}${category ? ` | кат: ${category}` : ''}${cardId ? ` | ${cardId}` : ''}${ref ? ` | ${ref}` : ''}${desc ? ` | ${desc}` : ''}`;
-  }).join('\n');
+    if (!response.ok) {
+      console.error("Transactions API error:", response.status);
+      return "Данные о транзакциях временно недоступны.";
+    }
 
-  // Format categories
-  const formattedCategories = Object.entries(categoryTotals)
-    .sort((a, b) => (b[1] as number) - (a[1] as number))
-    .slice(0, 5)
-    .map(([cat, amount]) => `- ${cat}: ${(amount as number).toFixed(2)} AED`)
-    .join('\n');
+    const rawData = await response.json();
+    const transactions = Array.isArray(rawData) ? rawData : (rawData?.results || rawData?.data || []);
 
-  return {
-    balance: {
-      total: (income - expenses).toFixed(2),
-      income: income.toFixed(2),
-      expenses: expenses.toFixed(2)
-    },
-    transactions: formattedTransactions,
-    categories: formattedCategories,
-    transactionCount: transactions.length
-  };
+    if (!transactions.length) {
+      return "Транзакций пока нет.";
+    }
+
+    // Format last 20 transactions
+    const formatted = transactions.slice(0, 20).map((tx: any, idx: number) => {
+      const num = idx + 1;
+      const date = tx.created_at ? formatDate(tx.created_at) : '';
+      
+      // Use display block if available (backend pre-formatted)
+      if (tx.display) {
+        const d = tx.display;
+        const title = d.title || tx.type || '';
+        const subtitle = d.subtitle || '';
+        const amount = d.primary_amount 
+          ? `${d.primary_amount.sign || ''}${d.primary_amount.amount} ${d.primary_amount.currency || 'AED'}`
+          : `${tx.amount} AED`;
+        return `- [#${num}] ${date} | ${title} | ${amount}${subtitle ? ` | ${subtitle}` : ''}`;
+      }
+
+      // Fallback: raw fields
+      const type = formatTransactionType(tx.type || '');
+      const amount = tx.amount !== undefined ? `${parseFloat(tx.amount) > 0 ? '+' : ''}${tx.amount} ${tx.currency || 'AED'}` : '';
+      const status = tx.status || 'completed';
+      const merchant = tx.merchant_name || '';
+      const senderMask = tx.sender_card_mask ? `от ****${tx.sender_card_mask.slice(-4)}` : '';
+      const receiverMask = tx.receiver_card_mask ? `на ****${tx.receiver_card_mask.slice(-4)}` : '';
+      const participants = [senderMask, receiverMask].filter(Boolean).join(' → ');
+
+      return `- [#${num}] ${date} | ${type} | ${amount} | ${status}${merchant ? ` | ${merchant}` : ''}${participants ? ` | ${participants}` : ''}`;
+    }).join('\n');
+
+    return `${formatted}\n\nВсего транзакций в истории: ${transactions.length}`;
+  } catch (err) {
+    console.error("Error fetching transactions from API:", err);
+    return "Ошибка при получении транзакций.";
+  }
 }
 
 serve(async (req) => {
