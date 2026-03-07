@@ -119,16 +119,28 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
       receiverDetails.push(`${a.slice(0, 6)}••••${a.slice(-4)}`);
     }
     // Card number
-    if (tx.metadata?.receiver_card_number || tx.metadata?.to_card_number) {
-      const c = String(tx.metadata?.receiver_card_number || tx.metadata?.to_card_number);
+    const rCard = tx.metadata?.receiver_card_number || tx.metadata?.to_card_number || tx.metadata?.card_number || tx.metadata?.to_card_mask;
+    if (rCard) {
+      const c = String(rCard);
       receiverDetails.push(`•••• ${c.slice(-4)}`);
     }
-    // Movements fallback (index 1 = receiver)
-    if (receiverDetails.length === 0 && tx.movements && Array.isArray(tx.movements) && tx.movements[1]) {
-      const m = tx.movements[1];
-      if (m.card_mask) receiverDetails.push(`•••• ${m.card_mask.slice(-4)}`);
-      else if (m.iban) { const i = String(m.iban); receiverDetails.push(`${i.slice(0, 4)}••••${i.slice(-4)}`); }
-      else if (m.address) { const a = String(m.address); receiverDetails.push(`${a.slice(0, 6)}••••${a.slice(-4)}`); }
+    // Movements fallback - check ALL movements for receiver data
+    if (receiverDetails.length === 0 && tx.movements && Array.isArray(tx.movements)) {
+      // Try index 1 first, then any movement with account_type 'card' or 'bank'
+      const candidates = tx.movements.length > 1 ? [tx.movements[1], ...tx.movements] : tx.movements;
+      for (const m of candidates) {
+        if (receiverDetails.length > 0) break;
+        if (m.card_mask) receiverDetails.push(`•••• ${m.card_mask.slice(-4)}`);
+        else if (m.card_number) { const c = String(m.card_number); receiverDetails.push(`•••• ${c.slice(-4)}`); }
+        else if (m.iban) { const i = String(m.iban); receiverDetails.push(`${i.slice(0, 4)}••••${i.slice(-4)}`); }
+        else if (m.address) { const a = String(m.address); receiverDetails.push(`${a.slice(0, 6)}••••${a.slice(-4)}`); }
+      }
+    }
+    // Last resort: use display subtitle
+    if (receiverDetails.length === 0 && tx.display?.subtitle) {
+      const sub = String(tx.display.subtitle);
+      const cardMatch = sub.match(/(\d{4})\s*$/);
+      if (cardMatch) receiverDetails.push(`•••• ${cardMatch[1]}`);
     }
     
     const senderMask = senderDetails.length > 0 ? esc(senderDetails.join(' · ')) : '—';
