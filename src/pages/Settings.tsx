@@ -820,69 +820,6 @@ const Settings = () => {
           </motion.button>
         )}
 
-      {/* PUSH Notifications Drawer */}
-      <Drawer open={isPushDrawerOpen} onOpenChange={setIsPushDrawerOpen}>
-        <DrawerContent className="max-h-[85vh]">
-          <DrawerHeader className="flex items-center justify-between px-6 pb-2">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: iconGradients.bell }}>
-                <Bell className="w-5 h-5 text-white" />
-              </div>
-              <DrawerTitle className="text-lg font-semibold">{t("settings.pushNotifications") || "PUSH уведомления"}</DrawerTitle>
-            </div>
-            <button onClick={() => setIsPushDrawerOpen(false)} className="p-1.5 rounded-full hover:bg-muted transition-colors">
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
-          </DrawerHeader>
-          <div className="px-6 pb-8 space-y-6">
-            <p className="text-sm text-muted-foreground">
-              {t("settings.pushDescription") || "Получайте мгновенные уведомления о транзакциях, входах в аккаунт и важных событиях."}
-            </p>
-
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/50 border border-border/50">
-              <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="text-sm font-medium text-foreground">{t("settings.enablePush") || "Включить PUSH"}</p>
-                  <p className="text-xs text-muted-foreground">{t("settings.pushSubtitle") || "Уведомления на это устройство"}</p>
-                </div>
-              </div>
-              <Switch
-                checked={isPushEnabled}
-                onCheckedChange={(checked) => {
-                  setIsPushEnabled(checked);
-                  localStorage.setItem('push_notifications_enabled', String(checked));
-                  if (checked) {
-                    if ('Notification' in window) {
-                      Notification.requestPermission().then((permission) => {
-                        if (permission === 'granted') {
-                          toast.success(t("toast.pushEnabled") || "PUSH уведомления включены");
-                        } else {
-                          toast.error(t("toast.pushDenied") || "Разрешение на уведомления отклонено");
-                          setIsPushEnabled(false);
-                          localStorage.setItem('push_notifications_enabled', 'false');
-                        }
-                      });
-                    } else {
-                      toast.error(t("toast.pushNotSupported") || "Уведомления не поддерживаются в этом браузере");
-                      setIsPushEnabled(false);
-                      localStorage.setItem('push_notifications_enabled', 'false');
-                    }
-                  } else {
-                    toast.success(t("toast.pushDisabled") || "PUSH уведомления выключены");
-                  }
-                }}
-              />
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/15">
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                📌 {t("settings.pushHint") || "Для работы PUSH уведомлений необходимо разрешить уведомления в настройках браузера. На iOS добавьте приложение на домашний экран."}
-              </p>
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
 
         {/* Profile Section - Edit Profile, Personal Details, Referral Partner, Limits Settings in one block */}
         {isAuthenticated && (
