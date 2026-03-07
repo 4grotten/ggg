@@ -386,10 +386,10 @@ ${userDataContext}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5",
+        model: "openai/gpt-5-mini",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
+          ...messages.slice(-20),
         ],
         stream: true,
       }),
