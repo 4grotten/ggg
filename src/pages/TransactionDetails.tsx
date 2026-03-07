@@ -2584,8 +2584,8 @@ const TransactionDetails = () => {
               </div>
             )}
             {(() => {
-              // For crypto_to_card, crypto_address belongs to sender, not receiver — skip here
-              if (receipt.type === 'crypto_to_card') return null;
+              // For crypto_to_card and crypto_to_iban (crypto sender), crypto_address belongs to sender — skip here
+              if (receipt.type === 'crypto_to_card' || (receipt.type === 'crypto_to_iban' && isCryptoToIbanCryptoSender)) return null;
               const cryptoAddr = (receipt as any)?.crypto_address || (receipt as any)?.metadata?.crypto_address || (receipt as any)?.receiver_wallet || (transaction as any)?.cryptoAddress || '';
               if (!cryptoAddr) return null;
               return (
