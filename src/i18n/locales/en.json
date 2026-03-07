@@ -2105,6 +2105,11 @@
     "notFound": "Account not found"
   },
   "notifications": {
+    "title": "Notifications",
+    "clearAll": "Clear all",
+    "empty": "No notifications",
+    "justNow": "Just now",
+    "minAgo": "min ago",
     "transferSent": "Transfer sent",
     "profileUpdated": "Profile updated"
   }

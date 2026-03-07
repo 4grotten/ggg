@@ -2014,6 +2014,11 @@
     "notFound": "未找到账户"
   },
   "notifications": {
+    "title": "通知",
+    "clearAll": "全部清除",
+    "empty": "没有通知",
+    "justNow": "刚刚",
+    "minAgo": "分钟前",
     "transferSent": "转账已发送",
     "profileUpdated": "个人资料已更新"
   }

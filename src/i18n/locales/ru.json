@@ -2114,6 +2114,11 @@
     "notFound": "Счёт не найден"
   },
   "notifications": {
+    "title": "Уведомления",
+    "clearAll": "Очистить",
+    "empty": "Нет уведомлений",
+    "justNow": "Только что",
+    "minAgo": "мин назад",
     "transferSent": "Перевод отправлен",
     "profileUpdated": "Профиль обновлён"
   }
