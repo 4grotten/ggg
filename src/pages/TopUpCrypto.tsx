@@ -6,9 +6,10 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/contexts/SettingsContext";
-import { useSettings } from "@/contexts/SettingsContext";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { useCryptoWallets } from "@/hooks/useCards";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCryptoWallets, useCards } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 
