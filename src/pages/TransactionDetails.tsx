@@ -716,7 +716,7 @@ const TransactionDetails = () => {
                 animate={{ y: 0, x: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
               >
-                <UsdtIcon size={40} />
+                <UsdtIcon size={52} />
               </motion.div>
             </motion.div>
           ) : isCardActivation ? (
