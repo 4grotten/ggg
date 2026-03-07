@@ -145,6 +145,10 @@ const markdownComponents = {
     return <strong className="font-bold text-foreground">{processChildren(children)}</strong>;
   },
   li: ({ children }: { children?: ReactNode }) => {
+    const lineType = detectCardLineType(children);
+    if (lineType) {
+      return <BalanceCard lineType={lineType}>{children}</BalanceCard>;
+    }
     return <li className="my-1 text-sm leading-relaxed">{processChildren(children)}</li>;
   },
   ul: ({ children }: { children?: ReactNode }) => {
