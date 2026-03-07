@@ -14,7 +14,7 @@ import { useCards, useWalletSummary } from "@/hooks/useCards";
 import { useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
 import { Card } from "@/types/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { submitInternalTransfer } from "@/services/api/transactions";
+import { submitInternalTransfer, submitCryptoToBank } from "@/services/api/transactions";
 import { useQueryClient } from "@tanstack/react-query";
 
 type Destination = "card" | "account";
