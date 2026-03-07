@@ -120,8 +120,7 @@ async function fetchAllBalances(userToken?: string): Promise<string> {
       // Bank account (IBAN)
       if (data.physical_account) {
         const pa = data.physical_account;
-        const iban = pa.iban ? ` | IBAN: ${pa.iban}` : '';
-        bankLines.push(`🏦 Банковский счёт: ${pa.balance} ${pa.currency || 'AED'}${iban}`);
+        bankLines.push(`🏦 Банковский счёт: ${pa.balance} ${pa.currency || 'AED'}`);
       }
     } else {
       cardLines.push('💳 Данные о картах временно недоступны.');
