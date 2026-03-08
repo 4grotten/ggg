@@ -313,7 +313,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
   
   .summary-card.income .value { color: #10b981; }
   .summary-card.expense .value { color: #ef4444; }
-  .summary-card.balance .value { color: #0ea5e9; }
+  .summary-card.balance .value { color: #007AFF; }
   .summary-card.count .value { color: #1e293b; }
   
   /* ===== TABLE ===== */
