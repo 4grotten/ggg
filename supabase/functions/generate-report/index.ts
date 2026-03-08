@@ -188,7 +188,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
   
   /* ===== HEADER ===== */
   .header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0ea5e9 100%);
+    background: linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #0ea5e9 100%);
     color: #fff;
     padding: 40px 48px;
     position: relative;
@@ -202,7 +202,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     right: -20%;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(14,165,233,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(14,165,233,0.3) 0%, transparent 70%);
     border-radius: 50%;
   }
   
@@ -213,7 +213,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     left: 10%;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(56,189,248,0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(56,189,248,0.2) 0%, transparent 70%);
     border-radius: 50%;
   }
   
@@ -232,19 +232,10 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     margin-bottom: 24px;
   }
   
-  .logo-circle {
+  .logo-svg {
     width: 56px;
     height: 56px;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255,255,255,0.25);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 800;
-    color: #38bdf8;
+    flex-shrink: 0;
   }
   
   .brand-name {
@@ -253,7 +244,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     letter-spacing: -0.5px;
   }
   
-  .brand-name span { color: #38bdf8; }
+  .brand-name .u-letter { color: #0ea5e9; }
   
   .report-title {
     font-size: 18px;
