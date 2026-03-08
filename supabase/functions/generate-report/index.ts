@@ -188,7 +188,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
   
   /* ===== HEADER ===== */
   .header {
-    background: linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #0ea5e9 100%);
+    background: linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #007AFF 100%);
     color: #fff;
     padding: 40px 48px;
     position: relative;
@@ -202,7 +202,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     right: -20%;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(14,165,233,0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(0,122,255,0.3) 0%, transparent 70%);
     border-radius: 50%;
   }
   
@@ -213,7 +213,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     left: 10%;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(56,189,248,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(0,122,255,0.2) 0%, transparent 70%);
     border-radius: 50%;
   }
   
