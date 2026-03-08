@@ -188,7 +188,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
   
   /* ===== HEADER ===== */
   .header {
-    background: linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #0ea5e9 100%);
+    background: linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #007AFF 100%);
     color: #fff;
     padding: 40px 48px;
     position: relative;
@@ -202,7 +202,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     right: -20%;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(14,165,233,0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(0,122,255,0.3) 0%, transparent 70%);
     border-radius: 50%;
   }
   
@@ -213,7 +213,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     left: 10%;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(56,189,248,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(0,122,255,0.2) 0%, transparent 70%);
     border-radius: 50%;
   }
   
@@ -244,7 +244,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     letter-spacing: -0.5px;
   }
   
-  .brand-name .u-letter { color: #0ea5e9; }
+  .brand-name .u-letter { color: #007AFF; }
   
   .report-title {
     font-size: 18px;
@@ -257,7 +257,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     font-size: 32px;
     font-weight: 800;
     letter-spacing: -1px;
-    background: linear-gradient(90deg, #fff, #7dd3fc);
+    background: linear-gradient(90deg, #fff, #5AC8FA);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -274,7 +274,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     display: block;
     font-size: 14px;
     opacity: 1;
-    color: #7dd3fc;
+    color: #5AC8FA;
   }
   
   /* ===== SUMMARY CARDS ===== */
@@ -313,7 +313,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
   
   .summary-card.income .value { color: #10b981; }
   .summary-card.expense .value { color: #ef4444; }
-  .summary-card.balance .value { color: #0ea5e9; }
+  .summary-card.balance .value { color: #007AFF; }
   .summary-card.count .value { color: #1e293b; }
   
   /* ===== TABLE ===== */
@@ -336,7 +336,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     content: '';
     width: 4px;
     height: 20px;
-    background: linear-gradient(180deg, #0ea5e9, #38bdf8);
+    background: linear-gradient(180deg, #007AFF, #5AC8FA);
     border-radius: 2px;
   }
   
@@ -471,7 +471,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
       <div>
         <div class="brand">
           <svg class="logo-svg" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="512" height="512" rx="62" fill="#0ea5e9"/>
+            <rect width="512" height="512" rx="62" fill="#007AFF"/>
             <path d="M259 66.002L301.399 66V266.83C301.399 289.38 296.013 309.111 285.242 326.023C274.571 342.935 259.622 356.122 240.394 365.585C221.167 374.947 198.769 379.628 173.199 379.628C147.529 379.628 125.081 374.947 105.853 365.585C86.6258 356.122 71.6767 342.935 61.006 326.023C50.3353 309.111 45 289.38 45 266.83V66H110.383V261.243C110.383 273.021 112.95 283.491 118.084 292.651C123.319 301.812 130.668 309.01 140.13 314.245C149.593 319.479 160.616 322.097 173.199 322.097C185.883 322.097 196.906 319.479 206.268 314.245C215.731 309.01 223.029 301.812 228.163 292.651C233.398 283.491 236.015 273.021 236.015 261.243L259 66.002Z" fill="white"/>
             <path d="M259 379.002V66.002H467.381V120.563H324.383V195.145H456.659V249.706H324.383V324.441H467.985V379.002H259Z" fill="white"/>
             <path d="M142.852 414.35H119.597C119.172 413.031 118.305 411.858 116.995 410.834C115.686 409.793 114.004 408.908 111.951 408.179C109.898 407.449 107.527 406.89 104.837 406.502C102.182 406.114 99.2974 405.92 96.1826 405.92C90.5546 405.92 85.6523 406.533 81.4755 407.76C77.2988 408.971 74.0601 410.74 71.7593 413.069C69.4586 415.383 68.3082 418.193 68.3082 421.5C68.3082 424.9 69.4586 427.757 71.7593 430.07C74.0955 432.384 77.3519 434.13 81.5286 435.31C85.7054 436.49 90.5369 437.08 96.0233 437.08C99.1027 437.08 101.952 436.902 104.571 436.545C107.226 436.188 109.58 435.667 111.633 434.984C113.686 434.286 115.385 433.439 116.73 432.446C118.11 431.452 119.066 430.319 119.597 429.046L142.852 429.092C142.25 431.281 140.746 433.393 138.339 435.427C135.968 437.445 132.764 439.254 128.729 440.853C124.729 442.437 119.951 443.694 114.394 444.626C108.872 445.542 102.625 446 95.6516 446C85.9531 446 77.2811 445.037 69.6356 443.112C62.0255 441.187 56.0081 438.4 51.5836 434.751C47.1945 431.103 45 426.686 45 421.5C45 416.299 47.2299 411.874 51.6898 408.225C56.1497 404.577 62.2024 401.798 69.848 399.888C77.4935 397.963 86.0947 397 95.6516 397C101.952 397 107.792 397.388 113.173 398.164C118.588 398.941 123.384 400.074 127.561 401.565C131.738 403.04 135.136 404.848 137.755 406.991C140.41 409.134 142.109 411.587 142.852 414.35Z" fill="white"/>
