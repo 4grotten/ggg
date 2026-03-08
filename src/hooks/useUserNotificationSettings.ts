@@ -18,7 +18,7 @@ export function useUserNotificationSettings() {
   const query = useQuery({
     queryKey: ["user-notification-settings"],
     queryFn: async () => {
-      const res = await apiGet<UserNotificationSettings>("/accounts/users/notifications/settings/");
+      const res = await apiGet<UserNotificationSettings>("/users/notifications/settings/");
       if (res.error) throw new Error(res.error.detail || res.error.message);
       return res.data;
     },
