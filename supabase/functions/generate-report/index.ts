@@ -274,7 +274,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     display: block;
     font-size: 14px;
     opacity: 1;
-    color: #7dd3fc;
+    color: #5AC8FA;
   }
   
   /* ===== SUMMARY CARDS ===== */
