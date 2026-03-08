@@ -519,6 +519,15 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
         </div>
         <div class="report-title">Отчёт по транзакциям</div>
         <div class="report-period">${esc(periodLabel)}</div>
+        ${assetBalances.length > 0 ? `
+        <div class="balances-row">
+          ${assetBalances.map(b => `
+            <div class="balance-chip">
+              <span class="bal-label">${esc(b.label)}:</span>
+              <span class="bal-value">${esc(b.amount)} ${esc(b.currency)}</span>
+            </div>
+          `).join('')}
+        </div>` : ''}
       </div>
       <div class="header-meta">
         ${userName ? `<strong>${esc(userName)}</strong>` : ''}
