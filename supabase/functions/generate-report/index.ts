@@ -42,7 +42,13 @@ const statusMap: Record<string, { label: string; color: string }> = {
   'declined': { label: 'Отклонено', color: '#ef4444' },
 };
 
-function buildHTML(filtered: any[], periodLabel: string, userName: string, generatedDate: string, totalIn: number, totalOut: number): string {
+interface AssetBalance {
+  label: string;
+  amount: string;
+  currency: string;
+}
+
+function buildHTML(filtered: any[], periodLabel: string, userName: string, generatedDate: string, totalIn: number, totalOut: number, assetBalances: AssetBalance[] = []): string {
   const txRows = filtered.map((tx: any, idx: number) => {
     const date = tx.created_at ? formatDate(tx.created_at) : '';
     const time = tx.created_at ? formatTime(tx.created_at) : '';
