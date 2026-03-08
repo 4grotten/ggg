@@ -45,7 +45,7 @@ export function useUserNotificationSettings() {
         email_enabled: patch.email_enabled ?? current.email_enabled,
       };
 
-      const res = await apiPut<UserNotificationSettings>("/accounts/users/notifications/settings/", body);
+      const res = await apiPut<UserNotificationSettings>("/users/notifications/settings/", body);
       if (res.error) throw new Error(res.error.detail || res.error.message);
       return res.data;
     },
