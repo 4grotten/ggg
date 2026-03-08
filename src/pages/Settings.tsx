@@ -737,17 +737,17 @@ const Settings = () => {
                 <span>{t("settings.personalData") || "Личные данные"}</span>
               </button>
               
-              {/* Verification status - verified when completed 3 steps */}
+               {/* Verification status - from API */}
               <button
                 onClick={() => {
-                  if (getCompletedSteps() >= 3) {
+                  if (user?.is_verified) {
                     setIsVerificationDialogOpen(true);
                   } else {
                     navigate("/profile-verification");
                   }
                 }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  getCompletedSteps() < 3
+                  !user?.is_verified
                     ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
                     : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
                 }`}
