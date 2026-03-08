@@ -336,7 +336,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     content: '';
     width: 4px;
     height: 20px;
-    background: linear-gradient(180deg, #0ea5e9, #38bdf8);
+    background: linear-gradient(180deg, #007AFF, #5AC8FA);
     border-radius: 2px;
   }
   
