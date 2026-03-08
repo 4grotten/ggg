@@ -457,6 +457,7 @@
     "pushSubtitle": "Notifications to this device",
     "pushDescription": "Receive instant notifications about transactions, account logins, and important events.",
     "pushHint": "To use push notifications, allow notifications in your browser settings. On iOS, add the app to your home screen.",
+    "browserPush": "Browser PUSH",
     "noActiveChannels": "No active channels",
     "notifications": "Notifications",
     "notificationsDescription": "Configure channels for receiving notifications about transactions and important events.",

@@ -442,6 +442,7 @@
     "pushSubtitle": "Bu cihaza bildirimler",
     "pushDescription": "İşlemler, hesap girişleri ve önemli olaylar hakkında anında bildirim alın.",
     "pushHint": "Push bildirimlerinin çalışması için tarayıcı ayarlarınızda bildirimlere izin verin. iOS'ta uygulamayı ana ekrana ekleyin.",
+    "browserPush": "Tarayıcı PUSH",
     "noActiveChannels": "Aktif kanal yok",
     "notifications": "Bildirimler",
     "notificationsDescription": "İşlemler ve önemli olaylar hakkında bildirim almak için kanalları yapılandırın.",

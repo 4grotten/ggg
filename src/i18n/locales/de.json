@@ -442,6 +442,7 @@
     "pushSubtitle": "Benachrichtigungen auf dieses Gerät",
     "pushDescription": "Erhalten Sie sofortige Benachrichtigungen über Transaktionen, Kontoanmeldungen und wichtige Ereignisse.",
     "pushHint": "Damit Push-Benachrichtigungen funktionieren, erlauben Sie Benachrichtigungen in Ihren Browsereinstellungen. Fügen Sie auf iOS die App zum Startbildschirm hinzu.",
+    "browserPush": "Browser PUSH",
     "noActiveChannels": "Keine aktiven Kanäle",
     "notifications": "Benachrichtigungen",
     "notificationsDescription": "Konfigurieren Sie Kanäle für Benachrichtigungen über Transaktionen und wichtige Ereignisse.",
