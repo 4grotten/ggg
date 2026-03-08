@@ -42,7 +42,13 @@ const statusMap: Record<string, { label: string; color: string }> = {
   'declined': { label: 'Отклонено', color: '#ef4444' },
 };
 
-function buildHTML(filtered: any[], periodLabel: string, userName: string, generatedDate: string, totalIn: number, totalOut: number): string {
+interface AssetBalance {
+  label: string;
+  amount: string;
+  currency: string;
+}
+
+function buildHTML(filtered: any[], periodLabel: string, userName: string, generatedDate: string, totalIn: number, totalOut: number, assetBalances: AssetBalance[] = []): string {
   const txRows = filtered.map((tx: any, idx: number) => {
     const date = tx.created_at ? formatDate(tx.created_at) : '';
     const time = tx.created_at ? formatTime(tx.created_at) : '';
@@ -260,7 +266,34 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     color: #fff;
   }
   
-  .header-meta {
+  .balances-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  
+  .balance-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    backdrop-filter: blur(4px);
+  }
+  
+  .balance-chip .bal-label {
+    opacity: 0.7;
+    font-weight: 500;
+  }
+  
+  .balance-chip .bal-value {
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
     text-align: right;
     font-size: 13px;
     opacity: 0.75;
@@ -486,6 +519,15 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
         </div>
         <div class="report-title">Отчёт по транзакциям</div>
         <div class="report-period">${esc(periodLabel)}</div>
+        ${assetBalances.length > 0 ? `
+        <div class="balances-row">
+          ${assetBalances.map(b => `
+            <div class="balance-chip">
+              <span class="bal-label">${esc(b.label)}:</span>
+              <span class="bal-value">${esc(b.amount)} ${esc(b.currency)}</span>
+            </div>
+          `).join('')}
+        </div>` : ''}
       </div>
       <div class="header-meta">
         ${userName ? `<strong>${esc(userName)}</strong>` : ''}
@@ -570,7 +612,13 @@ serve(async (req) => {
       "Authorization": `Token ${backend_token}`,
     };
 
-    const response = await fetch(`${BACKEND_BASE}/transactions/all/`, { method: "GET", headers });
+    // Fetch transactions and balances in parallel
+    const [response, walletRes, bankRes, cryptoRes] = await Promise.all([
+      fetch(`${BACKEND_BASE}/transactions/all/`, { method: "GET", headers }),
+      fetch(`${BACKEND_BASE}/cards/wallet/summary/`, { method: "GET", headers }).catch(() => null),
+      fetch(`${BACKEND_BASE}/transactions/bank-accounts/`, { method: "GET", headers }).catch(() => null),
+      fetch(`${BACKEND_BASE}/transactions/crypto-wallets/`, { method: "GET", headers }).catch(() => null),
+    ]);
 
     if (!response.ok) {
       console.error("Transactions API error:", response.status);
@@ -579,6 +627,56 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Parse balances
+    const assetBalances: AssetBalance[] = [];
+    try {
+      if (walletRes?.ok) {
+        const wallet = await walletRes.json();
+        // Cards balances
+        if (wallet.cards && Array.isArray(wallet.cards)) {
+          for (const card of wallet.cards) {
+            const bal = parseFloat(String(card.balance || 0));
+            if (bal > 0 || card.card_mask) {
+              const mask = card.card_mask ? `•••• ${String(card.card_mask).slice(-4)}` : (card.card_type || 'Карта');
+              assetBalances.push({ label: mask, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'AED' });
+            }
+          }
+        }
+        // USDT balance
+        if (wallet.usdt_balance !== undefined) {
+          const usdtBal = parseFloat(String(wallet.usdt_balance || 0));
+          assetBalances.push({ label: 'USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
+        }
+      }
+    } catch (e) { console.error("Wallet parse error:", e); }
+
+    try {
+      if (bankRes?.ok) {
+        const bankData = await bankRes.json();
+        const accounts = Array.isArray(bankData) ? bankData : (bankData?.results || []);
+        for (const acc of accounts) {
+          const bal = parseFloat(String(acc.balance || 0));
+          const iban = acc.iban ? `${String(acc.iban).slice(0, 4)}••••${String(acc.iban).slice(-4)}` : 'IBAN';
+          assetBalances.push({ label: iban, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: acc.currency || 'AED' });
+        }
+      }
+    } catch (e) { console.error("Bank parse error:", e); }
+
+    try {
+      if (cryptoRes?.ok) {
+        const cryptoData = await cryptoRes.json();
+        const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
+        for (const w of wallets) {
+          const bal = parseFloat(String(w.balance || 0));
+          const addr = w.address ? `${String(w.address).slice(0, 6)}••••${String(w.address).slice(-4)}` : (w.token || 'Crypto');
+          const token = w.token || 'USDT';
+          // Skip if already added via wallet summary
+          if (token === 'USDT' && assetBalances.some(a => a.label === 'USDT')) continue;
+          assetBalances.push({ label: `${token} (${w.network || 'TRC20'})`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
+        }
+      }
+    } catch (e) { console.error("Crypto parse error:", e); }
 
     const rawData = await response.json();
     const allTransactions = Array.isArray(rawData) ? rawData : (rawData?.results || rawData?.data || []);
@@ -625,7 +723,7 @@ serve(async (req) => {
           : 'Все транзакции';
 
     const generatedDate = formatDate(new Date().toISOString());
-    const html = buildHTML(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut);
+    const html = buildHTML(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut, assetBalances);
 
     const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const fileName = `uEasyCard_Report_${fileDate}.html`;
