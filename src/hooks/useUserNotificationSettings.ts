@@ -18,7 +18,7 @@ export function useUserNotificationSettings() {
   const query = useQuery({
     queryKey: ["user-notification-settings"],
     queryFn: async () => {
-      const res = await apiGet<UserNotificationSettings>("/accounts/users/notifications/settings/");
+      const res = await apiGet<UserNotificationSettings>("/users/notifications/settings/");
       if (res.error) throw new Error(res.error.detail || res.error.message);
       return res.data;
     },
@@ -45,7 +45,7 @@ export function useUserNotificationSettings() {
         email_enabled: patch.email_enabled ?? current.email_enabled,
       };
 
-      const res = await apiPut<UserNotificationSettings>("/accounts/users/notifications/settings/", body);
+      const res = await apiPut<UserNotificationSettings>("/users/notifications/settings/", body);
       if (res.error) throw new Error(res.error.detail || res.error.message);
       return res.data;
     },
