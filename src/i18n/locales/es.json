@@ -442,6 +442,7 @@
     "pushSubtitle": "Notificaciones a este dispositivo",
     "pushDescription": "Reciba notificaciones instantáneas sobre transacciones, inicios de sesión y eventos importantes.",
     "pushHint": "Para usar notificaciones push, permita las notificaciones en la configuración de su navegador. En iOS, agregue la app a la pantalla de inicio.",
+    "browserPush": "PUSH del navegador",
     "noActiveChannels": "No hay canales activos",
     "notifications": "Notificaciones",
     "notificationsDescription": "Configure canales para recibir notificaciones sobre transacciones y eventos importantes.",

@@ -444,6 +444,7 @@
     "pushSubtitle": "向此设备发送通知",
     "pushDescription": "即时接收有关交易、账户登录和重要事件的通知。",
     "pushHint": "要使用推送通知，请在浏览器设置中允许通知。在iOS上，请将应用添加到主屏幕。",
+    "browserPush": "浏览器推送",
     "noActiveChannels": "没有活跃的频道",
     "notifications": "通知",
     "notificationsDescription": "配置接收交易和重要事件通知的渠道。",
