@@ -244,7 +244,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     letter-spacing: -0.5px;
   }
   
-  .brand-name .u-letter { color: #0ea5e9; }
+  .brand-name .u-letter { color: #007AFF; }
   
   .report-title {
     font-size: 18px;
