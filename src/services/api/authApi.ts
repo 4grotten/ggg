@@ -67,6 +67,8 @@ export interface UserProfile {
   gender: 'male' | 'female' | null;
   has_empty_fields: boolean;
   role: string | null;
+  is_verified?: boolean;
+  verification_status?: string;
 }
 
 export interface LoginResponse {
