@@ -921,8 +921,7 @@ const Settings = () => {
 
             {/* Personal Details / Verification */}
             {(() => {
-              const completedSteps = getCompletedSteps();
-              const isVerified = completedSteps >= 3;
+              const isVerified = user?.is_verified ?? false;
               return (
                 <button
                   onClick={() => {
