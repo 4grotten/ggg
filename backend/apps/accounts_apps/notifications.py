@@ -1,15 +1,30 @@
-
 import threading
 import requests
 import logging
 import ast
+import re
 from datetime import timedelta, timezone
+from decimal import Decimal
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import send_mail, get_connection, EmailMessage
 from .models import AdminNotificationSettings, UserRoles, WahaSession, UserNotificationSettings
 from django.apps import apps
 
 logger = logging.getLogger(__name__)
+
+def to_2_decimals(value):
+    if value is None:
+        return "0.00"
+    if isinstance(value, (int, float, Decimal)):
+        return f"{float(value):.2f}"
+    if isinstance(value, str):
+        if re.match(r'^-?\d+(?:\.\d+)?$', value):
+            try:
+                return f"{float(value):.2f}"
+            except ValueError:
+                pass
+    return str(value)
+
 
 def resolve_telegram_username_to_id(username):
     username = username.replace('@', '').strip().lower()
@@ -74,16 +89,29 @@ def send_whatsapp(phone, text):
     except Exception as e:
         logger.error(f"WhatsApp Notification Error: {str(e)}")
 
-
-def send_email_async(email, text):
+def send_email_async(email, text, is_transaction=False):
     try:
-        send_mail(
-            subject="🔔 Уведомление системы uEasyCard",
-            message=text,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
-        )
+        subject = "💳 Финансовое уведомление uEasyCard" if is_transaction else "🔔 Системное уведомление uEasyCard"
+        if is_transaction:
+            from_email = getattr(settings, 'TRANSACTION_EMAIL_HOST_USER', getattr(settings, 'DEFAULT_FROM_EMAIL'))
+            tx_host = getattr(settings, 'TRANSACTION_EMAIL_HOST', None)
+            
+            if tx_host:
+                connection = get_connection(
+                    host=tx_host,
+                    port=getattr(settings, 'TRANSACTION_EMAIL_PORT', 587),
+                    username=getattr(settings, 'TRANSACTION_EMAIL_HOST_USER', ''),
+                    password=getattr(settings, 'TRANSACTION_EMAIL_HOST_PASSWORD', ''),
+                    use_tls=getattr(settings, 'TRANSACTION_EMAIL_USE_TLS', True)
+                )
+                email_msg = EmailMessage(subject, text, from_email, [email], connection=connection)
+                email_msg.send()
+                return
+            else:
+                send_mail(subject, text, from_email, [email], fail_silently=False)
+        else:
+            send_mail(subject, text, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)
+            
     except Exception as e:
         logger.error(f"Email Notification Error: {e}")
 
@@ -99,8 +127,8 @@ def format_human_readable_details(details_str):
             if 'changes' in data:
                 lines.append("<b>Изменения:</b>")
                 for field, values in data['changes'].items():
-                    old_v = values.get('было', 'Пусто')
-                    new_v = values.get('стало', 'Пусто')
+                    old_v = to_2_decimals(values.get('было', 'Пусто'))
+                    new_v = to_2_decimals(values.get('стало', 'Пусто'))
                     lines.append(f" └ <i>{field}</i>: {old_v} ➔ {new_v}")
             return "\n".join(lines) if lines else str(data)
         return str(details_str)
@@ -134,7 +162,7 @@ def dispatch_notifications(instance):
         if s.whatsapp_enabled and s.whatsapp_number:
             threading.Thread(target=send_whatsapp, args=(s.whatsapp_number, wa_text), daemon=True).start()
         if s.email_enabled and s.email_address:
-            threading.Thread(target=send_email_async, args=(s.email_address, plain_text), daemon=True).start()
+            threading.Thread(target=send_email_async, args=(s.email_address, plain_text, False), daemon=True).start()
 
 def dispatch_test_notification(s):
     text = "🔧 <b>Тестовое уведомление из системы uEasyCard</b>\nЕсли вы это читаете, интеграция работает успешно!"
@@ -144,8 +172,7 @@ def dispatch_test_notification(s):
         threading.Thread(target=send_whatsapp, args=(s.whatsapp_number, text), daemon=True).start()
     if s.email_enabled and s.email_address:
         plain_text = text.replace('<b>', '').replace('</b>', '')
-        threading.Thread(target=send_email_async, args=(s.email_address, plain_text), daemon=True).start()
-
+        threading.Thread(target=send_email_async, args=(s.email_address, plain_text, False), daemon=True).start()
 
 def resolve_user_telegram_username_to_id(username):
     username = username.replace('@', '').strip().lower()
@@ -164,7 +191,6 @@ def resolve_user_telegram_username_to_id(username):
     except Exception as e:
         logger.error(f"User TG Resolve Error: {e}")
     return None
-
 
 def send_user_telegram(settings_obj, text):
     try:
@@ -189,19 +215,102 @@ def send_user_telegram(settings_obj, text):
     except Exception as e:
         logger.error(f"User Telegram Notification Error: {e}")
 
+def build_transaction_message(txn, role):
+    amount = to_2_decimals(txn.amount)
+    fee = to_2_decimals(txn.fee) if txn.fee else "0.00"
+    currency = txn.currency
+    
+    tz_utc_4 = timezone(timedelta(hours=4))
+    date_str = txn.created_at.astimezone(tz_utc_4).strftime('%d.%m.%Y %H:%M')
 
-def dispatch_user_transaction_notification(user_id, tx_details_text):
+    tx_type_map = {
+        'card_transfer': 'Перевод на карту',
+        'internal_transfer': 'Внутренний перевод',
+        'top_up': 'Пополнение счета',
+        'bank_topup': 'Пополнение банковским переводом',
+        'crypto_deposit': 'Пополнение криптовалютой',
+        'crypto_withdrawal': 'Вывод в криптовалюте',
+        'bank_withdrawal': 'Вывод на банковский счет',
+        'card_to_crypto': 'Перевод с карты в крипто',
+        'crypto_to_card': 'Перевод из крипто на карту',
+        'bank_to_crypto': 'Перевод со счета в крипто',
+        'crypto_to_iban': 'Перевод из крипто на счет',
+        'iban_to_card': 'Перевод со счета на карту',
+        'crypto_to_crypto': 'Перевод криптовалюты'
+    }
+    tx_type_display = tx_type_map.get(txn.type, txn.type.replace('_', ' ').capitalize())
+    meta = txn.metadata or {}
+    
+    lines = []
+    
+    if role == 'sender':
+        lines.append(f"💸 <b>Успешное списание</b>")
+        lines.append(f"Тип операции: {tx_type_display}")
+        lines.append(f"Сумма перевода: <b>-{amount} {currency}</b>")
+        if txn.fee and float(txn.fee) > 0:
+            lines.append(f"Комиссия: {fee} {currency}")
+            
+        if meta.get('sender_card_mask'):
+            lines.append(f"С карты: {meta.get('sender_card_mask')}")
+        if meta.get('sender_iban_mask'):
+            lines.append(f"Со счета: {meta.get('sender_iban_mask')}")
+            
+        lines.append(f"Получатель: {txn.receiver_name or txn.receiver_id or 'Внешний счет'}")
+        
+    else:
+        lines.append(f"📥 <b>Поступление средств</b>")
+        lines.append(f"Тип операции: {tx_type_display}")
+        lines.append(f"Сумма: <b>+{amount} {currency}</b>")
+        
+        if meta.get('receiver_card_mask'):
+            lines.append(f"На карту: {meta.get('receiver_card_mask')}")
+        if meta.get('beneficiary_iban'):
+            lines.append(f"На счет: {meta.get('beneficiary_iban')}")
+            
+        lines.append(f"Отправитель: {txn.sender_name or txn.sender_id or 'Внешний отправитель'}")
+
+    lines.append("")
+    lines.append(f"Статус: <b>{txn.status.upper()}</b>")
+    lines.append(f"ID: {str(txn.id).split('-')[0]}...")
+    lines.append(f"Время: {date_str} (UTC+4)")
+    if txn.description:
+        lines.append(f"Назначение: {txn.description}")
+
+    return "\n".join(lines)
+
+
+def notify_transaction_parties(transaction_id):
+    from apps.transactions_apps.models import Transactions
+    try:
+        txn = Transactions.objects.get(id=transaction_id)
+    except Transactions.DoesNotExist:
+        return
+    if txn.sender_id and txn.sender_id != 'EXTERNAL':
+        sender_text = build_transaction_message(txn, 'sender')
+        send_user_notification(txn.sender_id, sender_text, is_transaction=True)
+    if txn.receiver_id and txn.receiver_id != 'EXTERNAL':
+        if txn.sender_id != txn.receiver_id:
+            receiver_text = build_transaction_message(txn, 'receiver')
+            send_user_notification(txn.receiver_id, receiver_text, is_transaction=True)
+
+
+def send_user_notification(user_id, text, is_transaction=False):
     try:
         settings_obj = UserNotificationSettings.objects.get(user_id=str(user_id))
     except UserNotificationSettings.DoesNotExist:
         return
-
-    wa_text = tx_details_text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_')
-    plain_text = tx_details_text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
-
+    wa_text = text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_')
+    plain_text = text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
     if settings_obj.telegram_enabled and settings_obj.telegram_username:
-        threading.Thread(target=send_user_telegram, args=(settings_obj, tx_details_text), daemon=True).start()
+        threading.Thread(target=send_user_telegram, args=(settings_obj, text), daemon=True).start()
     if settings_obj.whatsapp_enabled and settings_obj.whatsapp_number:
         threading.Thread(target=send_whatsapp, args=(settings_obj.whatsapp_number, wa_text), daemon=True).start()
     if settings_obj.email_enabled and settings_obj.email_address:
-        threading.Thread(target=send_email_async, args=(settings_obj.email_address, plain_text), daemon=True).start()
+        threading.Thread(target=send_email_async, args=(settings_obj.email_address, plain_text, is_transaction), daemon=True).start()
+
+
+def dispatch_user_transaction_notification(user_id, tx_details_text=None, transaction_id=None):
+    if transaction_id:
+        notify_transaction_parties(transaction_id)
+    elif tx_details_text:
+        send_user_notification(user_id, tx_details_text, is_transaction=True)
