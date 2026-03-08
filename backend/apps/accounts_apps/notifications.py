@@ -6,7 +6,7 @@ import ast
 from datetime import timedelta, timezone
 from django.conf import settings
 from django.core.mail import send_mail
-from .models import AdminNotificationSettings, UserRoles, WahaSession
+from .models import AdminNotificationSettings, UserRoles, WahaSession, UserNotificationSettings
 from django.apps import apps
 
 logger = logging.getLogger(__name__)
@@ -145,3 +145,63 @@ def dispatch_test_notification(s):
     if s.email_enabled and s.email_address:
         plain_text = text.replace('<b>', '').replace('</b>', '')
         threading.Thread(target=send_email_async, args=(s.email_address, plain_text), daemon=True).start()
+
+
+def resolve_user_telegram_username_to_id(username):
+    username = username.replace('@', '').strip().lower()
+    bot_token = getattr(settings, 'USER_TELEGRAM_BOT_TOKEN', '')
+    if not bot_token:
+        return None
+    url = f"https://api.telegram.org/bot{bot_token}/getUpdates"
+    try:
+        resp = requests.get(url, timeout=10).json()
+        if resp.get('ok'):
+            for update in resp['result']:
+                msg = update.get('message', {})
+                chat = msg.get('chat', {})
+                if chat.get('username', '').lower() == username:
+                    return str(chat.get('id'))
+    except Exception as e:
+        logger.error(f"User TG Resolve Error: {e}")
+    return None
+
+
+def send_user_telegram(settings_obj, text):
+    try:
+        bot_token = getattr(settings, 'USER_TELEGRAM_BOT_TOKEN', '')
+        if not bot_token:
+            logger.error("USER_TELEGRAM_BOT_TOKEN не настроен!")
+            return
+
+        chat_id = settings_obj.telegram_chat_id
+        if not chat_id and settings_obj.telegram_username:
+            chat_id = resolve_user_telegram_username_to_id(settings_obj.telegram_username)
+            if chat_id:
+                settings_obj.telegram_chat_id = chat_id
+                settings_obj.save(update_fields=['telegram_chat_id'])
+        
+        if not chat_id:
+            logger.error(f"User TG: Не найден chat_id для {settings_obj.telegram_username}. Пользователь должен запустить бота!")
+            return
+
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        requests.post(url, json={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}, timeout=10)
+    except Exception as e:
+        logger.error(f"User Telegram Notification Error: {e}")
+
+
+def dispatch_user_transaction_notification(user_id, tx_details_text):
+    try:
+        settings_obj = UserNotificationSettings.objects.get(user_id=str(user_id))
+    except UserNotificationSettings.DoesNotExist:
+        return
+
+    wa_text = tx_details_text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_')
+    plain_text = tx_details_text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
+
+    if settings_obj.telegram_enabled and settings_obj.telegram_username:
+        threading.Thread(target=send_user_telegram, args=(settings_obj, tx_details_text), daemon=True).start()
+    if settings_obj.whatsapp_enabled and settings_obj.whatsapp_number:
+        threading.Thread(target=send_whatsapp, args=(settings_obj.whatsapp_number, wa_text), daemon=True).start()
+    if settings_obj.email_enabled and settings_obj.email_address:
+        threading.Thread(target=send_email_async, args=(settings_obj.email_address, plain_text), daemon=True).start()

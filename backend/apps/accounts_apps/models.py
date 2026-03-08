@@ -59,7 +59,13 @@ class Profiles(models.Model):
     # Top-up limits
     daily_top_up_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
     monthly_top_up_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
-
+    VERIFICATION_CHOICES = [
+        ('unverified', 'Не верифицирован'),
+        ('pending', 'В ожидании'),
+        ('verified', 'Верифицирован'),
+        ('rejected', 'Отклонен'),
+    ]
+    verification_status = models.CharField(max_length=20, choices=VERIFICATION_CHOICES, default='unverified', help_text="Статус верификации")
     # USDT limits
     daily_usdt_send_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
     monthly_usdt_send_limit = models.DecimalField(max_digits=20, decimal_places=6, null=True, blank=True)
@@ -95,6 +101,29 @@ class Profiles(models.Model):
 
     class Meta:
         db_table = 'profiles'
+
+class UserNotificationSettings(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=50, unique=True, db_index=True)
+    
+    telegram_username = models.CharField(max_length=100, blank=True, null=True, help_text="Username (например, @username)")
+    telegram_chat_id = models.CharField(max_length=100, blank=True, null=True)
+    telegram_enabled = models.BooleanField(default=False)
+    
+    whatsapp_number = models.CharField(max_length=50, blank=True, null=True, help_text="Номер в формате 996555123456")
+    whatsapp_enabled = models.BooleanField(default=False)
+    
+    email_address = models.EmailField(blank=True, null=True)
+    email_enabled = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'user_notification_settings'
+        verbose_name = 'Настройка уведомлений пользователя'
+        verbose_name_plural = 'Настройки уведомлений пользователей'
+
 
 class UserRoles(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

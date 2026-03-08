@@ -56,4 +56,7 @@ urlpatterns = [
 
     path('admin/notifications/settings/<str:user_id>/', views.AdminNotificationSettingsView.as_view(), name='admin-notification-settings'),
     path('admin/notifications/test/<str:user_id>/', views.TestNotificationView.as_view(), name='admin-notification-test'),
+
+    path('users/notifications/settings/', views.UserNotificationSettingsView.as_view(), name='user-notification-settings'),
+    path('admin/users/<str:user_id>/verification/', views.AdminVerifyUserView.as_view(), name='admin-user-verify'),
 ]

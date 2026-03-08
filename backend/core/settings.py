@@ -159,6 +159,9 @@ DATABASES = {
     }
 }
 
+USER_TELEGRAM_BOT_TOKEN = config('USER_TELEGRAM_BOT_TOKEN', default='8673662030:AAF-oElXbfGC7YYVJvCLDrLWiAznhj_0nqw')
+USER_TELEGRAM_BOT_USERNAME = config('USER_TELEGRAM_BOT_USERNAME', default='@uEasyCard_Bot')
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

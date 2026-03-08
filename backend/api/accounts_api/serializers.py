@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from apps.accounts_apps.models import AdminNotificationSettings, Profiles, Contacts, AdminSettings
+from apps.accounts_apps.models import AdminNotificationSettings, Profiles, Contacts, AdminSettings, UserNotificationSettings
 from apps.accounts_apps.models import AdminActionHistory
+from django.conf import settings
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -54,8 +56,24 @@ class UserLimitsSerializer(serializers.ModelSerializer):
             'card_to_card_percent', 'bank_transfer_percent', 'network_fee_percent', 
             'currency_conversion_percent',
             'is_blocked', 'is_vip', 'subscription_type', 'referral_level',
-            'first_name', 'last_name', 'gender', 'language', 'avatar_url'
+            'first_name', 'last_name', 'gender', 'language', 'avatar_url', 'verification_status'
         ]
+
+
+class UserNotificationSettingsSerializer(serializers.ModelSerializer):
+    tg_bot = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserNotificationSettings
+        fields = [
+            'telegram_username', 'telegram_enabled', 
+            'whatsapp_number', 'whatsapp_enabled', 
+            'email_address', 'email_enabled',
+            'tg_bot'
+        ]
+
+    def get_tg_bot(self, obj):
+        return getattr(settings, 'USER_TELEGRAM_BOT_USERNAME', '@YourEasyCardUserBot')
 
 
 class AdminActionHistorySerializer(serializers.ModelSerializer):

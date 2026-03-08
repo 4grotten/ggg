@@ -5,7 +5,7 @@ import requests
 from django.db.models import Q
 from apps.cards_apps.models import Cards
 from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets, Transactions
-from api.accounts_api.serializers import AdminActionHistorySerializer, AdminNotificationSettingsSerializer, AdminSettingsSerializer, ContactSerializer, UserLimitsSerializer
+from api.accounts_api.serializers import AdminActionHistorySerializer, AdminNotificationSettingsSerializer, AdminSettingsSerializer, ContactSerializer, UserLimitsSerializer, UserNotificationSettingsSerializer
 from apps.accounts_apps.notifications import dispatch_test_notification
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,7 +15,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from apps.accounts_apps.models import AdminNotificationSettings, AdminSettings, Contacts, Profiles
+from apps.accounts_apps.models import AdminNotificationSettings, AdminSettings, Contacts, Profiles, UserNotificationSettings
 from .apofiz_client import ApofizClient
 from django.db.models import Sum, Count
 from apps.accounts_apps.models import UserRoles
@@ -352,7 +352,9 @@ class CurrentUserView(APIView):
             transactions.append(tx)
 
         limits_serializer = UserLimitsSerializer(profile)
-        is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
+        
+        is_verified = (getattr(profile, 'verification_status', 'unverified') == 'verified')
+        verification_status = getattr(profile, 'verification_status', 'unverified')
         
         return Response({
             "user_id": uid,
@@ -364,6 +366,7 @@ class CurrentUserView(APIView):
             "avatar_url": getattr(profile, 'avatar_url', None),
             "created_at": profile.created_at.isoformat() if profile.created_at else None,
             "is_verified": is_verified,
+            "verification_status": verification_status,
             "role": current_role,
             "is_blocked": profile.is_blocked,
             "is_vip": profile.is_vip,
@@ -795,7 +798,9 @@ class AdminUserLimitsListView(APIView):
             c = cards_agg.get(uid, {})
             a = accounts_agg.get(uid, {})
             w = crypto_agg.get(uid, {})
-            is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
+            
+            is_verified = (getattr(profile, 'verification_status', 'unverified') == 'verified')
+            verification_status = getattr(profile, 'verification_status', 'unverified')
 
             user_obj = users_map.get(uid)
             email = user_obj.email if user_obj else ''
@@ -811,6 +816,7 @@ class AdminUserLimitsListView(APIView):
                 "created_at": profile.created_at.isoformat() if profile.created_at else None,
                 "role": roles_map.get(uid, 'user'),
                 "is_verified": is_verified,
+                "verification_status": verification_status,
                 "referral_level": getattr(profile, 'referral_level', 'r1'),
                 "cards_count": c.get('cards_count', 0),
                 "total_cards_balance": round(float(c.get('total_cards_balance', 0) or 0), 2),
@@ -898,7 +904,10 @@ class AdminUserDetailView(APIView):
             transactions.append(tx)
 
         limits_serializer = UserLimitsSerializer(profile)
-        is_verified = bool(full_name and full_name != "Unknown User" and getattr(profile, 'avatar_url', None))
+        
+        is_verified = (getattr(profile, 'verification_status', 'unverified') == 'verified')
+        verification_status = getattr(profile, 'verification_status', 'unverified')
+        
         return Response({
             "user_id": uid,
             "full_name": full_name or "Unknown User",
@@ -909,6 +918,7 @@ class AdminUserDetailView(APIView):
             "avatar_url": getattr(profile, 'avatar_url', None),
             "created_at": profile.created_at.isoformat() if profile.created_at else None,
             "is_verified": is_verified,
+            "verification_status": verification_status,
             "role": current_role,
             "is_blocked": profile.is_blocked,
             "is_vip": profile.is_vip,
@@ -1347,3 +1357,74 @@ class OpenUserDetailView(APIView):
             "limits_and_settings": limits_serializer.data,
             "apofiz_data": None 
         }, status=status.HTTP_200_OK)
+    
+
+class UserNotificationSettingsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Получить настройки уведомлений текущего пользователя",
+        tags=["Настройки уведомлений (Пользователь)"]
+    )
+    def get(self, request):
+        obj, _ = UserNotificationSettings.objects.get_or_create(user_id=str(request.user.id))
+        serializer = UserNotificationSettingsSerializer(obj)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_summary="Обновить настройки уведомлений текущего пользователя",
+        request_body=UserNotificationSettingsSerializer,
+        tags=["Настройки уведомлений (Пользователь)"]
+    )
+    def put(self, request):
+        obj, _ = UserNotificationSettings.objects.get_or_create(user_id=str(request.user.id))
+        serializer = UserNotificationSettingsSerializer(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminVerifyUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Изменить статус верификации пользователя (Admin/Root)",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['verification_status'],
+            properties={'verification_status': openapi.Schema(type=openapi.TYPE_STRING, enum=['unverified', 'pending', 'verified', 'rejected'])}
+        ),
+        tags=["Админ: Управление пользователями"]
+    )
+    def patch(self, request, user_id):
+        acting_user_role_obj = UserRoles.objects.filter(user_id=str(request.user.id)).first()
+        acting_role = acting_user_role_obj.role if acting_user_role_obj else 'user'
+        if acting_role not in ['root', 'admin']:
+            return Response({"error": "Доступ запрещен"}, status=status.HTTP_403_FORBIDDEN)
+
+        profile = Profiles.objects.filter(user_id=str(user_id)).first()
+        if not profile:
+            return Response({"error": "Профиль не найден"}, status=status.HTTP_404_NOT_FOUND)
+
+        new_status = request.data.get('verification_status')
+        if new_status not in ['unverified', 'pending', 'verified', 'rejected']:
+            return Response({"error": "Неверный статус"}, status=status.HTTP_400_BAD_REQUEST)
+
+        old_status = profile.verification_status
+        profile.verification_status = new_status
+        profile.save()
+        try:
+            AdminActionHistory.objects.create(
+                admin_id=str(request.user.id),
+                admin_name=request.user.get_full_name() or request.user.username,
+                action="VERIFICATION_STATUS_CHANGED",
+                target_user_id=str(user_id),
+                details={"changes": {"verification_status": {"было": old_status, "стало": new_status}}, "acting_role": acting_role},
+                ip_address=request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR')),
+                user_agent=request.META.get('HTTP_USER_AGENT')
+            )
+        except Exception:
+            pass
+
+        return Response({"status": "success", "user_id": user_id, "verification_status": new_status}, status=status.HTTP_200_OK)

@@ -22,6 +22,7 @@ from .serializers import (
     CryptoWalletWithdrawalRequestSerializer, CryptoWalletWithdrawalResponseSerializer
 )
 from apps.transactions_apps.services import SettingsManager, TransactionService
+from apps.accounts_apps.notifications import dispatch_user_transaction_notification
 
 
 class RecipientInfoView(APIView):
@@ -150,8 +151,6 @@ class CardTransactionsListView(APIView):
             Q(sender_id=user_id) | Q(receiver_id=user_id),
             movements__user_id=user_id, movements__account_type='card'
         ).distinct().order_by('-created_at')
-
-        # Optional: filter by specific card_id
         card_id = request.query_params.get('card_id')
         if card_id:
             card = Cards.objects.filter(id=card_id, user_id=user_id).first()
@@ -233,6 +232,9 @@ class BankTopupView(APIView):
         if serializer.is_valid():
             try:
                 topup = TransactionService.initiate_bank_topup(user_id=request.user.id, transfer_rail=serializer.validated_data['transfer_rail'])
+                text = f"⏳ <b>Заявка на пополнение (Bank)</b>\nСистема ожидает поступления средств.\nID: {topup.transaction.id}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Topup initiated", "transaction_id": topup.transaction.id, "instructions": topup.instructions_snapshot}, status=status.HTTP_201_CREATED)
             except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -245,6 +247,9 @@ class CryptoTopupView(APIView):
         serializer = CryptoTopupRequestSerializer(data=request.data)
         if serializer.is_valid():
             topup = TransactionService.initiate_crypto_topup(user_id=request.user.id, card_id=serializer.validated_data['card_id'], token=serializer.validated_data['token'], network=serializer.validated_data['network'])
+            text = f"⏳ <b>Ожидание пополнения (Crypto)</b>\nСеть: {serializer.validated_data['network']}\nТокен: {serializer.validated_data['token']}\nАдрес сгенерирован."
+            dispatch_user_transaction_notification(request.user.id, text)
+            
             return Response({"message": "Crypto address generated", "deposit_address": topup.deposit_address, "qr_payload": topup.qr_payload}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -257,6 +262,9 @@ class CardTransferView(APIView):
         if serializer.is_valid():
             try:
                 txn = TransactionService.execute_card_transfer(sender_id=request.user.id, sender_card_id=serializer.validated_data['sender_card_id'], receiver_card_number=serializer.validated_data['receiver_card_number'], amount=serializer.validated_data['amount'])
+                text = f"✅ <b>Успешный перевод (Card)</b>\nСумма: {txn.amount} AED\nПолучатель: {serializer.validated_data['receiver_card_number']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Transfer successful", "transaction_id": txn.id, "amount": txn.amount}, status=status.HTTP_200_OK)
             except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -270,6 +278,9 @@ class CryptoWithdrawalView(APIView):
         if serializer.is_valid():
             try:
                 withdrawal = TransactionService.execute_crypto_withdrawal(user_id=request.user.id, card_id=serializer.validated_data['from_card_id'], token=serializer.validated_data['token'], network=serializer.validated_data['network'], to_address=serializer.validated_data['to_address'], amount_crypto=serializer.validated_data['amount_crypto'])
+                text = f"📤 <b>Вывод средств (Crypto)</b>\nСумма: {serializer.validated_data['amount_crypto']} {serializer.validated_data['token']}\nПолучатель: {serializer.validated_data['to_address']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Withdrawal processing", "transaction_id": withdrawal.transaction.id, "total_debit_crypto": withdrawal.total_debit}, status=status.HTTP_200_OK)
             except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -291,6 +302,9 @@ class BankWithdrawalView(APIView):
                     bank_name=serializer.validated_data['bank_name'],
                     amount_aed=serializer.validated_data['amount_aed']
                 )
+                text = f"📤 <b>Вывод средств (Bank)</b>\nСумма: {serializer.validated_data['amount_aed']} AED\nПолучатель: {serializer.validated_data['iban']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Bank wire processing", "transaction_id": withdrawal.transaction.id, "fee_amount": withdrawal.fee_amount, "total_debit_aed": withdrawal.total_debit}, status=status.HTTP_200_OK)
             except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -301,8 +315,6 @@ class TransactionReceiptView(APIView):
     @swagger_auto_schema(operation_summary="Получить выписку (Квитанцию) по транзакции", responses={200: openapi.Response(description="Детали транзакции"), 400: ErrorResponseSerializer, 404: openapi.Response(description="Транзакция не найдена")}, tags=["Receipts (Квитанции)"])
     def get(self, request, transaction_id):
         try:
-            # Allow viewing receipt from another user's perspective via ?view_as=<user_id>
-            # This only changes the direction/sign perspective, not data access — safe for any authenticated user
             view_as = request.query_params.get('view_as')
             viewer_id = view_as if view_as else request.user.id
             receipt_data = TransactionService.get_transaction_receipt(transaction_id, viewer_id)
@@ -322,6 +334,9 @@ class CardToCryptoView(APIView):
                     request.user.id, ser.validated_data['from_card_id'], 
                     ser.validated_data['to_crypto_address'], ser.validated_data['amount_aed']
                 )
+                text = f"✅ <b>Перевод (Card ➔ Crypto)</b>\nСписано: {debit} AED\nПолучено: {credit} USDT\nАдрес: {ser.validated_data['to_crypto_address']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
             except ValueError as e: return Response({"error": str(e)}, status=400)
         return Response(ser.errors, status=400)
@@ -338,6 +353,9 @@ class CryptoToCardView(APIView):
                     request.user.id, ser.validated_data['from_wallet_id'], 
                     ser.validated_data['to_card_number'], ser.validated_data['amount_usdt']
                 )
+                text = f"✅ <b>Перевод (Crypto ➔ Card)</b>\nСписано: {debit} USDT\nЗачислено: {credit} AED\nКарта: {ser.validated_data['to_card_number']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
             except ValueError as e: return Response({"error": str(e)}, status=400)
         return Response(ser.errors, status=400)
@@ -351,6 +369,9 @@ class BankToCryptoView(APIView):
         if ser.is_valid():
             try:
                 txn, debit, fee, credit = TransactionService.execute_bank_to_crypto(request.user.id, ser.validated_data['from_bank_account_id'], ser.validated_data['to_crypto_address'], ser.validated_data['amount_aed'])
+                text = f"✅ <b>Перевод (Bank ➔ Crypto)</b>\nСписано: {debit} AED\nПолучено: {credit} USDT\nАдрес: {ser.validated_data['to_crypto_address']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
             except ValueError as e: return Response({"error": str(e)}, status=400)
         return Response(ser.errors, status=400)
@@ -364,6 +385,9 @@ class CryptoToBankView(APIView):
         if ser.is_valid():
             try:
                 txn, debit, fee, credit = TransactionService.execute_crypto_to_bank(request.user.id, ser.validated_data['from_wallet_id'], ser.validated_data['to_iban'], ser.validated_data['amount_usdt'])
+                text = f"✅ <b>Перевод (Crypto ➔ Bank)</b>\nСписано: {debit} USDT\nЗачислено: {credit} AED\nIBAN: {ser.validated_data['to_iban']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
             except ValueError as e: return Response({"error": str(e)}, status=400)
         return Response(ser.errors, status=400)
@@ -377,6 +401,9 @@ class CardToBankView(APIView):
         if ser.is_valid():
             try:
                 txn, debit, fee, credit = TransactionService.execute_card_to_bank(request.user.id, ser.validated_data['from_card_id'], ser.validated_data['to_iban'], ser.validated_data['amount_aed'])
+                text = f"✅ <b>Перевод (Card ➔ Bank)</b>\nСписано: {debit} AED\nЗачислено: {credit} AED\nIBAN: {ser.validated_data['to_iban']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({"message": "Успешно", "transaction_id": txn.id, "deducted_amount": str(debit), "fee": str(fee), "credited_amount": str(credit)}, status=200)
             except ValueError as e: return Response({"error": str(e)}, status=400)
         return Response(ser.errors, status=400)
@@ -403,6 +430,10 @@ class CryptoWalletWithdrawalView(APIView):
                     token=serializer.validated_data.get('token', 'USDT'),
                     network=serializer.validated_data.get('network', 'TRC20'),
                 )
+                token = serializer.validated_data.get('token', 'USDT')
+                text = f"✅ <b>Внутренний перевод (Crypto ➔ Crypto)</b>\nСумма: {serializer.validated_data['amount_usdt']} {token}\nАдрес: {serializer.validated_data['to_address']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response(result, status=status.HTTP_200_OK)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -428,6 +459,9 @@ class BankToCardTransferView(APIView):
                     receiver_card_number=serializer.validated_data['receiver_card_number'],
                     amount=serializer.validated_data['amount']
                 )
+                text = f"✅ <b>Перевод (Bank ➔ Card)</b>\nСумма: {serializer.validated_data['amount']} AED\nПолучатель: {serializer.validated_data['receiver_card_number']}"
+                dispatch_user_transaction_notification(request.user.id, text)
+                
                 return Response({
                     "message": "Transfer successful",
                     "transaction_id": txn.id,
