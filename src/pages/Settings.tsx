@@ -33,7 +33,7 @@ import { DataUnlockDialog } from "@/components/settings/DataUnlockDialog";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { isHapticEnabled, setHapticEnabled, useHapticFeedback } from "@/hooks/useHapticFeedback";
-import { NotificationChannelItem } from "@/components/settings/NotificationChannelItem";
+import { UserNotificationChannels } from "@/components/settings/UserNotificationChannels";
 
 // Telegram-style colored icon backgrounds with gradients
 const iconGradients: Record<string, string> = {
@@ -1785,92 +1785,11 @@ const Settings = () => {
               {t("settings.notificationsDescription") || "Настройте каналы для получения уведомлений о транзакциях и важных событиях."}
             </p>
 
-            {/* PUSH */}
-            <div className="p-3 rounded-xl border border-border/50 bg-muted/30">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: iconGradients.bell }}>
-                  <Bell className="w-4 h-4 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-muted-foreground">PUSH</p>
-                  <p className="text-sm font-medium">{t("settings.pushSubtitle") || "Уведомления на это устройство"}</p>
-                </div>
-                <Switch
-                  checked={isPushEnabled}
-                  onCheckedChange={(checked) => {
-                    setIsPushEnabled(checked);
-                    localStorage.setItem('push_notifications_enabled', String(checked));
-                    if (checked) {
-                      if ('Notification' in window) {
-                        Notification.requestPermission().then((permission) => {
-                          if (permission === 'granted') {
-                            toast.success(t("toast.pushEnabled") || "PUSH уведомления включены");
-                          } else {
-                            toast.error(t("toast.pushDenied") || "Разрешение на уведомления отклонено");
-                            setIsPushEnabled(false);
-                            localStorage.setItem('push_notifications_enabled', 'false');
-                          }
-                        });
-                      } else {
-                        toast.error(t("toast.pushNotSupported") || "Уведомления не поддерживаются");
-                        setIsPushEnabled(false);
-                        localStorage.setItem('push_notifications_enabled', 'false');
-                      }
-                    } else {
-                      toast.success(t("toast.pushDisabled") || "PUSH уведомления выключены");
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* WhatsApp */}
-            <NotificationChannelItem
-              icon={<MessageCircle className="w-4 h-4 text-white" />}
-              gradient="linear-gradient(135deg, #25D366 0%, #128C7E 100%)"
-              label="WhatsApp"
-              storageKey="notif_whatsapp"
-              placeholder="+971 50 123 4567"
+            <UserNotificationChannels
               t={t}
+              isPushEnabled={isPushEnabled}
+              setIsPushEnabled={setIsPushEnabled}
             />
-
-            {/* Telegram */}
-            <NotificationChannelItem
-              icon={<svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>}
-              gradient="linear-gradient(135deg, #2AABEE 0%, #229ED9 100%)"
-              label="Telegram"
-              storageKey="notif_telegram"
-              placeholder="@username"
-              t={t}
-              hint={
-                <div className="mt-2 p-2 rounded-lg bg-blue-500/5 border border-blue-500/15">
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    📌 {t("settings.telegramHint") || "Чтобы получать уведомления в Telegram:"}
-                  </p>
-                  <ol className="text-[11px] text-muted-foreground leading-relaxed mt-1 ml-4 list-decimal space-y-0.5">
-                    <li>{t("settings.telegramStep1") || "Перейдите в бот"} <a href="https://t.me/uEasyCard_Bot" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-semibold">@uEasyCard_Bot</a></li>
-                    <li>{t("settings.telegramStep2") || "Нажмите кнопку"} <span className="font-semibold">Start</span></li>
-                  </ol>
-                </div>
-              }
-            />
-
-            {/* Email */}
-            <NotificationChannelItem
-              icon={<Mail className="w-4 h-4 text-white" />}
-              gradient="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
-              label="Email"
-              storageKey="notif_email"
-              placeholder="user@example.com"
-              t={t}
-            />
-
-            {/* Info */}
-            <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/15">
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                📌 {t("settings.pushHint") || "Для работы PUSH уведомлений необходимо разрешить уведомления в настройках браузера. На iOS добавьте приложение на домашний экран."}
-              </p>
-            </div>
           </div>
         </DrawerContent>
       </Drawer>
