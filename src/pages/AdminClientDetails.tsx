@@ -183,6 +183,10 @@ export default function AdminClientDetails() {
   const [isBlocked, setIsBlocked] = useState(false);
   const [showBlockAlert, setShowBlockAlert] = useState(false);
   const [pendingBlockValue, setPendingBlockValue] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [showVerifyAlert, setShowVerifyAlert] = useState(false);
+  const [pendingVerifyValue, setPendingVerifyValue] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [showAllTx, setShowAllTx] = useState(false);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
