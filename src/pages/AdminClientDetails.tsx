@@ -251,7 +251,7 @@ export default function AdminClientDetails() {
     // Set root-level fields
     setIsVIP(client.is_vip ?? false);
     setIsBlocked(client.is_blocked ?? false);
-    setIsVerified(client.is_verified ?? client.verification_status === 'verified' ?? false);
+    setIsVerified(client.is_verified ?? (client as any).verification_status === 'verified');
     if (client.role) setSelectedRole(client.role);
     if (client.subscription_type) setSelectedSubscription(client.subscription_type === 'default' ? 'smart' : client.subscription_type);
     if (client.referral_level) {
