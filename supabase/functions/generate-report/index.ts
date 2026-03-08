@@ -266,7 +266,34 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     color: #fff;
   }
   
-  .header-meta {
+  .balances-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  
+  .balance-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    backdrop-filter: blur(4px);
+  }
+  
+  .balance-chip .bal-label {
+    opacity: 0.7;
+    font-weight: 500;
+  }
+  
+  .balance-chip .bal-value {
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
     text-align: right;
     font-size: 13px;
     opacity: 0.75;
