@@ -612,7 +612,13 @@ serve(async (req) => {
       "Authorization": `Token ${backend_token}`,
     };
 
-    const response = await fetch(`${BACKEND_BASE}/transactions/all/`, { method: "GET", headers });
+    // Fetch transactions and balances in parallel
+    const [response, walletRes, bankRes, cryptoRes] = await Promise.all([
+      fetch(`${BACKEND_BASE}/transactions/all/`, { method: "GET", headers }),
+      fetch(`${BACKEND_BASE}/cards/wallet/summary/`, { method: "GET", headers }).catch(() => null),
+      fetch(`${BACKEND_BASE}/transactions/bank-accounts/`, { method: "GET", headers }).catch(() => null),
+      fetch(`${BACKEND_BASE}/transactions/crypto-wallets/`, { method: "GET", headers }).catch(() => null),
+    ]);
 
     if (!response.ok) {
       console.error("Transactions API error:", response.status);
@@ -621,6 +627,56 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Parse balances
+    const assetBalances: AssetBalance[] = [];
+    try {
+      if (walletRes?.ok) {
+        const wallet = await walletRes.json();
+        // Cards balances
+        if (wallet.cards && Array.isArray(wallet.cards)) {
+          for (const card of wallet.cards) {
+            const bal = parseFloat(String(card.balance || 0));
+            if (bal > 0 || card.card_mask) {
+              const mask = card.card_mask ? `•••• ${String(card.card_mask).slice(-4)}` : (card.card_type || 'Карта');
+              assetBalances.push({ label: mask, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'AED' });
+            }
+          }
+        }
+        // USDT balance
+        if (wallet.usdt_balance !== undefined) {
+          const usdtBal = parseFloat(String(wallet.usdt_balance || 0));
+          assetBalances.push({ label: 'USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
+        }
+      }
+    } catch (e) { console.error("Wallet parse error:", e); }
+
+    try {
+      if (bankRes?.ok) {
+        const bankData = await bankRes.json();
+        const accounts = Array.isArray(bankData) ? bankData : (bankData?.results || []);
+        for (const acc of accounts) {
+          const bal = parseFloat(String(acc.balance || 0));
+          const iban = acc.iban ? `${String(acc.iban).slice(0, 4)}••••${String(acc.iban).slice(-4)}` : 'IBAN';
+          assetBalances.push({ label: iban, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: acc.currency || 'AED' });
+        }
+      }
+    } catch (e) { console.error("Bank parse error:", e); }
+
+    try {
+      if (cryptoRes?.ok) {
+        const cryptoData = await cryptoRes.json();
+        const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
+        for (const w of wallets) {
+          const bal = parseFloat(String(w.balance || 0));
+          const addr = w.address ? `${String(w.address).slice(0, 6)}••••${String(w.address).slice(-4)}` : (w.token || 'Crypto');
+          const token = w.token || 'USDT';
+          // Skip if already added via wallet summary
+          if (token === 'USDT' && assetBalances.some(a => a.label === 'USDT')) continue;
+          assetBalances.push({ label: `${token} (${w.network || 'TRC20'})`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
+        }
+      }
+    } catch (e) { console.error("Crypto parse error:", e); }
 
     const rawData = await response.json();
     const allTransactions = Array.isArray(rawData) ? rawData : (rawData?.results || rawData?.data || []);
@@ -667,7 +723,7 @@ serve(async (req) => {
           : 'Все транзакции';
 
     const generatedDate = formatDate(new Date().toISOString());
-    const html = buildHTML(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut);
+    const html = buildHTML(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut, assetBalances);
 
     const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const fileName = `uEasyCard_Report_${fileDate}.html`;
