@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
-import { apiRequest, apiPost } from "@/services/api/apiClient";
+import { apiRequest, apiPost, apiPatch } from "@/services/api/apiClient";
 import { BackendClientDetail } from "@/hooks/useAdminManagement";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { Transaction as AppTransaction, TransactionGroup as AppTransactionGroup } from "@/types/transaction";
