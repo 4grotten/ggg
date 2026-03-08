@@ -257,10 +257,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     font-size: 32px;
     font-weight: 800;
     letter-spacing: -1px;
-    background: linear-gradient(90deg, #fff, #5AC8FA);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #fff;
   }
   
   .header-meta {
@@ -274,7 +271,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     display: block;
     font-size: 14px;
     opacity: 1;
-    color: #5AC8FA;
+    color: #fff;
   }
   
   /* ===== SUMMARY CARDS ===== */
