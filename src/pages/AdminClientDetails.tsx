@@ -652,6 +652,87 @@ export default function AdminClientDetails() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          {/* Verification toggle */}
+          <div className="px-5 pb-4 flex items-center justify-between border-t border-border/30 pt-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-emerald-500" />
+              <span className="text-sm font-medium">{t("admin.clients.verificationStatus", "Верификация")}</span>
+              {isVerified && (
+                <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] px-2 py-0 border-0">
+                  ✅ {t("admin.clients.verified")}
+                </Badge>
+              )}
+            </div>
+            <Switch
+              checked={isVerified}
+              disabled={isVerifying}
+              onCheckedChange={(val) => {
+                setPendingVerifyValue(val);
+                setShowVerifyAlert(true);
+              }}
+            />
+          </div>
+
+          {/* Verification confirmation alert */}
+          <AlertDialog open={showVerifyAlert} onOpenChange={setShowVerifyAlert}>
+            <AlertDialogContent className="max-w-[320px] rounded-2xl">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-base">
+                  {pendingVerifyValue
+                    ? t("admin.clients.verifyUserTitle", "Верифицировать пользователя?")
+                    : t("admin.clients.unverifyUserTitle", "Снять верификацию?")}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-sm space-y-2">
+                  <span className="block">
+                    {pendingVerifyValue
+                      ? t("admin.clients.verifyUserDesc", { name: client?.full_name || '' })
+                      : t("admin.clients.unverifyUserDesc", { name: client?.full_name || '' })}
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    {t("admin.clients.whoChanged", "Кто изменил")}: <span className="font-medium">{currentUser?.full_name || '—'}</span>
+                  </span>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-row gap-3">
+                <AlertDialogCancel className="flex-1 rounded-xl mt-0">{t("common.cancel")}</AlertDialogCancel>
+                <AlertDialogAction
+                  className="flex-1 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white"
+                  disabled={isVerifying}
+                  onClick={async () => {
+                    setIsVerifying(true);
+                    try {
+                      const newStatus = pendingVerifyValue ? "verified" : "unverified";
+                      const res = await apiPatch<any>(
+                        `/admin/users/${userId}/verification/`,
+                        { verification_status: newStatus }
+                      );
+                      if (res.error) throw new Error(res.error.detail || "Failed");
+                      setIsVerified(pendingVerifyValue);
+                      queryClient.invalidateQueries({ queryKey: ["admin-client-detail", userId] });
+                      toast.success(
+                        pendingVerifyValue
+                          ? t("admin.clients.verifiedSuccess", "Пользователь верифицирован")
+                          : t("admin.clients.unverifiedSuccess", "Верификация снята")
+                      );
+                      apiPost('/admin/audit-history/log/', {
+                        action: pendingVerifyValue ? 'VERIFY_USER' : 'UNVERIFY_USER',
+                        target_user_id: userId,
+                        details: { target_name: client?.full_name || '', new_value: newStatus },
+                      }).catch(() => {});
+                    } catch (e: any) {
+                      toast.error(e.message || t("common.error"));
+                    } finally {
+                      setIsVerifying(false);
+                      setShowVerifyAlert(false);
+                    }
+                  }}
+                >
+                  {isVerifying ? "..." : pendingVerifyValue ? t("admin.clients.verify", "Верифицировать") : t("admin.clients.unverify", "Снять")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         {/* Financial Summary */}
