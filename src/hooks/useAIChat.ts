@@ -47,7 +47,7 @@ export const useAIChat = () => {
       const content = detail?.content;
       console.log("voice-chat-message received:", { role, content });
       if (!content?.trim() || !role) return;
-      const prefixed = `🎙 ${content}`;
+      const prefixed = `🎙 ${convertRussianNumbersToDigits(content)}`;
       setMessages(prev => {
         // Avoid duplicate if last message has same content
         const last = prev[prev.length - 1];
