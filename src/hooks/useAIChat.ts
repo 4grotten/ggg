@@ -38,6 +38,22 @@ export const useAIChat = () => {
     saveMessages(messages);
   }, [messages]);
 
+  // Listen for voice assistant messages
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { role, content } = (e as CustomEvent).detail;
+      if (!content?.trim()) return;
+      setMessages(prev => {
+        // Avoid duplicate if last message is same
+        const last = prev[prev.length - 1];
+        if (last?.role === role && last?.content === content) return prev;
+        return [...prev, { role, content: `🎙 ${content}` }];
+      });
+    };
+    window.addEventListener("voice-chat-message", handler);
+    return () => window.removeEventListener("voice-chat-message", handler);
+  }, []);
+
   const sendMessage = useCallback(async (input: string) => {
     if (!input.trim()) return;
     
