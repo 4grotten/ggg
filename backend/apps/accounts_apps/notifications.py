@@ -241,6 +241,9 @@ def build_transaction_message(txn, role):
     tx_type_display = tx_type_map.get(txn.type, txn.type.replace('_', ' ').title())
     meta = txn.metadata or {}
     
+    sender_display = txn.sender_name or txn.sender_id or 'External Sender'
+    receiver_display = txn.receiver_name or txn.receiver_id or 'External Account'
+    
     lines = []
     
     if role == 'sender':
@@ -250,7 +253,8 @@ def build_transaction_message(txn, role):
         if txn.fee and float(txn.fee) > 0:
             lines.append(f"Fee: {fee} {currency}")
             
-        # Displaying FULL unmasked sender details
+        # Отправитель (теперь есть всегда)
+        lines.append(f"From: {sender_display}")
         if txn.sender_card:
             lines.append(f"From Card: {txn.sender_card}")
         elif meta.get('sender_iban'):
@@ -258,8 +262,7 @@ def build_transaction_message(txn, role):
         elif meta.get('from_address'):
             lines.append(f"From Crypto Wallet: {meta.get('from_address')}")
             
-        # Displaying FULL unmasked receiver details
-        receiver_display = txn.receiver_name or txn.receiver_id or 'External Account'
+        # Получатель
         lines.append(f"To: {receiver_display}")
         if txn.recipient_card:
             lines.append(f"To Card: {txn.recipient_card}")
@@ -273,7 +276,8 @@ def build_transaction_message(txn, role):
         lines.append(f"Operation Type: {tx_type_display}")
         lines.append(f"Amount: <b>+{amount} {currency}</b>")
         
-        # Displaying FULL unmasked receiver details
+        # Получатель
+        lines.append(f"To: {receiver_display}")
         if txn.recipient_card:
             lines.append(f"To Card: {txn.recipient_card}")
         elif meta.get('beneficiary_iban'):
@@ -281,8 +285,7 @@ def build_transaction_message(txn, role):
         elif meta.get('crypto_address'):
             lines.append(f"To Crypto Wallet: {meta.get('crypto_address')}")
             
-        # Displaying FULL unmasked sender details
-        sender_display = txn.sender_name or txn.sender_id or 'External Sender'
+        # Отправитель
         lines.append(f"From: {sender_display}")
         if txn.sender_card:
             lines.append(f"From Card: {txn.sender_card}")
