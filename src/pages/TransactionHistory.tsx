@@ -112,7 +112,7 @@ const allTransactionsData: Record<string, TransactionGroup[]> = {
 
 type FilterType = "all" | "income" | "expenses" | "transfers";
 type AssetType = "all" | "virtual" | "metal" | "iban" | "crypto";
-type PeriodPreset = "allTime" | "today" | "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "custom";
+type PeriodPreset = "allTime" | "today" | "thisWeek" | "month" | "threeMonths" | "nineMonths" | "custom";
 
 const TransactionHistory = () => {
   const navigate = useNavigate();
