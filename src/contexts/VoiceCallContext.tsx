@@ -215,18 +215,23 @@ const clientTools = {
         }
       });
 
-      if (!response.ok) throw new Error("API Error");
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
       const data = await response.json();
+      console.log("get_balance_summary raw response:", JSON.stringify(data).substring(0, 300));
 
-      if (!data.results || data.results.length === 0) return "Нет данных для формирования сводки.";
+      const results = Array.isArray(data) ? data : (data.results || []);
+      if (results.length === 0) return "Нет данных для формирования сводки.";
 
       let income = 0;
       let expenses = 0;
-      data.results.forEach((tx: any) => {
-        if (tx.receiver_id === String(user.id)) {
-          income += parseFloat(tx.amount);
+      results.forEach((tx: any) => {
+        const sign = tx.display?.primary_amount?.sign;
+        const amt = parseFloat(tx.display?.primary_amount?.amount || tx.amount || '0');
+        if (sign === '+' || tx.receiver_id === String(user.id)) {
+          income += amt;
         } else {
-          expenses += parseFloat(tx.amount);
+          expenses += amt;
+        }
         }
       });
 
