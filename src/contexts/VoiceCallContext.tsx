@@ -491,22 +491,38 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
     onMessage: (message: any) => {
       console.log("ElevenLabs onMessage RAW:", JSON.stringify(message)?.slice(0, 300));
       try {
+        // Handle client_tool_call
         if (message?.type === "client_tool_call") {
           console.log("ElevenLabs client_tool_call:", message);
         } else if (message?.type === "agent_tool_response") {
           console.log("ElevenLabs agent_tool_response:", message);
-        } else if (message?.type === "agent_response") {
+        }
+
+        // Handle agent_response (nested format)
+        if (message?.type === "agent_response") {
           const text = message?.agent_response_event?.agent_response;
-          console.log("ElevenLabs agent_response:", text);
           if (text) {
+            console.log("ElevenLabs agent_response (nested):", text);
             window.dispatchEvent(new CustomEvent("voice-chat-message", { detail: { role: "assistant", content: text } }));
           }
-        } else if (message?.type === "user_transcript") {
+        }
+        // Handle user_transcript (nested format)
+        if (message?.type === "user_transcript") {
           const text = message?.user_transcription_event?.user_transcript;
-          console.log("ElevenLabs user_transcript:", text);
           if (text) {
+            console.log("ElevenLabs user_transcript (nested):", text);
             window.dispatchEvent(new CustomEvent("voice-chat-message", { detail: { role: "user", content: text } }));
           }
+        }
+
+        // Handle flat format: {source: "ai", role: "agent", message: "..."}
+        if (message?.source === "ai" && message?.message) {
+          console.log("ElevenLabs agent message (flat):", message.message);
+          window.dispatchEvent(new CustomEvent("voice-chat-message", { detail: { role: "assistant", content: message.message } }));
+        }
+        if (message?.source === "user" && message?.role === "user" && message?.message) {
+          console.log("ElevenLabs user message (flat):", message.message);
+          window.dispatchEvent(new CustomEvent("voice-chat-message", { detail: { role: "user", content: message.message } }));
         }
       } catch {
         // ignore
