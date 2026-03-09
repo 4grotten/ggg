@@ -359,9 +359,9 @@ const TransactionHistory = () => {
     { key: "allTime", label: t("history.allTime"), dateRange: "" },
     { key: "today", label: t("history.today"), dateRange: formatDateRange(today, today) },
     { key: "thisWeek", label: t("history.thisWeek"), dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
-    { key: "lastWeek", label: t("history.lastWeek"), dateRange: formatDateRange(startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 }), endOfWeek(subWeeks(today, 1), { weekStartsOn: 1 })) },
-    { key: "thisMonth", label: t("history.thisMonth"), dateRange: formatDateRange(startOfMonth(today), today) },
-    { key: "lastMonth", label: t("history.lastMonth"), dateRange: formatDateRange(startOfMonth(subMonths(today, 1)), endOfMonth(subMonths(today, 1))) },
+    { key: "month", label: t("history.month", "Месяц"), dateRange: formatDateRange(subMonths(today, 1), today) },
+    { key: "threeMonths", label: t("history.threeMonths", "3 месяца"), dateRange: formatDateRange(subMonths(today, 3), today) },
+    { key: "nineMonths", label: t("history.nineMonths", "9 месяцев"), dateRange: formatDateRange(subMonths(today, 9), today) },
   ];
 
   const handlePresetSelect = (preset: PeriodPreset) => {
