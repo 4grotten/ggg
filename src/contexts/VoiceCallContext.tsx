@@ -301,26 +301,31 @@ const clientTools = {
         'x-backend-token': token,
       };
 
-      const [walletRes, ibanRes, cryptoRes] = await Promise.all([
+      const [walletRes, ibanRes, cryptoRes, bankAccountsRes] = await Promise.all([
         fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/cards/wallet/summary/')}`, { headers }),
         fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/cards/accounts/IBAN_AED/')}`, { headers }),
         fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/transactions/crypto-wallets/')}`, { headers }),
+        fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/transactions/bank-accounts/')}`, { headers }),
       ]);
 
       const walletData = await walletRes.json();
       const ibanData = await ibanRes.json();
       const cryptoData = await cryptoRes.json();
+      const bankAccountsData = await bankAccountsRes.json().catch(() => []);
       console.log("get_balance_summary wallet:", JSON.stringify(walletData).substring(0, 500));
       console.log("get_balance_summary iban:", JSON.stringify(ibanData).substring(0, 300));
       console.log("get_balance_summary crypto:", JSON.stringify(cryptoData).substring(0, 300));
+      console.log("get_balance_summary bankAccounts:", JSON.stringify(bankAccountsData).substring(0, 300));
 
       // Cards
       const cards = walletData?.cards || [];
       const cardsTotal = cards.reduce((sum: number, c: any) => sum + parseFloat(c.balance || '0'), 0);
 
-      // IBAN — prioritize dedicated IBAN endpoint over wallet summary
-      const ibanBalance = parseFloat(ibanData?.balance || walletData?.physical_account?.balance || '0');
-      const iban = ibanData?.iban || walletData?.physical_account?.iban || null;
+      // IBAN — prioritize /transactions/bank-accounts/ (same as Dashboard), then IBAN endpoint, then wallet summary
+      const bankAccounts = Array.isArray(bankAccountsData) ? bankAccountsData : (bankAccountsData?.results || []);
+      const primaryBankAccount = bankAccounts[0];
+      const ibanBalance = parseFloat(primaryBankAccount?.balance || ibanData?.balance || walletData?.physical_account?.balance || '0');
+      const iban = primaryBankAccount?.iban || ibanData?.iban || walletData?.physical_account?.iban || null;
       const maskedIban = iban ? `••••${iban.slice(-4)}` : null;
 
       // USDT
