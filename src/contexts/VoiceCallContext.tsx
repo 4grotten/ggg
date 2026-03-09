@@ -471,13 +471,9 @@ const clientTools = {
 
       let totalAmount = 0;
       const txStrings = results.slice(0, limit).map((tx: any, i: number) => {
-        const title = tx.display?.title || tx.description || "Операция";
         const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
-        const sign = tx.display?.primary_amount?.sign || '';
-        const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
-        const dateStr = new Date(tx.created_at).toLocaleDateString('ru-RU');
-        totalAmount += parseFloat(amount);
-        return `${i + 1}. ${title}: ${sign}${amount} ${currency} (${dateStr})`;
+        totalAmount += parseFloat(String(amount).replace(/,/g, ''));
+        return `${i + 1}. ${formatTransactionForVoice(tx, user)}`;
       });
 
       return `Найдено ${results.length} транзакций категории "${params.category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Проанализируй и расскажи пользователю.`;
