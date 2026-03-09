@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronDown, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { format, startOfDay, endOfDay, startOfWeek, subMonths } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TransactionGroup, Transaction } from "@/types/transaction";
+import { StatementDownloadDrawer } from "@/components/history/StatementDownloadDrawer";
 
 // All transactions data
 const allTransactionsData: Record<string, TransactionGroup[]> = {
@@ -135,6 +136,7 @@ const TransactionHistory = () => {
   const [tempCustomFrom, setTempCustomFrom] = useState<Date | undefined>(undefined);
   const [tempCustomTo, setTempCustomTo] = useState<Date | undefined>(undefined);
   const [hasSelectedFrom, setHasSelectedFrom] = useState(false);
+  const [isStatementOpen, setIsStatementOpen] = useState(false);
   
   // Refs for filter sliding indicator
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -433,13 +435,22 @@ const TransactionHistory = () => {
           {/* Title with Period Selector */}
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold">{t("history.title")}</h1>
-            <button
-              onClick={() => setIsDateDrawerOpen(true)}
-              className="flex items-center gap-1.5 text-primary"
-            >
-              <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsStatementOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" />
+                {t("statement.short", "Скачать")}
+              </button>
+              <button
+                onClick={() => setIsDateDrawerOpen(true)}
+                className="flex items-center gap-1.5 text-primary"
+              >
+                <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Asset Category Tabs */}
@@ -621,6 +632,8 @@ const TransactionHistory = () => {
           </div>
         </DrawerContent>
       </Drawer>
+
+      <StatementDownloadDrawer open={isStatementOpen} onOpenChange={setIsStatementOpen} />
     </MobileLayout>
   );
 };
