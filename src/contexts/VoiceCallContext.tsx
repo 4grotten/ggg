@@ -232,10 +232,9 @@ const clientTools = {
         } else {
           expenses += amt;
         }
-        }
       });
 
-      return `Сводка по последним ${data.results.length} операциям: Доходы составили +${income.toFixed(2)} AED. Расходы составили -${expenses.toFixed(2)} AED. Разница: ${(income - expenses).toFixed(2)} AED. Расскажи это пользователю.`;
+      return `Сводка по последним ${results.length} операциям: Доходы составили +${income.toFixed(2)} AED. Расходы составили -${expenses.toFixed(2)} AED. Разница: ${(income - expenses).toFixed(2)} AED. Расскажи это пользователю.`;
     } catch (error) {
       return "Не удалось посчитать сводку.";
     }
