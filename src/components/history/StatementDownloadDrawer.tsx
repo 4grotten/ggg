@@ -47,29 +47,30 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
   // Build asset list from live data
   useEffect(() => {
     const items: AssetItem[] = [];
+    const wd = walletData?.data;
 
     // Cards from wallet summary
-    if (walletData?.cards && Array.isArray(walletData.cards)) {
-      for (const card of walletData.cards) {
-        const mask = card.card_mask ? `•••• ${String(card.card_mask).slice(-4)}` : "";
-        const cardType = card.card_type || "Virtual";
+    if (wd?.cards && Array.isArray(wd.cards)) {
+      for (const card of wd.cards) {
+        const mask = card.card_number ? `•••• ${String(card.card_number).slice(-4)}` : "";
+        const cardType = card.type || "Virtual";
         items.push({
-          id: `card_${card.id || card.card_mask}`,
+          id: `card_${card.id || card.card_number}`,
           label: `${cardType} ${mask}`,
-          sublabel: card.balance !== undefined ? `${parseFloat(String(card.balance)).toFixed(2)} AED` : undefined,
+          sublabel: card.balance !== undefined ? `${parseFloat(String(card.balance)).toFixed(2)} ${card.currency || "AED"}` : undefined,
           type: "card",
         });
       }
     }
 
     // IBAN / physical account
-    if (walletData?.physical_account) {
-      const acc = walletData.physical_account;
+    if (wd?.physical_account) {
+      const acc = wd.physical_account;
       const iban = acc.iban ? `${String(acc.iban).slice(0, 4)}••••${String(acc.iban).slice(-4)}` : "IBAN";
       items.push({
-        id: `iban_${acc.id || "main"}`,
+        id: `iban_main`,
         label: `IBAN ${iban}`,
-        sublabel: acc.balance !== undefined ? `${parseFloat(String(acc.balance)).toFixed(2)} AED` : undefined,
+        sublabel: acc.balance !== undefined ? `${parseFloat(String(acc.balance)).toFixed(2)} ${acc.currency || "AED"}` : undefined,
         type: "iban",
       });
     }
@@ -79,7 +80,6 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       const accounts = Array.isArray(bankData) ? bankData : (bankData as any)?.results || [];
       for (const acc of accounts) {
         const iban = acc.iban ? `${String(acc.iban).slice(0, 4)}••••${String(acc.iban).slice(-4)}` : "Bank";
-        // Avoid duplicating the main IBAN
         if (items.some(i => i.label.includes(iban))) continue;
         items.push({
           id: `bank_${acc.id || acc.iban}`,
@@ -90,14 +90,8 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       }
     }
 
-    // USDT balance from wallet
-    if (walletData?.usdt_balance !== undefined) {
-      items.push({
-        id: "usdt_wallet",
-        label: "USDT Wallet",
-        sublabel: `${parseFloat(String(walletData.usdt_balance)).toFixed(2)} USDT`,
-        type: "crypto",
-      });
+    // Crypto wallets
+    // No usdt_balance on WalletSummaryResponse, handled via cryptoData below
     }
 
     // Crypto wallets
