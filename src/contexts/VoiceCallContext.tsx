@@ -229,20 +229,25 @@ const clientTools = {
     }
   },
   
-  // Get user transactions via Django backend
-  get_transactions: async (params: { type?: string; limit?: number; days?: number; summary?: boolean }) => {
+  // Unified transactions tool for ElevenLabs agent
+  tool_5801kkac8x3af67t323efk98nq5x: async (params: { type?: string; category?: string; limit?: number; days?: number; summary?: boolean }) => {
     const token = getAuthToken();
     const user = getCurrentUserProfile();
     if (!token || !user) return "Для просмотра транзакций необходимо авторизоваться.";
 
     try {
       const limit = params.limit || 10;
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.ueasycard.com';
-      console.log(`ИИ запросил ${limit} транзакций`);
-
-      // Use the existing transactions/all/ endpoint via cards-proxy
+      const category = params.category || params.type;
       const cardsProxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cards-proxy`;
-      const response = await fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent(`/transactions/all/?limit=${limit}`)}`, {
+      
+      let endpoint = `/transactions/all/?limit=${limit}`;
+      if (category) {
+        endpoint += `&type=${encodeURIComponent(category)}`;
+      }
+      
+      console.log(`ИИ запросил ${limit} транзакций${category ? `, категория: ${category}` : ''}`);
+
+      const response = await fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent(endpoint)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -254,17 +259,25 @@ const clientTools = {
 
       if (!response.ok) throw new Error(`API Error: ${response.status}`);
       const data = await response.json();
-      console.log("get_transactions raw response:", JSON.stringify(data).substring(0, 500));
+      console.log("tool_5801 raw response:", JSON.stringify(data).substring(0, 500));
 
-      // Support both { results: [...] } and plain array formats
       const results = Array.isArray(data) ? data : (data.results || []);
       if (results.length === 0) {
-        return "Список транзакций пуст. Скажи пользователю, что у него нет операций.";
+        return category 
+          ? `Транзакций категории "${category}" не найдено.`
+          : "Список транзакций пуст. Скажи пользователю, что у него нет операций.";
       }
 
+      let totalAmount = 0;
       const txStrings = results.slice(0, limit).map((tx: any, index: number) => {
+        const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
+        totalAmount += parseFloat(String(amount).replace(/,/g, ''));
         return `${index + 1}. ${formatTransactionForVoice(tx, user)}`;
       });
+
+      if (category) {
+        return `Найдено ${results.length} транзакций категории "${category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Расскажи детали. Если какого-то поля нет — не упоминай его.`;
+      }
 
       return `Вот последние ${txStrings.length} транзакций пользователя: ${txStrings.join(' | ')}. Расскажи пользователю детали. Если какого-то поля нет — не упоминай его.`;
     } catch (error) {
@@ -439,49 +452,6 @@ const clientTools = {
     }
   },
 
-  // Get transactions filtered by category/type
-  get_transactions_by_category: async (params: { category: string; limit?: number }) => {
-    console.log("Agent calling get_transactions_by_category, category:", params.category);
-    const token = getAuthToken();
-    const user = getCurrentUserProfile();
-    if (!token || !user) return "Для просмотра транзакций необходимо авторизоваться.";
-
-    try {
-      const limit = params.limit || 20;
-      const cardsProxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cards-proxy`;
-      const endpoint = `/transactions/all/?limit=${limit}&type=${encodeURIComponent(params.category)}`;
-
-      const response = await fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent(endpoint)}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          'x-backend-token': token,
-        }
-      });
-
-      if (!response.ok) throw new Error(`API Error: ${response.status}`);
-      const data = await response.json();
-      console.log("get_transactions_by_category raw:", JSON.stringify(data).substring(0, 500));
-
-      const results = Array.isArray(data) ? data : (data.results || []);
-      if (results.length === 0) {
-        return `Транзакций категории "${params.category}" не найдено.`;
-      }
-
-      let totalAmount = 0;
-      const txStrings = results.slice(0, limit).map((tx: any, i: number) => {
-        const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
-        totalAmount += parseFloat(String(amount).replace(/,/g, ''));
-        return `${i + 1}. ${formatTransactionForVoice(tx, user)}`;
-      });
-
-      return `Найдено ${results.length} транзакций категории "${params.category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Расскажи детали. Если какого-то поля нет — не упоминай его.`;
-    } catch (error) {
-      console.error("Error in get_transactions_by_category:", error);
-      return "Не удалось загрузить транзакции по категории.";
-    }
-  },
 };
 
 export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
@@ -504,7 +474,7 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
         conversation.sendContextualUpdate(
           [
             "ВАЖНО: Игнорируй любую ранее сказанную финансовую информацию.",
-            "Единственный источник правды по транзакциям — результат инструментов get_transactions / get_balance_summary.",
+            "Единственный источник правды по транзакциям — результат инструмента tool_5801kkac8x3af67t323efk98nq5x / get_balance_summary.",
             "Если инструмент не вызывался, скажи что нужно запросить данные инструментом.",
           ].join(" ")
         );
