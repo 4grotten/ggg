@@ -230,7 +230,7 @@ const clientTools = {
   },
   
   // Unified transactions tool for ElevenLabs agent
-  tool_5801kkac8x3af67t323efk98nq5x: async (params: { type?: string; category?: string; limit?: number; days?: number; summary?: boolean }) => {
+  get_transactions: async (params: { type?: string; category?: string; limit?: number; days?: number; summary?: boolean }) => {
     const token = getAuthToken();
     const user = getCurrentUserProfile();
     if (!token || !user) return "Для просмотра транзакций необходимо авторизоваться.";
