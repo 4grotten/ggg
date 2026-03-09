@@ -318,11 +318,10 @@ const clientTools = {
       const cards = walletData?.cards || [];
       const cardsTotal = cards.reduce((sum: number, c: any) => sum + parseFloat(c.balance || '0'), 0);
 
-      // IBAN
-      const physicalAccount = walletData?.physical_account;
-      const ibanBalance = parseFloat(physicalAccount?.balance || ibanData?.balance || '0');
-      const iban = physicalAccount?.iban || ibanData?.iban || null;
-      const maskedIban = iban ? `${iban.substring(0, 4)}••••${iban.slice(-4)}` : null;
+      // IBAN — prioritize dedicated IBAN endpoint over wallet summary
+      const ibanBalance = parseFloat(ibanData?.balance || walletData?.physical_account?.balance || '0');
+      const iban = ibanData?.iban || walletData?.physical_account?.iban || null;
+      const maskedIban = iban ? `••••${iban.slice(-4)}` : null;
 
       // USDT
       const cryptoWallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
