@@ -339,16 +339,9 @@ const TransactionHistory = () => {
       case "allTime": return { from: undefined, to: undefined };
       case "today": return { from: today, to: today };
       case "thisWeek": return { from: startOfWeek(today, { weekStartsOn: 1 }), to: today };
-      case "lastWeek": {
-        const lastWeekStart = startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
-        const lastWeekEnd = endOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
-        return { from: lastWeekStart, to: lastWeekEnd };
-      }
-      case "thisMonth": return { from: startOfMonth(today), to: today };
-      case "lastMonth": {
-        const lastMonth = subMonths(today, 1);
-        return { from: startOfMonth(lastMonth), to: endOfMonth(lastMonth) };
-      }
+      case "month": return { from: subMonths(today, 1), to: today };
+      case "threeMonths": return { from: subMonths(today, 3), to: today };
+      case "nineMonths": return { from: subMonths(today, 9), to: today };
       case "custom": return { from: tempCustomFrom, to: tempCustomTo };
       default: return { from: undefined, to: undefined };
     }
