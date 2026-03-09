@@ -435,13 +435,22 @@ const TransactionHistory = () => {
           {/* Title with Period Selector */}
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold">{t("history.title")}</h1>
-            <button
-              onClick={() => setIsDateDrawerOpen(true)}
-              className="flex items-center gap-1.5 text-primary"
-            >
-              <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsStatementOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" />
+                {t("statement.short", "Скачать")}
+              </button>
+              <button
+                onClick={() => setIsDateDrawerOpen(true)}
+                className="flex items-center gap-1.5 text-primary"
+              >
+                <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Asset Category Tabs */}
