@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/drawer";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
+import { format, startOfDay, endOfDay, startOfWeek, subMonths } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TransactionGroup, Transaction } from "@/types/transaction";
 
@@ -112,7 +112,7 @@ const allTransactionsData: Record<string, TransactionGroup[]> = {
 
 type FilterType = "all" | "income" | "expenses" | "transfers";
 type AssetType = "all" | "virtual" | "metal" | "iban" | "crypto";
-type PeriodPreset = "allTime" | "today" | "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "custom";
+type PeriodPreset = "allTime" | "today" | "thisWeek" | "month" | "threeMonths" | "nineMonths" | "custom";
 
 const TransactionHistory = () => {
   const navigate = useNavigate();
@@ -339,16 +339,9 @@ const TransactionHistory = () => {
       case "allTime": return { from: undefined, to: undefined };
       case "today": return { from: today, to: today };
       case "thisWeek": return { from: startOfWeek(today, { weekStartsOn: 1 }), to: today };
-      case "lastWeek": {
-        const lastWeekStart = startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
-        const lastWeekEnd = endOfWeek(subWeeks(today, 1), { weekStartsOn: 1 });
-        return { from: lastWeekStart, to: lastWeekEnd };
-      }
-      case "thisMonth": return { from: startOfMonth(today), to: today };
-      case "lastMonth": {
-        const lastMonth = subMonths(today, 1);
-        return { from: startOfMonth(lastMonth), to: endOfMonth(lastMonth) };
-      }
+      case "month": return { from: subMonths(today, 1), to: today };
+      case "threeMonths": return { from: subMonths(today, 3), to: today };
+      case "nineMonths": return { from: subMonths(today, 9), to: today };
       case "custom": return { from: tempCustomFrom, to: tempCustomTo };
       default: return { from: undefined, to: undefined };
     }
@@ -366,9 +359,9 @@ const TransactionHistory = () => {
     { key: "allTime", label: t("history.allTime"), dateRange: "" },
     { key: "today", label: t("history.today"), dateRange: formatDateRange(today, today) },
     { key: "thisWeek", label: t("history.thisWeek"), dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
-    { key: "lastWeek", label: t("history.lastWeek"), dateRange: formatDateRange(startOfWeek(subWeeks(today, 1), { weekStartsOn: 1 }), endOfWeek(subWeeks(today, 1), { weekStartsOn: 1 })) },
-    { key: "thisMonth", label: t("history.thisMonth"), dateRange: formatDateRange(startOfMonth(today), today) },
-    { key: "lastMonth", label: t("history.lastMonth"), dateRange: formatDateRange(startOfMonth(subMonths(today, 1)), endOfMonth(subMonths(today, 1))) },
+    { key: "month", label: t("history.month", "Месяц"), dateRange: formatDateRange(subMonths(today, 1), today) },
+    { key: "threeMonths", label: t("history.threeMonths", "3 месяца"), dateRange: formatDateRange(subMonths(today, 3), today) },
+    { key: "nineMonths", label: t("history.nineMonths", "9 месяцев"), dateRange: formatDateRange(subMonths(today, 9), today) },
   ];
 
   const handlePresetSelect = (preset: PeriodPreset) => {
