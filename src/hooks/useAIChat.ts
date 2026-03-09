@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAuthToken } from '@/services/api/apiClient';
+import { convertRussianNumbersToDigits } from '@/utils/russianNumbersToDigits';
 
 type Message = {
   role: 'user' | 'assistant';
