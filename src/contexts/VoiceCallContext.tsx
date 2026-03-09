@@ -452,49 +452,6 @@ const clientTools = {
     }
   },
 
-  // Get transactions filtered by category/type
-  get_transactions_by_category: async (params: { category: string; limit?: number }) => {
-    console.log("Agent calling get_transactions_by_category, category:", params.category);
-    const token = getAuthToken();
-    const user = getCurrentUserProfile();
-    if (!token || !user) return "Для просмотра транзакций необходимо авторизоваться.";
-
-    try {
-      const limit = params.limit || 20;
-      const cardsProxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cards-proxy`;
-      const endpoint = `/transactions/all/?limit=${limit}&type=${encodeURIComponent(params.category)}`;
-
-      const response = await fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent(endpoint)}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          'x-backend-token': token,
-        }
-      });
-
-      if (!response.ok) throw new Error(`API Error: ${response.status}`);
-      const data = await response.json();
-      console.log("get_transactions_by_category raw:", JSON.stringify(data).substring(0, 500));
-
-      const results = Array.isArray(data) ? data : (data.results || []);
-      if (results.length === 0) {
-        return `Транзакций категории "${params.category}" не найдено.`;
-      }
-
-      let totalAmount = 0;
-      const txStrings = results.slice(0, limit).map((tx: any, i: number) => {
-        const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
-        totalAmount += parseFloat(String(amount).replace(/,/g, ''));
-        return `${i + 1}. ${formatTransactionForVoice(tx, user)}`;
-      });
-
-      return `Найдено ${results.length} транзакций категории "${params.category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Расскажи детали. Если какого-то поля нет — не упоминай его.`;
-    } catch (error) {
-      console.error("Error in get_transactions_by_category:", error);
-      return "Не удалось загрузить транзакции по категории.";
-    }
-  },
 };
 
 export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
