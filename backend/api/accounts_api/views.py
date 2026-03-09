@@ -1428,3 +1428,36 @@ class AdminVerifyUserView(APIView):
             pass
 
         return Response({"status": "success", "user_id": user_id, "verification_status": new_status}, status=status.HTTP_200_OK)
+
+
+class UpdateLanguageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Изменить язык интерфейса пользователя",
+        operation_description="Обновляет предпочитаемый язык для пользователя (влияет на push-уведомления).",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['language'],
+            properties={
+                'language': openapi.Schema(
+                    type=openapi.TYPE_STRING, 
+                    description="Код языка: ru, en, de, tr, zh, ar, es"
+                )
+            }
+        ),
+        tags=["Профиль пользователя"]
+    )
+    def post(self, request):
+        lang = request.data.get('language')
+        if not lang:
+            return Response({"error": "language is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        profile, _ = Profiles.objects.get_or_create(
+            user_id=str(request.user.id), 
+            defaults={'phone': request.user.username}
+        )
+        profile.language = lang
+        profile.save()
+        
+        return Response({"status": "success", "language": lang}, status=status.HTTP_200_OK)

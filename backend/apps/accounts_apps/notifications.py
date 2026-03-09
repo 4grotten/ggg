@@ -7,10 +7,225 @@ from datetime import timedelta, timezone
 from decimal import Decimal
 from django.conf import settings
 from django.core.mail import send_mail, get_connection, EmailMessage
-from .models import AdminNotificationSettings, UserRoles, WahaSession, UserNotificationSettings
+from .models import AdminNotificationSettings, UserRoles, WahaSession, UserNotificationSettings, Profiles
 from django.apps import apps
 
 logger = logging.getLogger(__name__)
+
+# --- MULTILANGUAGE DICTIONARY ---
+TRANSLATIONS = {
+    'en': {
+        'debit_title': '💸 <b>Successful Debit</b>',
+        'credit_title': '📥 <b>Funds Received</b>',
+        'op_type': 'Operation Type:',
+        'amount': 'Amount:',
+        'fee': 'Fee:',
+        'from': 'From:',
+        'from_card': 'From Card:',
+        'from_iban': 'From Account (IBAN):',
+        'from_crypto': 'From Crypto Wallet:',
+        'to': 'To:',
+        'to_card': 'To Card:',
+        'to_iban': 'To Account (IBAN):',
+        'to_crypto': 'To Crypto Wallet:',
+        'status': 'Status:',
+        'tx_id': 'Transaction ID:',
+        'time': 'Time:',
+        'desc': 'Description:',
+        'ext_sender': 'External Sender',
+        'ext_account': 'External Account',
+        'ops': {
+            'card_transfer': 'Card Transfer', 'internal_transfer': 'Internal Transfer',
+            'top_up': 'Account Top Up', 'bank_topup': 'Bank Transfer Top Up',
+            'crypto_deposit': 'Crypto Deposit', 'crypto_withdrawal': 'Crypto Withdrawal',
+            'bank_withdrawal': 'Bank Withdrawal', 'card_to_crypto': 'Card to Crypto',
+            'crypto_to_card': 'Crypto to Card', 'bank_to_crypto': 'Bank to Crypto',
+            'crypto_to_iban': 'Crypto to Bank Account', 'iban_to_card': 'Bank Account to Card',
+            'crypto_to_crypto': 'Crypto Transfer'
+        }
+    },
+    'ru': {
+        'debit_title': '💸 <b>Успешное списание</b>',
+        'credit_title': '📥 <b>Поступление средств</b>',
+        'op_type': 'Тип операции:',
+        'amount': 'Сумма:',
+        'fee': 'Комиссия:',
+        'from': 'Отправитель:',
+        'from_card': 'С карты:',
+        'from_iban': 'Со счета (IBAN):',
+        'from_crypto': 'С криптокошелька:',
+        'to': 'Получатель:',
+        'to_card': 'На карту:',
+        'to_iban': 'На счет (IBAN):',
+        'to_crypto': 'На криптокошелек:',
+        'status': 'Статус:',
+        'tx_id': 'ID Транзакции:',
+        'time': 'Время:',
+        'desc': 'Описание:',
+        'ext_sender': 'Внешний отправитель',
+        'ext_account': 'Внешний счет',
+        'ops': {
+            'card_transfer': 'Перевод на карту', 'internal_transfer': 'Внутренний перевод',
+            'top_up': 'Пополнение счета', 'bank_topup': 'Пополнение банк. переводом',
+            'crypto_deposit': 'Пополнение криптовалютой', 'crypto_withdrawal': 'Вывод в криптовалюте',
+            'bank_withdrawal': 'Вывод на банк. счет', 'card_to_crypto': 'Перевод с карты в крипто',
+            'crypto_to_card': 'Перевод из крипто на карту', 'bank_to_crypto': 'Перевод со счета в крипто',
+            'crypto_to_iban': 'Перевод из крипто на счет', 'iban_to_card': 'Перевод со счета на карту',
+            'crypto_to_crypto': 'Перевод криптовалюты'
+        }
+    },
+    'de': {
+        'debit_title': '💸 <b>Erfolgreiche Abbuchung</b>',
+        'credit_title': '📥 <b>Geldeingang</b>',
+        'op_type': 'Vorgangsart:',
+        'amount': 'Betrag:',
+        'fee': 'Gebühr:',
+        'from': 'Von:',
+        'from_card': 'Von Karte:',
+        'from_iban': 'Von Konto (IBAN):',
+        'from_crypto': 'Von Krypto-Wallet:',
+        'to': 'An:',
+        'to_card': 'Auf Karte:',
+        'to_iban': 'Auf Konto (IBAN):',
+        'to_crypto': 'Auf Krypto-Wallet:',
+        'status': 'Status:',
+        'tx_id': 'Transaktions-ID:',
+        'time': 'Zeit:',
+        'desc': 'Beschreibung:',
+        'ext_sender': 'Externer Absender',
+        'ext_account': 'Externes Konto',
+        'ops': {
+            'card_transfer': 'Kartenüberweisung', 'internal_transfer': 'Interne Überweisung',
+            'top_up': 'Kontoaufladung', 'bank_topup': 'Banküberweisung Aufladung',
+            'crypto_deposit': 'Krypto-Einzahlung', 'crypto_withdrawal': 'Krypto-Auszahlung',
+            'bank_withdrawal': 'Bankauszahlung', 'card_to_crypto': 'Karte zu Krypto',
+            'crypto_to_card': 'Krypto zu Karte', 'bank_to_crypto': 'Bank zu Krypto',
+            'crypto_to_iban': 'Krypto zu Bankkonto', 'iban_to_card': 'Bankkonto zu Karte',
+            'crypto_to_crypto': 'Krypto-Transfer'
+        }
+    },
+    'tr': {
+        'debit_title': '💸 <b>Başarılı Çekim</b>',
+        'credit_title': '📥 <b>Para Geldi</b>',
+        'op_type': 'İşlem Tipi:',
+        'amount': 'Tutar:',
+        'fee': 'Ücret:',
+        'from': 'Gönderen:',
+        'from_card': 'Karttan:',
+        'from_iban': 'Hesaptan (IBAN):',
+        'from_crypto': 'Kripto Cüzdandan:',
+        'to': 'Alıcı:',
+        'to_card': 'Karta:',
+        'to_iban': 'Hesaba (IBAN):',
+        'to_crypto': 'Kripto Cüzdana:',
+        'status': 'Durum:',
+        'tx_id': 'İşlem ID:',
+        'time': 'Zaman:',
+        'desc': 'Açıklama:',
+        'ext_sender': 'Dış Gönderici',
+        'ext_account': 'Dış Hesap',
+        'ops': {
+            'card_transfer': 'Kart Transferi', 'internal_transfer': 'İç Transfer',
+            'top_up': 'Hesaba Para Yükleme', 'bank_topup': 'Banka Transferi ile Yükleme',
+            'crypto_deposit': 'Kripto Para Yatırma', 'crypto_withdrawal': 'Kripto Para Çekme',
+            'bank_withdrawal': 'Banka Çekimi', 'card_to_crypto': 'Karttan Kriptoya',
+            'crypto_to_card': 'Kriptodan Karta', 'bank_to_crypto': 'Bankadan Kriptoya',
+            'crypto_to_iban': 'Kriptodan Banka Hesabına', 'iban_to_card': 'Banka Hesabından Karta',
+            'crypto_to_crypto': 'Kripto Transferi'
+        }
+    },
+    'zh': {
+        'debit_title': '💸 <b>成功扣款</b>',
+        'credit_title': '📥 <b>资金已收到</b>',
+        'op_type': '操作类型:',
+        'amount': '金额:',
+        'fee': '手续费:',
+        'from': '来自:',
+        'from_card': '来自卡:',
+        'from_iban': '来自账户 (IBAN):',
+        'from_crypto': '来自加密钱包:',
+        'to': '到:',
+        'to_card': '到卡:',
+        'to_iban': '到账户 (IBAN):',
+        'to_crypto': '到加密钱包:',
+        'status': '状态:',
+        'tx_id': '交易ID:',
+        'time': '时间:',
+        'desc': '描述:',
+        'ext_sender': '外部发送者',
+        'ext_account': '外部账户',
+        'ops': {
+            'card_transfer': '卡转账', 'internal_transfer': '内部转账',
+            'top_up': '账户充值', 'bank_topup': '银行转账充值',
+            'crypto_deposit': '加密货币存款', 'crypto_withdrawal': '加密货币提现',
+            'bank_withdrawal': '银行提现', 'card_to_crypto': '卡到加密货币',
+            'crypto_to_card': '加密货币到卡', 'bank_to_crypto': '银行到加密货币',
+            'crypto_to_iban': '加密货币到银行账户', 'iban_to_card': '银行账户到卡',
+            'crypto_to_crypto': '加密货币转账'
+        }
+    },
+    'ar': {
+        'debit_title': '💸 <b>خصم ناجح</b>',
+        'credit_title': '📥 <b>استلام الأموال</b>',
+        'op_type': 'نوع العملية:',
+        'amount': 'المبلغ:',
+        'fee': 'الرسوم:',
+        'from': 'من:',
+        'from_card': 'من بطاقة:',
+        'from_iban': 'من حساب (IBAN):',
+        'from_crypto': 'من محفظة رقمية:',
+        'to': 'إلى:',
+        'to_card': 'إلى بطاقة:',
+        'to_iban': 'إلى حساب (IBAN):',
+        'to_crypto': 'إلى محفظة رقمية:',
+        'status': 'الحالة:',
+        'tx_id': 'رقم المعاملة:',
+        'time': 'الوقت:',
+        'desc': 'الوصف:',
+        'ext_sender': 'مرسل خارجي',
+        'ext_account': 'حساب خارجي',
+        'ops': {
+            'card_transfer': 'تحويل بطاقة', 'internal_transfer': 'تحويل داخلي',
+            'top_up': 'تعبئة الرصيد', 'bank_topup': 'تعبئة تحويل بنكي',
+            'crypto_deposit': 'إيداع عملة رقمية', 'crypto_withdrawal': 'سحب عملة رقمية',
+            'bank_withdrawal': 'سحب بنكي', 'card_to_crypto': 'من بطاقة إلى عملة رقمية',
+            'crypto_to_card': 'من عملة رقمية إلى بطاقة', 'bank_to_crypto': 'من بنك إلى عملة رقمية',
+            'crypto_to_iban': 'من عملة رقمية إلى حساب بنكي', 'iban_to_card': 'من حساب بنكي إلى بطاقة',
+            'crypto_to_crypto': 'تحويل عملة رقمية'
+        }
+    },
+    'es': {
+        'debit_title': '💸 <b>Débito exitoso</b>',
+        'credit_title': '📥 <b>Fondos recibidos</b>',
+        'op_type': 'Tipo de operación:',
+        'amount': 'Monto:',
+        'fee': 'Comisión:',
+        'from': 'De:',
+        'from_card': 'Desde tarjeta:',
+        'from_iban': 'Desde cuenta (IBAN):',
+        'from_crypto': 'Desde billetera cripto:',
+        'to': 'A:',
+        'to_card': 'A la tarjeta:',
+        'to_iban': 'A la cuenta (IBAN):',
+        'to_crypto': 'A la billetera cripto:',
+        'status': 'Estado:',
+        'tx_id': 'ID de transacción:',
+        'time': 'Hora:',
+        'desc': 'Descripción:',
+        'ext_sender': 'Remitente externo',
+        'ext_account': 'Cuenta externa',
+        'ops': {
+            'card_transfer': 'Transferencia a tarjeta', 'internal_transfer': 'Transferencia interna',
+            'top_up': 'Recarga de cuenta', 'bank_topup': 'Recarga por transferencia bancaria',
+            'crypto_deposit': 'Depósito criptográfico', 'crypto_withdrawal': 'Retiro criptográfico',
+            'bank_withdrawal': 'Retiro bancario', 'card_to_crypto': 'Tarjeta a cripto',
+            'crypto_to_card': 'Cripto a tarjeta', 'bank_to_crypto': 'Banco a cripto',
+            'crypto_to_iban': 'Cripto a cuenta bancaria', 'iban_to_card': 'Cuenta bancaria a tarjeta',
+            'crypto_to_crypto': 'Transferencia criptográfica'
+        }
+    }
+}
+
 
 def to_2_decimals(value):
     if value is None:
@@ -215,7 +430,12 @@ def send_user_telegram(settings_obj, text):
     except Exception as e:
         logger.error(f"User Telegram Notification Error: {e}")
 
-def build_transaction_message(txn, role):
+
+def build_transaction_message(txn, role, lang_code='en'):
+    if lang_code not in TRANSLATIONS:
+        lang_code = 'en'
+    t = TRANSLATIONS[lang_code]
+
     amount = to_2_decimals(txn.amount)
     fee = to_2_decimals(txn.fee) if txn.fee else "0.00"
     currency = txn.currency
@@ -223,85 +443,78 @@ def build_transaction_message(txn, role):
     tz_utc_4 = timezone(timedelta(hours=4))
     date_str = txn.created_at.astimezone(tz_utc_4).strftime('%d.%m.%Y %H:%M')
 
-    tx_type_map = {
-        'card_transfer': 'Card Transfer',
-        'internal_transfer': 'Internal Transfer',
-        'top_up': 'Account Top Up',
-        'bank_topup': 'Bank Transfer Top Up',
-        'crypto_deposit': 'Crypto Deposit',
-        'crypto_withdrawal': 'Crypto Withdrawal',
-        'bank_withdrawal': 'Bank Withdrawal',
-        'card_to_crypto': 'Card to Crypto',
-        'crypto_to_card': 'Crypto to Card',
-        'bank_to_crypto': 'Bank to Crypto',
-        'crypto_to_iban': 'Crypto to Bank Account',
-        'iban_to_card': 'Bank Account to Card',
-        'crypto_to_crypto': 'Crypto Transfer'
-    }
-    tx_type_display = tx_type_map.get(txn.type, txn.type.replace('_', ' ').title())
+    tx_type_display = t['ops'].get(txn.type, txn.type.replace('_', ' ').title())
     meta = txn.metadata or {}
     
-    sender_display = txn.sender_name or txn.sender_id or 'External Sender'
-    receiver_display = txn.receiver_name or txn.receiver_id or 'External Account'
+    sender_display = txn.sender_name or txn.sender_id or t['ext_sender']
+    receiver_display = txn.receiver_name or txn.receiver_id or t['ext_account']
     
     lines = []
     
     if role == 'sender':
-        lines.append(f"💸 <b>Successful Debit</b>")
-        lines.append(f"Operation Type: {tx_type_display}")
-        lines.append(f"Amount: <b>-{amount} {currency}</b>")
+        lines.append(t['debit_title'])
+        lines.append(f"{t['op_type']} {tx_type_display}")
+        lines.append(f"{t['amount']} <b>-{amount} {currency}</b>")
         if txn.fee and float(txn.fee) > 0:
-            lines.append(f"Fee: {fee} {currency}")
+            lines.append(f"{t['fee']} {fee} {currency}")
             
-        # Отправитель (теперь есть всегда)
-        lines.append(f"From: {sender_display}")
+        lines.append(f"{t['from']} {sender_display}")
         if txn.sender_card:
-            lines.append(f"From Card: {txn.sender_card}")
+            lines.append(f"{t['from_card']} {txn.sender_card}")
         elif meta.get('sender_iban'):
-            lines.append(f"From Account (IBAN): {meta.get('sender_iban')}")
+            lines.append(f"{t['from_iban']} {meta.get('sender_iban')}")
         elif meta.get('from_address'):
-            lines.append(f"From Crypto Wallet: {meta.get('from_address')}")
+            lines.append(f"{t['from_crypto']} {meta.get('from_address')}")
             
-        # Получатель
-        lines.append(f"To: {receiver_display}")
+        lines.append(f"{t['to']} {receiver_display}")
         if txn.recipient_card:
-            lines.append(f"To Card: {txn.recipient_card}")
+            lines.append(f"{t['to_card']} {txn.recipient_card}")
         elif meta.get('beneficiary_iban'):
-            lines.append(f"To Account (IBAN): {meta.get('beneficiary_iban')}")
+            lines.append(f"{t['to_iban']} {meta.get('beneficiary_iban')}")
         elif meta.get('crypto_address'):
-            lines.append(f"To Crypto Wallet: {meta.get('crypto_address')}")
+            lines.append(f"{t['to_crypto']} {meta.get('crypto_address')}")
         
     else:
-        lines.append(f"📥 <b>Funds Received</b>")
-        lines.append(f"Operation Type: {tx_type_display}")
-        lines.append(f"Amount: <b>+{amount} {currency}</b>")
+        lines.append(t['credit_title'])
+        lines.append(f"{t['op_type']} {tx_type_display}")
+        lines.append(f"{t['amount']} <b>+{amount} {currency}</b>")
         
-        # Получатель
-        lines.append(f"To: {receiver_display}")
+        lines.append(f"{t['to']} {receiver_display}")
         if txn.recipient_card:
-            lines.append(f"To Card: {txn.recipient_card}")
+            lines.append(f"{t['to_card']} {txn.recipient_card}")
         elif meta.get('beneficiary_iban'):
-            lines.append(f"To Account (IBAN): {meta.get('beneficiary_iban')}")
+            lines.append(f"{t['to_iban']} {meta.get('beneficiary_iban')}")
         elif meta.get('crypto_address'):
-            lines.append(f"To Crypto Wallet: {meta.get('crypto_address')}")
+            lines.append(f"{t['to_crypto']} {meta.get('crypto_address')}")
             
-        # Отправитель
-        lines.append(f"From: {sender_display}")
+        lines.append(f"{t['from']} {sender_display}")
         if txn.sender_card:
-            lines.append(f"From Card: {txn.sender_card}")
+            lines.append(f"{t['from_card']} {txn.sender_card}")
         elif meta.get('sender_iban'):
-            lines.append(f"From Account (IBAN): {meta.get('sender_iban')}")
+            lines.append(f"{t['from_iban']} {meta.get('sender_iban')}")
         elif meta.get('from_address'):
-            lines.append(f"From Crypto Wallet: {meta.get('from_address')}")
+            lines.append(f"{t['from_crypto']} {meta.get('from_address')}")
 
     lines.append("")
-    lines.append(f"Status: <b>{txn.status.upper()}</b>")
-    lines.append(f"Transaction ID: {str(txn.id)}")
-    lines.append(f"Time: {date_str} (UTC+4)")
+    lines.append(f"{t['status']} <b>{txn.status.upper()}</b>")
+    lines.append(f"{t['tx_id']} {str(txn.id)}")
+    lines.append(f"{t['time']} {date_str} (UTC+4)")
     if txn.description:
-        lines.append(f"Description: {txn.description}")
+        lines.append(f"{t['desc']} {txn.description}")
 
     return "\n".join(lines)
+
+
+def get_user_language(user_id):
+    if not user_id or str(user_id) == 'EXTERNAL':
+        return 'en'
+    try:
+        profile = Profiles.objects.filter(user_id=str(user_id)).first()
+        if profile and profile.language:
+            return profile.language.lower()[:2]
+    except Exception:
+        pass
+    return 'en'
 
 
 def notify_transaction_parties(transaction_id):
@@ -310,12 +523,16 @@ def notify_transaction_parties(transaction_id):
         txn = Transactions.objects.get(id=transaction_id)
     except Transactions.DoesNotExist:
         return
+        
     if txn.sender_id and txn.sender_id != 'EXTERNAL':
-        sender_text = build_transaction_message(txn, 'sender')
+        sender_lang = get_user_language(txn.sender_id)
+        sender_text = build_transaction_message(txn, 'sender', sender_lang)
         send_user_notification(txn.sender_id, sender_text, is_transaction=True)
+        
     if txn.receiver_id and txn.receiver_id != 'EXTERNAL':
         if txn.sender_id != txn.receiver_id:
-            receiver_text = build_transaction_message(txn, 'receiver')
+            receiver_lang = get_user_language(txn.receiver_id)
+            receiver_text = build_transaction_message(txn, 'receiver', receiver_lang)
             send_user_notification(txn.receiver_id, receiver_text, is_transaction=True)
 
 

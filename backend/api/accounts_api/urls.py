@@ -59,4 +59,6 @@ urlpatterns = [
 
     path('users/notifications/settings/', views.UserNotificationSettingsView.as_view(), name='user-notification-settings'),
     path('admin/users/<str:user_id>/verification/', views.AdminVerifyUserView.as_view(), name='admin-user-verify'),
+
+    path('users/language/', views.UpdateLanguageView.as_view()),
 ]
