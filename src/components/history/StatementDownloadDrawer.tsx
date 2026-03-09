@@ -91,8 +91,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     }
 
     // Crypto wallets
-    // No usdt_balance on WalletSummaryResponse, handled via cryptoData below
-    }
+    // Crypto wallets (including USDT)
 
     // Crypto wallets
     if (cryptoData) {
