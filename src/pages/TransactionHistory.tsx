@@ -136,6 +136,7 @@ const TransactionHistory = () => {
   const [tempCustomFrom, setTempCustomFrom] = useState<Date | undefined>(undefined);
   const [tempCustomTo, setTempCustomTo] = useState<Date | undefined>(undefined);
   const [hasSelectedFrom, setHasSelectedFrom] = useState(false);
+  const [isStatementOpen, setIsStatementOpen] = useState(false);
   
   // Refs for filter sliding indicator
   const tabsContainerRef = useRef<HTMLDivElement>(null);
