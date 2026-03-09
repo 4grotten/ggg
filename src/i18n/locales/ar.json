@@ -552,6 +552,26 @@
     "metalCard": "Metal",
     "crypto": "كريبتو"
   },
+  "statement": {
+    "title": "تحميل كشف الحساب",
+    "short": "تحميل",
+    "accounts": "الحسابات والمحافظ",
+    "selectAll": "تحديد الكل",
+    "deselectAll": "إلغاء تحديد الكل",
+    "period": "الفترة",
+    "1month": "شهر",
+    "3months": "3 أشهر",
+    "6months": "6 أشهر",
+    "9months": "9 أشهر",
+    "1year": "سنة",
+    "download": "تحميل كشف الحساب",
+    "generating": "جارٍ الإنشاء...",
+    "done": "تم التحميل!",
+    "downloaded": "تم تحميل كشف الحساب!",
+    "downloadError": "خطأ في إنشاء التقرير",
+    "selectAtLeastOne": "اختر حسابًا واحدًا على الأقل",
+    "usdtWallet": "محفظة USDT"
+  },
   "transaction": {
     "back": "رجوع",
     "notFound": "لم يتم العثور على المعاملة",

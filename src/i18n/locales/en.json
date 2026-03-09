@@ -633,6 +633,26 @@
     "metalCard": "Metal",
     "crypto": "Crypto"
   },
+  "statement": {
+    "title": "Download Statement",
+    "short": "Download",
+    "accounts": "Accounts & Wallets",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "period": "Period",
+    "1month": "1 mo",
+    "3months": "3 mo",
+    "6months": "6 mo",
+    "9months": "9 mo",
+    "1year": "1 year",
+    "download": "Download Statement",
+    "generating": "Generating...",
+    "done": "Downloaded!",
+    "downloaded": "Statement downloaded!",
+    "downloadError": "Report generation error",
+    "selectAtLeastOne": "Select at least one account",
+    "usdtWallet": "USDT Wallet"
+  },
   "transaction": {
     "back": "Back",
     "notFound": "Transaction not found",
