@@ -474,7 +474,7 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
         conversation.sendContextualUpdate(
           [
             "ВАЖНО: Игнорируй любую ранее сказанную финансовую информацию.",
-            "Единственный источник правды по транзакциям — результат инструментов get_transactions / get_balance_summary.",
+            "Единственный источник правды по транзакциям — результат инструмента tool_5801kkac8x3af67t323efk98nq5x / get_balance_summary.",
             "Если инструмент не вызывался, скажи что нужно запросить данные инструментом.",
           ].join(" ")
         );
