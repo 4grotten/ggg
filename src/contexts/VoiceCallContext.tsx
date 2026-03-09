@@ -321,9 +321,11 @@ const clientTools = {
       const cards = walletData?.cards || [];
       const cardsTotal = cards.reduce((sum: number, c: any) => sum + parseFloat(c.balance || '0'), 0);
 
-      // IBAN — prioritize dedicated IBAN endpoint over wallet summary
-      const ibanBalance = parseFloat(ibanData?.balance || walletData?.physical_account?.balance || '0');
-      const iban = ibanData?.iban || walletData?.physical_account?.iban || null;
+      // IBAN — prioritize /transactions/bank-accounts/ (same as Dashboard), then IBAN endpoint, then wallet summary
+      const bankAccounts = Array.isArray(bankAccountsData) ? bankAccountsData : (bankAccountsData?.results || []);
+      const primaryBankAccount = bankAccounts[0];
+      const ibanBalance = parseFloat(primaryBankAccount?.balance || ibanData?.balance || walletData?.physical_account?.balance || '0');
+      const iban = primaryBankAccount?.iban || ibanData?.iban || walletData?.physical_account?.iban || null;
       const maskedIban = iban ? `••••${iban.slice(-4)}` : null;
 
       // USDT
