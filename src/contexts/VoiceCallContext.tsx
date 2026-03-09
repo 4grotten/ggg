@@ -170,10 +170,13 @@ const clientTools = {
         }
       });
 
-      if (!response.ok) throw new Error("API Error");
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
       const data = await response.json();
+      console.log("get_transactions raw response:", JSON.stringify(data).substring(0, 500));
 
-      if (!data.results || data.results.length === 0) {
+      // Support both { results: [...] } and plain array formats
+      const results = Array.isArray(data) ? data : (data.results || []);
+      if (results.length === 0) {
         return "Список транзакций пуст. Скажи пользователю, что у него нет операций.";
       }
 
