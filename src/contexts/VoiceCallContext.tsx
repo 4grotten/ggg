@@ -58,6 +58,88 @@ const calculateAge = (dateOfBirth: string | null | undefined): number | null => 
   }
 };
 
+// Format a single transaction with full details for voice assistant
+const formatTransactionForVoice = (tx: any, user: any): string => {
+  const parts: string[] = [];
+
+  // Title & direction
+  const title = tx.display?.title || tx.description || tx.type || "Операция";
+  const sign = tx.display?.primary_amount?.sign || '';
+  const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
+  const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
+  parts.push(`${title}: ${sign}${amount} ${currency}`);
+
+  // Secondary amount (e.g. USDT equivalent)
+  const sec = tx.display?.secondary_amount;
+  if (sec?.amount && sec.amount !== "0" && sec.amount !== "0.00") {
+    parts.push(`(${sec.sign || ''}${sec.amount} ${sec.currency || ''})`);
+  }
+
+  // Date
+  if (tx.created_at) {
+    parts.push(`Дата: ${new Date(tx.created_at).toLocaleDateString('ru-RU')}`);
+  }
+
+  // Sender info
+  const senderName = tx.sender_name || tx.metadata?.sender_name;
+  const senderCard = tx.sender_card_mask || tx.metadata?.sender_card_mask;
+  const senderIban = tx.metadata?.sender_iban_mask;
+  if (senderName) parts.push(`От: ${senderName}`);
+  if (senderCard) parts.push(`С карты: ••••${senderCard.slice(-4)}`);
+  if (senderIban) parts.push(`Со счёта: ${senderIban}`);
+
+  // Receiver info
+  const receiverName = tx.receiver_name || tx.metadata?.receiver_name || tx.metadata?.beneficiary_name;
+  const receiverCard = tx.receiver_card_mask || tx.metadata?.receiver_card_mask;
+  const receiverIban = tx.metadata?.receiver_iban_mask || tx.metadata?.beneficiary_iban;
+  if (receiverName) parts.push(`Кому: ${receiverName}`);
+  if (receiverCard) parts.push(`На карту: ••••${receiverCard.slice(-4)}`);
+  if (receiverIban) parts.push(`На счёт: ${receiverIban}`);
+
+  // Account types from movements
+  const movements = tx.movements || tx.metadata?.movements;
+  if (Array.isArray(movements) && movements.length > 0) {
+    const accountTypes = movements.map((m: any) => {
+      const acType = m.account_type === 'crypto' ? 'USDT кошелёк' :
+                     m.account_type === 'card' ? 'Карта' :
+                     m.account_type === 'bank' ? 'Банковский счёт' : m.account_type;
+      return `${m.type === 'debit' ? 'Списание' : 'Зачисление'} ${acType}`;
+    });
+    parts.push(`Движение: ${accountTypes.join(' → ')}`);
+  }
+
+  // Fee
+  const fee = tx.fee_amount || tx.metadata?.fee_amount || tx.metadata?.service_fee_usdt;
+  const feePercent = tx.fee_percent || tx.metadata?.fee_percent || tx.metadata?.service_fee_percent;
+  if (fee && parseFloat(fee) > 0) {
+    const feeCurrency = tx.metadata?.fee_currency || currency;
+    let feeStr = `Комиссия: ${fee} ${feeCurrency}`;
+    if (feePercent && parseFloat(feePercent) > 0) feeStr += ` (${feePercent}%)`;
+    parts.push(feeStr);
+  }
+
+  // Network fee (crypto)
+  const networkFee = tx.metadata?.network_fee_usdt || tx.metadata?.network_fee;
+  if (networkFee && parseFloat(networkFee) > 0) {
+    parts.push(`Сетевая комиссия: ${networkFee} USDT`);
+  }
+
+  // Exchange rate
+  const rate = tx.exchange_rate || tx.metadata?.exchange_rate;
+  if (rate && parseFloat(rate) > 0 && parseFloat(rate) !== 1) {
+    const fromCur = tx.metadata?.currency_from || tx.original_currency || '';
+    const toCur = tx.metadata?.currency_to || currency;
+    parts.push(`Курс: ${fromCur ? fromCur + '/' + toCur + ' = ' : ''}${rate}`);
+  }
+
+  // Status
+  if (tx.status && tx.status !== 'completed' && tx.status !== 'settled') {
+    parts.push(`Статус: ${tx.status}`);
+  }
+
+  return parts.join('. ');
+};
+
 // Edge function name for transactions
 const TRANSACTIONS_FUNCTION = "get-transactions";
 
@@ -181,17 +263,10 @@ const clientTools = {
       }
 
       const txStrings = results.slice(0, limit).map((tx: any, index: number) => {
-        const isIncome = tx.receiver_id === String(user.id);
-        const direction = isIncome ? "Поступление" : "Списание";
-        // Use display block if available, fallback to raw fields
-        const displayTitle = tx.display?.title || tx.description || "Операция";
-        const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
-        const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
-        const dateStr = new Date(tx.created_at).toLocaleDateString('ru-RU');
-        return `${index + 1}. ${displayTitle}: ${tx.display?.primary_amount?.sign || ''}${amount} ${currency}. Дата: ${dateStr}.`;
+        return `${index + 1}. ${formatTransactionForVoice(tx, user)}`;
       });
 
-      return `Вот последние ${txStrings.length} транзакций пользователя: ${txStrings.join(' | ')}. Проанализируй их и ответь пользователю.`;
+      return `Вот последние ${txStrings.length} транзакций пользователя: ${txStrings.join(' | ')}. Расскажи пользователю детали. Если какого-то поля нет — не упоминай его.`;
     } catch (error) {
       console.error("Ошибка:", error);
       return "Не удалось загрузить историю транзакций с сервера.";
@@ -396,16 +471,12 @@ const clientTools = {
 
       let totalAmount = 0;
       const txStrings = results.slice(0, limit).map((tx: any, i: number) => {
-        const title = tx.display?.title || tx.description || "Операция";
         const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
-        const sign = tx.display?.primary_amount?.sign || '';
-        const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
-        const dateStr = new Date(tx.created_at).toLocaleDateString('ru-RU');
-        totalAmount += parseFloat(amount);
-        return `${i + 1}. ${title}: ${sign}${amount} ${currency} (${dateStr})`;
+        totalAmount += parseFloat(String(amount).replace(/,/g, ''));
+        return `${i + 1}. ${formatTransactionForVoice(tx, user)}`;
       });
 
-      return `Найдено ${results.length} транзакций категории "${params.category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Проанализируй и расскажи пользователю.`;
+      return `Найдено ${results.length} транзакций категории "${params.category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Расскажи детали. Если какого-то поля нет — не упоминай его.`;
     } catch (error) {
       console.error("Error in get_transactions_by_category:", error);
       return "Не удалось загрузить транзакции по категории.";
