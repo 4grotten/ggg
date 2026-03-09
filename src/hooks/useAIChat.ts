@@ -41,13 +41,17 @@ export const useAIChat = () => {
   // Listen for voice assistant messages
   useEffect(() => {
     const handler = (e: Event) => {
-      const { role, content } = (e as CustomEvent).detail;
-      if (!content?.trim()) return;
+      const detail = (e as CustomEvent).detail;
+      const role = detail?.role;
+      const content = detail?.content;
+      console.log("voice-chat-message received:", { role, content });
+      if (!content?.trim() || !role) return;
+      const prefixed = `🎙 ${content}`;
       setMessages(prev => {
-        // Avoid duplicate if last message is same
+        // Avoid duplicate if last message has same content
         const last = prev[prev.length - 1];
-        if (last?.role === role && last?.content === content) return prev;
-        return [...prev, { role, content: `🎙 ${content}` }];
+        if (last?.content === prefixed) return prev;
+        return [...prev, { role, content: prefixed }];
       });
     };
     window.addEventListener("voice-chat-message", handler);

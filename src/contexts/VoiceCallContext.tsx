@@ -489,6 +489,7 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
       toast.info("Звонок завершён");
     },
     onMessage: (message: any) => {
+      console.log("ElevenLabs onMessage RAW:", JSON.stringify(message)?.slice(0, 300));
       try {
         if (message?.type === "client_tool_call") {
           console.log("ElevenLabs client_tool_call:", message);
