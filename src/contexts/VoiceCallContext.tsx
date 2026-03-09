@@ -198,45 +198,71 @@ const clientTools = {
     }
   },
 
-  // Get balance summary via Django backend
+  // Get balance summary — returns full wallet balances (cards + IBAN + USDT)
   get_balance_summary: async () => {
+    console.log("Agent calling get_balance_summary (wallet balances)");
     const token = getAuthToken();
-    const user = getCurrentUserProfile();
-    if (!token || !user) return "Нужна авторизация.";
+    if (!token) return "Для просмотра баланса необходимо авторизоваться.";
 
     try {
       const cardsProxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cards-proxy`;
-      const response = await fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/transactions/all/?limit=50')}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          'x-backend-token': token,
-        }
+      const headers = {
+        'Content-Type': 'application/json',
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        'x-backend-token': token,
+      };
+
+      const [walletRes, ibanRes, cryptoRes] = await Promise.all([
+        fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/cards/wallet/summary/')}`, { headers }),
+        fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/cards/accounts/IBAN_AED/')}`, { headers }),
+        fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/transactions/crypto-wallets/')}`, { headers }),
+      ]);
+
+      const walletData = await walletRes.json();
+      const ibanData = await ibanRes.json();
+      const cryptoData = await cryptoRes.json();
+      console.log("get_balance_summary wallet:", JSON.stringify(walletData).substring(0, 500));
+      console.log("get_balance_summary iban:", JSON.stringify(ibanData).substring(0, 300));
+      console.log("get_balance_summary crypto:", JSON.stringify(cryptoData).substring(0, 300));
+
+      // Cards
+      const cards = walletData?.cards || [];
+      const cardsTotal = cards.reduce((sum: number, c: any) => sum + parseFloat(c.balance || '0'), 0);
+
+      // IBAN
+      const physicalAccount = walletData?.physical_account;
+      const ibanBalance = parseFloat(physicalAccount?.balance || ibanData?.balance || '0');
+      const iban = physicalAccount?.iban || ibanData?.iban || null;
+      const maskedIban = iban ? `${iban.substring(0, 4)}••••${iban.slice(-4)}` : null;
+
+      // USDT
+      const cryptoWallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
+      const usdtWallet = cryptoWallets.find((w: any) => w.currency === 'USDT' || w.network === 'TRC20') || cryptoWallets[0];
+      const usdtBalance = usdtWallet ? parseFloat(usdtWallet.balance || '0') : 0;
+      const usdtNetwork = usdtWallet?.network || 'TRC20';
+
+      const totalAed = cardsTotal + ibanBalance;
+
+      // Build voice-friendly message
+      const parts: string[] = [];
+      cards.forEach((c: any) => {
+        const type = c.type === 'virtual' ? 'Виртуальная карта' : 'Металлическая карта';
+        const digits = c.card_number?.slice(-4) || '****';
+        parts.push(`💳 ${type} (****${digits}): ${parseFloat(c.balance).toLocaleString('ru-RU', { minimumFractionDigits: 2 })} ${c.currency}`);
       });
+      parts.push(`💰 Итого на картах: ${cardsTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`);
+      if (iban) {
+        parts.push(`🏦 Банковский счёт (${maskedIban}): ${ibanBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`);
+      }
+      if (usdtWallet) {
+        parts.push(`🪙 USDT (${usdtNetwork}): ${usdtBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} USDT`);
+      }
 
-      if (!response.ok) throw new Error(`API Error: ${response.status}`);
-      const data = await response.json();
-      console.log("get_balance_summary raw response:", JSON.stringify(data).substring(0, 300));
-
-      const results = Array.isArray(data) ? data : (data.results || []);
-      if (results.length === 0) return "Нет данных для формирования сводки.";
-
-      let income = 0;
-      let expenses = 0;
-      results.forEach((tx: any) => {
-        const sign = tx.display?.primary_amount?.sign;
-        const amt = parseFloat(tx.display?.primary_amount?.amount || tx.amount || '0');
-        if (sign === '+' || tx.receiver_id === String(user.id)) {
-          income += amt;
-        } else {
-          expenses += amt;
-        }
-      });
-
-      return `Сводка по последним ${results.length} операциям: Доходы составили +${income.toFixed(2)} AED. Расходы составили -${expenses.toFixed(2)} AED. Разница: ${(income - expenses).toFixed(2)} AED. Расскажи это пользователю.`;
+      return parts.join('. ') + '. Озвучь всю эту информацию пользователю.';
     } catch (error) {
-      return "Не удалось посчитать сводку.";
+      console.error("Error in get_balance_summary:", error);
+      return "Не удалось загрузить информацию о балансах.";
     }
   },
 
