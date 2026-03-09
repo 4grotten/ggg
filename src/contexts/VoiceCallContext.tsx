@@ -239,6 +239,128 @@ const clientTools = {
       return "Не удалось посчитать сводку.";
     }
   },
+
+  // Get full wallet summary: cards + IBAN bank account + totals
+  get_wallet_summary: async () => {
+    console.log("Agent calling get_wallet_summary");
+    const token = getAuthToken();
+    if (!token) {
+      return JSON.stringify({ error: true, message: "Для просмотра баланса необходимо авторизоваться." });
+    }
+
+    try {
+      const cardsProxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cards-proxy`;
+
+      const [walletRes, ibanRes] = await Promise.all([
+        fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/cards/wallet/summary/')}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'x-backend-token': token,
+          }
+        }),
+        fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/cards/accounts/IBAN_AED/')}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'x-backend-token': token,
+          }
+        }),
+      ]);
+
+      const walletData = await walletRes.json();
+      const ibanData = await ibanRes.json();
+      console.log("get_wallet_summary wallet:", JSON.stringify(walletData).substring(0, 500));
+      console.log("get_wallet_summary iban:", JSON.stringify(ibanData).substring(0, 300));
+
+      const cards = walletData?.cards || [];
+      const cardsInfo = cards.map((c: any) => ({
+        type: c.type,
+        last_digits: c.card_number?.slice(-4) || '****',
+        currency: c.currency,
+        balance: c.balance,
+      }));
+      const cardsTotal = cards.reduce((sum: number, c: any) => sum + parseFloat(c.balance || '0'), 0);
+
+      const physicalAccount = walletData?.physical_account;
+      const ibanBalance = parseFloat(physicalAccount?.balance || ibanData?.balance || '0');
+      const iban = physicalAccount?.iban || ibanData?.iban || null;
+      const maskedIban = iban ? `${iban.substring(0, 4)}••••${iban.slice(-4)}` : null;
+
+      const totalBalance = cardsTotal + ibanBalance;
+
+      const parts: string[] = [];
+      if (cardsInfo.length > 0) {
+        parts.push(`Карты (${cardsInfo.length}): ${cardsInfo.map((c: any) => `*${c.last_digits}: ${parseFloat(c.balance).toFixed(2)} ${c.currency}`).join(', ')}. Итого по картам: ${cardsTotal.toFixed(2)} AED`);
+      }
+      if (iban) {
+        parts.push(`Банковский счёт (${maskedIban}): ${ibanBalance.toFixed(2)} AED`);
+      }
+      parts.push(`Общий баланс: ${totalBalance.toFixed(2)} AED`);
+
+      return JSON.stringify({
+        cards: cardsInfo,
+        cards_total: cardsTotal,
+        iban: maskedIban,
+        iban_balance: ibanBalance,
+        total_balance: totalBalance,
+        message: parts.join('. ') + '. Озвучь эту информацию пользователю.',
+      });
+    } catch (error) {
+      console.error("Error in get_wallet_summary:", error);
+      return JSON.stringify({ error: true, message: "Не удалось загрузить сводку по балансам." });
+    }
+  },
+
+  // Get transactions filtered by category/type
+  get_transactions_by_category: async (params: { category: string; limit?: number }) => {
+    console.log("Agent calling get_transactions_by_category, category:", params.category);
+    const token = getAuthToken();
+    const user = getCurrentUserProfile();
+    if (!token || !user) return "Для просмотра транзакций необходимо авторизоваться.";
+
+    try {
+      const limit = params.limit || 20;
+      const cardsProxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cards-proxy`;
+      const endpoint = `/transactions/all/?limit=${limit}&type=${encodeURIComponent(params.category)}`;
+
+      const response = await fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent(endpoint)}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'x-backend-token': token,
+        }
+      });
+
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
+      const data = await response.json();
+      console.log("get_transactions_by_category raw:", JSON.stringify(data).substring(0, 500));
+
+      const results = Array.isArray(data) ? data : (data.results || []);
+      if (results.length === 0) {
+        return `Транзакций категории "${params.category}" не найдено.`;
+      }
+
+      let totalAmount = 0;
+      const txStrings = results.slice(0, limit).map((tx: any, i: number) => {
+        const title = tx.display?.title || tx.description || "Операция";
+        const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
+        const sign = tx.display?.primary_amount?.sign || '';
+        const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
+        const dateStr = new Date(tx.created_at).toLocaleDateString('ru-RU');
+        totalAmount += parseFloat(amount);
+        return `${i + 1}. ${title}: ${sign}${amount} ${currency} (${dateStr})`;
+      });
+
+      return `Найдено ${results.length} транзакций категории "${params.category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Проанализируй и расскажи пользователю.`;
+    } catch (error) {
+      console.error("Error in get_transactions_by_category:", error);
+      return "Не удалось загрузить транзакции по категории.";
+    }
+  },
 };
 
 export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
