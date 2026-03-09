@@ -315,7 +315,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             className={cn(
               "w-full flex items-center justify-center gap-3 py-3.5 rounded-xl font-medium text-sm transition-all",
               isDone
-                ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/20"
+                ? "bg-success/15 text-success border border-success/20"
                 : "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]",
               (isDownloading || selectedAssets.size === 0) && "opacity-60 cursor-not-allowed"
             )}
