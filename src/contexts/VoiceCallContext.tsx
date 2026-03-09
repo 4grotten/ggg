@@ -180,17 +180,18 @@ const clientTools = {
         return "Список транзакций пуст. Скажи пользователю, что у него нет операций.";
       }
 
-      const txStrings = data.results.map((tx: any, index: number) => {
+      const txStrings = results.slice(0, limit).map((tx: any, index: number) => {
         const isIncome = tx.receiver_id === String(user.id);
         const direction = isIncome ? "Поступление" : "Списание";
-        const counterpart = isIncome
-          ? (tx.sender_name || tx.sender_id || "Неизвестный отправитель")
-          : (tx.receiver_name || tx.receiver_id || "Внешний счет");
+        // Use display block if available, fallback to raw fields
+        const displayTitle = tx.display?.title || tx.description || "Операция";
+        const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
+        const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
         const dateStr = new Date(tx.created_at).toLocaleDateString('ru-RU');
-        return `Операция ${index + 1}: ${direction} на ${tx.amount} ${tx.currency || 'AED'}. Вторая сторона: ${counterpart}. Дата: ${dateStr}.`;
+        return `${index + 1}. ${displayTitle}: ${tx.display?.primary_amount?.sign || ''}${amount} ${currency}. Дата: ${dateStr}.`;
       });
 
-      return `Вот последние ${data.results.length} транзакций пользователя: ${txStrings.join(' | ')}. Проанализируй их и ответь пользователю.`;
+      return `Вот последние ${txStrings.length} транзакций пользователя: ${txStrings.join(' | ')}. Проанализируй их и ответь пользователю.`;
     } catch (error) {
       console.error("Ошибка:", error);
       return "Не удалось загрузить историю транзакций с сервера.";
