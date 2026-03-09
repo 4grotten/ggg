@@ -1,94 +1,117 @@
 /**
  * Converts Russian spelled-out numbers to digits in text.
- * E.g. "пятьдесят семь тысяч восемьсот девяносто пять дирхамов две копейки" 
- *   → "57 895 дирхамов 2 копейки"
+ * Handles cardinal and ordinal forms, compound numbers like "две тысячи двадцать шестого".
  */
 
 const ONES: Record<string, number> = {
-  'ноль': 0, 'один': 1, 'одна': 1, 'одну': 1, 'одного': 1, 'одной': 1,
-  'два': 2, 'две': 2, 'двух': 2, 'три': 3, 'трёх': 3, 'трех': 3,
-  'четыре': 4, 'четырёх': 4, 'четырех': 4, 'пять': 5, 'пяти': 5,
-  'шесть': 6, 'шести': 6, 'семь': 7, 'семи': 7,
-  'восемь': 8, 'восьми': 8, 'девять': 9, 'девяти': 9,
+  'ноль': 0, 'нуля': 0,
+  'один': 1, 'одна': 1, 'одну': 1, 'одного': 1, 'одной': 1, 'одно': 1, 'первого': 1, 'первое': 1, 'первый': 1, 'первая': 1,
+  'два': 2, 'две': 2, 'двух': 2, 'второго': 2, 'второе': 2, 'второй': 2, 'вторая': 2,
+  'три': 3, 'трёх': 3, 'трех': 3, 'третьего': 3, 'третье': 3, 'третий': 3, 'третья': 3,
+  'четыре': 4, 'четырёх': 4, 'четырех': 4, 'четвёртого': 4, 'четвертого': 4,
+  'пять': 5, 'пяти': 5, 'пятого': 5, 'пятое': 5, 'пятый': 5,
+  'шесть': 6, 'шести': 6, 'шестого': 6, 'шестое': 6, 'шестой': 6,
+  'семь': 7, 'семи': 7, 'седьмого': 7, 'седьмое': 7, 'седьмой': 7,
+  'восемь': 8, 'восьми': 8, 'восьмого': 8, 'восьмое': 8, 'восьмой': 8,
+  'девять': 9, 'девяти': 9, 'девятого': 9, 'девятое': 9, 'девятый': 9,
 };
 
 const TEENS: Record<string, number> = {
-  'десять': 10, 'одиннадцать': 11, 'двенадцать': 12, 'тринадцать': 13,
-  'четырнадцать': 14, 'пятнадцать': 15, 'шестнадцать': 16, 'семнадцать': 17,
-  'восемнадцать': 18, 'девятнадцать': 19,
+  'десять': 10, 'десятого': 10,
+  'одиннадцать': 11, 'одиннадцатого': 11,
+  'двенадцать': 12, 'двенадцатого': 12,
+  'тринадцать': 13, 'тринадцатого': 13,
+  'четырнадцать': 14, 'четырнадцатого': 14,
+  'пятнадцать': 15, 'пятнадцатого': 15,
+  'шестнадцать': 16, 'шестнадцатого': 16,
+  'семнадцать': 17, 'семнадцатого': 17,
+  'восемнадцать': 18, 'восемнадцатого': 18,
+  'девятнадцать': 19, 'девятнадцатого': 19,
 };
 
 const TENS: Record<string, number> = {
-  'двадцать': 20, 'тридцать': 30, 'сорок': 40, 'пятьдесят': 50,
-  'шестьдесят': 60, 'семьдесят': 70, 'восемьдесят': 80, 'девяносто': 90,
+  'двадцать': 20, 'двадцатого': 20,
+  'тридцать': 30, 'тридцатого': 30,
+  'сорок': 40, 'сорокового': 40,
+  'пятьдесят': 50, 'пятидесятого': 50,
+  'шестьдесят': 60, 'шестидесятого': 60,
+  'семьдесят': 70, 'семидесятого': 70,
+  'восемьдесят': 80, 'восьмидесятого': 80,
+  'девяносто': 90, 'девяностого': 90,
 };
 
 const HUNDREDS: Record<string, number> = {
-  'сто': 100, 'ста': 100, 'двести': 200, 'двухсот': 200, 'триста': 300,
-  'трёхсот': 300, 'трехсот': 300, 'четыреста': 400, 'четырёхсот': 400,
-  'четырехсот': 400, 'пятьсот': 500, 'шестьсот': 600, 'семьсот': 700,
+  'сто': 100, 'ста': 100, 'сотого': 100,
+  'двести': 200, 'двухсот': 200, 'двухсотого': 200,
+  'триста': 300, 'трёхсот': 300, 'трехсот': 300, 'трёхсотого': 300,
+  'четыреста': 400, 'четырёхсот': 400, 'четырехсот': 400,
+  'пятьсот': 500, 'шестьсот': 600, 'семьсот': 700,
   'восемьсот': 800, 'девятьсот': 900,
 };
 
 const MULTIPLIERS: Record<string, number> = {
-  'тысяча': 1000, 'тысячи': 1000, 'тысяч': 1000, 'тысячу': 1000, 'тыс': 1000,
+  'тысяча': 1000, 'тысячи': 1000, 'тысяч': 1000, 'тысячу': 1000, 'тыс': 1000, 'тысячного': 1000,
   'миллион': 1_000_000, 'миллиона': 1_000_000, 'миллионов': 1_000_000,
   'миллиард': 1_000_000_000, 'миллиарда': 1_000_000_000, 'миллиардов': 1_000_000_000,
 };
 
-const ORDINAL_SUFFIXES: Record<string, number> = {
-  'тысячных': 1000, 'тысячная': 1000, 'сотых': 100, 'сотая': 100,
+// Fractional ordinals like "тысячных", "сотых" for decimal expressions
+const FRACTIONAL_SUFFIXES: Record<string, number> = {
+  'тысячных': 1000, 'тысячная': 1000,
+  'сотых': 100, 'сотая': 100,
   'десятых': 10, 'десятая': 10,
 };
 
-const ALL_NUMBER_WORDS = new Set([
-  ...Object.keys(ONES), ...Object.keys(TEENS), ...Object.keys(TENS),
-  ...Object.keys(HUNDREDS), ...Object.keys(MULTIPLIERS), ...Object.keys(ORDINAL_SUFFIXES),
-  'и', // conjunction used in numbers
-]);
-
-function isNumberWord(word: string): boolean {
-  return ALL_NUMBER_WORDS.has(word.toLowerCase());
-}
-
-function getWordValue(word: string): { type: 'ones' | 'teens' | 'tens' | 'hundreds' | 'multiplier' | 'ordinal' | 'conjunction' | null; value: number } {
+function getWordValue(word: string): { type: 'value' | 'multiplier' | 'fractional' | null; value: number } {
   const w = word.toLowerCase();
-  if (w === 'и') return { type: 'conjunction', value: 0 };
-  if (ONES[w] !== undefined) return { type: 'ones', value: ONES[w] };
-  if (TEENS[w] !== undefined) return { type: 'teens', value: TEENS[w] };
-  if (TENS[w] !== undefined) return { type: 'tens', value: TENS[w] };
-  if (HUNDREDS[w] !== undefined) return { type: 'hundreds', value: HUNDREDS[w] };
+  if (ONES[w] !== undefined) return { type: 'value', value: ONES[w] };
+  if (TEENS[w] !== undefined) return { type: 'value', value: TEENS[w] };
+  if (TENS[w] !== undefined) return { type: 'value', value: TENS[w] };
+  if (HUNDREDS[w] !== undefined) return { type: 'value', value: HUNDREDS[w] };
   if (MULTIPLIERS[w] !== undefined) return { type: 'multiplier', value: MULTIPLIERS[w] };
-  if (ORDINAL_SUFFIXES[w] !== undefined) return { type: 'ordinal', value: ORDINAL_SUFFIXES[w] };
+  if (FRACTIONAL_SUFFIXES[w] !== undefined) return { type: 'fractional', value: FRACTIONAL_SUFFIXES[w] };
   return { type: null, value: 0 };
 }
 
-function wordsToNumber(words: string[]): number {
-  let total = 0;
-  let current = 0;
-  let hasOrdinal = false;
-  let ordinalDivisor = 1;
+function isNumberWord(word: string): boolean {
+  const w = word.toLowerCase();
+  if (w === 'и') return true; // conjunction in numbers
+  return getWordValue(w).type !== null;
+}
 
-  for (const word of words) {
+function wordsToNumber(words: string[]): number {
+  // Filter out conjunctions
+  const filtered = words.filter(w => w.toLowerCase() !== 'и');
+  if (filtered.length === 0) return 0;
+
+  let total = 0;
+  let current = 0; // accumulator for the current group (below multiplier)
+  let hasFractional = false;
+  let fractionalDivisor = 1;
+
+  for (const word of filtered) {
     const { type, value } = getWordValue(word);
-    if (type === 'conjunction') continue;
-    if (type === 'ordinal') {
-      hasOrdinal = true;
-      ordinalDivisor = value;
+    
+    if (type === 'fractional') {
+      hasFractional = true;
+      fractionalDivisor = value;
       continue;
     }
+    
     if (type === 'multiplier') {
+      // If current is 0, treat as 1 (e.g., "тысяча" = 1000)
       if (current === 0) current = 1;
       total += current * value;
       current = 0;
-    } else if (type !== null) {
+    } else if (type === 'value') {
       current += value;
     }
   }
+  
   total += current;
 
-  if (hasOrdinal) {
-    return total / ordinalDivisor;
+  if (hasFractional) {
+    return total / fractionalDivisor;
   }
   return total;
 }
@@ -97,7 +120,6 @@ function formatNumber(num: number): string {
   if (Number.isInteger(num)) {
     return num.toLocaleString('ru-RU');
   }
-  // Format with appropriate decimal places
   const str = num.toFixed(2);
   const [intPart, decPart] = str.split('.');
   const formattedInt = parseInt(intPart).toLocaleString('ru-RU');
@@ -105,51 +127,72 @@ function formatNumber(num: number): string {
 }
 
 export function convertRussianNumbersToDigits(text: string): string {
-  // Split preserving punctuation
-  const tokens = text.split(/(\s+|[,.](?:\s|$))/);
+  // Tokenize: split into words and non-word tokens (punctuation, spaces)
+  const tokenRegex = /[а-яА-ЯёЁa-zA-Z]+|[^\s\wа-яА-ЯёЁ]+|\s+/g;
+  const tokens: string[] = [];
+  let match;
+  while ((match = tokenRegex.exec(text)) !== null) {
+    tokens.push(match[0]);
+  }
+
   const result: string[] = [];
-  let numberWords: string[] = [];
-  let numberStart = -1;
+  let i = 0;
 
-  const flushNumber = () => {
-    if (numberWords.length === 0) return;
-    // Filter out conjunctions for pure number check
-    const meaningful = numberWords.filter(w => w.toLowerCase() !== 'и');
-    if (meaningful.length === 0) {
-      // Just "и" - put back as text
-      result.push(...numberWords);
-      numberWords = [];
-      return;
-    }
-    const num = wordsToNumber(numberWords);
-    result.push(formatNumber(num));
-    numberWords = [];
-  };
-
-  for (const token of tokens) {
+  while (i < tokens.length) {
+    const token = tokens[i];
     const trimmed = token.trim();
-    if (!trimmed) {
-      if (numberWords.length === 0) {
-        result.push(token);
-      }
+
+    // Skip whitespace/punctuation
+    if (!trimmed || !isNumberWord(trimmed)) {
+      result.push(token);
+      i++;
       continue;
     }
 
-    // Check if this word is part of a number
-    if (isNumberWord(trimmed)) {
-      // Special case: "и" should only be included if it's between number words
-      if (trimmed.toLowerCase() === 'и' && numberWords.length === 0) {
-        flushNumber();
-        result.push(token);
+    // Don't start with just "и"
+    if (trimmed.toLowerCase() === 'и') {
+      result.push(token);
+      i++;
+      continue;
+    }
+
+    // Collect consecutive number words
+    const numberWords: string[] = [trimmed];
+    let j = i + 1;
+    
+    while (j < tokens.length) {
+      const next = tokens[j].trim();
+      if (!next) {
+        // whitespace - look ahead
+        j++;
         continue;
       }
-      numberWords.push(trimmed);
-    } else {
-      flushNumber();
-      result.push(token);
+      if (isNumberWord(next)) {
+        // "и" only counts if followed by another number word
+        if (next.toLowerCase() === 'и') {
+          // Look ahead past whitespace for another number word
+          let k = j + 1;
+          while (k < tokens.length && !tokens[k].trim()) k++;
+          if (k < tokens.length && isNumberWord(tokens[k].trim()) && tokens[k].trim().toLowerCase() !== 'и') {
+            numberWords.push(next);
+            j++;
+            continue;
+          } else {
+            break;
+          }
+        }
+        numberWords.push(next);
+        j++;
+      } else {
+        break;
+      }
     }
-  }
-  flushNumber();
 
-  return result.join(' ').replace(/\s+/g, ' ').trim();
+    const num = wordsToNumber(numberWords);
+    result.push(formatNumber(num));
+    i = j;
+  }
+
+  // Clean up multiple spaces
+  return result.join('').replace(/\s{2,}/g, ' ').trim();
 }
