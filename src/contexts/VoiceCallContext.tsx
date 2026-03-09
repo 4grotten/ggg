@@ -259,7 +259,7 @@ const clientTools = {
 
       if (!response.ok) throw new Error(`API Error: ${response.status}`);
       const data = await response.json();
-      console.log("tool_5801 raw response:", JSON.stringify(data).substring(0, 500));
+      console.log("get_transactions raw response:", JSON.stringify(data).substring(0, 500));
 
       const results = Array.isArray(data) ? data : (data.results || []);
       if (results.length === 0) {
