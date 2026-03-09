@@ -181,17 +181,10 @@ const clientTools = {
       }
 
       const txStrings = results.slice(0, limit).map((tx: any, index: number) => {
-        const isIncome = tx.receiver_id === String(user.id);
-        const direction = isIncome ? "Поступление" : "Списание";
-        // Use display block if available, fallback to raw fields
-        const displayTitle = tx.display?.title || tx.description || "Операция";
-        const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
-        const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
-        const dateStr = new Date(tx.created_at).toLocaleDateString('ru-RU');
-        return `${index + 1}. ${displayTitle}: ${tx.display?.primary_amount?.sign || ''}${amount} ${currency}. Дата: ${dateStr}.`;
+        return `${index + 1}. ${formatTransactionForVoice(tx, user)}`;
       });
 
-      return `Вот последние ${txStrings.length} транзакций пользователя: ${txStrings.join(' | ')}. Проанализируй их и ответь пользователю.`;
+      return `Вот последние ${txStrings.length} транзакций пользователя: ${txStrings.join(' | ')}. Расскажи пользователю детали. Если какого-то поля нет — не упоминай его.`;
     } catch (error) {
       console.error("Ошибка:", error);
       return "Не удалось загрузить историю транзакций с сервера.";
