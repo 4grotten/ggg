@@ -201,9 +201,14 @@ const clientTools = {
     if (!token || !user) return "Нужна авторизация.";
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.ueasycard.com';
-      const response = await fetch(`${apiUrl}/api/v1/transactions/open/?limit=50&offset=0`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const cardsProxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cards-proxy`;
+      const response = await fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/transactions/all/?limit=50')}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'x-backend-token': token,
+        }
       });
 
       if (!response.ok) throw new Error("API Error");
