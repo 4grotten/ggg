@@ -51,7 +51,7 @@ def send_telegram(settings_obj, text):
                 settings_obj.save(update_fields=['telegram_chat_id'])
         
         if not chat_id:
-            logger.error(f"TG: Не найден chat_id для {settings_obj.telegram_username}. Пользователь должен нажать /start в боте!")
+            logger.error(f"TG: chat_id not found for {settings_obj.telegram_username}. The user must press /start in the bot!")
             return
 
         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -91,7 +91,7 @@ def send_whatsapp(phone, text):
 
 def send_email_async(email, text, is_transaction=False):
     try:
-        subject = "💳 Финансовое уведомление uEasyCard" if is_transaction else "🔔 Системное уведомление uEasyCard"
+        subject = "💳 Financial Notification | uEasyCard" if is_transaction else "🔔 System Notification | uEasyCard"
         if is_transaction:
             from_email = getattr(settings, 'TRANSACTION_EMAIL_HOST_USER', getattr(settings, 'DEFAULT_FROM_EMAIL'))
             tx_host = getattr(settings, 'TRANSACTION_EMAIL_HOST', None)
@@ -117,18 +117,18 @@ def send_email_async(email, text, is_transaction=False):
 
 def format_human_readable_details(details_str):
     if not details_str:
-        return "Нет деталей"
+        return "No details"
     try:
         data = ast.literal_eval(details_str) if isinstance(details_str, str) else details_str
         if isinstance(data, dict):
             lines = []
             if 'acting_role' in data:
-                lines.append(f"<b>Роль исполнителя:</b> {data['acting_role']}")
+                lines.append(f"<b>Acting Role:</b> {data['acting_role']}")
             if 'changes' in data:
-                lines.append("<b>Изменения:</b>")
+                lines.append("<b>Changes:</b>")
                 for field, values in data['changes'].items():
-                    old_v = to_2_decimals(values.get('было', 'Пусто'))
-                    new_v = to_2_decimals(values.get('стало', 'Пусто'))
+                    old_v = to_2_decimals(values.get('было', values.get('was', 'Empty')))
+                    new_v = to_2_decimals(values.get('стало', values.get('became', 'Empty')))
                     lines.append(f" └ <i>{field}</i>: {old_v} ➔ {new_v}")
             return "\n".join(lines) if lines else str(data)
         return str(details_str)
@@ -142,11 +142,11 @@ def format_notification_message(instance):
 
     return (
         f"🔔 <b>Admin Action Log</b>\n"
-        f"👤 <b>Кто:</b> {instance.admin_name or instance.admin_id}\n"
-        f"🎯 <b>Действие:</b> {instance.action}\n"
-        f"👥 <b>Кому:</b> {instance.target_user_name or instance.target_user_id or 'N/A'}\n"
-        f"🕒 <b>Время:</b> {local_time} (UTC+4)\n"
-        f"📝 <b>Детали:</b>\n{pretty_details}"
+        f"👤 <b>Who:</b> {instance.admin_name or instance.admin_id}\n"
+        f"🎯 <b>Action:</b> {instance.action}\n"
+        f"👥 <b>To:</b> {instance.target_user_name or instance.target_user_id or 'N/A'}\n"
+        f"🕒 <b>Time:</b> {local_time} (UTC+4)\n"
+        f"📝 <b>Details:</b>\n{pretty_details}"
     )
 
 def dispatch_notifications(instance):
@@ -165,7 +165,7 @@ def dispatch_notifications(instance):
             threading.Thread(target=send_email_async, args=(s.email_address, plain_text, False), daemon=True).start()
 
 def dispatch_test_notification(s):
-    text = "🔧 <b>Тестовое уведомление из системы uEasyCard</b>\nЕсли вы это читаете, интеграция работает успешно!"
+    text = "🔧 <b>Test notification from uEasyCard system</b>\nIf you are reading this, the integration works successfully!"
     if s.telegram_enabled and s.telegram_username:
         threading.Thread(target=send_telegram, args=(s, text), daemon=True).start()
     if s.whatsapp_enabled and s.whatsapp_number:
@@ -196,7 +196,7 @@ def send_user_telegram(settings_obj, text):
     try:
         bot_token = getattr(settings, 'USER_TELEGRAM_BOT_TOKEN', '')
         if not bot_token:
-            logger.error("USER_TELEGRAM_BOT_TOKEN не настроен!")
+            logger.error("USER_TELEGRAM_BOT_TOKEN is not configured!")
             return
 
         chat_id = settings_obj.telegram_chat_id
@@ -207,7 +207,7 @@ def send_user_telegram(settings_obj, text):
                 settings_obj.save(update_fields=['telegram_chat_id'])
         
         if not chat_id:
-            logger.error(f"User TG: Не найден chat_id для {settings_obj.telegram_username}. Пользователь должен запустить бота!")
+            logger.error(f"User TG: chat_id not found for {settings_obj.telegram_username}. The user must start the bot!")
             return
 
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -224,57 +224,79 @@ def build_transaction_message(txn, role):
     date_str = txn.created_at.astimezone(tz_utc_4).strftime('%d.%m.%Y %H:%M')
 
     tx_type_map = {
-        'card_transfer': 'Перевод на карту',
-        'internal_transfer': 'Внутренний перевод',
-        'top_up': 'Пополнение счета',
-        'bank_topup': 'Пополнение банковским переводом',
-        'crypto_deposit': 'Пополнение криптовалютой',
-        'crypto_withdrawal': 'Вывод в криптовалюте',
-        'bank_withdrawal': 'Вывод на банковский счет',
-        'card_to_crypto': 'Перевод с карты в крипто',
-        'crypto_to_card': 'Перевод из крипто на карту',
-        'bank_to_crypto': 'Перевод со счета в крипто',
-        'crypto_to_iban': 'Перевод из крипто на счет',
-        'iban_to_card': 'Перевод со счета на карту',
-        'crypto_to_crypto': 'Перевод криптовалюты'
+        'card_transfer': 'Card Transfer',
+        'internal_transfer': 'Internal Transfer',
+        'top_up': 'Account Top Up',
+        'bank_topup': 'Bank Transfer Top Up',
+        'crypto_deposit': 'Crypto Deposit',
+        'crypto_withdrawal': 'Crypto Withdrawal',
+        'bank_withdrawal': 'Bank Withdrawal',
+        'card_to_crypto': 'Card to Crypto',
+        'crypto_to_card': 'Crypto to Card',
+        'bank_to_crypto': 'Bank to Crypto',
+        'crypto_to_iban': 'Crypto to Bank Account',
+        'iban_to_card': 'Bank Account to Card',
+        'crypto_to_crypto': 'Crypto Transfer'
     }
-    tx_type_display = tx_type_map.get(txn.type, txn.type.replace('_', ' ').capitalize())
+    tx_type_display = tx_type_map.get(txn.type, txn.type.replace('_', ' ').title())
     meta = txn.metadata or {}
     
     lines = []
     
     if role == 'sender':
-        lines.append(f"💸 <b>Успешное списание</b>")
-        lines.append(f"Тип операции: {tx_type_display}")
-        lines.append(f"Сумма перевода: <b>-{amount} {currency}</b>")
+        lines.append(f"💸 <b>Successful Debit</b>")
+        lines.append(f"Operation Type: {tx_type_display}")
+        lines.append(f"Amount: <b>-{amount} {currency}</b>")
         if txn.fee and float(txn.fee) > 0:
-            lines.append(f"Комиссия: {fee} {currency}")
+            lines.append(f"Fee: {fee} {currency}")
             
-        if meta.get('sender_card_mask'):
-            lines.append(f"С карты: {meta.get('sender_card_mask')}")
-        if meta.get('sender_iban_mask'):
-            lines.append(f"Со счета: {meta.get('sender_iban_mask')}")
+        # Displaying FULL unmasked sender details
+        if txn.sender_card:
+            lines.append(f"From Card: {txn.sender_card}")
+        elif meta.get('sender_iban'):
+            lines.append(f"From Account (IBAN): {meta.get('sender_iban')}")
+        elif meta.get('from_address'):
+            lines.append(f"From Crypto Wallet: {meta.get('from_address')}")
             
-        lines.append(f"Получатель: {txn.receiver_name or txn.receiver_id or 'Внешний счет'}")
+        # Displaying FULL unmasked receiver details
+        receiver_display = txn.receiver_name or txn.receiver_id or 'External Account'
+        lines.append(f"To: {receiver_display}")
+        if txn.recipient_card:
+            lines.append(f"To Card: {txn.recipient_card}")
+        elif meta.get('beneficiary_iban'):
+            lines.append(f"To Account (IBAN): {meta.get('beneficiary_iban')}")
+        elif meta.get('crypto_address'):
+            lines.append(f"To Crypto Wallet: {meta.get('crypto_address')}")
         
     else:
-        lines.append(f"📥 <b>Поступление средств</b>")
-        lines.append(f"Тип операции: {tx_type_display}")
-        lines.append(f"Сумма: <b>+{amount} {currency}</b>")
+        lines.append(f"📥 <b>Funds Received</b>")
+        lines.append(f"Operation Type: {tx_type_display}")
+        lines.append(f"Amount: <b>+{amount} {currency}</b>")
         
-        if meta.get('receiver_card_mask'):
-            lines.append(f"На карту: {meta.get('receiver_card_mask')}")
-        if meta.get('beneficiary_iban'):
-            lines.append(f"На счет: {meta.get('beneficiary_iban')}")
+        # Displaying FULL unmasked receiver details
+        if txn.recipient_card:
+            lines.append(f"To Card: {txn.recipient_card}")
+        elif meta.get('beneficiary_iban'):
+            lines.append(f"To Account (IBAN): {meta.get('beneficiary_iban')}")
+        elif meta.get('crypto_address'):
+            lines.append(f"To Crypto Wallet: {meta.get('crypto_address')}")
             
-        lines.append(f"Отправитель: {txn.sender_name or txn.sender_id or 'Внешний отправитель'}")
+        # Displaying FULL unmasked sender details
+        sender_display = txn.sender_name or txn.sender_id or 'External Sender'
+        lines.append(f"From: {sender_display}")
+        if txn.sender_card:
+            lines.append(f"From Card: {txn.sender_card}")
+        elif meta.get('sender_iban'):
+            lines.append(f"From Account (IBAN): {meta.get('sender_iban')}")
+        elif meta.get('from_address'):
+            lines.append(f"From Crypto Wallet: {meta.get('from_address')}")
 
     lines.append("")
-    lines.append(f"Статус: <b>{txn.status.upper()}</b>")
-    lines.append(f"ID: {str(txn.id).split('-')[0]}...")
-    lines.append(f"Время: {date_str} (UTC+4)")
+    lines.append(f"Status: <b>{txn.status.upper()}</b>")
+    lines.append(f"Transaction ID: {str(txn.id)}")
+    lines.append(f"Time: {date_str} (UTC+4)")
     if txn.description:
-        lines.append(f"Назначение: {txn.description}")
+        lines.append(f"Description: {txn.description}")
 
     return "\n".join(lines)
 
