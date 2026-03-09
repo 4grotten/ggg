@@ -489,17 +489,23 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
       toast.info("Звонок завершён");
     },
     onMessage: (message: any) => {
-      // Debugging: helps verify whether agent actually calls tools and what it receives.
-      // We'll see these logs in the browser console.
       try {
         if (message?.type === "client_tool_call") {
           console.log("ElevenLabs client_tool_call:", message);
         } else if (message?.type === "agent_tool_response") {
           console.log("ElevenLabs agent_tool_response:", message);
         } else if (message?.type === "agent_response") {
-          console.log("ElevenLabs agent_response:", message?.agent_response_event?.agent_response);
+          const text = message?.agent_response_event?.agent_response;
+          console.log("ElevenLabs agent_response:", text);
+          if (text) {
+            window.dispatchEvent(new CustomEvent("voice-chat-message", { detail: { role: "assistant", content: text } }));
+          }
         } else if (message?.type === "user_transcript") {
-          console.log("ElevenLabs user_transcript:", message?.user_transcription_event?.user_transcript);
+          const text = message?.user_transcription_event?.user_transcript;
+          console.log("ElevenLabs user_transcript:", text);
+          if (text) {
+            window.dispatchEvent(new CustomEvent("voice-chat-message", { detail: { role: "user", content: text } }));
+          }
         }
       } catch {
         // ignore
