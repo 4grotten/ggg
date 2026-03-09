@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAuthToken } from '@/services/api/apiClient';
+import { convertRussianNumbersToDigits } from '@/utils/russianNumbersToDigits';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -46,7 +47,7 @@ export const useAIChat = () => {
       const content = detail?.content;
       console.log("voice-chat-message received:", { role, content });
       if (!content?.trim() || !role) return;
-      const prefixed = `🎙 ${content}`;
+      const prefixed = `🎙 ${convertRussianNumbersToDigits(content)}`;
       setMessages(prev => {
         // Avoid duplicate if last message has same content
         const last = prev[prev.length - 1];
