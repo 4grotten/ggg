@@ -15,7 +15,7 @@ import { useWalletSummary, useBankAccounts, useCryptoWallets } from "@/hooks/use
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthToken } from "@/services/api/apiClient";
 import { subMonths, subYears, format } from "date-fns";
-import { UsdtIcon } from "@/components/icons/CryptoIcons";
+
 
 type PeriodOption = "1m" | "3m" | "6m" | "9m" | "1y";
 
