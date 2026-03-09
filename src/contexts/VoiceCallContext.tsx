@@ -170,24 +170,28 @@ const clientTools = {
         }
       });
 
-      if (!response.ok) throw new Error("API Error");
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
       const data = await response.json();
+      console.log("get_transactions raw response:", JSON.stringify(data).substring(0, 500));
 
-      if (!data.results || data.results.length === 0) {
+      // Support both { results: [...] } and plain array formats
+      const results = Array.isArray(data) ? data : (data.results || []);
+      if (results.length === 0) {
         return "Список транзакций пуст. Скажи пользователю, что у него нет операций.";
       }
 
-      const txStrings = data.results.map((tx: any, index: number) => {
+      const txStrings = results.slice(0, limit).map((tx: any, index: number) => {
         const isIncome = tx.receiver_id === String(user.id);
         const direction = isIncome ? "Поступление" : "Списание";
-        const counterpart = isIncome
-          ? (tx.sender_name || tx.sender_id || "Неизвестный отправитель")
-          : (tx.receiver_name || tx.receiver_id || "Внешний счет");
+        // Use display block if available, fallback to raw fields
+        const displayTitle = tx.display?.title || tx.description || "Операция";
+        const amount = tx.display?.primary_amount?.amount || tx.amount || "0";
+        const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
         const dateStr = new Date(tx.created_at).toLocaleDateString('ru-RU');
-        return `Операция ${index + 1}: ${direction} на ${tx.amount} ${tx.currency || 'AED'}. Вторая сторона: ${counterpart}. Дата: ${dateStr}.`;
+        return `${index + 1}. ${displayTitle}: ${tx.display?.primary_amount?.sign || ''}${amount} ${currency}. Дата: ${dateStr}.`;
       });
 
-      return `Вот последние ${data.results.length} транзакций пользователя: ${txStrings.join(' | ')}. Проанализируй их и ответь пользователю.`;
+      return `Вот последние ${txStrings.length} транзакций пользователя: ${txStrings.join(' | ')}. Проанализируй их и ответь пользователю.`;
     } catch (error) {
       console.error("Ошибка:", error);
       return "Не удалось загрузить историю транзакций с сервера.";
@@ -211,22 +215,26 @@ const clientTools = {
         }
       });
 
-      if (!response.ok) throw new Error("API Error");
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
       const data = await response.json();
+      console.log("get_balance_summary raw response:", JSON.stringify(data).substring(0, 300));
 
-      if (!data.results || data.results.length === 0) return "Нет данных для формирования сводки.";
+      const results = Array.isArray(data) ? data : (data.results || []);
+      if (results.length === 0) return "Нет данных для формирования сводки.";
 
       let income = 0;
       let expenses = 0;
-      data.results.forEach((tx: any) => {
-        if (tx.receiver_id === String(user.id)) {
-          income += parseFloat(tx.amount);
+      results.forEach((tx: any) => {
+        const sign = tx.display?.primary_amount?.sign;
+        const amt = parseFloat(tx.display?.primary_amount?.amount || tx.amount || '0');
+        if (sign === '+' || tx.receiver_id === String(user.id)) {
+          income += amt;
         } else {
-          expenses += parseFloat(tx.amount);
+          expenses += amt;
         }
       });
 
-      return `Сводка по последним ${data.results.length} операциям: Доходы составили +${income.toFixed(2)} AED. Расходы составили -${expenses.toFixed(2)} AED. Разница: ${(income - expenses).toFixed(2)} AED. Расскажи это пользователю.`;
+      return `Сводка по последним ${results.length} операциям: Доходы составили +${income.toFixed(2)} AED. Расходы составили -${expenses.toFixed(2)} AED. Разница: ${(income - expenses).toFixed(2)} AED. Расскажи это пользователю.`;
     } catch (error) {
       return "Не удалось посчитать сводку.";
     }
