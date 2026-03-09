@@ -476,7 +476,7 @@ const clientTools = {
         return `${i + 1}. ${formatTransactionForVoice(tx, user)}`;
       });
 
-      return `Найдено ${results.length} транзакций категории "${params.category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Проанализируй и расскажи пользователю.`;
+      return `Найдено ${results.length} транзакций категории "${params.category}". Общая сумма: ${totalAmount.toFixed(2)} AED. Список: ${txStrings.join(' | ')}. Расскажи детали. Если какого-то поля нет — не упоминай его.`;
     } catch (error) {
       console.error("Error in get_transactions_by_category:", error);
       return "Не удалось загрузить транзакции по категории.";
