@@ -230,7 +230,7 @@ const clientTools = {
   },
   
   // Unified transactions tool for ElevenLabs agent
-  tool_5801kkac8x3af67t323efk98nq5x: async (params: { type?: string; category?: string; limit?: number; days?: number; summary?: boolean }) => {
+  get_transactions: async (params: { type?: string; category?: string; limit?: number; days?: number; summary?: boolean }) => {
     const token = getAuthToken();
     const user = getCurrentUserProfile();
     if (!token || !user) return "Для просмотра транзакций необходимо авторизоваться.";
@@ -259,7 +259,7 @@ const clientTools = {
 
       if (!response.ok) throw new Error(`API Error: ${response.status}`);
       const data = await response.json();
-      console.log("tool_5801 raw response:", JSON.stringify(data).substring(0, 500));
+      console.log("get_transactions raw response:", JSON.stringify(data).substring(0, 500));
 
       const results = Array.isArray(data) ? data : (data.results || []);
       if (results.length === 0) {
@@ -474,7 +474,7 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
         conversation.sendContextualUpdate(
           [
             "ВАЖНО: Игнорируй любую ранее сказанную финансовую информацию.",
-            "Единственный источник правды по транзакциям — результат инструмента tool_5801kkac8x3af67t323efk98nq5x / get_balance_summary.",
+            "Единственный источник правды по транзакциям — результат инструмента get_transactions / get_balance_summary.",
             "Если инструмент не вызывался, скажи что нужно запросить данные инструментом.",
           ].join(" ")
         );
