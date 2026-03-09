@@ -632,6 +632,8 @@ const TransactionHistory = () => {
           </div>
         </DrawerContent>
       </Drawer>
+
+      <StatementDownloadDrawer open={isStatementOpen} onOpenChange={setIsStatementOpen} />
     </MobileLayout>
   );
 };
