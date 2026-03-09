@@ -251,7 +251,7 @@ const clientTools = {
     try {
       const cardsProxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cards-proxy`;
 
-      const [walletRes, ibanRes] = await Promise.all([
+      const [walletRes, ibanRes, cryptoRes] = await Promise.all([
         fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/cards/wallet/summary/')}`, {
           headers: {
             'Content-Type': 'application/json',
@@ -268,43 +268,67 @@ const clientTools = {
             'x-backend-token': token,
           }
         }),
+        fetch(`${cardsProxyUrl}?endpoint=${encodeURIComponent('/transactions/crypto-wallets/')}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'x-backend-token': token,
+          }
+        }),
       ]);
 
       const walletData = await walletRes.json();
       const ibanData = await ibanRes.json();
+      const cryptoData = await cryptoRes.json();
       console.log("get_wallet_summary wallet:", JSON.stringify(walletData).substring(0, 500));
       console.log("get_wallet_summary iban:", JSON.stringify(ibanData).substring(0, 300));
+      console.log("get_wallet_summary crypto:", JSON.stringify(cryptoData).substring(0, 300));
 
+      // Parse cards
       const cards = walletData?.cards || [];
       const cardsInfo = cards.map((c: any) => ({
-        type: c.type,
+        type: c.type === 'virtual' ? 'Виртуальная карта' : 'Металлическая карта',
         last_digits: c.card_number?.slice(-4) || '****',
         currency: c.currency,
         balance: c.balance,
       }));
       const cardsTotal = cards.reduce((sum: number, c: any) => sum + parseFloat(c.balance || '0'), 0);
 
+      // Parse IBAN / physical account
       const physicalAccount = walletData?.physical_account;
       const ibanBalance = parseFloat(physicalAccount?.balance || ibanData?.balance || '0');
       const iban = physicalAccount?.iban || ibanData?.iban || null;
       const maskedIban = iban ? `${iban.substring(0, 4)}••••${iban.slice(-4)}` : null;
 
+      // Parse USDT crypto wallet
+      const cryptoWallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
+      const usdtWallet = cryptoWallets.find((w: any) => w.currency === 'USDT' || w.network === 'TRC20') || cryptoWallets[0];
+      const usdtBalance = usdtWallet ? parseFloat(usdtWallet.balance || '0') : 0;
+      const usdtNetwork = usdtWallet?.network || 'TRC20';
+
       const totalBalance = cardsTotal + ibanBalance;
 
+      // Build message parts matching the expected format
       const parts: string[] = [];
-      if (cardsInfo.length > 0) {
-        parts.push(`Карты (${cardsInfo.length}): ${cardsInfo.map((c: any) => `*${c.last_digits}: ${parseFloat(c.balance).toFixed(2)} ${c.currency}`).join(', ')}. Итого по картам: ${cardsTotal.toFixed(2)} AED`);
-      }
+      cardsInfo.forEach((c: any) => {
+        parts.push(`💳 ${c.type} (****${c.last_digits}): ${parseFloat(c.balance).toLocaleString('ru-RU', { minimumFractionDigits: 2 })} ${c.currency}`);
+      });
+      parts.push(`💰 Итого на картах: ${cardsTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`);
       if (iban) {
-        parts.push(`Банковский счёт (${maskedIban}): ${ibanBalance.toFixed(2)} AED`);
+        parts.push(`🏦 Банковский счёт: ${ibanBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED`);
       }
-      parts.push(`Общий баланс: ${totalBalance.toFixed(2)} AED`);
+      if (usdtWallet) {
+        parts.push(`🪙 USDT (${usdtNetwork}): ${usdtBalance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} USDT`);
+      }
 
       return JSON.stringify({
         cards: cardsInfo,
         cards_total: cardsTotal,
         iban: maskedIban,
         iban_balance: ibanBalance,
+        usdt_balance: usdtBalance,
+        usdt_network: usdtNetwork,
         total_balance: totalBalance,
         message: parts.join('. ') + '. Озвучь эту информацию пользователю.',
       });
