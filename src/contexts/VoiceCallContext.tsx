@@ -147,118 +147,76 @@ const clientTools = {
     }
   },
   
-  // Get user transactions - REQUIRES authenticated user
+  // Get user transactions via Django backend
   get_transactions: async (params: { type?: string; limit?: number; days?: number; summary?: boolean }) => {
-    // Check authorization first
     const token = getAuthToken();
     const user = getCurrentUserProfile();
-    if (!token || !user) {
-      return "Для просмотра транзакций необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
-    }
-    
+    if (!token || !user) return "Для просмотра транзакций необходимо авторизоваться.";
+
     try {
-      console.log("Agent calling get_transactions:", params, "user.id:", user.id);
-      
-      // Use supabase.functions.invoke instead of raw fetch to avoid CORS/WebSocket issues
-      const { data, error } = await supabase.functions.invoke(TRANSACTIONS_FUNCTION, {
-        body: { ...params, external_user_id: user.id },
+      const limit = params.limit || 10;
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.ueasycard.com';
+      console.log(`ИИ запросил ${limit} транзакций`);
+
+      const response = await fetch(`${apiUrl}/api/transactions/open/?limit=${limit}&offset=0`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
-      if (error) {
-        console.error("Error from edge function:", error);
-        throw error;
+
+      if (!response.ok) throw new Error("API Error");
+      const data = await response.json();
+
+      if (!data.results || data.results.length === 0) {
+        return "Список транзакций пуст. Скажи пользователю, что у него нет операций.";
       }
-      
-      console.log("Transactions fetched:", data);
-      
-      // Return formatted string for agent to speak
-      if (params.summary && data.summary) {
-        return `За последние ${params.days || 30} дней: доходы ${data.summary.total_income}, расходы ${data.summary.total_expenses}, баланс ${data.summary.net_balance}. Всего ${data.summary.transaction_count} транзакций.`;
-      }
-      
-      if (data.transactions && data.transactions.length > 0) {
-        const txList = data.transactions.slice(0, 5).map((tx: any) => 
-          `${tx.type}: ${tx.amount} - ${tx.description || tx.merchant}`
-        ).join(". ");
-        return `Последние транзакции: ${txList}`;
-      }
-      
-      return "Транзакции не найдены за указанный период.";
+
+      const txStrings = data.results.map((tx: any, index: number) => {
+        const isIncome = tx.receiver_id === String(user.id);
+        const direction = isIncome ? "Поступление" : "Списание";
+        const counterpart = isIncome
+          ? (tx.sender_name || tx.sender_id || "Неизвестный отправитель")
+          : (tx.receiver_name || tx.receiver_id || "Внешний счет");
+        const dateStr = new Date(tx.created_at).toLocaleDateString('ru-RU');
+        return `Операция ${index + 1}: ${direction} на ${tx.amount} ${tx.currency || 'AED'}. Вторая сторона: ${counterpart}. Дата: ${dateStr}.`;
+      });
+
+      return `Вот последние ${data.results.length} транзакций пользователя: ${txStrings.join(' | ')}. Проанализируй их и ответь пользователю.`;
     } catch (error) {
-      console.error("Error fetching transactions:", error);
-      return "Не удалось загрузить транзакции. Попробуйте позже.";
+      console.error("Ошибка:", error);
+      return "Не удалось загрузить историю транзакций с сервера.";
     }
   },
-  
-  // Get account balance summary - REQUIRES authenticated user
+
+  // Get balance summary via Django backend
   get_balance_summary: async () => {
-    // Check authorization first
     const token = getAuthToken();
     const user = getCurrentUserProfile();
-    if (!token || !user) {
-      return "Для просмотра баланса необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
-    }
-    
+    if (!token || !user) return "Нужна авторизация.";
+
     try {
-      console.log("Agent calling get_balance_summary, user.id:", user.id);
-      
-      // Use supabase.functions.invoke instead of raw fetch
-      const { data, error } = await supabase.functions.invoke(TRANSACTIONS_FUNCTION, {
-        body: { summary: true, days: 30, external_user_id: user.id },
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.ueasycard.com';
+      const response = await fetch(`${apiUrl}/api/transactions/open/?limit=50&offset=0`, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
-      if (error) {
-        console.error("Error from edge function:", error);
-        throw error;
-      }
-      
-      if (data.summary) {
-        const topMerchants = data.summary.top_merchants
-          .map((m: any) => `${m.name}: ${m.amount}`)
-          .join(", ");
-        return `Сводка за месяц. Доходы: ${data.summary.total_income}. Расходы: ${data.summary.total_expenses}. Чистый баланс: ${data.summary.net_balance}. Топ расходов: ${topMerchants}.`;
-      }
-      
-      return "Не удалось получить сводку баланса.";
-    } catch (error) {
-      console.error("Error fetching balance:", error);
-      return "Не удалось загрузить баланс.";
-    }
-  },
-  
-  // Get spending by category - REQUIRES authenticated user
-  get_spending_by_category: async (params: { days?: number }) => {
-    // Check authorization first
-    const token = getAuthToken();
-    const user = getCurrentUserProfile();
-    if (!token || !user) {
-      return "Для просмотра расходов по категориям необходимо авторизоваться. Пожалуйста, войдите в аккаунт.";
-    }
-    
-    try {
-      console.log("Agent calling get_spending_by_category:", params, "user.id:", user.id);
-      
-      // Use supabase.functions.invoke instead of raw fetch
-      const { data, error } = await supabase.functions.invoke(TRANSACTIONS_FUNCTION, {
-        body: { summary: true, days: params.days || 30, external_user_id: user.id },
+
+      if (!response.ok) throw new Error("API Error");
+      const data = await response.json();
+
+      if (!data.results || data.results.length === 0) return "Нет данных для формирования сводки.";
+
+      let income = 0;
+      let expenses = 0;
+      data.results.forEach((tx: any) => {
+        if (tx.receiver_id === String(user.id)) {
+          income += parseFloat(tx.amount);
+        } else {
+          expenses += parseFloat(tx.amount);
+        }
       });
-      
-      if (error) {
-        console.error("Error from edge function:", error);
-        throw error;
-      }
-      
-      if (data.summary?.by_type) {
-        const categories = Object.entries(data.summary.by_type)
-          .map(([type, info]: [string, any]) => `${type}: ${info.count} операций на сумму ${info.total.toFixed(2)} AED`)
-          .join(". ");
-        return `Расходы по категориям за ${params.days || 30} дней: ${categories}`;
-      }
-      
-      return "Нет данных по категориям.";
+
+      return `Сводка по последним ${data.results.length} операциям: Доходы составили +${income.toFixed(2)} AED. Расходы составили -${expenses.toFixed(2)} AED. Разница: ${(income - expenses).toFixed(2)} AED. Расскажи это пользователю.`;
     } catch (error) {
-      console.error("Error fetching categories:", error);
-      return "Не удалось загрузить данные по категориям.";
+      return "Не удалось посчитать сводку.";
     }
   },
 };
