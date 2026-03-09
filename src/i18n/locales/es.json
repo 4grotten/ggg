@@ -552,6 +552,26 @@
     "metalCard": "Metal",
     "crypto": "Cripto"
   },
+  "statement": {
+    "title": "Descargar extracto",
+    "short": "Descargar",
+    "accounts": "Cuentas y billeteras",
+    "selectAll": "Seleccionar todo",
+    "deselectAll": "Deseleccionar todo",
+    "period": "Período",
+    "1month": "1 mes",
+    "3months": "3 meses",
+    "6months": "6 meses",
+    "9months": "9 meses",
+    "1year": "1 año",
+    "download": "Descargar extracto",
+    "generating": "Generando...",
+    "done": "¡Descargado!",
+    "downloaded": "¡Extracto descargado!",
+    "downloadError": "Error al generar el informe",
+    "selectAtLeastOne": "Selecciona al menos una cuenta",
+    "usdtWallet": "Billetera USDT"
+  },
   "transaction": {
     "back": "Atrás",
     "notFound": "Transacción no encontrada",

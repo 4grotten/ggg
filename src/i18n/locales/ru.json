@@ -619,6 +619,26 @@
     "metalCard": "Metal",
     "crypto": "Крипто"
   },
+  "statement": {
+    "title": "Скачать выписку",
+    "short": "Скачать",
+    "accounts": "Счета и кошельки",
+    "selectAll": "Выбрать все",
+    "deselectAll": "Снять все",
+    "period": "Период",
+    "1month": "1 мес",
+    "3months": "3 мес",
+    "6months": "6 мес",
+    "9months": "9 мес",
+    "1year": "1 год",
+    "download": "Скачать выписку",
+    "generating": "Генерация...",
+    "done": "Скачано!",
+    "downloaded": "Выписка скачана!",
+    "downloadError": "Ошибка генерации отчёта",
+    "selectAtLeastOne": "Выберите хотя бы один счёт",
+    "usdtWallet": "Кошелёк USDT"
+  },
   "transaction": {
     "back": "Назад",
     "notFound": "Транзакция не найдена",

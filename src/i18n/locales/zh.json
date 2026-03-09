@@ -558,6 +558,26 @@
     "metalCard": "Metal",
     "crypto": "加密"
   },
+  "statement": {
+    "title": "下载对账单",
+    "short": "下载",
+    "accounts": "账户和钱包",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "period": "时间段",
+    "1month": "1个月",
+    "3months": "3个月",
+    "6months": "6个月",
+    "9months": "9个月",
+    "1year": "1年",
+    "download": "下载对账单",
+    "generating": "生成中...",
+    "done": "已下载！",
+    "downloaded": "对账单已下载！",
+    "downloadError": "报告生成错误",
+    "selectAtLeastOne": "请至少选择一个账户",
+    "usdtWallet": "USDT钱包"
+  },
   "transaction": {
     "back": "返回",
     "notFound": "未找到交易",

@@ -90,10 +90,19 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       }
     }
 
-    // Crypto wallets
-    // Crypto wallets (including USDT)
+    // USDT wallet from wallet summary
+    const rawWallet = walletData as any;
+    const usdtBalance = rawWallet?.data?.usdt_balance ?? rawWallet?.usdt_balance;
+    if (usdtBalance !== undefined) {
+      items.push({
+        id: "usdt_wallet",
+        label: t("statement.usdtWallet", "Кошелёк USDT"),
+        sublabel: `${parseFloat(String(usdtBalance)).toFixed(2)} USDT`,
+        type: "crypto",
+      });
+    }
 
-    // Crypto wallets
+    // Crypto wallets from API
     if (cryptoData) {
       const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData as any)?.results || [];
       for (const w of wallets) {

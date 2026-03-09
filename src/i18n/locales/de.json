@@ -552,6 +552,26 @@
     "metalCard": "Metal",
     "crypto": "Krypto"
   },
+  "statement": {
+    "title": "Kontoauszug herunterladen",
+    "short": "Herunterladen",
+    "accounts": "Konten & Wallets",
+    "selectAll": "Alle auswählen",
+    "deselectAll": "Alle abwählen",
+    "period": "Zeitraum",
+    "1month": "1 Mon",
+    "3months": "3 Mon",
+    "6months": "6 Mon",
+    "9months": "9 Mon",
+    "1year": "1 Jahr",
+    "download": "Auszug herunterladen",
+    "generating": "Wird erstellt...",
+    "done": "Heruntergeladen!",
+    "downloaded": "Auszug heruntergeladen!",
+    "downloadError": "Fehler bei der Berichtserstellung",
+    "selectAtLeastOne": "Wählen Sie mindestens ein Konto",
+    "usdtWallet": "USDT-Wallet"
+  },
   "transaction": {
     "back": "Zurück",
     "notFound": "Transaktion nicht gefunden",

@@ -552,6 +552,26 @@
     "metalCard": "Metal",
     "crypto": "Kripto"
   },
+  "statement": {
+    "title": "Hesap Özeti İndir",
+    "short": "İndir",
+    "accounts": "Hesaplar ve Cüzdanlar",
+    "selectAll": "Tümünü seç",
+    "deselectAll": "Seçimi kaldır",
+    "period": "Dönem",
+    "1month": "1 ay",
+    "3months": "3 ay",
+    "6months": "6 ay",
+    "9months": "9 ay",
+    "1year": "1 yıl",
+    "download": "Hesap özeti indir",
+    "generating": "Oluşturuluyor...",
+    "done": "İndirildi!",
+    "downloaded": "Hesap özeti indirildi!",
+    "downloadError": "Rapor oluşturma hatası",
+    "selectAtLeastOne": "En az bir hesap seçin",
+    "usdtWallet": "USDT Cüzdan"
+  },
   "transaction": {
     "back": "Geri",
     "notFound": "İşlem bulunamadı",
