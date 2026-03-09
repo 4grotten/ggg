@@ -158,7 +158,7 @@ const clientTools = {
       const apiUrl = import.meta.env.VITE_API_URL || 'https://api.ueasycard.com';
       console.log(`ИИ запросил ${limit} транзакций`);
 
-      const response = await fetch(`${apiUrl}/api/transactions/open/?limit=${limit}&offset=0`, {
+      const response = await fetch(`${apiUrl}/api/v1/transactions/open/?limit=${limit}&offset=0`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -195,7 +195,7 @@ const clientTools = {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'https://api.ueasycard.com';
-      const response = await fetch(`${apiUrl}/api/transactions/open/?limit=50&offset=0`, {
+      const response = await fetch(`${apiUrl}/api/v1/transactions/open/?limit=50&offset=0`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
