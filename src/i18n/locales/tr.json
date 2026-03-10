@@ -570,7 +570,8 @@
     "downloaded": "Hesap özeti indirildi!",
     "downloadError": "Rapor oluşturma hatası",
     "selectAtLeastOne": "En az bir hesap seçin",
-    "usdtWallet": "USDT Cüzdan"
+    "usdtWallet": "USDT Cüzdan",
+    "next": "Devam et"
   },
   "transaction": {
     "back": "Geri",

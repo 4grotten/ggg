@@ -576,7 +576,8 @@
     "downloaded": "对账单已下载！",
     "downloadError": "报告生成错误",
     "selectAtLeastOne": "请至少选择一个账户",
-    "usdtWallet": "USDT钱包"
+    "usdtWallet": "USDT钱包",
+    "next": "继续"
   },
   "transaction": {
     "back": "返回",

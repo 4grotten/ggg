@@ -570,7 +570,8 @@
     "downloaded": "Auszug heruntergeladen!",
     "downloadError": "Fehler bei der Berichtserstellung",
     "selectAtLeastOne": "Wählen Sie mindestens ein Konto",
-    "usdtWallet": "USDT-Wallet"
+    "usdtWallet": "USDT-Wallet",
+    "next": "Weiter"
   },
   "transaction": {
     "back": "Zurück",
