@@ -261,28 +261,50 @@ export async function changePassword(old_password: string, new_password: string)
  * GET /users/me/
  */
 export async function getCurrentUser() {
-  const response = await apiGet<UserProfile>('/users/me/');
+  const response = await apiGet<any>('/users/me/');
   
-  // При успехе сохраняем данные пользователя
+  // При успехе нормализуем и сохраняем данные пользователя
   if (response.data) {
-    // Merge phone_number from previous data if API didn't return it
-    if (!response.data.phone_number) {
+    const raw = response.data;
+    
+    // Normalize nested API response to flat UserProfile
+    // API returns: { id, username, email, first_name, last_name, profile: { gender, date_of_birth, avatar_url, phone } }
+    const profile = raw.profile || {};
+    const normalized: UserProfile = {
+      id: raw.id,
+      user_id: raw.user_id,
+      full_name: raw.full_name || [raw.first_name, raw.last_name].filter(Boolean).join(' ') || '',
+      phone_number: raw.phone_number || profile.phone || raw.username || '',
+      email: raw.email || null,
+      avatar: raw.avatar || (profile.avatar_url ? { id: 0, file: profile.avatar_url, large: profile.avatar_url, medium: profile.avatar_url, small: profile.avatar_url } : null),
+      username: raw.username || null,
+      date_of_birth: raw.date_of_birth || profile.date_of_birth || null,
+      gender: raw.gender || profile.gender || null,
+      has_empty_fields: raw.has_empty_fields ?? false,
+      role: raw.role || null,
+      is_verified: raw.is_verified,
+      verification_status: raw.verification_status,
+    };
+
+    // Fallback phone from cached login data
+    if (!normalized.phone_number) {
       try {
         const cached = localStorage.getItem(AUTH_USER_KEY);
         if (cached) {
           const prev = JSON.parse(cached) as UserProfile;
           if (prev.phone_number) {
-            response.data.phone_number = prev.phone_number;
+            normalized.phone_number = prev.phone_number;
           }
         }
       } catch {}
     }
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
-    // Persist for multi-account switching
-    saveCurrentAccount(response.data);
+
+    response.data = normalized as any;
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalized));
+    saveCurrentAccount(normalized);
   }
   
-  return response;
+  return response as { data: UserProfile | null; error: any; status: number };
 }
 
 /**
