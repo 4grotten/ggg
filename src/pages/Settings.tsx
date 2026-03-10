@@ -1117,6 +1117,11 @@ const Settings = () => {
             label={t("settings.apiDocumentation")}
             onClick={() => navigate("/settings/api")}
           />
+          <SettingsItem
+            icon={<ColoredIcon colorKey="code"><Plug className="w-4 h-4" /></ColoredIcon>}
+            label={t("settings.apiThirdParty")}
+            onClick={() => navigate("/settings/api-third-party")}
+          />
         </AnimatedMenuSection>
 
         {/* Support & Legal */}

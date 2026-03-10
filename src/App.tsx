@@ -187,6 +187,7 @@ const AppContent = () => {
             <Route path="/settings/edit-profile" element={<EditProfile />} />
             <Route path="/settings/devices" element={<DevicesPage />} />
             <Route path="/settings/api" element={<ApiDocumentation />} />
+            <Route path="/settings/api-third-party" element={<ApiThirdParty />} />
             <Route path="/settings/admin" element={<AdminPanel />} />
             <Route path="/settings/admin/clients" element={<AdminClients />} />
             <Route path="/settings/admin/admins" element={<AdminAdmins />} />
