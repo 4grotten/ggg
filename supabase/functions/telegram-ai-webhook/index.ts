@@ -116,12 +116,20 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
       console.log(`[telegram-ai] account detail failed: ${res.status}`);
       return "Данные аккаунта недоступны.";
     }
-    const d = await res.json();
+    const data = await res.json();
     const lines: string[] = [];
-    if (d.first_name || d.last_name) lines.push(`👤 ${[d.first_name, d.last_name].filter(Boolean).join(" ")}`);
-    if (d.phone) lines.push(`📱 ${d.phone}`);
-    if (d.balance !== undefined) lines.push(`💰 Баланс: ${d.balance} AED`);
-    return lines.join("\n") || "Нет данных.";
+    if (data.first_name || data.last_name) lines.push(`👤 Имя: ${[data.first_name, data.last_name].filter(Boolean).join(" ")}`);
+    if (data.email) lines.push(`📧 Email: ${data.email}`);
+    if (data.phone) lines.push(`📱 Телефон: ${data.phone}`);
+    if (data.balance !== undefined) lines.push(`💰 Баланс счёта: ${data.balance} AED`);
+    if (data.status) lines.push(`📋 Статус аккаунта: ${data.status}`);
+    if (data.is_verified !== undefined) lines.push(`✅ Верификация: ${data.is_verified ? "Пройдена" : "Не пройдена"}`);
+    if (data.created_at) lines.push(`📅 Дата регистрации: ${formatDate(data.created_at)}`);
+    if (data.iban) {
+      const iban = String(data.iban);
+      lines.push(`🏦 IBAN: ${iban.slice(0, 4)}••••${iban.slice(-4)}`);
+    }
+    return lines.length > 0 ? lines.join("\n") : "Нет данных аккаунта.";
   } catch { return "Ошибка загрузки аккаунта."; }
 }
 
