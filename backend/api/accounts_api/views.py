@@ -33,15 +33,18 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
         status_code, fetched_data = ApofizClient.get_me(apofiz_token)
         if status_code == 200:
             apofiz_user_data = fetched_data
+            
     apofiz_id = apofiz_user_data.get('id') if apofiz_user_data else None
     user = User.objects.filter(username=phone_number).first()
     created = False
+    
     if not user:
         if apofiz_id and isinstance(apofiz_id, int):
             user = User.objects.create(id=apofiz_id, username=phone_number)
         else:
             user = User.objects.create(username=phone_number)
         created = True
+        
     has_init_profile = False
     if apofiz_user_data:
         if 'email' in apofiz_user_data and apofiz_user_data['email']:
@@ -53,8 +56,10 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
                 user.last_name = names[1]
             has_init_profile = True
         user.save()
+        
     profile, _ = Profiles.objects.get_or_create(user_id=str(user.id), defaults={'phone': phone_number})
     profile_updated = False
+    
     if apofiz_user_data:
         if 'full_name' in apofiz_user_data and apofiz_user_data['full_name']:
             names = apofiz_user_data['full_name'].split(' ', 1)
@@ -67,9 +72,11 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
         if avatar_val:
             profile.avatar_url = avatar_val.get('file') if isinstance(avatar_val, dict) else avatar_val
             profile_updated = True
+            
     if profile_updated:
         profile.save()
-    if has_init_profile:
+        
+    if has_init_profile or created: # Генерируем кошельки если новый юзер или профиль обновлен впервые
         tail = generate_uid_tail(user.id)
         if not Cards.objects.filter(user_id=str(user.id)).exists():
             Cards.objects.create(
@@ -90,9 +97,32 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
             CryptoWallets.objects.create(
                 user_id=str(user.id), network="TRC20", token="USDT", address=mock_address, balance=Decimal('200000.000000'), is_active=True
             )
+            
     Token.objects.filter(user=user).delete()
     if apofiz_token:
         Token.objects.create(key=apofiz_token, user=user)
+    if created:
+        full_name = f"{profile.first_name or ''} {profile.last_name or ''}".strip()
+        if not full_name:
+            full_name = "Имя еще не заполнено (в процессе)"
+            
+        details = {
+            "acting_role": "System Auto-Registration",
+            "changes": {
+                "Новый пользователь": {
+                    "was": "Отсутствовал",
+                    "became": f"{full_name} (Тел: {phone_number}, ID: {user.id})"
+                }
+            }
+        }
+        
+        from apps.accounts_apps.models import AdminActionHistory
+        AdminActionHistory.objects.create(
+            admin_id="SYSTEM",
+            action="NEW_USER_REGISTRATION",
+            target_user_id=str(user.id),
+            details=details
+        )
         
     return user, created
 
@@ -1588,7 +1618,7 @@ class StatementSendView(APIView):
 class MessengerIdentifyView(APIView):
     permission_classes = []
     authentication_classes = []
-    
+
     @swagger_auto_schema(
         operation_summary="Идентификация пользователя по мессенджеру",
         request_body=openapi.Schema(

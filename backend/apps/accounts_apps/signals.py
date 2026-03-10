@@ -17,27 +17,3 @@ def transaction_status_notification(sender, instance, created, update_fields, **
         threading.Thread(target=notify_transaction_parties, args=(instance.id,), daemon=True).start()
     elif update_fields and 'status' in update_fields and instance.status == 'completed':
         threading.Thread(target=notify_transaction_parties, args=(instance.id,), daemon=True).start()
-
-
-@receiver(post_save, sender=Profiles)
-def notify_admins_on_new_user(sender, instance, created, **kwargs):
-    if created:
-        full_name = f"{instance.first_name or ''} {instance.last_name or ''}".strip()
-        if not full_name:
-            full_name = "No Name Provided"
-        user_ident = instance.user_id
-        details = {
-            "acting_role": "System Auto-Registration",
-            "changes": {
-                "New User Account": {
-                    "was": "None",
-                    "became": f"{full_name} (ID: {user_ident})"
-                }
-            }
-        }
-        AdminActionHistory.objects.create(
-            admin_id="SYSTEM",
-            action="NEW_USER_REGISTRATION",
-            target_user_id=str(user_ident),
-            details=details
-        )
