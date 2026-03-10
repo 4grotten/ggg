@@ -83,7 +83,7 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
     onError: () => toast.error("Ошибка отправки тестового уведомления"),
   });
 
-
+  const handleToggle = (ch: typeof CHANNELS[number]) => {
     if (!settings) return;
     updateMutation.mutate({ [ch.enabledField]: !settings[ch.enabledField] });
   };
