@@ -75,18 +75,10 @@ export function WelcomeMessagesEditor() {
   const handleTest = async () => {
     setIsTesting(true);
     try {
-      // Get current admin's phone from profile
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("phone")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!profile?.phone) {
+      const phone = user?.phone_number;
+      if (!phone) {
         toast.error(t("admin.welcomeMessages.noPhone", "Номер телефона не найден в профиле"));
+        setIsTesting(false);
         return;
       }
 
