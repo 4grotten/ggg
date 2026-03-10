@@ -284,42 +284,43 @@ export function UserNotificationChannels({ t, isPushEnabled, setIsPushEnabled }:
         </p>
       </div>
 
-      {/* Telegram Start Alert */}
+      {/* Telegram Start Alert — iOS style */}
       <AlertDialog open={showTelegramAlert} onOpenChange={setShowTelegramAlert}>
-        <AlertDialogContent className="max-w-sm rounded-2xl">
-          <AlertDialogHeader>
-            <div className="mx-auto w-12 h-12 rounded-xl flex items-center justify-center mb-2" style={{ background: "linear-gradient(135deg, #2AABEE 0%, #229ED9 100%)" }}>
+        <AlertDialogContent className="w-[270px] rounded-2xl p-0 gap-0 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-0 shadow-2xl">
+          <div className="pt-5 pb-4 px-4 text-center">
+            <div className="mx-auto w-12 h-12 rounded-xl flex items-center justify-center mb-3" style={{ background: "linear-gradient(135deg, #2AABEE 0%, #229ED9 100%)" }}>
               <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
               </svg>
             </div>
-            <AlertDialogTitle className="text-center">
+            <AlertDialogTitle className="text-[17px] font-semibold text-foreground mb-1">
               {t("settings.telegramAlertTitle") || "Активируйте бота"}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-center">
+            <AlertDialogDescription className="text-[13px] text-muted-foreground leading-tight">
               {t("settings.telegramAlertDesc") || "Чтобы получать уведомления, перейдите в Telegram-бот и нажмите кнопку Start"}
             </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
-            <Button
-              className="w-full gap-2"
+          </div>
+          <div className="border-t border-border/30">
+            <button
               onClick={() => {
                 const bot = (settings?.tg_bot || "@uEasyCard_Bot").replace("@", "");
                 window.open(`https://t.me/${bot}`, "_blank");
                 setShowTelegramAlert(false);
               }}
+              className="w-full py-3 text-[17px] font-semibold text-primary hover:bg-muted/50 transition-colors flex items-center justify-center gap-2"
             >
               <ExternalLink className="w-4 h-4" />
               {t("settings.goToBot") || "Перейти в бот"}
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full"
+            </button>
+          </div>
+          <div className="border-t border-border/30">
+            <button
               onClick={() => setShowTelegramAlert(false)}
+              className="w-full py-3 text-[17px] text-muted-foreground hover:bg-muted/50 transition-colors"
             >
               {t("settings.later") || "Позже"}
-            </Button>
-          </AlertDialogFooter>
+            </button>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </div>
