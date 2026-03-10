@@ -1264,6 +1264,8 @@
     "phone": "Telefon",
     "addPhone": "Telefonnummer hinzufügen",
     "phoneDescription": "Telefonnummer, die für die Anmeldung verwendet wird.",
+    "verified": "Verifiziert",
+    "notVerified": "Nicht verifiziert",
     "username": "Benutzername",
     "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
     "usernameDescription": "Eindeutige Kennung für Überweisungen zwischen Benutzern. Nur Buchstaben, Zahlen und Unterstriche erlaubt.",
