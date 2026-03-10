@@ -184,7 +184,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       {
         key: "download",
         label: t("statement.deliveryDownload", "Скачать файл"),
-        sublabel: "HTML",
+        sublabel: "PDF",
         icon: <Download className="w-4 h-4" />,
         enabled: true,
         configured: true,
@@ -304,7 +304,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       const a = document.createElement("a");
       a.href = url;
       const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-      a.download = `uEasyCard_Statement_${fileDate}.html`;
+      a.download = `uEasyCard_Statement_${fileDate}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -382,14 +382,14 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
 
       const contentType = response.headers.get("content-type") || "";
 
-      if (wantDownload && contentType.includes("text/html")) {
-        // Response is HTML file for download; delivery results are in header
+      if (wantDownload && (contentType.includes("application/pdf") || contentType.includes("text/html"))) {
+        // Response is PDF file for download; delivery results are in header
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
         const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        a.download = `uEasyCard_Statement_${fileDate}.html`;
+        a.download = `uEasyCard_Statement_${fileDate}.pdf`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
