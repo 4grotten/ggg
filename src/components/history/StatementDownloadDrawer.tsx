@@ -53,7 +53,8 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     if (wd?.cards && Array.isArray(wd.cards)) {
       for (const card of wd.cards) {
         const mask = card.card_number ? `•••• ${String(card.card_number).slice(-4)}` : "";
-        const cardType = card.type || "Virtual";
+        const rawType = card.type || "Virtual";
+        const cardType = rawType.charAt(0).toUpperCase() + rawType.slice(1).toLowerCase();
         items.push({
           id: `card_${card.id || card.card_number}`,
           label: `${cardType} ${mask}`,
@@ -153,11 +154,11 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
   };
 
   const periodOptions: { key: PeriodOption; label: string }[] = [
-    { key: "1m", label: t("statement.1month", "1 мес") },
-    { key: "3m", label: t("statement.3months", "3 мес") },
-    { key: "6m", label: t("statement.6months", "6 мес") },
-    { key: "9m", label: t("statement.9months", "9 мес") },
-    { key: "1y", label: t("statement.1year", "1 год") },
+    { key: "1m", label: t("statement.1month", "1 Мес") },
+    { key: "3m", label: t("statement.3months", "3 Мес") },
+    { key: "6m", label: t("statement.6months", "6 Мес") },
+    { key: "9m", label: t("statement.9months", "9 Мес") },
+    { key: "1y", label: t("statement.1year", "1 Год") },
   ];
 
   const getDateRange = (period: PeriodOption): { start: string; end: string } => {
