@@ -618,12 +618,17 @@ serve(async (req) => {
     const channelsToSend = Array.isArray(delivery_channels) ? delivery_channels.filter((c: string) => c !== 'download') : [];
 
     if (channelsToSend.length > 0) {
-      const di = deliveryI18n[lang] || deliveryI18n['en'];
-      const assetLabels: string[] = [];
-      if (filterAssets) {
-        if (filterAssets.includes('card')) assetLabels.push(di.card);
-        if (filterAssets.includes('iban')) assetLabels.push(di.iban);
-        if (filterAssets.includes('crypto')) assetLabels.push(di.crypto);
+      // Use detailed asset labels from frontend if available, otherwise fall back to generic
+      let assetLabels: string[] = [];
+      if (Array.isArray(rawAssetLabels) && rawAssetLabels.length > 0) {
+        assetLabels = rawAssetLabels;
+      } else {
+        const di = deliveryI18n[lang] || deliveryI18n['en'];
+        if (filterAssets) {
+          if (filterAssets.includes('card')) assetLabels.push(di.card);
+          if (filterAssets.includes('iban')) assetLabels.push(di.iban);
+          if (filterAssets.includes('crypto')) assetLabels.push(di.crypto);
+        }
       }
 
       // Convert PDF to base64 for backend delivery
