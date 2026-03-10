@@ -28,6 +28,7 @@ interface NotifApiResponse {
 }
 
 const CHANNELS = [
+  { key: "push" as const, valueField: "push_token" as const, enabledField: "push_enabled" as const, icon: Bell, label: "Push", placeholder: "", color: "text-purple-500", bg: "bg-purple-500/10 border-purple-500/20", noValue: true },
   { key: "whatsapp" as const, valueField: "whatsapp_number" as const, enabledField: "whatsapp_enabled" as const, icon: MessageCircle, label: "WhatsApp", placeholder: "+971 50 123 4567", color: "text-green-500", bg: "bg-green-500/10 border-green-500/20" },
   { key: "telegram" as const, valueField: "telegram_username" as const, enabledField: "telegram_enabled" as const, icon: Send, label: "Telegram", placeholder: "@username", color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/20" },
   { key: "email" as const, valueField: "email_address" as const, enabledField: "email_enabled" as const, icon: Mail, label: "Email", placeholder: "admin@example.com", color: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
