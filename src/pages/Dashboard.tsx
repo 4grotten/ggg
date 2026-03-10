@@ -404,6 +404,34 @@ const Dashboard = () => {
     <AccountSwitcher open={accountSwitcherOpen} onOpenChange={setAccountSwitcherOpen} />
     <PartnerDrawer open={partnerDrawerOpen} onOpenChange={setPartnerDrawerOpen} />
     
+    {/* Verification Update Dialog */}
+    <AlertDialog open={verificationDialogOpen} onOpenChange={setVerificationDialogOpen}>
+      <AlertDialogContent className="max-w-[320px] rounded-2xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {t('settings.updateDataConfirmTitle') || 'Обновить данные?'}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {t('settings.updateVerificationConfirmDescription') || 'Вы уверены, что хотите обновить данные верификации?'}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex-row gap-3">
+          <AlertDialogCancel className="flex-1 mt-0">
+            {t('common.cancel') || 'Отмена'}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              setVerificationDialogOpen(false);
+              navigate("/profile-verification");
+            }}
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+          >
+            {t('common.continue') || 'Продолжить'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
     {/* iOS-style Auth Alert */}
     <AlertDialog open={authAlertOpen} onOpenChange={setAuthAlertOpen}>
       <AlertDialogContent className="w-[270px] rounded-2xl p-0 gap-0 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-0 shadow-2xl">
