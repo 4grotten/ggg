@@ -737,7 +737,7 @@ const Settings = () => {
                 <span>{t("settings.personalData") || "Личные данные"}</span>
               </button>
               
-               {/* Verification status - from API */}
+               {/* Verification status badge */}
               <button
                 onClick={() => {
                   if (user?.is_verified) {
@@ -747,14 +747,31 @@ const Settings = () => {
                   }
                 }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  !user?.is_verified
-                    ? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
-                    : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
+                  user?.is_verified
+                    ? "bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/20"
+                    : "bg-red-500/15 text-red-500 hover:bg-red-500/20"
                 }`}
               >
-                <Check className="w-3.5 h-3.5" />
-                <span>{t("settings.verification")}</span>
+                {user?.is_verified ? (
+                  <BadgeCheck className="w-3.5 h-3.5" />
+                ) : (
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                )}
+                <span>{user?.is_verified ? t("editProfile.verified") || "Verified" : t("editProfile.notVerified") || "Not verified"}</span>
               </button>
+
+              {/* Role badge */}
+              {user?.role === 'admin' ? (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/15 text-primary text-xs font-medium">
+                  <Crown className="w-3.5 h-3.5" />
+                  Admin
+                </div>
+              ) : user?.role === 'moderator' ? (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-500/15 text-violet-500 text-xs font-medium">
+                  <Shield className="w-3.5 h-3.5" />
+                  Moderator
+                </div>
+              ) : null}
             </div>
           </>
         ) : (
