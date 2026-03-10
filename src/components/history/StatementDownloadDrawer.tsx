@@ -15,6 +15,7 @@ import { useWalletSummary, useBankAccounts, useCryptoWallets } from "@/hooks/use
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthToken } from "@/services/api/apiClient";
 import { subMonths, subYears, format } from "date-fns";
+import i18n from "@/i18n";
 import { useUserNotificationSettings } from "@/hooks/useUserNotificationSettings";
 import { useNavigate } from "react-router-dom";
 import { UserNotificationChannels } from "@/components/settings/UserNotificationChannels";
@@ -288,6 +289,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             end_date: end,
             user_name: userName,
             asset_filter: uniqueAssetTypes,
+            lang: i18n.language,
           }),
         }
       );
@@ -365,6 +367,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             asset_filter: uniqueAssetTypes,
             delivery_channels: channels.filter(c => c !== "download"),
             also_download: channels.includes("download"),
+            lang: i18n.language,
           }),
         }
       );
