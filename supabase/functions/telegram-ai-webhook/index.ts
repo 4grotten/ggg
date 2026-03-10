@@ -7,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// ── Data fetching (same logic as ai-chat) ──
+// ── Data fetching ──
 
 function formatTransactionType(type: string): string {
   const map: Record<string, string> = {
@@ -112,10 +112,7 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
     const res = await fetch(`${BACKEND_BASE}/accounts/open/users/${userId}/detail/`, {
       headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
     });
-    if (!res.ok) {
-      console.log(`[telegram-ai] account detail failed: ${res.status}`);
-      return "Данные аккаунта недоступны.";
-    }
+    if (!res.ok) return "Данные аккаунта недоступны.";
     const data = await res.json();
     const lines: string[] = [];
     if (data.first_name || data.last_name) lines.push(`👤 Имя: ${[data.first_name, data.last_name].filter(Boolean).join(" ")}`);
@@ -133,10 +130,66 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
   } catch { return "Ошибка загрузки аккаунта."; }
 }
 
+// ── Statement detection ──
+
+function detectStatementRequest(text: string): { isStatement: boolean; months: number } {
+  const lower = text.toLowerCase();
+  const keywords = ["выписк", "выписку", "отчёт", "отчет", "statement", "report", "extract"];
+  const isStatement = keywords.some(k => lower.includes(k));
+  if (!isStatement) return { isStatement: false, months: 3 };
+
+  // Parse period
+  if (/9\s*(мес|month)/i.test(lower) || lower.includes("9м")) return { isStatement: true, months: 9 };
+  if (/6\s*(мес|month)/i.test(lower) || lower.includes("6м") || lower.includes("полгод") || lower.includes("пол года")) return { isStatement: true, months: 6 };
+  if (/год|year|12\s*мес/i.test(lower) || lower.includes("1г")) return { isStatement: true, months: 12 };
+  if (/1\s*(мес|month)/i.test(lower) || lower.includes("1м") || /за месяц/i.test(lower)) return { isStatement: true, months: 1 };
+  if (/3\s*(мес|month)/i.test(lower) || lower.includes("3м") || /три месяц/i.test(lower)) return { isStatement: true, months: 3 };
+  
+  return { isStatement: true, months: 3 }; // default 3 months
+}
+
+async function generateStatement(token: string, months: number, userName: string): Promise<Uint8Array | null> {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+  const now = new Date();
+  const startDate = new Date(now);
+  startDate.setMonth(startDate.getMonth() - months);
+
+  const body = {
+    backend_token: token,
+    start_date: startDate.toISOString().slice(0, 10),
+    end_date: now.toISOString().slice(0, 10),
+    user_name: userName,
+    lang: "ru",
+  };
+
+  try {
+    const res = await fetch(`${supabaseUrl}/functions/v1/generate-report`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      console.error("[telegram-ai] Statement generation failed:", res.status);
+      return null;
+    }
+
+    const htmlContent = await res.text();
+    return new TextEncoder().encode(htmlContent);
+  } catch (e) {
+    console.error("[telegram-ai] Statement generation error:", e);
+    return null;
+  }
+}
+
 // ── Telegram helpers ──
 
 async function sendTelegramMessage(botToken: string, chatId: string, text: string) {
-  // Split long messages (Telegram limit 4096)
   const chunks: string[] = [];
   let remaining = text;
   while (remaining.length > 4096) {
@@ -156,6 +209,18 @@ async function sendTelegramMessage(botToken: string, chatId: string, text: strin
   }
 }
 
+async function sendTelegramDocument(botToken: string, chatId: string, fileBytes: Uint8Array, fileName: string, caption: string) {
+  const formData = new FormData();
+  formData.append("chat_id", chatId);
+  formData.append("document", new Blob([fileBytes], { type: "text/html" }), fileName);
+  formData.append("caption", caption);
+
+  await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
+    method: "POST",
+    body: formData,
+  });
+}
+
 async function sendTypingAction(botToken: string, chatId: string) {
   await fetch(`https://api.telegram.org/bot${botToken}/sendChatAction`, {
     method: "POST",
@@ -164,7 +229,7 @@ async function sendTypingAction(botToken: string, chatId: string) {
   });
 }
 
-// ── System prompt (same as ai-chat) ──
+// ── System prompt ──
 
 function buildSystemPrompt(firstName: string, accountText: string, balancesText: string, txText: string): string {
   return `Ты - дружелюбный AI-ассистент для финансового приложения Easy Card. Отвечай кратко и по делу на языке пользователя. Используй эмодзи для дружелюбности.
@@ -223,6 +288,7 @@ Easy Card - это финансовое приложение для управл
 - НЕ показывай балансы, транзакции и финансовые данные пока пользователь ЯВНО не спросит о них
 - При приветствии просто поздоровайся и спроси чем помочь, НЕ выкладывай сразу все данные
 - Показывай только ту информацию, которую пользователь запросил
+- Если пользователь просит выписку/отчёт/statement — НЕ отвечай текстом. Система автоматически сформирует и отправит файл. Просто подтверди что формируешь отчёт.
 
 ## Формат вывода транзакций
 Когда пользователь спрашивает о транзакциях, выводи их СПИСКОМ, группируя по дате. НЕ используй таблицы. Формат:
@@ -300,11 +366,10 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Helper: identify user — try Supabase links table first, then backend API
+    // Helper: identify user
     async function identifyUser(): Promise<any | null> {
       const supabase = createClient(supabaseUrl, supabaseKey);
 
-      // 1. Try Supabase table by chat_id
       const { data: byChatId } = await supabase
         .from("telegram_user_links")
         .select("*")
@@ -312,11 +377,9 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (byChatId) {
-        console.log(`[telegram-ai] Found in links by chat_id: user ${byChatId.backend_user_id}`);
         return { found: true, user_id: byChatId.backend_user_id, token: byChatId.backend_token, first_name: byChatId.first_name, language: "ru" };
       }
 
-      // 2. Try Supabase table by username
       if (username) {
         const { data: byUsername } = await supabase
           .from("telegram_user_links")
@@ -325,15 +388,11 @@ Deno.serve(async (req) => {
           .maybeSingle();
 
         if (byUsername) {
-          console.log(`[telegram-ai] Found in links by username @${username}, updating chat_id`);
-          // Save chat_id for next time
           await supabase.from("telegram_user_links").update({ telegram_chat_id: chatId }).eq("id", byUsername.id);
           return { found: true, user_id: byUsername.backend_user_id, token: byUsername.backend_token, first_name: byUsername.first_name, language: "ru" };
         }
       }
 
-      // 3. Fallback: try backend API by chat_id
-      console.log(`[telegram-ai] Not in links table, trying backend API`);
       const res1 = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
@@ -342,7 +401,6 @@ Deno.serve(async (req) => {
       if (res1.ok) {
         const data = await res1.json();
         if (data.found) {
-          // Cache in links table
           await supabase.from("telegram_user_links").upsert({
             telegram_chat_id: chatId,
             telegram_username: username ? `@${username}` : null,
@@ -362,9 +420,9 @@ Deno.serve(async (req) => {
       await sendTypingAction(botToken, chatId);
       const identity = await identifyUser();
       if (identity) {
-        await sendTelegramMessage(botToken, chatId, `👋 Привет, ${identity.first_name || ""}! Я AI-ассистент Easy Card.\n\nЯ могу показать ваши балансы, транзакции и ответить на вопросы о приложении.\n\nНапишите мне что-нибудь! 😊`);
+        await sendTelegramMessage(botToken, chatId, `👋 Привет, ${identity.first_name || ""}! Я AI-ассистент Easy Card.\n\nЯ могу показать ваши балансы, транзакции, сформировать выписку и ответить на вопросы о приложении.\n\nНапишите мне что-нибудь! 😊`);
       } else {
-        await sendTelegramMessage(botToken, chatId, "👋 Привет! Я AI-ассистент Easy Card.\n\nЯ могу показать ваши балансы, транзакции и ответить на вопросы о приложении.\n\n⚠️ Убедитесь, что ваш Telegram привязан в настройках приложения Easy Card.");
+        await sendTelegramMessage(botToken, chatId, "👋 Привет! Я AI-ассистент Easy Card.\n\nЯ могу показать ваши балансы, транзакции, сформировать выписку и ответить на вопросы о приложении.\n\n⚠️ Убедитесь, что ваш Telegram привязан в настройках приложения Easy Card.");
       }
       return new Response(JSON.stringify({ ok: true }));
     }
@@ -382,9 +440,65 @@ Deno.serve(async (req) => {
 
     const { user_id, token: userToken, language } = identity;
     const first_name = identity.first_name || message.from?.first_name || "";
-    console.log(`[telegram-ai] Identified user: ${user_id} (${first_name}), token: ${userToken?.slice(0, 8)}...`);
+    console.log(`[telegram-ai] Identified user: ${user_id} (${first_name})`);
 
-    // 2. Load history (supabase already initialized in identifyUser)
+    // 2. Check if this is a statement request
+    const statementCheck = detectStatementRequest(userText);
+    if (statementCheck.isStatement) {
+      console.log(`[telegram-ai] Statement request detected, period: ${statementCheck.months} months`);
+
+      // Save user message
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      await supabase.from("messenger_chat_history").insert({
+        platform: "telegram",
+        platform_chat_id: chatId,
+        user_id: String(user_id),
+        role: "user",
+        content: userText,
+      });
+
+      // Send "generating" message
+      const periodText = statementCheck.months === 1 ? "месяц" :
+        statementCheck.months === 3 ? "3 месяца" :
+        statementCheck.months === 6 ? "6 месяцев" :
+        statementCheck.months === 9 ? "9 месяцев" :
+        statementCheck.months === 12 ? "год" : `${statementCheck.months} мес.`;
+
+      await sendTelegramMessage(botToken, chatId, `📊 Формирую выписку за последние ${periodText}...`);
+      await sendTypingAction(botToken, chatId);
+
+      // Generate statement
+      const fileBytes = await generateStatement(userToken, statementCheck.months, first_name);
+
+      if (fileBytes) {
+        const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        const fileName = `uEasyCard_Statement_${fileDate}.html`;
+
+        await sendTelegramDocument(botToken, chatId, fileBytes, fileName, `📄 Выписка за последние ${periodText}`);
+
+        // Save assistant message
+        await supabase.from("messenger_chat_history").insert({
+          platform: "telegram",
+          platform_chat_id: chatId,
+          user_id: String(user_id),
+          role: "assistant",
+          content: `📊 Выписка за последние ${periodText} сформирована и отправлена файлом.`,
+        });
+      } else {
+        await sendTelegramMessage(botToken, chatId, "⚠️ Не удалось сформировать выписку. Попробуйте позже.");
+        await supabase.from("messenger_chat_history").insert({
+          platform: "telegram",
+          platform_chat_id: chatId,
+          user_id: String(user_id),
+          role: "assistant",
+          content: "⚠️ Не удалось сформировать выписку.",
+        });
+      }
+
+      return new Response(JSON.stringify({ ok: true }));
+    }
+
+    // 3. Regular AI chat flow
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { data: history } = await supabase
       .from("messenger_chat_history")
@@ -394,7 +508,6 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: true })
       .limit(20);
 
-    // 3. Save user message
     await supabase.from("messenger_chat_history").insert({
       platform: "telegram",
       platform_chat_id: chatId,
@@ -403,25 +516,20 @@ Deno.serve(async (req) => {
       content: userText,
     });
 
-    // 4. Fetch financial data
     const [accountText, balancesText, txText] = await Promise.all([
       fetchAccountDetail(userToken, user_id),
       fetchAllBalances(userToken),
       fetchTransactions(userToken),
     ]);
-    console.log(`[telegram-ai] Data fetched — account: ${accountText.slice(0, 80)}, balances: ${balancesText.slice(0, 80)}, tx: ${txText.slice(0, 80)}`);
 
-    // 5. Build messages array with history
     const messages: { role: string; content: string }[] = [];
     if (history?.length) {
       history.forEach((m: any) => messages.push({ role: m.role, content: m.content }));
     }
-    // Latest user message is already in history, but ensure it's in the array
     if (!messages.length || messages[messages.length - 1].content !== userText) {
       messages.push({ role: "user", content: userText });
     }
 
-    // 6. Call AI (non-streaming)
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
@@ -443,9 +551,7 @@ Deno.serve(async (req) => {
 
     const aiData = await aiRes.json();
     const reply = aiData.choices?.[0]?.message?.content || "Не удалось получить ответ.";
-    console.log(`[telegram-ai] AI reply: ${reply.slice(0, 100)}`);
 
-    // 7. Save assistant message
     await supabase.from("messenger_chat_history").insert({
       platform: "telegram",
       platform_chat_id: chatId,
@@ -454,7 +560,6 @@ Deno.serve(async (req) => {
       content: reply,
     });
 
-    // 8. Send reply
     await sendTelegramMessage(botToken, chatId, reply);
 
     return new Response(JSON.stringify({ ok: true }));

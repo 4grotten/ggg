@@ -130,10 +130,63 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
   } catch { return "Ошибка загрузки аккаунта."; }
 }
 
+// ── Statement detection ──
+
+function detectStatementRequest(text: string): { isStatement: boolean; months: number } {
+  const lower = text.toLowerCase();
+  const keywords = ["выписк", "выписку", "отчёт", "отчет", "statement", "report", "extract"];
+  const isStatement = keywords.some(k => lower.includes(k));
+  if (!isStatement) return { isStatement: false, months: 3 };
+
+  if (/9\s*(мес|month)/i.test(lower) || lower.includes("9м")) return { isStatement: true, months: 9 };
+  if (/6\s*(мес|month)/i.test(lower) || lower.includes("6м") || lower.includes("полгод") || lower.includes("пол года")) return { isStatement: true, months: 6 };
+  if (/год|year|12\s*мес/i.test(lower) || lower.includes("1г")) return { isStatement: true, months: 12 };
+  if (/1\s*(мес|month)/i.test(lower) || lower.includes("1м") || /за месяц/i.test(lower)) return { isStatement: true, months: 1 };
+  if (/3\s*(мес|month)/i.test(lower) || lower.includes("3м") || /три месяц/i.test(lower)) return { isStatement: true, months: 3 };
+
+  return { isStatement: true, months: 3 };
+}
+
+async function generateStatement(token: string, months: number, userName: string): Promise<Uint8Array | null> {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+  const now = new Date();
+  const startDate = new Date(now);
+  startDate.setMonth(startDate.getMonth() - months);
+
+  try {
+    const res = await fetch(`${supabaseUrl}/functions/v1/generate-report`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify({
+        backend_token: token,
+        start_date: startDate.toISOString().slice(0, 10),
+        end_date: now.toISOString().slice(0, 10),
+        user_name: userName,
+        lang: "ru",
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("[whatsapp-ai] Statement generation failed:", res.status);
+      return null;
+    }
+
+    const htmlContent = await res.text();
+    return new TextEncoder().encode(htmlContent);
+  } catch (e) {
+    console.error("[whatsapp-ai] Statement generation error:", e);
+    return null;
+  }
+}
+
 // ── WhatsApp WAHA helpers ──
 
 async function sendWhatsAppMessage(wahaHost: string, wahaApiKey: string, session: string, chatId: string, text: string) {
-  // WAHA API: POST /api/sendText
   const base = wahaHost.replace(/\/+$/, "");
   await fetch(`${base}/api/sendText`, {
     method: "POST",
@@ -145,6 +198,31 @@ async function sendWhatsAppMessage(wahaHost: string, wahaApiKey: string, session
       session,
       chatId: chatId.includes("@") ? chatId : `${chatId}@c.us`,
       text,
+    }),
+  });
+}
+
+async function sendWhatsAppFile(wahaHost: string, wahaApiKey: string, session: string, chatId: string, fileBytes: Uint8Array, fileName: string, caption: string) {
+  const base = wahaHost.replace(/\/+$/, "");
+  // Convert to base64 for WAHA sendFile API
+  const base64 = btoa(String.fromCharCode(...fileBytes));
+  const mimeType = "text/html";
+
+  await fetch(`${base}/api/sendFile`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": wahaApiKey,
+    },
+    body: JSON.stringify({
+      session,
+      chatId: chatId.includes("@") ? chatId : `${chatId}@c.us`,
+      file: {
+        mimetype: mimeType,
+        filename: fileName,
+        data: `data:${mimeType};base64,${base64}`,
+      },
+      caption,
     }),
   });
 }
@@ -208,6 +286,7 @@ Easy Card - это финансовое приложение для управл
 - НЕ показывай балансы, транзакции и финансовые данные пока пользователь ЯВНО не спросит о них
 - При приветствии просто поздоровайся и спроси чем помочь, НЕ выкладывай сразу все данные
 - Показывай только ту информацию, которую пользователь запросил
+- Если пользователь просит выписку/отчёт/statement — НЕ отвечай текстом. Система автоматически сформирует и отправит файл. Просто подтверди что формируешь отчёт.
 
 ## Формат вывода транзакций
 Когда пользователь спрашивает о транзакциях, выводи их СПИСКОМ, группируя по дате. НЕ используй таблицы. Формат:
@@ -267,7 +346,6 @@ ${txText}`;
 // ── Extract phone number from WAHA chatId ──
 
 function extractPhone(chatId: string): string {
-  // WAHA chatId format: "996555123456@c.us" or just "996555123456"
   return chatId.replace("@c.us", "").replace("@s.whatsapp.net", "").replace("+", "");
 }
 
@@ -280,7 +358,6 @@ Deno.serve(async (req) => {
     const payload = await req.json();
     console.log("[whatsapp-ai] payload:", JSON.stringify(payload).slice(0, 500));
 
-    // WAHA webhook payload structure
     const event = payload.event;
     if (event !== "message") {
       return new Response(JSON.stringify({ ok: true }));
@@ -291,7 +368,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true }));
     }
 
-    const chatId = msgBody.from; // e.g. "996555123456@c.us"
+    const chatId = msgBody.from;
     const userText = msgBody.body;
     const phone = extractPhone(chatId);
 
@@ -326,7 +403,60 @@ Deno.serve(async (req) => {
     const { user_id, token: userToken, first_name } = identity;
     console.log(`[whatsapp-ai] Identified user: ${user_id} (${first_name})`);
 
-    // 2. Init Supabase & load history
+    // 2. Check if this is a statement request
+    const statementCheck = detectStatementRequest(userText);
+    if (statementCheck.isStatement) {
+      console.log(`[whatsapp-ai] Statement request detected, period: ${statementCheck.months} months`);
+
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      await supabase.from("messenger_chat_history").insert({
+        platform: "whatsapp",
+        platform_chat_id: phone,
+        user_id: String(user_id),
+        role: "user",
+        content: userText,
+      });
+
+      const periodText = statementCheck.months === 1 ? "месяц" :
+        statementCheck.months === 3 ? "3 месяца" :
+        statementCheck.months === 6 ? "6 месяцев" :
+        statementCheck.months === 9 ? "9 месяцев" :
+        statementCheck.months === 12 ? "год" : `${statementCheck.months} мес.`;
+
+      await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
+        `📊 Формирую выписку за последние ${periodText}...`);
+
+      const fileBytes = await generateStatement(userToken, statementCheck.months, first_name);
+
+      if (fileBytes) {
+        const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        const fileName = `uEasyCard_Statement_${fileDate}.html`;
+
+        await sendWhatsAppFile(wahaHost, wahaApiKey, wahaSession, chatId, fileBytes, fileName, `📄 Выписка за последние ${periodText}`);
+
+        await supabase.from("messenger_chat_history").insert({
+          platform: "whatsapp",
+          platform_chat_id: phone,
+          user_id: String(user_id),
+          role: "assistant",
+          content: `📊 Выписка за последние ${periodText} сформирована и отправлена файлом.`,
+        });
+      } else {
+        await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
+          "⚠️ Не удалось сформировать выписку. Попробуйте позже.");
+        await supabase.from("messenger_chat_history").insert({
+          platform: "whatsapp",
+          platform_chat_id: phone,
+          user_id: String(user_id),
+          role: "assistant",
+          content: "⚠️ Не удалось сформировать выписку.",
+        });
+      }
+
+      return new Response(JSON.stringify({ ok: true }));
+    }
+
+    // 3. Regular AI chat flow
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { data: history } = await supabase
       .from("messenger_chat_history")
@@ -336,7 +466,6 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: true })
       .limit(20);
 
-    // 3. Save user message
     await supabase.from("messenger_chat_history").insert({
       platform: "whatsapp",
       platform_chat_id: phone,
@@ -345,14 +474,12 @@ Deno.serve(async (req) => {
       content: userText,
     });
 
-    // 4. Fetch financial data
     const [accountText, balancesText, txText] = await Promise.all([
       fetchAccountDetail(userToken, user_id),
       fetchAllBalances(userToken),
       fetchTransactions(userToken),
     ]);
 
-    // 5. Build messages with history
     const messages: { role: string; content: string }[] = [];
     if (history?.length) {
       history.forEach((m: any) => messages.push({ role: m.role, content: m.content }));
@@ -361,7 +488,6 @@ Deno.serve(async (req) => {
       messages.push({ role: "user", content: userText });
     }
 
-    // 6. Call AI
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
@@ -385,7 +511,6 @@ Deno.serve(async (req) => {
     const aiData = await aiRes.json();
     const reply = aiData.choices?.[0]?.message?.content || "Не удалось получить ответ.";
 
-    // 7. Save assistant message
     await supabase.from("messenger_chat_history").insert({
       platform: "whatsapp",
       platform_chat_id: phone,
@@ -394,7 +519,6 @@ Deno.serve(async (req) => {
       content: reply,
     });
 
-    // 8. Send reply
     await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId, reply);
 
     return new Response(JSON.stringify({ ok: true }));
