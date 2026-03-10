@@ -268,22 +268,24 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
   
   .balances-row {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-top: 16px;
     flex-wrap: nowrap;
-    overflow-x: auto;
+    white-space: nowrap;
   }
   
   .balance-chip {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 13px;
+    padding: 5px 10px;
+    font-size: 12px;
     backdrop-filter: blur(4px);
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
   .balance-chip .bal-label {
