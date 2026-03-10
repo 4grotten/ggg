@@ -241,7 +241,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: buildSystemPrompt(accountText, balancesText, txText) },
+          { role: "system", content: buildSystemPrompt(first_name, accountText, balancesText, txText) },
           ...messages.slice(-20),
         ],
         stream: false,
