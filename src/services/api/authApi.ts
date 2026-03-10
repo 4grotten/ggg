@@ -267,20 +267,20 @@ export async function getCurrentUser() {
   if (response.data) {
     const raw = response.data;
     
-    // Normalize nested API response to flat UserProfile
-    // API returns: { id, username, email, first_name, last_name, profile: { gender, date_of_birth, avatar_url, phone } }
-    const profile = raw.profile || {};
+    // Normalize API response to flat UserProfile
+    // API returns: { user_id, full_name, phone, email, gender, avatar_url, apofiz_data: { username, date_of_birth, phone_number, avatar, ... } }
+    const apofiz = raw.apofiz_data || {};
     const normalized: UserProfile = {
-      id: raw.id,
+      id: raw.id || apofiz.id,
       user_id: raw.user_id,
-      full_name: raw.full_name || [raw.first_name, raw.last_name].filter(Boolean).join(' ') || '',
-      phone_number: raw.phone_number || profile.phone || raw.username || '',
-      email: raw.email || null,
-      avatar: raw.avatar || (profile.avatar_url ? { id: 0, file: profile.avatar_url, large: profile.avatar_url, medium: profile.avatar_url, small: profile.avatar_url } : null),
-      username: raw.username || null,
-      date_of_birth: raw.date_of_birth || profile.date_of_birth || null,
-      gender: raw.gender || profile.gender || null,
-      has_empty_fields: raw.has_empty_fields ?? false,
+      full_name: raw.full_name || apofiz.full_name || '',
+      phone_number: raw.phone || apofiz.phone_number || raw.phone_number || '',
+      email: raw.email || apofiz.email || null,
+      avatar: apofiz.avatar || (raw.avatar_url ? { id: 0, file: raw.avatar_url, large: raw.avatar_url, medium: raw.avatar_url, small: raw.avatar_url } : null),
+      username: apofiz.username || raw.username || null,
+      date_of_birth: apofiz.date_of_birth || raw.date_of_birth || null,
+      gender: raw.gender || apofiz.gender || null,
+      has_empty_fields: apofiz.has_empty_fields ?? raw.has_empty_fields ?? false,
       role: raw.role || null,
       is_verified: raw.is_verified,
       verification_status: raw.verification_status,
