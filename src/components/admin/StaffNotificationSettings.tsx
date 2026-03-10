@@ -36,7 +36,6 @@ const CHANNELS = [
 export default function StaffNotificationSettings({ staffUserId, readOnly = false }: Props) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const pushStorageKey = `staff-push-enabled:${staffUserId}`;
 
   const [editingChannel, setEditingChannel] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
