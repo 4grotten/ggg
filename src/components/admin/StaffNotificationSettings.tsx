@@ -74,14 +74,6 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   });
 
   const handleToggle = (ch: typeof CHANNELS[number]) => {
-    if ('noValue' in ch && ch.noValue) {
-      const nextValue = !pushEnabled;
-      setPushEnabled(nextValue);
-      localStorage.setItem(pushStorageKey, String(nextValue));
-      toast.success(nextValue ? "Push включён" : "Push выключен");
-      return;
-    }
-
     if (!settings) return;
     updateMutation.mutate({ [ch.enabledField]: !settings[ch.enabledField] });
   };
