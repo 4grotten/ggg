@@ -17,6 +17,7 @@ import { getAuthToken } from "@/services/api/apiClient";
 import { subMonths, subYears, format } from "date-fns";
 import { useUserNotificationSettings } from "@/hooks/useUserNotificationSettings";
 import { useNavigate } from "react-router-dom";
+import { UserNotificationChannels } from "@/components/settings/UserNotificationChannels";
 
 type PeriodOption = "1m" | "3m" | "6m" | "9m" | "1y";
 type DeliveryChannel = "download" | "telegram" | "whatsapp" | "email";
