@@ -50,6 +50,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
   const [step, setStep] = useState<DrawerStep>("form");
   const [selectedChannels, setSelectedChannels] = useState<Set<DeliveryChannel>>(new Set(["download"]));
   const [isSending, setIsSending] = useState(false);
+  const [showNotifSetup, setShowNotifSetup] = useState(false);
 
   // Build asset list from live data
   useEffect(() => {
