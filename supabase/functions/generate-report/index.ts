@@ -356,6 +356,27 @@ function buildHTML(
     </div>
   </div>
 
+  <!-- Client Info -->
+  ${userProfile ? `
+  <div style="padding:16px 32px">
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px 20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:4px;height:18px;background:#007aff;border-radius:2px"></div>
+        <div style="font-size:13px;font-weight:700;color:#1e293b">${t(lang, 'clientInfo')}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        ${userProfile.full_name ? `<tr><td style="padding:4px 8px;font-size:12px;color:#64748b;width:160px;font-weight:600">${t(lang, 'clientName')}</td><td style="padding:4px 8px;font-size:12px;color:#1e293b;font-weight:500">${userProfile.full_name}</td></tr>` : ''}
+        ${userProfile.phone ? `<tr><td style="padding:4px 8px;font-size:12px;color:#64748b;width:160px;font-weight:600">${t(lang, 'clientPhone')}</td><td style="padding:4px 8px;font-size:12px;color:#1e293b">${userProfile.phone}</td></tr>` : ''}
+        ${userProfile.email ? `<tr><td style="padding:4px 8px;font-size:12px;color:#64748b;width:160px;font-weight:600">${t(lang, 'clientEmail')}</td><td style="padding:4px 8px;font-size:12px;color:#1e293b">${userProfile.email}</td></tr>` : ''}
+        ${userProfile.iban ? `<tr><td style="padding:4px 8px;font-size:12px;color:#64748b;width:160px;font-weight:600">${t(lang, 'clientIban')}</td><td style="padding:4px 8px;font-size:12px;color:#1e293b;font-family:monospace">${userProfile.iban}</td></tr>` : ''}
+        ${userProfile.account_balance ? `<tr><td style="padding:4px 8px;font-size:12px;color:#64748b;width:160px;font-weight:600">${t(lang, 'balance')}</td><td style="padding:4px 8px;font-size:12px;color:#1e293b;font-weight:700">${userProfile.account_balance} AED</td></tr>` : ''}
+        ${userProfile.is_verified !== undefined ? `<tr><td style="padding:4px 8px;font-size:12px;color:#64748b;width:160px;font-weight:600">${t(lang, 'clientStatus')}</td><td style="padding:4px 8px;font-size:12px"><span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;${userProfile.is_verified ? 'background:#dcfce7;color:#16a34a' : 'background:#fef9c3;color:#ca8a04'}">${userProfile.is_verified ? t(lang, 'clientVerified') : t(lang, 'clientNotVerified')}</span></td></tr>` : ''}
+        ${userProfile.created_at ? `<tr><td style="padding:4px 8px;font-size:12px;color:#64748b;width:160px;font-weight:600">${t(lang, 'clientRegDate')}</td><td style="padding:4px 8px;font-size:12px;color:#1e293b">${formatDate(userProfile.created_at)}</td></tr>` : ''}
+      </table>
+    </div>
+  </div>
+  ` : ''}
+
   <!-- Summary -->
   <div style="display:flex;gap:12px;padding:16px 32px;flex-wrap:wrap">
     ${summaryCards}
