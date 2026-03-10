@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { apiGet, apiPut } from "@/services/api/apiClient";
+import { apiGet, apiPut, getAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface UserNotificationSettings {
   telegram_username: string | null;
@@ -10,6 +11,35 @@ export interface UserNotificationSettings {
   email_address: string | null;
   email_enabled: boolean;
   tg_bot?: string;
+}
+
+// Sync telegram username to Supabase links table for webhook identification
+async function syncTelegramLink(username: string | null) {
+  if (!username) return;
+  const token = getAuthToken();
+  const cachedUser = localStorage.getItem(AUTH_USER_KEY);
+  if (!token || !cachedUser) return;
+
+  try {
+    const user = JSON.parse(cachedUser);
+    const userId = user.user_id || user.id;
+    const firstName = user.first_name || "";
+    if (!userId) return;
+
+    const cleanUsername = username.startsWith("@") ? username : `@${username}`;
+
+    await supabase.from("telegram_user_links").upsert(
+      {
+        telegram_username: cleanUsername,
+        backend_user_id: String(userId),
+        backend_token: token,
+        first_name: firstName,
+      },
+      { onConflict: "telegram_username" }
+    );
+  } catch (e) {
+    console.error("[syncTelegramLink]", e);
+  }
 }
 
 export function useUserNotificationSettings() {
@@ -47,6 +77,12 @@ export function useUserNotificationSettings() {
 
       const res = await apiPut<UserNotificationSettings>("/users/notifications/settings/", body);
       if (res.error) throw new Error(res.error.detail || res.error.message);
+
+      // Sync telegram link to Supabase for webhook identification
+      if (patch.telegram_username !== undefined || patch.telegram_enabled !== undefined) {
+        await syncTelegramLink(body.telegram_username);
+      }
+
       return res.data;
     },
     onSuccess: (data) => {
