@@ -204,11 +204,22 @@ async function sendWhatsAppMessage(wahaHost: string, wahaApiKey: string, session
 
 async function sendWhatsAppFile(wahaHost: string, wahaApiKey: string, session: string, chatId: string, fileBytes: Uint8Array, fileName: string, caption: string) {
   const base = wahaHost.replace(/\/+$/, "");
-  // Convert to base64 for WAHA sendFile API
-  const base64 = btoa(String.fromCharCode(...fileBytes));
+  // Convert to base64 in chunks to avoid stack overflow
+  let binary = "";
+  const chunkSize = 8192;
+  for (let i = 0; i < fileBytes.length; i += chunkSize) {
+    const chunk = fileBytes.subarray(i, i + chunkSize);
+    for (let j = 0; j < chunk.length; j++) {
+      binary += String.fromCharCode(chunk[j]);
+    }
+  }
+  const base64 = btoa(binary);
   const mimeType = "text/html";
 
-  await fetch(`${base}/api/sendFile`, {
+  const targetChatId = chatId.includes("@") ? chatId : `${chatId}@c.us`;
+  console.log(`[whatsapp-ai] Sending file ${fileName} (${fileBytes.length} bytes) to ${targetChatId}`);
+
+  const res = await fetch(`${base}/api/sendFile`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -216,7 +227,7 @@ async function sendWhatsAppFile(wahaHost: string, wahaApiKey: string, session: s
     },
     body: JSON.stringify({
       session,
-      chatId: chatId.includes("@") ? chatId : `${chatId}@c.us`,
+      chatId: targetChatId,
       file: {
         mimetype: mimeType,
         filename: fileName,
@@ -225,6 +236,12 @@ async function sendWhatsAppFile(wahaHost: string, wahaApiKey: string, session: s
       caption,
     }),
   });
+
+  const resText = await res.text();
+  console.log(`[whatsapp-ai] sendFile response: ${res.status} ${resText.slice(0, 300)}`);
+  if (!res.ok) {
+    console.error(`[whatsapp-ai] sendFile FAILED: ${res.status} ${resText}`);
+  }
 }
 
 // ── System prompt ──
