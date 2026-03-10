@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Download } from "lucide-react";
+import { ChevronLeft, ChevronDown, Download, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
@@ -21,8 +21,9 @@ import { format, startOfDay, endOfDay, startOfWeek, subMonths } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TransactionGroup, Transaction } from "@/types/transaction";
 import { StatementDownloadDrawer } from "@/components/history/StatementDownloadDrawer";
-
-// All transactions data
+import { useApiTransactionGroups, useIbanTransactionGroups, useCryptoTransactionGroups, useCardTransactionGroups } from "@/hooks/useTransactions";
+import { useQueryClient } from "@tanstack/react-query";
+import { transactionKeys } from "@/hooks/useTransactions";
 const allTransactionsData: Record<string, TransactionGroup[]> = {
   virtual: [
     {
