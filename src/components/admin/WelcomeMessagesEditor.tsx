@@ -20,6 +20,7 @@ const LANGUAGES = [
 
 export function WelcomeMessagesEditor() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [activeLang, setActiveLang] = useState("en");
   const [messages, setMessages] = useState<Record<string, string>>({});
   const [originalMessages, setOriginalMessages] = useState<Record<string, string>>({});
