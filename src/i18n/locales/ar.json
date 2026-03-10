@@ -555,7 +555,7 @@
   "statement": {
     "title": "تحميل كشف الحساب",
     "short": "تحميل",
-    "accounts": "الحسابات والمحافظ",
+    "accounts": "اختر نوع الأصول",
     "selectAll": "تحديد الكل",
     "deselectAll": "إلغاء تحديد الكل",
     "period": "الفترة",

@@ -561,7 +561,7 @@
   "statement": {
     "title": "下载对账单",
     "short": "下载",
-    "accounts": "账户和钱包",
+    "accounts": "选择资产类型",
     "selectAll": "全选",
     "deselectAll": "取消全选",
     "period": "时间段",

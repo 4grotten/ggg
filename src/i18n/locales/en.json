@@ -636,7 +636,7 @@
   "statement": {
     "title": "Download Statement",
     "short": "Download",
-    "accounts": "Accounts & Wallets",
+    "accounts": "Select asset type",
     "selectAll": "Select all",
     "deselectAll": "Deselect all",
     "period": "Period",
