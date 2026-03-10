@@ -725,14 +725,41 @@ class AdminSettingsListView(APIView):
         value = request.data.get('value')
         if not category or not key or value is None:
             return Response({"error": "Отсутствуют обязательные параметры (category, key, value)"}, status=status.HTTP_400_BAD_REQUEST)
-        setting, created = AdminSettings.objects.get_or_create(
-            category=category, 
-            key=key,
-            defaults={'value': value}
-        )
-        if not created:
+        setting = AdminSettings.objects.filter(category=category, key=key).first()
+        
+        details = {
+            "category": category,
+            "key": key
+        }
+
+        if not setting:
+            setting = AdminSettings.objects.create(category=category, key=key, value=value)
+            action_desc = f"Создана глобальная настройка: {category} -> {key}"
+            details["old_value"] = "Не задано"
+            details["new_value"] = str(value)
+        else:
+            old_value = setting.value
+            
+            if str(old_value) == str(value):
+                serializer = AdminSettingsSerializer(setting)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+                
             setting.value = value
             setting.save()
+            
+            action_desc = f"Изменена глобальная настройка: {category} -> {key}"
+            details["old_value"] = str(old_value)
+            details["new_value"] = str(value)
+        
+        admin_id = str(request.user.id) if request.user and request.user.is_authenticated else "SYSTEM"
+        
+        AdminActionHistory.objects.create(
+            admin_id=admin_id,
+            action=action_desc,
+            target_user_id="GLOBAL",
+            details=details
+        )
+
         serializer = AdminSettingsSerializer(setting)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
