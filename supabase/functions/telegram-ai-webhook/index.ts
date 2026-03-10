@@ -256,7 +256,7 @@ Deno.serve(async (req) => {
     const { user_id, token: userToken, first_name, language } = identity;
     console.log(`[telegram-ai] Identified user: ${user_id} (${first_name})`);
 
-    // 2. Init Supabase & load history
+    // 2. Load history (supabase already initialized in identifyUser)
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { data: history } = await supabase
       .from("messenger_chat_history")
