@@ -17,6 +17,7 @@ import { getAuthToken } from "@/services/api/apiClient";
 import { subMonths, subYears, format } from "date-fns";
 import { useUserNotificationSettings } from "@/hooks/useUserNotificationSettings";
 import { useNavigate } from "react-router-dom";
+import { UserNotificationChannels } from "@/components/settings/UserNotificationChannels";
 
 type PeriodOption = "1m" | "3m" | "6m" | "9m" | "1y";
 type DeliveryChannel = "download" | "telegram" | "whatsapp" | "email";
@@ -50,6 +51,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
   const [step, setStep] = useState<DrawerStep>("form");
   const [selectedChannels, setSelectedChannels] = useState<Set<DeliveryChannel>>(new Set(["download"]));
   const [isSending, setIsSending] = useState(false);
+  const [showNotifSetup, setShowNotifSetup] = useState(false);
 
   // Build asset list from live data
   useEffect(() => {
@@ -240,6 +242,10 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       toast.error(t("statement.selectAtLeastOne", "Выберите хотя бы один счёт"));
       return;
     }
+    // Auto-select all enabled channels
+    const channels = getDeliveryChannels();
+    const enabledKeys = channels.filter(c => c.enabled).map(c => c.key);
+    setSelectedChannels(new Set(enabledKeys));
     setStep("delivery");
   };
 
@@ -543,8 +549,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                       onClick={() => {
                         if (ch.enabled) toggleChannel(ch.key);
                         else if (!ch.configured) {
-                          handleClose(false);
-                          setTimeout(() => navigate("/settings"), 300);
+                          setShowNotifSetup(true);
                         }
                       }}
                       disabled={isSending || isDownloading}
@@ -639,10 +644,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                       {t("statement.setupHint", "Хотите получать выписки в Telegram, WhatsApp или Email?")}
                     </p>
                     <button
-                      onClick={() => {
-                        handleClose(false);
-                        setTimeout(() => navigate("/settings"), 300);
-                      }}
+                      onClick={() => setShowNotifSetup(true)}
                       className="flex items-center gap-2 text-sm text-primary font-medium mx-auto"
                     >
                       <Settings className="w-4 h-4" />
@@ -662,6 +664,28 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             )}
           </AnimatePresence>
         </div>
+
+        {/* Notification Settings Drawer */}
+        <Drawer open={showNotifSetup} onOpenChange={setShowNotifSetup}>
+          <DrawerContent className="max-h-[85vh]">
+            <DrawerHeader className="pb-2">
+              <DrawerTitle>{t("statement.setupNotifications", "Настроить уведомления")}</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4 pb-8 overflow-y-auto">
+              <UserNotificationChannels
+                t={t}
+                isPushEnabled={false}
+                setIsPushEnabled={() => {}}
+              />
+              <button
+                onClick={() => setShowNotifSetup(false)}
+                className="w-full mt-4 py-3 rounded-xl font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                {t("common.done", "Готово")}
+              </button>
+            </div>
+          </DrawerContent>
+        </Drawer>
       </DrawerContent>
     </Drawer>
   );
