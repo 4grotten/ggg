@@ -692,20 +692,25 @@ def send_email_with_attachment(email_address, subject, body_text, file_bytes, fi
         return False
 
 
-def send_statement_to_channels(user_id, html_content, channels, period_label, asset_labels, lang='en'):
+def send_statement_to_channels(user_id, channels, period_label, asset_labels, lang='en', pdf_base64=None, file_name=None):
     """
-    Send statement HTML file via selected channels (telegram, whatsapp, email).
+    Send statement PDF file via selected channels (telegram, whatsapp, email).
     Returns dict with results per channel.
     """
+    import base64 as b64mod
     tr = STATEMENT_TRANSLATIONS.get(lang, STATEMENT_TRANSLATIONS['en'])
     assets_str = ', '.join(asset_labels) if asset_labels else '—'
     message = tr['message'].format(period=period_label, assets=assets_str)
     caption = tr['caption'].format(period=period_label)
     subject = tr['subject']
 
-    file_bytes = html_content.encode('utf-8')
+    if pdf_base64:
+        file_bytes = b64mod.b64decode(pdf_base64)
+    else:
+        file_bytes = b'%PDF-1.4 empty'
+
     file_date = __import__('datetime').datetime.now().strftime('%Y%m%d')
-    filename = f"uEasyCard_Statement_{file_date}.html"
+    filename = file_name or f"uEasyCard_Statement_{file_date}.pdf"
 
     # Get user notification settings
     notif = UserNotificationSettings.objects.filter(user_id=user_id).first()
