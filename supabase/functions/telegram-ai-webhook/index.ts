@@ -281,6 +281,7 @@ Deno.serve(async (req) => {
       fetchAllBalances(userToken),
       fetchTransactions(userToken),
     ]);
+    console.log(`[telegram-ai] Data fetched — account: ${accountText.slice(0, 80)}, balances: ${balancesText.slice(0, 80)}, tx: ${txText.slice(0, 80)}`);
 
     // 5. Build messages array with history
     const messages: { role: string; content: string }[] = [];
