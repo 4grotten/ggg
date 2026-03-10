@@ -448,6 +448,11 @@ def build_transaction_message(txn, role, lang_code='en'):
     
     sender_display = txn.sender_name or txn.sender_id or t['ext_sender']
     receiver_display = txn.receiver_name or txn.receiver_id or t['ext_account']
+    sender_iban = meta.get('sender_iban') or meta.get('sender_account') or meta.get('from_account')
+    sender_crypto = meta.get('from_address') or meta.get('from_wallet') or meta.get('sender_wallet')
+    
+    receiver_iban = meta.get('beneficiary_iban') or meta.get('receiver_account') or meta.get('to_account')
+    receiver_crypto = meta.get('crypto_address') or meta.get('to_address') or meta.get('to_wallet')
     
     lines = []
     
@@ -461,18 +466,18 @@ def build_transaction_message(txn, role, lang_code='en'):
         lines.append(f"{t['from']} {sender_display}")
         if txn.sender_card:
             lines.append(f"{t['from_card']} {txn.sender_card}")
-        elif meta.get('sender_iban'):
-            lines.append(f"{t['from_iban']} {meta.get('sender_iban')}")
-        elif meta.get('from_address'):
-            lines.append(f"{t['from_crypto']} {meta.get('from_address')}")
+        elif sender_iban:
+            lines.append(f"{t['from_iban']} {sender_iban}")
+        elif sender_crypto:
+            lines.append(f"{t['from_crypto']} {sender_crypto}")
             
         lines.append(f"{t['to']} {receiver_display}")
         if txn.recipient_card:
             lines.append(f"{t['to_card']} {txn.recipient_card}")
-        elif meta.get('beneficiary_iban'):
-            lines.append(f"{t['to_iban']} {meta.get('beneficiary_iban')}")
-        elif meta.get('crypto_address'):
-            lines.append(f"{t['to_crypto']} {meta.get('crypto_address')}")
+        elif receiver_iban:
+            lines.append(f"{t['to_iban']} {receiver_iban}")
+        elif receiver_crypto:
+            lines.append(f"{t['to_crypto']} {receiver_crypto}")
         
     else:
         lines.append(t['credit_title'])
@@ -482,18 +487,18 @@ def build_transaction_message(txn, role, lang_code='en'):
         lines.append(f"{t['to']} {receiver_display}")
         if txn.recipient_card:
             lines.append(f"{t['to_card']} {txn.recipient_card}")
-        elif meta.get('beneficiary_iban'):
-            lines.append(f"{t['to_iban']} {meta.get('beneficiary_iban')}")
-        elif meta.get('crypto_address'):
-            lines.append(f"{t['to_crypto']} {meta.get('crypto_address')}")
+        elif receiver_iban:
+            lines.append(f"{t['to_iban']} {receiver_iban}")
+        elif receiver_crypto:
+            lines.append(f"{t['to_crypto']} {receiver_crypto}")
             
         lines.append(f"{t['from']} {sender_display}")
         if txn.sender_card:
             lines.append(f"{t['from_card']} {txn.sender_card}")
-        elif meta.get('sender_iban'):
-            lines.append(f"{t['from_iban']} {meta.get('sender_iban')}")
-        elif meta.get('from_address'):
-            lines.append(f"{t['from_crypto']} {meta.get('from_address')}")
+        elif sender_iban:
+            lines.append(f"{t['from_iban']} {sender_iban}")
+        elif sender_crypto:
+            lines.append(f"{t['from_crypto']} {sender_crypto}")
 
     lines.append("")
     lines.append(f"{t['status']} <b>{txn.status.upper()}</b>")

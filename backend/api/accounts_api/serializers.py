@@ -74,6 +74,12 @@ class UserNotificationSettingsSerializer(serializers.ModelSerializer):
 
     def get_tg_bot(self, obj):
         return getattr(settings, 'USER_TELEGRAM_BOT_USERNAME', '@YourEasyCardUserBot')
+    
+    def update(self, instance, validated_data):
+        new_username = validated_data.get('telegram_username')
+        if new_username and new_username != instance.telegram_username:
+            instance.telegram_chat_id = None
+        return super().update(instance, validated_data)
 
 
 class AdminActionHistorySerializer(serializers.ModelSerializer):
@@ -91,3 +97,9 @@ class AdminNotificationSettingsSerializer(serializers.ModelSerializer):
             'whatsapp_number', 'whatsapp_enabled', 
             'email_address', 'email_enabled'
         ]
+
+    def update(self, instance, validated_data):
+        new_username = validated_data.get('telegram_username')
+        if new_username and new_username != instance.telegram_username:
+            instance.telegram_chat_id = None
+        return super().update(instance, validated_data)
