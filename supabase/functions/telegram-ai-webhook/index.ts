@@ -253,8 +253,9 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true }));
     }
 
-    const { user_id, token: userToken, first_name, language } = identity;
-    console.log(`[telegram-ai] Identified user: ${user_id} (${first_name})`);
+    const { user_id, token: userToken, language } = identity;
+    const first_name = identity.first_name || message.from?.first_name || "";
+    console.log(`[telegram-ai] Identified user: ${user_id} (${first_name}), token: ${userToken?.slice(0, 8)}...`);
 
     // 2. Load history (supabase already initialized in identifyUser)
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -281,6 +282,7 @@ Deno.serve(async (req) => {
       fetchAllBalances(userToken),
       fetchTransactions(userToken),
     ]);
+    console.log(`[telegram-ai] Data fetched — account: ${accountText.slice(0, 80)}, balances: ${balancesText.slice(0, 80)}, tx: ${txText.slice(0, 80)}`);
 
     // 5. Build messages array with history
     const messages: { role: string; content: string }[] = [];
@@ -314,6 +316,7 @@ Deno.serve(async (req) => {
 
     const aiData = await aiRes.json();
     const reply = aiData.choices?.[0]?.message?.content || "Не удалось получить ответ.";
+    console.log(`[telegram-ai] AI reply: ${reply.slice(0, 100)}`);
 
     // 7. Save assistant message
     await supabase.from("messenger_chat_history").insert({
