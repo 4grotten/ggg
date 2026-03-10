@@ -4,9 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Loader2, MessageCircle, Mail, Bell } from "lucide-react";
+import { Loader2, MessageCircle, Mail, Bell, ExternalLink } from "lucide-react";
 import { useUserNotificationSettings, UserNotificationSettings } from "@/hooks/useUserNotificationSettings";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+} from "@/components/ui/alert-dialog";
 
 interface ChannelConfig {
   key: "whatsapp" | "telegram" | "email";
