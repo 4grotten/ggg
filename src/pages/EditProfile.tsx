@@ -651,7 +651,7 @@ const EditProfile = () => {
                   {t("editProfile.verified") || "Verified"}
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-500 text-xs font-medium">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/15 text-red-500 text-xs font-medium">
                   <ShieldCheck className="w-3.5 h-3.5" />
                   {t("editProfile.notVerified") || "Not verified"}
                 </div>
