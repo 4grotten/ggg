@@ -474,13 +474,60 @@ Deno.serve(async (req) => {
     }
 
     const msgBody = payload.payload;
-    if (!msgBody?.body || msgBody.fromMe) {
+    if (msgBody.fromMe) {
       return new Response(JSON.stringify({ ok: true }));
     }
 
     const chatId = msgBody.from;
-    const userText = msgBody.body;
     const phone = extractPhone(chatId);
+
+    const serviceToken = Deno.env.get("AI_SERVICE_TOKEN")!;
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY")!;
+    const wahaHost = Deno.env.get("WAHA_HOST")!;
+    const wahaApiKey = Deno.env.get("WAHA_API_KEY")!;
+    const wahaSession = Deno.env.get("WAHA_SESSION_NAME") || "default";
+
+    // Handle voice/audio messages
+    let userText = msgBody.body || "";
+    const isVoiceMessage = msgBody.hasMedia && (msgBody.type === "ptt" || msgBody.type === "audio");
+    
+    if (isVoiceMessage && !userText) {
+      console.log("[whatsapp-ai] Voice message detected, attempting transcription...");
+      
+      // Try to get media URL from WAHA payload
+      let mediaUrl = msgBody.mediaUrl;
+      let mimetype = msgBody.mimetype || "audio/ogg";
+      
+      if (!mediaUrl) {
+        // Try downloading via WAHA API
+        const media = await downloadWahaMedia(wahaHost, wahaApiKey, wahaSession, msgBody.id?._serialized || msgBody.id);
+        if (media) {
+          mediaUrl = media.url;
+          mimetype = media.mimetype;
+        }
+      }
+      
+      if (mediaUrl) {
+        const transcript = await transcribeVoice(mediaUrl, mimetype);
+        if (transcript) {
+          userText = transcript;
+          console.log(`[whatsapp-ai] Voice transcribed: ${transcript.substring(0, 100)}`);
+        } else {
+          await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
+            "⚠️ Не удалось распознать голосовое сообщение. Попробуйте ещё раз или напишите текстом.");
+          return new Response(JSON.stringify({ ok: true }));
+        }
+      } else {
+        console.error("[whatsapp-ai] No media URL available for voice message");
+        await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
+          "⚠️ Не удалось загрузить голосовое сообщение.");
+        return new Response(JSON.stringify({ ok: true }));
+      }
+    }
+
+    if (!userText) {
+      return new Response(JSON.stringify({ ok: true }));
+    }
 
     const serviceToken = Deno.env.get("AI_SERVICE_TOKEN")!;
     const lovableKey = Deno.env.get("LOVABLE_API_KEY")!;
