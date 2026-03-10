@@ -645,7 +645,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
           </svg>
           <div class="brand-name"><span class="u-letter">u</span>EasyCard</div>
         </div>
-        <div class="report-title">Отчёт по транзакциям</div>
+        <div class="report-title">${t(lang, 'reportTitle')}</div>
         <div class="report-period">${esc(periodLabel)}</div>
         ${assetBalances.length > 0 ? `
         <div class="balances-row">
