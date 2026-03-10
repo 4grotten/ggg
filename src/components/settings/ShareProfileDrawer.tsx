@@ -360,6 +360,36 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
       setIsLoadingSocial(false);
     }
   };
+
+  const loadPhoneNumbers = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await getPhoneNumbers(user.id);
+      if (response.data) {
+        setPhoneNumbers(response.data);
+        // Add phone numbers as business card fields
+        setBusinessCardFields(prev => {
+          // Remove old phone_extra fields
+          const filtered = prev.filter(f => !f.id.startsWith("phone_extra_"));
+          const phoneFields: BusinessCardField[] = response.data.map((pn, idx) => ({
+            id: `phone_extra_${idx}`,
+            label: `${t("editProfile.phone") || "Phone"} ${idx + 1}`,
+            value: pn.phone_number,
+            icon: <Phone className="w-4 h-4" />,
+            checked: true
+          }));
+          // Insert after the main phone field (or at end of existing fields)
+          const phoneIndex = filtered.findIndex(f => f.id === "phone");
+          if (phoneIndex >= 0) {
+            return [...filtered.slice(0, phoneIndex + 1), ...phoneFields, ...filtered.slice(phoneIndex + 1)];
+          }
+          return [...filtered, ...phoneFields];
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load phone numbers:", error);
+    }
+  };
   
   const toggleField = (fieldId: string) => {
     tap();
