@@ -571,7 +571,21 @@
     "downloadError": "Fehler bei der Berichtserstellung",
     "selectAtLeastOne": "Wählen Sie mindestens ein Konto",
     "usdtWallet": "USDT-Wallet",
-    "next": "Weiter"
+    "next": "Weiter",
+    "deliveryTitle": "Wohin senden?",
+    "doneTitle": "Fertig!",
+    "chooseDelivery": "Wählen Sie die Zustellmethode für den Auszug",
+    "deliveryDownload": "Datei herunterladen",
+    "channelDisabled": "Deaktiviert",
+    "noChannels": "Richten Sie Telegram, WhatsApp oder E-Mail ein, um Auszüge direkt zu erhalten",
+    "setupNotifications": "Benachrichtigungen einrichten",
+    "setupHint": "Möchten Sie Auszüge über Telegram, WhatsApp oder E-Mail erhalten?",
+    "doneMessage": "Auszug erfolgreich erstellt",
+    "sentTo": "Auszug gesendet an {{channel}}",
+    "sendError": "Sendefehler",
+    "notConfigured": "Nicht konfiguriert",
+    "setup": "Einrichten",
+    "send": "Senden"
   },
   "transaction": {
     "back": "Zurück",

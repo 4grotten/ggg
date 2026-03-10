@@ -571,7 +571,21 @@
     "downloadError": "Rapor oluşturma hatası",
     "selectAtLeastOne": "En az bir hesap seçin",
     "usdtWallet": "USDT Cüzdan",
-    "next": "Devam et"
+    "next": "Devam et",
+    "deliveryTitle": "Nereye gönderilsin?",
+    "doneTitle": "Hazır!",
+    "chooseDelivery": "Hesap özeti alma yöntemini seçin",
+    "deliveryDownload": "Dosya indir",
+    "channelDisabled": "Devre dışı",
+    "noChannels": "Hesap özetlerini doğrudan almak için Telegram, WhatsApp veya E-posta ayarlayın",
+    "setupNotifications": "Bildirimleri ayarla",
+    "setupHint": "Hesap özetlerini Telegram, WhatsApp veya E-posta ile almak ister misiniz?",
+    "doneMessage": "Hesap özeti başarıyla oluşturuldu",
+    "sentTo": "Hesap özeti {{channel}} adresine gönderildi",
+    "sendError": "Gönderme hatası",
+    "notConfigured": "Yapılandırılmamış",
+    "setup": "Ayarla",
+    "send": "Gönder"
   },
   "transaction": {
     "back": "Geri",

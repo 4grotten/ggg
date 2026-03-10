@@ -571,7 +571,21 @@
     "downloadError": "Error al generar el informe",
     "selectAtLeastOne": "Selecciona al menos una cuenta",
     "usdtWallet": "Billetera USDT",
-    "next": "Continuar"
+    "next": "Continuar",
+    "deliveryTitle": "¿Dónde enviar?",
+    "doneTitle": "¡Listo!",
+    "chooseDelivery": "Elija cómo recibir el extracto",
+    "deliveryDownload": "Descargar archivo",
+    "channelDisabled": "Desactivado",
+    "noChannels": "Configure Telegram, WhatsApp o Email para recibir extractos directamente",
+    "setupNotifications": "Configurar notificaciones",
+    "setupHint": "¿Desea recibir extractos por Telegram, WhatsApp o Email?",
+    "doneMessage": "Extracto generado con éxito",
+    "sentTo": "Extracto enviado a {{channel}}",
+    "sendError": "Error de envío",
+    "notConfigured": "No configurado",
+    "setup": "Configurar",
+    "send": "Enviar"
   },
   "transaction": {
     "back": "Atrás",

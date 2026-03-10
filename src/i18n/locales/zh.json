@@ -577,7 +577,21 @@
     "downloadError": "报告生成错误",
     "selectAtLeastOne": "请至少选择一个账户",
     "usdtWallet": "USDT钱包",
-    "next": "继续"
+    "next": "继续",
+    "deliveryTitle": "发送到哪里？",
+    "doneTitle": "完成！",
+    "chooseDelivery": "选择账单接收方式",
+    "deliveryDownload": "下载文件",
+    "channelDisabled": "已禁用",
+    "noChannels": "设置Telegram、WhatsApp或Email以直接接收账单",
+    "setupNotifications": "设置通知",
+    "setupHint": "想通过Telegram、WhatsApp或Email接收账单吗？",
+    "doneMessage": "账单生成成功",
+    "sentTo": "账单已发送至{{channel}}",
+    "sendError": "发送错误",
+    "notConfigured": "未配置",
+    "setup": "设置",
+    "send": "发送"
   },
   "transaction": {
     "back": "返回",

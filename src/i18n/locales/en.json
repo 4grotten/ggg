@@ -652,7 +652,21 @@
     "downloadError": "Report generation error",
     "selectAtLeastOne": "Select at least one account",
     "usdtWallet": "USDT Wallet",
-    "next": "Continue"
+    "next": "Continue",
+    "deliveryTitle": "Where to send?",
+    "doneTitle": "Done!",
+    "chooseDelivery": "Choose how to receive the statement",
+    "deliveryDownload": "Download file",
+    "channelDisabled": "Disabled",
+    "noChannels": "Set up Telegram, WhatsApp or Email to receive statements directly",
+    "setupNotifications": "Set up notifications",
+    "setupHint": "Want to receive statements via Telegram, WhatsApp or Email?",
+    "doneMessage": "Statement generated successfully",
+    "sentTo": "Statement sent to {{channel}}",
+    "sendError": "Sending error",
+    "notConfigured": "Not configured",
+    "setup": "Set up",
+    "send": "Send"
   },
   "transaction": {
     "back": "Back",
