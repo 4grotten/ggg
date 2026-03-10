@@ -722,14 +722,14 @@ def send_statement_to_channels(user_id, channels, period_label, asset_labels, la
     for ch in channels:
         if ch == 'telegram':
             if notif.telegram_enabled and (notif.telegram_chat_id or notif.telegram_username):
-                ok = send_telegram_document(notif, file_bytes, filename, caption)
+                ok = send_telegram_document(notif, file_bytes, filename, message)
                 results['telegram'] = {'ok': ok}
             else:
                 results['telegram'] = {'ok': False, 'error': 'Telegram not configured'}
 
         elif ch == 'whatsapp':
             if notif.whatsapp_enabled and notif.whatsapp_number:
-                ok = send_whatsapp_file(notif.whatsapp_number, file_bytes, filename, caption)
+                ok = send_whatsapp_file(notif.whatsapp_number, file_bytes, filename, message)
                 results['whatsapp'] = {'ok': ok}
             else:
                 results['whatsapp'] = {'ok': False, 'error': 'WhatsApp not configured'}
