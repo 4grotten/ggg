@@ -32,7 +32,8 @@ async function fetchAllBalances(token: string): Promise<string> {
   const lines: string[] = [];
   try {
     if (walletRes.status === "fulfilled" && walletRes.value.ok) {
-      const data = (await walletRes.value.json()).data || await walletRes.value.json();
+      const raw = await walletRes.value.json();
+      const data = raw.data || raw;
       if (data.cards && Array.isArray(data.cards)) {
         data.cards.forEach((c: any) => {
           const t = c.type === "metal" ? "Металлическая карта" : "Виртуальная карта";
@@ -41,14 +42,17 @@ async function fetchAllBalances(token: string): Promise<string> {
         });
       }
       if (data.physical_account) lines.push(`🏦 Банковский счёт: ${data.physical_account.balance} ${data.physical_account.currency || "AED"}`);
+    } else if (walletRes.status === "fulfilled") {
+      console.log(`[telegram-ai] wallet/summary failed: ${walletRes.value.status}`);
     }
-  } catch {}
+  } catch (e) { console.error("[telegram-ai] wallet parse error:", e); }
   try {
     if (cryptoRes.status === "fulfilled" && cryptoRes.value.ok) {
-      const wallets = (await cryptoRes.value.json()).data || [];
+      const raw = await cryptoRes.value.json();
+      const wallets = raw.data || raw;
       if (Array.isArray(wallets)) wallets.forEach((w: any) => lines.push(`🪙 ${w.token || "USDT"} (${w.network || "TRC20"}): ${w.balance} ${w.token || "USDT"}`));
     }
-  } catch {}
+  } catch (e) { console.error("[telegram-ai] crypto parse error:", e); }
   return lines.length ? lines.join("\n") : "Балансы не найдены.";
 }
 
@@ -78,7 +82,10 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
     const res = await fetch(`${BACKEND_BASE}/accounts/open/users/${userId}/detail/`, {
       headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
     });
-    if (!res.ok) return "Данные аккаунта недоступны.";
+    if (!res.ok) {
+      console.log(`[telegram-ai] account detail failed: ${res.status}`);
+      return "Данные аккаунта недоступны.";
+    }
     const d = await res.json();
     const lines: string[] = [];
     if (d.first_name || d.last_name) lines.push(`👤 ${[d.first_name, d.last_name].filter(Boolean).join(" ")}`);
