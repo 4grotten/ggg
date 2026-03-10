@@ -795,7 +795,7 @@ serve(async (req) => {
         for (const acc of accounts) {
           const bal = parseFloat(String(acc.balance || 0));
           const iban = acc.iban ? `${String(acc.iban).slice(0, 4)}••••${String(acc.iban).slice(-4)}` : 'IBAN';
-          assetBalances.push({ label: `Счёт ${iban}`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: acc.currency || 'AED' });
+          assetBalances.push({ label: `${t(lang, 'account')} ${iban}`, amount: bal.toLocaleString(locale, { minimumFractionDigits: 2 }), currency: acc.currency || 'AED' });
         }
       }
     } catch (e) { console.error("Bank parse error:", e); }
