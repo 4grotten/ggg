@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2, Phone, Plus, X, Trash2 } from "lucide-react";
+import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2, Phone, Plus, X, Trash2, Shield, ShieldCheck, BadgeCheck, Crown } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { toast } from "sonner";
@@ -635,7 +635,43 @@ const EditProfile = () => {
             </button>
           </div>
 
-          {/* Form */}
+          {/* User Info: ID, Verification, Role */}
+          <div className="flex flex-col items-center gap-2 mt-1">
+            {/* User ID */}
+            <p className="text-xs text-muted-foreground font-mono">
+              ID: {user?.user_id || user?.id}
+            </p>
+            
+            {/* Badges row */}
+            <div className="flex items-center gap-2">
+              {/* Verification badge */}
+              {user?.verification_status === 'verified' || user?.is_verified ? (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-500 text-xs font-medium">
+                  <BadgeCheck className="w-3.5 h-3.5" />
+                  {t("editProfile.verified") || "Verified"}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-500 text-xs font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  {t("editProfile.notVerified") || "Not verified"}
+                </div>
+              )}
+              
+              {/* Role badge */}
+              {user?.role === 'admin' ? (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-medium">
+                  <Crown className="w-3.5 h-3.5" />
+                  Admin
+                </div>
+              ) : user?.role === 'moderator' ? (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 text-violet-500 text-xs font-medium">
+                  <Shield className="w-3.5 h-3.5" />
+                  Moderator
+                </div>
+              ) : null}
+            </div>
+          </div>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Full Name */}

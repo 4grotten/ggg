@@ -1264,6 +1264,8 @@
     "phone": "Telefon",
     "addPhone": "Telefon numarası ekle",
     "phoneDescription": "Uygulamaya giriş için kullanılan telefon numarası.",
+    "verified": "Doğrulanmış",
+    "notVerified": "Doğrulanmamış",
     "username": "Kullanıcı Adı",
     "usernamePlaceholder": "Kullanıcı adınızı girin",
     "usernameDescription": "Kullanıcılar arası transferler için benzersiz tanımlayıcı. Sadece harf, rakam ve alt çizgi kullanılabilir.",
