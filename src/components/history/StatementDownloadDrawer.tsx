@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, Loader2, CheckCircle, CreditCard, Landmark, Wallet, Send, MessageCircle, Mail, Settings, ChevronRight } from "lucide-react";
+import { Download, Loader2, CheckCircle, CreditCard, Landmark, Wallet, Send, MessageCircle, Mail, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Drawer,
@@ -48,7 +48,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>("1m");
   const [isDownloading, setIsDownloading] = useState(false);
   const [step, setStep] = useState<DrawerStep>("form");
-  const [selectedChannel, setSelectedChannel] = useState<DeliveryChannel>("download");
+  const [selectedChannels, setSelectedChannels] = useState<Set<DeliveryChannel>>(new Set(["download"]));
   const [isSending, setIsSending] = useState(false);
 
   // Build asset list from live data
@@ -177,52 +177,53 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
 
   // Build available delivery channels
   const getDeliveryChannels = () => {
-    const channels: { key: DeliveryChannel; label: string; sublabel?: string; icon: React.ReactNode; enabled: boolean }[] = [
+    const channels: { key: DeliveryChannel; label: string; sublabel?: string; icon: React.ReactNode; enabled: boolean; configured: boolean }[] = [
       {
         key: "download",
         label: t("statement.deliveryDownload", "Скачать файл"),
         sublabel: "HTML",
         icon: <Download className="w-4 h-4" />,
         enabled: true,
+        configured: true,
       },
     ];
 
     if (notifSettings) {
-      if (notifSettings.telegram_username) {
-        channels.push({
-          key: "telegram",
-          label: "Telegram",
-          sublabel: notifSettings.telegram_enabled
-            ? `@${notifSettings.telegram_username}`
-            : t("statement.channelDisabled", "Отключен"),
-          icon: <Send className="w-4 h-4" />,
-          enabled: notifSettings.telegram_enabled,
-        });
-      }
+      const tgUser = notifSettings.telegram_username;
+      const tgDisplay = tgUser ? (tgUser.startsWith("@") ? tgUser : `@${tgUser}`) : null;
+      
+      channels.push({
+        key: "telegram",
+        label: "Telegram",
+        sublabel: tgUser
+          ? (notifSettings.telegram_enabled ? tgDisplay! : t("statement.channelDisabled", "Отключен"))
+          : t("statement.notConfigured", "Не настроен"),
+        icon: <Send className="w-4 h-4" />,
+        enabled: notifSettings.telegram_enabled && !!tgUser,
+        configured: !!tgUser,
+      });
 
-      if (notifSettings.whatsapp_number) {
-        channels.push({
-          key: "whatsapp",
-          label: "WhatsApp",
-          sublabel: notifSettings.whatsapp_enabled
-            ? notifSettings.whatsapp_number
-            : t("statement.channelDisabled", "Отключен"),
-          icon: <MessageCircle className="w-4 h-4" />,
-          enabled: notifSettings.whatsapp_enabled,
-        });
-      }
+      channels.push({
+        key: "whatsapp",
+        label: "WhatsApp",
+        sublabel: notifSettings.whatsapp_number
+          ? (notifSettings.whatsapp_enabled ? notifSettings.whatsapp_number : t("statement.channelDisabled", "Отключен"))
+          : t("statement.notConfigured", "Не настроен"),
+        icon: <MessageCircle className="w-4 h-4" />,
+        enabled: notifSettings.whatsapp_enabled && !!notifSettings.whatsapp_number,
+        configured: !!notifSettings.whatsapp_number,
+      });
 
-      if (notifSettings.email_address) {
-        channels.push({
-          key: "email",
-          label: "Email",
-          sublabel: notifSettings.email_enabled
-            ? notifSettings.email_address
-            : t("statement.channelDisabled", "Отключен"),
-          icon: <Mail className="w-4 h-4" />,
-          enabled: notifSettings.email_enabled,
-        });
-      }
+      channels.push({
+        key: "email",
+        label: "Email",
+        sublabel: notifSettings.email_address
+          ? (notifSettings.email_enabled ? notifSettings.email_address : t("statement.channelDisabled", "Отключен"))
+          : t("statement.notConfigured", "Не настроен"),
+        icon: <Mail className="w-4 h-4" />,
+        enabled: notifSettings.email_enabled && !!notifSettings.email_address,
+        configured: !!notifSettings.email_address,
+      });
     }
 
     return channels;
@@ -311,9 +312,18 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     }
   };
 
-  const handleSendToChannel = async (channel: DeliveryChannel) => {
-    if (channel === "download") {
-      await handleDownloadFile();
+  const toggleChannel = (key: DeliveryChannel) => {
+    setSelectedChannels(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const handleSendSelected = async () => {
+    if (selectedChannels.size === 0) {
+      toast.error(t("statement.selectAtLeastOne", "Выберите хотя бы один способ"));
       return;
     }
 
@@ -322,6 +332,14 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       const { token, start, end, userName, uniqueAssetTypes } = buildRequestBody();
       if (!token) {
         toast.error(t("common.authRequired", "Необходима авторизация"));
+        return;
+      }
+
+      const channels = [...selectedChannels];
+
+      // If only download selected, just download
+      if (channels.length === 1 && channels[0] === "download") {
+        await handleDownloadFile();
         return;
       }
 
@@ -339,7 +357,8 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             end_date: end,
             user_name: userName,
             asset_filter: uniqueAssetTypes,
-            delivery_channel: channel,
+            delivery_channels: channels.filter(c => c !== "download"),
+            also_download: channels.includes("download"),
           }),
         }
       );
@@ -349,9 +368,22 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
         throw new Error(err.error || t("statement.sendError", "Ошибка отправки"));
       }
 
+      // If download was also selected, download the blob
+      if (channels.includes("download")) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        a.download = `uEasyCard_Statement_${fileDate}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
       setStep("done");
-      const channelLabel = channel === "telegram" ? "Telegram" : channel === "whatsapp" ? "WhatsApp" : "Email";
-      toast.success(t("statement.sentTo", `Выписка отправлена в ${channelLabel}`, { channel: channelLabel }));
+      toast.success(t("statement.downloaded", "Выписка отправлена!"));
     } catch (error) {
       console.error("Statement send error:", error);
       toast.error(error instanceof Error ? error.message : t("statement.sendError", "Ошибка отправки"));
@@ -365,7 +397,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     if (!v) {
       setTimeout(() => {
         setStep("form");
-        setSelectedChannel("download");
+        setSelectedChannels(new Set(["download"]));
       }, 300);
     }
   };
@@ -504,26 +536,34 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                   {t("statement.chooseDelivery", "Выберите способ получения выписки")}
                 </p>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {deliveryChannels.map((ch) => (
                     <button
                       key={ch.key}
                       onClick={() => {
-                        if (ch.enabled) {
-                          setSelectedChannel(ch.key);
-                          handleSendToChannel(ch.key);
+                        if (ch.enabled) toggleChannel(ch.key);
+                        else if (!ch.configured) {
+                          handleClose(false);
+                          setTimeout(() => navigate("/settings"), 300);
                         }
                       }}
-                      disabled={!ch.enabled || isDownloading || isSending}
+                      disabled={isSending || isDownloading}
                       className={cn(
-                        "w-full flex items-center gap-3 p-3.5 rounded-xl transition-colors border",
-                        ch.enabled
-                          ? "bg-secondary hover:bg-secondary/80 border-transparent hover:border-primary/20"
-                          : "bg-secondary/50 border-transparent opacity-50 cursor-not-allowed"
+                        "w-full flex items-center gap-3 p-3 rounded-xl transition-colors border",
+                        ch.enabled && selectedChannels.has(ch.key)
+                          ? "bg-primary/10 border-primary/20"
+                          : ch.enabled
+                            ? "bg-secondary hover:bg-secondary/80 border-transparent"
+                            : "bg-secondary/50 border-transparent opacity-60"
                       )}
                     >
+                      <Checkbox
+                        checked={selectedChannels.has(ch.key)}
+                        disabled={!ch.enabled}
+                        className="pointer-events-none"
+                      />
                       <div className={cn(
-                        "w-9 h-9 rounded-full flex items-center justify-center",
+                        "w-8 h-8 rounded-full flex items-center justify-center",
                         ch.key === "telegram" ? "bg-[#26A5E4]/15 text-[#26A5E4]" :
                         ch.key === "whatsapp" ? "bg-[#25D366]/15 text-[#25D366]" :
                         ch.key === "email" ? "bg-orange-500/15 text-orange-500" :
@@ -537,33 +577,35 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                           <p className="text-xs text-muted-foreground">{ch.sublabel}</p>
                         )}
                       </div>
-                      {(isDownloading || isSending) && selectedChannel === ch.key ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      {!ch.configured && (
+                        <span className="text-xs text-primary font-medium">
+                          {t("statement.setup", "Настроить")}
+                        </span>
                       )}
                     </button>
                   ))}
                 </div>
 
-                {/* Suggest setting up notifications if none configured */}
-                {!hasAnyChannel && !notifLoading && (
-                  <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      {t("statement.noChannels", "Настройте Telegram, WhatsApp или Email, чтобы получать выписки напрямую")}
-                    </p>
-                    <button
-                      onClick={() => {
-                        handleClose(false);
-                        setTimeout(() => navigate("/settings"), 300);
-                      }}
-                      className="flex items-center gap-2 text-sm text-primary font-medium"
-                    >
-                      <Settings className="w-4 h-4" />
-                      {t("statement.setupNotifications", "Настроить уведомления")}
-                    </button>
-                  </div>
-                )}
+                {/* Send button */}
+                <motion.button
+                  onClick={handleSendSelected}
+                  disabled={selectedChannels.size === 0 || isSending || isDownloading}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-3 py-3.5 rounded-xl font-medium text-sm transition-all",
+                    "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]",
+                    (selectedChannels.size === 0 || isSending) && "opacity-60 cursor-not-allowed"
+                  )}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {isSending || isDownloading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                  {isSending || isDownloading
+                    ? t("statement.generating", "Генерация...")
+                    : t("statement.send", "Отправить")}
+                </motion.button>
 
                 {/* Back button */}
                 <button
