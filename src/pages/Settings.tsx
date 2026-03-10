@@ -15,7 +15,7 @@ import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
-import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode, Contact, BookUser, EyeOff, Bell, Mail, BadgeCheck, Crown, Shield } from "lucide-react";
+import { User, Globe, Palette, Receipt, MessageCircle, Briefcase, ChevronRight, ChevronDown, Check, X, Sun, Moon, Monitor, Camera, Smartphone, Share2, LogOut, Loader2, Plus, Home, Upload, LogIn, UserPlus, Users, SlidersHorizontal, Laptop, Code, Download, ArrowLeftRight, ScanFace, ShieldCheck, Vibrate, QrCode, Contact, BookUser, EyeOff, Bell, Mail, BadgeCheck, Crown, Shield, Plug } from "lucide-react";
 import { ApofizLogo } from "@/components/icons/ApofizLogo";
 import { openApofizWithAuth } from "@/components/layout/PoweredByFooter";
 import { toast } from "sonner";
@@ -1116,6 +1116,11 @@ const Settings = () => {
             icon={<ColoredIcon colorKey="code"><Code className="w-4 h-4" /></ColoredIcon>}
             label={t("settings.apiDocumentation")}
             onClick={() => navigate("/settings/api")}
+          />
+          <SettingsItem
+            icon={<ColoredIcon colorKey="code"><Plug className="w-4 h-4" /></ColoredIcon>}
+            label={t("settings.apiThirdParty")}
+            onClick={() => navigate("/settings/api-third-party")}
           />
         </AnimatedMenuSection>
 

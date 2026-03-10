@@ -523,28 +523,9 @@ export default function AdminPanel() {
     const oldSetting = settings?.find((s) => s.category === category && s.key === key);
     const oldValue = oldSetting?.value;
 
-    updateSetting.mutate({ category, key, value }, {
-      onSuccess: () => {
-        // Log the change to audit history
-        const categoryLabels: Record<string, string> = {
-          exchange_rates: 'Курсы обмена',
-          fees: 'Комиссии',
-          limits: 'Лимиты',
-        };
-        apiPost('/admin/audit-history/log/', {
-          action: 'UPDATE_ADMIN_SETTING',
-          target_user_id: (user as any)?.user_id || '',
-          details: {
-            category,
-            category_label: categoryLabels[category] || category,
-            key,
-            old_value: oldValue ?? null,
-            new_value: value,
-            description: oldSetting?.description || null,
-          },
-        }).catch((err) => console.error('Audit log failed:', err));
-      },
-    });
+    // Audit log is created automatically by the backend when the setting is saved,
+    // so we do NOT send a separate audit-history/log/ request here to avoid duplicate Telegram notifications.
+    updateSetting.mutate({ category, key, value });
   };
 
   const handleSearchUser = async () => {
