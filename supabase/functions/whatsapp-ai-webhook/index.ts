@@ -512,7 +512,7 @@ Deno.serve(async (req) => {
           console.log(`[whatsapp-ai] Rewritten media URL: ${mediaUrl}`);
         }
         
-        const transcript = await transcribeVoice(mediaUrl, mimetype);
+        const transcript = await transcribeVoice(mediaUrl, mimetype, wahaApiKey);
         if (transcript) {
           userText = transcript;
           console.log(`[whatsapp-ai] Voice transcribed: ${transcript.substring(0, 100)}`);
