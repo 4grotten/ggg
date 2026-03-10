@@ -56,6 +56,7 @@
     "stepsDone": "ШАГОВ ВЫПОЛНЕНО",
     "stepCompleted": "Шаг {{step}} завершён ✓",
     "canOpenCard": "Теперь можно открыть карту",
+    "verifiedDescription": "Ваша личность успешно верифицирована",
     "identityVerified": "Личность верифицирована",
     "verified": "Верифицировано",
     "allStepsCompleted": "Все шаги выполнены ✓",

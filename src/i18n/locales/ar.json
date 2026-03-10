@@ -63,6 +63,7 @@
     "stepsDone": "خطوات مكتملة",
     "stepCompleted": "الخطوة {{step}} مكتملة ✓",
     "canOpenCard": "الآن يمكنك فتح بطاقة",
+    "verifiedDescription": "تم التحقق من هويتك بنجاح",
     "identityVerified": "تم التحقق من الهوية",
     "verified": "تم التحقق",
     "allStepsCompleted": "جميع الخطوات مكتملة ✓",
