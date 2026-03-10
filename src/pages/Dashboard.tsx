@@ -31,8 +31,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
@@ -65,6 +69,7 @@ const Dashboard = () => {
   const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
   const [partnerDrawerOpen, setPartnerDrawerOpen] = useState(false);
   const [authAlertOpen, setAuthAlertOpen] = useState(false);
+  const [verificationDialogOpen, setVerificationDialogOpen] = useState(false);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [pendingUnlockAction, setPendingUnlockAction] = useState<'send' | 'topup' | null>(null);
   
@@ -237,7 +242,10 @@ const Dashboard = () => {
           {/* Verified badge card */}
           {isVerified && (
             <AnimatedSection delay={0.3} preset="fadeUpBlur">
-              <div className="w-full rounded-2xl p-4 bg-gradient-to-br from-[#27AE60] to-[#1B8A4A] text-white">
+              <button
+                onClick={() => setVerificationDialogOpen(true)}
+                className="w-full rounded-2xl p-4 bg-gradient-to-br from-[#27AE60] to-[#1B8A4A] text-white text-left"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                     <BadgeCheck className="w-5 h-5 text-white" />
@@ -247,7 +255,7 @@ const Dashboard = () => {
                     <p className="text-sm text-white/70">{t('dashboard.verifiedDescription') || t('dashboard.canOpenCard')}</p>
                   </div>
                 </div>
-              </div>
+              </button>
             </AnimatedSection>
           )}
 
@@ -396,6 +404,34 @@ const Dashboard = () => {
     <AccountSwitcher open={accountSwitcherOpen} onOpenChange={setAccountSwitcherOpen} />
     <PartnerDrawer open={partnerDrawerOpen} onOpenChange={setPartnerDrawerOpen} />
     
+    {/* Verification Update Dialog */}
+    <AlertDialog open={verificationDialogOpen} onOpenChange={setVerificationDialogOpen}>
+      <AlertDialogContent className="max-w-[320px] rounded-2xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {t('settings.updateDataConfirmTitle') || 'Обновить данные?'}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {t('settings.updateVerificationConfirmDescription') || 'Вы уверены, что хотите обновить данные верификации?'}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex-row gap-3">
+          <AlertDialogCancel className="flex-1 mt-0">
+            {t('common.cancel') || 'Отмена'}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              setVerificationDialogOpen(false);
+              navigate("/profile-verification");
+            }}
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+          >
+            {t('common.continue') || 'Продолжить'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
     {/* iOS-style Auth Alert */}
     <AlertDialog open={authAlertOpen} onOpenChange={setAuthAlertOpen}>
       <AlertDialogContent className="w-[270px] rounded-2xl p-0 gap-0 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-0 shadow-2xl">
