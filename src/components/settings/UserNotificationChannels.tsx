@@ -93,8 +93,10 @@ export function UserNotificationChannels({ t, isPushEnabled, setIsPushEnabled }:
   };
 
   const handleSaveValue = (ch: ChannelConfig) => {
-    const value = drafts[ch.key]?.trim();
+    let value = drafts[ch.key]?.trim();
     if (!value) return;
+    if (ch.key === "whatsapp") value = value.replace(/^\+/, "");
+    if (ch.key === "telegram") value = value.replace(/^@+/, "@").replace(/^([^@])/, "@$1");
     updateSettings({ [ch.valueField]: value, [ch.enabledField]: true });
     setEditingChannel(null);
     toast.success(t("settings.saved") || "Сохранено");
