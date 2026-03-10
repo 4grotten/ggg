@@ -227,10 +227,29 @@ const Dashboard = () => {
             />
           </AnimatedSection>
 
-          {/* Verify Identity Card */}
-          <AnimatedSection delay={0.3} preset="fadeUpBlur">
-            <VerifyIdentityCard />
-          </AnimatedSection>
+          {/* Verify Identity Card - only show if not verified */}
+          {!isVerified && (
+            <AnimatedSection delay={0.3} preset="fadeUpBlur">
+              <VerifyIdentityCard />
+            </AnimatedSection>
+          )}
+
+          {/* Verified badge card */}
+          {isVerified && (
+            <AnimatedSection delay={0.3} preset="fadeUpBlur">
+              <div className="w-full rounded-2xl p-4 bg-gradient-to-br from-[#27AE60] to-[#1B8A4A] text-white">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <BadgeCheck className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg">{t('dashboard.identityVerified')}</p>
+                    <p className="text-sm text-white/70">{t('dashboard.verifiedDescription') || t('dashboard.canOpenCard')}</p>
+                  </div>
+                </div>
+              </div>
+            </AnimatedSection>
+          )}
 
           {/* Partner Program Card */}
           <AnimatedSection delay={0.4} preset="fadeUpBlur">
