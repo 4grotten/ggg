@@ -102,7 +102,10 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   const getChannelValue = (ch: typeof CHANNELS[number]): string => {
     if (!settings) return "";
     const val = settings[ch.valueField];
-    return val != null ? String(val) : "";
+    if (val == null) return "";
+    const str = String(val);
+    if (ch.key === "whatsapp" && str && !str.startsWith("+")) return "+" + str;
+    return str;
   };
 
   const getChannelEnabled = (ch: typeof CHANNELS[number]): boolean => {
