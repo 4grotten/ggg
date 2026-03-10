@@ -449,7 +449,7 @@ serve(async (req) => {
       fetch(`${BACKEND_BASE}/cards/wallet/summary/`, { method: "GET", headers }).catch(() => null),
       fetch(`${BACKEND_BASE}/transactions/bank-accounts/`, { method: "GET", headers }).catch(() => null),
       fetch(`${BACKEND_BASE}/transactions/crypto-wallets/`, { method: "GET", headers }).catch(() => null),
-      fetch(`${BACKEND_BASE}/accounts/open/users/me/detail/`, { method: "GET", headers }).catch(() => null),
+      fetch(`${BACKEND_BASE}/accounts/users/me/`, { method: "GET", headers }).catch(() => null),
     ]);
 
     if (!response.ok) {
