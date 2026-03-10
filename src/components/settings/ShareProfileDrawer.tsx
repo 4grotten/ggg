@@ -41,7 +41,7 @@ import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
-import { getSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
+import { getSocialNetworks, getPhoneNumbers, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -281,11 +281,13 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
   const [socialLinks, setSocialLinks] = useState<SocialNetworkItem[]>([]);
   const [socialChecked, setSocialChecked] = useState<Record<number, boolean>>({});
   const [isLoadingSocial, setIsLoadingSocial] = useState(false);
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberItem[]>([]);
   
-  // Load social links when opening business card view
+  // Load social links and phone numbers when opening business card view
   useEffect(() => {
     if (currentView === "businessCard" && user?.id) {
       loadSocialLinks();
+      loadPhoneNumbers();
     }
   }, [currentView, user?.id]);
   
@@ -358,6 +360,36 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
       setIsLoadingSocial(false);
     }
   };
+
+  const loadPhoneNumbers = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await getPhoneNumbers(user.id);
+      if (response.data) {
+        setPhoneNumbers(response.data);
+        // Add phone numbers as business card fields
+        setBusinessCardFields(prev => {
+          // Remove old phone_extra fields
+          const filtered = prev.filter(f => !f.id.startsWith("phone_extra_"));
+          const phoneFields: BusinessCardField[] = response.data.map((pn, idx) => ({
+            id: `phone_extra_${idx}`,
+            label: `${t("editProfile.phone") || "Phone"} ${idx + 1}`,
+            value: pn.phone_number,
+            icon: <Phone className="w-4 h-4" />,
+            checked: true
+          }));
+          // Insert after the main phone field (or at end of existing fields)
+          const phoneIndex = filtered.findIndex(f => f.id === "phone");
+          if (phoneIndex >= 0) {
+            return [...filtered.slice(0, phoneIndex + 1), ...phoneFields, ...filtered.slice(phoneIndex + 1)];
+          }
+          return [...filtered, ...phoneFields];
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load phone numbers:", error);
+    }
+  };
   
   const toggleField = (fieldId: string) => {
     tap();
@@ -385,6 +417,7 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     setBusinessCardFields([]);
     setSocialLinks([]);
     setSocialChecked({});
+    setPhoneNumbers([]);
     onClose();
   };
 
@@ -583,10 +616,16 @@ Easy Card UAE`;
       vcard += `N:;Contact;;;\n`;
     }
     
-    // Phone number
+    // Phone number (main auth phone)
     if (phone) {
       vcard += `TEL;TYPE=CELL:${phone}\n`;
     }
+    
+    // Extra phone numbers from phone_numbers API
+    const extraPhones = selectedFields.filter(f => f.id.startsWith("phone_extra_"));
+    extraPhones.forEach(pf => {
+      vcard += `TEL;TYPE=VOICE:${pf.value}\n`;
+    });
     
     // Email
     if (email) {
