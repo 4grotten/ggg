@@ -547,15 +547,12 @@ serve(async (req) => {
         }
       }
 
-      // Encode HTML to base64 for backend delivery
-      const htmlBase64 = btoa(unescape(encodeURIComponent(htmlContent)));
-
       try {
         const sendRes = await fetch(`${BACKEND_BASE}/accounts/statement/send/`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            html_base64: htmlBase64,
+            html_content: htmlContent,
             file_name: fileName,
             channels: channelsToSend,
             period_label: periodLabel,
@@ -563,7 +560,15 @@ serve(async (req) => {
             lang,
           }),
         });
-        const sendData = await sendRes.json();
+
+        let sendData: any = {};
+        const resText = await sendRes.text();
+        try {
+          sendData = JSON.parse(resText);
+        } catch {
+          console.error("Backend returned non-JSON:", resText.slice(0, 200));
+          sendData = { error: `Backend HTTP ${sendRes.status}` };
+        }
         console.log("Statement delivery results:", JSON.stringify(sendData));
 
         if (also_download) {
