@@ -67,18 +67,9 @@ export default function AdminStaffDetail() {
   const navigate = useNavigate();
   const { staffId } = useParams<{ staffId: string }>();
   const { t } = useTranslation();
+  const { user } = useAuth();
 
-  // Check if current logged-in user is root
-  const currentUserRole = (() => {
-    try {
-      const cached = localStorage.getItem(AUTH_USER_KEY);
-      const parsed = cached ? JSON.parse(cached) : null;
-      console.log('[StaffDetail] AUTH_USER_KEY parsed:', parsed, 'role:', parsed?.role);
-      return parsed?.role || null;
-    } catch { /* ignore */ }
-    return null;
-  })();
-  const isCurrentUserRoot = currentUserRole === 'root';
+  const isCurrentUserRoot = user?.role === 'root';
 
   const { data: staffList } = useQuery({
     queryKey: ["admin-staff"],
