@@ -1,4 +1,4 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings, Key, Copy, Check, ChevronDown, Bot, Crown } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings, Key, Copy, Check, ChevronDown, Bot, Crown, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
 import { useOpenAISettings } from "@/hooks/useOpenAISettings";
 import { apiPost } from "@/services/api/apiClient";
+import { WelcomeMessagesEditor } from "@/components/admin/WelcomeMessagesEditor";
 
 // Settings field configuration with i18n keys
 const exchangeRateFields = [
@@ -1259,6 +1260,15 @@ export default function AdminPanel() {
                       </div>
                     </div>
                   </div>
+                </GlassCard>
+
+                <GlassCard
+                  title={t("admin.welcomeMessages.title", "Welcome-сообщения WhatsApp")}
+                  description={t("admin.welcomeMessages.description", "Приветственные сообщения при регистрации")}
+                  icon={MessageSquare}
+                  iconColor="text-green-500"
+                >
+                  <WelcomeMessagesEditor />
                 </GlassCard>
 
                 <GlassCard
