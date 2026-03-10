@@ -86,15 +86,24 @@ async function fetchTransactions(token: string): Promise<string> {
     const raw = await res.json();
     const txs = Array.isArray(raw) ? raw : raw?.results || raw?.data || [];
     if (!txs.length) return "Транзакций пока нет.";
-    return txs.slice(0, 15).map((tx: any, i: number) => {
+    const formatted = txs.slice(0, 20).map((tx: any, i: number) => {
       const date = tx.created_at ? formatDate(tx.created_at) : "";
       if (tx.display) {
         const d = tx.display;
-        const amt = d.primary_amount ? `${d.primary_amount.sign || ""}${d.primary_amount.amount} ${d.primary_amount.currency || "AED"}` : `${tx.amount} AED`;
-        return `[#${i + 1}] ${date} | ${d.title || tx.type} | ${amt}`;
+        const title = d.title || tx.type || "";
+        const subtitle = d.subtitle || "";
+        const amt = d.primary_amount
+          ? `${d.primary_amount.sign || ""}${d.primary_amount.amount} ${d.primary_amount.currency || "AED"}`
+          : `${tx.amount} AED`;
+        return `- [#${i + 1}] ${date} | ${title} | ${amt}${subtitle ? ` | ${subtitle}` : ""}`;
       }
-      return `[#${i + 1}] ${date} | ${formatTransactionType(tx.type || "")} | ${tx.amount} ${tx.currency || "AED"}`;
+      const type = formatTransactionType(tx.type || "");
+      const amount = tx.amount !== undefined ? `${parseFloat(tx.amount) > 0 ? "+" : ""}${tx.amount} ${tx.currency || "AED"}` : "";
+      const status = tx.status || "completed";
+      const merchant = tx.merchant_name || "";
+      return `- [#${i + 1}] ${date} | ${type} | ${amount} | ${status}${merchant ? ` | ${merchant}` : ""}`;
     }).join("\n");
+    return `${formatted}\n\nВсего транзакций в истории: ${txs.length}`;
   } catch { return "Ошибка загрузки транзакций."; }
 }
 
