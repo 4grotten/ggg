@@ -645,15 +645,16 @@ serve(async (req) => {
           for (const card of wallet.cards) {
             const bal = parseFloat(String(card.balance || 0));
             if (bal > 0 || card.card_mask) {
-              const mask = card.card_mask ? `•••• ${String(card.card_mask).slice(-4)}` : (card.card_type || 'Карта');
-              assetBalances.push({ label: mask, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'AED' });
+              const cardType = card.card_type || card.type || 'Карта';
+              const mask = card.card_mask ? `•••• ${String(card.card_mask).slice(-4)}` : '';
+              assetBalances.push({ label: `${cardType} ${mask}`.trim(), amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'AED' });
             }
           }
         }
         // USDT balance
         if (includeCrypto && wallet.usdt_balance !== undefined) {
           const usdtBal = parseFloat(String(wallet.usdt_balance || 0));
-          assetBalances.push({ label: 'USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
+          assetBalances.push({ label: 'Кошелёк USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
         }
       }
     } catch (e) { console.error("Wallet parse error:", e); }
@@ -665,7 +666,7 @@ serve(async (req) => {
         for (const acc of accounts) {
           const bal = parseFloat(String(acc.balance || 0));
           const iban = acc.iban ? `${String(acc.iban).slice(0, 4)}••••${String(acc.iban).slice(-4)}` : 'IBAN';
-          assetBalances.push({ label: iban, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: acc.currency || 'AED' });
+          assetBalances.push({ label: `Счёт ${iban}`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: acc.currency || 'AED' });
         }
       }
     } catch (e) { console.error("Bank parse error:", e); }
@@ -676,10 +677,9 @@ serve(async (req) => {
         const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
         for (const w of wallets) {
           const bal = parseFloat(String(w.balance || 0));
-          const addr = w.address ? `${String(w.address).slice(0, 6)}••••${String(w.address).slice(-4)}` : (w.token || 'Crypto');
           const token = w.token || 'USDT';
-          if (token === 'USDT' && assetBalances.some(a => a.label === 'USDT')) continue;
-          assetBalances.push({ label: `${token} (${w.network || 'TRC20'})`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
+          if (token === 'USDT' && assetBalances.some(a => a.label === 'Кошелёк USDT')) continue;
+          assetBalances.push({ label: `Кошелёк ${token}`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
         }
       }
     } catch (e) { console.error("Crypto parse error:", e); }
