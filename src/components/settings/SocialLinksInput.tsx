@@ -260,7 +260,7 @@ const WebsiteFavicon = ({ url }: { url: string }) => {
   return (
     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-muted overflow-hidden">
       <img
-        src={`${domainInfo.origin}/favicon.ico`}
+        src={`https://www.google.com/s2/favicons?domain=${domainInfo.domain}&sz=64`}
         alt=""
         className="w-7 h-7 rounded"
         onError={() => setFailed(true)}
