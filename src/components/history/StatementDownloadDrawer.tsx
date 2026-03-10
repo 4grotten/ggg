@@ -430,7 +430,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
               <ArrowLeft className="w-4 h-4 text-primary" />
             </button>
           )}
-          <DrawerTitle className={step === "delivery" ? "text-center" : ""}>
+          <DrawerTitle className="text-center">
             {step === "delivery"
               ? t("statement.deliveryTitle", "Куда отправить?")
               : step === "done"
