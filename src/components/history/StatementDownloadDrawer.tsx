@@ -347,7 +347,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
 
     setIsSending(true);
     try {
-      const { token, start, end, userName, uniqueAssetTypes } = buildRequestBody();
+      const { token, start, end, userName, uniqueAssetTypes, detailedAssetLabels } = buildRequestBody();
       if (!token) {
         toast.error(t("common.authRequired", "Необходима авторизация"));
         return;
