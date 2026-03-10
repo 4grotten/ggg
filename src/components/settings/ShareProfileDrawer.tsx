@@ -982,11 +982,30 @@ Easy Card UAE`;
                             animate={{ scale: isChecked ? 1 : 0.95, opacity: isChecked ? 1 : 0.7 }}
                             transition={{ type: "spring", stiffness: 400, damping: 25 }}
                             className={cn(
-                              "w-11 h-11 rounded-xl flex items-center justify-center shadow-lg",
+                              "w-11 h-11 rounded-xl flex items-center justify-center shadow-lg overflow-hidden",
                               platform.bgColor
                             )}
                           >
-                            <IconComponent className="w-5 h-5 text-white" />
+                            {platform.id === "website" ? (() => {
+                              try {
+                                const hostname = new URL(link.url.startsWith("http") ? link.url : `https://${link.url}`).hostname;
+                                return (
+                                  <img 
+                                    src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`} 
+                                    alt={hostname}
+                                    className="w-6 h-6 rounded"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                      (e.target as HTMLImageElement).parentElement!.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+                                    }}
+                                  />
+                                );
+                              } catch {
+                                return <IconComponent className="w-5 h-5 text-white" />;
+                              }
+                            })() : (
+                              <IconComponent className="w-5 h-5 text-white" />
+                            )}
                           </motion.div>
                           <motion.div 
                             animate={{ opacity: isChecked ? 1 : 0.6 }}
