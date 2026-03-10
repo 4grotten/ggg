@@ -109,6 +109,9 @@ export function UserNotificationChannels({ t, isPushEnabled, setIsPushEnabled }:
     updateSettings({ [ch.valueField]: value, [ch.enabledField]: true });
     setEditingChannel(null);
     toast.success(t("settings.saved") || "Сохранено");
+    if (ch.key === "telegram") {
+      setShowTelegramAlert(true);
+    }
   };
 
   const handlePushToggle = (checked: boolean) => {
