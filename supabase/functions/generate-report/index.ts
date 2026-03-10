@@ -1,6 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { jsPDF } from "npm:jspdf@2.5.2";
-import "npm:jspdf-autotable@3.8.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
