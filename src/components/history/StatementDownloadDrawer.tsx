@@ -154,11 +154,11 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
   };
 
   const periodOptions: { key: PeriodOption; label: string }[] = [
-    { key: "1m", label: t("statement.1month", "1 мес") },
-    { key: "3m", label: t("statement.3months", "3 мес") },
-    { key: "6m", label: t("statement.6months", "6 мес") },
-    { key: "9m", label: t("statement.9months", "9 мес") },
-    { key: "1y", label: t("statement.1year", "1 год") },
+    { key: "1m", label: t("statement.1month", "1 Мес") },
+    { key: "3m", label: t("statement.3months", "3 Мес") },
+    { key: "6m", label: t("statement.6months", "6 Мес") },
+    { key: "9m", label: t("statement.9months", "9 Мес") },
+    { key: "1y", label: t("statement.1year", "1 Год") },
   ];
 
   const getDateRange = (period: PeriodOption): { start: string; end: string } => {
