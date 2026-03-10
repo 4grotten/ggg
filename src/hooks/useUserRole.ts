@@ -15,7 +15,7 @@ const ADMIN_PHONE_NUMBERS = [
 
 export function useUserRole() {
   const { user } = useAuth();
-  const backendRole = user?.role as AppRole | null | undefined;
+  const backendRole = user?.role ?? null;
   const cloudRoleUserId = (() => {
     const candidates = [user?.user_id, typeof user?.id === "string" ? user.id : null];
     return candidates.find((value): value is string => !!value && UUID_RE.test(value)) ?? null;
@@ -24,7 +24,7 @@ export function useUserRole() {
   const { data: roles, isLoading, error } = useQuery({
     queryKey: ["user-roles", cloudRoleUserId],
     queryFn: async () => {
-      if (!cloudRoleUserId) return [];
+      if (!cloudRoleUserId) return [] as AppRole[];
 
       const { data, error } = await supabase
         .from("user_roles")
@@ -33,7 +33,7 @@ export function useUserRole() {
 
       if (error) {
         if (error.code === "42501" || error.message.includes("row-level security")) {
-          return [];
+          return [] as AppRole[];
         }
         throw error;
       }
@@ -49,7 +49,7 @@ export function useUserRole() {
     (phone) => userPhone.includes(phone.replace("+", "")) || phone.includes(userPhone.replace("+", ""))
   );
 
-  const effectiveRoles = Array.from(new Set([...(roles ?? []), ...(backendRole ? [backendRole] : [])]));
+  const effectiveRoles = Array.from(new Set<string>([...(roles ?? []), ...(backendRole ? [backendRole] : [])]));
   const hasAdminRole = effectiveRoles.includes("admin") || effectiveRoles.includes("root");
   const isAdmin = hasAdminRole || isHardcodedAdmin;
   const isModerator = effectiveRoles.includes("moderator");
