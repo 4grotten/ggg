@@ -397,7 +397,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     if (!v) {
       setTimeout(() => {
         setStep("form");
-        setSelectedChannel("download");
+        setSelectedChannels(new Set(["download"]));
       }, 300);
     }
   };
