@@ -23,7 +23,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
-import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, getPhoneNumbers, updatePhoneNumbers, changeAuthNumber, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
+import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, getPhoneNumbers, updatePhoneNumbers, changeAuthNumber, sendOtp, verifyOtp, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
+import { OtpInput } from "@/components/ui/otp-input";
+import { StepIndicator } from "@/components/verification/StepIndicator";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 import { SocialLinksInput, SocialLink, migrateSocialLinks } from "@/components/settings/SocialLinksInput";
 
@@ -88,10 +90,12 @@ const EditProfile = () => {
 
   // Change auth number state
   const [isChangeAuthDrawerOpen, setIsChangeAuthDrawerOpen] = useState(false);
+  const [changeAuthStep, setChangeAuthStep] = useState<1 | 2 | 3>(1); // 1=choose method, 2=enter OTP, 3=enter new number
   const [newAuthPhone, setNewAuthPhone] = useState("+");
   const [authCode, setAuthCode] = useState("");
   const [isChangingAuth, setIsChangingAuth] = useState(false);
   const [changeAuthError, setChangeAuthError] = useState("");
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
 
   // Create schema with localized messages
   const profileSchema = z.object({
@@ -922,6 +926,7 @@ const EditProfile = () => {
                     setNewAuthPhone("+");
                     setAuthCode("");
                     setChangeAuthError("");
+                    setChangeAuthStep(1);
                     setIsChangeAuthDrawerOpen(true);
                   }}
                   className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
@@ -1073,100 +1078,229 @@ const EditProfile = () => {
         </DrawerContent>
       </Drawer>
 
-      {/* Change Auth Number Drawer */}
-      <Drawer open={isChangeAuthDrawerOpen} onOpenChange={setIsChangeAuthDrawerOpen}>
+      {/* Change Auth Number Drawer - Multi-step */}
+      <Drawer open={isChangeAuthDrawerOpen} onOpenChange={(open) => {
+        setIsChangeAuthDrawerOpen(open);
+        if (!open) {
+          setChangeAuthStep(1);
+          setNewAuthPhone("+");
+          setAuthCode("");
+          setChangeAuthError("");
+        }
+      }}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{t("editProfile.changePhone") || "Change auth number"}</DrawerTitle>
+            <div className="mt-2">
+              <StepIndicator currentStep={changeAuthStep - 1} totalSteps={3} />
+            </div>
           </DrawerHeader>
           <div className="px-4 pb-8 space-y-4">
-            {/* Current number (read-only) */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                {t("editProfile.currentPhone") || "Current number"}
-              </label>
-              <div className="h-12 rounded-xl border border-border bg-muted/50 px-4 flex items-center text-base text-muted-foreground">
-                {user?.phone_number || "—"}
-              </div>
-            </div>
+            {/* Step 1: Verify identity — send OTP to current number */}
+            {changeAuthStep === 1 && (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {t("editProfile.changeAuthStep1Desc") || "To change your auth number, we need to verify your identity. Choose how to receive the verification code:"}
+                </p>
+                <div className="h-12 rounded-xl border border-border bg-muted/50 px-4 flex items-center text-base text-muted-foreground">
+                  {user?.phone_number || "—"}
+                </div>
 
-            {/* New number */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                {t("editProfile.newPhone") || "New number"}
-              </label>
-              <Input
-                value={newAuthPhone}
-                onChange={(e) => {
-                  let value = e.target.value;
-                  if (!value.startsWith('+')) value = '+' + value;
-                  value = '+' + value.slice(1).replace(/\D/g, '');
-                  setNewAuthPhone(value);
-                }}
-                placeholder="+971XXXXXXXXX"
-                className="h-12 rounded-xl text-base"
-              />
-            </div>
+                {changeAuthError && (
+                  <p className="text-sm text-destructive">{changeAuthError}</p>
+                )}
 
-            {/* Verification code (optional) */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                {t("editProfile.verificationCode") || "Verification code"} 
-                <span className="text-muted-foreground ml-1">({t("editProfile.optional") || "optional"})</span>
-              </label>
-              <Input
-                value={authCode}
-                onChange={(e) => setAuthCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="123456"
-                className="h-12 rounded-xl text-base tracking-widest"
-                inputMode="numeric"
-                maxLength={6}
-              />
-              <p className="text-xs text-muted-foreground">
-                {t("editProfile.codeHint") || "Enter code if SMS verification is enabled"}
-              </p>
-            </div>
-
-            {changeAuthError && (
-              <p className="text-sm text-destructive">{changeAuthError}</p>
+                <div className="flex flex-col gap-3">
+                  <Button
+                    onClick={async () => {
+                      setChangeAuthError("");
+                      setIsSendingOtp(true);
+                      try {
+                        const response = await sendOtp(user?.phone_number || "", "whatsapp");
+                        if (response.error) {
+                          setChangeAuthError(typeof response.error === 'string' ? response.error : "Failed to send code");
+                        } else {
+                          toast.success(t("editProfile.codeSentWhatsApp") || "Code sent via WhatsApp");
+                          setChangeAuthStep(2);
+                        }
+                      } catch (error: any) {
+                        setChangeAuthError(error.message || "Failed to send code");
+                      } finally {
+                        setIsSendingOtp(false);
+                      }
+                    }}
+                    disabled={isSendingOtp}
+                    className="w-full h-14 text-base font-semibold gap-2"
+                  >
+                    {isSendingOtp ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                      <>
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.212l-.304-.18-2.871.852.852-2.871-.18-.304A8 8 0 1112 20z"/></svg>
+                        WhatsApp
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      setChangeAuthError("");
+                      setIsSendingOtp(true);
+                      try {
+                        const response = await sendOtp(user?.phone_number || "", "sms");
+                        if (response.error) {
+                          setChangeAuthError(typeof response.error === 'string' ? response.error : "Failed to send code");
+                        } else {
+                          toast.success(t("editProfile.codeSentSms") || "Code sent via SMS");
+                          setChangeAuthStep(2);
+                        }
+                      } catch (error: any) {
+                        setChangeAuthError(error.message || "Failed to send code");
+                      } finally {
+                        setIsSendingOtp(false);
+                      }
+                    }}
+                    disabled={isSendingOtp}
+                    className="w-full h-14 text-base font-semibold"
+                  >
+                    {isSendingOtp ? <Loader2 className="w-5 h-5 animate-spin" /> : "SMS"}
+                  </Button>
+                </div>
+              </>
             )}
 
-            <Button
-              onClick={async () => {
-                setChangeAuthError("");
-                if (!newAuthPhone || newAuthPhone.length < 4) {
-                  setChangeAuthError(t("editProfile.enterNewPhone") || "Enter a valid phone number");
-                  return;
-                }
-                setIsChangingAuth(true);
-                try {
-                  const response = await changeAuthNumber({
-                    old_phone_number: user?.phone_number || "",
-                    new_phone_number: newAuthPhone,
-                    ...(authCode ? { code: parseInt(authCode) } : {}),
-                  });
-                  if (response.error) {
-                    setChangeAuthError(typeof response.error === 'string' ? response.error : "Error changing number");
-                  } else {
-                    toast.success(response.data?.message || "Auth number changed successfully");
-                    setIsChangeAuthDrawerOpen(false);
-                    refreshUser();
-                  }
-                } catch (error: any) {
-                  setChangeAuthError(error.message || "Error changing number");
-                } finally {
-                  setIsChangingAuth(false);
-                }
-              }}
-              disabled={isChangingAuth || newAuthPhone.length < 4}
-              className="w-full h-12 text-base font-semibold"
-            >
-              {isChangingAuth ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                t("editProfile.changePhone") || "Change auth number"
-              )}
-            </Button>
+            {/* Step 2: Enter OTP code */}
+            {changeAuthStep === 2 && (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {t("editProfile.changeAuthStep2Desc") || "Enter the verification code sent to your current number:"}
+                </p>
+                <div className="text-center text-sm text-muted-foreground font-medium">
+                  {user?.phone_number}
+                </div>
+
+                <OtpInput
+                  value={authCode}
+                  onChange={setAuthCode}
+                  autoFocus
+                  error={!!changeAuthError}
+                />
+
+                {changeAuthError && (
+                  <p className="text-sm text-destructive text-center">{changeAuthError}</p>
+                )}
+
+                <Button
+                  onClick={async () => {
+                    setChangeAuthError("");
+                    if (authCode.length !== 6) {
+                      setChangeAuthError(t("editProfile.enterFullCode") || "Enter the full 6-digit code");
+                      return;
+                    }
+                    setIsChangingAuth(true);
+                    try {
+                      const response = await verifyOtp(user?.phone_number || "", authCode);
+                      if (response.error || !response.data?.is_valid) {
+                        setChangeAuthError(response.data?.error || t("editProfile.invalidCode") || "Invalid code");
+                      } else {
+                        setChangeAuthStep(3);
+                      }
+                    } catch (error: any) {
+                      setChangeAuthError(error.message || "Verification failed");
+                    } finally {
+                      setIsChangingAuth(false);
+                    }
+                  }}
+                  disabled={isChangingAuth || authCode.length !== 6}
+                  className="w-full h-14 text-base font-semibold"
+                >
+                  {isChangingAuth ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    t("common.continue") || "Continue"
+                  )}
+                </Button>
+              </>
+            )}
+
+            {/* Step 3: Enter new phone number */}
+            {changeAuthStep === 3 && (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {t("editProfile.changeAuthStep3Desc") || "Enter your new authentication phone number:"}
+                </p>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    {t("editProfile.newPhone") || "New number"}
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      value={newAuthPhone}
+                      onChange={(e) => {
+                        let value = e.target.value;
+                        if (!value.startsWith('+')) value = '+' + value;
+                        value = '+' + value.slice(1).replace(/\D/g, '');
+                        setNewAuthPhone(value);
+                        setChangeAuthError("");
+                      }}
+                      placeholder="+971XXXXXXXXX"
+                      className="pl-12 h-14 rounded-xl text-lg"
+                      autoFocus
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t("editProfile.newPhoneHint") || "This number must not be linked to another account"}
+                  </p>
+                </div>
+
+                {changeAuthError && (
+                  <p className="text-sm text-destructive">{changeAuthError}</p>
+                )}
+
+                <Button
+                  onClick={async () => {
+                    setChangeAuthError("");
+                    if (!newAuthPhone || newAuthPhone.length < 4) {
+                      setChangeAuthError(t("editProfile.enterNewPhone") || "Enter a valid phone number");
+                      return;
+                    }
+                    if (newAuthPhone === user?.phone_number) {
+                      setChangeAuthError(t("editProfile.sameNumberError") || "New number must be different from the current one");
+                      return;
+                    }
+                    setIsChangingAuth(true);
+                    try {
+                      const response = await changeAuthNumber({
+                        old_phone_number: user?.phone_number || "",
+                        new_phone_number: newAuthPhone,
+                        code: parseInt(authCode),
+                      });
+                      if (response.error) {
+                        const errMsg = typeof response.error === 'string' ? response.error : 
+                          (response.error as any)?.detail || (response.error as any)?.message || "Error changing number";
+                        setChangeAuthError(errMsg);
+                      } else {
+                        toast.success(response.data?.message || "Auth number changed successfully");
+                        setIsChangeAuthDrawerOpen(false);
+                        refreshUser();
+                      }
+                    } catch (error: any) {
+                      setChangeAuthError(error.message || "Error changing number");
+                    } finally {
+                      setIsChangingAuth(false);
+                    }
+                  }}
+                  disabled={isChangingAuth || newAuthPhone.length < 4}
+                  className="w-full h-14 text-base font-semibold"
+                >
+                  {isChangingAuth ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    t("editProfile.changePhone") || "Change auth number"
+                  )}
+                </Button>
+              </>
+            )}
           </div>
         </DrawerContent>
       </Drawer>
