@@ -705,25 +705,6 @@ const EditProfile = () => {
                 )}
               />
 
-              {/* Phone Number — clickable to change */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  {t("editProfile.phone") || "Phone"}
-                </label>
-                <div className="h-14 rounded-2xl border border-border bg-muted/50 px-4 flex items-center text-base text-foreground">
-                  {user?.phone_number || "—"}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handlePhoneContactsDrawerOpen(true)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                  {t("editProfile.changePhone") || "Change auth number"}
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
 
               {/* Username / Nickname */}
               <FormField
@@ -925,6 +906,26 @@ const EditProfile = () => {
                     )}
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
+                </button>
+
+                {/* Change Auth Number Button */}
+                <button
+                  type="button"
+                  onClick={() => handlePhoneContactsDrawerOpen(true)}
+                  className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Phone className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <span className="text-foreground font-medium">{t("editProfile.changePhone") || "Change auth number"}</span>
+                      {user?.phone_number && (
+                        <span className="text-xs text-muted-foreground">{user.phone_number}</span>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </button>
 
                 {/* Change Password Button */}
