@@ -70,7 +70,7 @@ const Dashboard = () => {
   
   const { addCurrentAccount } = useMultiAccount();
   const { getCompletedSteps } = useVerificationProgress();
-  const isVerified = getCompletedSteps() >= 3;
+  const isVerified = user?.is_verified ?? false;
   
   const requiresAuth = isHideDataEnabled && isEnabled;
 
