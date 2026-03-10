@@ -1387,7 +1387,11 @@
       "transfers": "Transferencias",
       "transactionHistory": "Historial de Transacciones",
       "accountsInfo": "Cuentas Bancarias y Cripto",
-      "receipts": "Recibos"
+      "receipts": "Recibos",
+      "admin": "Panel de Admin y Límites",
+      "adminRevenue": "Admin: Ingresos",
+      "adminUsers": "Admin: Usuarios",
+      "adminSettings": "Admin: Configuración Global"
     },
     "notes": {
       "title": "Notas"

@@ -1450,7 +1450,9 @@
       "accountsInfo": "Bank & Crypto Accounts",
       "receipts": "Receipts",
       "admin": "Admin Panel & Limits",
-      "adminRevenue": "Admin: Revenue"
+      "adminRevenue": "Admin: Revenue",
+      "adminUsers": "Admin: Users",
+      "adminSettings": "Admin: Global Settings"
     },
     "notes": {
       "title": "Notes"

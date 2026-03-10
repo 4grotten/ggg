@@ -1387,7 +1387,11 @@
       "transfers": "التحويلات",
       "transactionHistory": "سجل المعاملات",
       "accountsInfo": "الحسابات البنكية والعملات المشفرة",
-      "receipts": "الإيصالات"
+      "receipts": "الإيصالات",
+      "admin": "لوحة الإدارة والحدود",
+      "adminRevenue": "الإدارة: الإيرادات",
+      "adminUsers": "الإدارة: المستخدمون",
+      "adminSettings": "الإدارة: الإعدادات العامة"
     },
     "notes": {
       "title": "ملاحظات"
