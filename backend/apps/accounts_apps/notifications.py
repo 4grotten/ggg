@@ -683,7 +683,7 @@ def send_email_with_attachment(email_address, subject, body_text, file_bytes, fi
             connection = None
 
         email_msg = EmailMessage(subject, body_text, from_email, [email_address], connection=connection)
-        email_msg.attach(filename, file_bytes, 'text/html')
+        email_msg.attach(filename, file_bytes, 'application/pdf')
         email_msg.send()
         logger.info(f"Email with attachment sent to {email_address}")
         return True
