@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { MessageCircle, Send, Mail, Bell, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Mail, Bell, Loader2, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
