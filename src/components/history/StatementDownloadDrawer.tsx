@@ -177,52 +177,53 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
 
   // Build available delivery channels
   const getDeliveryChannels = () => {
-    const channels: { key: DeliveryChannel; label: string; sublabel?: string; icon: React.ReactNode; enabled: boolean }[] = [
+    const channels: { key: DeliveryChannel; label: string; sublabel?: string; icon: React.ReactNode; enabled: boolean; configured: boolean }[] = [
       {
         key: "download",
         label: t("statement.deliveryDownload", "Скачать файл"),
         sublabel: "HTML",
         icon: <Download className="w-4 h-4" />,
         enabled: true,
+        configured: true,
       },
     ];
 
     if (notifSettings) {
-      if (notifSettings.telegram_username) {
-        channels.push({
-          key: "telegram",
-          label: "Telegram",
-          sublabel: notifSettings.telegram_enabled
-            ? `@${notifSettings.telegram_username}`
-            : t("statement.channelDisabled", "Отключен"),
-          icon: <Send className="w-4 h-4" />,
-          enabled: notifSettings.telegram_enabled,
-        });
-      }
+      const tgUser = notifSettings.telegram_username;
+      const tgDisplay = tgUser ? (tgUser.startsWith("@") ? tgUser : `@${tgUser}`) : null;
+      
+      channels.push({
+        key: "telegram",
+        label: "Telegram",
+        sublabel: tgUser
+          ? (notifSettings.telegram_enabled ? tgDisplay! : t("statement.channelDisabled", "Отключен"))
+          : t("statement.notConfigured", "Не настроен"),
+        icon: <Send className="w-4 h-4" />,
+        enabled: notifSettings.telegram_enabled && !!tgUser,
+        configured: !!tgUser,
+      });
 
-      if (notifSettings.whatsapp_number) {
-        channels.push({
-          key: "whatsapp",
-          label: "WhatsApp",
-          sublabel: notifSettings.whatsapp_enabled
-            ? notifSettings.whatsapp_number
-            : t("statement.channelDisabled", "Отключен"),
-          icon: <MessageCircle className="w-4 h-4" />,
-          enabled: notifSettings.whatsapp_enabled,
-        });
-      }
+      channels.push({
+        key: "whatsapp",
+        label: "WhatsApp",
+        sublabel: notifSettings.whatsapp_number
+          ? (notifSettings.whatsapp_enabled ? notifSettings.whatsapp_number : t("statement.channelDisabled", "Отключен"))
+          : t("statement.notConfigured", "Не настроен"),
+        icon: <MessageCircle className="w-4 h-4" />,
+        enabled: notifSettings.whatsapp_enabled && !!notifSettings.whatsapp_number,
+        configured: !!notifSettings.whatsapp_number,
+      });
 
-      if (notifSettings.email_address) {
-        channels.push({
-          key: "email",
-          label: "Email",
-          sublabel: notifSettings.email_enabled
-            ? notifSettings.email_address
-            : t("statement.channelDisabled", "Отключен"),
-          icon: <Mail className="w-4 h-4" />,
-          enabled: notifSettings.email_enabled,
-        });
-      }
+      channels.push({
+        key: "email",
+        label: "Email",
+        sublabel: notifSettings.email_address
+          ? (notifSettings.email_enabled ? notifSettings.email_address : t("statement.channelDisabled", "Отключен"))
+          : t("statement.notConfigured", "Не настроен"),
+        icon: <Mail className="w-4 h-4" />,
+        enabled: notifSettings.email_enabled && !!notifSettings.email_address,
+        configured: !!notifSettings.email_address,
+      });
     }
 
     return channels;
