@@ -451,9 +451,8 @@ Deno.serve(async (req) => {
     console.log(`[whatsapp-ai] Identified user: ${user_id} (${first_name})`);
 
     // 2. Check if this is a statement request
-    const statementCheck = detectStatementRequest(userText);
-    if (statementCheck.isStatement) {
-      console.log(`[whatsapp-ai] Statement request detected, period: ${statementCheck.months} months`);
+    if (isStatementRequest(userText)) {
+      console.log(`[whatsapp-ai] Statement request detected`);
 
       const supabase = createClient(supabaseUrl, supabaseKey);
       await supabase.from("messenger_chat_history").insert({
@@ -464,16 +463,13 @@ Deno.serve(async (req) => {
         content: userText,
       });
 
-      const periodText = statementCheck.months === 1 ? "месяц" :
-        statementCheck.months === 3 ? "3 месяца" :
-        statementCheck.months === 6 ? "6 месяцев" :
-        statementCheck.months === 9 ? "9 месяцев" :
-        statementCheck.months === 12 ? "год" : `${statementCheck.months} мес.`;
-
       await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
-        `📊 Формирую выписку за последние ${periodText}...`);
+        `📊 Формирую выписку...`);
 
-      const fileBytes = await generateStatement(userToken, statementCheck.months, first_name);
+      const dateRange = await parseDateRange(userText, lovableKey);
+      const periodText = dateRange.period_text;
+
+      const fileBytes = await generateStatement(userToken, dateRange.start_date, dateRange.end_date, first_name);
 
       if (fileBytes) {
         const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -500,7 +496,7 @@ Deno.serve(async (req) => {
           console.log(`[whatsapp-ai] Statement uploaded, URL: ${publicUrl}`);
 
           await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
-            `📄 *Выписка за последние ${periodText}*\n\nСкачайте файл по ссылке:\n${publicUrl}`);
+            `📄 *Выписка за ${periodText}*\n\n📅 Период: ${dateRange.start_date} — ${dateRange.end_date}\n\nСкачайте файл по ссылке:\n${publicUrl}`);
         }
 
         await supabase.from("messenger_chat_history").insert({
@@ -508,7 +504,7 @@ Deno.serve(async (req) => {
           platform_chat_id: phone,
           user_id: String(user_id),
           role: "assistant",
-          content: `📊 Выписка за последние ${periodText} сформирована и отправлена ссылкой.`,
+          content: `📊 Выписка за ${periodText} (${dateRange.start_date} — ${dateRange.end_date}) сформирована.`,
         });
       } else {
         await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
