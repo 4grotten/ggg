@@ -1262,6 +1262,8 @@
     "fullNamePlaceholder": "Ingrese su nombre completo",
     "fullNameDescription": "Su nombre como aparece en su pasaporte. Se usa para identificación y visualización del perfil.",
     "phone": "Teléfono",
+    "addPhone": "Agregar número de teléfono",
+    "phoneDescription": "Número de teléfono utilizado para iniciar sesión.",
     "username": "Nombre de Usuario",
     "usernamePlaceholder": "Ingrese su nombre de usuario",
     "usernameDescription": "Identificador único para transferencias entre usuarios. Solo se permiten letras, números y guiones bajos.",
