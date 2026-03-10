@@ -312,9 +312,18 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     }
   };
 
-  const handleSendToChannel = async (channel: DeliveryChannel) => {
-    if (channel === "download") {
-      await handleDownloadFile();
+  const toggleChannel = (key: DeliveryChannel) => {
+    setSelectedChannels(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const handleSendSelected = async () => {
+    if (selectedChannels.size === 0) {
+      toast.error(t("statement.selectAtLeastOne", "Выберите хотя бы один способ"));
       return;
     }
 
@@ -323,6 +332,14 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       const { token, start, end, userName, uniqueAssetTypes } = buildRequestBody();
       if (!token) {
         toast.error(t("common.authRequired", "Необходима авторизация"));
+        return;
+      }
+
+      const channels = [...selectedChannels];
+
+      // If only download selected, just download
+      if (channels.length === 1 && channels[0] === "download") {
+        await handleDownloadFile();
         return;
       }
 
@@ -340,7 +357,8 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             end_date: end,
             user_name: userName,
             asset_filter: uniqueAssetTypes,
-            delivery_channel: channel,
+            delivery_channels: channels.filter(c => c !== "download"),
+            also_download: channels.includes("download"),
           }),
         }
       );
@@ -350,9 +368,22 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
         throw new Error(err.error || t("statement.sendError", "Ошибка отправки"));
       }
 
+      // If download was also selected, download the blob
+      if (channels.includes("download")) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        a.download = `uEasyCard_Statement_${fileDate}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
       setStep("done");
-      const channelLabel = channel === "telegram" ? "Telegram" : channel === "whatsapp" ? "WhatsApp" : "Email";
-      toast.success(t("statement.sentTo", `Выписка отправлена в ${channelLabel}`, { channel: channelLabel }));
+      toast.success(t("statement.downloaded", "Выписка отправлена!"));
     } catch (error) {
       console.error("Statement send error:", error);
       toast.error(error instanceof Error ? error.message : t("statement.sendError", "Ошибка отправки"));
