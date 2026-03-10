@@ -637,7 +637,19 @@
     "downloaded": "Выписка скачана!",
     "downloadError": "Ошибка генерации отчёта",
     "selectAtLeastOne": "Выберите хотя бы один счёт",
-    "usdtWallet": "Кошелёк USDT"
+    "usdtWallet": "Кошелёк USDT",
+    "deliveryTitle": "Куда отправить?",
+    "doneTitle": "Готово!",
+    "chooseDelivery": "Выберите способ получения выписки",
+    "deliveryDownload": "Скачать файл",
+    "channelDisabled": "Отключен",
+    "noChannels": "Настройте Telegram, WhatsApp или Email, чтобы получать выписки напрямую",
+    "setupNotifications": "Настроить уведомления",
+    "setupHint": "Хотите получать выписки в Telegram, WhatsApp или Email?",
+    "doneMessage": "Выписка успешно сформирована",
+    "sentTo": "Выписка отправлена в {{channel}}",
+    "sendError": "Ошибка отправки",
+    "next": "Продолжить"
   },
   "transaction": {
     "back": "Назад",
