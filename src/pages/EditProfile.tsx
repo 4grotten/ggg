@@ -1491,36 +1491,51 @@ const EditProfile = () => {
             )}
 
             {/* Existing phone numbers list */}
-            {!isLoadingPhones && phoneNumbers.length > 0 && (
+            {!isLoadingPhones && (
               <div className="space-y-2">
-                {phoneNumbers.map((phone, index) => (
-                  <div key={phone.id || index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-xl">
+                {/* Auth phone number - non-deletable */}
+                {user?.phone_number && (
+                  <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-xl">
                     <Phone className="w-5 h-5 text-muted-foreground ml-2" />
-                    <Input
-                      value={phone.phone_number}
-                      onChange={(e) => {
-                        let value = e.target.value;
-                        if (!value.startsWith('+')) {
-                          value = '+' + value.replace(/^\+*/, '');
-                        }
-                        value = '+' + value.slice(1).replace(/\D/g, '');
-                        setPhoneNumbers(prev => prev.map((p, i) => 
-                          i === index ? { ...p, phone_number: value } : p
-                        ));
-                      }}
-                      type="tel"
-                      className="flex-1 h-10 border-0 bg-transparent focus-visible:ring-0 text-base font-medium"
-                    />
-                    <button
-                      onClick={() => {
-                        setPhoneNumbers(prev => prev.filter((_, i) => i !== index));
-                      }}
-                      className="w-8 h-8 rounded-full hover:bg-destructive/10 flex items-center justify-center transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base font-medium px-3 py-1">{user.phone_number}</p>
+                      <p className="text-xs text-muted-foreground px-3">{t("editProfile.authNumber")}</p>
+                    </div>
                   </div>
-                ))}
+                )}
+                {/* Additional phone numbers */}
+                {phoneNumbers.map((phone, index) => {
+                  const isAuthPhone = user?.phone_number && phone.phone_number === user.phone_number;
+                  if (isAuthPhone) return null;
+                  return (
+                    <div key={phone.id || index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-xl">
+                      <Phone className="w-5 h-5 text-muted-foreground ml-2" />
+                      <Input
+                        value={phone.phone_number}
+                        onChange={(e) => {
+                          let value = e.target.value;
+                          if (!value.startsWith('+')) {
+                            value = '+' + value.replace(/^\+*/, '');
+                          }
+                          value = '+' + value.slice(1).replace(/\D/g, '');
+                          setPhoneNumbers(prev => prev.map((p, i) => 
+                            i === index ? { ...p, phone_number: value } : p
+                          ));
+                        }}
+                        type="tel"
+                        className="flex-1 h-10 border-0 bg-transparent focus-visible:ring-0 text-base font-medium"
+                      />
+                      <button
+                        onClick={() => {
+                          setPhoneNumbers(prev => prev.filter((_, i) => i !== index));
+                        }}
+                        className="w-8 h-8 rounded-full hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
