@@ -1267,6 +1267,7 @@
     "verified": "Verificado",
     "notVerified": "No verificado",
     "changePhone": "Cambiar número de acceso",
+    "authNumber": "Número de autorización",
     "username": "Nombre de Usuario",
     "usernamePlaceholder": "Ingrese su nombre de usuario",
     "usernameDescription": "Identificador único para transferencias entre usuarios. Solo se permiten letras, números y guiones bajos.",

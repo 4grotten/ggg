@@ -1274,6 +1274,7 @@
     "verified": "已验证",
     "notVerified": "未验证",
     "changePhone": "更改登录号码",
+    "authNumber": "授权号码",
     "username": "用户名",
     "usernamePlaceholder": "输入您的用户名",
     "usernameDescription": "用户间转账的唯一标识符。只允许字母、数字和下划线。",

@@ -513,6 +513,7 @@
     "verified": "Верифицирован",
     "notVerified": "Не верифицирован",
     "changePhone": "Сменить номер авторизации",
+    "authNumber": "Номер авторизации",
     "currentPhone": "Текущий номер",
     "newPhone": "Новый номер",
     "verificationCode": "Код подтверждения",

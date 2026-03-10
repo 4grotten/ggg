@@ -527,6 +527,7 @@
     "verified": "Verified",
     "notVerified": "Not verified",
     "changePhone": "Change auth number",
+    "authNumber": "Authorization number",
     "currentPhone": "Current number",
     "newPhone": "New number",
     "verificationCode": "Verification code",

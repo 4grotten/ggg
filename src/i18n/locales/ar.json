@@ -1267,6 +1267,7 @@
     "verified": "موثق",
     "notVerified": "غير موثق",
     "changePhone": "تغيير رقم تسجيل الدخول",
+    "authNumber": "رقم التفويض",
     "username": "اسم المستخدم",
     "usernamePlaceholder": "أدخل اسم المستخدم",
     "usernameDescription": "معرّف فريد للتحويلات بين المستخدمين. يُسمح فقط بالحروف والأرقام والشرطات السفلية.",
