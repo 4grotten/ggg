@@ -643,10 +643,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                       {t("statement.setupHint", "Хотите получать выписки в Telegram, WhatsApp или Email?")}
                     </p>
                     <button
-                      onClick={() => {
-                        handleClose(false);
-                        setTimeout(() => navigate("/settings"), 300);
-                      }}
+                      onClick={() => setShowNotifSetup(true)}
                       className="flex items-center gap-2 text-sm text-primary font-medium mx-auto"
                     >
                       <Settings className="w-4 h-4" />
