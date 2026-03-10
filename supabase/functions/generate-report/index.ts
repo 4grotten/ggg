@@ -669,20 +669,20 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
   <!-- SUMMARY -->
   <div class="summary">
     <div class="summary-card count">
-      <div class="label">Всего операций</div>
+      <div class="label">${t(lang, 'totalOps')}</div>
       <div class="value">${filtered.length}</div>
     </div>
     <div class="summary-card income">
-      <div class="label">Приход</div>
-      <div class="value">+${totalIn.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED</div>
+      <div class="label">${t(lang, 'income')}</div>
+      <div class="value">+${totalIn.toLocaleString(locale, { minimumFractionDigits: 2 })} AED</div>
     </div>
     <div class="summary-card expense">
-      <div class="label">Расход</div>
-      <div class="value">-${totalOut.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED</div>
+      <div class="label">${t(lang, 'expense')}</div>
+      <div class="value">-${totalOut.toLocaleString(locale, { minimumFractionDigits: 2 })} AED</div>
     </div>
     <div class="summary-card balance">
-      <div class="label">Баланс</div>
-      <div class="value">${(totalIn - totalOut).toLocaleString('ru-RU', { minimumFractionDigits: 2 })} AED</div>
+      <div class="label">${t(lang, 'balance')}</div>
+      <div class="value">${(totalIn - totalOut).toLocaleString(locale, { minimumFractionDigits: 2 })} AED</div>
     </div>
   </div>
 
