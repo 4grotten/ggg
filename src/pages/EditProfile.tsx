@@ -1073,6 +1073,104 @@ const EditProfile = () => {
         </DrawerContent>
       </Drawer>
 
+      {/* Change Auth Number Drawer */}
+      <Drawer open={isChangeAuthDrawerOpen} onOpenChange={setIsChangeAuthDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{t("editProfile.changePhone") || "Change auth number"}</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-8 space-y-4">
+            {/* Current number (read-only) */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                {t("editProfile.currentPhone") || "Current number"}
+              </label>
+              <div className="h-12 rounded-xl border border-border bg-muted/50 px-4 flex items-center text-base text-muted-foreground">
+                {user?.phone_number || "—"}
+              </div>
+            </div>
+
+            {/* New number */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                {t("editProfile.newPhone") || "New number"}
+              </label>
+              <Input
+                value={newAuthPhone}
+                onChange={(e) => {
+                  let value = e.target.value;
+                  if (!value.startsWith('+')) value = '+' + value;
+                  value = '+' + value.slice(1).replace(/\D/g, '');
+                  setNewAuthPhone(value);
+                }}
+                placeholder="+971XXXXXXXXX"
+                className="h-12 rounded-xl text-base"
+              />
+            </div>
+
+            {/* Verification code (optional) */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                {t("editProfile.verificationCode") || "Verification code"} 
+                <span className="text-muted-foreground ml-1">({t("editProfile.optional") || "optional"})</span>
+              </label>
+              <Input
+                value={authCode}
+                onChange={(e) => setAuthCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="123456"
+                className="h-12 rounded-xl text-base tracking-widest"
+                inputMode="numeric"
+                maxLength={6}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("editProfile.codeHint") || "Enter code if SMS verification is enabled"}
+              </p>
+            </div>
+
+            {changeAuthError && (
+              <p className="text-sm text-destructive">{changeAuthError}</p>
+            )}
+
+            <Button
+              onClick={async () => {
+                setChangeAuthError("");
+                if (!newAuthPhone || newAuthPhone.length < 4) {
+                  setChangeAuthError(t("editProfile.enterNewPhone") || "Enter a valid phone number");
+                  return;
+                }
+                setIsChangingAuth(true);
+                try {
+                  const response = await changeAuthNumber({
+                    old_phone_number: user?.phone_number || "",
+                    new_phone_number: newAuthPhone,
+                    ...(authCode ? { code: parseInt(authCode) } : {}),
+                  });
+                  if (response.error) {
+                    setChangeAuthError(typeof response.error === 'string' ? response.error : "Error changing number");
+                  } else {
+                    toast.success(response.data?.message || "Auth number changed successfully");
+                    setIsChangeAuthDrawerOpen(false);
+                    refreshUser();
+                  }
+                } catch (error: any) {
+                  setChangeAuthError(error.message || "Error changing number");
+                } finally {
+                  setIsChangingAuth(false);
+                }
+              }}
+              disabled={isChangingAuth || newAuthPhone.length < 4}
+              className="w-full h-12 text-base font-semibold"
+            >
+              {isChangingAuth ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                t("editProfile.changePhone") || "Change auth number"
+              )}
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
       {/* Change Password Drawer */}
       <Drawer open={isPasswordDrawerOpen} onOpenChange={handlePasswordDrawerOpen}>
         <DrawerContent>
