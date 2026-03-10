@@ -172,7 +172,8 @@ interface AssetBalance {
   currency: string;
 }
 
-function buildHTML(filtered: any[], periodLabel: string, userName: string, generatedDate: string, totalIn: number, totalOut: number, assetBalances: AssetBalance[] = []): string {
+function buildHTML(filtered: any[], periodLabel: string, userName: string, generatedDate: string, totalIn: number, totalOut: number, assetBalances: AssetBalance[] = [], lang: Lang = 'ru'): string {
+  const locale = getLocale(lang);
   const txRows = filtered.map((tx: any, idx: number) => {
     const date = tx.created_at ? formatDate(tx.created_at) : '';
     const time = tx.created_at ? formatTime(tx.created_at) : '';
