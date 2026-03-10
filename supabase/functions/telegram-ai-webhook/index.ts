@@ -199,7 +199,7 @@ Deno.serve(async (req) => {
           const res2 = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
-            body: JSON.stringify({ platform: "telegram", identifier: variant }),
+            body: JSON.stringify({ platform: "telegram", identifier: variant, chat_id: chatId }),
           });
           const body2 = await res2.text();
           console.log(`[telegram-ai] identify by "${variant}" response: ${res2.status} ${body2}`);
