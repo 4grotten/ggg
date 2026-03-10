@@ -21,13 +21,23 @@ export const ApiSidebar = ({
 }: ApiSidebarProps) => {
   const { t } = useTranslation();
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const toggleCategory = (categoryId: string) => {
-    setExpandedCategories(prev => 
-      prev.includes(categoryId) 
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
+    setExpandedCategories(prev => {
+      const isExpanding = !prev.includes(categoryId);
+      if (isExpanding) {
+        // Auto-scroll to the category after it expands
+        setTimeout(() => {
+          categoryRefs.current[categoryId]?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        }, 100);
+        return [...prev, categoryId];
+      }
+      return prev.filter(id => id !== categoryId);
+    });
   };
 
   const getMethodColor = (method: string) => {
