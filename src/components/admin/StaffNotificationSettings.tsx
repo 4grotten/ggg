@@ -124,7 +124,19 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
           {readOnly && (
             <Badge variant="outline" className="text-[10px] ml-1 text-muted-foreground border-muted-foreground/30">Только просмотр</Badge>
           )}
-          <Badge variant="secondary" className="text-[10px] ml-auto">
+          {!readOnly && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-[10px] h-6 px-2 ml-auto gap-1"
+              onClick={() => testMutation.mutate()}
+              disabled={testMutation.isPending || activeCount === 0}
+            >
+              {testMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+              Тест
+            </Button>
+          )}
+          <Badge variant="secondary" className={cn("text-[10px]", readOnly && "ml-auto")}>
             {activeCount} активных
           </Badge>
         </div>
