@@ -53,7 +53,8 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     if (wd?.cards && Array.isArray(wd.cards)) {
       for (const card of wd.cards) {
         const mask = card.card_number ? `•••• ${String(card.card_number).slice(-4)}` : "";
-        const cardType = card.type || "Virtual";
+        const rawType = card.type || "Virtual";
+        const cardType = rawType.charAt(0).toUpperCase() + rawType.slice(1).toLowerCase();
         items.push({
           id: `card_${card.id || card.card_number}`,
           label: `${cardType} ${mask}`,
