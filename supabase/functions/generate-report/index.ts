@@ -597,7 +597,10 @@ serve(async (req) => {
   }
 
   try {
-    const { backend_token, start_date, end_date, user_name } = await req.json();
+    const { backend_token, start_date, end_date, user_name, asset_filter } = await req.json();
+    // asset_filter: optional array of asset types to include: ["card", "iban", "crypto"]
+    // If not provided or empty, include all assets
+    const filterAssets = Array.isArray(asset_filter) && asset_filter.length > 0 ? asset_filter : null;
 
     if (!backend_token) {
       return new Response(
@@ -630,11 +633,15 @@ serve(async (req) => {
 
     // Parse balances
     const assetBalances: AssetBalance[] = [];
+    const includeCards = !filterAssets || filterAssets.includes('card');
+    const includeIban = !filterAssets || filterAssets.includes('iban');
+    const includeCrypto = !filterAssets || filterAssets.includes('crypto');
+
     try {
       if (walletRes?.ok) {
         const wallet = await walletRes.json();
         // Cards balances
-        if (wallet.cards && Array.isArray(wallet.cards)) {
+        if (includeCards && wallet.cards && Array.isArray(wallet.cards)) {
           for (const card of wallet.cards) {
             const bal = parseFloat(String(card.balance || 0));
             if (bal > 0 || card.card_mask) {
@@ -644,7 +651,7 @@ serve(async (req) => {
           }
         }
         // USDT balance
-        if (wallet.usdt_balance !== undefined) {
+        if (includeCrypto && wallet.usdt_balance !== undefined) {
           const usdtBal = parseFloat(String(wallet.usdt_balance || 0));
           assetBalances.push({ label: 'USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
         }
@@ -652,7 +659,7 @@ serve(async (req) => {
     } catch (e) { console.error("Wallet parse error:", e); }
 
     try {
-      if (bankRes?.ok) {
+      if (includeIban && bankRes?.ok) {
         const bankData = await bankRes.json();
         const accounts = Array.isArray(bankData) ? bankData : (bankData?.results || []);
         for (const acc of accounts) {
@@ -664,14 +671,13 @@ serve(async (req) => {
     } catch (e) { console.error("Bank parse error:", e); }
 
     try {
-      if (cryptoRes?.ok) {
+      if (includeCrypto && cryptoRes?.ok) {
         const cryptoData = await cryptoRes.json();
         const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
         for (const w of wallets) {
           const bal = parseFloat(String(w.balance || 0));
           const addr = w.address ? `${String(w.address).slice(0, 6)}••••${String(w.address).slice(-4)}` : (w.token || 'Crypto');
           const token = w.token || 'USDT';
-          // Skip if already added via wallet summary
           if (token === 'USDT' && assetBalances.some(a => a.label === 'USDT')) continue;
           assetBalances.push({ label: `${token} (${w.network || 'TRC20'})`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
         }
@@ -691,7 +697,37 @@ serve(async (req) => {
       });
     }
 
-    // Calculate totals
+    // Filter by asset type if specified
+    if (filterAssets) {
+      filtered = filtered.filter((tx: any) => {
+        const txType = String(tx.type || '').toLowerCase();
+        const currency = String(tx.currency || tx.display?.primary_amount?.currency || '').toUpperCase();
+        
+        // Card transactions
+        if (includeCards) {
+          if (txType === 'card_payment' || txType === 'card_activation' || txType === 'card_transfer' || txType === 'payment') return true;
+          if (tx.card_id) return true;
+          // Top-ups that go to cards
+          if (txType === 'top_up' || txType === 'topup') return true;
+        }
+        
+        // IBAN / bank transactions
+        if (includeIban) {
+          if (txType.includes('bank') || txType.includes('iban') || txType === 'withdrawal') return true;
+          if (txType === 'transfer_in' || txType === 'transfer_out' || txType === 'internal_transfer') return true;
+        }
+        
+        // Crypto transactions
+        if (includeCrypto) {
+          if (txType.includes('crypto')) return true;
+          if (currency === 'USDT' || currency === 'BTC' || currency === 'ETH') return true;
+        }
+        
+        // If transaction type doesn't clearly match any category, include if all types selected
+        return false;
+      });
+    }
+
     const totalIn = filtered
       .filter((tx: any) => {
         const sign = tx.display?.primary_amount?.sign;

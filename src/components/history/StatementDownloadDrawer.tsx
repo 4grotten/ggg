@@ -193,6 +193,16 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       const { start, end } = getDateRange(selectedPeriod);
       const userName = user?.full_name || "";
 
+      // Build selected asset types for filtering
+      const selectedAssetTypes: string[] = [];
+      for (const id of selectedAssets) {
+        if (id.startsWith("card_")) selectedAssetTypes.push("card");
+        else if (id.startsWith("iban_") || id.startsWith("bank_")) selectedAssetTypes.push("iban");
+        else if (id === "usdt_wallet" || id.startsWith("crypto_")) selectedAssetTypes.push("crypto");
+      }
+      // Deduplicate
+      const uniqueAssetTypes = [...new Set(selectedAssetTypes)];
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
         {
@@ -206,6 +216,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             start_date: start,
             end_date: end,
             user_name: userName,
+            asset_filter: uniqueAssetTypes,
           }),
         }
       );
