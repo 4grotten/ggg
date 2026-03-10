@@ -571,7 +571,21 @@
     "downloadError": "خطأ في إنشاء التقرير",
     "selectAtLeastOne": "اختر حسابًا واحدًا على الأقل",
     "usdtWallet": "محفظة USDT",
-    "next": "متابعة"
+    "next": "متابعة",
+    "deliveryTitle": "إلى أين ترسل؟",
+    "doneTitle": "تم!",
+    "chooseDelivery": "اختر طريقة استلام كشف الحساب",
+    "deliveryDownload": "تحميل الملف",
+    "channelDisabled": "معطل",
+    "noChannels": "قم بإعداد Telegram أو WhatsApp أو البريد الإلكتروني لاستلام الكشوفات مباشرة",
+    "setupNotifications": "إعداد الإشعارات",
+    "setupHint": "هل تريد استلام الكشوفات عبر Telegram أو WhatsApp أو البريد الإلكتروني؟",
+    "doneMessage": "تم إنشاء كشف الحساب بنجاح",
+    "sentTo": "تم إرسال كشف الحساب إلى {{channel}}",
+    "sendError": "خطأ في الإرسال",
+    "notConfigured": "غير مُعدّ",
+    "setup": "إعداد",
+    "send": "إرسال"
   },
   "transaction": {
     "back": "رجوع",
