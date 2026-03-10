@@ -602,6 +602,11 @@ serve(async (req) => {
       }
     } catch (e) { console.error("Profile parse error:", e); }
 
+    // Fill IBAN from bank accounts if not in profile
+    if (userProfile && !userProfile.iban && firstIban) {
+      userProfile.iban = firstIban;
+    }
+
     // Generate HTML
     const htmlContent = buildHTML(filtered, periodLabel, userProfile?.full_name || user_name || '', generatedDate, totalIn, totalOut, assetBalances, lang, userProfile);
 
