@@ -11,10 +11,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { apiRequest, AUTH_USER_KEY } from "@/services/api/apiClient";
+import { apiRequest } from "@/services/api/apiClient";
 import { StaffMember } from "@/hooks/useAdminManagement";
 import { format } from "date-fns";
 import StaffNotificationSettings from "@/components/admin/StaffNotificationSettings";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AuditEntry {
   id: string;
