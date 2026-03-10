@@ -188,20 +188,22 @@ export default function AdminAdmins() {
   }, [activeSubTab, visibleCount, auditHistory.length]);
 
   // Build a map of staff user_id -> staff member for avatars/roles
+  const staffArray = Array.isArray(staff) ? staff : [];
+  const clientsArray = Array.isArray(clients) ? clients : [];
+
   const staffMap = useMemo(() => {
-    const map = new Map<string, typeof staff extends (infer T)[] ? T : never>();
-    staff?.forEach((s) => map.set(s.user_id, s));
+    const map = new Map<string, typeof staffArray extends (infer T)[] ? T : never>();
+    staffArray.forEach((s) => map.set(s.user_id, s));
     return map;
-  }, [staff]);
+  }, [staffArray]);
 
   // Build a map of clients by user_id for target user avatars
   const clientsMap = useMemo(() => {
     const map = new Map<string, { avatar_url: string | null; full_name: string; phone?: string }>();
-    clients?.forEach((c) => map.set(c.user_id, { avatar_url: c.avatar_url, full_name: c.full_name, phone: c.phone }));
-    // Also add staff members
-    staff?.forEach((s) => map.set(s.user_id, { avatar_url: s.avatar_url, full_name: s.full_name, phone: s.phone }));
+    clientsArray.forEach((c) => map.set(c.user_id, { avatar_url: c.avatar_url, full_name: c.full_name, phone: c.phone }));
+    staffArray.forEach((s) => map.set(s.user_id, { avatar_url: s.avatar_url, full_name: s.full_name, phone: s.phone }));
     return map;
-  }, [clients, staff]);
+  }, [clientsArray, staffArray]);
 
   const handleSearchUser = async () => {
     if (!searchQuery.trim()) return;
