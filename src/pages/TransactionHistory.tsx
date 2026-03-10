@@ -113,7 +113,8 @@ const TransactionHistory = () => {
   }, [activeAsset]);
 
   const handleRefresh = async () => {
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Invalidate all transaction queries to refetch
+    await queryClient.invalidateQueries({ queryKey: transactionKeys.all });
     toast.success(t('toast.dataUpdated'));
   };
 
@@ -133,7 +134,11 @@ const TransactionHistory = () => {
 
   const isIncomeTransaction = (tx: Transaction): boolean => {
     return tx.type === "topup" || 
+           tx.type === "top_up" ||
            tx.type === "bank_transfer_incoming" || 
+           tx.type === "transfer_in" ||
+           tx.type === "refund" ||
+           tx.type === "cashback" ||
            (tx.type === "card_transfer" && !!tx.senderCard);
   };
 
@@ -141,7 +146,11 @@ const TransactionHistory = () => {
     return !tx.type || 
            tx.type === "declined" || 
            tx.type === "card_activation" ||
+           tx.type === "card_payment" ||
            tx.type === "bank_transfer" ||
+           tx.type === "transfer_out" ||
+           tx.type === "withdrawal" ||
+           tx.type === "fee" ||
            tx.type === "crypto_withdrawal";
   };
 
@@ -149,70 +158,62 @@ const TransactionHistory = () => {
     return tx.type === "card_transfer" || 
            tx.type === "bank_transfer" || 
            tx.type === "bank_transfer_incoming" ||
-           tx.type === "crypto_withdrawal";
+           tx.type === "transfer_in" ||
+           tx.type === "transfer_out" ||
+           tx.type === "crypto_withdrawal" ||
+           tx.type === "crypto_to_card" ||
+           tx.type === "crypto_to_iban" ||
+           tx.type === "iban_to_iban";
   };
 
-  // Asset filtering for mock data
-  const isAssetMatch = (tx: Transaction, asset: AssetType): boolean => {
-    if (asset === "all") return true;
-    const txType = tx.type || "";
-    if (asset === "crypto") {
-      return txType.includes("crypto") || tx.localCurrency === "USDT";
+  // Merge groups by date helper
+  const mergeGroupsByDate = (allGroups: TransactionGroup[]): TransactionGroup[] => {
+    const dateMap = new Map<string, TransactionGroup>();
+    for (const group of allGroups) {
+      if (dateMap.has(group.date)) {
+        const existing = dateMap.get(group.date)!;
+        // Deduplicate transactions by id
+        const existingIds = new Set(existing.transactions.map(tx => tx.id));
+        const newTxs = group.transactions.filter(tx => !existingIds.has(tx.id));
+        dateMap.set(group.date, {
+          ...existing,
+          totalSpend: existing.totalSpend + group.totalSpend,
+          transactions: [...existing.transactions, ...newTxs],
+        });
+      } else {
+        dateMap.set(group.date, { ...group });
+      }
     }
-    if (asset === "iban") {
-      return txType.includes("bank_transfer");
-    }
-    // virtual and metal use the data source directly
-    return true;
+    return Array.from(dateMap.values());
   };
 
   const filteredGroups = useMemo(() => {
-    // Get groups based on asset type
     let groups: TransactionGroup[] = [];
+    
     if (activeAsset === "all") {
-      // Merge virtual and metal
-      const virtualGroups = allTransactionsData.virtual || [];
-      const metalGroups = allTransactionsData.metal || [];
-      const allGroups = [...virtualGroups, ...metalGroups];
-      // Merge by date
-      const dateMap = new Map<string, TransactionGroup>();
-      for (const group of allGroups) {
-        if (dateMap.has(group.date)) {
-          const existing = dateMap.get(group.date)!;
-          dateMap.set(group.date, {
-            ...existing,
-            totalSpend: existing.totalSpend + group.totalSpend,
-            transactions: [...existing.transactions, ...group.transactions],
-          });
-        } else {
-          dateMap.set(group.date, { ...group });
-        }
-      }
-      groups = Array.from(dateMap.values());
+      // Merge all API sources
+      const allSources = [
+        ...(apiGroups || []),
+        ...(ibanGroups || []),
+        ...(cryptoGroups || []),
+        ...(cardGroups || []),
+      ];
+      groups = mergeGroupsByDate(allSources);
+    } else if (activeAsset === "iban") {
+      groups = ibanGroups || [];
+    } else if (activeAsset === "crypto") {
+      groups = cryptoGroups || [];
     } else if (activeAsset === "virtual" || activeAsset === "metal") {
-      groups = allTransactionsData[activeAsset] || [];
-    } else {
-      // For iban/crypto, filter from all data
-      const virtualGroups = allTransactionsData.virtual || [];
-      const metalGroups = allTransactionsData.metal || [];
-      const allGroups = [...virtualGroups, ...metalGroups];
-      const dateMap = new Map<string, TransactionGroup>();
-      for (const group of allGroups) {
-        const filtered = group.transactions.filter(tx => isAssetMatch(tx, activeAsset));
-        if (filtered.length > 0) {
-          const key = group.date;
-          if (dateMap.has(key)) {
-            const existing = dateMap.get(key)!;
-            dateMap.set(key, {
-              ...existing,
-              transactions: [...existing.transactions, ...filtered],
-            });
-          } else {
-            dateMap.set(key, { ...group, transactions: filtered });
-          }
-        }
-      }
-      groups = Array.from(dateMap.values());
+      // Card groups filtered by card type
+      const allCardGroups = cardGroups || [];
+      groups = allCardGroups.map(group => ({
+        ...group,
+        transactions: group.transactions.filter(tx => {
+          const meta = tx.metadata as Record<string, unknown> | undefined;
+          const cardType = (meta?.card_type as string || '').toLowerCase();
+          return cardType === activeAsset;
+        }),
+      })).filter(g => g.transactions.length > 0);
     }
 
     // Sort groups by date
@@ -239,7 +240,7 @@ const TransactionHistory = () => {
       
       return { ...group, transactions: filteredTxs };
     }).filter(group => group.transactions.length > 0);
-  }, [activeAsset, activeFilter, dateFrom, dateTo]);
+  }, [activeAsset, activeFilter, dateFrom, dateTo, apiGroups, ibanGroups, cryptoGroups, cardGroups]);
 
   const filterOptions: { key: FilterType; label: string }[] = [
     { key: "all", label: t("history.all") },
