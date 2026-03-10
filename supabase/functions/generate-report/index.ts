@@ -773,10 +773,10 @@ serve(async (req) => {
           for (const card of wallet.cards) {
             const bal = parseFloat(String(card.balance || 0));
             if (bal > 0 || card.card_mask) {
-              const rawType = card.card_type || card.type || 'Карта';
+              const rawType = card.card_type || card.type || t(lang, 'card');
               const cardType = rawType.charAt(0).toUpperCase() + rawType.slice(1).toLowerCase();
               const mask = card.card_mask ? `•••• ${String(card.card_mask).slice(-4)}` : '';
-              assetBalances.push({ label: `${cardType} ${mask}`.trim(), amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'AED' });
+              assetBalances.push({ label: `${cardType} ${mask}`.trim(), amount: bal.toLocaleString(locale, { minimumFractionDigits: 2 }), currency: 'AED' });
             }
           }
         }
