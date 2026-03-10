@@ -90,33 +90,44 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       }
     }
 
-    // USDT wallet from wallet summary
+    // USDT wallet - always show, try multiple data sources for balance
+    let usdtAdded = false;
     const rawWallet = walletData as any;
     const usdtBalance = rawWallet?.data?.usdt_balance ?? rawWallet?.usdt_balance;
-    if (usdtBalance !== undefined) {
-      items.push({
-        id: "usdt_wallet",
-        label: t("statement.usdtWallet", "Кошелёк USDT"),
-        sublabel: `${parseFloat(String(usdtBalance)).toFixed(2)} USDT`,
-        type: "crypto",
-      });
-    }
-
-    // Crypto wallets from API
+    
+    // Try crypto wallets API first
     if (cryptoData) {
       const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData as any)?.results || [];
       for (const w of wallets) {
         const token = w.token || "USDT";
-        // Skip if USDT already added
-        if (token === "USDT" && items.some(i => i.id === "usdt_wallet")) continue;
-        const addr = w.address ? `${String(w.address).slice(0, 6)}••${String(w.address).slice(-4)}` : "";
-        items.push({
-          id: `crypto_${w.id || w.address}`,
-          label: `${token} ${w.network || "TRC20"}`,
-          sublabel: w.balance !== undefined ? `${parseFloat(String(w.balance)).toFixed(2)} ${token}` : addr,
-          type: "crypto",
-        });
+        if (token === "USDT" && !usdtAdded) {
+          items.push({
+            id: "usdt_wallet",
+            label: t("statement.usdtWallet", "Кошелёк USDT"),
+            sublabel: w.balance !== undefined ? `${parseFloat(String(w.balance)).toFixed(2)} USDT` : undefined,
+            type: "crypto",
+          });
+          usdtAdded = true;
+        } else if (token !== "USDT") {
+          const addr = w.address ? `${String(w.address).slice(0, 6)}••${String(w.address).slice(-4)}` : "";
+          items.push({
+            id: `crypto_${w.id || w.address}`,
+            label: `${token} ${w.network || "TRC20"}`,
+            sublabel: w.balance !== undefined ? `${parseFloat(String(w.balance)).toFixed(2)} ${token}` : addr,
+            type: "crypto",
+          });
+        }
       }
+    }
+    
+    // Fallback: add USDT from wallet summary or as static entry
+    if (!usdtAdded) {
+      items.push({
+        id: "usdt_wallet",
+        label: t("statement.usdtWallet", "Кошелёк USDT"),
+        sublabel: usdtBalance !== undefined ? `${parseFloat(String(usdtBalance)).toFixed(2)} USDT` : "USDT",
+        type: "crypto",
+      });
     }
 
     setAssets(items);
