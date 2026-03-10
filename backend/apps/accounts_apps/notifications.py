@@ -612,7 +612,7 @@ def send_telegram_document(settings_obj, file_bytes, filename, caption):
             logger.error(f"TG Document: chat_id not found for {settings_obj.telegram_username}")
             return False
         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendDocument"
-        files = {'document': (filename, file_bytes, 'application/pdf')}
+        files = {'document': (filename, file_bytes, 'text/html')}
         data = {'chat_id': chat_id, 'caption': caption, 'parse_mode': 'HTML'}
         resp = requests.post(url, data=data, files=files, timeout=30)
         if resp.status_code == 200:
@@ -645,9 +645,9 @@ def send_whatsapp_file(phone, file_bytes, filename, caption):
         payload = {
             "chatId": f"{clean_phone}@c.us",
             "file": {
-                "mimetype": "application/pdf",
+                "mimetype": "text/html",
                 "filename": filename,
-                "data": f"data:application/pdf;base64,{b64}",
+                "data": f"data:text/html;base64,{b64}",
             },
             "caption": caption,
             "session": session_name,
@@ -683,7 +683,7 @@ def send_email_with_attachment(email_address, subject, body_text, file_bytes, fi
             connection = None
 
         email_msg = EmailMessage(subject, body_text, from_email, [email_address], connection=connection)
-        email_msg.attach(filename, file_bytes, 'application/pdf')
+        email_msg.attach(filename, file_bytes, 'text/html')
         email_msg.send()
         logger.info(f"Email with attachment sent to {email_address}")
         return True
@@ -692,9 +692,9 @@ def send_email_with_attachment(email_address, subject, body_text, file_bytes, fi
         return False
 
 
-def send_statement_to_channels(user_id, channels, period_label, asset_labels, lang='en', pdf_base64=None, file_name=None):
+def send_statement_to_channels(user_id, channels, period_label, asset_labels, lang='en', html_base64=None, file_name=None):
     """
-    Send statement PDF file via selected channels (telegram, whatsapp, email).
+    Send statement HTML file via selected channels (telegram, whatsapp, email).
     Returns dict with results per channel.
     """
     import base64 as b64mod
@@ -704,13 +704,13 @@ def send_statement_to_channels(user_id, channels, period_label, asset_labels, la
     caption = tr['caption'].format(period=period_label)
     subject = tr['subject']
 
-    if pdf_base64:
-        file_bytes = b64mod.b64decode(pdf_base64)
+    if html_base64:
+        file_bytes = b64mod.b64decode(html_base64)
     else:
-        file_bytes = b'%PDF-1.4 empty'
+        file_bytes = b'<html><body>Empty statement</body></html>'
 
     file_date = __import__('datetime').datetime.now().strftime('%Y%m%d')
-    filename = file_name or f"uEasyCard_Statement_{file_date}.pdf"
+    filename = file_name or f"uEasyCard_Statement_{file_date}.html"
 
     # Get user notification settings
     notif = UserNotificationSettings.objects.filter(user_id=user_id).first()

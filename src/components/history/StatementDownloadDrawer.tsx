@@ -184,7 +184,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       {
         key: "download",
         label: t("statement.deliveryDownload", "Скачать файл"),
-        sublabel: "PDF",
+        sublabel: "HTML",
         icon: <Download className="w-4 h-4" />,
         enabled: true,
         configured: true,
@@ -314,7 +314,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       const a = document.createElement("a");
       a.href = url;
       const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-      a.download = `uEasyCard_Statement_${fileDate}.pdf`;
+      a.download = `uEasyCard_Statement_${fileDate}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -400,7 +400,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
         const a = document.createElement("a");
         a.href = url;
         const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        a.download = `uEasyCard_Statement_${fileDate}.pdf`;
+        a.download = `uEasyCard_Statement_${fileDate}.html`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
