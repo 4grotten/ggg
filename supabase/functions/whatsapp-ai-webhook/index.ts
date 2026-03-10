@@ -489,25 +489,24 @@ Deno.serve(async (req) => {
 
     // Handle voice/audio messages
     let userText = msgBody.body || "";
-    const isVoiceMessage = msgBody.hasMedia && (msgBody.type === "ptt" || msgBody.type === "audio");
+    const hasMediaAudio = msgBody.hasMedia && msgBody.media?.mimetype?.startsWith("audio");
     
-    if (isVoiceMessage && !userText) {
-      console.log("[whatsapp-ai] Voice message detected, attempting transcription...");
+    if (hasMediaAudio && !userText) {
+      console.log("[whatsapp-ai] Voice message detected, media:", JSON.stringify(msgBody.media));
       
-      // Try to get media URL from WAHA payload
-      let mediaUrl = msgBody.mediaUrl;
-      let mimetype = msgBody.mimetype || "audio/ogg";
-      
-      if (!mediaUrl) {
-        // Try downloading via WAHA API
-        const media = await downloadWahaMedia(wahaHost, wahaApiKey, wahaSession, msgBody.id?._serialized || msgBody.id);
-        if (media) {
-          mediaUrl = media.url;
-          mimetype = media.mimetype;
-        }
-      }
+      // Get media URL from WAHA payload and fix localhost URL
+      let mediaUrl = msgBody.media?.url || "";
+      const mimetype = msgBody.media?.mimetype || "audio/ogg";
       
       if (mediaUrl) {
+        // WAHA returns localhost URL — replace with actual WAHA host
+        if (mediaUrl.includes("localhost") || mediaUrl.includes("127.0.0.1")) {
+          const wahaBase = wahaHost.replace(/\/+$/, "");
+          const urlPath = new URL(mediaUrl).pathname;
+          mediaUrl = `${wahaBase}${urlPath}`;
+          console.log(`[whatsapp-ai] Rewritten media URL: ${mediaUrl}`);
+        }
+        
         const transcript = await transcribeVoice(mediaUrl, mimetype);
         if (transcript) {
           userText = transcript;
@@ -518,7 +517,7 @@ Deno.serve(async (req) => {
           return new Response(JSON.stringify({ ok: true }));
         }
       } else {
-        console.error("[whatsapp-ai] No media URL available for voice message");
+        console.error("[whatsapp-ai] No media URL in payload");
         await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
           "⚠️ Не удалось загрузить голосовое сообщение.");
         return new Response(JSON.stringify({ ok: true }));
