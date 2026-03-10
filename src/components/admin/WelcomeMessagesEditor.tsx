@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇬🇧" },
@@ -19,6 +20,7 @@ const LANGUAGES = [
 
 export function WelcomeMessagesEditor() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [activeLang, setActiveLang] = useState("en");
   const [messages, setMessages] = useState<Record<string, string>>({});
   const [originalMessages, setOriginalMessages] = useState<Record<string, string>>({});
@@ -73,18 +75,10 @@ export function WelcomeMessagesEditor() {
   const handleTest = async () => {
     setIsTesting(true);
     try {
-      // Get current admin's phone from profile
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("phone")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!profile?.phone) {
+      const phone = user?.phone_number;
+      if (!phone) {
         toast.error(t("admin.welcomeMessages.noPhone", "Номер телефона не найден в профиле"));
+        setIsTesting(false);
         return;
       }
 
@@ -95,7 +89,7 @@ export function WelcomeMessagesEditor() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            phone: profile.phone,
+            phone: phone,
             language: activeLang,
           }),
         }
