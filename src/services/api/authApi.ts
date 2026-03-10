@@ -431,6 +431,33 @@ export async function setSocialNetworks(urls: string[]) {
   return apiPost<SetSocialNetworksResponse>('/users/social_networks/', { networks: urls });
 }
 
+// ============ Change Auth Number API ============
+
+export interface ChangeAuthNumberRequest {
+  old_phone_number: string;
+  new_phone_number: string;
+  code?: number;
+}
+
+export interface ChangeAuthNumberResponse {
+  message: string;
+}
+
+/**
+ * Change and verify auth phone number
+ * POST /users/doChangeAndVerifyNewNumber/
+ */
+export async function changeAuthNumber(data: ChangeAuthNumberRequest) {
+  const body: Record<string, any> = {
+    old_phone_number: data.old_phone_number,
+    new_phone_number: data.new_phone_number,
+  };
+  if (data.code !== undefined) {
+    body.code = data.code;
+  }
+  return apiPost<ChangeAuthNumberResponse>('/users/doChangeAndVerifyNewNumber/', body);
+}
+
 // ============ Phone Numbers API ============
 
 export interface PhoneNumberItem {
