@@ -621,7 +621,7 @@
   },
   "statement": {
     "title": "Скачать выписку",
-    "short": "Скачать",
+    "short": "Выписка",
     "accounts": "Счета и кошельки",
     "selectAll": "Выбрать все",
     "deselectAll": "Снять все",
