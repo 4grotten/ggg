@@ -675,6 +675,19 @@ const ProfileSteps = () => {
       // Sync profile to AuthContext so name/avatar appear globally
       await refreshUser();
       
+      // Send WhatsApp welcome message (fire-and-forget)
+      if (phone) {
+        const deviceLang = navigator.language || "en";
+        const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+        if (projectId) {
+          fetch(`https://${projectId}.supabase.co/functions/v1/send-welcome-whatsapp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone, language: deviceLang }),
+          }).catch((err) => console.warn("Welcome WA failed:", err));
+        }
+      }
+      
       toast.success(t('auth.profile.success'));
       navigate("/", { replace: true });
     } catch (error) {
