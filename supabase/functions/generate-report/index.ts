@@ -579,8 +579,28 @@ serve(async (req) => {
 
     const generatedDate = formatDate(new Date().toISOString());
 
+    // Parse user profile
+    let userProfile: UserProfile | undefined;
+    try {
+      if (profileRes?.ok) {
+        const profileData = await profileRes.json();
+        const p = profileData.data || profileData;
+        const fullName = [p.first_name, p.last_name].filter(Boolean).join(' ');
+        userProfile = {
+          full_name: fullName || user_name || undefined,
+          phone: p.phone || undefined,
+          email: p.email || undefined,
+          iban: p.iban || undefined,
+          status: p.status || undefined,
+          is_verified: p.is_verified,
+          created_at: p.created_at || undefined,
+          account_balance: p.balance !== undefined ? String(p.balance) : undefined,
+        };
+      }
+    } catch (e) { console.error("Profile parse error:", e); }
+
     // Generate HTML
-    const htmlContent = buildHTML(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut, assetBalances, lang);
+    const htmlContent = buildHTML(filtered, periodLabel, userProfile?.full_name || user_name || '', generatedDate, totalIn, totalOut, assetBalances, lang, userProfile);
 
     const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const fileName = `uEasyCard_Report_${fileDate}.html`;
