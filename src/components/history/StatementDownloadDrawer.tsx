@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, Loader2, CheckCircle, CreditCard, Landmark, Wallet, Send, MessageCircle, Mail, Settings } from "lucide-react";
+import { Download, Loader2, CheckCircle, CreditCard, Landmark, Wallet, Send, MessageCircle, Mail, Settings, X, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Drawer,
