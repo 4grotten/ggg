@@ -1012,7 +1012,7 @@ Easy Card UAE`;
                             transition={{ duration: 0.2 }}
                             className="flex-1 text-left min-w-0"
                           >
-                            <p className="font-semibold">{platform.name}</p>
+                            <p className="font-semibold">{platform.id === "website" ? (() => { try { return new URL(link.url.startsWith("http") ? link.url : `https://${link.url}`).hostname; } catch { return platform.name; } })() : platform.name}</p>
                             <p className="text-sm text-muted-foreground truncate">{link.url}</p>
                           </motion.div>
                           <motion.div
