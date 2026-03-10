@@ -926,6 +926,7 @@ const EditProfile = () => {
                     setNewAuthPhone("+");
                     setAuthCode("");
                     setChangeAuthError("");
+                    setChangeAuthStep(1);
                     setIsChangeAuthDrawerOpen(true);
                   }}
                   className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
