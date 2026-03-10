@@ -547,15 +547,12 @@ serve(async (req) => {
         }
       }
 
-      // Encode HTML to base64 for backend delivery
-      const htmlBase64 = btoa(unescape(encodeURIComponent(htmlContent)));
-
       try {
         const sendRes = await fetch(`${BACKEND_BASE}/accounts/statement/send/`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            html_base64: htmlBase64,
+            html_content: htmlContent,
             file_name: fileName,
             channels: channelsToSend,
             period_label: periodLabel,

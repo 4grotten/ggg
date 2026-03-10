@@ -1509,9 +1509,9 @@ class StatementSendView(APIView):
         operation_summary="Отправить выписку через каналы уведомлений",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            required=['html_base64', 'channels'],
+            required=['html_content', 'channels'],
             properties={
-                'html_base64': openapi.Schema(type=openapi.TYPE_STRING, description='Base64-encoded HTML file'),
+                'html_content': openapi.Schema(type=openapi.TYPE_STRING, description='HTML content of the statement'),
                 'file_name': openapi.Schema(type=openapi.TYPE_STRING),
                 'channels': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
                 'period_label': openapi.Schema(type=openapi.TYPE_STRING),
@@ -1525,15 +1525,15 @@ class StatementSendView(APIView):
     def post(self, request):
         from apps.accounts_apps.notifications import send_statement_to_channels
 
-        html_base64 = request.data.get('html_base64', '')
+        html_content = request.data.get('html_content', '')
         file_name = request.data.get('file_name', '')
         channels = request.data.get('channels', [])
         period_label = request.data.get('period_label', '')
         asset_labels = request.data.get('asset_labels', [])
         lang = request.data.get('lang', 'en')
 
-        if not html_base64 or not channels:
-            return Response({"error": "html_base64 and channels are required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not html_content or not channels:
+            return Response({"error": "html_content and channels are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         results = send_statement_to_channels(
             user_id=request.user.id,
@@ -1541,7 +1541,7 @@ class StatementSendView(APIView):
             period_label=period_label,
             asset_labels=asset_labels,
             lang=lang,
-            html_base64=html_base64,
+            html_content=html_content,
             file_name=file_name,
         )
 
