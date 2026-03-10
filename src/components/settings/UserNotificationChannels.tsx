@@ -4,9 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Loader2, MessageCircle, Mail, Bell } from "lucide-react";
+import { Loader2, MessageCircle, Mail, Bell, ExternalLink } from "lucide-react";
 import { useUserNotificationSettings, UserNotificationSettings } from "@/hooks/useUserNotificationSettings";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+} from "@/components/ui/alert-dialog";
 
 interface ChannelConfig {
   key: "whatsapp" | "telegram" | "email";
@@ -62,6 +70,7 @@ export function UserNotificationChannels({ t, isPushEnabled, setIsPushEnabled }:
   const { settings, isLoading, updateSettings, isUpdating } = useUserNotificationSettings();
   const [editingChannel, setEditingChannel] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [showTelegramAlert, setShowTelegramAlert] = useState(false);
 
   const getValue = (ch: ChannelConfig): string => {
     if (!settings) return "";
@@ -100,6 +109,9 @@ export function UserNotificationChannels({ t, isPushEnabled, setIsPushEnabled }:
     updateSettings({ [ch.valueField]: value, [ch.enabledField]: true });
     setEditingChannel(null);
     toast.success(t("settings.saved") || "Сохранено");
+    if (ch.key === "telegram") {
+      setShowTelegramAlert(true);
+    }
   };
 
   const handlePushToggle = (checked: boolean) => {
@@ -271,6 +283,45 @@ export function UserNotificationChannels({ t, isPushEnabled, setIsPushEnabled }:
           📌 {t("settings.pushHint") || "Для работы PUSH уведомлений необходимо разрешить уведомления в настройках браузера. На iOS добавьте приложение на домашний экран."}
         </p>
       </div>
+
+      {/* Telegram Start Alert */}
+      <AlertDialog open={showTelegramAlert} onOpenChange={setShowTelegramAlert}>
+        <AlertDialogContent className="max-w-sm rounded-2xl">
+          <AlertDialogHeader>
+            <div className="mx-auto w-12 h-12 rounded-xl flex items-center justify-center mb-2" style={{ background: "linear-gradient(135deg, #2AABEE 0%, #229ED9 100%)" }}>
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+              </svg>
+            </div>
+            <AlertDialogTitle className="text-center">
+              {t("settings.telegramAlertTitle") || "Активируйте бота"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              {t("settings.telegramAlertDesc") || "Чтобы получать уведомления, перейдите в Telegram-бот и нажмите кнопку Start"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              className="w-full gap-2"
+              onClick={() => {
+                const bot = (settings?.tg_bot || "@uEasyCard_Bot").replace("@", "");
+                window.open(`https://t.me/${bot}`, "_blank");
+                setShowTelegramAlert(false);
+              }}
+            >
+              <ExternalLink className="w-4 h-4" />
+              {t("settings.goToBot") || "Перейти в бот"}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={() => setShowTelegramAlert(false)}
+            >
+              {t("settings.later") || "Позже"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
