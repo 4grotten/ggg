@@ -699,8 +699,8 @@ def send_statement_to_channels(user_id, channels, period_label, asset_labels, la
     """
     import base64 as b64mod
     tr = STATEMENT_TRANSLATIONS.get(lang, STATEMENT_TRANSLATIONS['en'])
-    assets_str = ', '.join(asset_labels) if asset_labels else '—'
-    message = tr['message'].format(period=period_label, assets=assets_str)
+    assets_detail = '\n'.join(f'  • {label}' for label in asset_labels) if asset_labels else '—'
+    message = tr['message'].format(period=period_label, assets_detail=assets_detail)
     caption = tr['caption'].format(period=period_label)
     subject = tr['subject']
 
