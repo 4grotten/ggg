@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { MessageCircle, Send, Mail, Bell, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Mail, Bell, Loader2, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { apiGet, apiPut } from "@/services/api/apiClient";
+import { apiGet, apiPut, apiPost } from "@/services/api/apiClient";
 
 interface Props {
   staffUserId: string;
@@ -23,6 +23,8 @@ interface NotifApiResponse {
   whatsapp_enabled: boolean;
   email_address: string | null;
   email_enabled: boolean;
+  push_enabled?: boolean;
+  push_token?: string | null;
 }
 
 const CHANNELS = [
@@ -71,6 +73,16 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
     onError: () => toast.error("Ошибка сохранения"),
   });
 
+  const testMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiPost(`/admin/notifications/test/${staffUserId}/`, {});
+      if (res.error) throw new Error(res.error.detail || res.error.message);
+      return res.data;
+    },
+    onSuccess: () => toast.success("Тестовое уведомление отправлено"),
+    onError: () => toast.error("Ошибка отправки тестового уведомления"),
+  });
+
   const handleToggle = (ch: typeof CHANNELS[number]) => {
     if (!settings) return;
     updateMutation.mutate({ [ch.enabledField]: !settings[ch.enabledField] });
@@ -85,7 +97,10 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   const getChannelValue = (ch: typeof CHANNELS[number]): string => {
     if (!settings) return "";
     const val = settings[ch.valueField];
-    return val != null ? String(val) : "";
+    if (val == null) return "";
+    const str = String(val);
+    if (ch.key === "whatsapp" && str && !str.startsWith("+")) return "+" + str;
+    return str;
   };
 
   const getChannelEnabled = (ch: typeof CHANNELS[number]): boolean => {
@@ -109,7 +124,19 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
           {readOnly && (
             <Badge variant="outline" className="text-[10px] ml-1 text-muted-foreground border-muted-foreground/30">Только просмотр</Badge>
           )}
-          <Badge variant="secondary" className="text-[10px] ml-auto">
+          {!readOnly && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-[10px] h-6 px-2 ml-auto gap-1"
+              onClick={() => testMutation.mutate()}
+              disabled={testMutation.isPending || activeCount === 0}
+            >
+              {testMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+              Тест
+            </Button>
+          )}
+          <Badge variant="secondary" className={cn("text-[10px]", readOnly && "ml-auto")}>
             {activeCount} активных
           </Badge>
         </div>

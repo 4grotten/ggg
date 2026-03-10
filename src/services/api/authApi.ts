@@ -261,16 +261,50 @@ export async function changePassword(old_password: string, new_password: string)
  * GET /users/me/
  */
 export async function getCurrentUser() {
-  const response = await apiGet<UserProfile>('/users/me/');
+  const response = await apiGet<any>('/users/me/');
   
-  // При успехе сохраняем данные пользователя
+  // При успехе нормализуем и сохраняем данные пользователя
   if (response.data) {
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
-    // Persist for multi-account switching
-    saveCurrentAccount(response.data);
+    const raw = response.data;
+    
+    // Normalize API response to flat UserProfile
+    // API returns: { user_id, full_name, phone, email, gender, avatar_url, apofiz_data: { username, date_of_birth, phone_number, avatar, ... } }
+    const apofiz = raw.apofiz_data || {};
+    const normalized: UserProfile = {
+      id: raw.id || apofiz.id,
+      user_id: raw.user_id,
+      full_name: raw.full_name || apofiz.full_name || '',
+      phone_number: raw.phone || apofiz.phone_number || raw.phone_number || '',
+      email: raw.email || apofiz.email || null,
+      avatar: apofiz.avatar || (raw.avatar_url ? { id: 0, file: raw.avatar_url, large: raw.avatar_url, medium: raw.avatar_url, small: raw.avatar_url } : null),
+      username: apofiz.username || raw.username || null,
+      date_of_birth: apofiz.date_of_birth || raw.date_of_birth || null,
+      gender: raw.gender || apofiz.gender || null,
+      has_empty_fields: apofiz.has_empty_fields ?? raw.has_empty_fields ?? false,
+      role: raw.role || null,
+      is_verified: raw.is_verified,
+      verification_status: raw.verification_status,
+    };
+
+    // Fallback phone from cached login data
+    if (!normalized.phone_number) {
+      try {
+        const cached = localStorage.getItem(AUTH_USER_KEY);
+        if (cached) {
+          const prev = JSON.parse(cached) as UserProfile;
+          if (prev.phone_number) {
+            normalized.phone_number = prev.phone_number;
+          }
+        }
+      } catch {}
+    }
+
+    response.data = normalized as any;
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalized));
+    saveCurrentAccount(normalized);
   }
   
-  return response;
+  return response as { data: UserProfile | null; error: any; status: number };
 }
 
 /**
@@ -395,6 +429,33 @@ export async function getSocialNetworks(userId: number) {
  */
 export async function setSocialNetworks(urls: string[]) {
   return apiPost<SetSocialNetworksResponse>('/users/social_networks/', { networks: urls });
+}
+
+// ============ Change Auth Number API ============
+
+export interface ChangeAuthNumberRequest {
+  old_phone_number: string;
+  new_phone_number: string;
+  code?: number;
+}
+
+export interface ChangeAuthNumberResponse {
+  message: string;
+}
+
+/**
+ * Change and verify auth phone number
+ * POST /users/doChangeAndVerifyNewNumber/
+ */
+export async function changeAuthNumber(data: ChangeAuthNumberRequest) {
+  const body: Record<string, any> = {
+    old_phone_number: data.old_phone_number,
+    new_phone_number: data.new_phone_number,
+  };
+  if (data.code !== undefined) {
+    body.code = data.code;
+  }
+  return apiPost<ChangeAuthNumberResponse>('/users/doChangeAndVerifyNewNumber/', body);
 }
 
 // ============ Phone Numbers API ============

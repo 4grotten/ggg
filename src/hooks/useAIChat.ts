@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAuthToken } from '@/services/api/apiClient';
+import { convertRussianNumbersToDigits } from '@/utils/russianNumbersToDigits';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -37,6 +38,26 @@ export const useAIChat = () => {
   useEffect(() => {
     saveMessages(messages);
   }, [messages]);
+
+  // Listen for voice assistant messages
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      const role = detail?.role;
+      const content = detail?.content;
+      console.log("voice-chat-message received:", { role, content });
+      if (!content?.trim() || !role) return;
+      const prefixed = `🎙 ${convertRussianNumbersToDigits(content)}`;
+      setMessages(prev => {
+        // Avoid duplicate if last message has same content
+        const last = prev[prev.length - 1];
+        if (last?.content === prefixed) return prev;
+        return [...prev, { role, content: prefixed }];
+      });
+    };
+    window.addEventListener("voice-chat-message", handler);
+    return () => window.removeEventListener("voice-chat-message", handler);
+  }, []);
 
   const sendMessage = useCallback(async (input: string) => {
     if (!input.trim()) return;

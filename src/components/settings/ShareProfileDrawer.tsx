@@ -41,7 +41,7 @@ import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
-import { getSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
+import { getSocialNetworks, getPhoneNumbers, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -281,11 +281,13 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
   const [socialLinks, setSocialLinks] = useState<SocialNetworkItem[]>([]);
   const [socialChecked, setSocialChecked] = useState<Record<number, boolean>>({});
   const [isLoadingSocial, setIsLoadingSocial] = useState(false);
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberItem[]>([]);
   
-  // Load social links when opening business card view
+  // Load social links and phone numbers when opening business card view
   useEffect(() => {
     if (currentView === "businessCard" && user?.id) {
       loadSocialLinks();
+      loadPhoneNumbers();
     }
   }, [currentView, user?.id]);
   
@@ -358,6 +360,36 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
       setIsLoadingSocial(false);
     }
   };
+
+  const loadPhoneNumbers = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await getPhoneNumbers(user.id);
+      if (response.data) {
+        setPhoneNumbers(response.data);
+        // Add phone numbers as business card fields
+        setBusinessCardFields(prev => {
+          // Remove old phone_extra fields
+          const filtered = prev.filter(f => !f.id.startsWith("phone_extra_"));
+          const phoneFields: BusinessCardField[] = response.data.map((pn, idx) => ({
+            id: `phone_extra_${idx}`,
+            label: `${t("editProfile.phone") || "Phone"} ${idx + 1}`,
+            value: pn.phone_number,
+            icon: <Phone className="w-4 h-4" />,
+            checked: true
+          }));
+          // Insert after the main phone field (or at end of existing fields)
+          const phoneIndex = filtered.findIndex(f => f.id === "phone");
+          if (phoneIndex >= 0) {
+            return [...filtered.slice(0, phoneIndex + 1), ...phoneFields, ...filtered.slice(phoneIndex + 1)];
+          }
+          return [...filtered, ...phoneFields];
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load phone numbers:", error);
+    }
+  };
   
   const toggleField = (fieldId: string) => {
     tap();
@@ -385,6 +417,7 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     setBusinessCardFields([]);
     setSocialLinks([]);
     setSocialChecked({});
+    setPhoneNumbers([]);
     onClose();
   };
 
@@ -583,10 +616,16 @@ Easy Card UAE`;
       vcard += `N:;Contact;;;\n`;
     }
     
-    // Phone number
+    // Phone number (main auth phone)
     if (phone) {
       vcard += `TEL;TYPE=CELL:${phone}\n`;
     }
+    
+    // Extra phone numbers from phone_numbers API
+    const extraPhones = selectedFields.filter(f => f.id.startsWith("phone_extra_"));
+    extraPhones.forEach(pf => {
+      vcard += `TEL;TYPE=VOICE:${pf.value}\n`;
+    });
     
     // Email
     if (email) {
@@ -649,9 +688,12 @@ Easy Card UAE`;
                   }}
                   className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-2xl hover:opacity-90 transition-opacity"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                    <User className="w-6 h-6" />
-                  </div>
+                  <Avatar className="w-12 h-12 rounded-full">
+                    <AvatarImage src={avatarUrl} alt={user?.full_name || "User"} className="rounded-full" />
+                    <AvatarFallback className="rounded-full bg-white/20 text-primary-foreground text-lg font-bold">
+                      {user?.full_name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="flex-1 text-left">
                     <p className="font-semibold">{t("settings.businessCard") || "Business Card"}</p>
                     <p className="text-sm opacity-80">{t("settings.shareContactInfo") || "Share your contact info"}</p>
@@ -940,18 +982,37 @@ Easy Card UAE`;
                             animate={{ scale: isChecked ? 1 : 0.95, opacity: isChecked ? 1 : 0.7 }}
                             transition={{ type: "spring", stiffness: 400, damping: 25 }}
                             className={cn(
-                              "w-11 h-11 rounded-xl flex items-center justify-center shadow-lg",
+                              "w-11 h-11 rounded-xl flex items-center justify-center shadow-lg overflow-hidden",
                               platform.bgColor
                             )}
                           >
-                            <IconComponent className="w-5 h-5 text-white" />
+                            {platform.id === "website" ? (() => {
+                              try {
+                                const hostname = new URL(link.url.startsWith("http") ? link.url : `https://${link.url}`).hostname;
+                                return (
+                                  <img 
+                                    src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`} 
+                                    alt={hostname}
+                                    className="w-6 h-6 rounded"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                      (e.target as HTMLImageElement).parentElement!.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+                                    }}
+                                  />
+                                );
+                              } catch {
+                                return <IconComponent className="w-5 h-5 text-white" />;
+                              }
+                            })() : (
+                              <IconComponent className="w-5 h-5 text-white" />
+                            )}
                           </motion.div>
                           <motion.div 
                             animate={{ opacity: isChecked ? 1 : 0.6 }}
                             transition={{ duration: 0.2 }}
                             className="flex-1 text-left min-w-0"
                           >
-                            <p className="font-semibold">{platform.name}</p>
+                            <p className="font-semibold">{platform.id === "website" ? (() => { try { return new URL(link.url.startsWith("http") ? link.url : `https://${link.url}`).hostname; } catch { return platform.name; } })() : platform.name}</p>
                             <p className="text-sm text-muted-foreground truncate">{link.url}</p>
                           </motion.div>
                           <motion.div

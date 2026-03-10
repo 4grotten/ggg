@@ -184,10 +184,11 @@ const Chat = () => {
             <AnimatePresence>
               {messages.map((message, index) => {
                 const isLastAssistant = message.role === 'assistant' && index === messages.length - 1;
-                // Only show period select if the user asked about transactions/balance/history
+                // Only show period select if user asked about transactions AND assistant responded with financial data
                 const prevUserMsg = index > 0 ? messages[index - 1] : null;
                 const userAskedForTransactions = prevUserMsg?.role === 'user' && /транзакц|операц|истори|баланс|отчет|покажи|выписк/i.test(prevUserMsg.content);
-                const showPeriod = isLastAssistant && !isLoading && userAskedForTransactions;
+                const assistantHasFinancialData = /💳|💰|🏦|🪙|AED|USDT|дирхам/i.test(message.content);
+                const showPeriod = isLastAssistant && !isLoading && userAskedForTransactions && assistantHasFinancialData;
                 return (
                   <div key={index}>
                     <ChatMessage role={message.role} content={message.content} periodSelect={showPeriod ? handleSendMessage : undefined} />

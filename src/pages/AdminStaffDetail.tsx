@@ -11,10 +11,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { apiRequest, AUTH_USER_KEY } from "@/services/api/apiClient";
+import { apiRequest } from "@/services/api/apiClient";
 import { StaffMember } from "@/hooks/useAdminManagement";
 import { format } from "date-fns";
 import StaffNotificationSettings from "@/components/admin/StaffNotificationSettings";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AuditEntry {
   id: string;
@@ -66,18 +67,9 @@ export default function AdminStaffDetail() {
   const navigate = useNavigate();
   const { staffId } = useParams<{ staffId: string }>();
   const { t } = useTranslation();
+  const { user } = useAuth();
 
-  // Check if current logged-in user is root
-  const currentUserRole = (() => {
-    try {
-      const cached = localStorage.getItem(AUTH_USER_KEY);
-      const parsed = cached ? JSON.parse(cached) : null;
-      console.log('[StaffDetail] AUTH_USER_KEY parsed:', parsed, 'role:', parsed?.role);
-      return parsed?.role || null;
-    } catch { /* ignore */ }
-    return null;
-  })();
-  const isCurrentUserRoot = currentUserRole === 'root';
+  const isCurrentUserRoot = user?.role === 'root';
 
   const { data: staffList } = useQuery({
     queryKey: ["admin-staff"],

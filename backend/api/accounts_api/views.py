@@ -1461,3 +1461,88 @@ class UpdateLanguageView(APIView):
         profile.save()
         
         return Response({"status": "success", "language": lang}, status=status.HTTP_200_OK)
+
+
+class TelegramWebhookSaveChatIdView(APIView):
+    """Публичный эндпоинт для сохранения telegram chat_id по username (вызывается webhook-ом бота)."""
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username', '').strip().lower().replace('@', '')
+        chat_id = request.data.get('chat_id', '').strip()
+
+        if not username or not chat_id:
+            return Response({"error": "username and chat_id required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update admin notification settings
+        updated_admin = AdminNotificationSettings.objects.filter(
+            telegram_username__iexact=username
+        ).update(telegram_chat_id=chat_id)
+
+        updated_admin2 = AdminNotificationSettings.objects.filter(
+            telegram_username__iexact=f"@{username}"
+        ).update(telegram_chat_id=chat_id)
+
+        # Update user notification settings
+        updated_user = UserNotificationSettings.objects.filter(
+            telegram_username__iexact=username
+        ).update(telegram_chat_id=chat_id)
+
+        updated_user2 = UserNotificationSettings.objects.filter(
+            telegram_username__iexact=f"@{username}"
+        ).update(telegram_chat_id=chat_id)
+
+        total = updated_admin + updated_admin2 + updated_user + updated_user2
+
+        return Response({
+            "detail": f"Updated {total} record(s) for @{username}",
+            "chat_id": chat_id,
+        }, status=status.HTTP_200_OK)
+
+
+class StatementSendView(APIView):
+    """Send generated statement HTML to user channels (Telegram, WhatsApp, Email)."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Отправить выписку через каналы уведомлений",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['html_base64', 'channels'],
+            properties={
+                'html_base64': openapi.Schema(type=openapi.TYPE_STRING, description='Base64-encoded HTML file'),
+                'file_name': openapi.Schema(type=openapi.TYPE_STRING),
+                'channels': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
+                'period_label': openapi.Schema(type=openapi.TYPE_STRING),
+                'asset_labels': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
+                'lang': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        ),
+        responses={200: openapi.Response(description="Результаты отправки")},
+        tags=["Выписки (Statements)"]
+    )
+    def post(self, request):
+        from apps.accounts_apps.notifications import send_statement_to_channels
+
+        html_base64 = request.data.get('html_base64', '')
+        file_name = request.data.get('file_name', '')
+        channels = request.data.get('channels', [])
+        period_label = request.data.get('period_label', '')
+        asset_labels = request.data.get('asset_labels', [])
+        lang = request.data.get('lang', 'en')
+
+        if not html_base64 or not channels:
+            return Response({"error": "html_base64 and channels are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        results = send_statement_to_channels(
+            user_id=request.user.id,
+            channels=channels,
+            period_label=period_label,
+            asset_labels=asset_labels,
+            lang=lang,
+            html_base64=html_base64,
+            file_name=file_name,
+        )
+
+        return Response({"results": results}, status=status.HTTP_200_OK)

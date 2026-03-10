@@ -9,6 +9,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
+import { apiPost } from "@/services/api/apiClient";
 
 const languages = [
   { code: "system", name: "System", flag: "🌐" },
@@ -33,6 +34,13 @@ export const LanguageSwitcher = () => {
     languages.find((l) => l.code === i18n.language) || 
     languages[2]; // Default to English
 
+  const syncLanguageToBackend = (langCode: string) => {
+    if (langCode === "system") return;
+    apiPost("/users/language/", { language: langCode }).catch((err) =>
+      console.warn("Failed to sync language to backend:", err)
+    );
+  };
+
   const handleLanguageSelect = (code: string) => {
     setSelectedLanguage(code);
     const selectedLang = languages.find((l) => l.code === code);
@@ -42,10 +50,12 @@ export const LanguageSwitcher = () => {
       const supportedLangs = ["en", "ru", "de", "tr", "zh", "ar", "es"];
       const detectedLang = supportedLangs.includes(browserLang) ? browserLang : "en";
       i18n.changeLanguage(detectedLang);
+      syncLanguageToBackend(detectedLang);
       const detectedLangName = languages.find((l) => l.code === detectedLang)?.name || "English";
       toast.success(t("toast.languageSystem", { language: detectedLangName }));
     } else {
       i18n.changeLanguage(code);
+      syncLanguageToBackend(code);
       toast.success(t("toast.languageChanged", { language: selectedLang?.name }));
     }
     
