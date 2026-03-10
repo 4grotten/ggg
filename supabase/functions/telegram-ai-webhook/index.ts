@@ -316,6 +316,7 @@ Deno.serve(async (req) => {
 
     const aiData = await aiRes.json();
     const reply = aiData.choices?.[0]?.message?.content || "Не удалось получить ответ.";
+    console.log(`[telegram-ai] AI reply: ${reply.slice(0, 100)}`);
 
     // 7. Save assistant message
     await supabase.from("messenger_chat_history").insert({
