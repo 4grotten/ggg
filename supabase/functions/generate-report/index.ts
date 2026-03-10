@@ -903,7 +903,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("Report generation error:", error);
     return new Response(
-      JSON.stringify({ error: "Ошибка при формировании отчёта" }),
+      JSON.stringify({ error: t(lang, 'genError') }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
