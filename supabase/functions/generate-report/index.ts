@@ -443,12 +443,13 @@ serve(async (req) => {
       "Authorization": `Token ${backend_token}`,
     };
 
-    // Fetch transactions and balances in parallel
-    const [response, walletRes, bankRes, cryptoRes] = await Promise.all([
+    // Fetch transactions, balances, and user profile in parallel
+    const [response, walletRes, bankRes, cryptoRes, profileRes] = await Promise.all([
       fetch(`${BACKEND_BASE}/transactions/all/`, { method: "GET", headers }),
       fetch(`${BACKEND_BASE}/cards/wallet/summary/`, { method: "GET", headers }).catch(() => null),
       fetch(`${BACKEND_BASE}/transactions/bank-accounts/`, { method: "GET", headers }).catch(() => null),
       fetch(`${BACKEND_BASE}/transactions/crypto-wallets/`, { method: "GET", headers }).catch(() => null),
+      fetch(`${BACKEND_BASE}/accounts/open/users/me/detail/`, { method: "GET", headers }).catch(() => null),
     ]);
 
     if (!response.ok) {
