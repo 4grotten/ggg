@@ -289,6 +289,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             end_date: end,
             user_name: userName,
             asset_filter: uniqueAssetTypes,
+            lang: i18n.language,
           }),
         }
       );
