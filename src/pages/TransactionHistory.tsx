@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronDown, Download } from "lucide-react";
+import { ChevronLeft, ChevronDown, Download, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
@@ -21,96 +21,9 @@ import { format, startOfDay, endOfDay, startOfWeek, subMonths } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TransactionGroup, Transaction } from "@/types/transaction";
 import { StatementDownloadDrawer } from "@/components/history/StatementDownloadDrawer";
-
-// All transactions data
-const allTransactionsData: Record<string, TransactionGroup[]> = {
-  virtual: [
-    {
-      date: "January 17",
-      totalSpend: 0,
-      transactions: [
-        { id: "23", merchant: "Bank Transfer", time: "14:30", amountUSDT: 28000.00, amountLocal: 28000.00, localCurrency: "AED", color: "#22C55E", type: "bank_transfer_incoming", status: "settled" },
-        { id: "22", merchant: "Top up", time: "11:15", amountUSDT: 50410.96, amountLocal: 184000.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
-      ],
-    },
-    {
-      date: "January 12",
-      totalSpend: 2420.00,
-      transactions: [
-        { id: "21", merchant: "Bank Transfer", time: "19:45", amountUSDT: 1890.00, amountLocal: 1890.00, localCurrency: "AED", color: "#8B5CF6", type: "bank_transfer", status: "settled" },
-        { id: "20", merchant: "Stablecoin Send", time: "18:20", amountUSDT: 280.00, amountLocal: 1033.20, localCurrency: "AED", color: "#10B981", type: "crypto_withdrawal", status: "settled" },
-        { id: "19", merchant: "Card Transfer", time: "16:45", amountUSDT: 50.00, amountLocal: 50.00, localCurrency: "AED", color: "#22C55E", type: "card_transfer", senderName: "ANNA JOHNSON", senderCard: "8834", status: "settled" },
-      ],
-    },
-    {
-      date: "January 10",
-      totalSpend: 125.87,
-      transactions: [
-        { id: "1", merchant: "LIFE", time: "13:02", amountUSDT: 8.34, amountLocal: 29.87, localCurrency: "AED", color: "#3B82F6" },
-        { id: "2", merchant: "ALAYA", time: "00:59", amountUSDT: 26.80, amountLocal: 96.00, localCurrency: "AED", color: "#22C55E" },
-      ],
-    },
-    {
-      date: "December 31",
-      totalSpend: 22.06,
-      transactions: [
-        { id: "5", merchant: "CELLAR", time: "20:48", amountUSDT: 22.06, amountLocal: 79.00, localCurrency: "AED", color: "#EAB308" },
-        { id: "6", merchant: "Top up", time: "20:46", amountUSDT: 194.10, amountLocal: 200.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
-      ],
-    },
-    {
-      date: "December 30",
-      totalSpend: 678.58,
-      transactions: [
-        { id: "12", merchant: "RESTAURANT", time: "03:21", amountUSDT: 424.81, amountLocal: 418.53, localCurrency: "AED", color: "#EF4444" },
-      ],
-    },
-    {
-      date: "December 21",
-      totalSpend: 204.55,
-      transactions: [
-        { id: "15", merchant: "Annual Card fee", time: "23:31", amountUSDT: 56.04, amountLocal: 204.55, localCurrency: "AED", color: "#CCFF00", type: "card_activation" },
-        { id: "16", merchant: "Top up", time: "23:30", amountUSDT: 44.10, amountLocal: 50.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
-      ],
-    },
-  ],
-  metal: [
-    {
-      date: "January 12",
-      totalSpend: 350.00,
-      transactions: [
-        { id: "17", merchant: "Card Transfer", time: "15:30", amountUSDT: 250.00, amountLocal: 250.00, localCurrency: "AED", color: "#007AFF", type: "card_transfer", recipientCard: "4521", status: "processing" },
-        { id: "18", merchant: "Card Transfer", time: "12:15", amountUSDT: 100.00, amountLocal: 100.00, localCurrency: "AED", color: "#007AFF", type: "card_transfer", recipientCard: "8834", status: "settled" },
-      ],
-    },
-    {
-      date: "January 10",
-      totalSpend: 193.60,
-      transactions: [
-        { id: "3", merchant: "Ongaku", time: "00:17", amountUSDT: 54.05, amountLocal: 193.60, localCurrency: "AED", color: "#F97316" },
-      ],
-    },
-    {
-      date: "January 02",
-      totalSpend: 225.00,
-      transactions: [
-        { id: "4", merchant: "OPERA", time: "20:20", amountUSDT: 62.82, amountLocal: 225.00, localCurrency: "AED", color: "#A855F7" },
-      ],
-    },
-    {
-      date: "December 30",
-      totalSpend: 996.50,
-      transactions: [
-        { id: "7", merchant: "BHPC", time: "20:16", amountUSDT: 125.64, amountLocal: 450.00, localCurrency: "AED", color: "#EAB308" },
-        { id: "8", merchant: "Bhpc", time: "20:15", amountUSDT: 142.90, amountLocal: 140.78, localCurrency: "$", color: "#EC4899", type: "declined" },
-        { id: "9", merchant: "Bhpc", time: "20:14", amountUSDT: 157.49, amountLocal: 155.16, localCurrency: "$", color: "#EC4899", type: "declined" },
-        { id: "11", merchant: "Service CEO", time: "07:58", amountUSDT: 11.59, amountLocal: 41.50, localCurrency: "AED", color: "#06B6D4" },
-        { id: "13", merchant: "Top up", time: "02:30", amountUSDT: 494.10, amountLocal: 500.00, localCurrency: "USDT", color: "#22C55E", type: "topup", status: "settled" },
-      ],
-    },
-  ],
-};
-
+import { useApiTransactionGroups, useIbanTransactionGroups, useCryptoTransactionGroups, useCardTransactionGroups } from "@/hooks/useTransactions";
+import { useQueryClient } from "@tanstack/react-query";
+import { transactionKeys } from "@/hooks/useTransactions";
 type FilterType = "all" | "income" | "expenses" | "transfers";
 type AssetType = "all" | "virtual" | "metal" | "iban" | "crypto";
 type PeriodPreset = "allTime" | "today" | "thisWeek" | "month" | "threeMonths" | "nineMonths" | "custom";
@@ -119,6 +32,15 @@ const TransactionHistory = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  
+  // Fetch real API data
+  const { data: apiGroups, isLoading: apiLoading } = useApiTransactionGroups();
+  const { data: ibanGroups, isLoading: ibanLoading } = useIbanTransactionGroups();
+  const { data: cryptoGroups, isLoading: cryptoLoading } = useCryptoTransactionGroups();
+  const { data: cardGroups, isLoading: cardLoading } = useCardTransactionGroups();
+  
+  const isLoading = apiLoading || ibanLoading || cryptoLoading || cardLoading;
   
   const [activeAsset, setActiveAsset] = useState<AssetType>(() => {
     const p = searchParams.get("asset");
@@ -191,7 +113,8 @@ const TransactionHistory = () => {
   }, [activeAsset]);
 
   const handleRefresh = async () => {
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Invalidate all transaction queries to refetch
+    await queryClient.invalidateQueries({ queryKey: transactionKeys.all });
     toast.success(t('toast.dataUpdated'));
   };
 
@@ -210,87 +133,90 @@ const TransactionHistory = () => {
   };
 
   const isIncomeTransaction = (tx: Transaction): boolean => {
-    return tx.type === "topup" || 
-           tx.type === "bank_transfer_incoming" || 
-           (tx.type === "card_transfer" && !!tx.senderCard);
+    const type = tx.type as string || "";
+    return type === "topup" || 
+           type === "top_up" ||
+           type === "bank_transfer_incoming" || 
+           type === "transfer_in" ||
+           type === "refund" ||
+           type === "cashback" ||
+           (type === "card_transfer" && !!tx.senderCard);
   };
 
   const isExpenseTransaction = (tx: Transaction): boolean => {
-    return !tx.type || 
-           tx.type === "declined" || 
-           tx.type === "card_activation" ||
-           tx.type === "bank_transfer" ||
-           tx.type === "crypto_withdrawal";
+    const type = tx.type as string || "";
+    return !type || 
+           type === "declined" || 
+           type === "card_activation" ||
+           type === "card_payment" ||
+           type === "bank_transfer" ||
+           type === "transfer_out" ||
+           type === "withdrawal" ||
+           type === "fee" ||
+           type === "crypto_withdrawal";
   };
 
   const isTransferTransaction = (tx: Transaction): boolean => {
-    return tx.type === "card_transfer" || 
-           tx.type === "bank_transfer" || 
-           tx.type === "bank_transfer_incoming" ||
-           tx.type === "crypto_withdrawal";
+    const type = tx.type as string || "";
+    return type === "card_transfer" || 
+           type === "bank_transfer" || 
+           type === "bank_transfer_incoming" ||
+           type === "transfer_in" ||
+           type === "transfer_out" ||
+           type === "crypto_withdrawal" ||
+           type === "crypto_to_card" ||
+           type === "crypto_to_iban" ||
+           type === "iban_to_iban";
   };
 
-  // Asset filtering for mock data
-  const isAssetMatch = (tx: Transaction, asset: AssetType): boolean => {
-    if (asset === "all") return true;
-    const txType = tx.type || "";
-    if (asset === "crypto") {
-      return txType.includes("crypto") || tx.localCurrency === "USDT";
+  // Merge groups by date helper
+  const mergeGroupsByDate = (allGroups: TransactionGroup[]): TransactionGroup[] => {
+    const dateMap = new Map<string, TransactionGroup>();
+    for (const group of allGroups) {
+      if (dateMap.has(group.date)) {
+        const existing = dateMap.get(group.date)!;
+        // Deduplicate transactions by id
+        const existingIds = new Set(existing.transactions.map(tx => tx.id));
+        const newTxs = group.transactions.filter(tx => !existingIds.has(tx.id));
+        dateMap.set(group.date, {
+          ...existing,
+          totalSpend: existing.totalSpend + group.totalSpend,
+          transactions: [...existing.transactions, ...newTxs],
+        });
+      } else {
+        dateMap.set(group.date, { ...group });
+      }
     }
-    if (asset === "iban") {
-      return txType.includes("bank_transfer");
-    }
-    // virtual and metal use the data source directly
-    return true;
+    return Array.from(dateMap.values());
   };
 
   const filteredGroups = useMemo(() => {
-    // Get groups based on asset type
     let groups: TransactionGroup[] = [];
+    
     if (activeAsset === "all") {
-      // Merge virtual and metal
-      const virtualGroups = allTransactionsData.virtual || [];
-      const metalGroups = allTransactionsData.metal || [];
-      const allGroups = [...virtualGroups, ...metalGroups];
-      // Merge by date
-      const dateMap = new Map<string, TransactionGroup>();
-      for (const group of allGroups) {
-        if (dateMap.has(group.date)) {
-          const existing = dateMap.get(group.date)!;
-          dateMap.set(group.date, {
-            ...existing,
-            totalSpend: existing.totalSpend + group.totalSpend,
-            transactions: [...existing.transactions, ...group.transactions],
-          });
-        } else {
-          dateMap.set(group.date, { ...group });
-        }
-      }
-      groups = Array.from(dateMap.values());
+      // Merge all API sources
+      const allSources = [
+        ...(apiGroups || []),
+        ...(ibanGroups || []),
+        ...(cryptoGroups || []),
+        ...(cardGroups || []),
+      ];
+      groups = mergeGroupsByDate(allSources);
+    } else if (activeAsset === "iban") {
+      groups = ibanGroups || [];
+    } else if (activeAsset === "crypto") {
+      groups = cryptoGroups || [];
     } else if (activeAsset === "virtual" || activeAsset === "metal") {
-      groups = allTransactionsData[activeAsset] || [];
-    } else {
-      // For iban/crypto, filter from all data
-      const virtualGroups = allTransactionsData.virtual || [];
-      const metalGroups = allTransactionsData.metal || [];
-      const allGroups = [...virtualGroups, ...metalGroups];
-      const dateMap = new Map<string, TransactionGroup>();
-      for (const group of allGroups) {
-        const filtered = group.transactions.filter(tx => isAssetMatch(tx, activeAsset));
-        if (filtered.length > 0) {
-          const key = group.date;
-          if (dateMap.has(key)) {
-            const existing = dateMap.get(key)!;
-            dateMap.set(key, {
-              ...existing,
-              transactions: [...existing.transactions, ...filtered],
-            });
-          } else {
-            dateMap.set(key, { ...group, transactions: filtered });
-          }
-        }
-      }
-      groups = Array.from(dateMap.values());
+      // Card groups filtered by card type
+      const allCardGroups = cardGroups || [];
+      groups = allCardGroups.map(group => ({
+        ...group,
+        transactions: group.transactions.filter(tx => {
+          const meta = tx.metadata as Record<string, unknown> | undefined;
+          const cardType = (meta?.card_type as string || '').toLowerCase();
+          return cardType === activeAsset;
+        }),
+      })).filter(g => g.transactions.length > 0);
     }
 
     // Sort groups by date
@@ -317,7 +243,7 @@ const TransactionHistory = () => {
       
       return { ...group, transactions: filteredTxs };
     }).filter(group => group.transactions.length > 0);
-  }, [activeAsset, activeFilter, dateFrom, dateTo]);
+  }, [activeAsset, activeFilter, dateFrom, dateTo, apiGroups, ibanGroups, cryptoGroups, cardGroups]);
 
   const filterOptions: { key: FilterType; label: string }[] = [
     { key: "all", label: t("history.all") },
@@ -518,23 +444,32 @@ const TransactionHistory = () => {
           </div>
 
           {/* Transactions List */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${activeAsset}-${activeFilter}-${dateFrom?.toISOString()}-${dateTo?.toISOString()}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <CardTransactionsList groups={filteredGroups} />
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Empty State */}
-          {filteredGroups.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">{t("history.noTransactions")}</p>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-primary mb-3" />
+              <p className="text-sm text-muted-foreground">{t("common.loading", "Загрузка...")}</p>
             </div>
+          ) : (
+            <>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${activeAsset}-${activeFilter}-${dateFrom?.toISOString()}-${dateTo?.toISOString()}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <CardTransactionsList groups={filteredGroups} />
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Empty State */}
+              {filteredGroups.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">{t("history.noTransactions")}</p>
+                </div>
+              )}
+            </>
           )}
 
           {/* Footer */}
