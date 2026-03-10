@@ -754,7 +754,7 @@ serve(async (req) => {
     if (!response.ok) {
       console.error("Transactions API error:", response.status);
       return new Response(
-        JSON.stringify({ error: "Не удалось получить транзакции" }),
+        JSON.stringify({ error: t(lang, 'fetchError') }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
