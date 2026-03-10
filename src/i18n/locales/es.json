@@ -570,7 +570,8 @@
     "downloaded": "¡Extracto descargado!",
     "downloadError": "Error al generar el informe",
     "selectAtLeastOne": "Selecciona al menos una cuenta",
-    "usdtWallet": "Billetera USDT"
+    "usdtWallet": "Billetera USDT",
+    "next": "Continuar"
   },
   "transaction": {
     "back": "Atrás",

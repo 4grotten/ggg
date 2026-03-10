@@ -570,7 +570,8 @@
     "downloaded": "تم تحميل كشف الحساب!",
     "downloadError": "خطأ في إنشاء التقرير",
     "selectAtLeastOne": "اختر حسابًا واحدًا على الأقل",
-    "usdtWallet": "محفظة USDT"
+    "usdtWallet": "محفظة USDT",
+    "next": "متابعة"
   },
   "transaction": {
     "back": "رجوع",

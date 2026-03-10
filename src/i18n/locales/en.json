@@ -651,7 +651,8 @@
     "downloaded": "Statement downloaded!",
     "downloadError": "Report generation error",
     "selectAtLeastOne": "Select at least one account",
-    "usdtWallet": "USDT Wallet"
+    "usdtWallet": "USDT Wallet",
+    "next": "Continue"
   },
   "transaction": {
     "back": "Back",
