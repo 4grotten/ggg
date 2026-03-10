@@ -1394,7 +1394,11 @@
       "transfers": "转账",
       "transactionHistory": "交易记录",
       "accountsInfo": "银行与加密账户",
-      "receipts": "收据"
+      "receipts": "收据",
+      "admin": "管理面板与限额",
+      "adminRevenue": "管理：收入",
+      "adminUsers": "管理：用户",
+      "adminSettings": "管理：全局设置"
     },
     "notes": {
       "title": "注意事项"

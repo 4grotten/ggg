@@ -1439,7 +1439,9 @@
       "accountsInfo": "Банк и крипто-счета",
       "receipts": "Квитанции",
       "admin": "Админ настройки",
-      "adminRevenue": "Админ: Доходы"
+      "adminRevenue": "Админ: Доходы",
+      "adminUsers": "Админ: Пользователи",
+      "adminSettings": "Админ: Глобальные настройки"
     },
     "notes": {
       "title": "Примечания"
