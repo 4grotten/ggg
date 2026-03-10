@@ -62,4 +62,5 @@ urlpatterns = [
 
     path('users/language/', views.UpdateLanguageView.as_view()),
     path('telegram-webhook/save-chat-id/', views.TelegramWebhookSaveChatIdView.as_view(), name='telegram-webhook-save-chat-id'),
+    path('statement/send/', views.StatementSendView.as_view(), name='statement-send'),
 ]

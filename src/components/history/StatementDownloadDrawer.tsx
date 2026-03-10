@@ -351,6 +351,9 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
         return;
       }
 
+      const nonDownloadChannels = channels.filter(c => c !== "download");
+      const wantDownload = channels.includes("download");
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
         {
@@ -365,8 +368,8 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             end_date: end,
             user_name: userName,
             asset_filter: uniqueAssetTypes,
-            delivery_channels: channels.filter(c => c !== "download"),
-            also_download: channels.includes("download"),
+            delivery_channels: nonDownloadChannels,
+            also_download: wantDownload,
             lang: i18n.language,
           }),
         }
@@ -377,8 +380,10 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
         throw new Error(err.error || t("statement.sendError", "Ошибка отправки"));
       }
 
-      // If download was also selected, download the blob
-      if (channels.includes("download")) {
+      const contentType = response.headers.get("content-type") || "";
+
+      if (wantDownload && contentType.includes("text/html")) {
+        // Response is HTML file for download; delivery results are in header
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -392,7 +397,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       }
 
       setStep("done");
-      toast.success(t("statement.downloaded", "Выписка отправлена!"));
+      toast.success(t("statement.sent", "Выписка отправлена!"));
     } catch (error) {
       console.error("Statement send error:", error);
       toast.error(error instanceof Error ? error.message : t("statement.sendError", "Ошибка отправки"));

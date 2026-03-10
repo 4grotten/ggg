@@ -719,13 +719,27 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
 </html>`;
 }
 
+// ─── i18n for delivery messages ───
+const deliveryI18n: Record<Lang, Record<string, string>> = {
+  ru: { card: 'Карты', iban: 'Счета IBAN', crypto: 'Крипто кошельки' },
+  en: { card: 'Cards', iban: 'IBAN Accounts', crypto: 'Crypto Wallets' },
+  de: { card: 'Karten', iban: 'IBAN-Konten', crypto: 'Krypto-Wallets' },
+  tr: { card: 'Kartlar', iban: 'IBAN Hesapları', crypto: 'Kripto Cüzdanları' },
+  zh: { card: '卡', iban: 'IBAN 账户', crypto: '加密钱包' },
+  ar: { card: 'بطاقات', iban: 'حسابات IBAN', crypto: 'محافظ كريبتو' },
+  es: { card: 'Tarjetas', iban: 'Cuentas IBAN', crypto: 'Billeteras Cripto' },
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { backend_token, start_date, end_date, user_name, asset_filter, lang: rawLang } = await req.json();
+    const {
+      backend_token, start_date, end_date, user_name, asset_filter,
+      lang: rawLang, delivery_channels, also_download,
+    } = await req.json();
     const lang: Lang = (['ru','en','de','tr','zh','ar','es'].includes(rawLang) ? rawLang : 'en') as Lang;
     const locale = getLocale(lang);
     const filterAssets = Array.isArray(asset_filter) && asset_filter.length > 0 ? asset_filter : null;
@@ -768,7 +782,6 @@ serve(async (req) => {
     try {
       if (walletRes?.ok) {
         const wallet = await walletRes.json();
-        // Cards balances
         if (includeCards && wallet.cards && Array.isArray(wallet.cards)) {
           for (const card of wallet.cards) {
             const bal = parseFloat(String(card.balance || 0));
@@ -780,7 +793,6 @@ serve(async (req) => {
             }
           }
         }
-        // USDT balance
         if (includeCrypto && wallet.usdt_balance !== undefined) {
           const usdtBal = parseFloat(String(wallet.usdt_balance || 0));
           assetBalances.push({ label: `${t(lang, 'wallet')} USDT`, amount: usdtBal.toLocaleString(locale, { minimumFractionDigits: 2 }), currency: 'USDT' });
@@ -831,28 +843,19 @@ serve(async (req) => {
       filtered = filtered.filter((tx: any) => {
         const txType = String(tx.type || '').toLowerCase();
         const currency = String(tx.currency || tx.display?.primary_amount?.currency || '').toUpperCase();
-        
-        // Card transactions
         if (includeCards) {
           if (txType === 'card_payment' || txType === 'card_activation' || txType === 'card_transfer' || txType === 'payment') return true;
           if (tx.card_id) return true;
-          // Top-ups that go to cards
           if (txType === 'top_up' || txType === 'topup') return true;
         }
-        
-        // IBAN / bank transactions
         if (includeIban) {
           if (txType.includes('bank') || txType.includes('iban') || txType === 'withdrawal') return true;
           if (txType === 'transfer_in' || txType === 'transfer_out' || txType === 'internal_transfer') return true;
         }
-        
-        // Crypto transactions
         if (includeCrypto) {
           if (txType.includes('crypto')) return true;
           if (currency === 'USDT' || currency === 'BTC' || currency === 'ETH') return true;
         }
-        
-        // If transaction type doesn't clearly match any category, include if all types selected
         return false;
       });
     }
@@ -893,6 +896,72 @@ serve(async (req) => {
     const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const fileName = `uEasyCard_Report_${fileDate}.html`;
 
+    // ─── Delivery channels logic ───
+    const channelsToSend = Array.isArray(delivery_channels) ? delivery_channels.filter((c: string) => c !== 'download') : [];
+
+    if (channelsToSend.length > 0) {
+      // Build localized asset labels
+      const di = deliveryI18n[lang] || deliveryI18n['en'];
+      const assetLabels: string[] = [];
+      if (filterAssets) {
+        if (filterAssets.includes('card')) assetLabels.push(di.card);
+        if (filterAssets.includes('iban')) assetLabels.push(di.iban);
+        if (filterAssets.includes('crypto')) assetLabels.push(di.crypto);
+      }
+
+      // Call backend to send via channels
+      try {
+        const sendRes = await fetch(`${BACKEND_BASE}/accounts/statement/send/`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            html_content: html,
+            channels: channelsToSend,
+            period_label: periodLabel,
+            asset_labels: assetLabels,
+            lang,
+          }),
+        });
+        const sendData = await sendRes.json();
+        console.log("Statement delivery results:", JSON.stringify(sendData));
+
+        if (also_download) {
+          // Return HTML as file for download, with delivery results in a custom header
+          return new Response(html, {
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "text/html; charset=utf-8",
+              "Content-Disposition": `attachment; filename="${fileName}"`,
+              "X-Delivery-Results": JSON.stringify(sendData.results || {}),
+            },
+          });
+        }
+
+        // No download needed — return JSON with results
+        return new Response(
+          JSON.stringify({ ok: true, delivery: sendData.results || {} }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch (sendErr) {
+        console.error("Statement delivery error:", sendErr);
+        // Still return HTML for download if requested
+        if (also_download) {
+          return new Response(html, {
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "text/html; charset=utf-8",
+              "Content-Disposition": `attachment; filename="${fileName}"`,
+            },
+          });
+        }
+        return new Response(
+          JSON.stringify({ ok: false, error: "Delivery failed" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // No delivery channels — just return HTML file
     return new Response(html, {
       headers: {
         ...corsHeaders,
