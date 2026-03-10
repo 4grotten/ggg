@@ -597,7 +597,10 @@ serve(async (req) => {
   }
 
   try {
-    const { backend_token, start_date, end_date, user_name } = await req.json();
+    const { backend_token, start_date, end_date, user_name, asset_filter } = await req.json();
+    // asset_filter: optional array of asset types to include: ["card", "iban", "crypto"]
+    // If not provided or empty, include all assets
+    const filterAssets = Array.isArray(asset_filter) && asset_filter.length > 0 ? asset_filter : null;
 
     if (!backend_token) {
       return new Response(
