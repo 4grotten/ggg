@@ -400,7 +400,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
         const a = document.createElement("a");
         a.href = url;
         const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        a.download = `uEasyCard_Statement_${fileDate}.pdf`;
+        a.download = `uEasyCard_Statement_${fileDate}.html`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
