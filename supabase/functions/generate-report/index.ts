@@ -162,6 +162,9 @@ const i18n: Record<Lang, Record<string, string>> = {
     crypto_to_crypto: 'Cripto → Cripto', bank_to_crypto: 'Banco → Cripto', iban_to_iban: 'IBAN → IBAN',
     internal_transfer: 'Transferencia interna', payment: 'Pago',
     confidential: 'Documento confidencial · Solo para uso personal',
+    clientInfo: 'Información del Cliente', clientName: 'Nombre Completo', clientPhone: 'Teléfono', clientEmail: 'Correo',
+    clientIban: 'IBAN', clientAccount: 'Número de Cuenta', clientStatus: 'Estado', clientVerified: 'Verificado',
+    clientNotVerified: 'No Verificado', clientRegDate: 'Fecha de Registro',
   },
 };
 
