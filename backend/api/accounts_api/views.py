@@ -1643,8 +1643,22 @@ class MessengerIdentifyView(APIView):
         if not platform or not identifier:
             return Response({"error": "Missing platform or identifier"}, status=status.HTTP_400_BAD_REQUEST) 
         user_id = None
+        setting = None
         if platform == "telegram":
+            # 1. Try by chat_id first
             setting = UserNotificationSettings.objects.filter(telegram_chat_id=str(identifier), telegram_enabled=True).first()
+            if not setting:
+                # 2. Try by username (with or without @)
+                clean_username = str(identifier).lstrip('@')
+                setting = UserNotificationSettings.objects.filter(
+                    telegram_username__in=[f'@{clean_username}', clean_username],
+                    telegram_enabled=True
+                ).first()
+                # 3. Save chat_id from request header for future lookups
+                chat_id_from_header = request.data.get('chat_id')
+                if setting and chat_id_from_header:
+                    setting.telegram_chat_id = str(chat_id_from_header)
+                    setting.save(update_fields=['telegram_chat_id'])
             if setting:
                 user_id = setting.user_id
                 
