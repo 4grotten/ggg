@@ -241,6 +241,10 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       toast.error(t("statement.selectAtLeastOne", "Выберите хотя бы один счёт"));
       return;
     }
+    // Auto-select all enabled channels
+    const channels = getDeliveryChannels();
+    const enabledKeys = channels.filter(c => c.enabled).map(c => c.key);
+    setSelectedChannels(new Set(enabledKeys));
     setStep("delivery");
   };
 
