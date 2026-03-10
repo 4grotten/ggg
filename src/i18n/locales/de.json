@@ -554,7 +554,7 @@
   },
   "statement": {
     "title": "Kontoauszug herunterladen",
-    "short": "Herunterladen",
+    "short": "Auszug",
     "accounts": "Vermögensart wählen",
     "selectAll": "Alle auswählen",
     "deselectAll": "Alle abwählen",

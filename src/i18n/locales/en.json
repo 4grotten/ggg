@@ -635,7 +635,7 @@
   },
   "statement": {
     "title": "Download Statement",
-    "short": "Download",
+    "short": "Statement",
     "accounts": "Select asset type",
     "selectAll": "Select all",
     "deselectAll": "Deselect all",
