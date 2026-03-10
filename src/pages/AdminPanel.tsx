@@ -1,4 +1,4 @@
-import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings, Key, Copy, Check, ChevronDown, Bot, Crown } from "lucide-react";
+import { ArrowLeft, DollarSign, Percent, TrendingUp, Shield, RefreshCw, Users, Search, UserPlus, Trash2, Phone, Hash, Sparkles, Activity, Wallet, CreditCard, Zap, UsersRound, Calendar, Eye, CheckCircle, History, Settings, Key, Copy, Check, ChevronDown, Bot, Crown, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
