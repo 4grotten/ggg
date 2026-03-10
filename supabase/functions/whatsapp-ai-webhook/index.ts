@@ -214,6 +214,69 @@ async function generateStatement(token: string, startDate: string, endDate: stri
   }
 }
 
+// ── Voice transcription ──
+
+async function transcribeVoice(fileUrl: string, mimeType: string): Promise<string | null> {
+  const elevenLabsKey = Deno.env.get("ELEVENLABS_API_KEY");
+  if (!elevenLabsKey) {
+    console.error("[whatsapp-ai] ELEVENLABS_API_KEY not configured");
+    return null;
+  }
+
+  try {
+    const audioRes = await fetch(fileUrl);
+    if (!audioRes.ok) {
+      console.error("[whatsapp-ai] Failed to download voice file:", audioRes.status);
+      return null;
+    }
+    const audioBlob = await audioRes.blob();
+    console.log(`[whatsapp-ai] Voice file downloaded: ${audioBlob.size} bytes, type: ${mimeType}`);
+
+    const formData = new FormData();
+    formData.append("file", new File([audioBlob], "voice.ogg", { type: mimeType }));
+    formData.append("model_id", "scribe_v2");
+
+    const sttRes = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
+      method: "POST",
+      headers: { "xi-api-key": elevenLabsKey },
+      body: formData,
+    });
+
+    if (!sttRes.ok) {
+      const errText = await sttRes.text();
+      console.error("[whatsapp-ai] ElevenLabs STT error:", sttRes.status, errText);
+      return null;
+    }
+
+    const result = await sttRes.json();
+    console.log("[whatsapp-ai] Transcription:", result.text?.substring(0, 100));
+    return result.text || null;
+  } catch (e) {
+    console.error("[whatsapp-ai] Voice transcription error:", e);
+    return null;
+  }
+}
+
+async function downloadWahaMedia(wahaHost: string, wahaApiKey: string, session: string, messageId: string): Promise<{ url: string; mimetype: string } | null> {
+  try {
+    const base = wahaHost.replace(/\/+$/, "");
+    // WAHA API: get media URL from message
+    const res = await fetch(`${base}/api/${session}/messages/${messageId}/download`, {
+      headers: { "X-Api-Key": wahaApiKey },
+    });
+    if (!res.ok) {
+      // Try alternative: direct media URL from payload
+      console.error("[whatsapp-ai] WAHA media download failed:", res.status);
+      return null;
+    }
+    const data = await res.json();
+    return { url: data.url || data.mediaUrl, mimetype: data.mimetype || "audio/ogg" };
+  } catch (e) {
+    console.error("[whatsapp-ai] WAHA media download error:", e);
+    return null;
+  }
+}
+
 // ── WhatsApp WAHA helpers ──
 
 async function sendWhatsAppMessage(wahaHost: string, wahaApiKey: string, session: string, chatId: string, text: string) {
