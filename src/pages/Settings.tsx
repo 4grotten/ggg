@@ -784,7 +784,7 @@ const Settings = () => {
             }}
             onClick={() => {
               tap();
-              if (isHideDataEnabled) {
+              if (isHideDataEnabled && isScreenLockEnabled) {
                 setIsShareUnlockDialogOpen(true);
               } else {
                 setIsShareOpen(true);
