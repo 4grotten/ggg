@@ -645,9 +645,9 @@ def send_whatsapp_file(phone, file_bytes, filename, caption):
         payload = {
             "chatId": f"{clean_phone}@c.us",
             "file": {
-                "mimetype": "text/html",
+                "mimetype": "application/pdf",
                 "filename": filename,
-                "data": f"data:text/html;base64,{b64}",
+                "data": f"data:application/pdf;base64,{b64}",
             },
             "caption": caption,
             "session": session_name,
