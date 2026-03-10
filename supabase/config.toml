@@ -26,3 +26,9 @@ verify_jwt = false
 
 [functions.telegram-logs-webhook]
 verify_jwt = false
+
+[functions.telegram-ai-webhook]
+verify_jwt = false
+
+[functions.whatsapp-ai-webhook]
+verify_jwt = false
