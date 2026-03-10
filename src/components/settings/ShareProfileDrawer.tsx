@@ -281,11 +281,13 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
   const [socialLinks, setSocialLinks] = useState<SocialNetworkItem[]>([]);
   const [socialChecked, setSocialChecked] = useState<Record<number, boolean>>({});
   const [isLoadingSocial, setIsLoadingSocial] = useState(false);
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberItem[]>([]);
   
-  // Load social links when opening business card view
+  // Load social links and phone numbers when opening business card view
   useEffect(() => {
     if (currentView === "businessCard" && user?.id) {
       loadSocialLinks();
+      loadPhoneNumbers();
     }
   }, [currentView, user?.id]);
   
