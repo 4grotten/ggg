@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { apiGet, apiPut } from "@/services/api/apiClient";
+import { apiGet, apiPut, apiPost } from "@/services/api/apiClient";
 
 interface Props {
   staffUserId: string;
