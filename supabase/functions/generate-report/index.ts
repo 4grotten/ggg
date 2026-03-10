@@ -677,10 +677,9 @@ serve(async (req) => {
         const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
         for (const w of wallets) {
           const bal = parseFloat(String(w.balance || 0));
-          const addr = w.address ? `${String(w.address).slice(0, 6)}••••${String(w.address).slice(-4)}` : (w.token || 'Crypto');
           const token = w.token || 'USDT';
-          if (token === 'USDT' && assetBalances.some(a => a.label === 'USDT')) continue;
-          assetBalances.push({ label: `${token} (${w.network || 'TRC20'})`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
+          if (token === 'USDT' && assetBalances.some(a => a.label === 'Кошелёк USDT')) continue;
+          assetBalances.push({ label: `Кошелёк ${token}`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
         }
       }
     } catch (e) { console.error("Crypto parse error:", e); }
