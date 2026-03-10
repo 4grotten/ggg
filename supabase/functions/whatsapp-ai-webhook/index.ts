@@ -94,7 +94,8 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
 
 async function sendWhatsAppMessage(wahaHost: string, wahaApiKey: string, session: string, chatId: string, text: string) {
   // WAHA API: POST /api/sendText
-  await fetch(`${wahaHost}/api/sendText`, {
+  const base = wahaHost.replace(/\/+$/, "");
+  await fetch(`${base}/api/sendText`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
