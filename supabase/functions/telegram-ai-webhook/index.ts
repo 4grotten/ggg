@@ -176,40 +176,50 @@ Deno.serve(async (req) => {
     // Helper: try to identify user by chat_id first, then by username
     async function identifyUser(): Promise<any | null> {
       // Try by chat_id
+      console.log(`[telegram-ai] Trying identify by chat_id: ${chatId}`);
       const res1 = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
         body: JSON.stringify({ platform: "telegram", identifier: chatId }),
       });
+      const body1 = await res1.text();
+      console.log(`[telegram-ai] identify by chat_id response: ${res1.status} ${body1}`);
       if (res1.ok) {
-        const data = await res1.json();
-        if (data.found) return data;
+        try {
+          const data = JSON.parse(body1);
+          if (data.found) return data;
+        } catch {}
       }
 
       // Fallback: try by username (with and without @)
       if (username) {
         const variants = [`@${username}`, username];
         for (const variant of variants) {
+          console.log(`[telegram-ai] Trying identify by: "${variant}"`);
           const res2 = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
             body: JSON.stringify({ platform: "telegram", identifier: variant }),
           });
+          const body2 = await res2.text();
+          console.log(`[telegram-ai] identify by "${variant}" response: ${res2.status} ${body2}`);
           if (res2.ok) {
-            const data = await res2.json();
-            if (data.found) {
-              console.log(`[telegram-ai] Matched by identifier "${variant}", saving chat_id ${chatId}`);
-              try {
-                await fetch(`${BACKEND_BASE}/accounts/messenger/register/`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
-                  body: JSON.stringify({ platform: "telegram", user_id: data.user_id, chat_id: chatId, username: `@${username}` }),
-                });
-              } catch (e) {
-                console.error("[telegram-ai] Failed to register chat_id:", e);
+            try {
+              const data = JSON.parse(body2);
+              if (data.found) {
+                console.log(`[telegram-ai] Matched by identifier "${variant}", saving chat_id ${chatId}`);
+                try {
+                  await fetch(`${BACKEND_BASE}/accounts/messenger/register/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
+                    body: JSON.stringify({ platform: "telegram", user_id: data.user_id, chat_id: chatId, username: `@${username}` }),
+                  });
+                } catch (e) {
+                  console.error("[telegram-ai] Failed to register chat_id:", e);
+                }
+                return data;
               }
-              return data;
-            }
+            } catch {}
           }
         }
       }
