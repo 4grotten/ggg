@@ -663,6 +663,28 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             )}
           </AnimatePresence>
         </div>
+
+        {/* Notification Settings Drawer */}
+        <Drawer open={showNotifSetup} onOpenChange={setShowNotifSetup}>
+          <DrawerContent className="max-h-[85vh]">
+            <DrawerHeader className="pb-2">
+              <DrawerTitle>{t("statement.setupNotifications", "Настроить уведомления")}</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4 pb-8 overflow-y-auto">
+              <UserNotificationChannels
+                t={t}
+                isPushEnabled={false}
+                setIsPushEnabled={() => {}}
+              />
+              <button
+                onClick={() => setShowNotifSetup(false)}
+                className="w-full mt-4 py-3 rounded-xl font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                {t("common.done", "Готово")}
+              </button>
+            </div>
+          </DrawerContent>
+        </Drawer>
       </DrawerContent>
     </Drawer>
   );
