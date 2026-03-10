@@ -177,7 +177,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
   const txRows = filtered.map((tx: any, idx: number) => {
     const date = tx.created_at ? formatDate(tx.created_at) : '';
     const time = tx.created_at ? formatTime(tx.created_at) : '';
-    const type = typeMap[tx.type] || tx.type || '—';
+    const type = getTypeLabel(tx.type, lang);
 
     let description = '';
     if (tx.display?.title) {
