@@ -82,7 +82,10 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
     const res = await fetch(`${BACKEND_BASE}/accounts/open/users/${userId}/detail/`, {
       headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
     });
-    if (!res.ok) return "Данные аккаунта недоступны.";
+    if (!res.ok) {
+      console.log(`[telegram-ai] account detail failed: ${res.status}`);
+      return "Данные аккаунта недоступны.";
+    }
     const d = await res.json();
     const lines: string[] = [];
     if (d.first_name || d.last_name) lines.push(`👤 ${[d.first_name, d.last_name].filter(Boolean).join(" ")}`);
