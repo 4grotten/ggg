@@ -628,13 +628,8 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                     : t("statement.send", "Отправить")}
                 </motion.button>
 
-                {/* Back button */}
-                <button
-                  onClick={() => setStep("form")}
-                  className="w-full text-center text-sm text-muted-foreground py-2"
-                >
-                  {t("common.back", "Назад")}
-                </button>
+
+
               </motion.div>
             )}
 
