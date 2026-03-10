@@ -165,6 +165,7 @@ Deno.serve(async (req) => {
     if (!message?.text) return new Response(JSON.stringify({ ok: true }));
 
     const chatId = String(message.chat.id);
+    const username = message.from?.username || "";
     const userText = message.text;
     const botToken = Deno.env.get("TELEGRAM_AI_BOT_TOKEN")!;
     const serviceToken = Deno.env.get("AI_SERVICE_TOKEN")!;
@@ -172,9 +173,57 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+    // Helper: try to identify user by chat_id first, then by username
+    async function identifyUser(): Promise<any | null> {
+      // Try by chat_id
+      const res1 = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
+        body: JSON.stringify({ platform: "telegram", identifier: chatId }),
+      });
+      if (res1.ok) {
+        const data = await res1.json();
+        if (data.found) return data;
+      }
+
+      // Fallback: try by @username
+      if (username) {
+        const res2 = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
+          body: JSON.stringify({ platform: "telegram", identifier: `@${username}` }),
+        });
+        if (res2.ok) {
+          const data = await res2.json();
+          if (data.found) {
+            // Save chat_id for future lookups so next time we find by chat_id directly
+            console.log(`[telegram-ai] Matched by username @${username}, saving chat_id ${chatId}`);
+            try {
+              await fetch(`${BACKEND_BASE}/accounts/messenger/register/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
+                body: JSON.stringify({ platform: "telegram", user_id: data.user_id, chat_id: chatId, username: `@${username}` }),
+              });
+            } catch (e) {
+              console.error("[telegram-ai] Failed to register chat_id:", e);
+            }
+            return data;
+          }
+        }
+      }
+
+      return null;
+    }
+
     // Handle /start
     if (userText === "/start") {
-      await sendTelegramMessage(botToken, chatId, "👋 Привет! Я AI-ассистент Easy Card.\n\nЯ могу показать ваши балансы, транзакции и ответить на вопросы о приложении.\n\n⚠️ Убедитесь, что ваш Telegram привязан в настройках приложения Easy Card.");
+      await sendTypingAction(botToken, chatId);
+      const identity = await identifyUser();
+      if (identity) {
+        await sendTelegramMessage(botToken, chatId, `👋 Привет, ${identity.first_name || ""}! Я AI-ассистент Easy Card.\n\nЯ могу показать ваши балансы, транзакции и ответить на вопросы о приложении.\n\nНапишите мне что-нибудь! 😊`);
+      } else {
+        await sendTelegramMessage(botToken, chatId, "👋 Привет! Я AI-ассистент Easy Card.\n\nЯ могу показать ваши балансы, транзакции и ответить на вопросы о приложении.\n\n⚠️ Убедитесь, что ваш Telegram привязан в настройках приложения Easy Card.");
+      }
       return new Response(JSON.stringify({ ok: true }));
     }
 
@@ -182,20 +231,10 @@ Deno.serve(async (req) => {
     await sendTypingAction(botToken, chatId);
 
     // 1. Identify user
-    const identifyRes = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
-      body: JSON.stringify({ platform: "telegram", identifier: chatId }),
-    });
+    const identity = await identifyUser();
 
-    if (!identifyRes.ok) {
+    if (!identity) {
       await sendTelegramMessage(botToken, chatId, "❌ Ваш Telegram не привязан к аккаунту Easy Card.\n\nПривяжите Telegram в настройках приложения (Настройки → Уведомления).");
-      return new Response(JSON.stringify({ ok: true }));
-    }
-
-    const identity = await identifyRes.json();
-    if (!identity.found) {
-      await sendTelegramMessage(botToken, chatId, "❌ Аккаунт не найден. Привяжите Telegram в настройках приложения.");
       return new Response(JSON.stringify({ ok: true }));
     }
 
