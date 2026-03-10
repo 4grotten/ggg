@@ -1,0 +1,132 @@
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { MessageSquare, Save, Globe, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+
+const LANGUAGES = [
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "ru", label: "Русский", flag: "🇷🇺" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+  { code: "tr", label: "Türkçe", flag: "🇹🇷" },
+  { code: "zh", label: "中文", flag: "🇨🇳" },
+  { code: "ar", label: "العربية", flag: "🇸🇦" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+];
+
+export function WelcomeMessagesEditor() {
+  const { t } = useTranslation();
+  const [activeLang, setActiveLang] = useState("en");
+  const [messages, setMessages] = useState<Record<string, string>>({});
+  const [originalMessages, setOriginalMessages] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    loadMessages();
+  }, []);
+
+  const loadMessages = async () => {
+    setIsLoading(true);
+    const { data } = await supabase
+      .from("admin_settings")
+      .select("key, description")
+      .eq("category", "notifications")
+      .like("key", "welcome_message_%");
+
+    const msgs: Record<string, string> = {};
+    data?.forEach((row) => {
+      const lang = row.key.replace("welcome_message_", "");
+      msgs[lang] = row.description || "";
+    });
+    setMessages(msgs);
+    setOriginalMessages({ ...msgs });
+    setIsLoading(false);
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const key = `welcome_message_${activeLang}`;
+      const text = messages[activeLang] || "";
+      
+      const { error } = await supabase
+        .from("admin_settings")
+        .update({ description: text })
+        .eq("category", "notifications")
+        .eq("key", key);
+
+      if (error) throw error;
+
+      setOriginalMessages((prev) => ({ ...prev, [activeLang]: text }));
+      toast.success(t("admin.welcomeMessages.saved", "Сообщение сохранено"));
+    } catch {
+      toast.error(t("admin.welcomeMessages.saveError", "Ошибка сохранения"));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const hasChanges = messages[activeLang] !== originalMessages[activeLang];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Language chips */}
+      <div className="flex flex-wrap gap-2">
+        {LANGUAGES.map((lang) => (
+          <button
+            key={lang.code}
+            onClick={() => setActiveLang(lang.code)}
+            className={cn(
+              "px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5",
+              activeLang === lang.code
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted"
+            )}
+          >
+            <span>{lang.flag}</span>
+            <span>{lang.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Message textarea */}
+      <Textarea
+        value={messages[activeLang] || ""}
+        onChange={(e) =>
+          setMessages((prev) => ({ ...prev, [activeLang]: e.target.value }))
+        }
+        placeholder={t("admin.welcomeMessages.placeholder", "Введите приветственное сообщение...")}
+        className="min-h-[200px] rounded-xl bg-background/50 text-sm leading-relaxed resize-y"
+      />
+
+      {/* Save button */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={!hasChanges || isSaving}
+          className="rounded-xl gap-2"
+          size="sm"
+        >
+          {isSaving ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
+          {t("admin.welcomeMessages.save", "Сохранить")}
+        </Button>
+      </div>
+    </div>
+  );
+}
