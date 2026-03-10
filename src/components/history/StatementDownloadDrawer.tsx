@@ -548,8 +548,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                       onClick={() => {
                         if (ch.enabled) toggleChannel(ch.key);
                         else if (!ch.configured) {
-                          handleClose(false);
-                          setTimeout(() => navigate("/settings"), 300);
+                          setShowNotifSetup(true);
                         }
                       }}
                       disabled={isSending || isDownloading}
