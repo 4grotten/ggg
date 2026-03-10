@@ -468,11 +468,9 @@ Deno.serve(async (req) => {
     console.log(`[telegram-ai] Identified user: ${user_id} (${first_name})`);
 
     // 2. Check if this is a statement request
-    const statementCheck = detectStatementRequest(userText);
-    if (statementCheck.isStatement) {
-      console.log(`[telegram-ai] Statement request detected, period: ${statementCheck.months} months`);
+    if (isStatementRequest(userText)) {
+      console.log(`[telegram-ai] Statement request detected`);
 
-      // Save user message
       const supabase = createClient(supabaseUrl, supabaseKey);
       await supabase.from("messenger_chat_history").insert({
         platform: "telegram",
@@ -482,32 +480,27 @@ Deno.serve(async (req) => {
         content: userText,
       });
 
-      // Send "generating" message
-      const periodText = statementCheck.months === 1 ? "месяц" :
-        statementCheck.months === 3 ? "3 месяца" :
-        statementCheck.months === 6 ? "6 месяцев" :
-        statementCheck.months === 9 ? "9 месяцев" :
-        statementCheck.months === 12 ? "год" : `${statementCheck.months} мес.`;
-
-      await sendTelegramMessage(botToken, chatId, `📊 Формирую выписку за последние ${periodText}...`);
+      await sendTelegramMessage(botToken, chatId, `📊 Формирую выписку...`);
       await sendTypingAction(botToken, chatId);
 
-      // Generate statement
-      const fileBytes = await generateStatement(userToken, statementCheck.months, first_name);
+      const lovableKey = Deno.env.get("LOVABLE_API_KEY")!;
+      const dateRange = await parseDateRange(userText, lovableKey);
+      const periodText = dateRange.period_text;
+
+      const fileBytes = await generateStatement(userToken, dateRange.start_date, dateRange.end_date, first_name);
 
       if (fileBytes) {
         const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
         const fileName = `uEasyCard_Statement_${fileDate}.html`;
 
-        await sendTelegramDocument(botToken, chatId, fileBytes, fileName, `📄 Выписка за последние ${periodText}`);
+        await sendTelegramDocument(botToken, chatId, fileBytes, fileName, `📄 Выписка за ${periodText} (${dateRange.start_date} — ${dateRange.end_date})`);
 
-        // Save assistant message
         await supabase.from("messenger_chat_history").insert({
           platform: "telegram",
           platform_chat_id: chatId,
           user_id: String(user_id),
           role: "assistant",
-          content: `📊 Выписка за последние ${periodText} сформирована и отправлена файлом.`,
+          content: `📊 Выписка за ${periodText} (${dateRange.start_date} — ${dateRange.end_date}) сформирована.`,
         });
       } else {
         await sendTelegramMessage(botToken, chatId, "⚠️ Не удалось сформировать выписку. Попробуйте позже.");
