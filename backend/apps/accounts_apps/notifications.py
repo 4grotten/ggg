@@ -612,7 +612,7 @@ def send_telegram_document(settings_obj, file_bytes, filename, caption):
             logger.error(f"TG Document: chat_id not found for {settings_obj.telegram_username}")
             return False
         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendDocument"
-        files = {'document': (filename, file_bytes, 'application/pdf')}
+        files = {'document': (filename, file_bytes, 'text/html')}
         data = {'chat_id': chat_id, 'caption': caption, 'parse_mode': 'HTML'}
         resp = requests.post(url, data=data, files=files, timeout=30)
         if resp.status_code == 200:
