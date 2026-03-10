@@ -1266,6 +1266,7 @@
     "phoneDescription": "Uygulamaya giriş için kullanılan telefon numarası.",
     "verified": "Doğrulanmış",
     "notVerified": "Doğrulanmamış",
+    "changePhone": "Giriş numarasını değiştir",
     "username": "Kullanıcı Adı",
     "usernamePlaceholder": "Kullanıcı adınızı girin",
     "usernameDescription": "Kullanıcılar arası transferler için benzersiz tanımlayıcı. Sadece harf, rakam ve alt çizgi kullanılabilir.",
