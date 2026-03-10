@@ -645,15 +645,16 @@ serve(async (req) => {
           for (const card of wallet.cards) {
             const bal = parseFloat(String(card.balance || 0));
             if (bal > 0 || card.card_mask) {
-              const mask = card.card_mask ? `•••• ${String(card.card_mask).slice(-4)}` : (card.card_type || 'Карта');
-              assetBalances.push({ label: mask, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'AED' });
+              const cardType = card.card_type || card.type || 'Карта';
+              const mask = card.card_mask ? `•••• ${String(card.card_mask).slice(-4)}` : '';
+              assetBalances.push({ label: `${cardType} ${mask}`.trim(), amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'AED' });
             }
           }
         }
         // USDT balance
         if (includeCrypto && wallet.usdt_balance !== undefined) {
           const usdtBal = parseFloat(String(wallet.usdt_balance || 0));
-          assetBalances.push({ label: 'USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
+          assetBalances.push({ label: 'Кошелёк USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
         }
       }
     } catch (e) { console.error("Wallet parse error:", e); }
