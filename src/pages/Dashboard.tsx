@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, Landmark, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { Clock, Landmark, ChevronRight, Eye, EyeOff, BadgeCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
