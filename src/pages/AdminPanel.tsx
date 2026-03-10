@@ -1263,6 +1263,15 @@ export default function AdminPanel() {
                 </GlassCard>
 
                 <GlassCard
+                  title={t("admin.welcomeMessages.title", "Welcome-сообщения WhatsApp")}
+                  description={t("admin.welcomeMessages.description", "Приветственные сообщения при регистрации")}
+                  icon={MessageSquare}
+                  iconColor="text-green-500"
+                >
+                  <WelcomeMessagesEditor />
+                </GlassCard>
+
+                <GlassCard
                   title={t("admin.ai.title")}
                   description={t("admin.ai.description")}
                   icon={Bot}
