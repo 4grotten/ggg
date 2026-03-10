@@ -616,10 +616,16 @@ Easy Card UAE`;
       vcard += `N:;Contact;;;\n`;
     }
     
-    // Phone number
+    // Phone number (main auth phone)
     if (phone) {
       vcard += `TEL;TYPE=CELL:${phone}\n`;
     }
+    
+    // Extra phone numbers from phone_numbers API
+    const extraPhones = selectedFields.filter(f => f.id.startsWith("phone_extra_"));
+    extraPhones.forEach(pf => {
+      vcard += `TEL;TYPE=VOICE:${pf.value}\n`;
+    });
     
     // Email
     if (email) {
