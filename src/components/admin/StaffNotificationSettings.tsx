@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -23,8 +23,8 @@ interface NotifApiResponse {
   whatsapp_enabled: boolean;
   email_address: string | null;
   email_enabled: boolean;
-  push_enabled: boolean;
-  push_token: string | null;
+  push_enabled?: boolean;
+  push_token?: string | null;
 }
 
 const CHANNELS = [
@@ -37,9 +37,15 @@ const CHANNELS = [
 export default function StaffNotificationSettings({ staffUserId, readOnly = false }: Props) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const pushStorageKey = `staff-push-enabled:${staffUserId}`;
 
   const [editingChannel, setEditingChannel] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [pushEnabled, setPushEnabled] = useState(false);
+
+  useEffect(() => {
+    setPushEnabled(localStorage.getItem(pushStorageKey) === "true");
+  }, [pushStorageKey]);
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ["staff-notifications", staffUserId],
@@ -60,8 +66,6 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
         whatsapp_enabled: settings?.whatsapp_enabled || false,
         email_address: settings?.email_address || "",
         email_enabled: settings?.email_enabled || false,
-        push_enabled: settings?.push_enabled || false,
-        push_token: settings?.push_token || "",
         ...patch,
       };
       const res = await apiPut<NotifApiResponse>(`/admin/notifications/settings/${staffUserId}/`, fullBody);
@@ -77,6 +81,14 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   });
 
   const handleToggle = (ch: typeof CHANNELS[number]) => {
+    if ('noValue' in ch && ch.noValue) {
+      const nextValue = !pushEnabled;
+      setPushEnabled(nextValue);
+      localStorage.setItem(pushStorageKey, String(nextValue));
+      toast.success(nextValue ? "Push включён" : "Push выключен");
+      return;
+    }
+
     if (!settings) return;
     updateMutation.mutate({ [ch.enabledField]: !settings[ch.enabledField] });
   };
@@ -94,11 +106,12 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   };
 
   const getChannelEnabled = (ch: typeof CHANNELS[number]): boolean => {
+    if ('noValue' in ch && ch.noValue) return pushEnabled;
     if (!settings) return false;
     return !!settings[ch.enabledField];
   };
 
-  const activeCount = settings ? CHANNELS.filter(ch => getChannelEnabled(ch)).length : 0;
+  const activeCount = settings ? CHANNELS.filter(ch => getChannelEnabled(ch)).length : Number(pushEnabled);
 
   return (
     <motion.div
