@@ -15,6 +15,7 @@ import { useWalletSummary, useBankAccounts, useCryptoWallets } from "@/hooks/use
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthToken } from "@/services/api/apiClient";
 import { subMonths, subYears, format } from "date-fns";
+import i18n from "@/i18n";
 import { useUserNotificationSettings } from "@/hooks/useUserNotificationSettings";
 import { useNavigate } from "react-router-dom";
 import { UserNotificationChannels } from "@/components/settings/UserNotificationChannels";
