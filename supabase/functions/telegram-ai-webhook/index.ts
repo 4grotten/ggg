@@ -442,12 +442,35 @@ Deno.serve(async (req) => {
     console.log("[telegram-ai] update:", JSON.stringify(update).slice(0, 500));
 
     const message = update.message;
-    if (!message?.text) return new Response(JSON.stringify({ ok: true }));
+    if (!message) return new Response(JSON.stringify({ ok: true }));
 
     const chatId = String(message.chat.id);
     const username = message.from?.username || "";
-    const userText = message.text;
     const botToken = Deno.env.get("TELEGRAM_AI_BOT_TOKEN")!;
+
+    // Handle voice/audio messages
+    let userText = message.text || "";
+    const voiceOrAudio = message.voice || message.audio;
+    if (voiceOrAudio && !userText) {
+      await sendTypingAction(botToken, chatId);
+      const fileUrl = await getTelegramFileUrl(botToken, voiceOrAudio.file_id);
+      if (fileUrl) {
+        const mimeType = voiceOrAudio.mime_type || "audio/ogg";
+        const transcript = await transcribeVoice(fileUrl, mimeType);
+        if (transcript) {
+          userText = transcript;
+          console.log(`[telegram-ai] Voice transcribed: ${transcript.substring(0, 100)}`);
+        } else {
+          await sendTelegramMessage(botToken, chatId, "⚠️ Не удалось распознать голосовое сообщение. Попробуйте ещё раз или напишите текстом.");
+          return new Response(JSON.stringify({ ok: true }));
+        }
+      } else {
+        await sendTelegramMessage(botToken, chatId, "⚠️ Не удалось загрузить голосовое сообщение.");
+        return new Response(JSON.stringify({ ok: true }));
+      }
+    }
+
+    if (!userText) return new Response(JSON.stringify({ ok: true }));
     const serviceToken = Deno.env.get("AI_SERVICE_TOKEN")!;
     const lovableKey = Deno.env.get("LOVABLE_API_KEY")!;
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
