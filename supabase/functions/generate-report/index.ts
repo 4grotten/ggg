@@ -633,11 +633,15 @@ serve(async (req) => {
 
     // Parse balances
     const assetBalances: AssetBalance[] = [];
+    const includeCards = !filterAssets || filterAssets.includes('card');
+    const includeIban = !filterAssets || filterAssets.includes('iban');
+    const includeCrypto = !filterAssets || filterAssets.includes('crypto');
+
     try {
       if (walletRes?.ok) {
         const wallet = await walletRes.json();
         // Cards balances
-        if (wallet.cards && Array.isArray(wallet.cards)) {
+        if (includeCards && wallet.cards && Array.isArray(wallet.cards)) {
           for (const card of wallet.cards) {
             const bal = parseFloat(String(card.balance || 0));
             if (bal > 0 || card.card_mask) {
@@ -647,7 +651,7 @@ serve(async (req) => {
           }
         }
         // USDT balance
-        if (wallet.usdt_balance !== undefined) {
+        if (includeCrypto && wallet.usdt_balance !== undefined) {
           const usdtBal = parseFloat(String(wallet.usdt_balance || 0));
           assetBalances.push({ label: 'USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
         }
@@ -655,7 +659,7 @@ serve(async (req) => {
     } catch (e) { console.error("Wallet parse error:", e); }
 
     try {
-      if (bankRes?.ok) {
+      if (includeIban && bankRes?.ok) {
         const bankData = await bankRes.json();
         const accounts = Array.isArray(bankData) ? bankData : (bankData?.results || []);
         for (const acc of accounts) {
@@ -667,14 +671,13 @@ serve(async (req) => {
     } catch (e) { console.error("Bank parse error:", e); }
 
     try {
-      if (cryptoRes?.ok) {
+      if (includeCrypto && cryptoRes?.ok) {
         const cryptoData = await cryptoRes.json();
         const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData?.results || []);
         for (const w of wallets) {
           const bal = parseFloat(String(w.balance || 0));
           const addr = w.address ? `${String(w.address).slice(0, 6)}••••${String(w.address).slice(-4)}` : (w.token || 'Crypto');
           const token = w.token || 'USDT';
-          // Skip if already added via wallet summary
           if (token === 'USDT' && assetBalances.some(a => a.label === 'USDT')) continue;
           assetBalances.push({ label: `${token} (${w.network || 'TRC20'})`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
         }
