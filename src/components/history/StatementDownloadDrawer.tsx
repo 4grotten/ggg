@@ -381,6 +381,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             delivery_channels: nonDownloadChannels,
             also_download: wantDownload,
             lang: i18n.language,
+            asset_labels: detailedAssetLabels,
           }),
         }
       );
