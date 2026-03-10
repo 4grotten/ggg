@@ -529,11 +529,6 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true }));
     }
 
-    const serviceToken = Deno.env.get("AI_SERVICE_TOKEN")!;
-    const lovableKey = Deno.env.get("LOVABLE_API_KEY")!;
-    const wahaHost = Deno.env.get("WAHA_HOST")!;
-    const wahaApiKey = Deno.env.get("WAHA_API_KEY")!;
-    const wahaSession = Deno.env.get("WAHA_SESSION_NAME") || "default";
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
