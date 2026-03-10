@@ -447,16 +447,38 @@ Deno.serve(async (req) => {
 
       if (fileBytes) {
         const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        const fileName = `uEasyCard_Statement_${fileDate}.html`;
+        const fileName = `wa_${phone}_${fileDate}_${Date.now()}.html`;
 
-        await sendWhatsAppFile(wahaHost, wahaApiKey, wahaSession, chatId, fileBytes, fileName, `📄 Выписка за последние ${periodText}`);
+        // Upload to storage and send link (WAHA free doesn't support sendFile)
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("statements")
+          .upload(fileName, fileBytes, {
+            contentType: "text/html",
+            upsert: true,
+          });
+
+        if (uploadError) {
+          console.error("[whatsapp-ai] Storage upload error:", uploadError);
+          await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
+            "⚠️ Не удалось загрузить выписку. Попробуйте позже.");
+        } else {
+          const { data: publicUrlData } = supabase.storage
+            .from("statements")
+            .getPublicUrl(fileName);
+
+          const publicUrl = publicUrlData?.publicUrl;
+          console.log(`[whatsapp-ai] Statement uploaded, URL: ${publicUrl}`);
+
+          await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
+            `📄 *Выписка за последние ${periodText}*\n\nСкачайте файл по ссылке:\n${publicUrl}`);
+        }
 
         await supabase.from("messenger_chat_history").insert({
           platform: "whatsapp",
           platform_chat_id: phone,
           user_id: String(user_id),
           role: "assistant",
-          content: `📊 Выписка за последние ${periodText} сформирована и отправлена файлом.`,
+          content: `📊 Выписка за последние ${periodText} сформирована и отправлена ссылкой.`,
         });
       } else {
         await sendWhatsAppMessage(wahaHost, wahaApiKey, wahaSession, chatId,
