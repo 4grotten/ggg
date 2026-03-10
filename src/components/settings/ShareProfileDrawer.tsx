@@ -417,6 +417,7 @@ export const ShareProfileDrawer = ({ isOpen, onClose }: ShareProfileDrawerProps)
     setBusinessCardFields([]);
     setSocialLinks([]);
     setSocialChecked({});
+    setPhoneNumbers([]);
     onClose();
   };
 
