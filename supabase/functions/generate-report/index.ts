@@ -807,8 +807,8 @@ serve(async (req) => {
         for (const w of wallets) {
           const bal = parseFloat(String(w.balance || 0));
           const token = w.token || 'USDT';
-          if (token === 'USDT' && assetBalances.some(a => a.label === 'Кошелёк USDT')) continue;
-          assetBalances.push({ label: `Кошелёк ${token}`, amount: bal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: token });
+          if (token === 'USDT' && assetBalances.some(a => a.label.includes('USDT'))) continue;
+          assetBalances.push({ label: `${t(lang, 'wallet')} ${token}`, amount: bal.toLocaleString(locale, { minimumFractionDigits: 2 }), currency: token });
         }
       }
     } catch (e) { console.error("Crypto parse error:", e); }
