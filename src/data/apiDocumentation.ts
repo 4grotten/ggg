@@ -477,6 +477,51 @@ export const apiCategories: ApiCategory[] = [
         responseParams: [
           { name: 'status', type: 'string', required: true, description: 'Ссылка отправлена' }
         ]
+      },
+      // 11.5 Сменить номер авторизации
+      {
+        id: 'change-auth-number',
+        method: 'POST',
+        path: '/accounts/users/doChangeAndVerifyNewNumber/',
+        title: 'Сменить номер авторизации',
+        description: 'Смена и верификация нового номера телефона для авторизации. Если SMS-сервис включён, требуется код подтверждения.',
+        category: 'password',
+        authorization: TOKEN_AUTH,
+        bodyParams: [
+          { name: 'old_phone_number', type: 'string', required: true, description: 'Текущий номер телефона авторизации' },
+          { name: 'new_phone_number', type: 'string', required: true, description: 'Новый номер телефона' },
+          { name: 'code', type: 'number', required: false, description: 'Код подтверждения (обязателен если SMS-сервис включён)' }
+        ],
+        requestExample: {
+          curl: `curl --request POST \\
+  --url ${ACCOUNTS_URL}/users/doChangeAndVerifyNewNumber/ \\
+  --header 'Authorization: Token abc123xyz789token' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "old_phone_number": "+971501234567",
+    "new_phone_number": "+971509876543",
+    "code": 123456
+  }'`,
+          json: `{
+  "old_phone_number": "+971501234567",
+  "new_phone_number": "+971509876543",
+  "code": 123456
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "message": "You have successfully changed auth number"
+}`
+        },
+        responseParams: [
+          { name: 'message', type: 'string', required: true, description: 'Сообщение об успешной смене номера' }
+        ],
+        notes: [
+          'Если SMS-сервис отключён, поле code не требуется',
+          'Если SMS-сервис включён, поле code обязательно',
+          'После успешной смены номера, авторизация будет происходить по новому номеру'
+        ]
       }
     ]
   },
