@@ -86,6 +86,13 @@ const EditProfile = () => {
   const [isLoadingPhones, setIsLoadingPhones] = useState(false);
   const [isSavingPhone, setIsSavingPhone] = useState(false);
 
+  // Change auth number state
+  const [isChangeAuthDrawerOpen, setIsChangeAuthDrawerOpen] = useState(false);
+  const [newAuthPhone, setNewAuthPhone] = useState("+");
+  const [authCode, setAuthCode] = useState("");
+  const [isChangingAuth, setIsChangingAuth] = useState(false);
+  const [changeAuthError, setChangeAuthError] = useState("");
+
   // Create schema with localized messages
   const profileSchema = z.object({
     full_name: z.string()
