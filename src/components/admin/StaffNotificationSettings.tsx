@@ -73,7 +73,17 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
     onError: () => toast.error("Ошибка сохранения"),
   });
 
-  const handleToggle = (ch: typeof CHANNELS[number]) => {
+  const testMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiPost(`/admin/notifications/test/${staffUserId}/`, {});
+      if (res.error) throw new Error(res.error.detail || res.error.message);
+      return res.data;
+    },
+    onSuccess: () => toast.success("Тестовое уведомление отправлено"),
+    onError: () => toast.error("Ошибка отправки тестового уведомления"),
+  });
+
+
     if (!settings) return;
     updateMutation.mutate({ [ch.enabledField]: !settings[ch.enabledField] });
   };
