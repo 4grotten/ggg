@@ -536,26 +536,34 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                   {t("statement.chooseDelivery", "Выберите способ получения выписки")}
                 </p>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {deliveryChannels.map((ch) => (
                     <button
                       key={ch.key}
                       onClick={() => {
-                        if (ch.enabled) {
-                          setSelectedChannel(ch.key);
-                          handleSendToChannel(ch.key);
+                        if (ch.enabled) toggleChannel(ch.key);
+                        else if (!ch.configured) {
+                          handleClose(false);
+                          setTimeout(() => navigate("/settings"), 300);
                         }
                       }}
-                      disabled={!ch.enabled || isDownloading || isSending}
+                      disabled={isSending || isDownloading}
                       className={cn(
-                        "w-full flex items-center gap-3 p-3.5 rounded-xl transition-colors border",
-                        ch.enabled
-                          ? "bg-secondary hover:bg-secondary/80 border-transparent hover:border-primary/20"
-                          : "bg-secondary/50 border-transparent opacity-50 cursor-not-allowed"
+                        "w-full flex items-center gap-3 p-3 rounded-xl transition-colors border",
+                        ch.enabled && selectedChannels.has(ch.key)
+                          ? "bg-primary/10 border-primary/20"
+                          : ch.enabled
+                            ? "bg-secondary hover:bg-secondary/80 border-transparent"
+                            : "bg-secondary/50 border-transparent opacity-60"
                       )}
                     >
+                      <Checkbox
+                        checked={selectedChannels.has(ch.key)}
+                        disabled={!ch.enabled}
+                        className="pointer-events-none"
+                      />
                       <div className={cn(
-                        "w-9 h-9 rounded-full flex items-center justify-center",
+                        "w-8 h-8 rounded-full flex items-center justify-center",
                         ch.key === "telegram" ? "bg-[#26A5E4]/15 text-[#26A5E4]" :
                         ch.key === "whatsapp" ? "bg-[#25D366]/15 text-[#25D366]" :
                         ch.key === "email" ? "bg-orange-500/15 text-orange-500" :
@@ -569,33 +577,35 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
                           <p className="text-xs text-muted-foreground">{ch.sublabel}</p>
                         )}
                       </div>
-                      {(isDownloading || isSending) && selectedChannel === ch.key ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      {!ch.configured && (
+                        <span className="text-xs text-primary font-medium">
+                          {t("statement.setup", "Настроить")}
+                        </span>
                       )}
                     </button>
                   ))}
                 </div>
 
-                {/* Suggest setting up notifications if none configured */}
-                {!hasAnyChannel && !notifLoading && (
-                  <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      {t("statement.noChannels", "Настройте Telegram, WhatsApp или Email, чтобы получать выписки напрямую")}
-                    </p>
-                    <button
-                      onClick={() => {
-                        handleClose(false);
-                        setTimeout(() => navigate("/settings"), 300);
-                      }}
-                      className="flex items-center gap-2 text-sm text-primary font-medium"
-                    >
-                      <Settings className="w-4 h-4" />
-                      {t("statement.setupNotifications", "Настроить уведомления")}
-                    </button>
-                  </div>
-                )}
+                {/* Send button */}
+                <motion.button
+                  onClick={handleSendSelected}
+                  disabled={selectedChannels.size === 0 || isSending || isDownloading}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-3 py-3.5 rounded-xl font-medium text-sm transition-all",
+                    "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]",
+                    (selectedChannels.size === 0 || isSending) && "opacity-60 cursor-not-allowed"
+                  )}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {isSending || isDownloading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                  {isSending || isDownloading
+                    ? t("statement.generating", "Генерация...")
+                    : t("statement.send", "Отправить")}
+                </motion.button>
 
                 {/* Back button */}
                 <button
