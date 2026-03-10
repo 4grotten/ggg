@@ -524,12 +524,11 @@ serve(async (req) => {
 
     const generatedDate = formatDate(new Date().toISOString());
 
-    // Generate PDF
-    const pdfBuffer = buildPDF(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut, assetBalances, lang);
-    const pdfBytes = new Uint8Array(pdfBuffer);
+    // Generate HTML
+    const htmlContent = buildHTML(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut, assetBalances, lang);
 
     const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const fileName = `uEasyCard_Report_${fileDate}.pdf`;
+    const fileName = `uEasyCard_Report_${fileDate}.html`;
 
     // ─── Delivery channels logic ───
     const channelsToSend = Array.isArray(delivery_channels) ? delivery_channels.filter((c: string) => c !== 'download') : [];
@@ -548,21 +547,15 @@ serve(async (req) => {
         }
       }
 
-      // Convert PDF to base64 for backend delivery (chunk to avoid stack overflow)
-      let binary = '';
-      const chunkSize = 8192;
-      for (let i = 0; i < pdfBytes.length; i += chunkSize) {
-        const chunk = pdfBytes.subarray(i, i + chunkSize);
-        binary += String.fromCharCode(...chunk);
-      }
-      const pdfBase64 = btoa(binary);
+      // Encode HTML to base64 for backend delivery
+      const htmlBase64 = btoa(unescape(encodeURIComponent(htmlContent)));
 
       try {
         const sendRes = await fetch(`${BACKEND_BASE}/accounts/statement/send/`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            pdf_base64: pdfBase64,
+            html_base64: htmlBase64,
             file_name: fileName,
             channels: channelsToSend,
             period_label: periodLabel,
@@ -574,10 +567,10 @@ serve(async (req) => {
         console.log("Statement delivery results:", JSON.stringify(sendData));
 
         if (also_download) {
-          return new Response(pdfBytes, {
+          return new Response(htmlContent, {
             headers: {
               ...corsHeaders,
-              "Content-Type": "application/pdf",
+              "Content-Type": "text/html; charset=utf-8",
               "Content-Disposition": `attachment; filename="${fileName}"`,
               "X-Delivery-Results": JSON.stringify(sendData.results || {}),
             },
@@ -591,10 +584,10 @@ serve(async (req) => {
       } catch (sendErr) {
         console.error("Statement delivery error:", sendErr);
         if (also_download) {
-          return new Response(pdfBytes, {
+          return new Response(htmlContent, {
             headers: {
               ...corsHeaders,
-              "Content-Type": "application/pdf",
+              "Content-Type": "text/html; charset=utf-8",
               "Content-Disposition": `attachment; filename="${fileName}"`,
             },
           });
@@ -606,11 +599,11 @@ serve(async (req) => {
       }
     }
 
-    // No delivery channels — just return PDF file
-    return new Response(pdfBytes, {
+    // No delivery channels — just return HTML file
+    return new Response(htmlContent, {
       headers: {
         ...corsHeaders,
-        "Content-Type": "application/pdf",
+        "Content-Type": "text/html; charset=utf-8",
         "Content-Disposition": `attachment; filename="${fileName}"`,
       },
     });
