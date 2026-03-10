@@ -547,7 +547,7 @@ serve(async (req) => {
         }
       }
 
-      // Encode HTML to base64 for backend delivery
+      // Encode as base64 to match current backend deployment
       const htmlBase64 = btoa(unescape(encodeURIComponent(htmlContent)));
 
       try {
@@ -563,7 +563,15 @@ serve(async (req) => {
             lang,
           }),
         });
-        const sendData = await sendRes.json();
+
+        let sendData: any = {};
+        const resText = await sendRes.text();
+        try {
+          sendData = JSON.parse(resText);
+        } catch {
+          console.error("Backend returned non-JSON:", resText.slice(0, 200));
+          sendData = { error: `Backend HTTP ${sendRes.status}` };
+        }
         console.log("Statement delivery results:", JSON.stringify(sendData));
 
         if (also_download) {
