@@ -65,6 +65,7 @@
     "stepsDone": "步骤已完成",
     "stepCompleted": "步骤 {{step}} 已完成 ✓",
     "canOpenCard": "现在可以开卡了",
+    "verifiedDescription": "您的身份已成功验证",
     "identityVerified": "身份已验证",
     "verified": "已验证",
     "allStepsCompleted": "所有步骤已完成 ✓",

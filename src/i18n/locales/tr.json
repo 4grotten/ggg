@@ -63,6 +63,7 @@
     "stepsDone": "ADIM TAMAMLANDI",
     "stepCompleted": "Adım {{step}} tamamlandı ✓",
     "canOpenCard": "Artık kart açabilirsiniz",
+    "verifiedDescription": "Kimliğiniz başarıyla doğrulandı",
     "identityVerified": "Kimlik Doğrulandı",
     "verified": "Doğrulandı",
     "allStepsCompleted": "Tüm adımlar tamamlandı ✓",

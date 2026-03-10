@@ -63,6 +63,7 @@
     "stepsDone": "PASOS COMPLETADOS",
     "stepCompleted": "Paso {{step}} completado ✓",
     "canOpenCard": "Ahora puedes abrir una tarjeta",
+    "verifiedDescription": "Tu identidad ha sido verificada exitosamente",
     "identityVerified": "Identidad verificada",
     "verified": "Verificado",
     "allStepsCompleted": "Todos los pasos completados ✓",
