@@ -29,7 +29,11 @@ async function fetchAllBalances(token: string): Promise<string> {
     fetch(`${BACKEND_BASE}/cards/wallet/summary/`, { headers }),
     fetch(`${BACKEND_BASE}/transactions/crypto-wallets/`, { headers }),
   ]);
-  const lines: string[] = [];
+  const cardLines: string[] = [];
+  const bankLines: string[] = [];
+  const cryptoLines: string[] = [];
+  let cardsTotal = 0;
+
   try {
     if (walletRes.status === "fulfilled" && walletRes.value.ok) {
       const raw = await walletRes.value.json();
@@ -38,22 +42,39 @@ async function fetchAllBalances(token: string): Promise<string> {
         data.cards.forEach((c: any) => {
           const t = c.type === "metal" ? "Металлическая карта" : "Виртуальная карта";
           const l4 = c.card_number ? ` (****${c.card_number.slice(-4)})` : "";
-          lines.push(`💳 ${t}${l4}: ${c.balance} ${c.currency || "AED"}`);
+          const balance = parseFloat(c.balance) || 0;
+          cardsTotal += balance;
+          cardLines.push(`💳 ${t}${l4}: ${c.balance} ${c.currency || "AED"}`);
         });
       }
-      if (data.physical_account) lines.push(`🏦 Банковский счёт: ${data.physical_account.balance} ${data.physical_account.currency || "AED"}`);
-    } else if (walletRes.status === "fulfilled") {
-      console.log(`[telegram-ai] wallet/summary failed: ${walletRes.value.status}`);
+      if (data.physical_account) {
+        const pa = data.physical_account;
+        bankLines.push(`🏦 Банковский счёт: ${pa.balance} ${pa.currency || "AED"}`);
+      }
+    } else {
+      cardLines.push("💳 Данные о картах временно недоступны.");
     }
   } catch (e) { console.error("[telegram-ai] wallet parse error:", e); }
+
   try {
     if (cryptoRes.status === "fulfilled" && cryptoRes.value.ok) {
       const raw = await cryptoRes.value.json();
       const wallets = raw.data || raw;
-      if (Array.isArray(wallets)) wallets.forEach((w: any) => lines.push(`🪙 ${w.token || "USDT"} (${w.network || "TRC20"}): ${w.balance} ${w.token || "USDT"}`));
+      if (Array.isArray(wallets)) wallets.forEach((w: any) => {
+        cryptoLines.push(`🪙 ${w.token || "USDT"} (${w.network || "TRC20"}): ${w.balance} ${w.token || "USDT"}`);
+      });
     }
   } catch (e) { console.error("[telegram-ai] crypto parse error:", e); }
-  return lines.length ? lines.join("\n") : "Балансы не найдены.";
+
+  const result: string[] = [];
+  if (cardLines.length > 0) {
+    cardLines.forEach(line => { result.push(line); result.push(""); });
+    if (cardsTotal > 0) { result.push(`💰 Итого на картах: ${cardsTotal.toFixed(2)} AED`); result.push(""); }
+  }
+  if (bankLines.length > 0) { result.push(...bankLines); result.push(""); }
+  if (cryptoLines.length > 0) { result.push(...cryptoLines); }
+
+  return result.length > 0 ? result.join("\n") : "Балансы не найдены.";
 }
 
 async function fetchTransactions(token: string): Promise<string> {
