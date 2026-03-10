@@ -173,54 +173,57 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Helper: try to identify user by chat_id first, then by username
+    // Helper: identify user — try Supabase links table first, then backend API
     async function identifyUser(): Promise<any | null> {
-      // Try by chat_id
-      console.log(`[telegram-ai] Trying identify by chat_id: ${chatId}`);
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      // 1. Try Supabase table by chat_id
+      const { data: byChatId } = await supabase
+        .from("telegram_user_links")
+        .select("*")
+        .eq("telegram_chat_id", chatId)
+        .maybeSingle();
+
+      if (byChatId) {
+        console.log(`[telegram-ai] Found in links by chat_id: user ${byChatId.backend_user_id}`);
+        return { found: true, user_id: byChatId.backend_user_id, token: byChatId.backend_token, first_name: byChatId.first_name, language: "ru" };
+      }
+
+      // 2. Try Supabase table by username
+      if (username) {
+        const { data: byUsername } = await supabase
+          .from("telegram_user_links")
+          .select("*")
+          .eq("telegram_username", `@${username}`)
+          .maybeSingle();
+
+        if (byUsername) {
+          console.log(`[telegram-ai] Found in links by username @${username}, updating chat_id`);
+          // Save chat_id for next time
+          await supabase.from("telegram_user_links").update({ telegram_chat_id: chatId }).eq("id", byUsername.id);
+          return { found: true, user_id: byUsername.backend_user_id, token: byUsername.backend_token, first_name: byUsername.first_name, language: "ru" };
+        }
+      }
+
+      // 3. Fallback: try backend API by chat_id
+      console.log(`[telegram-ai] Not in links table, trying backend API`);
       const res1 = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
         body: JSON.stringify({ platform: "telegram", identifier: chatId }),
       });
-      const body1 = await res1.text();
-      console.log(`[telegram-ai] identify by chat_id response: ${res1.status} ${body1}`);
       if (res1.ok) {
-        try {
-          const data = JSON.parse(body1);
-          if (data.found) return data;
-        } catch {}
-      }
-
-      // Fallback: try by username (with and without @)
-      if (username) {
-        const variants = [`@${username}`, username];
-        for (const variant of variants) {
-          console.log(`[telegram-ai] Trying identify by: "${variant}"`);
-          const res2 = await fetch(`${BACKEND_BASE}/accounts/messenger/identify/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
-            body: JSON.stringify({ platform: "telegram", identifier: variant, chat_id: chatId }),
-          });
-          const body2 = await res2.text();
-          console.log(`[telegram-ai] identify by "${variant}" response: ${res2.status} ${body2}`);
-          if (res2.ok) {
-            try {
-              const data = JSON.parse(body2);
-              if (data.found) {
-                console.log(`[telegram-ai] Matched by identifier "${variant}", saving chat_id ${chatId}`);
-                try {
-                  await fetch(`${BACKEND_BASE}/accounts/messenger/register/`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", Authorization: `Token ${serviceToken}` },
-                    body: JSON.stringify({ platform: "telegram", user_id: data.user_id, chat_id: chatId, username: `@${username}` }),
-                  });
-                } catch (e) {
-                  console.error("[telegram-ai] Failed to register chat_id:", e);
-                }
-                return data;
-              }
-            } catch {}
-          }
+        const data = await res1.json();
+        if (data.found) {
+          // Cache in links table
+          await supabase.from("telegram_user_links").upsert({
+            telegram_chat_id: chatId,
+            telegram_username: username ? `@${username}` : null,
+            backend_user_id: data.user_id,
+            backend_token: data.token,
+            first_name: data.first_name,
+          }, { onConflict: "telegram_chat_id" });
+          return data;
         }
       }
 
@@ -253,7 +256,7 @@ Deno.serve(async (req) => {
     const { user_id, token: userToken, first_name, language } = identity;
     console.log(`[telegram-ai] Identified user: ${user_id} (${first_name})`);
 
-    // 2. Init Supabase & load history
+    // 2. Load history (supabase already initialized in identifyUser)
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { data: history } = await supabase
       .from("messenger_chat_history")

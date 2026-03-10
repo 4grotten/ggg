@@ -191,6 +191,39 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_user_links: {
+        Row: {
+          backend_token: string
+          backend_user_id: string
+          created_at: string
+          first_name: string | null
+          id: string
+          telegram_chat_id: string | null
+          telegram_username: string | null
+          updated_at: string
+        }
+        Insert: {
+          backend_token: string
+          backend_user_id: string
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          telegram_chat_id?: string | null
+          telegram_username?: string | null
+          updated_at?: string
+        }
+        Update: {
+          backend_token?: string
+          backend_user_id?: string
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          telegram_chat_id?: string | null
+          telegram_username?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
