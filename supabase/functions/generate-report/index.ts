@@ -453,7 +453,7 @@ serve(async (req) => {
   try {
     const {
       backend_token, start_date, end_date, user_name, asset_filter,
-      lang: rawLang, delivery_channels, also_download,
+      lang: rawLang, delivery_channels, also_download, asset_labels: rawAssetLabels,
     } = await req.json();
     const lang: Lang = (['ru','en','de','tr','zh','ar','es'].includes(rawLang) ? rawLang : 'en') as Lang;
     const locale = getLocale(lang);
