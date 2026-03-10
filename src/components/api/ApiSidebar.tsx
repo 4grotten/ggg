@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
