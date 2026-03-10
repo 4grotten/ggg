@@ -152,8 +152,22 @@ export function WelcomeMessagesEditor() {
         className="min-h-[200px] rounded-xl bg-background/50 text-sm leading-relaxed resize-y"
       />
 
-      {/* Save button */}
-      <div className="flex justify-end">
+      {/* Action buttons */}
+      <div className="flex justify-end gap-2">
+        <Button
+          onClick={handleTest}
+          disabled={isTesting}
+          variant="outline"
+          className="rounded-xl gap-2"
+          size="sm"
+        >
+          {isTesting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Zap className="w-4 h-4" />
+          )}
+          {t("admin.welcomeMessages.test", "Тест")}
+        </Button>
         <Button
           onClick={handleSave}
           disabled={!hasChanges || isSaving}
