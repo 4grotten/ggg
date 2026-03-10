@@ -526,6 +526,7 @@
     "phoneDescription": "Phone number used to log in to the app.",
     "verified": "Verified",
     "notVerified": "Not verified",
+    "changePhone": "Change auth number",
     "username": "Username",
     "usernamePlaceholder": "Enter your username",
     "usernameDescription": "Unique identifier for transfers between users. Only letters, numbers, and underscores allowed.",
