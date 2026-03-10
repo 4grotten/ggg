@@ -23,7 +23,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
 import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
-import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, getPhoneNumbers, updatePhoneNumbers, changeAuthNumber, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
+import { changePassword, getUserEmail, forgotPasswordEmail, getSocialNetworks, setSocialNetworks, getPhoneNumbers, updatePhoneNumbers, changeAuthNumber, sendOtp, verifyOtp, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
+import { OtpInput } from "@/components/ui/otp-input";
+import { StepIndicator } from "@/components/verification/StepIndicator";
 import { PasswordMatchInput } from "@/components/settings/PasswordMatchInput";
 import { SocialLinksInput, SocialLink, migrateSocialLinks } from "@/components/settings/SocialLinksInput";
 
