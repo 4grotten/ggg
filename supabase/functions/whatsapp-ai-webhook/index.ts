@@ -216,7 +216,7 @@ async function generateStatement(token: string, startDate: string, endDate: stri
 
 // ── Voice transcription ──
 
-async function transcribeVoice(fileUrl: string, mimeType: string): Promise<string | null> {
+async function transcribeVoice(fileUrl: string, mimeType: string, wahaApiKey?: string): Promise<string | null> {
   const elevenLabsKey = Deno.env.get("ELEVENLABS_API_KEY");
   if (!elevenLabsKey) {
     console.error("[whatsapp-ai] ELEVENLABS_API_KEY not configured");
@@ -224,7 +224,12 @@ async function transcribeVoice(fileUrl: string, mimeType: string): Promise<strin
   }
 
   try {
-    const audioRes = await fetch(fileUrl);
+    // Download audio, with WAHA auth if needed
+    const fetchHeaders: Record<string, string> = {};
+    if (wahaApiKey) {
+      fetchHeaders["X-Api-Key"] = wahaApiKey;
+    }
+    const audioRes = await fetch(fileUrl, { headers: fetchHeaders });
     if (!audioRes.ok) {
       console.error("[whatsapp-ai] Failed to download voice file:", audioRes.status);
       return null;
