@@ -184,7 +184,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       {
         key: "download",
         label: t("statement.deliveryDownload", "Скачать файл"),
-        sublabel: "HTML",
+        sublabel: "PDF",
         icon: <Download className="w-4 h-4" />,
         enabled: true,
         configured: true,
