@@ -711,19 +711,18 @@ const EditProfile = () => {
                   <Phone className="w-4 h-4 text-muted-foreground" />
                   {t("editProfile.phone") || "Phone"}
                 </label>
+                <div className="h-14 rounded-2xl border border-border bg-muted/50 px-4 flex items-center text-base text-foreground">
+                  {user?.phone_number || "—"}
+                </div>
                 <button
                   type="button"
                   onClick={() => handlePhoneContactsDrawerOpen(true)}
-                  className="w-full h-14 rounded-2xl border border-border bg-card px-4 flex items-center justify-between text-base hover:bg-muted/50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
                 >
-                  <span className={user?.phone_number ? "text-foreground" : "text-muted-foreground"}>
-                    {user?.phone_number || t("editProfile.addPhone") || "Add phone number"}
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  <Phone className="w-4 h-4" />
+                  {t("editProfile.changePhone") || "Change auth number"}
+                  <ChevronRight className="w-4 h-4" />
                 </button>
-                <p className="text-xs text-muted-foreground mt-1.5 px-1">
-                  {t("editProfile.phoneDescription") || "Phone number used for authentication"}
-                </p>
               </div>
 
               {/* Username / Nickname */}
