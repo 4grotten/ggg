@@ -649,9 +649,12 @@ Easy Card UAE`;
                   }}
                   className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-2xl hover:opacity-90 transition-opacity"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                    <User className="w-6 h-6" />
-                  </div>
+                  <Avatar className="w-12 h-12 rounded-xl">
+                    <AvatarImage src={avatarUrl} alt={user?.full_name || "User"} className="rounded-xl" />
+                    <AvatarFallback className="rounded-xl bg-white/20 text-primary-foreground text-lg font-bold">
+                      {user?.full_name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="flex-1 text-left">
                     <p className="font-semibold">{t("settings.businessCard") || "Business Card"}</p>
                     <p className="text-sm opacity-80">{t("settings.shareContactInfo") || "Share your contact info"}</p>
