@@ -563,38 +563,38 @@ def dispatch_user_transaction_notification(user_id, tx_details_text=None, transa
 STATEMENT_TRANSLATIONS = {
     'en': {
         'subject': '📄 Your Statement | uEasyCard',
-        'message': '📄 Your statement for the period {period} is ready.\nAssets: {assets}.',
-        'caption': 'Statement {period}',
+        'message': '📄 Your statement for the period {period} has been generated for your assets:\n{assets_detail}\n\nThe document is attached below.',
+        'caption': '📄 Statement {period}',
     },
     'ru': {
         'subject': '📄 Ваша выписка | uEasyCard',
-        'message': '📄 Ваша выписка за период {period} готова.\nАктивы: {assets}.',
-        'caption': 'Выписка {period}',
+        'message': '📄 Вам сформирована выписка за период {period} по вашим активам:\n{assets_detail}\n\nДокумент прикреплён ниже.',
+        'caption': '📄 Выписка {period}',
     },
     'de': {
         'subject': '📄 Ihr Kontoauszug | uEasyCard',
-        'message': '📄 Ihr Kontoauszug für den Zeitraum {period} ist bereit.\nVermögenswerte: {assets}.',
-        'caption': 'Kontoauszug {period}',
+        'message': '📄 Ihr Kontoauszug für den Zeitraum {period} wurde erstellt für Ihre Vermögenswerte:\n{assets_detail}\n\nDas Dokument ist unten angehängt.',
+        'caption': '📄 Kontoauszug {period}',
     },
     'tr': {
         'subject': '📄 Hesap Özetiniz | uEasyCard',
-        'message': '📄 {period} dönemi hesap özetiniz hazır.\nVarlıklar: {assets}.',
-        'caption': 'Hesap Özeti {period}',
+        'message': '📄 {period} dönemi için hesap özetiniz aşağıdaki varlıklarınız için oluşturuldu:\n{assets_detail}\n\nBelge aşağıda eklenmiştir.',
+        'caption': '📄 Hesap Özeti {period}',
     },
     'zh': {
         'subject': '📄 您的对账单 | uEasyCard',
-        'message': '📄 您 {period} 期间的对账单已准备就绪。\n资产: {assets}。',
-        'caption': '对账单 {period}',
+        'message': '📄 已为您生成 {period} 期间的对账单，涉及以下资产：\n{assets_detail}\n\n文件已附在下方。',
+        'caption': '📄 对账单 {period}',
     },
     'ar': {
         'subject': '📄 كشف حسابك | uEasyCard',
-        'message': '📄 كشف حسابك للفترة {period} جاهز.\nالأصول: {assets}.',
-        'caption': 'كشف حساب {period}',
+        'message': '📄 تم إعداد كشف حسابك للفترة {period} لأصولك:\n{assets_detail}\n\nالمستند مرفق أدناه.',
+        'caption': '📄 كشف حساب {period}',
     },
     'es': {
         'subject': '📄 Su Estado de Cuenta | uEasyCard',
-        'message': '📄 Su estado de cuenta del período {period} está listo.\nActivos: {assets}.',
-        'caption': 'Estado de Cuenta {period}',
+        'message': '📄 Se ha generado su estado de cuenta del período {period} para sus activos:\n{assets_detail}\n\nEl documento se adjunta a continuación.',
+        'caption': '📄 Estado de Cuenta {period}',
     },
 }
 
@@ -699,8 +699,8 @@ def send_statement_to_channels(user_id, channels, period_label, asset_labels, la
     """
     import base64 as b64mod
     tr = STATEMENT_TRANSLATIONS.get(lang, STATEMENT_TRANSLATIONS['en'])
-    assets_str = ', '.join(asset_labels) if asset_labels else '—'
-    message = tr['message'].format(period=period_label, assets=assets_str)
+    assets_detail = '\n'.join(f'  • {label}' for label in asset_labels) if asset_labels else '—'
+    message = tr['message'].format(period=period_label, assets_detail=assets_detail)
     caption = tr['caption'].format(period=period_label)
     subject = tr['subject']
 
@@ -722,14 +722,14 @@ def send_statement_to_channels(user_id, channels, period_label, asset_labels, la
     for ch in channels:
         if ch == 'telegram':
             if notif.telegram_enabled and (notif.telegram_chat_id or notif.telegram_username):
-                ok = send_telegram_document(notif, file_bytes, filename, caption)
+                ok = send_telegram_document(notif, file_bytes, filename, message)
                 results['telegram'] = {'ok': ok}
             else:
                 results['telegram'] = {'ok': False, 'error': 'Telegram not configured'}
 
         elif ch == 'whatsapp':
             if notif.whatsapp_enabled and notif.whatsapp_number:
-                ok = send_whatsapp_file(notif.whatsapp_number, file_bytes, filename, caption)
+                ok = send_whatsapp_file(notif.whatsapp_number, file_bytes, filename, message)
                 results['whatsapp'] = {'ok': ok}
             else:
                 results['whatsapp'] = {'ok': False, 'error': 'WhatsApp not configured'}
