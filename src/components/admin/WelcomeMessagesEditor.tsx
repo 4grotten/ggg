@@ -24,7 +24,7 @@ export function WelcomeMessagesEditor() {
   const [originalMessages, setOriginalMessages] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-
+  const [isTesting, setIsTesting] = useState(false);
   useEffect(() => {
     loadMessages();
   }, []);
