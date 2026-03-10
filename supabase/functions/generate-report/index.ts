@@ -697,7 +697,37 @@ serve(async (req) => {
       });
     }
 
-    // Calculate totals
+    // Filter by asset type if specified
+    if (filterAssets) {
+      filtered = filtered.filter((tx: any) => {
+        const txType = String(tx.type || '').toLowerCase();
+        const currency = String(tx.currency || tx.display?.primary_amount?.currency || '').toUpperCase();
+        
+        // Card transactions
+        if (includeCards) {
+          if (txType === 'card_payment' || txType === 'card_activation' || txType === 'card_transfer' || txType === 'payment') return true;
+          if (tx.card_id) return true;
+          // Top-ups that go to cards
+          if (txType === 'top_up' || txType === 'topup') return true;
+        }
+        
+        // IBAN / bank transactions
+        if (includeIban) {
+          if (txType.includes('bank') || txType.includes('iban') || txType === 'withdrawal') return true;
+          if (txType === 'transfer_in' || txType === 'transfer_out' || txType === 'internal_transfer') return true;
+        }
+        
+        // Crypto transactions
+        if (includeCrypto) {
+          if (txType.includes('crypto')) return true;
+          if (currency === 'USDT' || currency === 'BTC' || currency === 'ETH') return true;
+        }
+        
+        // If transaction type doesn't clearly match any category, include if all types selected
+        return false;
+      });
+    }
+
     const totalIn = filtered
       .filter((tx: any) => {
         const sign = tx.display?.primary_amount?.sign;
