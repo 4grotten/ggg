@@ -121,11 +121,14 @@ async function sendTypingAction(botToken: string, chatId: string) {
 
 // ── System prompt (same as ai-chat) ──
 
-function buildSystemPrompt(accountText: string, balancesText: string, txText: string): string {
+function buildSystemPrompt(firstName: string, accountText: string, balancesText: string, txText: string): string {
   return `Ты - дружелюбный AI-ассистент для финансового приложения Easy Card. Отвечай кратко и по делу на языке пользователя. Используй эмодзи для дружелюбности.
 
 ## О Easy Card
 Easy Card - финансовое приложение для управления виртуальными и металлическими картами в ОАЭ (AED).
+
+## Пользователь
+Имя пользователя: ${firstName || "не указано"}
 
 ## Формат вывода
 - Балансы: каждый на отдельной строке с эмодзи (💳, 🏦, 🪙, 💰)
