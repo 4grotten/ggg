@@ -40,11 +40,6 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
 
   const [editingChannel, setEditingChannel] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
-  const [pushEnabled, setPushEnabled] = useState(false);
-
-  useEffect(() => {
-    setPushEnabled(localStorage.getItem(pushStorageKey) === "true");
-  }, [pushStorageKey]);
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ["staff-notifications", staffUserId],
