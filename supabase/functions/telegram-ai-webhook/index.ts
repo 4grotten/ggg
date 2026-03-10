@@ -132,38 +132,56 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
 
 // ── Statement detection ──
 
-function detectStatementRequest(text: string): { isStatement: boolean; months: number } {
+function isStatementRequest(text: string): boolean {
   const lower = text.toLowerCase();
   const keywords = ["выписк", "выписку", "отчёт", "отчет", "statement", "report", "extract"];
-  const isStatement = keywords.some(k => lower.includes(k));
-  if (!isStatement) return { isStatement: false, months: 3 };
-
-  // Check longer periods first to avoid false matches
-  if (/12\s*(мес|month)/i.test(lower) || /год|year/i.test(lower) || lower.includes("1г")) return { isStatement: true, months: 12 };
-  if (/9\s*(мес|month)/i.test(lower) || lower.includes("9м") || /девять/i.test(lower)) return { isStatement: true, months: 9 };
-  if (/6\s*(мес|month)/i.test(lower) || lower.includes("6м") || /полгод|пол года|шесть/i.test(lower)) return { isStatement: true, months: 6 };
-  if (/3\s*(мес|month)/i.test(lower) || lower.includes("3м") || /три месяц|три мес|за 3/i.test(lower)) return { isStatement: true, months: 3 };
-  if (/2\s*(мес|month)/i.test(lower) || lower.includes("2м") || /два месяц|два мес/i.test(lower)) return { isStatement: true, months: 2 };
-  if (/1\s*(мес|month)/i.test(lower) || lower.includes("1м") || /за месяц|один месяц/i.test(lower)) return { isStatement: true, months: 1 };
-
-  return { isStatement: true, months: 3 };
+  return keywords.some(k => lower.includes(k));
 }
 
-async function generateStatement(token: string, months: number, userName: string): Promise<Uint8Array | null> {
+async function parseDateRange(text: string, lovableKey: string): Promise<{ start_date: string; end_date: string; period_text: string }> {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          {
+            role: "system",
+            content: `Ты парсер дат. Сегодня ${today}. Из текста пользователя извлеки период для финансовой выписки. Верни ТОЛЬКО JSON без markdown: {"start_date":"YYYY-MM-DD","end_date":"YYYY-MM-DD","period_text":"описание периода на русском"}. Примеры:
+- "выписка за 3 месяца" → от 3 месяцев назад до сегодня
+- "выписка за сегодня" → сегодняшняя дата в оба поля
+- "выписка с 1 по 10 марта" → конкретные даты
+- "выписка за последнюю неделю" → 7 дней назад до сегодня
+- "выписка за январь" → с 1 по 31 января текущего года
+- "выписка за год" → 12 месяцев назад до сегодня
+Если период неясен, используй последние 3 месяца.`
+          },
+          { role: "user", content: text }
+        ],
+        stream: false,
+      }),
+    });
+
+    if (!res.ok) throw new Error(`AI ${res.status}`);
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content || "";
+    const clean = content.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+    const parsed = JSON.parse(clean);
+    console.log(`[telegram-ai] Parsed date range: ${parsed.start_date} to ${parsed.end_date} (${parsed.period_text})`);
+    return parsed;
+  } catch (e) {
+    console.error("[telegram-ai] Date parse error:", e);
+    const fallbackStart = new Date();
+    fallbackStart.setMonth(fallbackStart.getMonth() - 3);
+    return { start_date: fallbackStart.toISOString().slice(0, 10), end_date: today, period_text: "3 месяца" };
+  }
+}
+
+async function generateStatement(token: string, startDate: string, endDate: string, userName: string): Promise<Uint8Array | null> {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-  const now = new Date();
-  const startDate = new Date(now);
-  startDate.setMonth(startDate.getMonth() - months);
-
-  const body = {
-    backend_token: token,
-    start_date: startDate.toISOString().slice(0, 10),
-    end_date: now.toISOString().slice(0, 10),
-    user_name: userName,
-    lang: "ru",
-  };
 
   try {
     const res = await fetch(`${supabaseUrl}/functions/v1/generate-report`, {
@@ -172,7 +190,13 @@ async function generateStatement(token: string, months: number, userName: string
         "Content-Type": "application/json",
         Authorization: `Bearer ${supabaseKey}`,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        backend_token: token,
+        start_date: startDate,
+        end_date: endDate,
+        user_name: userName,
+        lang: "ru",
+      }),
     });
 
     if (!res.ok) {
@@ -444,11 +468,9 @@ Deno.serve(async (req) => {
     console.log(`[telegram-ai] Identified user: ${user_id} (${first_name})`);
 
     // 2. Check if this is a statement request
-    const statementCheck = detectStatementRequest(userText);
-    if (statementCheck.isStatement) {
-      console.log(`[telegram-ai] Statement request detected, period: ${statementCheck.months} months`);
+    if (isStatementRequest(userText)) {
+      console.log(`[telegram-ai] Statement request detected`);
 
-      // Save user message
       const supabase = createClient(supabaseUrl, supabaseKey);
       await supabase.from("messenger_chat_history").insert({
         platform: "telegram",
@@ -458,32 +480,27 @@ Deno.serve(async (req) => {
         content: userText,
       });
 
-      // Send "generating" message
-      const periodText = statementCheck.months === 1 ? "месяц" :
-        statementCheck.months === 3 ? "3 месяца" :
-        statementCheck.months === 6 ? "6 месяцев" :
-        statementCheck.months === 9 ? "9 месяцев" :
-        statementCheck.months === 12 ? "год" : `${statementCheck.months} мес.`;
-
-      await sendTelegramMessage(botToken, chatId, `📊 Формирую выписку за последние ${periodText}...`);
+      await sendTelegramMessage(botToken, chatId, `📊 Формирую выписку...`);
       await sendTypingAction(botToken, chatId);
 
-      // Generate statement
-      const fileBytes = await generateStatement(userToken, statementCheck.months, first_name);
+      const lovableKey = Deno.env.get("LOVABLE_API_KEY")!;
+      const dateRange = await parseDateRange(userText, lovableKey);
+      const periodText = dateRange.period_text;
+
+      const fileBytes = await generateStatement(userToken, dateRange.start_date, dateRange.end_date, first_name);
 
       if (fileBytes) {
         const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
         const fileName = `uEasyCard_Statement_${fileDate}.html`;
 
-        await sendTelegramDocument(botToken, chatId, fileBytes, fileName, `📄 Выписка за последние ${periodText}`);
+        await sendTelegramDocument(botToken, chatId, fileBytes, fileName, `📄 Выписка за ${periodText} (${dateRange.start_date} — ${dateRange.end_date})`);
 
-        // Save assistant message
         await supabase.from("messenger_chat_history").insert({
           platform: "telegram",
           platform_chat_id: chatId,
           user_id: String(user_id),
           role: "assistant",
-          content: `📊 Выписка за последние ${periodText} сформирована и отправлена файлом.`,
+          content: `📊 Выписка за ${periodText} (${dateRange.start_date} — ${dateRange.end_date}) сформирована.`,
         });
       } else {
         await sendTelegramMessage(botToken, chatId, "⚠️ Не удалось сформировать выписку. Попробуйте позже.");
