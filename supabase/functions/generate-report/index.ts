@@ -191,6 +191,17 @@ interface AssetBalance {
   currency: string;
 }
 
+interface UserProfile {
+  full_name?: string;
+  phone?: string;
+  email?: string;
+  iban?: string;
+  status?: string;
+  is_verified?: boolean;
+  created_at?: string;
+  account_balance?: string;
+}
+
 // ─── HTML Generation ───
 function buildHTML(
   filtered: any[],
@@ -201,6 +212,7 @@ function buildHTML(
   totalOut: number,
   assetBalances: AssetBalance[],
   lang: Lang,
+  userProfile?: UserProfile,
 ): string {
   const locale = getLocale(lang);
 
