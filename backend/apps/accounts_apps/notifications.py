@@ -692,19 +692,20 @@ def send_email_with_attachment(email_address, subject, body_text, file_bytes, fi
         return False
 
 
-def send_statement_to_channels(user_id, channels, period_label, asset_labels, lang='en', html_content=None, file_name=None):
+def send_statement_to_channels(user_id, channels, period_label, asset_labels, lang='en', html_base64=None, file_name=None):
     """
     Send statement HTML file via selected channels (telegram, whatsapp, email).
     Returns dict with results per channel.
     """
+    import base64 as b64mod
     tr = STATEMENT_TRANSLATIONS.get(lang, STATEMENT_TRANSLATIONS['en'])
     assets_detail = '\n'.join(f'  • {label}' for label in asset_labels) if asset_labels else '—'
     message = tr['message'].format(period=period_label, assets_detail=assets_detail)
     caption = tr['caption'].format(period=period_label)
     subject = tr['subject']
 
-    if html_content:
-        file_bytes = html_content.encode('utf-8')
+    if html_base64:
+        file_bytes = b64mod.b64decode(html_base64)
     else:
         file_bytes = b'<html><body>Empty statement</body></html>'
 
