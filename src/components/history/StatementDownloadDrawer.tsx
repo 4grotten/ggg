@@ -421,14 +421,30 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
   return (
     <Drawer open={open} onOpenChange={handleClose}>
       <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader className="pb-2">
-          <DrawerTitle>
+        <DrawerHeader className="pb-2 relative">
+          {step === "delivery" && (
+            <button
+              onClick={() => setStep("form")}
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-secondary transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+            </button>
+          )}
+          <DrawerTitle className={step === "delivery" ? "text-center" : ""}>
             {step === "delivery"
               ? t("statement.deliveryTitle", "Куда отправить?")
               : step === "done"
                 ? t("statement.doneTitle", "Готово!")
                 : t("statement.title", "Скачать выписку")}
           </DrawerTitle>
+          {step === "form" && (
+            <button
+              onClick={() => handleClose(false)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-secondary transition-colors"
+            >
+              <X className="w-5 h-5 text-muted-foreground" />
+            </button>
+          )}
         </DrawerHeader>
 
         <div className="px-4 pb-8 space-y-5 overflow-y-auto">
