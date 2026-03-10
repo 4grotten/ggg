@@ -1387,7 +1387,11 @@
       "transfers": "Überweisungen",
       "transactionHistory": "Transaktionsverlauf",
       "accountsInfo": "Bank- & Kryptokonten",
-      "receipts": "Quittungen"
+      "receipts": "Quittungen",
+      "admin": "Admin-Panel & Limits",
+      "adminRevenue": "Admin: Einnahmen",
+      "adminUsers": "Admin: Benutzer",
+      "adminSettings": "Admin: Globale Einstellungen"
     },
     "notes": {
       "title": "Hinweise"

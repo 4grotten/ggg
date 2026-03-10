@@ -1387,7 +1387,11 @@
       "transfers": "Transferler",
       "transactionHistory": "İşlem Geçmişi",
       "accountsInfo": "Banka ve Kripto Hesapları",
-      "receipts": "Makbuzlar"
+      "receipts": "Makbuzlar",
+      "admin": "Yönetim Paneli ve Limitler",
+      "adminRevenue": "Yönetim: Gelirler",
+      "adminUsers": "Yönetim: Kullanıcılar",
+      "adminSettings": "Yönetim: Genel Ayarlar"
     },
     "notes": {
       "title": "Notlar"
