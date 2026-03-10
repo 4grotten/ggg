@@ -688,19 +688,19 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
 
   <!-- TABLE -->
   <div class="table-wrapper">
-    <div class="table-title">Детализация операций</div>
+    <div class="table-title">${t(lang, 'detailTitle')}</div>
     <table>
       <thead>
         <tr>
-          <th>№</th>
-          <th>Дата</th>
-          <th>Тип</th>
-          <th>Описание</th>
-          <th>Сумма</th>
-          <th>Статус</th>
-          <th>Отправитель</th>
-          <th>Получатель</th>
-          <th>Комиссия</th>
+          <th>${t(lang, 'num')}</th>
+          <th>${t(lang, 'date')}</th>
+          <th>${t(lang, 'type')}</th>
+          <th>${t(lang, 'description')}</th>
+          <th>${t(lang, 'amount')}</th>
+          <th>${t(lang, 'status')}</th>
+          <th>${t(lang, 'sender')}</th>
+          <th>${t(lang, 'receiver')}</th>
+          <th>${t(lang, 'fee')}</th>
         </tr>
       </thead>
       <tbody>
