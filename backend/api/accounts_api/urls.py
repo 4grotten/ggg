@@ -61,4 +61,5 @@ urlpatterns = [
     path('admin/users/<str:user_id>/verification/', views.AdminVerifyUserView.as_view(), name='admin-user-verify'),
 
     path('users/language/', views.UpdateLanguageView.as_view()),
+    path('telegram-webhook/save-chat-id/', views.TelegramWebhookSaveChatIdView.as_view(), name='telegram-webhook-save-chat-id'),
 ]
