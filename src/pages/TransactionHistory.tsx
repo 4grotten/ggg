@@ -133,37 +133,40 @@ const TransactionHistory = () => {
   };
 
   const isIncomeTransaction = (tx: Transaction): boolean => {
-    return tx.type === "topup" || 
-           tx.type === "top_up" ||
-           tx.type === "bank_transfer_incoming" || 
-           tx.type === "transfer_in" ||
-           tx.type === "refund" ||
-           tx.type === "cashback" ||
-           (tx.type === "card_transfer" && !!tx.senderCard);
+    const type = tx.type as string || "";
+    return type === "topup" || 
+           type === "top_up" ||
+           type === "bank_transfer_incoming" || 
+           type === "transfer_in" ||
+           type === "refund" ||
+           type === "cashback" ||
+           (type === "card_transfer" && !!tx.senderCard);
   };
 
   const isExpenseTransaction = (tx: Transaction): boolean => {
-    return !tx.type || 
-           tx.type === "declined" || 
-           tx.type === "card_activation" ||
-           tx.type === "card_payment" ||
-           tx.type === "bank_transfer" ||
-           tx.type === "transfer_out" ||
-           tx.type === "withdrawal" ||
-           tx.type === "fee" ||
-           tx.type === "crypto_withdrawal";
+    const type = tx.type as string || "";
+    return !type || 
+           type === "declined" || 
+           type === "card_activation" ||
+           type === "card_payment" ||
+           type === "bank_transfer" ||
+           type === "transfer_out" ||
+           type === "withdrawal" ||
+           type === "fee" ||
+           type === "crypto_withdrawal";
   };
 
   const isTransferTransaction = (tx: Transaction): boolean => {
-    return tx.type === "card_transfer" || 
-           tx.type === "bank_transfer" || 
-           tx.type === "bank_transfer_incoming" ||
-           tx.type === "transfer_in" ||
-           tx.type === "transfer_out" ||
-           tx.type === "crypto_withdrawal" ||
-           tx.type === "crypto_to_card" ||
-           tx.type === "crypto_to_iban" ||
-           tx.type === "iban_to_iban";
+    const type = tx.type as string || "";
+    return type === "card_transfer" || 
+           type === "bank_transfer" || 
+           type === "bank_transfer_incoming" ||
+           type === "transfer_in" ||
+           type === "transfer_out" ||
+           type === "crypto_withdrawal" ||
+           type === "crypto_to_card" ||
+           type === "crypto_to_iban" ||
+           type === "iban_to_iban";
   };
 
   // Merge groups by date helper
