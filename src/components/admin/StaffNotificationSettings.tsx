@@ -148,7 +148,11 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
                   <Icon className={cn("w-5 h-5 shrink-0", enabled ? ch.color : "text-muted-foreground")} />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-muted-foreground">{ch.label}</p>
-                    {!isEditing ? (
+                    {'noValue' in ch && ch.noValue ? (
+                      <p className="text-sm font-medium">
+                        {enabled ? "Активно" : "Отключено"}
+                      </p>
+                    ) : !isEditing ? (
                       <p
                         className={cn("text-sm font-medium truncate", !readOnly && "cursor-pointer hover:underline")}
                         onClick={() => {
