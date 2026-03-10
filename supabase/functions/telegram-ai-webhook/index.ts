@@ -138,14 +138,15 @@ function detectStatementRequest(text: string): { isStatement: boolean; months: n
   const isStatement = keywords.some(k => lower.includes(k));
   if (!isStatement) return { isStatement: false, months: 3 };
 
-  // Parse period
-  if (/9\s*(мес|month)/i.test(lower) || lower.includes("9м")) return { isStatement: true, months: 9 };
-  if (/6\s*(мес|month)/i.test(lower) || lower.includes("6м") || lower.includes("полгод") || lower.includes("пол года")) return { isStatement: true, months: 6 };
-  if (/год|year|12\s*мес/i.test(lower) || lower.includes("1г")) return { isStatement: true, months: 12 };
-  if (/1\s*(мес|month)/i.test(lower) || lower.includes("1м") || /за месяц/i.test(lower)) return { isStatement: true, months: 1 };
-  if (/3\s*(мес|month)/i.test(lower) || lower.includes("3м") || /три месяц/i.test(lower)) return { isStatement: true, months: 3 };
-  
-  return { isStatement: true, months: 3 }; // default 3 months
+  // Check longer periods first to avoid false matches
+  if (/12\s*(мес|month)/i.test(lower) || /год|year/i.test(lower) || lower.includes("1г")) return { isStatement: true, months: 12 };
+  if (/9\s*(мес|month)/i.test(lower) || lower.includes("9м") || /девять/i.test(lower)) return { isStatement: true, months: 9 };
+  if (/6\s*(мес|month)/i.test(lower) || lower.includes("6м") || /полгод|пол года|шесть/i.test(lower)) return { isStatement: true, months: 6 };
+  if (/3\s*(мес|month)/i.test(lower) || lower.includes("3м") || /три месяц|три мес|за 3/i.test(lower)) return { isStatement: true, months: 3 };
+  if (/2\s*(мес|month)/i.test(lower) || lower.includes("2м") || /два месяц|два мес/i.test(lower)) return { isStatement: true, months: 2 };
+  if (/1\s*(мес|month)/i.test(lower) || lower.includes("1м") || /за месяц|один месяц/i.test(lower)) return { isStatement: true, months: 1 };
+
+  return { isStatement: true, months: 3 };
 }
 
 async function generateStatement(token: string, months: number, userName: string): Promise<Uint8Array | null> {
