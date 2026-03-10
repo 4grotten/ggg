@@ -649,9 +649,9 @@ Easy Card UAE`;
                   }}
                   className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-2xl hover:opacity-90 transition-opacity"
                 >
-                  <Avatar className="w-12 h-12 rounded-xl">
-                    <AvatarImage src={avatarUrl} alt={user?.full_name || "User"} className="rounded-xl" />
-                    <AvatarFallback className="rounded-xl bg-white/20 text-primary-foreground text-lg font-bold">
+                  <Avatar className="w-12 h-12 rounded-full">
+                    <AvatarImage src={avatarUrl} alt={user?.full_name || "User"} className="rounded-full" />
+                    <AvatarFallback className="rounded-full bg-white/20 text-primary-foreground text-lg font-bold">
                       {user?.full_name?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
