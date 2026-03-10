@@ -70,6 +70,47 @@ export function WelcomeMessagesEditor() {
     }
   };
 
+  const handleTest = async () => {
+    setIsTesting(true);
+    try {
+      // Get current admin's phone from profile
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("phone")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!profile?.phone) {
+        toast.error(t("admin.welcomeMessages.noPhone", "Номер телефона не найден в профиле"));
+        return;
+      }
+
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const res = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/send-welcome-whatsapp`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            phone: profile.phone,
+            language: activeLang,
+          }),
+        }
+      );
+
+      if (!res.ok) throw new Error(await res.text());
+      toast.success(t("admin.welcomeMessages.testSent", "Тестовое сообщение отправлено"));
+    } catch (err) {
+      console.error("Test welcome failed:", err);
+      toast.error(t("admin.welcomeMessages.testError", "Ошибка отправки тестового сообщения"));
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
   const hasChanges = messages[activeLang] !== originalMessages[activeLang];
 
   if (isLoading) {
