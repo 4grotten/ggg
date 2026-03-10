@@ -554,7 +554,7 @@
   },
   "statement": {
     "title": "Descargar extracto",
-    "short": "Descargar",
+    "short": "Extracto",
     "accounts": "Seleccionar tipo de activo",
     "selectAll": "Seleccionar todo",
     "deselectAll": "Deseleccionar todo",

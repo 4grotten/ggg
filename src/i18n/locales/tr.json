@@ -554,7 +554,7 @@
   },
   "statement": {
     "title": "Hesap Özeti İndir",
-    "short": "İndir",
+    "short": "Hesap Özeti",
     "accounts": "Varlık türünü seçin",
     "selectAll": "Tümünü seç",
     "deselectAll": "Seçimi kaldır",
