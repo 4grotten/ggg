@@ -631,8 +631,14 @@ serve(async (req) => {
         }
       }
 
-      // Convert PDF to base64 for backend delivery
-      const pdfBase64 = btoa(String.fromCharCode(...pdfBytes));
+      // Convert PDF to base64 for backend delivery (chunk to avoid stack overflow)
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < pdfBytes.length; i += chunkSize) {
+        const chunk = pdfBytes.subarray(i, i + chunkSize);
+        binary += String.fromCharCode(...chunk);
+      }
+      const pdfBase64 = btoa(binary);
 
       try {
         const sendRes = await fetch(`${BACKEND_BASE}/accounts/statement/send/`, {
