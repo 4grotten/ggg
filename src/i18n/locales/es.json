@@ -555,7 +555,7 @@
   "statement": {
     "title": "Descargar extracto",
     "short": "Descargar",
-    "accounts": "Cuentas y billeteras",
+    "accounts": "Seleccionar tipo de activo",
     "selectAll": "Seleccionar todo",
     "deselectAll": "Deseleccionar todo",
     "period": "Período",

@@ -622,7 +622,7 @@
   "statement": {
     "title": "Скачать выписку",
     "short": "Выписка",
-    "accounts": "Счета и кошельки",
+    "accounts": "Выбрать вид активов",
     "selectAll": "Выбрать все",
     "deselectAll": "Снять все",
     "period": "Период",
