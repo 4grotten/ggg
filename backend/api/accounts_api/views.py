@@ -1587,6 +1587,7 @@ class StatementSendView(APIView):
 
 class MessengerIdentifyView(APIView):
     permission_classes = []
+    authentication_classes = []
     
     @swagger_auto_schema(
         operation_summary="Идентификация пользователя по мессенджеру",
