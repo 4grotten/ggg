@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      messenger_chat_history: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          platform: string
+          platform_chat_id: string
+          role: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          platform: string
+          platform_chat_id: string
+          role: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          platform?: string
+          platform_chat_id?: string
+          role?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
