@@ -69,6 +69,7 @@ const Dashboard = () => {
   const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
   const [partnerDrawerOpen, setPartnerDrawerOpen] = useState(false);
   const [authAlertOpen, setAuthAlertOpen] = useState(false);
+  const [verificationDialogOpen, setVerificationDialogOpen] = useState(false);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [pendingUnlockAction, setPendingUnlockAction] = useState<'send' | 'topup' | null>(null);
   
