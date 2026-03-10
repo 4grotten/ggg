@@ -783,7 +783,7 @@ serve(async (req) => {
         // USDT balance
         if (includeCrypto && wallet.usdt_balance !== undefined) {
           const usdtBal = parseFloat(String(wallet.usdt_balance || 0));
-          assetBalances.push({ label: 'Кошелёк USDT', amount: usdtBal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }), currency: 'USDT' });
+          assetBalances.push({ label: `${t(lang, 'wallet')} USDT`, amount: usdtBal.toLocaleString(locale, { minimumFractionDigits: 2 }), currency: 'USDT' });
         }
       }
     } catch (e) { console.error("Wallet parse error:", e); }
