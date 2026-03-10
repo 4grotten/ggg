@@ -367,6 +367,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
             asset_filter: uniqueAssetTypes,
             delivery_channels: channels.filter(c => c !== "download"),
             also_download: channels.includes("download"),
+            lang: i18n.language,
           }),
         }
       );
