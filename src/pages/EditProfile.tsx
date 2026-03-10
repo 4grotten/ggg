@@ -918,7 +918,12 @@ const EditProfile = () => {
                 {/* Change Auth Number Button */}
                 <button
                   type="button"
-                  onClick={() => handlePhoneContactsDrawerOpen(true)}
+                  onClick={() => {
+                    setNewAuthPhone("+");
+                    setAuthCode("");
+                    setChangeAuthError("");
+                    setIsChangeAuthDrawerOpen(true);
+                  }}
                   className="w-full h-14 px-4 text-left border border-border rounded-2xl bg-card hover:bg-muted/50 transition-colors flex items-center justify-between text-base group"
                 >
                   <div className="flex items-center gap-3">
