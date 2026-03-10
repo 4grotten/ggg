@@ -29,7 +29,11 @@ async function fetchAllBalances(token: string): Promise<string> {
     fetch(`${BACKEND_BASE}/cards/wallet/summary/`, { headers }),
     fetch(`${BACKEND_BASE}/transactions/crypto-wallets/`, { headers }),
   ]);
-  const lines: string[] = [];
+  const cardLines: string[] = [];
+  const bankLines: string[] = [];
+  const cryptoLines: string[] = [];
+  let cardsTotal = 0;
+
   try {
     if (walletRes.status === "fulfilled" && walletRes.value.ok) {
       const raw = await walletRes.value.json();
@@ -38,22 +42,39 @@ async function fetchAllBalances(token: string): Promise<string> {
         data.cards.forEach((c: any) => {
           const t = c.type === "metal" ? "Металлическая карта" : "Виртуальная карта";
           const l4 = c.card_number ? ` (****${c.card_number.slice(-4)})` : "";
-          lines.push(`💳 ${t}${l4}: ${c.balance} ${c.currency || "AED"}`);
+          const balance = parseFloat(c.balance) || 0;
+          cardsTotal += balance;
+          cardLines.push(`💳 ${t}${l4}: ${c.balance} ${c.currency || "AED"}`);
         });
       }
-      if (data.physical_account) lines.push(`🏦 Банковский счёт: ${data.physical_account.balance} ${data.physical_account.currency || "AED"}`);
-    } else if (walletRes.status === "fulfilled") {
-      console.log(`[telegram-ai] wallet/summary failed: ${walletRes.value.status}`);
+      if (data.physical_account) {
+        const pa = data.physical_account;
+        bankLines.push(`🏦 Банковский счёт: ${pa.balance} ${pa.currency || "AED"}`);
+      }
+    } else {
+      cardLines.push("💳 Данные о картах временно недоступны.");
     }
   } catch (e) { console.error("[telegram-ai] wallet parse error:", e); }
+
   try {
     if (cryptoRes.status === "fulfilled" && cryptoRes.value.ok) {
       const raw = await cryptoRes.value.json();
       const wallets = raw.data || raw;
-      if (Array.isArray(wallets)) wallets.forEach((w: any) => lines.push(`🪙 ${w.token || "USDT"} (${w.network || "TRC20"}): ${w.balance} ${w.token || "USDT"}`));
+      if (Array.isArray(wallets)) wallets.forEach((w: any) => {
+        cryptoLines.push(`🪙 ${w.token || "USDT"} (${w.network || "TRC20"}): ${w.balance} ${w.token || "USDT"}`);
+      });
     }
   } catch (e) { console.error("[telegram-ai] crypto parse error:", e); }
-  return lines.length ? lines.join("\n") : "Балансы не найдены.";
+
+  const result: string[] = [];
+  if (cardLines.length > 0) {
+    cardLines.forEach(line => { result.push(line); result.push(""); });
+    if (cardsTotal > 0) { result.push(`💰 Итого на картах: ${cardsTotal.toFixed(2)} AED`); result.push(""); }
+  }
+  if (bankLines.length > 0) { result.push(...bankLines); result.push(""); }
+  if (cryptoLines.length > 0) { result.push(...cryptoLines); }
+
+  return result.length > 0 ? result.join("\n") : "Балансы не найдены.";
 }
 
 async function fetchTransactions(token: string): Promise<string> {
@@ -65,15 +86,24 @@ async function fetchTransactions(token: string): Promise<string> {
     const raw = await res.json();
     const txs = Array.isArray(raw) ? raw : raw?.results || raw?.data || [];
     if (!txs.length) return "Транзакций пока нет.";
-    return txs.slice(0, 15).map((tx: any, i: number) => {
+    const formatted = txs.slice(0, 20).map((tx: any, i: number) => {
       const date = tx.created_at ? formatDate(tx.created_at) : "";
       if (tx.display) {
         const d = tx.display;
-        const amt = d.primary_amount ? `${d.primary_amount.sign || ""}${d.primary_amount.amount} ${d.primary_amount.currency || "AED"}` : `${tx.amount} AED`;
-        return `[#${i + 1}] ${date} | ${d.title || tx.type} | ${amt}`;
+        const title = d.title || tx.type || "";
+        const subtitle = d.subtitle || "";
+        const amt = d.primary_amount
+          ? `${d.primary_amount.sign || ""}${d.primary_amount.amount} ${d.primary_amount.currency || "AED"}`
+          : `${tx.amount} AED`;
+        return `- [#${i + 1}] ${date} | ${title} | ${amt}${subtitle ? ` | ${subtitle}` : ""}`;
       }
-      return `[#${i + 1}] ${date} | ${formatTransactionType(tx.type || "")} | ${tx.amount} ${tx.currency || "AED"}`;
+      const type = formatTransactionType(tx.type || "");
+      const amount = tx.amount !== undefined ? `${parseFloat(tx.amount) > 0 ? "+" : ""}${tx.amount} ${tx.currency || "AED"}` : "";
+      const status = tx.status || "completed";
+      const merchant = tx.merchant_name || "";
+      return `- [#${i + 1}] ${date} | ${type} | ${amount} | ${status}${merchant ? ` | ${merchant}` : ""}`;
     }).join("\n");
+    return `${formatted}\n\nВсего транзакций в истории: ${txs.length}`;
   } catch { return "Ошибка загрузки транзакций."; }
 }
 
@@ -86,12 +116,20 @@ async function fetchAccountDetail(token: string, userId: string): Promise<string
       console.log(`[telegram-ai] account detail failed: ${res.status}`);
       return "Данные аккаунта недоступны.";
     }
-    const d = await res.json();
+    const data = await res.json();
     const lines: string[] = [];
-    if (d.first_name || d.last_name) lines.push(`👤 ${[d.first_name, d.last_name].filter(Boolean).join(" ")}`);
-    if (d.phone) lines.push(`📱 ${d.phone}`);
-    if (d.balance !== undefined) lines.push(`💰 Баланс: ${d.balance} AED`);
-    return lines.join("\n") || "Нет данных.";
+    if (data.first_name || data.last_name) lines.push(`👤 Имя: ${[data.first_name, data.last_name].filter(Boolean).join(" ")}`);
+    if (data.email) lines.push(`📧 Email: ${data.email}`);
+    if (data.phone) lines.push(`📱 Телефон: ${data.phone}`);
+    if (data.balance !== undefined) lines.push(`💰 Баланс счёта: ${data.balance} AED`);
+    if (data.status) lines.push(`📋 Статус аккаунта: ${data.status}`);
+    if (data.is_verified !== undefined) lines.push(`✅ Верификация: ${data.is_verified ? "Пройдена" : "Не пройдена"}`);
+    if (data.created_at) lines.push(`📅 Дата регистрации: ${formatDate(data.created_at)}`);
+    if (data.iban) {
+      const iban = String(data.iban);
+      lines.push(`🏦 IBAN: ${iban.slice(0, 4)}••••${iban.slice(-4)}`);
+    }
+    return lines.length > 0 ? lines.join("\n") : "Нет данных аккаунта.";
   } catch { return "Ошибка загрузки аккаунта."; }
 }
 
@@ -132,30 +170,112 @@ function buildSystemPrompt(firstName: string, accountText: string, balancesText:
   return `Ты - дружелюбный AI-ассистент для финансового приложения Easy Card. Отвечай кратко и по делу на языке пользователя. Используй эмодзи для дружелюбности.
 
 ## О Easy Card
-Easy Card - финансовое приложение для управления виртуальными и металлическими картами в ОАЭ (AED).
+Easy Card - это финансовое приложение для управления виртуальными и металлическими картами в ОАЭ (валюта AED - дирхамы).
 
 ## Пользователь
 Имя пользователя: ${firstName || "не указано"}
+
+## Типы карт
+1. **Виртуальная карта** - мгновенный выпуск, идеально для онлайн-покупок
+2. **Металлическая карта** - премиум карта с доставкой, статусная и долговечная
+
+## Комиссии (в AED)
+### Единоразовые комиссии:
+- Годовое обслуживание виртуальной карты: 183 AED
+- Перевыпуск виртуальной карты: 183 AED  
+- Годовое обслуживание металлической карты: 183 AED
+- Перевыпуск металлической карты: 183 AED
+- Открытие виртуального счета: 183 AED
+
+### Пополнение баланса:
+- Криптовалютой (USDT): фиксированная комиссия 5.90 USDT
+- Банковским переводом: 1.5%
+- Минимальная сумма пополнения криптой: 15 USDT
+- Минимальная сумма пополнения банком: 50 AED
+
+### Переводы:
+- С карты на карту: 1%
+- Банковский перевод: 2%
+- Сетевая комиссия: 1%
+
+### Транзакции:
+- Конвертация валюты: 1.5%
+
+## Курсы обмена
+- Пополнение: 1 USDT = 3.65 AED
+- Вывод: 1 USDT = 3.69 AED
+
+## Функции приложения
+- 💳 Управление картами (виртуальные и металлические)
+- 💰 Пополнение баланса (криптой USDT или банковским переводом)
+- 📤 Переводы (на карту, на банк, криптой)
+- 📊 История транзакций
+- ⚙️ Настройка лимитов
+- 🔐 Верификация личности (KYC)
+- 🌐 Мультиязычность (EN, RU, AR, DE, ES, TR, ZH)
+
+## Важно
+- Все карты работают в валюте AED (дирхамы ОАЭ)
+- Для использования карт нужно пройти верификацию
+- Поддерживаются сети TRC20 и ERC20 для крипто-пополнений
 
 ## ВАЖНЫЕ ПРАВИЛА
 - НЕ показывай балансы, транзакции и финансовые данные пока пользователь ЯВНО не спросит о них
 - При приветствии просто поздоровайся и спроси чем помочь, НЕ выкладывай сразу все данные
 - Показывай только ту информацию, которую пользователь запросил
 
-## Формат вывода
-- Балансы: каждый на отдельной строке с эмодзи (💳, 🏦, 🪙, 💰)
-- Транзакции: списком, группируя по дате
-- НИКОГДА не показывай полный IBAN — маскируй: AE07••••2473
-- Ты отвечаешь через Telegram, форматируй текст с помощью Markdown
+## Формат вывода транзакций
+Когда пользователь спрашивает о транзакциях, выводи их СПИСКОМ, группируя по дате. НЕ используй таблицы. Формат:
+
+📅 *17.01.2026*
+
+• ✅ *Пополнение* — +28,000.00 AED
+  Карта: ****8646 | Статус: завершено
+
+• ❌ *Оплата картой* — -1,890.00 AED
+  Магазин: Carrefour | Карта: ****2207
+
+📊 Итого за день: +26,110.00 AED
+
+## Формат вывода балансов
+КРИТИЧЕСКИ ВАЖНО: Когда показываешь балансы, ты ОБЯЗАН показать ВСЕ 4 секции. НЕЛЬЗЯ пропускать ни одну!
+
+1. КАРТЫ (каждая карта отдельной строкой)
+2. ИТОГО НА КАРТАХ
+3. БАНКОВСКИЙ СЧЁТ
+4. КРИПТО КОШЕЛЁК
+
+Формат СТРОГО такой:
+
+💳 *Виртуальная карта* (****XXXX): *XX,XXX.XX AED*
+
+💳 *Металлическая карта* (****XXXX): *XX,XXX.XX AED*
+
+💰 *Итого на картах: XX,XXX.XX AED*
+
+🏦 *Банковский счёт*: *XX,XXX.XX AED*
+
+🪙 *USDT* (TRC20): *XX,XXX.XX USDT*
+
+ЗАПРЕЩЕНО:
+- Пропускать карты или итого
+- Дублировать банковские счета
+- Использовать слово "Дополнительно"
+- Показывать неполный список — ВСЕГДА показывай ВСЕ балансы
+- Каждый баланс ОБЯЗАН начинаться с эмодзи (💳, 🏦, 🪙, 💰)
+- НИКОГДА не показывай полный IBAN. Всегда маскируй: AE07••••2473
+
+## Формат
+- Ты отвечаешь через Telegram, форматируй текст с помощью Markdown (*жирный*, _курсив_)
 
 ## ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (показывай ТОЛЬКО по запросу)
-### Аккаунт:
+### Информация об аккаунте:
 ${accountText}
 
-### Балансы:
+### Все балансы (карты, счета, крипто):
 ${balancesText}
 
-### Транзакции:
+### История транзакций:
 ${txText}`;
 }
 
