@@ -265,6 +265,18 @@ export async function getCurrentUser() {
   
   // При успехе сохраняем данные пользователя
   if (response.data) {
+    // Merge phone_number from previous data if API didn't return it
+    if (!response.data.phone_number) {
+      try {
+        const cached = localStorage.getItem(AUTH_USER_KEY);
+        if (cached) {
+          const prev = JSON.parse(cached) as UserProfile;
+          if (prev.phone_number) {
+            response.data.phone_number = prev.phone_number;
+          }
+        }
+      } catch {}
+    }
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
     // Persist for multi-account switching
     saveCurrentAccount(response.data);
