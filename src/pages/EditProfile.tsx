@@ -88,10 +88,12 @@ const EditProfile = () => {
 
   // Change auth number state
   const [isChangeAuthDrawerOpen, setIsChangeAuthDrawerOpen] = useState(false);
+  const [changeAuthStep, setChangeAuthStep] = useState<1 | 2 | 3>(1); // 1=choose method, 2=enter OTP, 3=enter new number
   const [newAuthPhone, setNewAuthPhone] = useState("+");
   const [authCode, setAuthCode] = useState("");
   const [isChangingAuth, setIsChangingAuth] = useState(false);
   const [changeAuthError, setChangeAuthError] = useState("");
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
 
   // Create schema with localized messages
   const profileSchema = z.object({
