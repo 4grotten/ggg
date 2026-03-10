@@ -705,25 +705,6 @@ const EditProfile = () => {
                 )}
               />
 
-              {/* Phone Number — clickable to change */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  {t("editProfile.phone") || "Phone"}
-                </label>
-                <div className="h-14 rounded-2xl border border-border bg-muted/50 px-4 flex items-center text-base text-foreground">
-                  {user?.phone_number || "—"}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handlePhoneContactsDrawerOpen(true)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                  {t("editProfile.changePhone") || "Change auth number"}
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
 
               {/* Username / Nickname */}
               <FormField
