@@ -60,6 +60,8 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
         whatsapp_enabled: settings?.whatsapp_enabled || false,
         email_address: settings?.email_address || "",
         email_enabled: settings?.email_enabled || false,
+        push_enabled: settings?.push_enabled || false,
+        push_token: settings?.push_token || "",
         ...patch,
       };
       const res = await apiPut<NotifApiResponse>(`/admin/notifications/settings/${staffUserId}/`, fullBody);
