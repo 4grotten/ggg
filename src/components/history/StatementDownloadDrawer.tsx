@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Download, Loader2, CheckCircle, CreditCard, Landmark, Wallet } from "lucide-react";
-import { motion } from "framer-motion";
+import { Download, Loader2, CheckCircle, CreditCard, Landmark, Wallet, Send, MessageCircle, Mail, Settings, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Drawer,
   DrawerContent,
@@ -15,9 +15,12 @@ import { useWalletSummary, useBankAccounts, useCryptoWallets } from "@/hooks/use
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthToken } from "@/services/api/apiClient";
 import { subMonths, subYears, format } from "date-fns";
-
+import { useUserNotificationSettings } from "@/hooks/useUserNotificationSettings";
+import { useNavigate } from "react-router-dom";
 
 type PeriodOption = "1m" | "3m" | "6m" | "9m" | "1y";
+type DeliveryChannel = "download" | "telegram" | "whatsapp" | "email";
+type DrawerStep = "form" | "delivery" | "done";
 
 interface AssetItem {
   id: string;
@@ -34,22 +37,25 @@ interface StatementDownloadDrawerProps {
 export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloadDrawerProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: walletData } = useWalletSummary();
   const { data: bankData } = useBankAccounts();
   const { data: cryptoData } = useCryptoWallets();
+  const { settings: notifSettings, isLoading: notifLoading } = useUserNotificationSettings();
 
   const [assets, setAssets] = useState<AssetItem[]>([]);
   const [selectedAssets, setSelectedAssets] = useState<Set<string>>(new Set());
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>("1m");
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isDone, setIsDone] = useState(false);
+  const [step, setStep] = useState<DrawerStep>("form");
+  const [selectedChannel, setSelectedChannel] = useState<DeliveryChannel>("download");
+  const [isSending, setIsSending] = useState(false);
 
   // Build asset list from live data
   useEffect(() => {
     const items: AssetItem[] = [];
     const wd = walletData?.data;
 
-    // Cards from wallet summary
     if (wd?.cards && Array.isArray(wd.cards)) {
       for (const card of wd.cards) {
         const mask = card.card_number ? `•••• ${String(card.card_number).slice(-4)}` : "";
@@ -64,7 +70,6 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       }
     }
 
-    // IBAN / physical account
     if (wd?.physical_account) {
       const acc = wd.physical_account;
       const iban = acc.iban ? `${String(acc.iban).slice(0, 4)}••••${String(acc.iban).slice(-4)}` : "IBAN";
@@ -76,7 +81,6 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       });
     }
 
-    // Bank accounts
     if (bankData) {
       const accounts = Array.isArray(bankData) ? bankData : (bankData as any)?.results || [];
       for (const acc of accounts) {
@@ -91,12 +95,10 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       }
     }
 
-    // USDT wallet - always show, try multiple data sources for balance
     let usdtAdded = false;
     const rawWallet = walletData as any;
     const usdtBalance = rawWallet?.data?.usdt_balance ?? rawWallet?.usdt_balance;
-    
-    // Try crypto wallets API first
+
     if (cryptoData) {
       const wallets = Array.isArray(cryptoData) ? cryptoData : (cryptoData as any)?.results || [];
       for (const w of wallets) {
@@ -120,8 +122,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
         }
       }
     }
-    
-    // Fallback: add USDT from wallet summary or as static entry
+
     if (!usdtAdded) {
       items.push({
         id: "usdt_wallet",
@@ -132,7 +133,6 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     }
 
     setAssets(items);
-    // Select all by default
     setSelectedAssets(new Set(items.map(i => i.id)));
   }, [walletData, bankData, cryptoData]);
 
@@ -175,34 +175,97 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     return { start: format(start, "yyyy-MM-dd"), end };
   };
 
-  const handleDownload = async () => {
+  // Build available delivery channels
+  const getDeliveryChannels = () => {
+    const channels: { key: DeliveryChannel; label: string; sublabel?: string; icon: React.ReactNode; enabled: boolean }[] = [
+      {
+        key: "download",
+        label: t("statement.deliveryDownload", "Скачать файл"),
+        sublabel: "HTML",
+        icon: <Download className="w-4 h-4" />,
+        enabled: true,
+      },
+    ];
+
+    if (notifSettings) {
+      if (notifSettings.telegram_username) {
+        channels.push({
+          key: "telegram",
+          label: "Telegram",
+          sublabel: notifSettings.telegram_enabled
+            ? `@${notifSettings.telegram_username}`
+            : t("statement.channelDisabled", "Отключен"),
+          icon: <Send className="w-4 h-4" />,
+          enabled: notifSettings.telegram_enabled,
+        });
+      }
+
+      if (notifSettings.whatsapp_number) {
+        channels.push({
+          key: "whatsapp",
+          label: "WhatsApp",
+          sublabel: notifSettings.whatsapp_enabled
+            ? notifSettings.whatsapp_number
+            : t("statement.channelDisabled", "Отключен"),
+          icon: <MessageCircle className="w-4 h-4" />,
+          enabled: notifSettings.whatsapp_enabled,
+        });
+      }
+
+      if (notifSettings.email_address) {
+        channels.push({
+          key: "email",
+          label: "Email",
+          sublabel: notifSettings.email_enabled
+            ? notifSettings.email_address
+            : t("statement.channelDisabled", "Отключен"),
+          icon: <Mail className="w-4 h-4" />,
+          enabled: notifSettings.email_enabled,
+        });
+      }
+    }
+
+    return channels;
+  };
+
+  const hasAnyChannel = notifSettings && (
+    notifSettings.telegram_username ||
+    notifSettings.whatsapp_number ||
+    notifSettings.email_address
+  );
+
+  const handleProceedToDelivery = () => {
     if (selectedAssets.size === 0) {
       toast.error(t("statement.selectAtLeastOne", "Выберите хотя бы один счёт"));
       return;
     }
+    setStep("delivery");
+  };
 
+  const buildRequestBody = () => {
+    const token = getAuthToken();
+    const { start, end } = getDateRange(selectedPeriod);
+    const userName = user?.full_name || "";
+
+    const selectedAssetTypes: string[] = [];
+    for (const id of selectedAssets) {
+      if (id.startsWith("card_")) selectedAssetTypes.push("card");
+      else if (id.startsWith("iban_") || id.startsWith("bank_")) selectedAssetTypes.push("iban");
+      else if (id === "usdt_wallet" || id.startsWith("crypto_")) selectedAssetTypes.push("crypto");
+    }
+    const uniqueAssetTypes = [...new Set(selectedAssetTypes)];
+
+    return { token, start, end, userName, uniqueAssetTypes };
+  };
+
+  const handleDownloadFile = async () => {
     setIsDownloading(true);
-    setIsDone(false);
-
     try {
-      const token = getAuthToken();
+      const { token, start, end, userName, uniqueAssetTypes } = buildRequestBody();
       if (!token) {
         toast.error(t("common.authRequired", "Необходима авторизация"));
         return;
       }
-
-      const { start, end } = getDateRange(selectedPeriod);
-      const userName = user?.full_name || "";
-
-      // Build selected asset types for filtering
-      const selectedAssetTypes: string[] = [];
-      for (const id of selectedAssets) {
-        if (id.startsWith("card_")) selectedAssetTypes.push("card");
-        else if (id.startsWith("iban_") || id.startsWith("bank_")) selectedAssetTypes.push("iban");
-        else if (id === "usdt_wallet" || id.startsWith("crypto_")) selectedAssetTypes.push("crypto");
-      }
-      // Deduplicate
-      const uniqueAssetTypes = [...new Set(selectedAssetTypes)];
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
@@ -238,13 +301,72 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      setIsDone(true);
+      setStep("done");
       toast.success(t("statement.downloaded", "Выписка скачана!"));
     } catch (error) {
       console.error("Statement download error:", error);
       toast.error(error instanceof Error ? error.message : t("statement.downloadError", "Ошибка скачивания"));
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleSendToChannel = async (channel: DeliveryChannel) => {
+    if (channel === "download") {
+      await handleDownloadFile();
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const { token, start, end, userName, uniqueAssetTypes } = buildRequestBody();
+      if (!token) {
+        toast.error(t("common.authRequired", "Необходима авторизация"));
+        return;
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            backend_token: token,
+            start_date: start,
+            end_date: end,
+            user_name: userName,
+            asset_filter: uniqueAssetTypes,
+            delivery_channel: channel,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || t("statement.sendError", "Ошибка отправки"));
+      }
+
+      setStep("done");
+      const channelLabel = channel === "telegram" ? "Telegram" : channel === "whatsapp" ? "WhatsApp" : "Email";
+      toast.success(t("statement.sentTo", `Выписка отправлена в ${channelLabel}`, { channel: channelLabel }));
+    } catch (error) {
+      console.error("Statement send error:", error);
+      toast.error(error instanceof Error ? error.message : t("statement.sendError", "Ошибка отправки"));
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleClose = (v: boolean) => {
+    onOpenChange(v);
+    if (!v) {
+      setTimeout(() => {
+        setStep("form");
+        setSelectedChannel("download");
+      }, 300);
     }
   };
 
@@ -256,116 +378,247 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     }
   };
 
+  const deliveryChannels = getDeliveryChannels();
+
   return (
-    <Drawer open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setIsDone(false); } }}>
+    <Drawer open={open} onOpenChange={handleClose}>
       <DrawerContent className="max-h-[85vh]">
         <DrawerHeader className="pb-2">
-          <DrawerTitle>{t("statement.title", "Скачать выписку")}</DrawerTitle>
+          <DrawerTitle>
+            {step === "delivery"
+              ? t("statement.deliveryTitle", "Куда отправить?")
+              : step === "done"
+                ? t("statement.doneTitle", "Готово!")
+                : t("statement.title", "Скачать выписку")}
+          </DrawerTitle>
         </DrawerHeader>
 
         <div className="px-4 pb-8 space-y-5 overflow-y-auto">
-          {/* Account selection */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("statement.accounts", "Счета и кошельки")}
-              </p>
-              <button
-                onClick={toggleAll}
-                className="text-xs text-primary font-medium"
+          <AnimatePresence mode="wait">
+            {/* STEP 1: Form */}
+            {step === "form" && (
+              <motion.div
+                key="form"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-5"
               >
-                {selectedAssets.size === assets.length
-                  ? t("statement.deselectAll", "Снять все")
-                  : t("statement.selectAll", "Выбрать все")}
-              </button>
-            </div>
-
-            <div className="space-y-1">
-              {assets.map((asset) => (
-                <button
-                  key={asset.id}
-                  onClick={() => toggleAsset(asset.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-xl transition-colors",
-                    selectedAssets.has(asset.id)
-                      ? "bg-primary/10 border border-primary/20"
-                      : "bg-secondary hover:bg-secondary/80 border border-transparent"
-                  )}
-                >
-                  <Checkbox
-                    checked={selectedAssets.has(asset.id)}
-                    className="pointer-events-none"
-                  />
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    {getAssetIcon(asset.type)}
+                {/* Account selection */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {t("statement.accounts", "Выбрать вид активов")}
+                    </p>
+                    <button onClick={toggleAll} className="text-xs text-primary font-medium">
+                      {selectedAssets.size === assets.length
+                        ? t("statement.deselectAll", "Снять все")
+                        : t("statement.selectAll", "Выбрать все")}
+                    </button>
                   </div>
-                  <div className="text-left flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{asset.label}</p>
-                    {asset.sublabel && (
-                      <p className="text-xs text-muted-foreground">{asset.sublabel}</p>
+
+                  <div className="space-y-1">
+                    {assets.map((asset) => (
+                      <button
+                        key={asset.id}
+                        onClick={() => toggleAsset(asset.id)}
+                        className={cn(
+                          "w-full flex items-center gap-3 p-3 rounded-xl transition-colors",
+                          selectedAssets.has(asset.id)
+                            ? "bg-primary/10 border border-primary/20"
+                            : "bg-secondary hover:bg-secondary/80 border border-transparent"
+                        )}
+                      >
+                        <Checkbox checked={selectedAssets.has(asset.id)} className="pointer-events-none" />
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          {getAssetIcon(asset.type)}
+                        </div>
+                        <div className="text-left flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{asset.label}</p>
+                          {asset.sublabel && (
+                            <p className="text-xs text-muted-foreground">{asset.sublabel}</p>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+
+                    {assets.length === 0 && (
+                      <div className="text-center py-6">
+                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">{t("common.loading", "Загрузка...")}</p>
+                      </div>
                     )}
                   </div>
-                </button>
-              ))}
-
-              {assets.length === 0 && (
-                <div className="text-center py-6">
-                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">{t("common.loading", "Загрузка...")}</p>
                 </div>
-              )}
-            </div>
-          </div>
 
-          {/* Period selection */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">
-              {t("statement.period", "Период")}
-            </p>
-            <div className="flex gap-2 flex-wrap">
-              {periodOptions.map((opt) => (
-                <button
-                  key={opt.key}
-                  onClick={() => setSelectedPeriod(opt.key)}
+                {/* Period selection */}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {t("statement.period", "Период")}
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    {periodOptions.map((opt) => (
+                      <button
+                        key={opt.key}
+                        onClick={() => setSelectedPeriod(opt.key)}
+                        className={cn(
+                          "px-4 py-2 rounded-xl text-sm font-medium transition-all",
+                          selectedPeriod === opt.key
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Next button */}
+                <motion.button
+                  onClick={handleProceedToDelivery}
+                  disabled={selectedAssets.size === 0}
                   className={cn(
-                    "px-4 py-2 rounded-xl text-sm font-medium transition-all",
-                    selectedPeriod === opt.key
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                    "w-full flex items-center justify-center gap-3 py-3.5 rounded-xl font-medium text-sm transition-all",
+                    "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]",
+                    selectedAssets.size === 0 && "opacity-60 cursor-not-allowed"
                   )}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
+                  <Download className="w-5 h-5" />
+                  {t("statement.next", "Продолжить")}
+                </motion.button>
+              </motion.div>
+            )}
 
-          {/* Download button */}
-          <motion.button
-            onClick={handleDownload}
-            disabled={isDownloading || isDone || selectedAssets.size === 0}
-            className={cn(
-              "w-full flex items-center justify-center gap-3 py-3.5 rounded-xl font-medium text-sm transition-all",
-              isDone
-                ? "bg-success/15 text-success border border-success/20"
-                : "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]",
-              (isDownloading || selectedAssets.size === 0) && "opacity-60 cursor-not-allowed"
+            {/* STEP 2: Delivery channel selection */}
+            {step === "delivery" && (
+              <motion.div
+                key="delivery"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="space-y-4"
+              >
+                <p className="text-sm text-muted-foreground">
+                  {t("statement.chooseDelivery", "Выберите способ получения выписки")}
+                </p>
+
+                <div className="space-y-2">
+                  {deliveryChannels.map((ch) => (
+                    <button
+                      key={ch.key}
+                      onClick={() => {
+                        if (ch.enabled) {
+                          setSelectedChannel(ch.key);
+                          handleSendToChannel(ch.key);
+                        }
+                      }}
+                      disabled={!ch.enabled || isDownloading || isSending}
+                      className={cn(
+                        "w-full flex items-center gap-3 p-3.5 rounded-xl transition-colors border",
+                        ch.enabled
+                          ? "bg-secondary hover:bg-secondary/80 border-transparent hover:border-primary/20"
+                          : "bg-secondary/50 border-transparent opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-9 h-9 rounded-full flex items-center justify-center",
+                        ch.key === "telegram" ? "bg-[#26A5E4]/15 text-[#26A5E4]" :
+                        ch.key === "whatsapp" ? "bg-[#25D366]/15 text-[#25D366]" :
+                        ch.key === "email" ? "bg-orange-500/15 text-orange-500" :
+                        "bg-primary/10 text-primary"
+                      )}>
+                        {ch.icon}
+                      </div>
+                      <div className="text-left flex-1 min-w-0">
+                        <p className="text-sm font-medium">{ch.label}</p>
+                        {ch.sublabel && (
+                          <p className="text-xs text-muted-foreground">{ch.sublabel}</p>
+                        )}
+                      </div>
+                      {(isDownloading || isSending) && selectedChannel === ch.key ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Suggest setting up notifications if none configured */}
+                {!hasAnyChannel && !notifLoading && (
+                  <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      {t("statement.noChannels", "Настройте Telegram, WhatsApp или Email, чтобы получать выписки напрямую")}
+                    </p>
+                    <button
+                      onClick={() => {
+                        handleClose(false);
+                        setTimeout(() => navigate("/settings"), 300);
+                      }}
+                      className="flex items-center gap-2 text-sm text-primary font-medium"
+                    >
+                      <Settings className="w-4 h-4" />
+                      {t("statement.setupNotifications", "Настроить уведомления")}
+                    </button>
+                  </div>
+                )}
+
+                {/* Back button */}
+                <button
+                  onClick={() => setStep("form")}
+                  className="w-full text-center text-sm text-muted-foreground py-2"
+                >
+                  {t("common.back", "Назад")}
+                </button>
+              </motion.div>
             )}
-            whileTap={{ scale: isDone ? 1 : 0.97 }}
-          >
-            {isDownloading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : isDone ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <Download className="w-5 h-5" />
+
+            {/* STEP 3: Done */}
+            {step === "done" && (
+              <motion.div
+                key="done"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-5 text-center py-4"
+              >
+                <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-8 h-8 text-success" />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {t("statement.doneMessage", "Выписка успешно сформирована")}
+                </p>
+
+                {/* If no channels configured, suggest after successful download */}
+                {!hasAnyChannel && !notifLoading && (
+                  <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      {t("statement.setupHint", "Хотите получать выписки в Telegram, WhatsApp или Email?")}
+                    </p>
+                    <button
+                      onClick={() => {
+                        handleClose(false);
+                        setTimeout(() => navigate("/settings"), 300);
+                      }}
+                      className="flex items-center gap-2 text-sm text-primary font-medium mx-auto"
+                    >
+                      <Settings className="w-4 h-4" />
+                      {t("statement.setupNotifications", "Настроить уведомления")}
+                    </button>
+                  </div>
+                )}
+
+                <motion.button
+                  onClick={() => handleClose(false)}
+                  className="w-full py-3.5 rounded-xl font-medium text-sm bg-secondary text-foreground hover:bg-secondary/80"
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {t("common.close", "Закрыть")}
+                </motion.button>
+              </motion.div>
             )}
-            {isDownloading
-              ? t("statement.generating", "Генерация...")
-              : isDone
-                ? t("statement.done", "Скачано!")
-                : t("statement.download", "Скачать выписку")}
-          </motion.button>
+          </AnimatePresence>
         </div>
       </DrawerContent>
     </Drawer>
