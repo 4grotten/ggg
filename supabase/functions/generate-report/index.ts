@@ -583,17 +583,18 @@ serve(async (req) => {
     let userProfile: UserProfile | undefined;
     try {
       if (profileRes?.ok) {
-        const profileData = await profileRes.json();
-        const p = profileData.data || profileData;
-        const fullName = [p.first_name, p.last_name].filter(Boolean).join(' ');
+        const p = await profileRes.json();
+        // API returns: { full_name, phone, email, is_verified, ... }
+        // Also may have first_name/last_name separately
+        const fullName = p.full_name || [p.first_name, p.last_name].filter(Boolean).join(' ');
         userProfile = {
           full_name: fullName || user_name || undefined,
-          phone: p.phone || undefined,
+          phone: p.phone || p.phone_number || undefined,
           email: p.email || undefined,
           iban: p.iban || undefined,
-          status: p.status || undefined,
+          status: p.status || p.verification_status || undefined,
           is_verified: p.is_verified,
-          created_at: p.created_at || undefined,
+          created_at: p.created_at || p.date_joined || undefined,
           account_balance: p.balance !== undefined ? String(p.balance) : undefined,
         };
       }
