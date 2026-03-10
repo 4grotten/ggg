@@ -23,9 +23,12 @@ interface NotifApiResponse {
   whatsapp_enabled: boolean;
   email_address: string | null;
   email_enabled: boolean;
+  push_enabled: boolean;
+  push_token: string | null;
 }
 
 const CHANNELS = [
+  { key: "push" as const, valueField: "push_token" as const, enabledField: "push_enabled" as const, icon: Bell, label: "Push", placeholder: "", color: "text-purple-500", bg: "bg-purple-500/10 border-purple-500/20", noValue: true },
   { key: "whatsapp" as const, valueField: "whatsapp_number" as const, enabledField: "whatsapp_enabled" as const, icon: MessageCircle, label: "WhatsApp", placeholder: "+971 50 123 4567", color: "text-green-500", bg: "bg-green-500/10 border-green-500/20" },
   { key: "telegram" as const, valueField: "telegram_username" as const, enabledField: "telegram_enabled" as const, icon: Send, label: "Telegram", placeholder: "@username", color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/20" },
   { key: "email" as const, valueField: "email_address" as const, enabledField: "email_enabled" as const, icon: Mail, label: "Email", placeholder: "admin@example.com", color: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
@@ -57,6 +60,8 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
         whatsapp_enabled: settings?.whatsapp_enabled || false,
         email_address: settings?.email_address || "",
         email_enabled: settings?.email_enabled || false,
+        push_enabled: settings?.push_enabled || false,
+        push_token: settings?.push_token || "",
         ...patch,
       };
       const res = await apiPut<NotifApiResponse>(`/admin/notifications/settings/${staffUserId}/`, fullBody);
@@ -143,7 +148,11 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
                   <Icon className={cn("w-5 h-5 shrink-0", enabled ? ch.color : "text-muted-foreground")} />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-muted-foreground">{ch.label}</p>
-                    {!isEditing ? (
+                    {'noValue' in ch && ch.noValue ? (
+                      <p className="text-sm font-medium">
+                        {enabled ? "Активно" : "Отключено"}
+                      </p>
+                    ) : !isEditing ? (
                       <p
                         className={cn("text-sm font-medium truncate", !readOnly && "cursor-pointer hover:underline")}
                         onClick={() => {
