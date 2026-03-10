@@ -212,6 +212,68 @@ async function generateStatement(token: string, startDate: string, endDate: stri
   }
 }
 
+// ── Voice transcription ──
+
+async function transcribeVoice(fileUrl: string, mimeType: string): Promise<string | null> {
+  const elevenLabsKey = Deno.env.get("ELEVENLABS_API_KEY");
+  if (!elevenLabsKey) {
+    console.error("[telegram-ai] ELEVENLABS_API_KEY not configured");
+    return null;
+  }
+
+  try {
+    // Download the audio file
+    const audioRes = await fetch(fileUrl);
+    if (!audioRes.ok) {
+      console.error("[telegram-ai] Failed to download voice file:", audioRes.status);
+      return null;
+    }
+    const audioBlob = await audioRes.blob();
+    console.log(`[telegram-ai] Voice file downloaded: ${audioBlob.size} bytes, type: ${mimeType}`);
+
+    // Send to ElevenLabs STT
+    const formData = new FormData();
+    formData.append("file", new File([audioBlob], "voice.ogg", { type: mimeType }));
+    formData.append("model_id", "scribe_v2");
+
+    const sttRes = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
+      method: "POST",
+      headers: { "xi-api-key": elevenLabsKey },
+      body: formData,
+    });
+
+    if (!sttRes.ok) {
+      const errText = await sttRes.text();
+      console.error("[telegram-ai] ElevenLabs STT error:", sttRes.status, errText);
+      return null;
+    }
+
+    const result = await sttRes.json();
+    console.log("[telegram-ai] Transcription:", result.text?.substring(0, 100));
+    return result.text || null;
+  } catch (e) {
+    console.error("[telegram-ai] Voice transcription error:", e);
+    return null;
+  }
+}
+
+async function getTelegramFileUrl(botToken: string, fileId: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/getFile`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ file_id: fileId }),
+    });
+    const data = await res.json();
+    if (data.ok && data.result?.file_path) {
+      return `https://api.telegram.org/file/bot${botToken}/${data.result.file_path}`;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Telegram helpers ──
 
 async function sendTelegramMessage(botToken: string, chatId: string, text: string) {
