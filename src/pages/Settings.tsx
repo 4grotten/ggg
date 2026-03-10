@@ -760,18 +760,6 @@ const Settings = () => {
                 <span>{user?.is_verified ? t("editProfile.verified") || "Verified" : t("editProfile.notVerified") || "Not verified"}</span>
               </button>
 
-              {/* Role badge */}
-              {user?.role === 'admin' ? (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/15 text-primary text-xs font-medium">
-                  <Crown className="w-3.5 h-3.5" />
-                  Admin
-                </div>
-              ) : user?.role === 'moderator' ? (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-500/15 text-violet-500 text-xs font-medium">
-                  <Shield className="w-3.5 h-3.5" />
-                  Moderator
-                </div>
-              ) : null}
             </div>
           </>
         ) : (
