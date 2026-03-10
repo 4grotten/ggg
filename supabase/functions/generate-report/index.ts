@@ -487,12 +487,14 @@ serve(async (req) => {
       }
     } catch (e) { console.error("Wallet parse error:", e); }
 
+    let firstIban: string | undefined;
     try {
       if (includeIban && bankRes?.ok) {
         const bankData = await bankRes.json();
         const accounts = Array.isArray(bankData) ? bankData : (bankData?.results || []);
         for (const acc of accounts) {
           const bal = parseFloat(String(acc.balance || 0));
+          if (acc.iban && !firstIban) firstIban = String(acc.iban);
           const iban = acc.iban ? `${String(acc.iban).slice(0, 4)}••••${String(acc.iban).slice(-4)}` : 'IBAN';
           assetBalances.push({ label: `${t(lang, 'account')} ${iban}`, amount: bal.toLocaleString(locale, { minimumFractionDigits: 2 }), currency: acc.currency || 'AED' });
         }
