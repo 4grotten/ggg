@@ -556,3 +556,184 @@ def dispatch_user_transaction_notification(user_id, tx_details_text=None, transa
         notify_transaction_parties(transaction_id)
     elif tx_details_text:
         send_user_notification(user_id, tx_details_text, is_transaction=True)
+
+
+# ─── STATEMENT FILE DELIVERY ───
+
+STATEMENT_TRANSLATIONS = {
+    'en': {
+        'subject': '📄 Your Statement | uEasyCard',
+        'message': '📄 Your statement for the period {period} is ready.\nAssets: {assets}.',
+        'caption': 'Statement {period}',
+    },
+    'ru': {
+        'subject': '📄 Ваша выписка | uEasyCard',
+        'message': '📄 Ваша выписка за период {period} готова.\nАктивы: {assets}.',
+        'caption': 'Выписка {period}',
+    },
+    'de': {
+        'subject': '📄 Ihr Kontoauszug | uEasyCard',
+        'message': '📄 Ihr Kontoauszug für den Zeitraum {period} ist bereit.\nVermögenswerte: {assets}.',
+        'caption': 'Kontoauszug {period}',
+    },
+    'tr': {
+        'subject': '📄 Hesap Özetiniz | uEasyCard',
+        'message': '📄 {period} dönemi hesap özetiniz hazır.\nVarlıklar: {assets}.',
+        'caption': 'Hesap Özeti {period}',
+    },
+    'zh': {
+        'subject': '📄 您的对账单 | uEasyCard',
+        'message': '📄 您 {period} 期间的对账单已准备就绪。\n资产: {assets}。',
+        'caption': '对账单 {period}',
+    },
+    'ar': {
+        'subject': '📄 كشف حسابك | uEasyCard',
+        'message': '📄 كشف حسابك للفترة {period} جاهز.\nالأصول: {assets}.',
+        'caption': 'كشف حساب {period}',
+    },
+    'es': {
+        'subject': '📄 Su Estado de Cuenta | uEasyCard',
+        'message': '📄 Su estado de cuenta del período {period} está listo.\nActivos: {assets}.',
+        'caption': 'Estado de Cuenta {period}',
+    },
+}
+
+
+def send_telegram_document(settings_obj, file_bytes, filename, caption):
+    """Send a file (document) via Telegram Bot API."""
+    try:
+        chat_id = settings_obj.telegram_chat_id
+        if not chat_id and settings_obj.telegram_username:
+            chat_id = resolve_telegram_username_to_id(settings_obj.telegram_username)
+            if chat_id:
+                settings_obj.telegram_chat_id = chat_id
+                settings_obj.save(update_fields=['telegram_chat_id'])
+        if not chat_id:
+            logger.error(f"TG Document: chat_id not found for {settings_obj.telegram_username}")
+            return False
+        url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendDocument"
+        files = {'document': (filename, file_bytes, 'text/html')}
+        data = {'chat_id': chat_id, 'caption': caption, 'parse_mode': 'HTML'}
+        resp = requests.post(url, data=data, files=files, timeout=30)
+        if resp.status_code == 200:
+            logger.info(f"TG document sent to {chat_id}")
+            return True
+        else:
+            logger.error(f"TG Document Error: {resp.status_code} - {resp.text}")
+            return False
+    except Exception as e:
+        logger.error(f"TG Document Error: {e}")
+        return False
+
+
+def send_whatsapp_file(phone, file_bytes, filename, caption):
+    """Send a file via WAHA sendFile API."""
+    import base64
+    try:
+        clean_phone = ''.join(filter(str.isdigit, str(phone)))
+        try:
+            WahaSessionModel = apps.get_model('accounts_apps', 'WahaSession')
+            session = WahaSessionModel.objects.filter(is_active=True).first()
+        except Exception:
+            session = None
+        api_url = session.api_url if session else getattr(settings, 'WAHA_API_URL', 'http://waha:3000')
+        session_name = session.session_name if session else getattr(settings, 'WAHA_SESSION_NAME', 'default')
+        api_key = session.api_key if session else getattr(settings, 'WAHA_API_KEY', '5f0ed637143a4fddac67e3108cfd80ed')
+
+        b64 = base64.b64encode(file_bytes).decode('utf-8')
+        url = f"{api_url.rstrip('/')}/api/sendFile"
+        payload = {
+            "chatId": f"{clean_phone}@c.us",
+            "file": {
+                "mimetype": "text/html",
+                "filename": filename,
+                "data": f"data:text/html;base64,{b64}",
+            },
+            "caption": caption,
+            "session": session_name,
+        }
+        headers = {"Content-Type": "application/json", "X-Api-Key": api_key}
+        resp = requests.post(url, json=payload, headers=headers, timeout=30)
+        if resp.status_code in [200, 201]:
+            logger.info(f"WA file sent to {clean_phone}")
+            return True
+        else:
+            logger.error(f"WAHA File Error: {resp.status_code} - {resp.text}")
+            return False
+    except Exception as e:
+        logger.error(f"WA File Error: {e}")
+        return False
+
+
+def send_email_with_attachment(email_address, subject, body_text, file_bytes, filename):
+    """Send email with HTML file attachment."""
+    try:
+        from_email = getattr(settings, 'TRANSACTION_EMAIL_HOST_USER', getattr(settings, 'DEFAULT_FROM_EMAIL'))
+        tx_host = getattr(settings, 'TRANSACTION_EMAIL_HOST', None)
+
+        if tx_host:
+            connection = get_connection(
+                host=tx_host,
+                port=getattr(settings, 'TRANSACTION_EMAIL_PORT', 587),
+                username=getattr(settings, 'TRANSACTION_EMAIL_HOST_USER', ''),
+                password=getattr(settings, 'TRANSACTION_EMAIL_HOST_PASSWORD', ''),
+                use_tls=getattr(settings, 'TRANSACTION_EMAIL_USE_TLS', True)
+            )
+        else:
+            connection = None
+
+        email_msg = EmailMessage(subject, body_text, from_email, [email_address], connection=connection)
+        email_msg.attach(filename, file_bytes, 'text/html')
+        email_msg.send()
+        logger.info(f"Email with attachment sent to {email_address}")
+        return True
+    except Exception as e:
+        logger.error(f"Email Attachment Error: {e}")
+        return False
+
+
+def send_statement_to_channels(user_id, html_content, channels, period_label, asset_labels, lang='en'):
+    """
+    Send statement HTML file via selected channels (telegram, whatsapp, email).
+    Returns dict with results per channel.
+    """
+    tr = STATEMENT_TRANSLATIONS.get(lang, STATEMENT_TRANSLATIONS['en'])
+    assets_str = ', '.join(asset_labels) if asset_labels else '—'
+    message = tr['message'].format(period=period_label, assets=assets_str)
+    caption = tr['caption'].format(period=period_label)
+    subject = tr['subject']
+
+    file_bytes = html_content.encode('utf-8')
+    file_date = __import__('datetime').datetime.now().strftime('%Y%m%d')
+    filename = f"uEasyCard_Statement_{file_date}.html"
+
+    # Get user notification settings
+    notif = UserNotificationSettings.objects.filter(user_id=user_id).first()
+    if not notif:
+        return {ch: {'ok': False, 'error': 'Notification settings not found'} for ch in channels}
+
+    results = {}
+
+    for ch in channels:
+        if ch == 'telegram':
+            if notif.telegram_enabled and (notif.telegram_chat_id or notif.telegram_username):
+                ok = send_telegram_document(notif, file_bytes, filename, caption)
+                results['telegram'] = {'ok': ok}
+            else:
+                results['telegram'] = {'ok': False, 'error': 'Telegram not configured'}
+
+        elif ch == 'whatsapp':
+            if notif.whatsapp_enabled and notif.whatsapp_number:
+                ok = send_whatsapp_file(notif.whatsapp_number, file_bytes, filename, caption)
+                results['whatsapp'] = {'ok': ok}
+            else:
+                results['whatsapp'] = {'ok': False, 'error': 'WhatsApp not configured'}
+
+        elif ch == 'email':
+            if notif.email_enabled and notif.email_address:
+                ok = send_email_with_attachment(notif.email_address, subject, message, file_bytes, filename)
+                results['email'] = {'ok': ok}
+            else:
+                results['email'] = {'ok': False, 'error': 'Email not configured'}
+
+    return results

@@ -1499,3 +1499,47 @@ class TelegramWebhookSaveChatIdView(APIView):
             "detail": f"Updated {total} record(s) for @{username}",
             "chat_id": chat_id,
         }, status=status.HTTP_200_OK)
+
+
+class StatementSendView(APIView):
+    """Send generated statement HTML to user channels (Telegram, WhatsApp, Email)."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Отправить выписку через каналы уведомлений",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['html_content', 'channels'],
+            properties={
+                'html_content': openapi.Schema(type=openapi.TYPE_STRING, description='HTML content'),
+                'channels': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
+                'period_label': openapi.Schema(type=openapi.TYPE_STRING),
+                'asset_labels': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
+                'lang': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        ),
+        responses={200: openapi.Response(description="Результаты отправки")},
+        tags=["Выписки (Statements)"]
+    )
+    def post(self, request):
+        from apps.accounts_apps.notifications import send_statement_to_channels
+
+        html_content = request.data.get('html_content', '')
+        channels = request.data.get('channels', [])
+        period_label = request.data.get('period_label', '')
+        asset_labels = request.data.get('asset_labels', [])
+        lang = request.data.get('lang', 'en')
+
+        if not html_content or not channels:
+            return Response({"error": "html_content and channels are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        results = send_statement_to_channels(
+            user_id=request.user.id,
+            html_content=html_content,
+            channels=channels,
+            period_label=period_label,
+            asset_labels=asset_labels,
+            lang=lang,
+        )
+
+        return Response({"results": results}, status=status.HTTP_200_OK)
