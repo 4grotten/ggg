@@ -111,11 +111,14 @@ async function sendWhatsAppMessage(wahaHost: string, wahaApiKey: string, session
 
 // ── System prompt ──
 
-function buildSystemPrompt(accountText: string, balancesText: string, txText: string): string {
+function buildSystemPrompt(firstName: string, accountText: string, balancesText: string, txText: string): string {
   return `Ты - дружелюбный AI-ассистент для финансового приложения Easy Card. Отвечай кратко и по делу на языке пользователя. Используй эмодзи для дружелюбности.
 
 ## О Easy Card
 Easy Card - финансовое приложение для управления виртуальными и металлическими картами в ОАЭ (AED).
+
+## Пользователь
+Имя пользователя: ${firstName || "не указано"}
 
 ## Формат
 - Балансы: каждый на отдельной строке с эмодзи (💳, 🏦, 🪙, 💰)
@@ -238,7 +241,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: buildSystemPrompt(accountText, balancesText, txText) },
+          { role: "system", content: buildSystemPrompt(first_name, accountText, balancesText, txText) },
           ...messages.slice(-20),
         ],
         stream: false,
