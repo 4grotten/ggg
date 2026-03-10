@@ -89,8 +89,10 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   };
 
   const handleSaveValue = (ch: typeof CHANNELS[number]) => {
-    const value = drafts[ch.key]?.trim();
+    let value = drafts[ch.key]?.trim();
     if (!value) return;
+    if (ch.key === "whatsapp") value = value.replace(/^\+/, "");
+    if (ch.key === "telegram") value = value.replace(/^@+/, "@").replace(/^([^@])/, "@$1");
     updateMutation.mutate({ [ch.valueField]: value });
   };
 
