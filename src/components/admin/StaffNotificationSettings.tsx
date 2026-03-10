@@ -94,12 +94,11 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   };
 
   const getChannelEnabled = (ch: typeof CHANNELS[number]): boolean => {
-    if ('noValue' in ch && ch.noValue) return pushEnabled;
     if (!settings) return false;
     return !!settings[ch.enabledField];
   };
 
-  const activeCount = settings ? CHANNELS.filter(ch => getChannelEnabled(ch)).length : Number(pushEnabled);
+  const activeCount = settings ? CHANNELS.filter(ch => getChannelEnabled(ch)).length : 0;
 
   return (
     <motion.div
