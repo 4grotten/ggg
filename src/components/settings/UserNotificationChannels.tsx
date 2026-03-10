@@ -70,6 +70,7 @@ export function UserNotificationChannels({ t, isPushEnabled, setIsPushEnabled }:
   const { settings, isLoading, updateSettings, isUpdating } = useUserNotificationSettings();
   const [editingChannel, setEditingChannel] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [showTelegramAlert, setShowTelegramAlert] = useState(false);
 
   const getValue = (ch: ChannelConfig): string => {
     if (!settings) return "";
