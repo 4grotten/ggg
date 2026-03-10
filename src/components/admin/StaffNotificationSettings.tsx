@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -28,7 +28,6 @@ interface NotifApiResponse {
 }
 
 const CHANNELS = [
-  { key: "push" as const, valueField: "push_token" as const, enabledField: "push_enabled" as const, icon: Bell, label: "Push", placeholder: "", color: "text-purple-500", bg: "bg-purple-500/10 border-purple-500/20", noValue: true },
   { key: "whatsapp" as const, valueField: "whatsapp_number" as const, enabledField: "whatsapp_enabled" as const, icon: MessageCircle, label: "WhatsApp", placeholder: "+971 50 123 4567", color: "text-green-500", bg: "bg-green-500/10 border-green-500/20" },
   { key: "telegram" as const, valueField: "telegram_username" as const, enabledField: "telegram_enabled" as const, icon: Send, label: "Telegram", placeholder: "@username", color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/20" },
   { key: "email" as const, valueField: "email_address" as const, enabledField: "email_enabled" as const, icon: Mail, label: "Email", placeholder: "admin@example.com", color: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
@@ -37,15 +36,9 @@ const CHANNELS = [
 export default function StaffNotificationSettings({ staffUserId, readOnly = false }: Props) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const pushStorageKey = `staff-push-enabled:${staffUserId}`;
 
   const [editingChannel, setEditingChannel] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
-  const [pushEnabled, setPushEnabled] = useState(false);
-
-  useEffect(() => {
-    setPushEnabled(localStorage.getItem(pushStorageKey) === "true");
-  }, [pushStorageKey]);
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ["staff-notifications", staffUserId],
@@ -81,14 +74,6 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   });
 
   const handleToggle = (ch: typeof CHANNELS[number]) => {
-    if ('noValue' in ch && ch.noValue) {
-      const nextValue = !pushEnabled;
-      setPushEnabled(nextValue);
-      localStorage.setItem(pushStorageKey, String(nextValue));
-      toast.success(nextValue ? "Push включён" : "Push выключен");
-      return;
-    }
-
     if (!settings) return;
     updateMutation.mutate({ [ch.enabledField]: !settings[ch.enabledField] });
   };
@@ -109,12 +94,11 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
   };
 
   const getChannelEnabled = (ch: typeof CHANNELS[number]): boolean => {
-    if ('noValue' in ch && ch.noValue) return pushEnabled;
     if (!settings) return false;
     return !!settings[ch.enabledField];
   };
 
-  const activeCount = settings ? CHANNELS.filter(ch => getChannelEnabled(ch)).length : Number(pushEnabled);
+  const activeCount = settings ? CHANNELS.filter(ch => getChannelEnabled(ch)).length : 0;
 
   return (
     <motion.div
@@ -164,11 +148,7 @@ export default function StaffNotificationSettings({ staffUserId, readOnly = fals
                   <Icon className={cn("w-5 h-5 shrink-0", enabled ? ch.color : "text-muted-foreground")} />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-muted-foreground">{ch.label}</p>
-                    {'noValue' in ch && ch.noValue ? (
-                      <p className="text-sm font-medium">
-                        {enabled ? "Активно" : "Отключено"}
-                      </p>
-                    ) : !isEditing ? (
+                    {!isEditing ? (
                       <p
                         className={cn("text-sm font-medium truncate", !readOnly && "cursor-pointer hover:underline")}
                         onClick={() => {
