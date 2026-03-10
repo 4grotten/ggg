@@ -882,13 +882,13 @@ serve(async (req) => {
     const periodLabel = start_date && end_date
       ? `${formatDate(start_date)} — ${formatDate(end_date)}`
       : start_date
-        ? `с ${formatDate(start_date)}`
+        ? `${t(lang, 'from')} ${formatDate(start_date)}`
         : end_date
-          ? `по ${formatDate(end_date)}`
-          : 'Все транзакции';
+          ? `${t(lang, 'to')} ${formatDate(end_date)}`
+          : t(lang, 'allTx');
 
     const generatedDate = formatDate(new Date().toISOString());
-    const html = buildHTML(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut, assetBalances);
+    const html = buildHTML(filtered, periodLabel, user_name || '', generatedDate, totalIn, totalOut, assetBalances, lang);
 
     const fileDate = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const fileName = `uEasyCard_Report_${fileDate}.html`;
