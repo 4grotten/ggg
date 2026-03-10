@@ -444,23 +444,32 @@ const TransactionHistory = () => {
           </div>
 
           {/* Transactions List */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${activeAsset}-${activeFilter}-${dateFrom?.toISOString()}-${dateTo?.toISOString()}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <CardTransactionsList groups={filteredGroups} />
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Empty State */}
-          {filteredGroups.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">{t("history.noTransactions")}</p>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-primary mb-3" />
+              <p className="text-sm text-muted-foreground">{t("common.loading", "Загрузка...")}</p>
             </div>
+          ) : (
+            <>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${activeAsset}-${activeFilter}-${dateFrom?.toISOString()}-${dateTo?.toISOString()}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <CardTransactionsList groups={filteredGroups} />
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Empty State */}
+              {filteredGroups.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">{t("history.noTransactions")}</p>
+                </div>
+              )}
+            </>
           )}
 
           {/* Footer */}
