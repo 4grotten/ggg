@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
 import { useOpenAISettings } from "@/hooks/useOpenAISettings";
 import { apiPost } from "@/services/api/apiClient";
+import { WelcomeMessagesEditor } from "@/components/admin/WelcomeMessagesEditor";
 
 // Settings field configuration with i18n keys
 const exchangeRateFields = [
