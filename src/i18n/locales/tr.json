@@ -1262,6 +1262,8 @@
     "fullNamePlaceholder": "Tam adınızı girin",
     "fullNameDescription": "Pasaportunuzdaki adınız. Kimlik doğrulama ve profil görüntüleme için kullanılır.",
     "phone": "Telefon",
+    "addPhone": "Telefon numarası ekle",
+    "phoneDescription": "Uygulamaya giriş için kullanılan telefon numarası.",
     "username": "Kullanıcı Adı",
     "usernamePlaceholder": "Kullanıcı adınızı girin",
     "usernameDescription": "Kullanıcılar arası transferler için benzersiz tanımlayıcı. Sadece harf, rakam ve alt çizgi kullanılabilir.",
