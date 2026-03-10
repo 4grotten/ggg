@@ -48,7 +48,7 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>("1m");
   const [isDownloading, setIsDownloading] = useState(false);
   const [step, setStep] = useState<DrawerStep>("form");
-  const [selectedChannel, setSelectedChannel] = useState<DeliveryChannel>("download");
+  const [selectedChannels, setSelectedChannels] = useState<Set<DeliveryChannel>>(new Set(["download"]));
   const [isSending, setIsSending] = useState(false);
 
   // Build asset list from live data
