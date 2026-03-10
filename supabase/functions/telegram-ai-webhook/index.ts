@@ -253,8 +253,9 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true }));
     }
 
-    const { user_id, token: userToken, first_name, language } = identity;
-    console.log(`[telegram-ai] Identified user: ${user_id} (${first_name})`);
+    const { user_id, token: userToken, language } = identity;
+    const first_name = identity.first_name || message.from?.first_name || "";
+    console.log(`[telegram-ai] Identified user: ${user_id} (${first_name}), token: ${userToken?.slice(0, 8)}...`);
 
     // 2. Load history (supabase already initialized in identifyUser)
     const supabase = createClient(supabaseUrl, supabaseKey);
