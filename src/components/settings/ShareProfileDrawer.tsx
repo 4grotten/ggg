@@ -41,7 +41,7 @@ import { toast } from "sonner";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
-import { getSocialNetworks, type SocialNetworkItem } from "@/services/api/authApi";
+import { getSocialNetworks, getPhoneNumbers, type SocialNetworkItem, type PhoneNumberItem } from "@/services/api/authApi";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
