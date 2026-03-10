@@ -3046,6 +3046,310 @@ export const apiCategories: ApiCategory[] = [
         ]
       }
     ]
+  },
+  // ============ РАЗДЕЛ: АДМИН — ГЛОБАЛЬНЫЕ НАСТРОЙКИ ============
+  {
+    id: 'admin-settings',
+    title: 'Админ: Глобальные настройки',
+    titleKey: 'api.categories.adminSettings',
+    icon: '⚙️',
+    endpoints: [
+      // 69. Получить все настройки
+      {
+        id: 'admin-settings-list',
+        method: 'GET',
+        path: '/accounts/admin/settings/',
+        title: 'Получить все настройки',
+        description: 'Возвращает полный список глобальных настроек системы: курсы обмена, комиссии и лимиты.',
+        category: 'admin-settings',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        queryParams: [
+          { name: 'category', type: 'string', required: false, description: 'Фильтр по категории', enum: ['exchange_rates', 'fees', 'limits'] }
+        ],
+        requestExample: {
+          curl: `curl --request GET \\
+  --url '${API_BASE_URL}/accounts/admin/settings/' \\
+  --header 'Authorization: Token admin_token_here'`
+        },
+        responseExample: {
+          status: 200,
+          json: `[
+  {
+    "id": 1,
+    "category": "exchange_rates",
+    "key": "usdt_to_aed_buy",
+    "value": "3.65",
+    "description": "Курс покупки USDT за AED",
+    "updated_at": "2026-03-10T12:00:00Z"
+  },
+  {
+    "id": 2,
+    "category": "fees",
+    "key": "top_up_crypto_flat",
+    "value": "5.90",
+    "description": "Фиксированная комиссия за пополнение криптой (USDT)",
+    "updated_at": "2026-03-10T12:00:00Z"
+  },
+  {
+    "id": 3,
+    "category": "limits",
+    "key": "daily_top_up_limit",
+    "value": "100000.00",
+    "description": "Дневной лимит пополнения",
+    "updated_at": "2026-03-10T12:00:00Z"
+  }
+]`
+        },
+        responseParams: [
+          { name: 'id', type: 'number', required: true, description: 'ID настройки' },
+          { name: 'category', type: 'string', required: true, description: 'Категория: exchange_rates, fees, limits' },
+          { name: 'key', type: 'string', required: true, description: 'Ключ настройки (например usdt_to_aed_buy)' },
+          { name: 'value', type: 'string', required: true, description: 'Текущее значение' },
+          { name: 'description', type: 'string', required: false, description: 'Описание настройки' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время последнего обновления (ISO 8601)' }
+        ],
+        notes: [
+          'Возвращает все настройки из всех категорий, если фильтр не задан',
+          'Доступно только администраторам'
+        ]
+      },
+      // 70. Обновить курсы обмена
+      {
+        id: 'admin-settings-exchange-rates',
+        method: 'PATCH',
+        path: '/accounts/admin/settings/exchange_rates/',
+        title: 'Обновить курсы обмена',
+        description: 'Массовое обновление курсов обмена валют. Принимает объект с ключами курсов и новыми значениями.',
+        category: 'admin-settings',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        bodyParams: [
+          { name: 'usdt_to_aed_buy', type: 'number', required: false, description: 'Курс покупки USDT за AED' },
+          { name: 'usdt_to_aed_sell', type: 'number', required: false, description: 'Курс продажи USDT за AED' },
+          { name: 'aed_to_usd_buy', type: 'number', required: false, description: 'Курс покупки AED за USD' },
+          { name: 'aed_to_usd_sell', type: 'number', required: false, description: 'Курс продажи AED за USD' },
+          { name: 'usd_to_aed_buy', type: 'number', required: false, description: 'Курс покупки USD за AED' },
+          { name: 'usd_to_aed_sell', type: 'number', required: false, description: 'Курс продажи USD за AED' }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/settings/exchange_rates/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "usdt_to_aed_buy": 3.66,
+    "usdt_to_aed_sell": 3.70,
+    "aed_to_usd_buy": 0.2725
+  }'`,
+          json: `{
+  "usdt_to_aed_buy": 3.66,
+  "usdt_to_aed_sell": 3.70,
+  "aed_to_usd_buy": 0.2725
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "updated": [
+    { "key": "usdt_to_aed_buy", "old_value": "3.65", "new_value": "3.66" },
+    { "key": "usdt_to_aed_sell", "old_value": "3.69", "new_value": "3.70" },
+    { "key": "aed_to_usd_buy", "old_value": "0.2723", "new_value": "0.2725" }
+  ],
+  "updated_at": "2026-03-10T14:30:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'updated', type: 'array', required: true, description: 'Список обновлённых курсов с предыдущими и новыми значениями' },
+          { name: 'updated[].key', type: 'string', required: true, description: 'Ключ курса' },
+          { name: 'updated[].old_value', type: 'string', required: true, description: 'Предыдущее значение' },
+          { name: 'updated[].new_value', type: 'string', required: true, description: 'Новое значение' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ],
+        notes: [
+          'Частичное обновление — передавайте только изменяемые курсы',
+          'Все изменения фиксируются в аудит-логе',
+          'Курсы применяются мгновенно ко всем новым транзакциям'
+        ]
+      },
+      // 71. Обновить комиссии
+      {
+        id: 'admin-settings-fees',
+        method: 'PATCH',
+        path: '/accounts/admin/settings/fees/',
+        title: 'Обновить комиссии',
+        description: 'Массовое обновление комиссий системы: пополнение, переводы, обслуживание карт.',
+        category: 'admin-settings',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        bodyParams: [
+          { name: 'top_up_crypto_flat', type: 'number', required: false, description: 'Фиксированная комиссия за пополнение криптой (USDT)' },
+          { name: 'top_up_bank_percent', type: 'number', required: false, description: 'Комиссия за банковское пополнение (%)' },
+          { name: 'card_to_card_percent', type: 'number', required: false, description: 'Комиссия за перевод card-to-card (%)' },
+          { name: 'bank_transfer_percent', type: 'number', required: false, description: 'Комиссия за банковский перевод (%)' },
+          { name: 'network_fee_percent', type: 'number', required: false, description: 'Сетевая комиссия (%)' },
+          { name: 'currency_conversion_percent', type: 'number', required: false, description: 'Комиссия за конвертацию валют (%)' },
+          { name: 'virtual_card_annual', type: 'number', required: false, description: 'Годовое обслуживание виртуальной карты (AED)' },
+          { name: 'virtual_card_replacement', type: 'number', required: false, description: 'Перевыпуск виртуальной карты (AED)' },
+          { name: 'metal_card_annual', type: 'number', required: false, description: 'Годовое обслуживание металлической карты (AED)' },
+          { name: 'metal_card_replacement', type: 'number', required: false, description: 'Перевыпуск металлической карты (AED)' },
+          { name: 'virtual_account_opening', type: 'number', required: false, description: 'Открытие виртуального счёта (AED)' }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/settings/fees/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "top_up_crypto_flat": 6.50,
+    "card_to_card_percent": 1.2,
+    "virtual_card_annual": 200.00
+  }'`,
+          json: `{
+  "top_up_crypto_flat": 6.50,
+  "card_to_card_percent": 1.2,
+  "virtual_card_annual": 200.00
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "updated": [
+    { "key": "top_up_crypto_flat", "old_value": "5.90", "new_value": "6.50" },
+    { "key": "card_to_card_percent", "old_value": "1.0", "new_value": "1.2" },
+    { "key": "virtual_card_annual", "old_value": "183.00", "new_value": "200.00" }
+  ],
+  "updated_at": "2026-03-10T14:35:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'updated', type: 'array', required: true, description: 'Список обновлённых комиссий' },
+          { name: 'updated[].key', type: 'string', required: true, description: 'Ключ комиссии' },
+          { name: 'updated[].old_value', type: 'string', required: true, description: 'Предыдущее значение' },
+          { name: 'updated[].new_value', type: 'string', required: true, description: 'Новое значение' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ],
+        notes: [
+          'Частичное обновление — передавайте только изменяемые комиссии',
+          'Комиссии в процентах указываются как число (1.5 = 1.5%)',
+          'Фиксированные комиссии указываются в валюте (USDT или AED)'
+        ]
+      },
+      // 72. Обновить лимиты
+      {
+        id: 'admin-settings-limits',
+        method: 'PATCH',
+        path: '/accounts/admin/settings/limits/',
+        title: 'Обновить лимиты',
+        description: 'Массовое обновление глобальных лимитов: минимумы, максимумы, дневные и месячные ограничения.',
+        category: 'admin-settings',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        bodyParams: [
+          { name: 'top_up_crypto_min', type: 'number', required: false, description: 'Минимум пополнения криптой (USDT)' },
+          { name: 'top_up_bank_min', type: 'number', required: false, description: 'Минимум банковского пополнения' },
+          { name: 'transfer_min', type: 'number', required: false, description: 'Минимум перевода' },
+          { name: 'withdrawal_min', type: 'number', required: false, description: 'Минимум вывода' },
+          { name: 'top_up_crypto_max', type: 'number', required: false, description: 'Максимум пополнения криптой' },
+          { name: 'top_up_bank_max', type: 'number', required: false, description: 'Максимум банковского пополнения' },
+          { name: 'transfer_max', type: 'number', required: false, description: 'Максимум перевода' },
+          { name: 'withdrawal_max', type: 'number', required: false, description: 'Максимум вывода' },
+          { name: 'daily_top_up_limit', type: 'number', required: false, description: 'Дневной лимит пополнения' },
+          { name: 'daily_transfer_limit', type: 'number', required: false, description: 'Дневной лимит переводов' },
+          { name: 'daily_withdrawal_limit', type: 'number', required: false, description: 'Дневной лимит вывода' },
+          { name: 'daily_crypto_send_limit', type: 'number', required: false, description: 'Дневной лимит отправки крипты' },
+          { name: 'daily_crypto_receive_limit', type: 'number', required: false, description: 'Дневной лимит получения крипты' },
+          { name: 'monthly_top_up_limit', type: 'number', required: false, description: 'Месячный лимит пополнения' },
+          { name: 'monthly_transfer_limit', type: 'number', required: false, description: 'Месячный лимит переводов' },
+          { name: 'monthly_withdrawal_limit', type: 'number', required: false, description: 'Месячный лимит вывода' },
+          { name: 'monthly_crypto_send_limit', type: 'number', required: false, description: 'Месячный лимит отправки крипты' },
+          { name: 'monthly_crypto_receive_limit', type: 'number', required: false, description: 'Месячный лимит получения крипты' }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/settings/limits/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "daily_top_up_limit": 150000,
+    "monthly_transfer_limit": 750000,
+    "top_up_crypto_min": 20
+  }'`,
+          json: `{
+  "daily_top_up_limit": 150000,
+  "monthly_transfer_limit": 750000,
+  "top_up_crypto_min": 20
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "updated": [
+    { "key": "daily_top_up_limit", "old_value": "100000.00", "new_value": "150000.00" },
+    { "key": "monthly_transfer_limit", "old_value": "500000.00", "new_value": "750000.00" },
+    { "key": "top_up_crypto_min", "old_value": "15.00", "new_value": "20.00" }
+  ],
+  "updated_at": "2026-03-10T14:40:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'updated', type: 'array', required: true, description: 'Список обновлённых лимитов' },
+          { name: 'updated[].key', type: 'string', required: true, description: 'Ключ лимита' },
+          { name: 'updated[].old_value', type: 'string', required: true, description: 'Предыдущее значение' },
+          { name: 'updated[].new_value', type: 'string', required: true, description: 'Новое значение' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ],
+        notes: [
+          'Частичное обновление — передавайте только изменяемые лимиты',
+          'Все суммы в USDT, если не указано иное',
+          'Персональные лимиты пользователя (эндпоинт 67) имеют приоритет над глобальными'
+        ]
+      },
+      // 73. Обновить одну настройку
+      {
+        id: 'admin-settings-update-single',
+        method: 'PATCH',
+        path: '/accounts/admin/settings/{setting_id}/',
+        title: 'Обновить одну настройку',
+        description: 'Точечное обновление конкретной настройки по её ID.',
+        category: 'admin-settings',
+        authorization: { type: 'Token', description: 'Authorization: Token <токен_админа>' },
+        pathParams: [
+          { name: 'setting_id', type: 'number', required: true, description: 'ID настройки из списка (эндпоинт 69)' }
+        ],
+        bodyParams: [
+          { name: 'value', type: 'string', required: true, description: 'Новое значение настройки' }
+        ],
+        requestExample: {
+          curl: `curl --request PATCH \\
+  --url '${API_BASE_URL}/accounts/admin/settings/1/' \\
+  --header 'Authorization: Token admin_token_here' \\
+  --header 'Content-Type: application/json' \\
+  --data '{"value": "3.67"}'`,
+          json: `{
+  "value": "3.67"
+}`
+        },
+        responseExample: {
+          status: 200,
+          json: `{
+  "id": 1,
+  "category": "exchange_rates",
+  "key": "usdt_to_aed_buy",
+  "value": "3.67",
+  "description": "Курс покупки USDT за AED",
+  "updated_at": "2026-03-10T15:00:00Z"
+}`
+        },
+        responseParams: [
+          { name: 'id', type: 'number', required: true, description: 'ID настройки' },
+          { name: 'category', type: 'string', required: true, description: 'Категория' },
+          { name: 'key', type: 'string', required: true, description: 'Ключ настройки' },
+          { name: 'value', type: 'string', required: true, description: 'Обновлённое значение' },
+          { name: 'updated_at', type: 'string', required: true, description: 'Время обновления' }
+        ],
+        notes: [
+          'Используйте этот эндпоинт для изменения одной конкретной настройки',
+          'Изменение фиксируется в аудит-логе'
+        ]
+      }
+    ]
   }
 ];
 
