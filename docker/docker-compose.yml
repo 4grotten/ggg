@@ -317,7 +317,7 @@ services:
       - WHATSAPP_API_KEY=5f0ed637143a4fddac67e3108cfd80ed
       - WAHA_API_KEY=5f0ed637143a4fddac67e3108cfd80ed
     volumes:                 
-      - waha_data:/app/.waha
+      - waha_data:/app/.sessions
     networks:
       - default
 
