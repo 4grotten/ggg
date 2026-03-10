@@ -1,12 +1,14 @@
 from decimal import Decimal
 import uuid
-
+from rest_framework.authtoken.models import Token
+import re
 import requests
 from django.db.models import Q
 from apps.cards_apps.models import Cards
 from apps.transactions_apps.models import BankDepositAccounts, CryptoWallets, Transactions
 from api.accounts_api.serializers import AdminActionHistorySerializer, AdminNotificationSettingsSerializer, AdminSettingsSerializer, ContactSerializer, UserLimitsSerializer, UserNotificationSettingsSerializer
 from apps.accounts_apps.notifications import dispatch_test_notification
+from core import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -707,60 +709,68 @@ class AdminSettingsListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        operation_summary="Обновить или создать настройку",
+        operation_summary="Массовое обновление глобальных настроек",
         request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['category', 'key', 'value'],
-            properties={
-                'category': openapi.Schema(type=openapi.TYPE_STRING),
-                'key': openapi.Schema(type=openapi.TYPE_STRING),
-                'value': openapi.Schema(type=openapi.TYPE_NUMBER),
-            }
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'category': openapi.Schema(type=openapi.TYPE_STRING),
+                    'key': openapi.Schema(type=openapi.TYPE_STRING),
+                    'value': openapi.Schema(type=openapi.TYPE_NUMBER),
+                }
+            )
         ),
         tags=["Админ Настройки"]
     )
     def put(self, request):
-        category = request.data.get('category')
-        key = request.data.get('key')
-        value = request.data.get('value')
-        if not category or not key or value is None:
-            return Response({"error": "Отсутствуют обязательные параметры (category, key, value)"}, status=status.HTTP_400_BAD_REQUEST)
-        setting = AdminSettings.objects.filter(category=category, key=key).first()
-        
-        details = {
-            "category": category,
-            "key": key
-        }
-
-        if not setting:
-            setting = AdminSettings.objects.create(category=category, key=key, value=value)
-            action_desc = f"Создана глобальная настройка: {category} -> {key}"
-            details["old_value"] = "Не задано"
-            details["new_value"] = str(value)
-        else:
-            old_value = setting.value
+        data = request.data
+        if isinstance(data, dict):
+            data = [data]
             
-            if str(old_value) == str(value):
-                serializer = AdminSettingsSerializer(setting)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+        if not isinstance(data, list):
+            return Response({"error": "Ожидается объект или массив объектов"}, status=status.HTTP_400_BAD_REQUEST)
+
+        updated_settings = []
+        changes = {}
+        
+        for item in data:
+            category = item.get('category')
+            key = item.get('key')
+            value = item.get('value')
+            
+            if not category or not key or value is None:
+                continue
                 
-            setting.value = value
-            setting.save()
+            setting = AdminSettings.objects.filter(category=category, key=key).first()
             
-            action_desc = f"Изменена глобальная настройка: {category} -> {key}"
-            details["old_value"] = str(old_value)
-            details["new_value"] = str(value)
-        
-        admin_id = str(request.user.id) if request.user and request.user.is_authenticated else "SYSTEM"
-        
-        AdminActionHistory.objects.create(
-            admin_id=admin_id,
-            action=action_desc,
-            target_user_id="GLOBAL",
-            details=details
-        )
+            if not setting:
+                setting = AdminSettings.objects.create(category=category, key=key, value=value)
+                changes[f"{category} ➔ {key}"] = {"was": "Не задано", "became": str(value)}
+            else:
+                old_value = setting.value
+                if str(old_value) != str(value):
+                    setting.value = value
+                    setting.save()
+                    changes[f"{category} ➔ {key}"] = {"was": str(old_value), "became": str(value)}
+            
+            updated_settings.append(setting)
 
-        serializer = AdminSettingsSerializer(setting)
+        if changes:
+            admin_id = str(request.user.id) if request.user and request.user.is_authenticated else "SYSTEM"
+            admin_name = f"{request.user.first_name} {request.user.last_name}".strip() if request.user else "Admin"
+            formatted_details = {
+                "acting_role": "root", 
+                "changes": changes
+            }
+            AdminActionHistory.objects.create(
+                admin_id=admin_name if admin_name else admin_id,
+                action="UPDATE_GLOBAL_SETTINGS",
+                target_user_id="GLOBAL_SYSTEM",
+                details=formatted_details
+            )
+
+        serializer = AdminSettingsSerializer(updated_settings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
@@ -1573,3 +1583,60 @@ class StatementSendView(APIView):
         )
 
         return Response({"results": results}, status=status.HTTP_200_OK)
+
+
+class MessengerIdentifyView(APIView):
+    permission_classes = []
+    
+    @swagger_auto_schema(
+        operation_summary="Идентификация пользователя по мессенджеру",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'platform': openapi.Schema(type=openapi.TYPE_STRING, description="telegram | whatsapp"),
+                'identifier': openapi.Schema(type=openapi.TYPE_STRING, description="chat_id или номер телефона"),
+            }
+        ),
+        tags=["AI Messenger Webhook"]
+    )
+    def post(self, request):
+        expected_token = getattr(settings, 'AI_SERVICE_TOKEN', 'easycard_super_secret_ai_token_2026')
+        auth_header = request.headers.get('Authorization', '')
+        
+        if auth_header != f"Token {expected_token}":
+            return Response({"error": "Unauthorized. Invalid Service Token."}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        platform = request.data.get('platform')
+        identifier = request.data.get('identifier')
+        
+        if not platform or not identifier:
+            return Response({"error": "Missing platform or identifier"}, status=status.HTTP_400_BAD_REQUEST) 
+        user_id = None
+        if platform == "telegram":
+            setting = UserNotificationSettings.objects.filter(telegram_chat_id=str(identifier), telegram_enabled=True).first()
+            if setting:
+                user_id = setting.user_id
+                
+        elif platform == "whatsapp":
+            clean_id = re.sub(r'\D', '', str(identifier))
+            setting = UserNotificationSettings.objects.filter(whatsapp_number__icontains=clean_id, whatsapp_enabled=True).first()
+            if setting:
+                user_id = setting.user_id
+                
+        if not user_id:
+            return Response({"found": False, "message": "User not found or messenger not linked"}, status=status.HTTP_404_NOT_FOUND)
+            
+        try:
+            user_obj = User.objects.get(id=int(user_id) if str(user_id).isdigit() else user_id)
+            token, _ = Token.objects.get_or_create(user=user_obj)
+            profile = Profiles.objects.filter(user_id=str(user_id)).first()
+            
+            return Response({
+                "found": True,
+                "user_id": str(user_id),
+                "token": token.key,
+                "first_name": profile.first_name if profile and profile.first_name else user_obj.first_name,
+                "language": profile.language if profile and profile.language else "ru"
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"found": False, "message": str(e)}, status=status.HTTP_404_NOT_FOUND)
