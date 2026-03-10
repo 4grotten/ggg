@@ -202,7 +202,7 @@ function buildHTML(filtered: any[], periodLabel: string, userName: string, gener
     const currency = tx.display?.primary_amount?.currency || tx.currency || 'AED';
     const amountClass = sign === '+' ? 'amount-in' : sign === '-' ? 'amount-out' : '';
 
-    const st = statusMap[tx.status] || { label: tx.status || '—', color: '#6b7280' };
+    const st = getStatusLabel(tx.status, lang);
     const senderName = esc(tx.sender_name || tx.metadata?.sender_name || '—');
     const receiverName = esc(tx.receiver_name || tx.metadata?.beneficiary_name || tx.metadata?.receiver_name || '—');
     
