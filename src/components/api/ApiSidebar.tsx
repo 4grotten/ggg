@@ -74,20 +74,22 @@ export const ApiSidebar = ({
         {/* Categories */}
         <div className="space-y-1">
           {apiCategories.map((category) => (
-            <div key={category.id}>
+            <div key={category.id} ref={(el) => { categoryRefs.current[category.id] = el; }}>
               <button
                 onClick={() => toggleCategory(category.id)}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                className="w-full flex items-start justify-between px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors text-left"
               >
-                <div className="flex items-center gap-2">
-                  <span>{category.icon}</span>
-                  <span>{t(category.titleKey)}</span>
+                <div className="flex items-start gap-2 min-w-0">
+                  <span className="shrink-0 mt-0.5">{category.icon}</span>
+                  <span className="break-words">{t(category.titleKey)}</span>
                 </div>
-                {expandedCategories.includes(category.id) ? (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                )}
+                <span className="shrink-0 mt-0.5 ml-1">
+                  {expandedCategories.includes(category.id) ? (
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </span>
               </button>
               
               {expandedCategories.includes(category.id) && (
@@ -102,19 +104,19 @@ export const ApiSidebar = ({
                       key={endpoint.id}
                       onClick={() => onSelectEndpoint(endpoint.id)}
                       className={cn(
-                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
+                        "w-full flex items-start gap-2 px-3 py-2 rounded-lg text-sm transition-colors text-left",
                         selectedEndpoint === endpoint.id
                           ? "bg-primary/10 text-primary"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       )}
                     >
                       <span className={cn(
-                        "text-[10px] font-bold px-1.5 py-0.5 rounded",
+                        "text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 mt-0.5",
                         getMethodColor(endpoint.method)
                       )}>
                         {endpoint.method}
                       </span>
-                      <span className="truncate">{t(`api.endpoints.${endpoint.id}.title`, endpoint.title)}</span>
+                      <span className="break-words text-left">{t(`api.endpoints.${endpoint.id}.title`, endpoint.title)}</span>
                     </button>
                   ))}
                 </motion.div>
