@@ -76,6 +76,7 @@ export function WelcomeMessagesEditor() {
     setIsTesting(true);
     try {
       const phone = user?.phone_number;
+      console.log("[WelcomeTest] user:", user?.id, "phone:", phone);
       if (!phone) {
         toast.error(t("admin.welcomeMessages.noPhone", "Номер телефона не найден в профиле"));
         setIsTesting(false);
@@ -83,22 +84,25 @@ export function WelcomeMessagesEditor() {
       }
 
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const res = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/send-welcome-whatsapp`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            phone: phone,
-            language: activeLang,
-          }),
-        }
-      );
+      const url = `https://${projectId}.supabase.co/functions/v1/send-welcome-whatsapp`;
+      console.log("[WelcomeTest] sending to:", url, "phone:", phone, "lang:", activeLang);
+      
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: phone,
+          language: activeLang,
+        }),
+      });
 
-      if (!res.ok) throw new Error(await res.text());
+      const body = await res.text();
+      console.log("[WelcomeTest] response:", res.status, body);
+      
+      if (!res.ok) throw new Error(body);
       toast.success(t("admin.welcomeMessages.testSent", "Тестовое сообщение отправлено"));
     } catch (err) {
-      console.error("Test welcome failed:", err);
+      console.error("[WelcomeTest] failed:", err);
       toast.error(t("admin.welcomeMessages.testError", "Ошибка отправки тестового сообщения"));
     } finally {
       setIsTesting(false);
