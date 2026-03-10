@@ -59,6 +59,7 @@ import ReferralHistory from "./pages/ReferralHistory";
 import PartnerBonuses from "./pages/PartnerBonuses";
 import DevicesPage from "./pages/DevicesPage";
 import ApiDocumentation from "./pages/ApiDocumentation";
+import ApiThirdParty from "./pages/ApiThirdParty";
 import AdminPanel from "./pages/AdminPanel";
 import AdminClients from "./pages/AdminClients";
 import AdminAdmins from "./pages/AdminAdmins";
