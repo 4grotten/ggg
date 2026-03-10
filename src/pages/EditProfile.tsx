@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { AvatarCropDialog } from "@/components/settings/AvatarCropDialog";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2, Phone, Plus, X, Trash2 } from "lucide-react";
+import { Camera, Check, ChevronDown, ChevronRight, Lock, Eye, EyeOff, Loader2, Share2, Phone, Plus, X, Trash2, Shield, ShieldCheck, BadgeCheck, Crown } from "lucide-react";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { toast } from "sonner";
