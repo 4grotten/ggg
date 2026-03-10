@@ -669,6 +669,22 @@ const EditProfile = () => {
                 )}
               />
 
+              {/* Phone Number (read-only, from auth) */}
+              {user?.phone_number && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-muted-foreground" />
+                    {t("editProfile.phone") || "Phone"}
+                  </label>
+                  <div className="h-14 rounded-2xl border border-border bg-muted/50 px-4 flex items-center text-base text-muted-foreground">
+                    {user.phone_number}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5 px-1">
+                    {t("editProfile.phoneDescription") || "Phone number used for authentication"}
+                  </p>
+                </div>
+              )}
+
               {/* Username / Nickname */}
               <FormField
                 control={form.control}
