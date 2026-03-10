@@ -256,14 +256,24 @@ export const StatementDownloadDrawer = ({ open, onOpenChange }: StatementDownloa
     const userName = user?.full_name || "";
 
     const selectedAssetTypes: string[] = [];
+    const detailedAssetLabels: string[] = [];
+
     for (const id of selectedAssets) {
-      if (id.startsWith("card_")) selectedAssetTypes.push("card");
-      else if (id.startsWith("iban_") || id.startsWith("bank_")) selectedAssetTypes.push("iban");
-      else if (id === "usdt_wallet" || id.startsWith("crypto_")) selectedAssetTypes.push("crypto");
+      const asset = assets.find(a => a.id === id);
+      if (id.startsWith("card_")) {
+        selectedAssetTypes.push("card");
+        if (asset) detailedAssetLabels.push(asset.label);
+      } else if (id.startsWith("iban_") || id.startsWith("bank_")) {
+        selectedAssetTypes.push("iban");
+        if (asset) detailedAssetLabels.push(asset.label);
+      } else if (id === "usdt_wallet" || id.startsWith("crypto_")) {
+        selectedAssetTypes.push("crypto");
+        if (asset) detailedAssetLabels.push(asset.label);
+      }
     }
     const uniqueAssetTypes = [...new Set(selectedAssetTypes)];
 
-    return { token, start, end, userName, uniqueAssetTypes };
+    return { token, start, end, userName, uniqueAssetTypes, detailedAssetLabels };
   };
 
   const handleDownloadFile = async () => {
