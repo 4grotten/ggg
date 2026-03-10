@@ -1267,6 +1267,7 @@
     "verified": "Doğrulanmış",
     "notVerified": "Doğrulanmamış",
     "changePhone": "Giriş numarasını değiştir",
+    "authNumber": "Yetkilendirme numarası",
     "username": "Kullanıcı Adı",
     "usernamePlaceholder": "Kullanıcı adınızı girin",
     "usernameDescription": "Kullanıcılar arası transferler için benzersiz tanımlayıcı. Sadece harf, rakam ve alt çizgi kullanılabilir.",
