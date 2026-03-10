@@ -1262,6 +1262,8 @@
     "fullNamePlaceholder": "Geben Sie Ihren vollständigen Namen ein",
     "fullNameDescription": "Ihr Name wie im Reisepass. Wird zur Identifikation und Profilanzeige verwendet.",
     "phone": "Telefon",
+    "addPhone": "Telefonnummer hinzufügen",
+    "phoneDescription": "Telefonnummer, die für die Anmeldung verwendet wird.",
     "username": "Benutzername",
     "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
     "usernameDescription": "Eindeutige Kennung für Überweisungen zwischen Benutzern. Nur Buchstaben, Zahlen und Unterstriche erlaubt.",
