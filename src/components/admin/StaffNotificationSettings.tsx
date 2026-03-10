@@ -23,6 +23,8 @@ interface NotifApiResponse {
   whatsapp_enabled: boolean;
   email_address: string | null;
   email_enabled: boolean;
+  push_enabled: boolean;
+  push_token: string | null;
 }
 
 const CHANNELS = [
