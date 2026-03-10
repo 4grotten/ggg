@@ -89,7 +89,7 @@ export function WelcomeMessagesEditor() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            phone: profile.phone,
+            phone: phone,
             language: activeLang,
           }),
         }
