@@ -55,7 +55,7 @@ const TopUpFromUsdtBalance = () => {
 
     const commissionPercent = settings.CARD_TO_CARD_FEE_PERCENT; // 1%
     const networkFee = settings.TOP_UP_CRYPTO_FEE; // 5.90 USDT
-    const rate = settings.USDT_TO_AED_SELL; // 1 USDT = 3.69 AED
+    const rate = settings.USDT_TO_AED_BUY; // 1 USDT = 3.65 AED (sell rate)
     const commission = amountNum * (commissionPercent / 100);
     const totalUsdt = amountNum + commission + networkFee;
     const receiveAed = amountNum * rate;
