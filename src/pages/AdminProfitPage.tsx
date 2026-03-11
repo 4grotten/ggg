@@ -231,25 +231,11 @@ export default function AdminProfitPage() {
   };
 
   // ─── Derived data ──────────────────────────────────────────
-  // First filter by selected period (client-side, since API may not filter)
-  const periodFilteredTx = useMemo(() => {
-    const startDate = getStartDate(period);
-    const endDate = getEndDate(period);
-    if (!startDate && !endDate) return transactions;
-    return transactions.filter(tx => {
-      if (!tx.created_at) return false;
-      const txDate = format(new Date(tx.created_at), "yyyy-MM-dd");
-      if (startDate && txDate < startDate) return false;
-      if (endDate && txDate > endDate) return false;
-      return true;
-    });
-  }, [transactions, period, getStartDate, getEndDate]);
-
   const filteredTx = useMemo(() => {
-    if (subTab === "all") return periodFilteredTx;
-    if (subTab === "card_transfer") return periodFilteredTx.filter(tx => tx.fee_type === "card_transfer" || tx.fee_type === "card_to_card");
-    return periodFilteredTx.filter(tx => tx.fee_type === subTab);
-  }, [periodFilteredTx, subTab]);
+    if (subTab === "all") return transactions;
+    if (subTab === "card_transfer") return transactions.filter(tx => tx.fee_type === "card_transfer" || tx.fee_type === "card_to_card");
+    return transactions.filter(tx => tx.fee_type === subTab);
+  }, [transactions, subTab]);
 
   // Group transactions by date
   const dateGroups = useMemo((): DateGroup[] => {
@@ -271,13 +257,13 @@ export default function AdminProfitPage() {
   }, [filteredTx]);
 
   const subTabCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: periodFilteredTx.length };
-    for (const tx of periodFilteredTx) {
+    const counts: Record<string, number> = { all: transactions.length };
+    for (const tx of transactions) {
       const type = tx.fee_type === "card_to_card" ? "card_transfer" : tx.fee_type;
       counts[type] = (counts[type] || 0) + 1;
     }
     return counts;
-  }, [periodFilteredTx]);
+  }, [transactions]);
 
   const formatDateRange = (from: Date | undefined, to: Date | undefined): string => {
     if (!from && !to) return "";
