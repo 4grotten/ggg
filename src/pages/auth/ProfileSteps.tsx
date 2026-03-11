@@ -361,11 +361,18 @@ const ConfirmPasswordInput = ({
           type="text"
           value={confirmPassword}
           onChange={(e) => onConfirmPasswordChange(e.target.value)}
+          onPaste={(e) => {
+            const pasted = e.clipboardData?.getData('text');
+            if (pasted) {
+              e.preventDefault();
+              onConfirmPasswordChange(pasted);
+            }
+          }}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={t('editProfile.changePassword.confirmPlaceholder') || 'Повторите пароль'}
           className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-text"
-          autoComplete="off"
+          autoComplete="new-password"
         />
         
         {/* Visual representation */}
