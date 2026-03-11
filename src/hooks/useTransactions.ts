@@ -161,14 +161,9 @@ export const useMergedTransactionGroups = (params?: FetchTransactionsParams) => 
   
   const mergedGroups: TransactionGroup[] = [];
   
-  // API groups first (real data)
+  // API groups only (real data)
   if (apiQuery.data && apiQuery.data.length > 0) {
     mergedGroups.push(...apiQuery.data);
-  }
-  
-  // Then mock groups (existing dates won't overlap since they're different)
-  if (mockQuery.data?.groups) {
-    mergedGroups.push(...mockQuery.data.groups);
   }
   
   return {
