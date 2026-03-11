@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import aedCurrency from "@/assets/aed-currency.png";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { format, subDays, subMonths, startOfWeek, parseISO } from "date-fns";
 import {
   Drawer,
@@ -415,12 +417,15 @@ export default function AdminProfitPage() {
                     Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data]) => (
                       <div key={cur} className="flex items-center gap-3">
                         <div className={cn(
-                          "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black",
+                          "w-9 h-9 rounded-xl flex items-center justify-center",
                           cur === "USDT" 
-                            ? "bg-[#26A17B]/20 text-[#26A17B]" 
-                            : "bg-[#007AFF]/20 text-[#007AFF]"
+                            ? "bg-[#26A17B]/20" 
+                            : "bg-[#007AFF]/20"
                         )}>
-                          {cur === "USDT" ? "₮" : "د"}
+                          {cur === "USDT" 
+                            ? <UsdtIcon size={20} /> 
+                            : <img src={aedCurrency} alt="AED" className="w-5 h-5 brightness-0 invert" />
+                          }
                         </div>
                         <div className="flex-1">
                           <p className="text-2xl font-bold text-white tracking-tight font-mono">
@@ -432,7 +437,9 @@ export default function AdminProfitPage() {
                     ))
                   ) : (
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black bg-[#007AFF]/20 text-[#007AFF]">د</div>
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#007AFF]/20">
+                        <img src={aedCurrency} alt="AED" className="w-5 h-5 brightness-0 invert" />
+                      </div>
                       <div className="flex-1">
                         <p className="text-2xl font-bold text-white tracking-tight font-mono">{fmtAmount(summary.totalRevenue)}</p>
                         <p className="text-[10px] text-white/40 uppercase tracking-wider">AED · {summary.totalTransactions} операций</p>
