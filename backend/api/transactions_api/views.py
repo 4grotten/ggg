@@ -483,12 +483,27 @@ class AdminRevenueTransactionsView(APIView):
     )
     def get(self, request):
         fee_type = request.query_params.get('fee_type')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        fee_currency = request.query_params.get('fee_currency')
+        sort_by = request.query_params.get('sort_by', '-created_at')
         limit = int(request.query_params.get('limit', 50))
         offset = int(request.query_params.get('offset', 0))
 
-        query = FeeRevenue.objects.all().order_by('-created_at')
+        # Validate sort_by to prevent injection
+        allowed_sort_fields = ['created_at', '-created_at', 'fee_amount', '-fee_amount', 'base_amount', '-base_amount', 'fee_type', '-fee_type']
+        if sort_by not in allowed_sort_fields:
+            sort_by = '-created_at'
+
+        query = FeeRevenue.objects.all().order_by(sort_by)
         if fee_type:
             query = query.filter(fee_type=fee_type)
+        if start_date:
+            query = query.filter(created_at__date__gte=start_date)
+        if end_date:
+            query = query.filter(created_at__date__lte=end_date)
+        if fee_currency:
+            query = query.filter(fee_currency=fee_currency)
 
         total_count = query.count()
         records = query[offset:offset+limit]
