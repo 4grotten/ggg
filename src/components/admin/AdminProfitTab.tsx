@@ -50,6 +50,8 @@ const FEE_META: Record<string, { label: string; icon: typeof DollarSign; colorCl
   bank_withdrawal:     { label: "Банк вывод",     icon: Landmark,      colorClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
   bank_transfer:       { label: "Банк перевод",   icon: Landmark,      colorClass: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
   crypto_withdrawal:   { label: "Крипто вывод",   icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  crypto_to_card:      { label: "Крипто → Карта", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  crypto_to_iban:      { label: "Крипто → IBAN",  icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
   top_up_crypto:       { label: "Крипто пополн.", icon: Bitcoin,       colorClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
   top_up_bank:         { label: "Банк пополн.",   icon: Landmark,      colorClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
   network_fee:         { label: "Сетевая комиссия", icon: Zap,         colorClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
