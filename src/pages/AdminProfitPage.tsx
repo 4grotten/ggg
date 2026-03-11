@@ -549,6 +549,81 @@ export default function AdminProfitPage() {
           )}
         </div>
       </motion.div>
+
+      {/* Period Selection Drawer */}
+      <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle>Выберите период</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-8 overflow-y-auto">
+            {customDateField ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <button onClick={() => setCustomDateField(null)} className="text-sm text-muted-foreground">
+                    Назад
+                  </button>
+                  <span className="text-sm font-medium">
+                    {customDateField === "from" ? "Начальная дата" : "Конечная дата"}
+                  </span>
+                  <div className="w-12" />
+                </div>
+                <DateWheelPicker
+                  value={customDateField === "from" ? tempCustomFrom : tempCustomTo}
+                  onChange={handleWheelDateChange}
+                  minYear={2020}
+                  maxYear={new Date().getFullYear() + 1}
+                />
+                {customDateField === "from" && hasSelectedFrom && (
+                  <button
+                    onClick={() => setCustomDateField("to")}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
+                  >
+                    Далее
+                  </button>
+                )}
+                {customDateField === "to" && tempCustomFrom && tempCustomTo && (
+                  <button
+                    onClick={handleCustomDateConfirm}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
+                  >
+                    Применить
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {presetOptions.map((preset) => (
+                  <button
+                    key={preset.key}
+                    onClick={() => handlePresetSelect(preset.key)}
+                    className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors"
+                  >
+                    <p className="font-medium">{preset.label}</p>
+                    {preset.dateRange && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{preset.dateRange}</p>
+                    )}
+                  </button>
+                ))}
+                <button
+                  onClick={() => {
+                    setTempCustomFrom(dateFrom);
+                    setTempCustomTo(dateTo);
+                    setHasSelectedFrom(!!dateFrom);
+                    setCustomDateField("from");
+                  }}
+                  className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors"
+                >
+                  <p className="font-medium">Свой период</p>
+                  {period === "custom" && dateFrom && dateTo && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{formatDateRange(dateFrom, dateTo)}</p>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </MobileLayout>
   );
 }
