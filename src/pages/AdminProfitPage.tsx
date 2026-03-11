@@ -257,13 +257,13 @@ export default function AdminProfitPage() {
   }, [filteredTx]);
 
   const subTabCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: periodFilteredTx.length };
-    for (const tx of periodFilteredTx) {
+    const counts: Record<string, number> = { all: transactions.length };
+    for (const tx of transactions) {
       const type = tx.fee_type === "card_to_card" ? "card_transfer" : tx.fee_type;
       counts[type] = (counts[type] || 0) + 1;
     }
     return counts;
-  }, [periodFilteredTx]);
+  }, [transactions]);
 
   const formatDateRange = (from: Date | undefined, to: Date | undefined): string => {
     if (!from && !to) return "";
