@@ -678,6 +678,7 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
       displaySubtitle: tx.display?.subtitle || undefined,
       sender_card_mask: (tx as any).sender_card_mask || (tx.metadata as any)?.sender_card_mask || undefined,
       receiver_card_mask: (tx as any).receiver_card_mask || (tx.metadata as any)?.receiver_card_mask || undefined,
+      credited_aed: (tx.metadata as any)?.credited_aed || (tx.metadata as any)?.credited_amount_aed || (tx.metadata as any)?.fiat_amount_aed || undefined,
     },
   };
 };
