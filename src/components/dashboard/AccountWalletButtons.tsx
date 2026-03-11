@@ -81,8 +81,8 @@ export const AccountWalletButtons = ({
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
-              <Landmark className="w-4.5 h-4.5 text-primary" />
+            <div className="w-9 h-9 rounded-full bg-[#8B5CF6]/15 flex items-center justify-center">
+              <Landmark className="w-4.5 h-4.5 text-[#8B5CF6]" />
             </div>
             <div>
               <p className="text-sm font-semibold">Счёт</p>
