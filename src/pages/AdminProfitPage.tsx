@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { apiRequest } from "@/services/api/apiClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -65,31 +66,31 @@ type PeriodPreset = "allTime" | "today" | "thisWeek" | "month" | "threeMonths" |
 type SubTab = "all" | "card_transfer" | "bank_withdrawal" | "crypto_withdrawal" | "network_fee" | "currency_conversion";
 
 // ─── Constants ───────────────────────────────────────────────
-const FEE_META: Record<string, { label: string; icon: typeof DollarSign; colorClass: string }> = {
-  card_transfer:       { label: "Переводы",         icon: CreditCard,    colorClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
-  card_to_card:        { label: "Переводы",         icon: CreditCard,    colorClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
-  bank_withdrawal:     { label: "Банк вывод",       icon: Landmark,      colorClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
-  bank_transfer:       { label: "Банк перевод",     icon: Landmark,      colorClass: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
-  crypto_withdrawal:   { label: "Крипто вывод",     icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
-  top_up_crypto:       { label: "Крипто пополн.",   icon: Bitcoin,       colorClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  top_up_bank:         { label: "Банк пополн.",     icon: Landmark,      colorClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  network_fee:         { label: "Сетевая комиссия", icon: Zap,           colorClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  currency_conversion: { label: "Конвертация",      icon: ArrowRightLeft, colorClass: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
-  card_activation:     { label: "Активация карты",  icon: CreditCard,    colorClass: "bg-teal-500/10 text-teal-600 dark:text-teal-400" },
+const FEE_META_KEYS: Record<string, { labelKey: string; icon: typeof DollarSign; colorClass: string }> = {
+  card_transfer:       { labelKey: "feeTransfers",        icon: CreditCard,    colorClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
+  card_to_card:        { labelKey: "feeTransfers",        icon: CreditCard,    colorClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
+  bank_withdrawal:     { labelKey: "feeBankWithdrawal",   icon: Landmark,      colorClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
+  bank_transfer:       { labelKey: "feeBankTransfer",     icon: Landmark,      colorClass: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
+  crypto_withdrawal:   { labelKey: "feeCryptoWithdrawal", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  top_up_crypto:       { labelKey: "feeCryptoTopUp",      icon: Bitcoin,       colorClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+  top_up_bank:         { labelKey: "feeBankTopUp",        icon: Landmark,      colorClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+  network_fee:         { labelKey: "feeNetworkFee",       icon: Zap,           colorClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  currency_conversion: { labelKey: "feeConversion",       icon: ArrowRightLeft, colorClass: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
+  card_activation:     { labelKey: "feeCardActivation",   icon: CreditCard,    colorClass: "bg-teal-500/10 text-teal-600 dark:text-teal-400" },
 };
 
-const SUB_TABS: { value: SubTab; label: string; icon: typeof DollarSign }[] = [
-  { value: "all",                label: "Всё",       icon: Layers },
-  { value: "card_transfer",      label: "Переводы",  icon: CreditCard },
-  { value: "bank_withdrawal",    label: "Банк",      icon: Landmark },
-  { value: "crypto_withdrawal",  label: "Крипто",    icon: Bitcoin },
-  { value: "network_fee",        label: "Сеть",      icon: Zap },
-  { value: "currency_conversion", label: "Конверт.", icon: ArrowRightLeft },
+const SUB_TAB_KEYS: { value: SubTab; labelKey: string; icon: typeof DollarSign }[] = [
+  { value: "all",                labelKey: "tabAll",        icon: Layers },
+  { value: "card_transfer",      labelKey: "tabTransfers",  icon: CreditCard },
+  { value: "bank_withdrawal",    labelKey: "tabBank",       icon: Landmark },
+  { value: "crypto_withdrawal",  labelKey: "tabCrypto",     icon: Bitcoin },
+  { value: "network_fee",        labelKey: "tabNetwork",    icon: Zap },
+  { value: "currency_conversion", labelKey: "tabConversion", icon: ArrowRightLeft },
 ];
 
 const num = (v: string | number | null | undefined): number => parseFloat(String(v ?? 0)) || 0;
 const fmtAmount = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const getMeta = (type: string) => FEE_META[type] || { label: type, icon: DollarSign, colorClass: "bg-muted text-muted-foreground" };
+const getMetaRaw = (type: string) => FEE_META_KEYS[type] || { labelKey: type, icon: DollarSign, colorClass: "bg-muted text-muted-foreground" };
 
 function formatDateHeader(dateStr: string): string {
   try {
@@ -110,7 +111,12 @@ interface DateGroup {
 // ─── Page Component ──────────────────────────────────────────
 export default function AdminProfitPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
+  const getMeta = (type: string) => {
+    const raw = getMetaRaw(type);
+    return { label: t(`profit.${raw.labelKey}`, raw.labelKey), icon: raw.icon, colorClass: raw.colorClass };
+  };
   const [summary, setSummary] = useState<ParsedSummary | null>(null);
   const [transactions, setTransactions] = useState<RevenueTransaction[]>([]);
   const [txCount, setTxCount] = useState(0);
@@ -280,12 +286,12 @@ export default function AdminProfitPage() {
   };
 
   const presetOptions: { key: PeriodPreset; label: string; dateRange: string }[] = [
-    { key: "allTime", label: "За всё время", dateRange: "" },
-    { key: "today", label: "Сегодня", dateRange: formatDateRange(today, today) },
-    { key: "thisWeek", label: "Неделя", dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
-    { key: "month", label: "Месяц", dateRange: formatDateRange(subMonths(today, 1), today) },
-    { key: "threeMonths", label: "3 месяца", dateRange: formatDateRange(subMonths(today, 3), today) },
-    { key: "year", label: "Год", dateRange: formatDateRange(subMonths(today, 12), today) },
+    { key: "allTime", label: t("profit.allTime"), dateRange: "" },
+    { key: "today", label: t("profit.today"), dateRange: formatDateRange(today, today) },
+    { key: "thisWeek", label: t("profit.week"), dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
+    { key: "month", label: t("profit.month"), dateRange: formatDateRange(subMonths(today, 1), today) },
+    { key: "threeMonths", label: t("profit.threeMonths"), dateRange: formatDateRange(subMonths(today, 3), today) },
+    { key: "year", label: t("profit.year"), dateRange: formatDateRange(subMonths(today, 12), today) },
   ];
 
   const handlePresetSelect = (preset: PeriodPreset) => {
@@ -317,12 +323,12 @@ export default function AdminProfitPage() {
   };
 
   const getSelectedPeriodLabel = (): string => {
-    if (period === "allTime") return "За всё время";
+    if (period === "allTime") return t("profit.allTime");
     if (period === "custom" && dateFrom && dateTo) {
       return `${format(dateFrom, "dd.MM.yyyy")} - ${format(dateTo, "dd.MM.yyyy")}`;
     }
     const preset = presetOptions.find(p => p.key === period);
-    return preset?.label || "За всё время";
+    return preset?.label || t("profit.allTime");
   };
 
   const sortedTypes = summary ? Object.entries(summary.byType).sort(([, a], [, b]) => b.total - a.total) : [];
@@ -394,7 +400,7 @@ export default function AdminProfitPage() {
                     >
                       <RefreshCw className="w-4 h-4 text-white/70" />
                     </button>
-                    <span className="text-xs text-white/50 uppercase tracking-widest font-semibold">Total Profit</span>
+                    <span className="text-xs text-white/50 uppercase tracking-widest font-semibold">{t("profit.totalProfit")}</span>
                   </div>
                   <div className="flex items-center">
                     <button
@@ -423,7 +429,7 @@ export default function AdminProfitPage() {
                         {i === 0 && (
                           <div className="ml-auto flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
                             <TrendingUp className="w-3.5 h-3.5 text-[#007AFF]" />
-                            <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} транзакций</span>
+                            <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} {t("profit.transactions")}</span>
                           </div>
                         )}
                       </div>
@@ -435,7 +441,7 @@ export default function AdminProfitPage() {
                       <span className="text-2xl font-bold text-white/70">AED</span>
                       <div className="ml-auto flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
                         <TrendingUp className="w-3.5 h-3.5 text-[#007AFF]" />
-                        <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} транзакций</span>
+                        <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} {t("profit.transactions")}</span>
                       </div>
                     </div>
                   )}
@@ -446,16 +452,16 @@ export default function AdminProfitPage() {
                   <div className="relative flex gap-2 pt-3 mt-3 border-t border-white/10">
                     {Object.entries(summary.byCategory).sort(([,a],[,b]) => b.total - a.total).map(([cat, data]) => {
                       const catMeta: Record<string, { label: string; color: string }> = {
-                        service: { label: "Сервис", color: "text-[#007AFF]" },
-                        network: { label: "Сеть", color: "text-amber-400" },
-                        exchange: { label: "Обмен", color: "text-indigo-400" },
+                        service: { label: t("profit.categoryService"), color: "text-[#007AFF]" },
+                        network: { label: t("profit.categoryNetwork"), color: "text-amber-400" },
+                        exchange: { label: t("profit.categoryExchange"), color: "text-indigo-400" },
                       };
                       const m = catMeta[cat] || { label: cat, color: "text-white/60" };
                       return (
                         <div key={cat} className="flex-1 bg-white/5 rounded-xl px-3 py-2">
                           <p className={cn("text-[10px] font-medium uppercase tracking-wider", m.color)}>{m.label}</p>
                           <p className="text-sm font-bold text-white font-mono mt-0.5">{fmtAmount(data.total)}</p>
-                          <p className="text-[9px] text-white/30">{data.count} шт</p>
+                          <p className="text-[9px] text-white/30">{data.count} {t("profit.pcs")}</p>
                         </div>
                       );
                     })}
@@ -468,7 +474,7 @@ export default function AdminProfitPage() {
                 <div className="rounded-2xl bg-card border border-border p-4 space-y-2.5">
                   <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Percent className="w-4 h-4 text-primary" />
-                    По типу комиссии
+                    {t("profit.byFeeType")}
                   </h3>
                   {sortedTypes.map(([type, data], i) => {
                     const pct = summary.totalRevenue > 0 ? (data.total / summary.totalRevenue) * 100 : 0;
@@ -489,7 +495,7 @@ export default function AdminProfitPage() {
                               <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min(pct, 100)}%` }} />
                             </div>
                             <span className="text-[10px] text-muted-foreground w-8 text-right">{pct.toFixed(0)}%</span>
-                            <span className="text-[10px] text-muted-foreground">{data.count} шт</span>
+                            <span className="text-[10px] text-muted-foreground">{data.count} {t("profit.pcs")}</span>
                           </div>
                         </div>
                       </motion.div>
@@ -499,12 +505,12 @@ export default function AdminProfitPage() {
               )}
             </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground text-sm">Нет данных за выбранный период</div>
+            <div className="text-center py-8 text-muted-foreground text-sm">{t("profit.noData")}</div>
           )}
 
           {/* ─── Sub-tabs (fee type filter) ─────────────────────── */}
           <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
-            {SUB_TABS.map(tab => {
+            {SUB_TAB_KEYS.map(tab => {
               const count = subTabCounts[tab.value] || 0;
               const isActive = subTab === tab.value;
               const Icon = tab.icon;
@@ -518,7 +524,7 @@ export default function AdminProfitPage() {
                   )}
                 >
                   <Icon className="w-3.5 h-3.5" />
-                  {tab.label}
+                  {t(`profit.${tab.labelKey}`)}
                   {count > 0 && (
                     <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", isActive ? "bg-primary-foreground/20" : "bg-muted")}>{count}</span>
                   )}
@@ -544,7 +550,7 @@ export default function AdminProfitPage() {
               ))}
             </div>
           ) : dateGroups.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground text-sm">Нет транзакций</div>
+            <div className="text-center py-12 text-muted-foreground text-sm">{t("profit.noTransactions")}</div>
           ) : (
             <div className="space-y-3">
               {dateGroups.map((group) => (
@@ -585,7 +591,7 @@ export default function AdminProfitPage() {
                                 +{fmtAmount(amount)} {tx.fee_currency || "AED"}
                               </p>
                               <p className="text-[10px] text-muted-foreground">
-                                из {fmtAmount(baseAmount)} {tx.base_currency || ""}
+                                {t("profit.from")} {fmtAmount(baseAmount)} {tx.base_currency || ""}
                               </p>
                             </div>
                             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
@@ -596,13 +602,13 @@ export default function AdminProfitPage() {
                             {isExpanded && (
                               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                                 <div className="px-4 pb-3 space-y-1.5 border-t border-border/50 pt-2 mx-4">
-                                  <DetailRow label="Тип комиссии" value={meta.label} />
-                                  <DetailRow label="Сумма комиссии" value={`${fmtAmount(amount)} ${tx.fee_currency || "AED"}`} highlight />
-                                  <DetailRow label="Базовая сумма" value={`${fmtAmount(baseAmount)} ${tx.base_currency || ""}`} />
-                                  {feePercent > 0 && <DetailRow label="Процент" value={`${feePercent}%`} />}
-                                  <DetailRow label="User ID" value={tx.user_id} />
-                                  <DetailRow label="Дата" value={tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm:ss") : "—"} />
-                                  {tx.transaction_id && <DetailRow label="ID транзакции" value={tx.transaction_id.slice(0, 8) + "..."} />}
+                                  <DetailRow label={t("profit.feeType")} value={meta.label} />
+                                  <DetailRow label={t("profit.feeAmount")} value={`${fmtAmount(amount)} ${tx.fee_currency || "AED"}`} highlight />
+                                  <DetailRow label={t("profit.baseAmount")} value={`${fmtAmount(baseAmount)} ${tx.base_currency || ""}`} />
+                                  {feePercent > 0 && <DetailRow label={t("profit.percent")} value={`${feePercent}%`} />}
+                                  <DetailRow label={t("profit.userId")} value={tx.user_id} />
+                                  <DetailRow label={t("profit.date")} value={tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm:ss") : "—"} />
+                                  {tx.transaction_id && <DetailRow label={t("profit.transactionId")} value={tx.transaction_id.slice(0, 8) + "..."} />}
                                 </div>
                               </motion.div>
                             )}
@@ -619,7 +625,7 @@ export default function AdminProfitPage() {
           {/* Load more */}
           {transactions.length < txCount && subTab === "all" && (
             <Button variant="ghost" size="sm" className="w-full text-xs" onClick={handleLoadMore} disabled={isLoadingTx}>
-              {isLoadingTx ? "Загрузка..." : `Загрузить ещё (${transactions.length}/${txCount})`}
+              {isLoadingTx ? t("profit.loading") : `${t("profit.loadMore")} (${transactions.length}/${txCount})`}
             </Button>
           )}
         </div>
@@ -629,17 +635,17 @@ export default function AdminProfitPage() {
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
         <DrawerContent className="max-h-[85vh]">
           <DrawerHeader className="pb-2">
-            <DrawerTitle>Выберите период</DrawerTitle>
+            <DrawerTitle>{t("profit.selectPeriod")}</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-8 overflow-y-auto">
             {customDateField ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <button onClick={() => setCustomDateField(null)} className="text-sm text-muted-foreground">
-                    Назад
+                    {t("profit.back")}
                   </button>
                   <span className="text-sm font-medium">
-                    {customDateField === "from" ? "Начальная дата" : "Конечная дата"}
+                    {customDateField === "from" ? t("profit.startDate") : t("profit.endDate")}
                   </span>
                   <div className="w-12" />
                 </div>
@@ -654,7 +660,7 @@ export default function AdminProfitPage() {
                     onClick={() => setCustomDateField("to")}
                     className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
                   >
-                    Далее
+                    {t("profit.next")}
                   </button>
                 )}
                 {customDateField === "to" && tempCustomFrom && tempCustomTo && (
@@ -662,7 +668,7 @@ export default function AdminProfitPage() {
                     onClick={handleCustomDateConfirm}
                     className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
                   >
-                    Применить
+                    {t("profit.apply")}
                   </button>
                 )}
               </div>
@@ -699,7 +705,7 @@ export default function AdminProfitPage() {
                   )}
                 >
                   <div>
-                    <p className="font-medium">Свой период</p>
+                    <p className="font-medium">{t("profit.customPeriod")}</p>
                     {period === "custom" && dateFrom && dateTo && (
                       <p className="text-xs text-muted-foreground mt-0.5">{formatDateRange(dateFrom, dateTo)}</p>
                     )}
