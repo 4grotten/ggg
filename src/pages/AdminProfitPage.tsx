@@ -705,7 +705,7 @@ export default function AdminProfitPage() {
                   )}
                 >
                   <div>
-                    <p className="font-medium">Свой период</p>
+                    <p className="font-medium">{t("profit.customPeriod")}</p>
                     {period === "custom" && dateFrom && dateTo && (
                       <p className="text-xs text-muted-foreground mt-0.5">{formatDateRange(dateFrom, dateTo)}</p>
                     )}
