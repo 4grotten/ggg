@@ -494,11 +494,11 @@ const handleClick = (transaction: Transaction) => {
                       </>
                     ) : isCryptoToIban ? (
                       <>
-                         <p className={`font-semibold text-xs sm:text-sm ${colorClass}`}>
-                          {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                        <p className="font-semibold text-xs sm:text-sm text-green-500">
+                          +{((transaction.metadata as any)?.credited_aed || (transaction.metadata as any)?.fiat_amount_aed || transaction.amountLocal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground">
-                          {transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
+                        <p className={`text-[10px] sm:text-xs ${colorClass} font-medium`}>
+                          {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                         </p>
                       </>
                     ) : walletView ? (
