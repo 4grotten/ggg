@@ -16,7 +16,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useAdminManagement } from "@/hooks/useAdminManagement";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AdminSetting, AppRole } from "@/types/admin";
 import { cn } from "@/lib/utils";
 import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
