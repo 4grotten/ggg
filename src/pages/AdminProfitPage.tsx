@@ -245,8 +245,18 @@ export default function AdminProfitPage() {
     fetchTransactions(newOffset);
   };
 
-  // ─── Derived data (server-side filtered by fee_type) ───────
-  const filteredTx = transactions;
+  // ─── Derived data (front-side filtered + sorted) ───────────
+  const filteredTx = useMemo(() => {
+    const byTab = subTab === "all"
+      ? transactions
+      : transactions.filter((tx) => feeTypeToTab(tx.fee_type) === subTab);
+
+    return [...byTab].sort((a, b) => {
+      const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return bTime - aTime;
+    });
+  }, [transactions, subTab]);
 
   // Group transactions by date
   const dateGroups = useMemo((): DateGroup[] => {
