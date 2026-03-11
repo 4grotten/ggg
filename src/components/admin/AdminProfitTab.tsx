@@ -41,7 +41,7 @@ interface RevenueTransaction {
 }
 
 type PeriodPreset = "today" | "week" | "month" | "year" | "all";
-type SubTab = "all" | "card_transfer" | "bank_withdrawal" | "crypto_withdrawal" | "network_fee" | "currency_conversion";
+type SubTab = "all" | "cards" | "banks" | "crypto" | "network" | "conversion";
 
 // ─── Constants ───────────────────────────────────────────────
 const FEE_META: Record<string, { label: string; icon: typeof DollarSign; colorClass: string }> = {
@@ -58,12 +58,12 @@ const FEE_META: Record<string, { label: string; icon: typeof DollarSign; colorCl
 };
 
 const SUB_TABS: { value: SubTab; label: string; icon: typeof DollarSign }[] = [
-  { value: "all",                label: "Всё",         icon: Layers },
-  { value: "card_transfer",      label: "Переводы",    icon: CreditCard },
-  { value: "bank_withdrawal",    label: "Банк",        icon: Landmark },
-  { value: "crypto_withdrawal",  label: "Крипто",      icon: Bitcoin },
-  { value: "network_fee",        label: "Сеть",        icon: Zap },
-  { value: "currency_conversion", label: "Конверт.",   icon: ArrowRightLeft },
+  { value: "all",        label: "Всё",       icon: Layers },
+  { value: "cards",      label: "Карты",     icon: CreditCard },
+  { value: "banks",      label: "Банк",      icon: Landmark },
+  { value: "crypto",     label: "Крипто",    icon: Bitcoin },
+  { value: "network",    label: "Сеть",      icon: Zap },
+  { value: "conversion", label: "Конверт.",  icon: ArrowRightLeft },
 ];
 
 const num = (v: string | number | null | undefined): number => parseFloat(String(v ?? 0)) || 0;
@@ -130,8 +130,12 @@ export function AdminProfitTab() {
   // ─── Fetch transactions ────────────────────────────────────
   const fetchTransactions = useCallback(async (offset = 0) => {
     setIsLoadingTx(true);
+    const params = new URLSearchParams();
+    params.set("limit", String(TX_LIMIT));
+    params.set("offset", String(offset));
+    if (subTab !== "all") params.set("fee_type", subTab);
     const res = await apiRequest<any>(
-      `/transactions/admin/revenue/transactions/?limit=${TX_LIMIT}&offset=${offset}`,
+      `/transactions/admin/revenue/transactions/?${params.toString()}`,
       { method: "GET" },
       true
     );
@@ -146,7 +150,7 @@ export function AdminProfitTab() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, []);
+  }, [subTab]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
@@ -157,13 +161,8 @@ export function AdminProfitTab() {
     fetchTransactions(newOffset);
   };
 
-  // ─── Derived data ──────────────────────────────────────────
-  const filteredTx = useMemo(() => {
-    if (subTab === "all") return transactions;
-    // Group card_to_card with card_transfer
-    if (subTab === "card_transfer") return transactions.filter(tx => tx.fee_type === "card_transfer" || tx.fee_type === "card_to_card");
-    return transactions.filter(tx => tx.fee_type === subTab);
-  }, [transactions, subTab]);
+  // ─── Derived data (server-side filtered now) ────────────────
+  const filteredTx = transactions;
 
   // Currency breakdown
   const currencyTotals = useMemo(() => {
@@ -452,7 +451,7 @@ export function AdminProfitTab() {
             </AnimatePresence>
           )}
         </div>
-        {transactions.length < txCount && subTab === "all" && (
+        {transactions.length < txCount && (
           <div className="px-4 py-3 border-t border-border">
             <Button
               variant="ghost"
