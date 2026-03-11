@@ -221,6 +221,7 @@ export default function AdminProfitPage() {
     params.set("offset", String(offset));
     if (startDate) params.set("start_date", startDate);
     if (endDate) params.set("end_date", endDate);
+    if (subTab !== "all") params.set("fee_type", subTab);
 
     const res = await apiRequest<any>(
       `/transactions/admin/revenue/transactions/?${params.toString()}`,
@@ -234,7 +235,7 @@ export default function AdminProfitPage() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, [period, getStartDate, getEndDate]);
+  }, [period, subTab, getStartDate, getEndDate]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
@@ -245,20 +246,10 @@ export default function AdminProfitPage() {
     fetchTransactions(newOffset);
   };
 
-  // ─── Derived data (front-side filtered + sorted) ───────────
-  const filteredTx = useMemo(() => {
-    const byTab = subTab === "all"
-      ? transactions
-      : transactions.filter((tx) => feeTypeToTab(tx.fee_type) === subTab);
+  // ─── Derived data (backend-filtered, no front sorting) ─────
+  const filteredTx = transactions;
 
-    return [...byTab].sort((a, b) => {
-      const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
-      const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
-      return bTime - aTime;
-    });
-  }, [transactions, subTab]);
-
-  // Group transactions by date
+  // Group transactions by date (preserve backend order)
   const dateGroups = useMemo((): DateGroup[] => {
     const groups: Record<string, { txs: RevenueTransaction[]; total: number }> = {};
     for (const tx of filteredTx) {
@@ -267,24 +258,24 @@ export default function AdminProfitPage() {
       groups[dateKey].txs.push(tx);
       groups[dateKey].total += num(tx.fee_amount);
     }
-    return Object.entries(groups)
-      .sort(([a], [b]) => b.localeCompare(a))
-      .map(([date, { txs, total }]) => ({
-        date,
-        label: formatDateHeader(date),
-        dayTotal: total,
-        transactions: txs,
-      }));
+    return Object.entries(groups).map(([date, { txs, total }]) => ({
+      date,
+      label: formatDateHeader(date),
+      dayTotal: total,
+      transactions: txs,
+    }));
   }, [filteredTx]);
 
   const subTabCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: transactions.length };
-    for (const tx of transactions) {
-      const tab = feeTypeToTab(tx.fee_type);
-      if (tab !== "all") counts[tab] = (counts[tab] || 0) + 1;
+    const counts: Record<string, number> = { all: summary?.totalTransactions ?? 0 };
+    if (!summary) return counts;
+
+    for (const [feeType, data] of Object.entries(summary.byType)) {
+      const tab = feeTypeToTab(feeType);
+      if (tab !== "all") counts[tab] = (counts[tab] || 0) + data.count;
     }
     return counts;
-  }, [transactions]);
+  }, [summary]);
 
   const formatDateRange = (from: Date | undefined, to: Date | undefined): string => {
     if (!from && !to) return "";
