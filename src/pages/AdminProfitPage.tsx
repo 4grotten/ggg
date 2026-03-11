@@ -111,7 +111,12 @@ interface DateGroup {
 // ─── Page Component ──────────────────────────────────────────
 export default function AdminProfitPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
+  const getMeta = (type: string) => {
+    const raw = getMetaRaw(type);
+    return { label: t(`profit.${raw.labelKey}`, raw.labelKey), icon: raw.icon, colorClass: raw.colorClass };
+  };
   const [summary, setSummary] = useState<ParsedSummary | null>(null);
   const [transactions, setTransactions] = useState<RevenueTransaction[]>([]);
   const [txCount, setTxCount] = useState(0);
