@@ -464,27 +464,6 @@ function extractPhone(chatId: string): string {
   return chatId.replace("@c.us", "").replace("@s.whatsapp.net", "").replace("+", "");
 }
 
-// ── Dedup for transaction broadcast messages (prevents message.any + message.ack duplicates) ──
-const broadcastedTransactionMessages = new Map<string, number>();
-const BROADCAST_DEDUP_TTL_MS = 60_000;
-
-function shouldBroadcastTransaction(messageId: string): boolean {
-  const now = Date.now();
-
-  for (const [key, ts] of broadcastedTransactionMessages.entries()) {
-    if (now - ts > BROADCAST_DEDUP_TTL_MS) {
-      broadcastedTransactionMessages.delete(key);
-    }
-  }
-
-  if (broadcastedTransactionMessages.has(messageId)) {
-    return false;
-  }
-
-  broadcastedTransactionMessages.set(messageId, now);
-  return true;
-}
-
 // ── Main handler ──
 
 Deno.serve(async (req) => {
@@ -495,60 +474,11 @@ Deno.serve(async (req) => {
     console.log("[whatsapp-ai] payload:", JSON.stringify(payload).slice(0, 500));
 
     const event = payload.event;
-
-    // ── Detect backend transaction notifications and broadcast to Realtime ──
     const msgPayload = payload.payload;
+
+    // Outgoing WA service messages (including transaction notifications) are ignored here.
+    // Realtime refresh must come only from root backend transaction-webhook.
     if ((event === "message.any" || event === "message.ack") && msgPayload?.fromMe) {
-      const body = String(msgPayload.body || "");
-      const normalizedBody = body
-        .replace(/[\u00A0\u202F]/g, " ") // non-breaking spaces
-        .replace(/[\*_`~]/g, "") // markdown chars
-        .replace(/\s+/g, " ")
-        .trim()
-        .toLowerCase();
-
-      const messageSource = String(msgPayload.source || "").toLowerCase();
-      const isBackendNotification = messageSource === "api";
-      const isTransactionNotification = /(поступление\s+средств|успешное\s+списание|перевод\s+выполнен|пополнени|тип\s+операции|transaction|incoming|outgoing)/i.test(normalizedBody);
-
-      if (isBackendNotification && isTransactionNotification) {
-        const messageId = String(msgPayload.id || `${msgPayload.to || "unknown"}:${normalizedBody.slice(0, 80)}`);
-
-        if (shouldBroadcastTransaction(messageId)) {
-          try {
-            const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-            const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-            const sb = createClient(supabaseUrl, supabaseKey);
-
-            const channel = sb.channel("transaction-updates");
-            await new Promise<void>((resolve, reject) => {
-              channel.subscribe((status) => {
-                if (status === "SUBSCRIBED") resolve();
-                else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
-                  reject(new Error(`Channel status: ${status}`));
-                }
-              });
-            });
-
-            await channel.send({
-              type: "broadcast",
-              event: "new_transaction",
-              payload: {
-                event: "transaction_notification",
-                source: messageSource,
-                body: body.substring(0, 200),
-                timestamp: new Date().toISOString(),
-              },
-            });
-
-            await sb.removeChannel(channel);
-            console.log("[whatsapp-ai] Transaction broadcast sent", { event, messageId });
-          } catch (e) {
-            console.error("[whatsapp-ai] Broadcast error:", e);
-          }
-        }
-      }
-
       return new Response(JSON.stringify({ ok: true }));
     }
 
