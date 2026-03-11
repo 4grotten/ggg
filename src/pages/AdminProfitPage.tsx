@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "@/services/api/apiClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft, ChevronDown,
+  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft, ChevronDown, Check,
   ArrowRightLeft, Landmark, Bitcoin, CreditCard, Zap, Percent, Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
