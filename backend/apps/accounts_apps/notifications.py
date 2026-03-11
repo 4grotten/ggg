@@ -522,59 +522,32 @@ def get_user_language(user_id):
     return 'en'
 
 
-def _resolve_receiver_user_id(txn):
-    """Resolve receiver user_id reliably (fallback by recipient card)."""
-    receiver_id = getattr(txn, 'receiver_id', None)
-    if receiver_id and str(receiver_id) != 'EXTERNAL':
-        return str(receiver_id)
-
-    recipient_card = getattr(txn, 'recipient_card', None)
-    if not recipient_card:
-        return None
-
-    try:
-        Cards = apps.get_model('cards_apps', 'Cards')
-        card = Cards.objects.filter(card_number_encrypted=recipient_card).only('user_id').first()
-        if card and card.user_id and str(card.user_id) != str(getattr(txn, 'sender_id', '')):
-            logger.info(f"[notifications] Receiver resolved by card for tx {txn.id}: {card.user_id}")
-            return str(card.user_id)
-    except Exception as e:
-        logger.warning(f"[notifications] Failed to resolve receiver by card for tx {txn.id}: {e}")
-
-    return None
-
-
 def notify_transaction_parties(transaction_id):
     from apps.transactions_apps.models import Transactions
     try:
         txn = Transactions.objects.get(id=transaction_id)
     except Transactions.DoesNotExist:
         return
-
-    sender_id = str(txn.sender_id) if txn.sender_id and txn.sender_id != 'EXTERNAL' else None
-    receiver_id = _resolve_receiver_user_id(txn)
-
-    if sender_id:
-        sender_lang = get_user_language(sender_id)
+        
+    if txn.sender_id and txn.sender_id != 'EXTERNAL':
+        sender_lang = get_user_language(txn.sender_id)
         sender_text = build_transaction_message(txn, 'sender', sender_lang)
-        send_user_notification(sender_id, sender_text, is_transaction=True)
-
-    if receiver_id and receiver_id != sender_id:
-        receiver_lang = get_user_language(receiver_id)
-        receiver_text = build_transaction_message(txn, 'receiver', receiver_lang)
-        send_user_notification(receiver_id, receiver_text, is_transaction=True)
+        send_user_notification(txn.sender_id, sender_text, is_transaction=True)
+        
+    if txn.receiver_id and txn.receiver_id != 'EXTERNAL':
+        if txn.sender_id != txn.receiver_id:
+            receiver_lang = get_user_language(txn.receiver_id)
+            receiver_text = build_transaction_message(txn, 'receiver', receiver_lang)
+            send_user_notification(txn.receiver_id, receiver_text, is_transaction=True)
 
 
 def send_user_notification(user_id, text, is_transaction=False):
     try:
         settings_obj = UserNotificationSettings.objects.get(user_id=str(user_id))
     except UserNotificationSettings.DoesNotExist:
-        logger.warning(f"[notifications] Settings not found for user_id={user_id}")
         return
-
     wa_text = text.replace('<b>', '*').replace('</b>', '*').replace('<i>', '_').replace('</i>', '_')
     plain_text = text.replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')
-
     if settings_obj.telegram_enabled and settings_obj.telegram_username:
         threading.Thread(target=send_user_telegram, args=(settings_obj, text), daemon=True).start()
     if settings_obj.whatsapp_enabled and settings_obj.whatsapp_number:
