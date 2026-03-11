@@ -144,6 +144,8 @@ export function AdminProfitTab() {
     params.set("limit", String(TX_LIMIT));
     params.set("offset", String(offset));
     if (subTab !== "all") params.set("fee_type", subTab);
+    const startDate = getStartDate(period);
+    if (startDate) params.set("start_date", startDate);
     const res = await apiRequest<any>(
       `/transactions/admin/revenue/transactions/?${params.toString()}`,
       { method: "GET" },
@@ -160,7 +162,7 @@ export function AdminProfitTab() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, [subTab]);
+  }, [subTab, period, getStartDate]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
