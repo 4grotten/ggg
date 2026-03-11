@@ -550,7 +550,7 @@ export default function AdminProfitPage() {
               ))}
             </div>
           ) : dateGroups.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground text-sm">Нет транзакций</div>
+            <div className="text-center py-12 text-muted-foreground text-sm">{t("profit.noTransactions")}</div>
           ) : (
             <div className="space-y-3">
               {dateGroups.map((group) => (
