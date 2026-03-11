@@ -48,6 +48,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useMultiAccount } from "@/hooks/useMultiAccount";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
+import { useTransactionRealtime } from "@/hooks/useTransactionRealtime";
 import { useTransactionFilters, FilterType } from "@/hooks/useTransactionFilters";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { preloadTgs } from "@/components/ui/TgsPlayer";
@@ -63,6 +64,7 @@ const Dashboard = () => {
   const { avatarUrl } = useAvatar();
   const { isHideDataEnabled, isEnabled } = useScreenLockContext();
   const queryClient = useQueryClient();
+  useTransactionRealtime();
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [openCardOpen, setOpenCardOpen] = useState(false);
