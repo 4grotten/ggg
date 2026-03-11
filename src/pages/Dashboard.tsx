@@ -48,6 +48,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useMultiAccount } from "@/hooks/useMultiAccount";
 import { useVerificationProgress } from "@/hooks/useVerificationProgress";
+import { useTransactionRealtime } from "@/hooks/useTransactionRealtime";
 import { useTransactionFilters, FilterType } from "@/hooks/useTransactionFilters";
 import { useScreenLockContext } from "@/contexts/ScreenLockContext";
 import { preloadTgs } from "@/components/ui/TgsPlayer";
