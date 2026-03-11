@@ -3,13 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "@/services/api/apiClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft,
+  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft, ChevronDown,
   ArrowRightLeft, Landmark, Bitcoin, CreditCard, Zap, Percent, Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { format, subDays, startOfMonth, startOfYear, parseISO } from "date-fns";
+import { format, subDays, subMonths, startOfWeek, parseISO } from "date-fns";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
