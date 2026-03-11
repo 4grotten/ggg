@@ -455,21 +455,63 @@ class AdminRevenueSummaryView(APIView):
 
         total_revenue = query.aggregate(total=Sum('fee_amount'))['total'] or Decimal('0.00')
 
+        # --- by_type (как раньше) ---
         by_type_qs = query.values('fee_type').annotate(
             count=Count('id'),
             total=Sum('fee_amount')
         )
         by_type = {item['fee_type']: {"count": item['count'], "total": str(item['total'])} for item in by_type_qs}
 
+        # --- by_currency: разбивка по валюте комиссии ---
+        by_currency_qs = query.values('fee_currency').annotate(
+            count=Count('id'),
+            total=Sum('fee_amount')
+        )
+        by_currency = {
+            item['fee_currency']: {"count": item['count'], "total": str(item['total'])}
+            for item in by_currency_qs
+        }
+
+        # --- by_category: группировка типов в категории ---
+        # network_fee -> "network", currency_conversion -> "exchange", остальное -> "service"
+        category_map = {
+            'network_fee': 'network',
+            'currency_conversion': 'exchange',
+        }
+        categories = {}
+        for item in by_type_qs:
+            cat = category_map.get(item['fee_type'], 'service')
+            if cat not in categories:
+                categories[cat] = {"count": 0, "total": Decimal('0.00')}
+            categories[cat]['count'] += item['count']
+            categories[cat]['total'] += item['total']
+        by_category = {k: {"count": v['count'], "total": str(v['total'])} for k, v in categories.items()}
+
+        # --- by_currency_and_type: двойная группировка ---
+        by_ct_qs = query.values('fee_currency', 'fee_type').annotate(
+            count=Count('id'),
+            total=Sum('fee_amount')
+        )
+        by_currency_and_type = {}
+        for item in by_ct_qs:
+            cur = item['fee_currency']
+            ft = item['fee_type']
+            if cur not in by_currency_and_type:
+                by_currency_and_type[cur] = {}
+            by_currency_and_type[cur][ft] = {"count": item['count'], "total": str(item['total'])}
+
+        # --- by_day ---
         by_day_qs = query.annotate(date=TruncDate('created_at')).values('date').annotate(
             total=Sum('fee_amount')
         ).order_by('-date')
-        
         by_day = [{"date": item['date'].isoformat(), "total": str(item['total'])} for item in by_day_qs]
 
         return Response({
             "total_revenue": str(total_revenue),
             "by_type": by_type,
+            "by_currency": by_currency,
+            "by_category": by_category,
+            "by_currency_and_type": by_currency_and_type,
             "by_day": by_day
         }, status=status.HTTP_200_OK)
     
