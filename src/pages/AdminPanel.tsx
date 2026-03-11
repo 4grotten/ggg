@@ -419,24 +419,23 @@ export default function AdminPanel() {
     }
   }, [activeTab, openaiStatus, openaiLoading, fetchOpenAIStatus]);
 
-  // Log admin panel entry to audit history — only ONCE per browser session
+  // Log admin panel entry to audit history — once per visit to /settings/admin
+  // Flag is cleared when user leaves this page (unmount), so re-entering logs again.
   useEffect(() => {
     const SESSION_KEY = 'admin_panel_login_logged';
 
-    // Already logged in this session — skip
+    // Already logged during this visit — skip (prevents re-log on tab switch within admin)
     if (sessionStorage.getItem(SESSION_KEY)) return;
 
     const logAdminEntry = async () => {
       try {
         const ua = navigator.userAgent;
-        // Parse browser info
         let browser = 'Unknown';
         if (ua.includes('Firefox/')) browser = 'Firefox ' + ua.split('Firefox/')[1]?.split(' ')[0];
         else if (ua.includes('Edg/')) browser = 'Edge ' + ua.split('Edg/')[1]?.split(' ')[0];
         else if (ua.includes('Chrome/')) browser = 'Chrome ' + ua.split('Chrome/')[1]?.split(' ')[0];
         else if (ua.includes('Safari/') && !ua.includes('Chrome')) browser = 'Safari ' + (ua.split('Version/')[1]?.split(' ')[0] || '');
-        
-        // Parse OS
+
         let os = 'Unknown';
         if (ua.includes('Windows')) os = 'Windows';
         else if (ua.includes('Mac OS')) os = 'macOS';
@@ -444,7 +443,6 @@ export default function AdminPanel() {
         else if (ua.includes('Android')) os = 'Android';
         else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
 
-        // Device type
         const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
         const device = isMobile ? 'Mobile' : 'Desktop';
 
@@ -464,17 +462,21 @@ export default function AdminPanel() {
           details,
         });
 
-        // Mark as logged for this session
         sessionStorage.setItem(SESSION_KEY, '1');
       } catch {
         // silent fail
       }
     };
-    
+
     if (user && (user as any)?.role && ['admin', 'root'].includes((user as any).role.toLowerCase())) {
       logAdminEntry();
     }
-  }, []); // only on mount
+
+    // Cleanup: clear flag when leaving /settings/admin so next visit logs again
+    return () => {
+      sessionStorage.removeItem(SESSION_KEY);
+    };
+  }, []); // only on mount/unmount
 
   // Sync selected model with status
   useEffect(() => {
