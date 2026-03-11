@@ -23,7 +23,7 @@ import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
 import { useOpenAISettings } from "@/hooks/useOpenAISettings";
 import { apiPost } from "@/services/api/apiClient";
 import { WelcomeMessagesEditor } from "@/components/admin/WelcomeMessagesEditor";
-import { AdminProfitTab } from "@/components/admin/AdminProfitTab";
+
 
 // Settings field configuration with i18n keys
 const exchangeRateFields = [
@@ -668,7 +668,7 @@ export default function AdminPanel() {
     { value: "limits", label: t("admin.tabs.limits"), icon: Wallet },
     { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound, link: "/settings/admin/clients" },
     { value: "admins", label: t("admin.tabs.admins"), icon: Users, link: "/settings/admin/admins" },
-    ...(isRoot ? [{ value: "profit", label: "Profit", icon: DollarSign }] : []),
+    ...(isRoot ? [{ value: "profit", label: "Profit", icon: DollarSign, link: "/settings/admin/profit" }] : []),
     { value: "system", label: t("admin.system.title", "Система"), icon: Settings },
   ];
 
@@ -1156,11 +1156,6 @@ export default function AdminPanel() {
                 </AnimatePresence>
               </TabsContent>
 
-              {isRoot && (
-                <TabsContent value="profit" className="mt-0">
-                  <AdminProfitTab />
-                </TabsContent>
-              )}
 
               <TabsContent value="system" className="mt-0 space-y-4">
                 <GlassCard

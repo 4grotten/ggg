@@ -67,6 +67,7 @@ import AdminClientDetails from "./pages/AdminClientDetails";
 import AdminClientTransactionHistory from "./pages/AdminClientTransactionHistory";
 import AuditHistoryDetail from "./pages/AuditHistoryDetail";
 import AdminStaffDetail from "./pages/AdminStaffDetail";
+import AdminProfitPage from "./pages/AdminProfitPage";
 import AccountPage from "./pages/AccountPage";
 import WalletPage from "./pages/WalletPage";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
@@ -192,6 +193,7 @@ const AppContent = () => {
             <Route path="/settings/admin/clients" element={<AdminClients />} />
             <Route path="/settings/admin/admins" element={<AdminAdmins />} />
             <Route path="/settings/admin/audit/:auditId" element={<AuditHistoryDetail />} />
+            <Route path="/settings/admin/profit" element={<AdminProfitPage />} />
             <Route path="/settings/admin/staff/:staffId" element={<AdminStaffDetail />} />
             <Route path="/settings/admin/clients/details/:userId" element={<AdminClientDetails />} />
             <Route path="/settings/admin/clients/details/:userId/history" element={<AdminClientTransactionHistory />} />
