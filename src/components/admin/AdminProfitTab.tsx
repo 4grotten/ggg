@@ -8,11 +8,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { format, subDays, startOfMonth, startOfYear } from "date-fns";
 
+interface RevenueSummaryRaw {
+  total_revenue: string | number;
+  by_type?: Record<string, { total: string | number; count: number }>;
+  by_fee_type?: Record<string, { total: string | number; count: number }>;
+  by_day?: Array<{ date: string; total: string | number }>;
+}
+
 interface RevenueSummary {
   total_revenue: number;
   total_transactions: number;
   by_fee_type: Record<string, { total: number; count: number }>;
-  period: { start_date: string; end_date: string };
 }
 
 interface RevenueTransaction {
@@ -39,6 +45,7 @@ const FEE_TYPE_LABELS: Record<string, string> = {
   top_up_crypto: "Крипто пополнение",
   top_up_bank: "Банк пополнение",
   card_to_card: "Карта → Карта",
+  card_transfer: "Карта → Карта",
   bank_transfer: "Банковский перевод",
   crypto_withdrawal: "Крипто вывод",
   bank_withdrawal: "Банк вывод",
@@ -51,6 +58,7 @@ const FEE_TYPE_COLORS: Record<string, string> = {
   top_up_crypto: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   top_up_bank: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
   card_to_card: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+  card_transfer: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
   bank_transfer: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
   crypto_withdrawal: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
   bank_withdrawal: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
@@ -86,12 +94,26 @@ export function AdminProfitTab() {
     setIsLoadingSummary(true);
     const startDate = getStartDate(period);
     const qs = startDate ? `?start_date=${startDate}` : "";
-    const res = await apiRequest<RevenueSummary>(
+    const res = await apiRequest<RevenueSummaryRaw>(
       `/transactions/admin/revenue/summary/${qs}`,
       { method: "GET" },
       true
     );
-    if (res.data) setSummary(res.data);
+    if (res.data) {
+      const raw = res.data;
+      const byTypeRaw = raw.by_type || raw.by_fee_type || {};
+      const byFeeType: Record<string, { total: number; count: number }> = {};
+      let totalTx = 0;
+      for (const [k, v] of Object.entries(byTypeRaw)) {
+        byFeeType[k] = { total: parseFloat(String(v.total)) || 0, count: v.count || 0 };
+        totalTx += v.count || 0;
+      }
+      setSummary({
+        total_revenue: parseFloat(String(raw.total_revenue)) || 0,
+        total_transactions: totalTx,
+        by_fee_type: byFeeType,
+      });
+    }
     setIsLoadingSummary(false);
   }, [period, getStartDate]);
 
@@ -313,7 +335,7 @@ export function AdminProfitTab() {
                     </p>
                   </div>
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
-                    +{(tx.fee_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} {tx.fee_currency ?? ""}
+                    +{(parseFloat(String(tx.fee_amount ?? 0))).toLocaleString("en-US", { minimumFractionDigits: 2 })} {tx.fee_currency ?? ""}
                   </span>
                 </motion.div>
               ))}
