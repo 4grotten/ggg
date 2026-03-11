@@ -2722,39 +2722,81 @@ const TransactionDetails = () => {
                   </div>
                 ) : receipt ? (
                   <div ref={receiptPrintRef} className="space-y-2 text-sm">
-                    {Object.entries(receipt)
-                      .filter(([key, value]) => value !== null && value !== undefined && !RECEIPT_HIDDEN_KEYS.has(key))
-                      .sort(([a], [b]) => {
-                        const order: Record<string, number> = {
-                          // Identity & meta
-                          type: 0, direction: 1, status: 2, operation: 3,
-                          // Sender
-                          sender_name: 10, sender_id: 11, sender_card_mask: 12, sender_iban: 13, sender_iban_mask: 14, sender_bank: 15,
-                          // Receiver
-                          receiver_name: 20, receiver_id: 21, receiver_card_mask: 22, recipient_name: 23,
-                          beneficiary_name: 24, beneficiary_iban: 25, beneficiary_bank: 26, beneficiary_swift: 27,
-                          crypto_address: 10.5, is_internal: 29,
-                          // Token/network
-                          token: 30, network: 31, token_network: 32,
-                          // Amounts & fees
-                          amount: 40, currency: 41, amount_usdt: 42, exchange_rate: 43,
-                          fee: 50, fee_percent: 51, fee_amount: 52, network_fee: 53, bank_fee: 54,
-                          total: 60, credited: 61, debited: 62,
-                          // Dates
-                          created_at: 70, updated_at: 71, settled_at: 72,
-                          // Other
-                          description: 80, reference_id: 81, iban_mask: 82,
-                        };
-                        return (order[a] ?? 90) - (order[b] ?? 90);
-                      })
-                      .map(([key, value]) => (
-                      <div key={key} className="flex flex-col gap-1">
-                        <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
-                        <pre className="font-medium text-left text-xs whitespace-pre-wrap break-all max-w-full m-0 overflow-x-auto">
-                          {renderReceiptValue(key, value)}
-                        </pre>
-                      </div>
-                    ))}
+                    {(() => {
+                      // Merge receipt data with cached list transaction metadata for completeness
+                      let mergedData: Record<string, unknown> = { ...receipt };
+                      
+                      // Find cached transaction from apiTxGroups to get full metadata
+                      if (apiTxGroups) {
+                        for (const group of apiTxGroups) {
+                          const found = group.transactions?.find((t: any) => {
+                            const txRealId = t.id?.startsWith('api_') ? t.id.slice(4) : t.id;
+                            return txRealId === realTransactionId;
+                          });
+                          if (found) {
+                            // Add list-level fields not present in receipt
+                            const listMeta = (found.metadata as Record<string, unknown>) || {};
+                            // Flatten metadata fields into the merged object with meta_ prefix for clarity
+                            const metaFieldsToInclude = [
+                              'amount_usdt', 'credited_aed', 'fee_usdt', 'network_fee_usdt', 
+                              'service_fee_usdt', 'service_fee_percent', 'total_debited_usdt',
+                              'crypto_token', 'crypto_network', 'crypto_address',
+                              'beneficiary_iban', 'beneficiary_bank', 'beneficiary_bank_name', 
+                              'beneficiary_name', 'iban_mask',
+                              'exchange_rate_usdt_to_aed', 'fiat_amount_aed',
+                              'sender_card_mask', 'receiver_card_mask',
+                              'sender_iban', 'sender_iban_mask', 'sender_bank', 'sender_bank_name',
+                            ];
+                            for (const field of metaFieldsToInclude) {
+                              if (listMeta[field] !== undefined && listMeta[field] !== null && !(field in mergedData)) {
+                                mergedData[field] = listMeta[field];
+                              }
+                            }
+                            // Also add top-level list fields
+                            if (found.fee !== undefined && !('fee' in mergedData)) mergedData.fee = found.fee;
+                            break;
+                          }
+                        }
+                      }
+                      
+                      return Object.entries(mergedData)
+                        .filter(([key, value]) => value !== null && value !== undefined && !RECEIPT_HIDDEN_KEYS.has(key))
+                        .sort(([a], [b]) => {
+                          const order: Record<string, number> = {
+                            // Identity & meta
+                            type: 0, direction: 1, status: 2, operation: 3,
+                            // Sender
+                            sender_name: 10, sender_id: 11, sender_card_mask: 12, sender_iban: 13, sender_iban_mask: 14, sender_bank: 15, sender_bank_name: 15.5,
+                            // Receiver
+                            receiver_name: 20, receiver_id: 21, receiver_card_mask: 22, recipient_name: 23,
+                            beneficiary_name: 24, beneficiary_iban: 25, beneficiary_bank: 26, beneficiary_bank_name: 26.5, beneficiary_swift: 27,
+                            crypto_address: 10.5, crypto_token: 30, crypto_network: 31, is_internal: 29,
+                            // Token/network
+                            token: 30, network: 31, token_network: 32,
+                            // Amounts & fees
+                            amount: 40, amount_usdt: 41, currency: 42, exchange_rate: 43, exchange_rate_usdt_to_aed: 43.5,
+                            fee: 50, fee_usdt: 50.5, fee_percent: 51, fee_amount: 52, 
+                            service_fee_usdt: 53, service_fee_percent: 53.5, network_fee_usdt: 54, network_fee: 54.5, bank_fee: 55,
+                            total_debited_usdt: 60, credited_aed: 61, fiat_amount_aed: 61.5,
+                            total: 62, credited: 63, debited: 64,
+                            // IBAN
+                            iban_mask: 65,
+                            // Dates
+                            created_at: 70, updated_at: 71, settled_at: 72,
+                            // Other
+                            description: 80, reference_id: 81,
+                          };
+                          return (order[a] ?? 90) - (order[b] ?? 90);
+                        })
+                        .map(([key, value]) => (
+                        <div key={key} className="flex flex-col gap-1">
+                          <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
+                          <pre className="font-medium text-left text-xs whitespace-pre-wrap break-all max-w-full m-0 overflow-x-auto">
+                            {renderReceiptValue(key, value)}
+                          </pre>
+                        </div>
+                      ));
+                    })()}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">{t("transaction.receiptUnavailable")}</p>
