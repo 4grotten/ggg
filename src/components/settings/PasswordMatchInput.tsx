@@ -99,10 +99,17 @@ export const PasswordMatchInput = ({
             type="text"
             value={confirmPassword}
             onChange={(e) => onConfirmPasswordChange(e.target.value)}
+            onPaste={(e) => {
+              const pasted = e.clipboardData?.getData('text');
+              if (pasted) {
+                e.preventDefault();
+                onConfirmPasswordChange(pasted);
+              }
+            }}
             onFocus={() => setIsConfirmFocused(true)}
             onBlur={() => setIsConfirmFocused(false)}
             className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-text"
-            autoComplete="off"
+            autoComplete="new-password"
           />
           
           {/* Visual representation */}
