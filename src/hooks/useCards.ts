@@ -143,6 +143,7 @@ export const useCryptoWallets = () => {
     queryKey: cardKeys.cryptoWallets(),
     queryFn: fetchCryptoWallets,
     enabled: !!getAuthToken(),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30,
+    refetchInterval: 15000,
   });
 };
