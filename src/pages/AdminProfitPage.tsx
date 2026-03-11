@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { apiRequest } from "@/services/api/apiClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft, ChevronDown, Check,
+  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft, ChevronDown, Check, X,
   ArrowRightLeft, Landmark, Bitcoin, CreditCard, Zap, Percent, Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
