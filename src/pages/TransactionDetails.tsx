@@ -475,7 +475,7 @@ const TransactionDetails = () => {
     printWindow.close();
   }, [t]);
 
-  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar', 'pricing_version', 'fiat_amount_aed', 'exchange_rate_aed_per_usdt', 'service_fee_percent', 'network_fee_usdt', 'crypto_send_usdt', 'service_fee_usdt', 'total_debited_usdt', 'total_debited_aed_equivalent']);
+  const RECEIPT_HIDDEN_KEYS = new Set(['movements', 'user_id', 'id', 'card_id', 'sender_avatar', 'receiver_avatar', 'recipient_avatar', 'pricing_version']);
 
   const receiptTypeLabels: Record<string, string> = {
     crypto_to_crypto: t("transaction.typeCryptoToCrypto", "Отправка стейблкоинов"),
