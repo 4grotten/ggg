@@ -89,8 +89,8 @@ export const useWalletSummary = () => {
     queryKey: cardKeys.walletSummary(),
     queryFn: fetchWalletSummary,
     enabled: !!getAuthToken(),
-    staleTime: 1000 * 30,
-    refetchInterval: 15000,
+    staleTime: 1000 * 60 * 2,
+    refetchInterval: 1000 * 60 * 2,
   });
 };
 
@@ -129,8 +129,7 @@ export const useBankAccounts = () => {
     queryKey: cardKeys.bankAccounts(),
     queryFn: fetchBankAccounts,
     enabled: !!getAuthToken(),
-    staleTime: 1000 * 30,
-    refetchInterval: 15000,
+    staleTime: 1000 * 60 * 5,
   });
 };
 
@@ -143,7 +142,6 @@ export const useCryptoWallets = () => {
     queryKey: cardKeys.cryptoWallets(),
     queryFn: fetchCryptoWallets,
     enabled: !!getAuthToken(),
-    staleTime: 1000 * 30,
-    refetchInterval: 15000,
+    staleTime: 1000 * 60 * 5,
   });
 };
