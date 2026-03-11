@@ -136,8 +136,24 @@ export default function AdminProfitPage() {
   const [isLoadingTx, setIsLoadingTx] = useState(true);
   const [period, setPeriod] = useState<PeriodPreset>("today");
   const [subTab, setSubTab] = useState<SubTab>("all");
+  const [prevSubTab, setPrevSubTab] = useState<SubTab>("all");
   const [txOffset, setTxOffset] = useState(0);
   const [selectedTx, setSelectedTx] = useState<RevenueTransaction | null>(null);
+
+  // Per-tab transaction cache
+  const [txCache, setTxCache] = useState<Record<string, { transactions: RevenueTransaction[]; count: number }>>({});
+  const cacheKeyBase = `${period}_${dateFrom?.toISOString()}_${dateTo?.toISOString()}`;
+
+  const handleSubTabChange = (newTab: SubTab) => {
+    if (newTab === subTab) return;
+    setPrevSubTab(subTab);
+    setSubTab(newTab);
+  };
+
+  // Slide direction based on tab index
+  const subTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === subTab);
+  const prevSubTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === prevSubTab);
+  const slideDirection = subTabIndex >= prevSubTabIndex ? 1 : -1;
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
