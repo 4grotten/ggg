@@ -200,7 +200,7 @@ export function AdminProfitTab() {
 
   const handleTxClick = (tx: RevenueTransaction) => {
     if (tx.transaction_id) {
-      navigate(`/transactions/${tx.transaction_id}?view_as=${tx.user_id}`);
+      navigate(`/transaction/${tx.transaction_id}?view_as=${tx.user_id}`);
     } else {
       setSelectedTx(selectedTx?.id === tx.id ? null : tx);
     }
