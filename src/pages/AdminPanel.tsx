@@ -419,15 +419,16 @@ export default function AdminPanel() {
     }
   }, [activeTab, openaiStatus, openaiLoading, fetchOpenAIStatus]);
 
-  // Log admin panel entry to audit history — once per visit to /settings/admin
-  // Flag is cleared when user leaves this page (unmount), so re-entering logs again.
-  const adminLoginLoggedRef = useRef(false);
-
+  // Log admin panel entry to audit history — once per admin zone session.
+  // Uses sessionStorage so navigating to sub-pages (/profit, /admins, /clients)
+  // doesn't re-trigger the log. Flag is cleared when user leaves /settings/admin zone entirely.
   useEffect(() => {
+    const SESSION_KEY = 'admin_panel_login_logged';
+
     // Wait until user is loaded
     if (!user) return;
-    // Already logged during this mount — skip (prevents re-log on tab switch within admin)
-    if (adminLoginLoggedRef.current) return;
+    // Already logged during this admin zone session — skip
+    if (sessionStorage.getItem(SESSION_KEY)) return;
 
     const logAdminEntry = async () => {
       try {
@@ -464,7 +465,7 @@ export default function AdminPanel() {
           details,
         });
 
-        adminLoginLoggedRef.current = true;
+        sessionStorage.setItem(SESSION_KEY, '1');
       } catch {
         // silent fail
       }
@@ -473,14 +474,16 @@ export default function AdminPanel() {
     if (['admin', 'root'].includes(((user as any)?.role || '').toLowerCase())) {
       logAdminEntry();
     }
-  }, [user]); // re-run when user loads
+  }, [user]);
 
-  // Cleanup: reset ref on unmount so next visit logs again
+  // Clear the login flag when navigating OUTSIDE the /settings/admin zone.
+  // We listen to location changes: if the new path is outside admin zone, clear it.
   useEffect(() => {
-    return () => {
-      adminLoginLoggedRef.current = false;
-    };
-  }, []);
+    const SESSION_KEY = 'admin_panel_login_logged';
+    if (!location.pathname.startsWith('/settings/admin')) {
+      sessionStorage.removeItem(SESSION_KEY);
+    }
+  }, [location.pathname]);
 
   // Sync selected model with status
   useEffect(() => {
