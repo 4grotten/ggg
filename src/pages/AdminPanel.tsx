@@ -476,14 +476,7 @@ export default function AdminPanel() {
     }
   }, [user]);
 
-  // Clear the login flag when navigating OUTSIDE the /settings/admin zone.
-  // We listen to location changes: if the new path is outside admin zone, clear it.
-  useEffect(() => {
-    const SESSION_KEY = 'admin_panel_login_logged';
-    if (!location.pathname.startsWith('/settings/admin')) {
-      sessionStorage.removeItem(SESSION_KEY);
-    }
-  }, [location.pathname]);
+  // Note: the flag is cleared in Settings page when user navigates out of /settings/admin zone
 
   // Sync selected model with status
   useEffect(() => {
