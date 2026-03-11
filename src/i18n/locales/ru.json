@@ -2241,6 +2241,7 @@
     "feeNetworkFee": "Сетевая комиссия",
     "feeConversion": "Конвертация",
     "feeCardActivation": "Активация карты",
+    "feeExchangeSpread": "Спред обмена",
     "records": "записей",
     "operations": "операций"
   }

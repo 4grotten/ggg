@@ -2134,6 +2134,7 @@
     "feeNetworkFee": "Comisión de red",
     "feeConversion": "Conversión",
     "feeCardActivation": "Activación de tarjeta",
+    "feeExchangeSpread": "Margen de cambio",
     "records": "registros",
     "operations": "operaciones"
   }

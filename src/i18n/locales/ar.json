@@ -2134,6 +2134,7 @@
     "feeNetworkFee": "رسوم الشبكة",
     "feeConversion": "تحويل عملة",
     "feeCardActivation": "تفعيل البطاقة",
+    "feeExchangeSpread": "فرق سعر الصرف",
     "records": "سجل",
     "operations": "عملية"
   }

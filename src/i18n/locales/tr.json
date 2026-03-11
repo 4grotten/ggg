@@ -2134,6 +2134,7 @@
     "feeNetworkFee": "Ağ komisyonu",
     "feeConversion": "Dönüştürme",
     "feeCardActivation": "Kart aktivasyonu",
+    "feeExchangeSpread": "Döviz farkı",
     "records": "kayıt",
     "operations": "işlem"
   }
