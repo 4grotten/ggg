@@ -331,7 +331,7 @@ export default function AdminProfitPage() {
                 </Button>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-bold tracking-tight">Revenue</span>
+                    <span className="text-base font-bold tracking-tight">Profit</span>
                     <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
                       <Crown className="w-2.5 h-2.5" />Root
                     </Badge>
@@ -382,10 +382,7 @@ export default function AdminProfitPage() {
                 {/* Top row: label + tx count */}
                 <div className="relative flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-                      <DollarSign className="w-4 h-4 text-white/80" />
-                    </div>
-                    <span className="text-[11px] text-white/50 uppercase tracking-widest font-medium">Net Revenue</span>
+                    <span className="text-[11px] text-white/50 uppercase tracking-widest font-medium">Total Profit</span>
                   </div>
                   <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
                     <TrendingUp className="w-3 h-3 text-[#007AFF]" />
@@ -393,35 +390,28 @@ export default function AdminProfitPage() {
                   </div>
                 </div>
 
-                {/* Main amount */}
-                <div className="relative mb-4">
-                  <p className="text-3xl font-bold text-white tracking-tight font-mono">
-                    {fmtAmount(summary.totalRevenue)}
-                    <span className="text-base font-normal text-white/40 ml-2">AED</span>
-                  </p>
-                </div>
-
-                {/* Currency breakdown row */}
-                {Object.keys(currencyTotals).length > 0 && (
-                  <div className="relative flex gap-3 pt-3 border-t border-white/10">
-                    {Object.entries(currencyTotals).sort(([,a],[,b]) => b - a).map(([cur, total]) => (
-                      <div key={cur} className="flex items-center gap-2">
-                        <div className={cn(
-                          "w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-black",
-                          cur === "USDT" 
-                            ? "bg-[#26A17B]/20 text-[#26A17B]" 
-                            : "bg-[#007AFF]/20 text-[#007AFF]"
-                        )}>
-                          {cur === "USDT" ? "₮" : cur === "AED" ? "د" : cur.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-white font-mono">{fmtAmount(total)}</p>
-                          <p className="text-[9px] text-white/30 uppercase tracking-wider">{cur}</p>
-                        </div>
+                {/* Currency amounts — each currency on its own row */}
+                <div className="relative space-y-3">
+                  {Object.entries(currencyTotals).sort(([,a],[,b]) => b - a).map(([cur, total]) => (
+                    <div key={cur} className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black",
+                        cur === "USDT" 
+                          ? "bg-[#26A17B]/20 text-[#26A17B]" 
+                          : "bg-[#007AFF]/20 text-[#007AFF]"
+                      )}>
+                        {cur === "USDT" ? "₮" : "د"}
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <div>
+                        <p className="text-2xl font-bold text-white tracking-tight font-mono">
+                          {fmtAmount(total)}
+                        </p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-wider">{cur}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              
               </motion.div>
 
               {/* Type Breakdown */}
