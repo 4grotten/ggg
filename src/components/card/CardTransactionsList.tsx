@@ -362,7 +362,7 @@ const handleClick = (transaction: Transaction) => {
                            : translateMerchant(transaction.merchant, transaction.type, t)
                         }
                       </p>
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground truncate">
                         {transaction.time}
                         {isInternalCardTransfer
                           ? (() => {
