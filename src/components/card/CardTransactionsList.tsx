@@ -503,7 +503,7 @@ const handleClick = (transaction: Transaction) => {
                       </>
                     ) : walletView ? (
                       <>
-                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
+                         <p className={`font-semibold text-xs sm:text-sm ${colorClass}`}>
                           {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                         </p>
                         <p className="text-[10px] sm:text-xs text-muted-foreground">
