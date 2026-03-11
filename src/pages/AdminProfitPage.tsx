@@ -93,6 +93,15 @@ const num = (v: string | number | null | undefined): number => parseFloat(String
 const fmtAmount = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const getMetaRaw = (type: string) => FEE_META_KEYS[type] || { labelKey: type, icon: DollarSign, colorClass: "bg-muted text-muted-foreground" };
 
+const feeTypeToTab = (feeType: string): SubTab => {
+  if (["card_transfer", "card_to_card", "card_activation"].includes(feeType)) return "cards";
+  if (["bank_withdrawal", "bank_transfer", "top_up_bank"].includes(feeType)) return "banks";
+  if (["crypto_withdrawal", "crypto_to_card", "crypto_to_iban", "top_up_crypto"].includes(feeType)) return "crypto";
+  if (feeType === "network_fee") return "network";
+  if (["currency_conversion", "exchange_spread"].includes(feeType)) return "conversion";
+  return "all";
+};
+
 function formatDateHeader(dateStr: string): string {
   try {
     const d = parseISO(dateStr);
