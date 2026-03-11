@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAdminManagement, BackendClient } from "@/hooks/useAdminManagement";
 
+type StatusFilter = "all" | "active" | "inactive" | "blocked";
 type RoleFilter = "all" | "root" | "admin" | "moderator" | "user";
 type VerificationFilter = "all" | "verified" | "unverified";
 type AssetsFilter = "all" | "has_cards" | "has_accounts" | "has_crypto";
