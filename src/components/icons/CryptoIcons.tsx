@@ -108,7 +108,7 @@ export const TonIcon = ({ className, size = 20 }: CryptoIconProps) => (
 );
 
 // USDT icon
-export const UsdtIcon = ({ className, size = 32 }: CryptoIconProps) => (
+export const UsdtIcon = ({ className, size = 28 }: CryptoIconProps) => (
   <svg viewBox="0 0 32 32" width={size} height={size} className={className}>
     <circle cx="16" cy="16" r="16" fill="#26A17B" />
     <path
