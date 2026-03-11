@@ -262,15 +262,6 @@ export default function AdminProfitPage() {
       }));
   }, [filteredTx]);
 
-  const currencyTotals = useMemo(() => {
-    const totals: Record<string, number> = {};
-    for (const tx of filteredTx) {
-      const cur = tx.fee_currency || "AED";
-      totals[cur] = (totals[cur] || 0) + num(tx.fee_amount);
-    }
-    return totals;
-  }, [filteredTx]);
-
   const subTabCounts = useMemo(() => {
     const counts: Record<string, number> = { all: periodFilteredTx.length };
     for (const tx of periodFilteredTx) {
