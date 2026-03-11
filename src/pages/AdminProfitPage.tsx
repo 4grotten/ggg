@@ -53,7 +53,7 @@ interface RevenueTransaction {
   created_at: string;
 }
 
-type PeriodPreset = "today" | "week" | "month" | "year" | "all";
+type PeriodPreset = "allTime" | "today" | "thisWeek" | "month" | "threeMonths" | "year" | "custom";
 type SubTab = "all" | "card_transfer" | "bank_withdrawal" | "crypto_withdrawal" | "network_fee" | "currency_conversion";
 
 // ─── Constants ───────────────────────────────────────────────
