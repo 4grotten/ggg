@@ -2172,8 +2172,9 @@ const TransactionDetails = () => {
                       <span className="text-muted-foreground">{t("transaction.serviceFee", "Комиссия")} ({svcFeePct}%)</span>
                       <span className="font-medium">{Number(svcFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                     </div>
-                  )
+                  )}
                   <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.networkFeeFlat", "Сбор сети")}</span>
                     <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
                     <span className="font-medium">{Number(netFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                   </div>
