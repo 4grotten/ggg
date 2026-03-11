@@ -37,8 +37,10 @@ serve(async (req) => {
       messages: [
         {
           topic: "realtime:transaction-updates",
-          event: "new_transaction",
+          event: "broadcast",
           payload: {
+            type: "broadcast",
+            event: "new_transaction",
             event: event || "transaction_created",
             user_id,
             transaction_id,
