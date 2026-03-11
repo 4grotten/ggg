@@ -53,12 +53,18 @@ def admin_action_notification(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Transactions)
-def transaction_status_notification(sender, instance, created, update_fields, **kwargs):
-    if created:
+def transaction_status_notification(sender, instance, created, **kwargs):
+    update_fields = kwargs.get('update_fields')
+    is_completed = str(getattr(instance, 'status', '')).lower() == 'completed'
+
+    # created=True: шлём только если уже completed
+    # created=False: шлём при completed даже если save() был без update_fields
+    should_notify = (created and is_completed) or (
+        not created and is_completed and (not update_fields or 'status' in update_fields)
+    )
+
+    if should_notify:
         # Broadcast to frontend FIRST (fastest path for UI update)
         threading.Thread(target=broadcast_transaction_to_frontend, args=(instance,), daemon=True).start()
         # Then send Telegram/WhatsApp/Email notifications
-        threading.Thread(target=notify_transaction_parties, args=(instance.id,), daemon=True).start()
-    elif update_fields and 'status' in update_fields and instance.status == 'completed':
-        threading.Thread(target=broadcast_transaction_to_frontend, args=(instance,), daemon=True).start()
         threading.Thread(target=notify_transaction_parties, args=(instance.id,), daemon=True).start()
