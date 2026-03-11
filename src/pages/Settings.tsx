@@ -287,6 +287,8 @@ const Settings = () => {
   // Refresh accounts list when component mounts
   useEffect(() => {
     refreshAccounts();
+    // Clear admin login flag — user left the /settings/admin zone
+    sessionStorage.removeItem('admin_panel_login_logged');
   }, [refreshAccounts]);
   const { isInstallable, isInstalled, promptInstall } = useInstallPrompt();
   const { getCompletedSteps } = useVerificationProgress();
