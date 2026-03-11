@@ -64,6 +64,7 @@ const Dashboard = () => {
   const { avatarUrl } = useAvatar();
   const { isHideDataEnabled, isEnabled } = useScreenLockContext();
   const queryClient = useQueryClient();
+  useTransactionRealtime();
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [openCardOpen, setOpenCardOpen] = useState(false);
