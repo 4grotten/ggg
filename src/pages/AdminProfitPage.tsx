@@ -66,26 +66,26 @@ type PeriodPreset = "allTime" | "today" | "thisWeek" | "month" | "threeMonths" |
 type SubTab = "all" | "card_transfer" | "bank_withdrawal" | "crypto_withdrawal" | "network_fee" | "currency_conversion";
 
 // ─── Constants ───────────────────────────────────────────────
-const FEE_META: Record<string, { label: string; icon: typeof DollarSign; colorClass: string }> = {
-  card_transfer:       { label: "Переводы",         icon: CreditCard,    colorClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
-  card_to_card:        { label: "Переводы",         icon: CreditCard,    colorClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
-  bank_withdrawal:     { label: "Банк вывод",       icon: Landmark,      colorClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
-  bank_transfer:       { label: "Банк перевод",     icon: Landmark,      colorClass: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
-  crypto_withdrawal:   { label: "Крипто вывод",     icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
-  top_up_crypto:       { label: "Крипто пополн.",   icon: Bitcoin,       colorClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  top_up_bank:         { label: "Банк пополн.",     icon: Landmark,      colorClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  network_fee:         { label: "Сетевая комиссия", icon: Zap,           colorClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  currency_conversion: { label: "Конвертация",      icon: ArrowRightLeft, colorClass: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
-  card_activation:     { label: "Активация карты",  icon: CreditCard,    colorClass: "bg-teal-500/10 text-teal-600 dark:text-teal-400" },
+const FEE_META_KEYS: Record<string, { labelKey: string; icon: typeof DollarSign; colorClass: string }> = {
+  card_transfer:       { labelKey: "feeTransfers",        icon: CreditCard,    colorClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
+  card_to_card:        { labelKey: "feeTransfers",        icon: CreditCard,    colorClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
+  bank_withdrawal:     { labelKey: "feeBankWithdrawal",   icon: Landmark,      colorClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
+  bank_transfer:       { labelKey: "feeBankTransfer",     icon: Landmark,      colorClass: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
+  crypto_withdrawal:   { labelKey: "feeCryptoWithdrawal", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  top_up_crypto:       { labelKey: "feeCryptoTopUp",      icon: Bitcoin,       colorClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+  top_up_bank:         { labelKey: "feeBankTopUp",        icon: Landmark,      colorClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+  network_fee:         { labelKey: "feeNetworkFee",       icon: Zap,           colorClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  currency_conversion: { labelKey: "feeConversion",       icon: ArrowRightLeft, colorClass: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
+  card_activation:     { labelKey: "feeCardActivation",   icon: CreditCard,    colorClass: "bg-teal-500/10 text-teal-600 dark:text-teal-400" },
 };
 
-const SUB_TABS: { value: SubTab; label: string; icon: typeof DollarSign }[] = [
-  { value: "all",                label: "Всё",       icon: Layers },
-  { value: "card_transfer",      label: "Переводы",  icon: CreditCard },
-  { value: "bank_withdrawal",    label: "Банк",      icon: Landmark },
-  { value: "crypto_withdrawal",  label: "Крипто",    icon: Bitcoin },
-  { value: "network_fee",        label: "Сеть",      icon: Zap },
-  { value: "currency_conversion", label: "Конверт.", icon: ArrowRightLeft },
+const SUB_TAB_KEYS: { value: SubTab; labelKey: string; icon: typeof DollarSign }[] = [
+  { value: "all",                labelKey: "tabAll",        icon: Layers },
+  { value: "card_transfer",      labelKey: "tabTransfers",  icon: CreditCard },
+  { value: "bank_withdrawal",    labelKey: "tabBank",       icon: Landmark },
+  { value: "crypto_withdrawal",  labelKey: "tabCrypto",     icon: Bitcoin },
+  { value: "network_fee",        labelKey: "tabNetwork",    icon: Zap },
+  { value: "currency_conversion", labelKey: "tabConversion", icon: ArrowRightLeft },
 ];
 
 const num = (v: string | number | null | undefined): number => parseFloat(String(v ?? 0)) || 0;
