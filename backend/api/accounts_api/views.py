@@ -13,17 +13,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from apps.accounts_apps.models import AdminNotificationSettings, AdminSettings, Contacts, Profiles, UserNotificationSettings
 from .apofiz_client import ApofizClient
 from django.db.models import Sum, Count
-from apps.accounts_apps.models import UserRoles
-from apps.accounts_apps.models import AdminActionHistory, UserRoles
+from apps.accounts_apps.models import UserRoles, AdminActionHistory
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
+
 
 def generate_uid_tail(user_id):
     return str(user_id).zfill(6)[-6:]
@@ -40,9 +39,9 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
     
     if not user:
         if apofiz_id and isinstance(apofiz_id, int):
-            user = User.objects.create(id=apofiz_id, username=phone_number)
+            user = User.objects.create(id=apofiz_id, username=phone_number, is_active=False)
         else:
-            user = User.objects.create(username=phone_number)
+            user = User.objects.create(username=phone_number, is_active=False)
         created = True
         
     has_init_profile = False
@@ -76,7 +75,7 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
     if profile_updated:
         profile.save()
         
-    if has_init_profile or created: # Генерируем кошельки если новый юзер или профиль обновлен впервые
+    if has_init_profile or created:
         tail = generate_uid_tail(user.id)
         if not Cards.objects.filter(user_id=str(user.id)).exists():
             Cards.objects.create(
@@ -101,6 +100,7 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
     Token.objects.filter(user=user).delete()
     if apofiz_token:
         Token.objects.create(key=apofiz_token, user=user)
+        
     if created:
         full_name = f"{profile.first_name or ''} {profile.last_name or ''}".strip()
         if not full_name:
@@ -116,7 +116,6 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
             }
         }
         
-        from apps.accounts_apps.models import AdminActionHistory
         AdminActionHistory.objects.create(
             admin_id="SYSTEM",
             action="NEW_USER_REGISTRATION",
@@ -132,7 +131,6 @@ class SendOtpView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Отправить OTP (Apofiz)",
-        operation_description="**[Прокси на Apofiz: POST /otp/send/]**\nОтправляет одноразовый пароль на телефон пользователя через SMS или WhatsApp.",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING), 'type': openapi.Schema(type=openapi.TYPE_STRING, enum=['sms', 'whatsapp'])}),
         tags=["Аутентификация"]
@@ -147,7 +145,6 @@ class VerifyOtpView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Подтвердить OTP (Apofiz + EasyCard SSO)",
-        operation_description="**[СИМФОНИЯ SSO: POST /otp/verify/]**\nПроверяет код в Apofiz. При успехе бэкенд перехватывает токен, создает пользователя в EasyCard и выпускает 4 счета.",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number', 'code'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING), 'code': openapi.Schema(type=openapi.TYPE_STRING)}),
         tags=["Аутентификация"]
@@ -166,7 +163,6 @@ class RegisterAuthView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Быстрая регистрация (Автоматический вход)",
-        operation_description="Делает запрос в Apofiz. Если юзер новый и Apofiz возвращает token: null, бэкенд делает второй запрос автоматически, получает токен, создает локального юзера и 4 кошелька (Metal, Virtual, Bank, Crypto).",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING, example="+996777999991")}),
         tags=["Аутентификация"]
@@ -188,7 +184,6 @@ class VerifyCodeView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Подтвердить SMS-код регистрации (Apofiz + EasyCard SSO)",
-        operation_description="**[СИМФОНИЯ SSO: POST /verify_code/]**\nКак и verify_otp, перехватывает токен и инициирует создание счетов.",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number', 'code'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING), 'code': openapi.Schema(type=openapi.TYPE_INTEGER)}),
         tags=["Аутентификация"]
@@ -206,7 +201,6 @@ class ResendCodeView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Отправить код повторно (Apofiz)",
-        operation_description="**[Прокси на Apofiz: POST /resend_code/]**",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING), 'type': openapi.Schema(type=openapi.TYPE_STRING)}),
         tags=["Аутентификация"]
@@ -222,7 +216,6 @@ class LoginView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Вход по паролю (Apofiz + EasyCard SSO)",
-        operation_description="**[СИМФОНИЯ SSO: POST /login/]**\nВход. Обновляет локальный токен и данные профиля на основе ответа Apofiz.",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number', 'password'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING), 'password': openapi.Schema(type=openapi.TYPE_STRING), 
                         'location': openapi.Schema(type=openapi.TYPE_STRING), 'device': openapi.Schema(type=openapi.TYPE_STRING)}),
@@ -230,23 +223,33 @@ class LoginView(APIView):
     )
     def post(self, request):
         phone_number = request.data.get('phone_number')
+        password = request.data.get('password')
         status_code, data = ApofizClient.login(
-            phone_number, request.data.get('password'), 
+            phone_number, password, 
             request.data.get('location', 'Unknown'), request.data.get('device', 'Unknown')
         )
         if status_code == 200 and data.get('token'):
-            sync_apofiz_token_and_user(phone_number, data['token'], data.get('user'))
+            user, created = sync_apofiz_token_and_user(phone_number, data['token'], data.get('user'))
+            
+            user.set_password(password)
+            if not user.is_active:
+                user.is_active = True
+                AdminActionHistory.objects.create(
+                    admin_id="SYSTEM",
+                    action="USER_ACTIVATED",
+                    target_user_id=str(user.id),
+                    target_user_name=f"{user.first_name} {user.last_name}".strip(),
+                    details={"acting_role": "System Auto-Action", "message": "Вход по паролю: аккаунт активирован."}
+                )
+            user.save()
+            
         return Response(data, status=status_code)
 
 
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Выход (Apofiz)",
-        operation_description="**[Интеграция с Apofiz: POST /logout/]**\nИнвалидирует токен в Apofiz и удаляет его в локальной БД EasyCard.",
-        tags=["Аутентификация"]
-    )
+    @swagger_auto_schema(operation_summary="Выход (Apofiz)", tags=["Аутентификация"])
     def post(self, request):
         status_code, data = ApofizClient.logout(request.auth.key)
         if status_code == 200:
@@ -259,7 +262,6 @@ class SetPasswordView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Установить пароль",
-        operation_description="Устанавливает пароль для нового пользователя в Apofiz и дублирует его в локальной БД Django.",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['password'], 
             properties={'password': openapi.Schema(type=openapi.TYPE_STRING)}),
         tags=["Управление паролями"]
@@ -270,8 +272,36 @@ class SetPasswordView(APIView):
              return Response({"error": "password is required"}, status=status.HTTP_400_BAD_REQUEST)  
         status_code, data = ApofizClient.set_password(request.auth.key, password)
         if status_code == 200:
-            request.user.set_password(password)
-            request.user.save()
+            user = request.user
+            user.set_password(password)
+            user.save()
+            
+            target_name = f"{user.first_name} {user.last_name}".strip()
+            AdminActionHistory.objects.create(
+                admin_id="SYSTEM",
+                action="USER_PASSWORD_SET",
+                target_user_id=str(user.id),
+                target_user_name=target_name,
+                details={"acting_role": "System Auto-Action", "message": "Пользователь успешно установил пароль"}
+            )
+            
+            has_name = bool(user.first_name)
+            if not has_name:
+                profile = Profiles.objects.filter(user_id=str(user.id)).first()
+                if profile and profile.first_name:
+                    has_name = True
+
+            if not user.is_active and has_name:
+                user.is_active = True
+                user.save()
+                AdminActionHistory.objects.create(
+                    admin_id="SYSTEM",
+                    action="USER_ACTIVATED",
+                    target_user_id=str(user.id),
+                    target_user_name=target_name,
+                    details={"acting_role": "System Auto-Action", "message": "Профиль заполнен и пароль установлен. Аккаунт активирован."}
+                )
+                
         return Response(data, status=status_code)
 
 
@@ -280,7 +310,6 @@ class ChangePasswordView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Изменить пароль (Apofiz)",
-        operation_description="**[Прокси на Apofiz: POST /users/doChangePassword/]**",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['old_password', 'new_password'],
             properties={'old_password': openapi.Schema(type=openapi.TYPE_STRING), 'new_password': openapi.Schema(type=openapi.TYPE_STRING)}),
         tags=["Управление паролями"]
@@ -296,7 +325,7 @@ class ChangePasswordView(APIView):
 class ForgotPasswordView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    @swagger_auto_schema(operation_summary="Забыли пароль (Apofiz)", operation_description="**[Прокси на Apofiz: POST /users/forgot_password/]**",
+    @swagger_auto_schema(operation_summary="Забыли пароль (Apofiz)",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, required=['phone_number'],
             properties={'phone_number': openapi.Schema(type=openapi.TYPE_STRING), 'method': openapi.Schema(type=openapi.TYPE_STRING, enum=['sms', 'whatsapp', 'email'])}),
         tags=["Управление паролями"])
@@ -308,7 +337,7 @@ class ForgotPasswordView(APIView):
 class ForgotPasswordEmailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(operation_summary="Забыли пароль (Email) (Apofiz)", operation_description="**[Прокси на Apofiz: POST /users/forgot_password_email/]**", tags=["Управление паролями"])
+    @swagger_auto_schema(operation_summary="Забыли пароль (Email) (Apofiz)", tags=["Управление паролями"])
     def post(self, request):
         status_code, data = ApofizClient.forgot_password_email(request.auth.key)
         return Response(data, status=status_code)
@@ -319,7 +348,6 @@ class CurrentUserView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Получить текущего пользователя (Детально)",
-        operation_description="Синхронизируется с Apofiz и возвращает полную сводку по текущему пользователю (карты, счета, кошельки, лимиты, роль).",
         tags=["Профиль пользователя"]
     )
     def get(self, request):
@@ -402,6 +430,7 @@ class CurrentUserView(APIView):
             "role": current_role,
             "is_blocked": profile.is_blocked,
             "is_vip": profile.is_vip,
+            "is_active": request.user.is_active,
             "subscription_type": profile.subscription_type,
             "referral_level": profile.referral_level,
             "cards": cards,
@@ -418,7 +447,6 @@ class InitProfileView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Инициализация / Обновление профиля",
-        operation_description="Отправляет данные в Apofiz и синхронизирует их с локальной БД (Django User + Profiles).",
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT, properties={
             'gender': openapi.Schema(type=openapi.TYPE_STRING, description="male / female"), 
             'avatar_id': openapi.Schema(type=openapi.TYPE_INTEGER),
@@ -434,6 +462,8 @@ class InitProfileView(APIView):
         status_code, data = ApofizClient.init_profile(request.auth.key, request.data)
         if status_code == 200:
             user = request.user
+            old_full_name = f"{user.first_name} {user.last_name}".strip()
+            
             if 'full_name' in request.data:
                 names = request.data['full_name'].split(' ', 1)
                 user.first_name = names[0]
@@ -451,6 +481,33 @@ class InitProfileView(APIView):
                 profile.avatar_url = data['avatar'].get('file')
             profile.save()
             sync_apofiz_token_and_user(request.user.username, request.auth.key, data.get('user', request.data))
+
+            new_full_name = f"{user.first_name} {user.last_name}".strip()
+            AdminActionHistory.objects.create(
+                admin_id="SYSTEM",
+                action="USER_PROFILE_INIT",
+                target_user_id=str(user.id),
+                target_user_name=new_full_name,
+                details={
+                    "acting_role": "System Auto-Action",
+                    "changes": {
+                        "Имя пользователя": {"was": old_full_name or "Не заполнено", "became": new_full_name},
+                        "Дата рождения": {"became": request.data.get('date_of_birth', 'Не указано')}
+                    }
+                }
+            )
+
+            if not user.is_active and user.has_usable_password():
+                user.is_active = True
+                user.save()
+                AdminActionHistory.objects.create(
+                    admin_id="SYSTEM",
+                    action="USER_ACTIVATED",
+                    target_user_id=str(user.id),
+                    target_user_name=new_full_name,
+                    details={"acting_role": "System Auto-Action", "message": "Профиль заполнен и пароль установлен. Аккаунт активирован."}
+                )
+
         return Response(data, status=status_code)
 
 
@@ -500,7 +557,6 @@ class UploadAvatarView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Загрузить аватар",
-        operation_description="Передает Multipart файл на сервер Apofiz, локально сохраняет полученный URL в профиль пользователя.",
         consumes=['multipart/form-data'],
         manual_parameters=[openapi.Parameter('file', openapi.IN_FORM, type=openapi.TYPE_FILE, description='Изображение (JPEG, PNG)', required=True)],
         tags=["Файлы и Соцсети"]
@@ -573,7 +629,6 @@ class SyncContactsView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Синхронизация и получение контактов",
-        operation_description="Стучится в Apofiz, забирает свежие контакты, сохраняет/обновляет их в локальной БД EasyCard и возвращает актуальный список.",
         responses={200: ContactSerializer(many=True)},
         tags=["Контакты"]
     )
@@ -615,7 +670,6 @@ class SyncContactsView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Создать контакт",
-        operation_description="Создает новый контакт в локальной БД EasyCard.",
         request_body=ContactSerializer,
         responses={201: ContactSerializer},
         tags=["Контакты"]
@@ -871,6 +925,7 @@ class AdminUserLimitsListView(APIView):
 
             user_obj = users_map.get(uid)
             email = user_obj.email if user_obj else ''
+            is_active = user_obj.is_active if user_obj else False
 
             data.append({
                 "user_id": uid,
@@ -882,6 +937,7 @@ class AdminUserLimitsListView(APIView):
                 "avatar_url": getattr(profile, 'avatar_url', None),
                 "created_at": profile.created_at.isoformat() if profile.created_at else None,
                 "role": roles_map.get(uid, 'user'),
+                "is_active": is_active,
                 "is_verified": is_verified,
                 "verification_status": verification_status,
                 "referral_level": getattr(profile, 'referral_level', 'r1'),
@@ -917,6 +973,7 @@ class AdminUserDetailView(APIView):
         lname = getattr(profile, 'last_name', None) or ''
         full_name = f"{fname} {lname}".strip()
         email = ''
+        is_active = False
         
         if uid.isdigit():
             try:
@@ -924,6 +981,7 @@ class AdminUserDetailView(APIView):
                 if not full_name:
                     full_name = f"{user_obj.first_name or ''} {user_obj.last_name or ''}".strip()
                 email = user_obj.email or ''
+                is_active = user_obj.is_active
             except User.DoesNotExist:
                 pass
 
@@ -987,6 +1045,7 @@ class AdminUserDetailView(APIView):
             "is_verified": is_verified,
             "verification_status": verification_status,
             "role": current_role,
+            "is_active": is_active,
             "is_blocked": profile.is_blocked,
             "is_vip": profile.is_vip,
             "subscription_type": profile.subscription_type,
@@ -1129,7 +1188,6 @@ class AdminActionHistoryView(APIView):
 
     @swagger_auto_schema(
         operation_summary="История действий администраторов (Аудит)",
-        operation_description="Получить общий список логов или отфильтровать по конкретному админу (передав параметр ?admin_id=... в URL).",
         manual_parameters=[
             openapi.Parameter('admin_id', openapi.IN_QUERY, description="ID администратора для фильтрации", type=openapi.TYPE_STRING)
         ],
@@ -1150,7 +1208,6 @@ class AdminActionHistoryView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Записать действие администратора в аудит-лог",
-        operation_description="Создает запись в admin_action_history. Используется фронтендом для логирования действий типа VIEW_TRANSACTION_HISTORY, BLOCK_USER и т.д.",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=['action'],
@@ -1213,7 +1270,6 @@ class AdminStaffListView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Список персонала (Админы и Руты)",
-        operation_description="Возвращает список пользователей, у которых есть права admin или root. Без тяжелых финансовых данных.",
         tags=["Админ: Управление пользователями"]
     )
     def get(self, request):
@@ -1502,7 +1558,6 @@ class UpdateLanguageView(APIView):
 
     @swagger_auto_schema(
         operation_summary="Изменить язык интерфейса пользователя",
-        operation_description="Обновляет предпочитаемый язык для пользователя (влияет на push-уведомления).",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=['language'],
@@ -1645,16 +1700,13 @@ class MessengerIdentifyView(APIView):
         user_id = None
         setting = None
         if platform == "telegram":
-            # 1. Try by chat_id first
             setting = UserNotificationSettings.objects.filter(telegram_chat_id=str(identifier), telegram_enabled=True).first()
             if not setting:
-                # 2. Try by username (with or without @)
                 clean_username = str(identifier).lstrip('@')
                 setting = UserNotificationSettings.objects.filter(
                     telegram_username__in=[f'@{clean_username}', clean_username],
                     telegram_enabled=True
                 ).first()
-                # 3. Save chat_id from request header for future lookups
                 chat_id_from_header = request.data.get('chat_id')
                 if setting and chat_id_from_header:
                     setting.telegram_chat_id = str(chat_id_from_header)
