@@ -426,7 +426,7 @@ export default function AdminProfitPage() {
                 <div className="relative flex items-center justify-between mb-5">
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={(e) => { e.stopPropagation(); fetchSummary(); fetchTransactions(0); setTxOffset(0); }}
+                      onClick={(e) => { e.stopPropagation(); setTxCache({}); fetchSummary(); fetchTransactions(0, true); setTxOffset(0); }}
                       className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
                     >
                       <RefreshCw className="w-4 h-4 text-white/70" />
