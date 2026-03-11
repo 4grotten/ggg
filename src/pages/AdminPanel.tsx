@@ -800,7 +800,7 @@ export default function AdminPanel() {
                     />
                     
                     {/* Tab buttons - flex on mobile, grid on desktop */}
-                    <div className="relative flex md:grid md:grid-cols-6 h-full">
+                    <div className={cn("relative flex md:grid h-full", tabConfig.length <= 6 ? "md:grid-cols-6" : "md:grid-cols-7")}>
                       {tabConfig.map((tab) => (
                         <button
                           key={tab.value}
