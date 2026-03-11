@@ -452,9 +452,9 @@ export default function AdminProfitPage() {
                   <div className="relative flex gap-2 pt-3 mt-3 border-t border-white/10">
                     {Object.entries(summary.byCategory).sort(([,a],[,b]) => b.total - a.total).map(([cat, data]) => {
                       const catMeta: Record<string, { label: string; color: string }> = {
-                        service: { label: "Сервис", color: "text-[#007AFF]" },
-                        network: { label: "Сеть", color: "text-amber-400" },
-                        exchange: { label: "Обмен", color: "text-indigo-400" },
+                        service: { label: t("profit.categoryService"), color: "text-[#007AFF]" },
+                        network: { label: t("profit.categoryNetwork"), color: "text-amber-400" },
+                        exchange: { label: t("profit.categoryExchange"), color: "text-indigo-400" },
                       };
                       const m = catMeta[cat] || { label: cat, color: "text-white/60" };
                       return (
