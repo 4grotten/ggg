@@ -476,8 +476,9 @@ Deno.serve(async (req) => {
     const event = payload.event;
 
     // ── Detect outgoing transaction notifications and broadcast to Realtime ──
-    if ((event === "message.any" || event === "message.ack") && msgBody.fromMe) {
-      const body = msgBody.body || "";
+    const msgPayload = payload.payload;
+    if ((event === "message.any" || event === "message.ack") && msgPayload?.fromMe) {
+      const body = msgPayload.body || "";
       const isTransactionNotification = 
         body.includes("Поступление средств") || 
         body.includes("Успешное списание") ||
