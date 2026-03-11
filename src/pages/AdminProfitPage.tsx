@@ -139,6 +139,14 @@ export default function AdminProfitPage() {
   const [prevSubTab, setPrevSubTab] = useState<SubTab>("all");
   const [txOffset, setTxOffset] = useState(0);
   const [selectedTx, setSelectedTx] = useState<RevenueTransaction | null>(null);
+  const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [customDateField, setCustomDateField] = useState<"from" | "to" | null>(null);
+  const [tempCustomFrom, setTempCustomFrom] = useState<Date | undefined>(undefined);
+  const [tempCustomTo, setTempCustomTo] = useState<Date | undefined>(undefined);
+  const [hasSelectedFrom, setHasSelectedFrom] = useState(false);
+  const TX_LIMIT = 50;
 
   // Per-tab transaction cache
   const [txCache, setTxCache] = useState<Record<string, { transactions: RevenueTransaction[]; count: number }>>({});
@@ -154,14 +162,6 @@ export default function AdminProfitPage() {
   const subTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === subTab);
   const prevSubTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === prevSubTab);
   const slideDirection = subTabIndex >= prevSubTabIndex ? 1 : -1;
-  const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
-  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
-  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
-  const [customDateField, setCustomDateField] = useState<"from" | "to" | null>(null);
-  const [tempCustomFrom, setTempCustomFrom] = useState<Date | undefined>(undefined);
-  const [tempCustomTo, setTempCustomTo] = useState<Date | undefined>(undefined);
-  const [hasSelectedFrom, setHasSelectedFrom] = useState(false);
-  const TX_LIMIT = 50;
 
   const today = new Date();
 
