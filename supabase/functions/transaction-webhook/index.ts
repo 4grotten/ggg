@@ -36,20 +36,16 @@ serve(async (req) => {
     const broadcastPayload = {
       messages: [
         {
-          topic: "realtime:transaction-updates",
-          event: "broadcast",
+          topic: "transaction-updates",
+          event: "new_transaction",
           payload: {
-            type: "broadcast",
-            event: "new_transaction",
-            payload: {
-              event: event || "transaction_created",
-              user_id,
-              transaction_id,
-              type,
-              amount,
-              currency,
-              timestamp: new Date().toISOString(),
-            },
+            event: event || "transaction_created",
+            user_id,
+            transaction_id,
+            type,
+            amount,
+            currency,
+            timestamp: new Date().toISOString(),
           },
         },
       ],
