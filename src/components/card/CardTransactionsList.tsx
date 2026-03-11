@@ -332,7 +332,7 @@ const handleClick = (transaction: Transaction) => {
                       )}
                     </div>
                     <div className="text-left min-w-0 flex-1 overflow-hidden">
-                      <p className="font-medium truncate text-xs sm:text-sm md:text-base">
+                      <p className="font-medium truncate text-xs sm:text-sm">
                       {isOutgoingCryptoToBank
                           ? t("transaction.walletToIban")
                           : isIncomingCryptoToBank
@@ -362,7 +362,7 @@ const handleClick = (transaction: Transaction) => {
                            : translateMerchant(transaction.merchant, transaction.type, t)
                         }
                       </p>
-                      <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground truncate">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                         {transaction.time}
                         {isInternalCardTransfer
                           ? (() => {
@@ -485,7 +485,7 @@ const handleClick = (transaction: Transaction) => {
                   <div className="text-right shrink-0 ml-1 sm:ml-2">
                     {(isOutgoingCryptoToBank || isIncomingCryptoToBank) ? (
                       <>
-                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
+                         <p className={`font-semibold text-xs sm:text-sm ${colorClass}`}>
                           {prefix}{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                         <p className="text-[10px] sm:text-xs text-muted-foreground">
@@ -494,7 +494,7 @@ const handleClick = (transaction: Transaction) => {
                       </>
                     ) : isCryptoToIban ? (
                       <>
-                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
+                         <p className={`font-semibold text-xs sm:text-sm ${colorClass}`}>
                           {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                         </p>
                         <p className="text-[10px] sm:text-xs text-muted-foreground">
@@ -503,7 +503,7 @@ const handleClick = (transaction: Transaction) => {
                       </>
                     ) : walletView ? (
                       <>
-                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
+                         <p className={`font-semibold text-xs sm:text-sm ${colorClass}`}>
                           {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                         </p>
                         <p className="text-[10px] sm:text-xs text-muted-foreground">
@@ -512,7 +512,7 @@ const handleClick = (transaction: Transaction) => {
                       </>
                     ) : isInternalCardTransfer ? (
                       <>
-                        <p className="font-semibold text-xs sm:text-sm md:text-base text-[#007AFF]">
+                        <p className="font-semibold text-xs sm:text-sm text-[#007AFF]">
                           -{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                         <p className="text-[10px] sm:text-xs text-muted-foreground">
@@ -521,7 +521,7 @@ const handleClick = (transaction: Transaction) => {
                       </>
                     ) : (
                       <>
-                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
+                        <p className={`font-semibold text-xs sm:text-sm ${colorClass}`}>
                           {prefix}{(isCryptoDeposit || isCryptoSend) ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {(isCryptoDeposit || isCryptoSend) ? 'USDT' : 'AED'}
                         </p>
                         {isIncomingCryptoToCard && (
