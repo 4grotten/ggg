@@ -533,7 +533,7 @@ export default function AdminProfitPage() {
               return (
                 <button
                   key={tab.value}
-                  onClick={() => setSubTab(tab.value)}
+                  onClick={() => handleSubTabChange(tab.value)}
                   className={cn(
                     "shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
                     isActive ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
