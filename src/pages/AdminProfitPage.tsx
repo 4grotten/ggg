@@ -268,8 +268,8 @@ export default function AdminProfitPage() {
   const subTabCounts = useMemo(() => {
     const counts: Record<string, number> = { all: transactions.length };
     for (const tx of transactions) {
-      const type = tx.fee_type === "card_to_card" ? "card_transfer" : tx.fee_type;
-      counts[type] = (counts[type] || 0) + 1;
+      const tab = feeTypeToTab(tx.fee_type);
+      if (tab !== "all") counts[tab] = (counts[tab] || 0) + 1;
     }
     return counts;
   }, [transactions]);
