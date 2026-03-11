@@ -591,7 +591,7 @@ export default function AdminProfitPage() {
                                 +{fmtAmount(amount)} {tx.fee_currency || "AED"}
                               </p>
                               <p className="text-[10px] text-muted-foreground">
-                                из {fmtAmount(baseAmount)} {tx.base_currency || ""}
+                                {t("profit.from")} {fmtAmount(baseAmount)} {tx.base_currency || ""}
                               </p>
                             </div>
                             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
