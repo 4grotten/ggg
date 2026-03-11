@@ -267,13 +267,15 @@ export default function AdminProfitPage() {
   }, [filteredTx]);
 
   const subTabCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: transactions.length };
-    for (const tx of transactions) {
-      const tab = feeTypeToTab(tx.fee_type);
-      if (tab !== "all") counts[tab] = (counts[tab] || 0) + 1;
+    const counts: Record<string, number> = { all: summary?.totalTransactions ?? 0 };
+    if (!summary) return counts;
+
+    for (const [feeType, data] of Object.entries(summary.byType)) {
+      const tab = feeTypeToTab(feeType);
+      if (tab !== "all") counts[tab] = (counts[tab] || 0) + data.count;
     }
     return counts;
-  }, [transactions]);
+  }, [summary]);
 
   const formatDateRange = (from: Date | undefined, to: Date | undefined): string => {
     if (!from && !to) return "";
