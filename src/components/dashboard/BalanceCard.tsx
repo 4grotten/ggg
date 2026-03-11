@@ -94,7 +94,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
             {cards.map((card) => (
               <div key={card.id} className="flex-1 rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate(`/card/${card.type}`)}>
                 <div className="flex items-center gap-1.5 mb-1">
-                  <CreditCard className="w-3.5 h-3.5 text-[#007AFF]" />
+                  <CreditCard className={`w-3.5 h-3.5 ${card.type === 'metal' ? 'text-[#8B5CF6]' : 'text-[#007AFF]'}`} />
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
                     {card.name}{card.lastFourDigits && <span className="ml-1 opacity-60">•{card.lastFourDigits}</span>}
                   </p>
@@ -126,7 +126,7 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
           {/* AED Account Balance */}
           <div className="rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate('/account')}>
             <div className="flex items-center gap-1.5 mb-1">
-              <Landmark className="w-3.5 h-3.5 text-[#27AE60]" />
+              <Landmark className="w-3.5 h-3.5 text-[#8B5CF6]" />
               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
                 {t("topUp.aedAccount", "AED Account")}{accountIbanLast4 && <span className="ml-1 opacity-60">•{accountIbanLast4}</span>}
               </p>
