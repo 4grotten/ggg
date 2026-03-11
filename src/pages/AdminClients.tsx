@@ -24,6 +24,7 @@ export default function AdminClients() {
   const { clients, clientsLoading, clientsError, searchClients, refetchClients } = useAdminManagement();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
   const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("all");
   const [assetsFilter, setAssetsFilter] = useState<AssetsFilter>("all");
