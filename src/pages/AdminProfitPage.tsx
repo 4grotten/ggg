@@ -403,24 +403,24 @@ export default function AdminProfitPage() {
                 {/* Currency amounts from API by_currency, fallback to totalRevenue */}
                 <div className="relative space-y-3">
                   {Object.keys(summary.byCurrency).length > 0 ? (
-                    Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data], i) => (
-                      <div key={cur} className="flex items-center gap-3">
-                        {cur === "USDT" 
-                          ? <UsdtIcon size={28} /> 
-                          : <img src={aedCurrency} alt="AED" className="w-7 h-7 brightness-0 invert" />
-                        }
-                        <p className="text-2xl font-bold text-white tracking-tight font-mono">
-                          {fmtAmount(data.total)}
-                        </p>
-                        <span className="text-2xl font-bold text-white/70">{cur}</span>
-                        {i === 0 && (
-                          <div className="ml-auto flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
-                            <TrendingUp className="w-3.5 h-3.5 text-[#007AFF]" />
-                            <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} {t("profit.transactions")}</span>
-                          </div>
-                        )}
+                    <>
+                      {Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data]) => (
+                        <div key={cur} className="flex items-center gap-3">
+                          {cur === "USDT" 
+                            ? <UsdtIcon size={28} /> 
+                            : <img src={aedCurrency} alt="AED" className="w-7 h-7 brightness-0 invert" />
+                          }
+                          <p className="text-2xl font-bold text-white tracking-tight font-mono">
+                            {fmtAmount(data.total)}
+                          </p>
+                          <span className="text-2xl font-bold text-white/70">{cur}</span>
+                        </div>
+                      ))}
+                      <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1 w-fit">
+                        <TrendingUp className="w-3.5 h-3.5 text-[#007AFF]" />
+                        <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} {t("profit.transactions")}</span>
                       </div>
-                    ))
+                    </>
                   ) : (
                     <div className="flex items-center gap-3">
                       <img src={aedCurrency} alt="AED" className="w-7 h-7 brightness-0 invert" />
