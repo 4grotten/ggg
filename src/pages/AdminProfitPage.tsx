@@ -167,8 +167,27 @@ export default function AdminProfitPage() {
         byType[k] = { total: num(v.total), count: v.count || 0 };
         totalTx += v.count || 0;
       }
+
+      const byCurrency: Record<string, { total: number; count: number }> = {};
+      for (const [k, v] of Object.entries(raw.by_currency || {})) {
+        byCurrency[k] = { total: num(v.total), count: v.count || 0 };
+      }
+
+      const byCategory: Record<string, { total: number; count: number }> = {};
+      for (const [k, v] of Object.entries(raw.by_category || {})) {
+        byCategory[k] = { total: num(v.total), count: v.count || 0 };
+      }
+
+      const byCurrencyAndType: Record<string, Record<string, { total: number; count: number }>> = {};
+      for (const [cur, types] of Object.entries(raw.by_currency_and_type || {})) {
+        byCurrencyAndType[cur] = {};
+        for (const [ft, v] of Object.entries(types)) {
+          byCurrencyAndType[cur][ft] = { total: num(v.total), count: v.count || 0 };
+        }
+      }
+
       const byDay = (raw.by_day || []).map(d => ({ date: d.date, total: num(d.total) }));
-      setSummary({ totalRevenue: num(raw.total_revenue), totalTransactions: totalTx, byType, byDay });
+      setSummary({ totalRevenue: num(raw.total_revenue), totalTransactions: totalTx, byType, byCurrency, byCategory, byCurrencyAndType, byDay });
     }
     setIsLoadingSummary(false);
   }, [period, getStartDate, getEndDate]);
