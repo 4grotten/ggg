@@ -423,7 +423,7 @@ export default function AdminProfitPage() {
                         <p className="text-2xl font-bold text-white tracking-tight font-mono">
                           {fmtAmount(data.total)}
                         </p>
-                        <span className="text-base font-normal text-white/50">{cur}</span>
+                        <span className="text-2xl font-bold text-white/70">{cur}</span>
                       </div>
                     ))
                   ) : (
