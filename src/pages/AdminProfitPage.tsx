@@ -525,7 +525,7 @@ export default function AdminProfitPage() {
           )}
 
           {/* ─── Sub-tabs (fee type filter) ─────────────────────── */}
-          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
+          <div className="relative flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
             {SUB_TAB_KEYS.map(tab => {
               const count = subTabCounts[tab.value] || 0;
               const isActive = subTab === tab.value;
@@ -533,10 +533,11 @@ export default function AdminProfitPage() {
               return (
                 <button
                   key={tab.value}
+                  ref={(el) => { if (el) tabRefs.current[tab.value] = el; }}
                   onClick={() => handleSubTabChange(tab.value)}
                   className={cn(
-                    "shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
-                    isActive ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
+                    "relative shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors duration-200 border z-[1]",
+                    isActive ? "text-primary-foreground border-transparent" : "bg-transparent text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
                   )}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -547,6 +548,17 @@ export default function AdminProfitPage() {
                 </button>
               );
             })}
+            {/* Sliding background pill */}
+            <motion.div
+              className="absolute top-0 rounded-xl bg-primary shadow-sm z-0"
+              layoutId="profit-subtab-pill"
+              style={{
+                left: pillStyle.left,
+                width: pillStyle.width,
+                height: pillStyle.height,
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            />
           </div>
 
           {/* ─── Grouped Transactions ───────────────────────────── */}
