@@ -416,34 +416,21 @@ export default function AdminProfitPage() {
                   {Object.keys(summary.byCurrency).length > 0 ? (
                     Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data]) => (
                       <div key={cur} className="flex items-center gap-3">
-                        <div className={cn(
-                          "w-9 h-9 rounded-xl flex items-center justify-center",
-                          cur === "USDT" 
-                            ? "bg-[#26A17B]/20" 
-                            : "bg-[#007AFF]/20"
-                        )}>
-                          {cur === "USDT" 
-                            ? <UsdtIcon size={20} /> 
-                            : <img src={aedCurrency} alt="AED" className="w-5 h-5 brightness-0 invert" />
-                          }
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-2xl font-bold text-white tracking-tight font-mono">
-                            {fmtAmount(data.total)}
-                          </p>
-                          <p className="text-[10px] text-white/40 uppercase tracking-wider">{cur} · {data.count} операций</p>
-                        </div>
+                        {cur === "USDT" 
+                          ? <UsdtIcon size={28} /> 
+                          : <img src={aedCurrency} alt="AED" className="w-7 h-7 brightness-0 invert" />
+                        }
+                        <p className="text-2xl font-bold text-white tracking-tight font-mono">
+                          {fmtAmount(data.total)}
+                        </p>
+                        <span className="text-base font-normal text-white/50">{cur}</span>
                       </div>
                     ))
                   ) : (
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#007AFF]/20">
-                        <img src={aedCurrency} alt="AED" className="w-5 h-5 brightness-0 invert" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-2xl font-bold text-white tracking-tight font-mono">{fmtAmount(summary.totalRevenue)}</p>
-                        <p className="text-[10px] text-white/40 uppercase tracking-wider">AED · {summary.totalTransactions} операций</p>
-                      </div>
+                      <img src={aedCurrency} alt="AED" className="w-7 h-7 brightness-0 invert" />
+                      <p className="text-2xl font-bold text-white tracking-tight font-mono">{fmtAmount(summary.totalRevenue)}</p>
+                      <span className="text-base font-normal text-white/50">AED</span>
                     </div>
                   )}
                 </div>
