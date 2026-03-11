@@ -560,6 +560,8 @@ class AdminRevenueTransactionsView(APIView):
             "fee_percent": str(r.fee_percent) if r.fee_percent else None,
             "base_amount": str(r.base_amount),
             "base_currency": r.base_currency,
+            "exchange_rate": str(r.exchange_rate) if r.exchange_rate else None,
+            "description": r.description,
             "created_at": r.created_at
         } for r in records]
 
