@@ -2129,6 +2129,8 @@
     "feeBankWithdrawal": "Bankauszahlung",
     "feeBankTransfer": "Banküberweisung",
     "feeCryptoWithdrawal": "Krypto-Auszahlung",
+    "feeCryptoToCard": "Krypto → Karte",
+    "feeCryptoToIban": "Krypto → IBAN",
     "feeCryptoTopUp": "Krypto-Aufladung",
     "feeBankTopUp": "Bank-Aufladung",
     "feeNetworkFee": "Netzwerkgebühr",

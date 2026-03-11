@@ -2225,6 +2225,8 @@
     "feeBankWithdrawal": "Bank withdrawal",
     "feeBankTransfer": "Bank transfer",
     "feeCryptoWithdrawal": "Crypto withdrawal",
+    "feeCryptoToCard": "Crypto → Card",
+    "feeCryptoToIban": "Crypto → IBAN",
     "feeCryptoTopUp": "Crypto top-up",
     "feeBankTopUp": "Bank top-up",
     "feeNetworkFee": "Network fee",

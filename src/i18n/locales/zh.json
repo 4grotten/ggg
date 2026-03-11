@@ -2136,6 +2136,8 @@
     "feeBankWithdrawal": "银行提现",
     "feeBankTransfer": "银行转账",
     "feeCryptoWithdrawal": "加密提现",
+    "feeCryptoToCard": "加密 → 卡",
+    "feeCryptoToIban": "加密 → IBAN",
     "feeCryptoTopUp": "加密充值",
     "feeBankTopUp": "银行充值",
     "feeNetworkFee": "网络费用",

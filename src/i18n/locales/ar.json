@@ -2129,6 +2129,8 @@
     "feeBankWithdrawal": "سحب بنكي",
     "feeBankTransfer": "تحويل بنكي",
     "feeCryptoWithdrawal": "سحب كريبتو",
+    "feeCryptoToCard": "كريبتو → بطاقة",
+    "feeCryptoToIban": "كريبتو → IBAN",
     "feeCryptoTopUp": "شحن كريبتو",
     "feeBankTopUp": "شحن بنكي",
     "feeNetworkFee": "رسوم الشبكة",

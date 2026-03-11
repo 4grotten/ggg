@@ -2236,6 +2236,8 @@
     "feeBankWithdrawal": "Банк вывод",
     "feeBankTransfer": "Банк перевод",
     "feeCryptoWithdrawal": "Крипто вывод",
+    "feeCryptoToCard": "Крипто → Карта",
+    "feeCryptoToIban": "Крипто → IBAN",
     "feeCryptoTopUp": "Крипто пополн.",
     "feeBankTopUp": "Банк пополн.",
     "feeNetworkFee": "Сетевая комиссия",
