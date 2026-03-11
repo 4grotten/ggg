@@ -635,7 +635,7 @@ export default function AdminProfitPage() {
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
         <DrawerContent className="max-h-[85vh]">
           <DrawerHeader className="pb-2">
-            <DrawerTitle>Выберите период</DrawerTitle>
+            <DrawerTitle>{t("profit.selectPeriod")}</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-8 overflow-y-auto">
             {customDateField ? (
