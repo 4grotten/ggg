@@ -451,7 +451,7 @@ export function AdminProfitTab() {
             </AnimatePresence>
           )}
         </div>
-        {transactions.length < txCount && subTab === "all" && (
+        {transactions.length < txCount && (
           <div className="px-4 py-3 border-t border-border">
             <Button
               variant="ghost"
