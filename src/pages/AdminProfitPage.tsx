@@ -603,7 +603,7 @@ export default function AdminProfitPage() {
           )}
 
           {/* Load more */}
-          {transactions.length < txCount && subTab === "all" && (
+          {transactions.length < txCount && (
             <Button variant="ghost" size="sm" className="w-full text-xs" onClick={handleLoadMore} disabled={isLoadingTx}>
               {isLoadingTx ? t("profit.loading") : `${t("profit.loadMore")} (${transactions.length}/${txCount})`}
             </Button>
