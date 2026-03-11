@@ -161,13 +161,8 @@ export function AdminProfitTab() {
     fetchTransactions(newOffset);
   };
 
-  // ─── Derived data ──────────────────────────────────────────
-  const filteredTx = useMemo(() => {
-    if (subTab === "all") return transactions;
-    // Group card_to_card with card_transfer
-    if (subTab === "card_transfer") return transactions.filter(tx => tx.fee_type === "card_transfer" || tx.fee_type === "card_to_card");
-    return transactions.filter(tx => tx.fee_type === subTab);
-  }, [transactions, subTab]);
+  // ─── Derived data (server-side filtered now) ────────────────
+  const filteredTx = transactions;
 
   // Currency breakdown
   const currencyTotals = useMemo(() => {
