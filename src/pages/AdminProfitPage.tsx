@@ -642,7 +642,7 @@ export default function AdminProfitPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <button onClick={() => setCustomDateField(null)} className="text-sm text-muted-foreground">
-                    Назад
+                    {t("profit.back")}
                   </button>
                   <span className="text-sm font-medium">
                     {customDateField === "from" ? "Начальная дата" : "Конечная дата"}
