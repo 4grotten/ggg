@@ -563,7 +563,7 @@ export default function AdminProfitPage() {
                   <Icon className="w-3.5 h-3.5" />
                   {t(`profit.${tab.labelKey}`)}
                   {count > 0 && (
-                    <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", isActive ? "bg-primary-foreground/20" : "bg-muted")}>{count}</span>
+                    <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full font-semibold", isActive ? "bg-primary-foreground/20" : "bg-muted text-emerald-600 dark:text-emerald-400")}>{count}</span>
                   )}
                 </button>
               );
