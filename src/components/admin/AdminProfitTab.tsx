@@ -302,11 +302,11 @@ export function AdminProfitTab() {
                     <p className="text-[10px] text-muted-foreground mt-0.5">
                       {format(new Date(tx.created_at), "dd.MM.yyyy HH:mm")}
                       {tx.fee_percent != null && ` · ${tx.fee_percent}%`}
-                      {` · Base: ${tx.base_amount} ${tx.base_currency}`}
+                      {` · Base: ${tx.base_amount ?? 0} ${tx.base_currency ?? ""}`}
                     </p>
                   </div>
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
-                    +{tx.fee_amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} {tx.fee_currency}
+                    +{(tx.fee_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} {tx.fee_currency ?? ""}
                   </span>
                 </motion.div>
               ))}
