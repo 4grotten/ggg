@@ -102,9 +102,16 @@ export function AdminProfitTab() {
       { method: "GET" },
       true
     );
+    console.log('[AdminProfitTab] raw response:', JSON.stringify(res.data).slice(0, 500));
     if (res.data) {
-      setTransactions(prev => offset === 0 ? res.data!.results : [...prev, ...res.data!.results]);
-      setTxCount(res.data.count);
+      const results = Array.isArray(res.data) 
+        ? res.data 
+        : Array.isArray((res.data as any).results) 
+          ? (res.data as any).results 
+          : [];
+      const count = Array.isArray(res.data) ? res.data.length : ((res.data as any).count ?? results.length);
+      setTransactions(prev => offset === 0 ? results : [...prev, ...results]);
+      setTxCount(count);
     }
     setIsLoadingTx(false);
   }, []);
@@ -300,9 +307,9 @@ export function AdminProfitTab() {
                       {FEE_TYPE_LABELS[tx.fee_type] || tx.fee_type}
                     </p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">
-                      {format(new Date(tx.created_at), "dd.MM.yyyy HH:mm")}
+                      {tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm") : "—"}
                       {tx.fee_percent != null && ` · ${tx.fee_percent}%`}
-                      {` · Base: ${tx.base_amount ?? 0} ${tx.base_currency ?? ""}`}
+                      {tx.base_amount != null && ` · Base: ${tx.base_amount} ${tx.base_currency ?? ""}`}
                     </p>
                   </div>
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
