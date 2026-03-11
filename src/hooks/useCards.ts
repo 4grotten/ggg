@@ -129,8 +129,7 @@ export const useBankAccounts = () => {
     queryKey: cardKeys.bankAccounts(),
     queryFn: fetchBankAccounts,
     enabled: !!getAuthToken(),
-    staleTime: 1000 * 30,
-    refetchInterval: 15000,
+    staleTime: 1000 * 60 * 5,
   });
 };
 
