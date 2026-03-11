@@ -81,12 +81,12 @@ const FEE_META_KEYS: Record<string, { labelKey: string; icon: typeof DollarSign;
 };
 
 const SUB_TAB_KEYS: { value: SubTab; labelKey: string; icon: typeof DollarSign }[] = [
-  { value: "all",                labelKey: "tabAll",        icon: Layers },
-  { value: "card_transfer",      labelKey: "tabTransfers",  icon: CreditCard },
-  { value: "bank_withdrawal",    labelKey: "tabBank",       icon: Landmark },
-  { value: "crypto_withdrawal",  labelKey: "tabCrypto",     icon: Bitcoin },
-  { value: "network_fee",        labelKey: "tabNetwork",    icon: Zap },
-  { value: "currency_conversion", labelKey: "tabConversion", icon: ArrowRightLeft },
+  { value: "all",        labelKey: "tabAll",        icon: Layers },
+  { value: "cards",      labelKey: "tabTransfers",  icon: CreditCard },
+  { value: "banks",      labelKey: "tabBank",       icon: Landmark },
+  { value: "crypto",     labelKey: "tabCrypto",     icon: Bitcoin },
+  { value: "network",    labelKey: "tabNetwork",    icon: Zap },
+  { value: "conversion", labelKey: "tabConversion", icon: ArrowRightLeft },
 ];
 
 const num = (v: string | number | null | undefined): number => parseFloat(String(v ?? 0)) || 0;
