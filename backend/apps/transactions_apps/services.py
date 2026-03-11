@@ -562,7 +562,11 @@ class TransactionService:
         amount_usdt = Decimal(str(amount_usdt))
         SettingsManager.check_limits(sender_id, amount_usdt, 'transfer')
         buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'), sender_id)
-        crypto_fee = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
+        service_fee_pct = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'), sender_id)
+        service_fee = (amount_usdt * service_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
+        network_fee = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
+        crypto_fee = service_fee + network_fee
+        
         total_deduction = amount_usdt + crypto_fee
         amount_aed = (amount_usdt * buy_rate).quantize(Decimal('0.01'))
         
@@ -591,6 +595,9 @@ class TransactionService:
             "beneficiary_name": dest_bank.beneficiary,
             "pricing_version": 2,
             "amount_usdt": float(amount_usdt),
+            "service_fee_usdt": float(service_fee),
+            "service_fee_percent": float(service_fee_pct),
+            "network_fee_usdt": float(network_fee),
             "fee_usdt": float(crypto_fee),
             "total_debited_usdt": float(total_deduction),
             "exchange_rate_usdt_to_aed": float(buy_rate),
@@ -605,11 +612,15 @@ class TransactionService:
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='crypto', amount=total_deduction, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_bank.user_id, account_type='bank', amount=amount_aed, type='credit')
+
         if crypto_fee > 0:
             FeeRevenue.objects.create(
                 transaction=txn, user_id=str(sender_id), fee_type='crypto_to_iban',
-                fee_amount=crypto_fee, fee_currency='USDT', base_amount=amount_usdt,
-                base_currency='USDT', description=f"Фиксированная комиссия {crypto_fee} USDT"
+                fee_amount=crypto_fee, fee_currency='USDT', 
+                fee_percent=service_fee_pct,
+                base_amount=amount_usdt,
+                base_currency='USDT', 
+                description=f"Комиссия {service_fee_pct}% + {network_fee} фикс." 
             )
 
         return txn, total_deduction, crypto_fee, amount_aed
