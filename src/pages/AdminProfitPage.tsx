@@ -72,6 +72,8 @@ const FEE_META_KEYS: Record<string, { labelKey: string; icon: typeof DollarSign;
   bank_withdrawal:     { labelKey: "feeBankWithdrawal",   icon: Landmark,      colorClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
   bank_transfer:       { labelKey: "feeBankTransfer",     icon: Landmark,      colorClass: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
   crypto_withdrawal:   { labelKey: "feeCryptoWithdrawal", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  crypto_to_card:      { labelKey: "feeCryptoWithdrawal", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  crypto_to_iban:      { labelKey: "feeCryptoWithdrawal", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
   top_up_crypto:       { labelKey: "feeCryptoTopUp",      icon: Bitcoin,       colorClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
   top_up_bank:         { labelKey: "feeBankTopUp",        icon: Landmark,      colorClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
   network_fee:         { labelKey: "feeNetworkFee",       icon: Zap,           colorClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
