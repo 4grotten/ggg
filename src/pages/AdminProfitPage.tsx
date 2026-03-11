@@ -346,8 +346,9 @@ export default function AdminProfitPage() {
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-bold tracking-tight">Profit</span>
+                  <span className="text-base font-bold tracking-tight">Profit</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-xs text-muted-foreground">{user?.full_name || "Admin"}</span>
                     <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
                       <Crown className="w-2.5 h-2.5" />Root
                     </Badge>
