@@ -323,7 +323,7 @@ export default function AdminProfitPage() {
   };
 
   const getSelectedPeriodLabel = (): string => {
-    if (period === "allTime") return "За всё время";
+    if (period === "allTime") return t("profit.allTime");
     if (period === "custom" && dateFrom && dateTo) {
       return `${format(dateFrom, "dd.MM.yyyy")} - ${format(dateTo, "dd.MM.yyyy")}`;
     }
