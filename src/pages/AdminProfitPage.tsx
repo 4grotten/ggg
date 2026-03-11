@@ -3,13 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "@/services/api/apiClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft,
+  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft, ChevronDown,
   ArrowRightLeft, Landmark, Bitcoin, CreditCard, Zap, Percent, Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { format, subDays, startOfMonth, startOfYear, parseISO } from "date-fns";
+import { format, subDays, subMonths, startOfWeek, parseISO } from "date-fns";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { DateWheelPicker } from "@/components/ui/date-wheel-picker";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -46,7 +53,7 @@ interface RevenueTransaction {
   created_at: string;
 }
 
-type PeriodPreset = "today" | "week" | "month" | "year" | "all";
+type PeriodPreset = "allTime" | "today" | "thisWeek" | "month" | "threeMonths" | "year" | "custom";
 type SubTab = "all" | "card_transfer" | "bank_withdrawal" | "crypto_withdrawal" | "network_fee" | "currency_conversion";
 
 // ─── Constants ───────────────────────────────────────────────
@@ -101,27 +108,45 @@ export default function AdminProfitPage() {
   const [txCount, setTxCount] = useState(0);
   const [isLoadingSummary, setIsLoadingSummary] = useState(true);
   const [isLoadingTx, setIsLoadingTx] = useState(true);
-  const [period, setPeriod] = useState<PeriodPreset>("all");
+  const [period, setPeriod] = useState<PeriodPreset>("allTime");
   const [subTab, setSubTab] = useState<SubTab>("all");
   const [txOffset, setTxOffset] = useState(0);
   const [selectedTx, setSelectedTx] = useState<RevenueTransaction | null>(null);
+  const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [customDateField, setCustomDateField] = useState<"from" | "to" | null>(null);
+  const [tempCustomFrom, setTempCustomFrom] = useState<Date | undefined>(undefined);
+  const [tempCustomTo, setTempCustomTo] = useState<Date | undefined>(undefined);
+  const [hasSelectedFrom, setHasSelectedFrom] = useState(false);
   const TX_LIMIT = 50;
+
+  const today = new Date();
 
   const getStartDate = useCallback((p: PeriodPreset): string | null => {
     const now = new Date();
     switch (p) {
       case "today": return format(now, "yyyy-MM-dd");
-      case "week":  return format(subDays(now, 7), "yyyy-MM-dd");
-      case "month": return format(startOfMonth(now), "yyyy-MM-dd");
-      case "year":  return format(startOfYear(now), "yyyy-MM-dd");
-      case "all":   return null;
+      case "thisWeek": return format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      case "month": return format(subMonths(now, 1), "yyyy-MM-dd");
+      case "threeMonths": return format(subMonths(now, 3), "yyyy-MM-dd");
+      case "year": return format(subMonths(now, 12), "yyyy-MM-dd");
+      case "custom": return dateFrom ? format(dateFrom, "yyyy-MM-dd") : null;
+      case "allTime": return null;
     }
-  }, []);
+  }, [dateFrom]);
+
+  const getEndDate = useCallback((p: PeriodPreset): string | null => {
+    if (p === "custom" && dateTo) return format(dateTo, "yyyy-MM-dd");
+    return null;
+  }, [dateTo]);
 
   const fetchSummary = useCallback(async () => {
     setIsLoadingSummary(true);
     const startDate = getStartDate(period);
-    const qs = startDate ? `?start_date=${startDate}` : "";
+    const endDate = getEndDate(period);
+    let qs = startDate ? `?start_date=${startDate}` : "";
+    if (endDate) qs += `${qs ? "&" : "?"}end_date=${endDate}`;
     const res = await apiRequest<RevenueSummaryRaw>(
       `/transactions/admin/revenue/summary/${qs}`,
       { method: "GET" },
@@ -140,7 +165,7 @@ export default function AdminProfitPage() {
       setSummary({ totalRevenue: num(raw.total_revenue), totalTransactions: totalTx, byType, byDay });
     }
     setIsLoadingSummary(false);
-  }, [period, getStartDate]);
+  }, [period, getStartDate, getEndDate]);
 
   const fetchTransactions = useCallback(async (offset = 0) => {
     setIsLoadingTx(true);
@@ -211,13 +236,57 @@ export default function AdminProfitPage() {
     return counts;
   }, [transactions]);
 
-  const periodPresets: { value: PeriodPreset; label: string }[] = [
-    { value: "today", label: "Сегодня" },
-    { value: "week",  label: "Неделя" },
-    { value: "month", label: "Месяц" },
-    { value: "year",  label: "Год" },
-    { value: "all",   label: "Всё время" },
+  const formatDateRange = (from: Date | undefined, to: Date | undefined): string => {
+    if (!from && !to) return "";
+    const fmtStr = "dd.MM.yyyy";
+    return `${from ? format(from, fmtStr) : "..."} - ${to ? format(to, fmtStr) : "..."}`;
+  };
+
+  const presetOptions: { key: PeriodPreset; label: string; dateRange: string }[] = [
+    { key: "allTime", label: "За всё время", dateRange: "" },
+    { key: "today", label: "Сегодня", dateRange: formatDateRange(today, today) },
+    { key: "thisWeek", label: "Неделя", dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
+    { key: "month", label: "Месяц", dateRange: formatDateRange(subMonths(today, 1), today) },
+    { key: "threeMonths", label: "3 месяца", dateRange: formatDateRange(subMonths(today, 3), today) },
+    { key: "year", label: "Год", dateRange: formatDateRange(subMonths(today, 12), today) },
   ];
+
+  const handlePresetSelect = (preset: PeriodPreset) => {
+    setPeriod(preset);
+    if (preset !== "custom") {
+      setDateFrom(undefined);
+      setDateTo(undefined);
+      setIsDateDrawerOpen(false);
+    }
+  };
+
+  const handleWheelDateChange = (date: Date) => {
+    if (customDateField === "from") {
+      setTempCustomFrom(date);
+      setHasSelectedFrom(true);
+      if (!tempCustomTo) setTempCustomTo(new Date());
+    } else if (customDateField === "to") {
+      setTempCustomTo(date);
+    }
+  };
+
+  const handleCustomDateConfirm = () => {
+    if (!tempCustomFrom || !tempCustomTo) return;
+    setPeriod("custom");
+    setDateFrom(tempCustomFrom);
+    setDateTo(tempCustomTo);
+    setCustomDateField(null);
+    setIsDateDrawerOpen(false);
+  };
+
+  const getSelectedPeriodLabel = (): string => {
+    if (period === "allTime") return "За всё время";
+    if (period === "custom" && dateFrom && dateTo) {
+      return `${format(dateFrom, "dd.MM.yyyy")} - ${format(dateTo, "dd.MM.yyyy")}`;
+    }
+    const preset = presetOptions.find(p => p.key === period);
+    return preset?.label || "За всё время";
+  };
 
   const sortedTypes = summary ? Object.entries(summary.byType).sort(([, a], [, b]) => b.total - a.total) : [];
 
@@ -258,11 +327,24 @@ export default function AdminProfitPage() {
         </div>
 
         <div className="px-4 pb-24 space-y-4">
-          {/* Refresh button */}
-          <div className="flex justify-end">
-            <button onClick={() => { fetchSummary(); fetchTransactions(0); setTxOffset(0); }} className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
+          {/* Title with Period Selector */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-semibold">💵 Profit</h1>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { fetchSummary(); fetchTransactions(0); setTxOffset(0); }}
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setIsDateDrawerOpen(true)}
+                className="flex items-center gap-1.5 text-[#007AFF]"
+              >
+                <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* ─── Summary Cards ──────────────────────────────────── */}
@@ -467,6 +549,81 @@ export default function AdminProfitPage() {
           )}
         </div>
       </motion.div>
+
+      {/* Period Selection Drawer */}
+      <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle>Выберите период</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-8 overflow-y-auto">
+            {customDateField ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <button onClick={() => setCustomDateField(null)} className="text-sm text-muted-foreground">
+                    Назад
+                  </button>
+                  <span className="text-sm font-medium">
+                    {customDateField === "from" ? "Начальная дата" : "Конечная дата"}
+                  </span>
+                  <div className="w-12" />
+                </div>
+                <DateWheelPicker
+                  value={customDateField === "from" ? tempCustomFrom : tempCustomTo}
+                  onChange={handleWheelDateChange}
+                  minYear={2020}
+                  maxYear={new Date().getFullYear() + 1}
+                />
+                {customDateField === "from" && hasSelectedFrom && (
+                  <button
+                    onClick={() => setCustomDateField("to")}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
+                  >
+                    Далее
+                  </button>
+                )}
+                {customDateField === "to" && tempCustomFrom && tempCustomTo && (
+                  <button
+                    onClick={handleCustomDateConfirm}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
+                  >
+                    Применить
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {presetOptions.map((preset) => (
+                  <button
+                    key={preset.key}
+                    onClick={() => handlePresetSelect(preset.key)}
+                    className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors"
+                  >
+                    <p className="font-medium">{preset.label}</p>
+                    {preset.dateRange && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{preset.dateRange}</p>
+                    )}
+                  </button>
+                ))}
+                <button
+                  onClick={() => {
+                    setTempCustomFrom(dateFrom);
+                    setTempCustomTo(dateTo);
+                    setHasSelectedFrom(!!dateFrom);
+                    setCustomDateField("from");
+                  }}
+                  className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors"
+                >
+                  <p className="font-medium">Свой период</p>
+                  {period === "custom" && dateFrom && dateTo && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{formatDateRange(dateFrom, dateTo)}</p>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </MobileLayout>
   );
 }
