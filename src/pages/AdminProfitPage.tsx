@@ -645,7 +645,7 @@ export default function AdminProfitPage() {
                     {t("profit.back")}
                   </button>
                   <span className="text-sm font-medium">
-                    {customDateField === "from" ? "Начальная дата" : "Конечная дата"}
+                    {customDateField === "from" ? t("profit.startDate") : t("profit.endDate")}
                   </span>
                   <div className="w-12" />
                 </div>
