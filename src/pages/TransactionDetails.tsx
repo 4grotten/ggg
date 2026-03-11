@@ -325,7 +325,7 @@ const TransactionDetails = () => {
       // crypto_to_card specific
       cryptoToCardCreditedAed: receipt.type === 'crypto_to_card' ? receipt.movements?.find(m => m.type === 'credit')?.amount : undefined,
       cryptoToCardExchangeRate: receipt.type === 'crypto_to_card' ? receipt.exchange_rate : undefined,
-      cryptoToCardFeePercent: receipt.type === 'crypto_to_card' && receipt.amount && receipt.fee ? ((receipt.fee / receipt.amount) * 100) : undefined,
+      cryptoToCardFeePercent: receipt.type === 'crypto_to_card' ? (receipt.service_fee_percent ?? (receipt as any)?.metadata?.service_fee_percent ?? ((receipt.amount && receipt.fee) ? ((receipt.fee / receipt.amount) * 100) : undefined)) : undefined,
     };
   })() : null) as typeof mockTransaction;
 
