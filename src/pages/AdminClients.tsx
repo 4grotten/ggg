@@ -267,6 +267,8 @@ export default function AdminClients() {
                           </span>
                           {(client.is_blocked || (client.limits as any)?.is_blocked) ? (
                             <Badge className="bg-destructive/10 text-destructive border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.blocked', 'Заблокирован')}</Badge>
+                          ) : client.is_active === false ? (
+                            <Badge className="bg-muted text-muted-foreground border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.inactive', 'Не зарегистрирован')}</Badge>
                           ) : (
                             <Badge className="bg-emerald-500/10 text-emerald-500 border-0 text-[9px] px-1.5 py-0 h-4">{t('admin.clients.active', 'Активен')}</Badge>
                           )}
