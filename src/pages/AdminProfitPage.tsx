@@ -355,19 +355,6 @@ export default function AdminProfitPage() {
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => { fetchSummary(); fetchTransactions(0); setTxOffset(0); }}
-                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setIsDateDrawerOpen(true)}
-                  className="flex items-center gap-1 text-[#007AFF] font-medium text-sm"
-                >
-                  {getSelectedPeriodLabel()}
-                  <ChevronDown className="w-4 h-4" />
-                </button>
                 <ThemeSwitcher />
                 <LanguageSwitcher />
               </div>
