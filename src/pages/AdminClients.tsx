@@ -78,7 +78,7 @@ export default function AdminClients() {
     }
 
     return result;
-  }, [clients, searchQuery, roleFilter, verificationFilter, assetsFilter]);
+  }, [clients, searchQuery, statusFilter, roleFilter, verificationFilter, assetsFilter]);
 
   const activeFiltersCount = [
     roleFilter !== "all",
