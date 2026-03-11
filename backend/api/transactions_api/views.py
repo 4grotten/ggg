@@ -449,9 +449,9 @@ class AdminRevenueSummaryView(APIView):
 
         query = FeeRevenue.objects.all()
         if start_date:
-            query = query.filter(created_at__gte=start_date)
+            query = query.filter(created_at__date__gte=start_date)
         if end_date:
-            query = query.filter(created_at__lte=end_date)
+            query = query.filter(created_at__date__lte=end_date)
 
         total_revenue = query.aggregate(total=Sum('fee_amount'))['total'] or Decimal('0.00')
 
