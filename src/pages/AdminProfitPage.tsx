@@ -308,7 +308,7 @@ export default function AdminProfitPage() {
                   {Object.entries(currencyTotals).sort(([,a],[,b]) => b - a).map(([cur, total]) => (
                     <div key={cur} className="shrink-0 px-3 py-2 rounded-xl bg-card border border-border flex items-center gap-2">
                       <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded",
-                        cur === "USDT" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                        cur === "USDT" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-[#007AFF]/10 text-[#007AFF]"
                       )}>
                         {cur}
                       </span>
@@ -407,7 +407,7 @@ export default function AdminProfitPage() {
                   {/* Date header with day total */}
                   <div className="px-4 py-2.5 border-b border-border flex items-center justify-between bg-muted/30">
                     <span className="text-xs font-semibold text-foreground">{group.label}</span>
-                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+                    <span className="text-xs font-bold text-[#007AFF]">
                       +{fmtAmount(group.dayTotal)} AED
                     </span>
                   </div>
