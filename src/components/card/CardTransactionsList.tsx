@@ -331,8 +331,8 @@ const handleClick = (transaction: Transaction) => {
                         </div>
                       )}
                     </div>
-                    <div className="text-left min-w-0 flex-1">
-                      <p className="font-medium">
+                    <div className="text-left min-w-0 flex-1 overflow-hidden">
+                      <p className="font-medium truncate">
                       {isOutgoingCryptoToBank
                           ? t("transaction.walletToIban")
                           : isIncomingCryptoToBank
@@ -482,7 +482,7 @@ const handleClick = (transaction: Transaction) => {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
+                  <div className="text-right shrink-0 ml-2">
                     {(isOutgoingCryptoToBank || isIncomingCryptoToBank) ? (
                       <>
                         <p className={`font-semibold ${colorClass}`}>
