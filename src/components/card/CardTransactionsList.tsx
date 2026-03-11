@@ -196,8 +196,8 @@ const handleClick = (transaction: Transaction) => {
                     index < group.transactions.length - 1 ? 'border-b border-border/50' : ''
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                     <div className="relative shrink-0">
                       {isCardActivation ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
