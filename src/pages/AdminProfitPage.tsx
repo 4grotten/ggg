@@ -108,7 +108,7 @@ export default function AdminProfitPage() {
   const [txCount, setTxCount] = useState(0);
   const [isLoadingSummary, setIsLoadingSummary] = useState(true);
   const [isLoadingTx, setIsLoadingTx] = useState(true);
-  const [period, setPeriod] = useState<PeriodPreset>("allTime");
+  const [period, setPeriod] = useState<PeriodPreset>("today");
   const [subTab, setSubTab] = useState<SubTab>("all");
   const [txOffset, setTxOffset] = useState(0);
   const [selectedTx, setSelectedTx] = useState<RevenueTransaction | null>(null);
