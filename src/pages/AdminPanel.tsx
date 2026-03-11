@@ -1156,11 +1156,6 @@ export default function AdminPanel() {
                 </AnimatePresence>
               </TabsContent>
 
-              {isRoot && (
-                <TabsContent value="profit" className="mt-0">
-                  <AdminProfitTab />
-                </TabsContent>
-              )}
 
               <TabsContent value="system" className="mt-0 space-y-4">
                 <GlassCard
