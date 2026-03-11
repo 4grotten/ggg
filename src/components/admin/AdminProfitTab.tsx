@@ -92,13 +92,26 @@ export function AdminProfitTab() {
     setIsLoadingSummary(true);
     const startDate = getStartDate(period);
     const qs = startDate ? `?start_date=${startDate}` : "";
-    const res = await apiRequest<RevenueSummary>(
+    const res = await apiRequest<RevenueSummaryRaw>(
       `/transactions/admin/revenue/summary/${qs}`,
       { method: "GET" },
       true
     );
-    if (res.data) setSummary(res.data);
-    setIsLoadingSummary(false);
+    if (res.data) {
+      const raw = res.data;
+      const byTypeRaw = raw.by_type || raw.by_fee_type || {};
+      const byFeeType: Record<string, { total: number; count: number }> = {};
+      let totalTx = 0;
+      for (const [k, v] of Object.entries(byTypeRaw)) {
+        byFeeType[k] = { total: parseFloat(String(v.total)) || 0, count: v.count || 0 };
+        totalTx += v.count || 0;
+      }
+      setSummary({
+        total_revenue: parseFloat(String(raw.total_revenue)) || 0,
+        total_transactions: totalTx,
+        by_fee_type: byFeeType,
+      });
+    }
   }, [period, getStartDate]);
 
   const fetchTransactions = useCallback(async (offset = 0) => {
