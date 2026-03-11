@@ -234,13 +234,57 @@ export default function AdminProfitPage() {
     return counts;
   }, [transactions]);
 
-  const periodPresets: { value: PeriodPreset; label: string }[] = [
-    { value: "today", label: "Сегодня" },
-    { value: "week",  label: "Неделя" },
-    { value: "month", label: "Месяц" },
-    { value: "year",  label: "Год" },
-    { value: "all",   label: "Всё время" },
+  const formatDateRange = (from: Date | undefined, to: Date | undefined): string => {
+    if (!from && !to) return "";
+    const fmtStr = "dd.MM.yyyy";
+    return `${from ? format(from, fmtStr) : "..."} - ${to ? format(to, fmtStr) : "..."}`;
+  };
+
+  const presetOptions: { key: PeriodPreset; label: string; dateRange: string }[] = [
+    { key: "allTime", label: "За всё время", dateRange: "" },
+    { key: "today", label: "Сегодня", dateRange: formatDateRange(today, today) },
+    { key: "thisWeek", label: "Неделя", dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
+    { key: "month", label: "Месяц", dateRange: formatDateRange(subMonths(today, 1), today) },
+    { key: "threeMonths", label: "3 месяца", dateRange: formatDateRange(subMonths(today, 3), today) },
+    { key: "year", label: "Год", dateRange: formatDateRange(subMonths(today, 12), today) },
   ];
+
+  const handlePresetSelect = (preset: PeriodPreset) => {
+    setPeriod(preset);
+    if (preset !== "custom") {
+      setDateFrom(undefined);
+      setDateTo(undefined);
+      setIsDateDrawerOpen(false);
+    }
+  };
+
+  const handleWheelDateChange = (date: Date) => {
+    if (customDateField === "from") {
+      setTempCustomFrom(date);
+      setHasSelectedFrom(true);
+      if (!tempCustomTo) setTempCustomTo(new Date());
+    } else if (customDateField === "to") {
+      setTempCustomTo(date);
+    }
+  };
+
+  const handleCustomDateConfirm = () => {
+    if (!tempCustomFrom || !tempCustomTo) return;
+    setPeriod("custom");
+    setDateFrom(tempCustomFrom);
+    setDateTo(tempCustomTo);
+    setCustomDateField(null);
+    setIsDateDrawerOpen(false);
+  };
+
+  const getSelectedPeriodLabel = (): string => {
+    if (period === "allTime") return "За всё время";
+    if (period === "custom" && dateFrom && dateTo) {
+      return `${format(dateFrom, "dd.MM.yyyy")} - ${format(dateTo, "dd.MM.yyyy")}`;
+    }
+    const preset = presetOptions.find(p => p.key === period);
+    return preset?.label || "За всё время";
+  };
 
   const sortedTypes = summary ? Object.entries(summary.byType).sort(([, a], [, b]) => b.total - a.total) : [];
 
