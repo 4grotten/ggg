@@ -538,7 +538,19 @@ class AdminRevenueTransactionsView(APIView):
 
         query = FeeRevenue.objects.all().order_by(sort_by)
         if fee_type:
-            query = query.filter(fee_type=fee_type)
+            if fee_type == 'cards':
+                query = query.filter(fee_type__in=['card_transfer', 'internal_transfer'])
+            elif fee_type == 'banks':
+                query = query.filter(fee_type__in=['bank_withdrawal', 'iban_to_iban', 'iban_to_card', 'card_to_bank'])
+            elif fee_type == 'crypto':
+                query = query.filter(fee_type__in=['crypto_withdrawal', 'crypto_to_crypto'])
+            elif fee_type == 'network':
+                query = query.filter(Q(description__icontains='Сетевая') | Q(description__icontains='сеть') | Q(fee_type='crypto_withdrawal'))
+            elif fee_type == 'conversion':
+                query = query.filter(fee_type__in=['card_to_crypto', 'crypto_to_card', 'bank_to_crypto', 'crypto_to_iban', 'exchange_spread'])
+            else:
+                query = query.filter(fee_type=fee_type)
+
         if start_date:
             query = query.filter(created_at__date__gte=start_date)
         if end_date:
