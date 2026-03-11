@@ -510,7 +510,7 @@ export default function AdminProfitPage() {
 
           {/* ─── Sub-tabs (fee type filter) ─────────────────────── */}
           <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
-            {SUB_TABS.map(tab => {
+            {SUB_TAB_KEYS.map(tab => {
               const count = subTabCounts[tab.value] || 0;
               const isActive = subTab === tab.value;
               const Icon = tab.icon;
@@ -524,7 +524,7 @@ export default function AdminProfitPage() {
                   )}
                 >
                   <Icon className="w-3.5 h-3.5" />
-                  {tab.label}
+                  {t(`profit.${tab.labelKey}`)}
                   {count > 0 && (
                     <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full", isActive ? "bg-primary-foreground/20" : "bg-muted")}>{count}</span>
                   )}
