@@ -9,8 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { format, subDays, startOfMonth, startOfYear, isToday, isYesterday, parseISO } from "date-fns";
-import { ru } from "date-fns/locale";
+import { format, subDays, startOfMonth, startOfYear, parseISO } from "date-fns";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
@@ -80,9 +79,7 @@ const getMeta = (type: string) => FEE_META[type] || { label: type, icon: DollarS
 function formatDateHeader(dateStr: string): string {
   try {
     const d = parseISO(dateStr);
-    if (isToday(d)) return "Сегодня";
-    if (isYesterday(d)) return "Вчера";
-    return format(d, "d MMMM yyyy", { locale: ru });
+    return format(d, "dd.MM.yyyy");
   } catch {
     return dateStr;
   }
@@ -410,7 +407,7 @@ export default function AdminProfitPage() {
                   {/* Date header with day total */}
                   <div className="px-4 py-2.5 border-b border-border flex items-center justify-between bg-muted/30">
                     <span className="text-xs font-semibold text-foreground">{group.label}</span>
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
                       +{fmtAmount(group.dayTotal)} AED
                     </span>
                   </div>
