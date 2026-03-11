@@ -2723,9 +2723,9 @@ const TransactionDetails = () => {
                         return (order[a] ?? 90) - (order[b] ?? 90);
                       })
                       .map(([key, value]) => (
-                      <div key={key} className="flex items-start justify-between gap-3">
+                      <div key={key} className="flex flex-col gap-1">
                         <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
-                        <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
+                        <pre className="font-medium text-left text-xs whitespace-pre-wrap break-all max-w-full m-0 overflow-x-auto">
                           {renderReceiptValue(key, value)}
                         </pre>
                       </div>
