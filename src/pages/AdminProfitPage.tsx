@@ -243,12 +243,8 @@ export default function AdminProfitPage() {
     fetchTransactions(newOffset);
   };
 
-  // ─── Derived data ──────────────────────────────────────────
-  const filteredTx = useMemo(() => {
-    if (subTab === "all") return transactions;
-    if (subTab === "card_transfer") return transactions.filter(tx => tx.fee_type === "card_transfer" || tx.fee_type === "card_to_card");
-    return transactions.filter(tx => tx.fee_type === subTab);
-  }, [transactions, subTab]);
+  // ─── Derived data (server-side filtered by fee_type) ───────
+  const filteredTx = transactions;
 
   // Group transactions by date
   const dateGroups = useMemo((): DateGroup[] => {
