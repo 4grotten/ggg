@@ -9,8 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { format, subDays, startOfMonth, startOfYear, isToday, isYesterday, parseISO } from "date-fns";
-import { ru } from "date-fns/locale";
+import { format, subDays, startOfMonth, startOfYear, parseISO } from "date-fns";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
