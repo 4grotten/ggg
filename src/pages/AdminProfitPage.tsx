@@ -461,7 +461,7 @@ export default function AdminProfitPage() {
                         <div key={cat} className="flex-1 bg-white/5 rounded-xl px-3 py-2">
                           <p className={cn("text-[10px] font-medium uppercase tracking-wider", m.color)}>{m.label}</p>
                           <p className="text-sm font-bold text-white font-mono mt-0.5">{fmtAmount(data.total)}</p>
-                          <p className="text-[9px] text-white/30">{data.count} шт</p>
+                          <p className="text-[9px] text-white/30">{data.count} {t("profit.pcs")}</p>
                         </div>
                       );
                     })}
