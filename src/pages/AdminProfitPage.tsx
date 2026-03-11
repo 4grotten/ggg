@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "@/services/api/apiClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft, ChevronDown,
+  DollarSign, TrendingUp, RefreshCw, ChevronRight, ArrowLeft, ChevronDown, Check,
   ArrowRightLeft, Landmark, Bitcoin, CreditCard, Zap, Percent, Layers
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -597,12 +597,18 @@ export default function AdminProfitPage() {
                   <button
                     key={preset.key}
                     onClick={() => handlePresetSelect(preset.key)}
-                    className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors"
-                  >
-                    <p className="font-medium">{preset.label}</p>
-                    {preset.dateRange && (
-                      <p className="text-xs text-muted-foreground mt-0.5">{preset.dateRange}</p>
+                    className={cn(
+                      "w-full text-left p-4 rounded-xl transition-colors flex items-center justify-between",
+                      period === preset.key ? "bg-primary/10 border border-primary/30" : "bg-secondary hover:bg-secondary/80"
                     )}
+                  >
+                    <div>
+                      <p className="font-medium">{preset.label}</p>
+                      {preset.dateRange && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{preset.dateRange}</p>
+                      )}
+                    </div>
+                    {period === preset.key && <Check className="w-5 h-5 text-[#007AFF] shrink-0" />}
                   </button>
                 ))}
                 <button
@@ -612,12 +618,18 @@ export default function AdminProfitPage() {
                     setHasSelectedFrom(!!dateFrom);
                     setCustomDateField("from");
                   }}
-                  className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors"
-                >
-                  <p className="font-medium">Свой период</p>
-                  {period === "custom" && dateFrom && dateTo && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{formatDateRange(dateFrom, dateTo)}</p>
+                  className={cn(
+                    "w-full text-left p-4 rounded-xl transition-colors flex items-center justify-between",
+                    period === "custom" ? "bg-primary/10 border border-primary/30" : "bg-secondary hover:bg-secondary/80"
                   )}
+                >
+                  <div>
+                    <p className="font-medium">Свой период</p>
+                    {period === "custom" && dateFrom && dateTo && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{formatDateRange(dateFrom, dateTo)}</p>
+                    )}
+                  </div>
+                  {period === "custom" && <Check className="w-5 h-5 text-[#007AFF] shrink-0" />}
                 </button>
               </div>
             )}
