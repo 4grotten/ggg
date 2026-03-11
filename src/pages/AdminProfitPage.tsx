@@ -108,22 +108,38 @@ export default function AdminProfitPage() {
   const [txCount, setTxCount] = useState(0);
   const [isLoadingSummary, setIsLoadingSummary] = useState(true);
   const [isLoadingTx, setIsLoadingTx] = useState(true);
-  const [period, setPeriod] = useState<PeriodPreset>("all");
+  const [period, setPeriod] = useState<PeriodPreset>("allTime");
   const [subTab, setSubTab] = useState<SubTab>("all");
   const [txOffset, setTxOffset] = useState(0);
   const [selectedTx, setSelectedTx] = useState<RevenueTransaction | null>(null);
+  const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [customDateField, setCustomDateField] = useState<"from" | "to" | null>(null);
+  const [tempCustomFrom, setTempCustomFrom] = useState<Date | undefined>(undefined);
+  const [tempCustomTo, setTempCustomTo] = useState<Date | undefined>(undefined);
+  const [hasSelectedFrom, setHasSelectedFrom] = useState(false);
   const TX_LIMIT = 50;
+
+  const today = new Date();
 
   const getStartDate = useCallback((p: PeriodPreset): string | null => {
     const now = new Date();
     switch (p) {
       case "today": return format(now, "yyyy-MM-dd");
-      case "week":  return format(subDays(now, 7), "yyyy-MM-dd");
-      case "month": return format(startOfMonth(now), "yyyy-MM-dd");
-      case "year":  return format(startOfYear(now), "yyyy-MM-dd");
-      case "all":   return null;
+      case "thisWeek": return format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
+      case "month": return format(subMonths(now, 1), "yyyy-MM-dd");
+      case "threeMonths": return format(subMonths(now, 3), "yyyy-MM-dd");
+      case "year": return format(subMonths(now, 12), "yyyy-MM-dd");
+      case "custom": return dateFrom ? format(dateFrom, "yyyy-MM-dd") : null;
+      case "allTime": return null;
     }
-  }, []);
+  }, [dateFrom]);
+
+  const getEndDate = useCallback((p: PeriodPreset): string | null => {
+    if (p === "custom" && dateTo) return format(dateTo, "yyyy-MM-dd");
+    return null;
+  }, [dateTo]);
 
   const fetchSummary = useCallback(async () => {
     setIsLoadingSummary(true);
