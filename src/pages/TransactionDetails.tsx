@@ -2196,24 +2196,47 @@ const TransactionDetails = () => {
           ) : isCryptoToIban ? (
             <>
               {isCryptoToIbanCryptoSender ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
-                    <span className="font-medium">{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.fee")} ({receipt?.amount && receipt?.fee ? `${((receipt.fee / receipt.amount) * 100).toFixed(0)}%` : '1%'})</span>
-                    <span className="font-medium">{(receipt?.fee || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
-                    <span className="font-medium">1 USDT = {receipt?.exchange_rate || 3.65} AED</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className="text-muted-foreground">{t("transaction.creditedToIban")}</span>
-                    <span className="font-semibold text-green-500">+{(receipt?.movements?.[1]?.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
-                  </div>
-                </>
+                (() => {
+                  const meta = (receipt as any)?.metadata || (receipt as any) || {};
+                  const amountUsdt = meta.amount_usdt || receipt?.amount || transaction.amountUSDT;
+                  const svcFeePct = meta.service_fee_percent ?? 0;
+                  const svcFee = meta.service_fee_usdt ?? (svcFeePct > 0 ? (amountUsdt * svcFeePct / 100) : 0);
+                  const netFee = meta.network_fee_usdt ?? meta.fee_usdt ?? receipt?.fee ?? 5.90;
+                  const actualNetFee = meta.network_fee_usdt ?? (svcFee > 0 ? (meta.fee_usdt ?? receipt?.fee ?? 5.90) - svcFee : (meta.fee_usdt ?? receipt?.fee ?? 5.90));
+                  const totalDebit = meta.total_debited_usdt || (amountUsdt + (meta.fee_usdt ?? receipt?.fee ?? 0));
+                  const rate = meta.exchange_rate_usdt_to_aed || receipt?.exchange_rate || 3.65;
+                  const creditedAed = meta.credited_aed || receipt?.movements?.[1]?.amount || (amountUsdt * rate);
+                  return (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
+                        <span className="font-medium">{Number(amountUsdt).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                      </div>
+                      {svcFee > 0 && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">{t("transaction.serviceFee", "Комиссия")} ({svcFeePct}%)</span>
+                          <span className="font-medium">{Number(svcFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t("transaction.networkFeeFlat", "Сбор сети")}</span>
+                        <span className="font-medium">{Number(actualNetFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t("transaction.totalDeducted", "Итого списано")}</span>
+                        <span className="font-medium">{Number(totalDebit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t("transaction.exchangeRate")}</span>
+                        <span className="font-medium">1 USDT = {Number(rate).toFixed(2)} AED</span>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
+                        <span className="text-muted-foreground">{t("transaction.creditedToIban")}</span>
+                        <span className="font-semibold text-green-500">+{Number(creditedAed).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED</span>
+                      </div>
+                    </>
+                  );
+                })()
               ) : (
                 <>
                   <div className="flex items-center justify-between">
