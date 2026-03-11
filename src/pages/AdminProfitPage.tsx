@@ -221,7 +221,7 @@ export default function AdminProfitPage() {
     params.set("offset", String(offset));
     if (startDate) params.set("start_date", startDate);
     if (endDate) params.set("end_date", endDate);
-    if (subTab !== "all") params.set("fee_type", subTab);
+
     const res = await apiRequest<any>(
       `/transactions/admin/revenue/transactions/?${params.toString()}`,
       { method: "GET" },
@@ -234,7 +234,7 @@ export default function AdminProfitPage() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, [period, subTab, getStartDate, getEndDate]);
+  }, [period, getStartDate, getEndDate]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
@@ -245,8 +245,18 @@ export default function AdminProfitPage() {
     fetchTransactions(newOffset);
   };
 
-  // ─── Derived data (server-side filtered by fee_type) ───────
-  const filteredTx = transactions;
+  // ─── Derived data (front-side filtered + sorted) ───────────
+  const filteredTx = useMemo(() => {
+    const byTab = subTab === "all"
+      ? transactions
+      : transactions.filter((tx) => feeTypeToTab(tx.fee_type) === subTab);
+
+    return [...byTab].sort((a, b) => {
+      const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return bTime - aTime;
+    });
+  }, [transactions, subTab]);
 
   // Group transactions by date
   const dateGroups = useMemo((): DateGroup[] => {
