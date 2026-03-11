@@ -331,7 +331,7 @@ export default function AdminProfitPage() {
                 </Button>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-bold tracking-tight">Revenue</span>
+                    <span className="text-base font-bold tracking-tight">Profit</span>
                     <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
                       <Crown className="w-2.5 h-2.5" />Root
                     </Badge>
