@@ -80,9 +80,7 @@ const getMeta = (type: string) => FEE_META[type] || { label: type, icon: DollarS
 function formatDateHeader(dateStr: string): string {
   try {
     const d = parseISO(dateStr);
-    if (isToday(d)) return "Сегодня";
-    if (isYesterday(d)) return "Вчера";
-    return format(d, "d MMMM yyyy", { locale: ru });
+    return format(d, "dd.MM.yyyy");
   } catch {
     return dateStr;
   }
