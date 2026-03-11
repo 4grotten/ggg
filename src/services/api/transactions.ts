@@ -627,6 +627,20 @@ export const mapApiTransactionToLocal = (tx: ApiTransaction): Transaction => {
     }
   }
 
+  // Post-processing: for crypto_to_iban, ensure amountLocal has the credited AED value from metadata
+  const isCryptoToIbanType = tx.type === 'crypto_to_iban';
+  if (isCryptoToIbanType && (amountLocal === absAmount || amountLocal === 0)) {
+    const meta = tx.metadata as Record<string, unknown> | null;
+    const aedFromMeta = meta?.credited_aed ?? meta?.fiat_amount_aed ?? meta?.credited_amount_aed;
+    if (aedFromMeta && Number(aedFromMeta) > 0) {
+      amountLocal = Math.abs(Number(aedFromMeta));
+    } else if (tx.exchange_rate) {
+      const rate = parseFloat(String(tx.exchange_rate));
+      if (rate > 0) {
+        amountLocal = absAmount * rate;
+      }
+    }
+  }
   return {
     id: `api_${tx.id}`,
     merchant,
