@@ -485,7 +485,7 @@ const handleClick = (transaction: Transaction) => {
                   <div className="text-right shrink-0 ml-1 sm:ml-2">
                     {(isOutgoingCryptoToBank || isIncomingCryptoToBank) ? (
                       <>
-                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
+                         <p className={`font-semibold text-xs sm:text-sm ${colorClass}`}>
                           {prefix}{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                         <p className="text-[10px] sm:text-xs text-muted-foreground">
