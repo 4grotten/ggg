@@ -101,7 +101,7 @@ export default function AdminProfitPage() {
   const [txCount, setTxCount] = useState(0);
   const [isLoadingSummary, setIsLoadingSummary] = useState(true);
   const [isLoadingTx, setIsLoadingTx] = useState(true);
-  const [period, setPeriod] = useState<PeriodPreset>("month");
+  const [period, setPeriod] = useState<PeriodPreset>("all");
   const [subTab, setSubTab] = useState<SubTab>("all");
   const [txOffset, setTxOffset] = useState(0);
   const [selectedTx, setSelectedTx] = useState<RevenueTransaction | null>(null);
@@ -258,20 +258,8 @@ export default function AdminProfitPage() {
         </div>
 
         <div className="px-4 pb-24 space-y-4">
-          {/* ─── Period Selector ────────────────────────────────── */}
-          <div className="flex gap-1.5 p-1 bg-muted/50 rounded-xl overflow-x-auto scrollbar-hide">
-            {periodPresets.map((p) => (
-              <button
-                key={p.value}
-                onClick={() => setPeriod(p.value)}
-                className={cn(
-                  "flex-1 min-w-fit py-2 px-3 rounded-lg text-xs font-medium transition-all whitespace-nowrap",
-                  period === p.value ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {p.label}
-              </button>
-            ))}
+          {/* Refresh button */}
+          <div className="flex justify-end">
             <button onClick={() => { fetchSummary(); fetchTransactions(0); setTxOffset(0); }} className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
