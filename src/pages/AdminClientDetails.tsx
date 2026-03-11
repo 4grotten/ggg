@@ -968,34 +968,44 @@ export default function AdminClientDetails() {
 
 
         {/* Role Selector */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-primary" />
-            <h4 className="font-semibold">{t("admin.clients.roleLabel")}</h4>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            {ROLE_OPTIONS.map((role) => (
-              <button
-                key={role.id}
-                onClick={() => setSelectedRole(role.id)}
-                className={cn(
-                  "relative p-3 rounded-xl border-2 transition-all duration-200 text-center",
-                  selectedRole === role.id
-                    ? "border-primary bg-primary/10"
-                    : "border-border/50 bg-muted/30 hover:border-border"
+        {(() => {
+          const isRoot = (currentUser as any)?.role === 'root';
+          return (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary" />
+                <h4 className="font-semibold">{t("admin.clients.roleLabel")}</h4>
+                {!isRoot && (
+                  <span className="text-xs text-muted-foreground ml-auto">({t("admin.clients.rootOnly", "Только Root")})</span>
                 )}
-              >
-                <div className={cn("w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center text-xl", role.color)}>
-                  {role.icon}
-                </div>
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <span className="font-semibold text-sm">{role.label}</span>
-                  {selectedRole === role.id && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {ROLE_OPTIONS.map((role) => (
+                  <button
+                    key={role.id}
+                    onClick={() => isRoot && setSelectedRole(role.id)}
+                    disabled={!isRoot}
+                    className={cn(
+                      "relative p-3 rounded-xl border-2 transition-all duration-200 text-center",
+                      selectedRole === role.id
+                        ? "border-primary bg-primary/10"
+                        : "border-border/50 bg-muted/30 hover:border-border",
+                      !isRoot && "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    <div className={cn("w-10 h-10 mx-auto rounded-xl bg-gradient-to-br flex items-center justify-center text-xl", role.color)}>
+                      {role.icon}
+                    </div>
+                    <div className="flex items-center justify-center gap-1 mt-2">
+                      <span className="font-semibold text-sm">{role.label}</span>
+                      {selectedRole === role.id && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Subscription Type */}
         <div className="space-y-3">
