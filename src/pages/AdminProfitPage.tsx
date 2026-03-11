@@ -660,7 +660,7 @@ export default function AdminProfitPage() {
                     onClick={() => setCustomDateField("to")}
                     className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
                   >
-                    Далее
+                    {t("profit.next")}
                   </button>
                 )}
                 {customDateField === "to" && tempCustomFrom && tempCustomTo && (
