@@ -163,6 +163,29 @@ export default function AdminClients() {
             </Button>
           </div>
 
+          {/* Status tabs */}
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+            {([
+              { key: "all" as StatusFilter, label: t("admin.clients.all", "Все") },
+              { key: "inactive" as StatusFilter, label: t("admin.clients.inactive", "Неактивен") },
+              { key: "active" as StatusFilter, label: t("admin.clients.active", "Активен") },
+              { key: "blocked" as StatusFilter, label: t("admin.clients.blocked", "Заблокирован") },
+            ]).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setStatusFilter(tab.key)}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
+                  statusFilter === tab.key
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-muted/60 text-muted-foreground hover:bg-muted"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
           {/* Filters panel */}
           <AnimatePresence>
             {showFilters && (
