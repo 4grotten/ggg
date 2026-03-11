@@ -64,7 +64,15 @@ export const PasswordMatchInput = ({
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => onPasswordChange(e.target.value)}
+            onPaste={(e) => {
+              const pasted = e.clipboardData?.getData('text');
+              if (pasted) {
+                e.preventDefault();
+                onPasswordChange(pasted);
+              }
+            }}
             placeholder={passwordPlaceholder}
+            autoComplete="new-password"
             className="flex h-14 w-full rounded-2xl border border-border bg-card px-4 pr-12 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
           <button
