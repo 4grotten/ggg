@@ -328,7 +328,7 @@ export default function AdminProfitPage() {
       return `${format(dateFrom, "dd.MM.yyyy")} - ${format(dateTo, "dd.MM.yyyy")}`;
     }
     const preset = presetOptions.find(p => p.key === period);
-    return preset?.label || "За всё время";
+    return preset?.label || t("profit.allTime");
   };
 
   const sortedTypes = summary ? Object.entries(summary.byType).sort(([, a], [, b]) => b.total - a.total) : [];
