@@ -1,6 +1,5 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.db import transaction as db_transaction
 from .models import AdminActionHistory, Profiles
 from apps.transactions_apps.models import Transactions
 from .notifications import dispatch_notifications, notify_transaction_parties
@@ -65,11 +64,7 @@ def transaction_status_notification(sender, instance, created, **kwargs):
     )
 
     if should_notify:
-        def _dispatch_after_commit():
-            # External notifications first (critical path)
-            threading.Thread(target=notify_transaction_parties, args=(instance.id,), daemon=True).start()
-            # Realtime UI broadcast second
-            threading.Thread(target=broadcast_transaction_to_frontend, args=(instance,), daemon=True).start()
-
-        # Prevent race condition: notify thread may run before DB commit and miss txn row
-        db_transaction.on_commit(_dispatch_after_commit)
+        # Broadcast to frontend FIRST (fastest path for UI update)
+        threading.Thread(target=broadcast_transaction_to_frontend, args=(instance,), daemon=True).start()
+        # Then send Telegram/WhatsApp/Email notifications
+        threading.Thread(target=notify_transaction_parties, args=(instance.id,), daemon=True).start()
