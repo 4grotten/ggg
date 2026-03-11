@@ -495,7 +495,7 @@ export default function AdminProfitPage() {
                               <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min(pct, 100)}%` }} />
                             </div>
                             <span className="text-[10px] text-muted-foreground w-8 text-right">{pct.toFixed(0)}%</span>
-                            <span className="text-[10px] text-muted-foreground">{data.count} шт</span>
+                            <span className="text-[10px] text-muted-foreground">{data.count} {t("profit.pcs")}</span>
                           </div>
                         </div>
                       </motion.div>
