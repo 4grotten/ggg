@@ -2129,6 +2129,8 @@
     "feeBankWithdrawal": "Banka çekimi",
     "feeBankTransfer": "Banka transferi",
     "feeCryptoWithdrawal": "Kripto çekimi",
+    "feeCryptoToCard": "Kripto → Kart",
+    "feeCryptoToIban": "Kripto → IBAN",
     "feeCryptoTopUp": "Kripto yükleme",
     "feeBankTopUp": "Banka yükleme",
     "feeNetworkFee": "Ağ komisyonu",
