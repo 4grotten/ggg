@@ -660,12 +660,15 @@ export default function AdminPanel() {
 
   const displayedClients = filteredClients !== undefined ? filteredClients : clients;
 
+  const isRoot = (user as any)?.role === 'root';
+
   const tabConfig = [
     { value: "rates", label: t("admin.tabs.rates"), icon: TrendingUp },
     { value: "fees", label: t("admin.tabs.fees"), icon: Percent },
     { value: "limits", label: t("admin.tabs.limits"), icon: Wallet },
     { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound, link: "/settings/admin/clients" },
     { value: "admins", label: t("admin.tabs.admins"), icon: Users, link: "/settings/admin/admins" },
+    ...(isRoot ? [{ value: "profit", label: "Profit", icon: DollarSign }] : []),
     { value: "system", label: t("admin.system.title", "Система"), icon: Settings },
   ];
 
