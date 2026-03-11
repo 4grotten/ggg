@@ -614,8 +614,14 @@ export default function AdminProfitPage() {
       {/* Period Selection Drawer */}
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
         <DrawerContent className="max-h-[85vh]">
-          <DrawerHeader className="pb-2">
+          <DrawerHeader className="pb-2 relative">
             <DrawerTitle>{t("profit.selectPeriod")}</DrawerTitle>
+            <button
+              onClick={() => setIsDateDrawerOpen(false)}
+              className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+            >
+              <X className="w-3.5 h-3.5 text-primary" />
+            </button>
           </DrawerHeader>
           <div className="px-4 pb-8 overflow-y-auto">
             {customDateField ? (
