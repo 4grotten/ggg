@@ -625,7 +625,7 @@ export default function AdminProfitPage() {
           {/* Load more */}
           {transactions.length < txCount && subTab === "all" && (
             <Button variant="ghost" size="sm" className="w-full text-xs" onClick={handleLoadMore} disabled={isLoadingTx}>
-              {isLoadingTx ? "Загрузка..." : `Загрузить ещё (${transactions.length}/${txCount})`}
+              {isLoadingTx ? t("profit.loading") : `${t("profit.loadMore")} (${transactions.length}/${txCount})`}
             </Button>
           )}
         </div>
