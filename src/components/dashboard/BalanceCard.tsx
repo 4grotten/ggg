@@ -121,61 +121,64 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
           </div>
         )}
 
-        {/* AED Account Balance */}
-        <div className="rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate('/account')}>
-          <div className="flex items-center gap-1.5 mb-1">
-            <Landmark className="w-3.5 h-3.5 text-muted-foreground" />
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-              {t("topUp.aedAccount", "AED Account")}{accountIbanLast4 && <span className="ml-1 opacity-60">•{accountIbanLast4}</span>}
-            </p>
+        {/* AED Account + USDT TRC20 Balances */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* AED Account Balance */}
+          <div className="rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate('/account')}>
+            <div className="flex items-center gap-1.5 mb-1">
+              <Landmark className="w-3.5 h-3.5 text-muted-foreground" />
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                {t("topUp.aedAccount", "AED Account")}{accountIbanLast4 && <span className="ml-1 opacity-60">•{accountIbanLast4}</span>}
+              </p>
+            </div>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={isVisible ? "aed-visible" : "aed-hidden"}
+                className="text-sm font-semibold flex items-center gap-1"
+                initial={{ opacity: 0, filter: "blur(6px)" }}
+                animate={{ opacity: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, filter: "blur(6px)" }}
+                transition={{ duration: 0.3 }}
+              >
+                {isVisible ? (
+                  <>
+                    <img src={aedCurrency} alt="AED" className="w-4 h-4 dark:invert dark:brightness-200" />
+                    <AnimatedNumber key={`${animationKey}-aed-account`} value={accountBalance} duration={800} />
+                    <span className="text-xs text-muted-foreground ml-1">AED</span>
+                  </>
+                ) : "••••••"}
+              </motion.span>
+            </AnimatePresence>
           </div>
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={isVisible ? "aed-visible" : "aed-hidden"}
-              className="text-sm font-semibold flex items-center gap-1"
-              initial={{ opacity: 0, filter: "blur(6px)" }}
-              animate={{ opacity: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, filter: "blur(6px)" }}
-              transition={{ duration: 0.3 }}
-            >
-              {isVisible ? (
-                <>
-                  <img src={aedCurrency} alt="AED" className="w-4 h-4 dark:invert dark:brightness-200" />
-                  <AnimatedNumber key={`${animationKey}-aed-account`} value={accountBalance} duration={800} />
-                  <span className="text-xs text-muted-foreground ml-1">AED</span>
-                </>
-              ) : "••••••"}
-            </motion.span>
-          </AnimatePresence>
-        </div>
 
-        {/* USDT TRC20 Balance */}
-        <div className="rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate('/wallet')}>
-          <div className="flex items-center gap-1.5 mb-1">
-            <UsdtIcon size={14} />
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-              USDT TRC20<span className="ml-1 opacity-60">•TRC20</span>
-            </p>
-            <TronIcon size={10} className="opacity-50" />
+          {/* USDT TRC20 Balance */}
+          <div className="rounded-xl bg-secondary/50 hover:bg-secondary/80 p-3 cursor-pointer active:scale-[0.98] transition-all duration-200" onClick={() => navigate('/wallet')}>
+            <div className="flex items-center gap-1.5 mb-1">
+              <UsdtIcon size={14} />
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                USDT TRC20<span className="ml-1 opacity-60">•TRC20</span>
+              </p>
+              <TronIcon size={10} className="opacity-50" />
+            </div>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={isVisible ? "usdt-visible" : "usdt-hidden"}
+                className="text-sm font-semibold flex items-center gap-1"
+                initial={{ opacity: 0, filter: "blur(6px)" }}
+                animate={{ opacity: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, filter: "blur(6px)" }}
+                transition={{ duration: 0.3 }}
+              >
+                {isVisible ? (
+                  <>
+                    <span className="text-[#26A17B]">$</span>
+                    <AnimatedNumber key={`${animationKey}-usdt`} value={usdtBalance} duration={800} />
+                    <span className="text-xs text-muted-foreground ml-1">USDT</span>
+                  </>
+                ) : "••••••"}
+              </motion.span>
+            </AnimatePresence>
           </div>
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={isVisible ? "usdt-visible" : "usdt-hidden"}
-              className="text-sm font-semibold flex items-center gap-1"
-              initial={{ opacity: 0, filter: "blur(6px)" }}
-              animate={{ opacity: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, filter: "blur(6px)" }}
-              transition={{ duration: 0.3 }}
-            >
-              {isVisible ? (
-                <>
-                  <span className="text-[#26A17B]">$</span>
-                  <AnimatedNumber key={`${animationKey}-usdt`} value={usdtBalance} duration={800} />
-                  <span className="text-xs text-muted-foreground ml-1">USDT</span>
-                </>
-              ) : "••••••"}
-            </motion.span>
-          </AnimatePresence>
         </div>
 
 

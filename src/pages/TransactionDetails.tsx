@@ -325,7 +325,7 @@ const TransactionDetails = () => {
       // crypto_to_card specific
       cryptoToCardCreditedAed: receipt.type === 'crypto_to_card' ? receipt.movements?.find(m => m.type === 'credit')?.amount : undefined,
       cryptoToCardExchangeRate: receipt.type === 'crypto_to_card' ? receipt.exchange_rate : undefined,
-      cryptoToCardFeePercent: receipt.type === 'crypto_to_card' && receipt.amount && receipt.fee ? ((receipt.fee / receipt.amount) * 100) : undefined,
+      cryptoToCardFeePercent: receipt.type === 'crypto_to_card' ? (receipt.service_fee_percent ?? (receipt as any)?.metadata?.service_fee_percent ?? ((receipt.amount && receipt.fee) ? ((receipt.fee / receipt.amount) * 100) : undefined)) : undefined,
     };
   })() : null) as typeof mockTransaction;
 
@@ -2135,7 +2135,7 @@ const TransactionDetails = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.fee")} ({(transaction as any).cryptoToCardFeePercent?.toFixed(0) || '1'}%)</span>
-                <span className="font-medium">{transaction.transferFee?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                <span className="font-medium">{Number((receipt as any)?.service_fee_usdt ?? (receipt as any)?.metadata?.service_fee_usdt ?? (((receipt?.amount ?? 0) * (Number((receipt as any)?.service_fee_percent ?? (receipt as any)?.metadata?.service_fee_percent ?? 1) / 100)))).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
@@ -2723,9 +2723,9 @@ const TransactionDetails = () => {
                         return (order[a] ?? 90) - (order[b] ?? 90);
                       })
                       .map(([key, value]) => (
-                      <div key={key} className="flex items-start justify-between gap-3">
+                      <div key={key} className="flex flex-col gap-1">
                         <span className="text-muted-foreground shrink-0">{formatReceiptKey(key)}</span>
-                        <pre className="font-medium text-right text-xs whitespace-pre-wrap break-all max-w-[210px] m-0">
+                        <pre className="font-medium text-left text-xs whitespace-pre-wrap break-all max-w-full m-0 overflow-x-auto">
                           {renderReceiptValue(key, value)}
                         </pre>
                       </div>
