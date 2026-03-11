@@ -90,7 +90,7 @@ const SUB_TAB_KEYS: { value: SubTab; labelKey: string; icon: typeof DollarSign }
 
 const num = (v: string | number | null | undefined): number => parseFloat(String(v ?? 0)) || 0;
 const fmtAmount = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const getMeta = (type: string) => FEE_META[type] || { label: type, icon: DollarSign, colorClass: "bg-muted text-muted-foreground" };
+const getMetaRaw = (type: string) => FEE_META_KEYS[type] || { labelKey: type, icon: DollarSign, colorClass: "bg-muted text-muted-foreground" };
 
 function formatDateHeader(dateStr: string): string {
   try {
