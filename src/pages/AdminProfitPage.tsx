@@ -474,7 +474,7 @@ export default function AdminProfitPage() {
                           <div key={cur} className="flex items-center gap-3">
                             {cur === "USDT" 
                               ? <UsdtIcon size={28} /> 
-                              : <img src={aedCurrency} alt="AED" className="w-7 h-7 brightness-0 invert" />
+                              : <img src={aedCurrency} alt="AED" className="w-8 h-8 brightness-0 invert" />
                             }
                             <p className="text-2xl font-bold text-white tracking-tight font-mono">
                               {fmtAmount(data.total)}
