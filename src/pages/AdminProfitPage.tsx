@@ -608,7 +608,7 @@ export default function AdminProfitPage() {
                                   {feePercent > 0 && <DetailRow label={t("profit.percent")} value={`${feePercent}%`} />}
                                   <DetailRow label={t("profit.userId")} value={tx.user_id} />
                                   <DetailRow label={t("profit.date")} value={tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm:ss") : "—"} />
-                                  {tx.transaction_id && <DetailRow label="ID транзакции" value={tx.transaction_id.slice(0, 8) + "..."} />}
+                                  {tx.transaction_id && <DetailRow label={t("profit.transactionId")} value={tx.transaction_id.slice(0, 8) + "..."} />}
                                 </div>
                               </motion.div>
                             )}
