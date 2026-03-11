@@ -136,6 +136,7 @@ export default function AdminProfitPage() {
   const [isLoadingTx, setIsLoadingTx] = useState(true);
   const [period, setPeriod] = useState<PeriodPreset>("today");
   const [subTab, setSubTab] = useState<SubTab>("all");
+  const [prevSubTab, setPrevSubTab] = useState<SubTab>("all");
   const [txOffset, setTxOffset] = useState(0);
   const [selectedTx, setSelectedTx] = useState<RevenueTransaction | null>(null);
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
@@ -146,6 +147,21 @@ export default function AdminProfitPage() {
   const [tempCustomTo, setTempCustomTo] = useState<Date | undefined>(undefined);
   const [hasSelectedFrom, setHasSelectedFrom] = useState(false);
   const TX_LIMIT = 50;
+
+  // Per-tab transaction cache
+  const [txCache, setTxCache] = useState<Record<string, { transactions: RevenueTransaction[]; count: number }>>({});
+  const cacheKeyBase = `${period}_${dateFrom?.toISOString()}_${dateTo?.toISOString()}`;
+
+  const handleSubTabChange = (newTab: SubTab) => {
+    if (newTab === subTab) return;
+    setPrevSubTab(subTab);
+    setSubTab(newTab);
+  };
+
+  // Slide direction based on tab index
+  const subTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === subTab);
+  const prevSubTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === prevSubTab);
+  const slideDirection = subTabIndex >= prevSubTabIndex ? 1 : -1;
 
   const today = new Date();
 
@@ -212,7 +228,16 @@ export default function AdminProfitPage() {
     setIsLoadingSummary(false);
   }, [period, getStartDate, getEndDate]);
 
-  const fetchTransactions = useCallback(async (offset = 0) => {
+  const fetchTransactions = useCallback(async (offset = 0, forceRefresh = false) => {
+    const cacheKey = `${cacheKeyBase}_${subTab}`;
+    
+    // Return cached data instantly if available (only for first page)
+    if (offset === 0 && !forceRefresh && txCache[cacheKey]) {
+      setTransactions(txCache[cacheKey].transactions);
+      setTxCount(txCache[cacheKey].count);
+      return; // no loading state needed
+    }
+    
     setIsLoadingTx(true);
     const startDate = getStartDate(period);
     const endDate = getEndDate(period);
@@ -231,11 +256,19 @@ export default function AdminProfitPage() {
     if (res.data) {
       const results: RevenueTransaction[] = Array.isArray(res.data) ? res.data : Array.isArray(res.data.results) ? res.data.results : [];
       const count = Array.isArray(res.data) ? res.data.length : (res.data.count ?? results.length);
-      setTransactions(prev => offset === 0 ? results : [...prev, ...results]);
+      const newTx = offset === 0 ? results : [...transactions, ...results];
+      setTransactions(newTx);
       setTxCount(count);
+      // Cache first-page results
+      if (offset === 0) {
+        setTxCache(prev => ({ ...prev, [cacheKey]: { transactions: results, count } }));
+      }
     }
     setIsLoadingTx(false);
-  }, [period, subTab, getStartDate, getEndDate]);
+  }, [period, subTab, getStartDate, getEndDate, cacheKeyBase, txCache, transactions]);
+
+  // Clear cache when period changes
+  useEffect(() => { setTxCache({}); }, [cacheKeyBase]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
@@ -393,7 +426,7 @@ export default function AdminProfitPage() {
                 <div className="relative flex items-center justify-between mb-5">
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={(e) => { e.stopPropagation(); fetchSummary(); fetchTransactions(0); setTxOffset(0); }}
+                      onClick={(e) => { e.stopPropagation(); setTxCache({}); fetchSummary(); fetchTransactions(0, true); setTxOffset(0); }}
                       className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
                     >
                       <RefreshCw className="w-4 h-4 text-white/70" />
@@ -500,7 +533,7 @@ export default function AdminProfitPage() {
               return (
                 <button
                   key={tab.value}
-                  onClick={() => setSubTab(tab.value)}
+                  onClick={() => handleSubTabChange(tab.value)}
                   className={cn(
                     "shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
                     isActive ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
@@ -517,93 +550,102 @@ export default function AdminProfitPage() {
           </div>
 
           {/* ─── Grouped Transactions ───────────────────────────── */}
-          {isLoadingTx && transactions.length === 0 ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="rounded-2xl bg-card border border-border p-4 space-y-3">
-                  <Skeleton className="h-4 w-32" />
-                  {Array.from({ length: 2 }).map((_, j) => (
-                    <div key={j} className="flex items-center gap-3">
-                      <Skeleton className="w-9 h-9 rounded-xl shrink-0" />
-                      <div className="flex-1 space-y-1.5"><Skeleton className="h-3 w-28" /><Skeleton className="h-2.5 w-20" /></div>
-                      <Skeleton className="h-4 w-16" />
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          ) : dateGroups.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground text-sm">{t("profit.noTransactions")}</div>
-          ) : (
-            <div className="space-y-3">
-              {dateGroups.map((group) => (
-                <div key={group.date} className="rounded-2xl bg-card border border-border overflow-hidden">
-                  {/* Date header with day total */}
-                  <div className="px-4 py-2.5 border-b border-border flex items-center justify-between bg-muted/30">
-                    <span className="text-xs font-semibold text-foreground">{group.label}</span>
-                    <span className="text-xs font-bold text-[#007AFF]">
-                      +{fmtAmount(group.dayTotal)} AED
-                    </span>
-                  </div>
-                  {/* Transactions in this day */}
-                  <div className="divide-y divide-border">
-                    {group.transactions.map((tx) => {
-                      const meta = getMeta(tx.fee_type);
-                      const Icon = meta.icon;
-                      const amount = num(tx.fee_amount);
-                      const baseAmount = num(tx.base_amount);
-                      const feePercent = num(tx.fee_percent);
-                      const isExpanded = selectedTx?.id === tx.id && !tx.transaction_id;
-
-                      return (
-                        <div key={tx.id} className="cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => handleTxClick(tx)}>
-                          <div className="px-4 py-3 flex items-center gap-3">
-                            <div className={cn("shrink-0 w-9 h-9 rounded-xl flex items-center justify-center", meta.colorClass)}>
-                              <Icon className="w-4 h-4" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-foreground truncate">{meta.label}</p>
-                              <p className="text-[10px] text-muted-foreground mt-0.5">
-                                {tx.created_at ? format(new Date(tx.created_at), "HH:mm") : "—"}
-                                {feePercent > 0 && ` · ${feePercent}%`}
-                                {` · ID: ${tx.user_id}`}
-                              </p>
-                            </div>
-                            <div className="text-right shrink-0">
-                              <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                                +{fmtAmount(amount)} {tx.fee_currency || "AED"}
-                              </p>
-                              <p className="text-[10px] text-muted-foreground">
-                                {t("profit.from")} {fmtAmount(baseAmount)} {tx.base_currency || ""}
-                              </p>
-                            </div>
-                            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+          <div className="overflow-hidden">
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.div
+                key={subTab}
+                initial={{ x: slideDirection * 80, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: slideDirection * -80, opacity: 0 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              >
+                {isLoadingTx && transactions.length === 0 ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="rounded-2xl bg-card border border-border p-4 space-y-3">
+                        <Skeleton className="h-4 w-32" />
+                        {Array.from({ length: 2 }).map((_, j) => (
+                          <div key={j} className="flex items-center gap-3">
+                            <Skeleton className="w-9 h-9 rounded-xl shrink-0" />
+                            <div className="flex-1 space-y-1.5"><Skeleton className="h-3 w-28" /><Skeleton className="h-2.5 w-20" /></div>
+                            <Skeleton className="h-4 w-16" />
                           </div>
-
-                          {/* Expanded details */}
-                          <AnimatePresence>
-                            {isExpanded && (
-                              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                <div className="px-4 pb-3 space-y-1.5 border-t border-border/50 pt-2 mx-4">
-                                  <DetailRow label={t("profit.feeType")} value={meta.label} />
-                                  <DetailRow label={t("profit.feeAmount")} value={`${fmtAmount(amount)} ${tx.fee_currency || "AED"}`} highlight />
-                                  <DetailRow label={t("profit.baseAmount")} value={`${fmtAmount(baseAmount)} ${tx.base_currency || ""}`} />
-                                  {feePercent > 0 && <DetailRow label={t("profit.percent")} value={`${feePercent}%`} />}
-                                  <DetailRow label={t("profit.userId")} value={tx.user_id} />
-                                  <DetailRow label={t("profit.date")} value={tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm:ss") : "—"} />
-                                  {tx.transaction_id && <DetailRow label={t("profit.transactionId")} value={tx.transaction_id.slice(0, 8) + "..."} />}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      );
-                    })}
+                        ))}
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ) : dateGroups.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground text-sm">{t("profit.noTransactions")}</div>
+                ) : (
+                  <div className="space-y-3">
+                    {dateGroups.map((group) => (
+                      <div key={group.date} className="rounded-2xl bg-card border border-border overflow-hidden">
+                        <div className="px-4 py-2.5 border-b border-border flex items-center justify-between bg-muted/30">
+                          <span className="text-xs font-semibold text-foreground">{group.label}</span>
+                          <span className="text-xs font-bold text-primary">
+                            +{fmtAmount(group.dayTotal)} AED
+                          </span>
+                        </div>
+                        <div className="divide-y divide-border">
+                          {group.transactions.map((tx) => {
+                            const meta = getMeta(tx.fee_type);
+                            const Icon = meta.icon;
+                            const amount = num(tx.fee_amount);
+                            const baseAmount = num(tx.base_amount);
+                            const feePercent = num(tx.fee_percent);
+                            const isExpanded = selectedTx?.id === tx.id && !tx.transaction_id;
+
+                            return (
+                              <div key={tx.id} className="cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => handleTxClick(tx)}>
+                                <div className="px-4 py-3 flex items-center gap-3">
+                                  <div className={cn("shrink-0 w-9 h-9 rounded-xl flex items-center justify-center", meta.colorClass)}>
+                                    <Icon className="w-4 h-4" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium text-foreground truncate">{meta.label}</p>
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                                      {tx.created_at ? format(new Date(tx.created_at), "HH:mm") : "—"}
+                                      {feePercent > 0 && ` · ${feePercent}%`}
+                                      {` · ID: ${tx.user_id}`}
+                                    </p>
+                                  </div>
+                                  <div className="text-right shrink-0">
+                                    <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                      +{fmtAmount(amount)} {tx.fee_currency || "AED"}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      {t("profit.from")} {fmtAmount(baseAmount)} {tx.base_currency || ""}
+                                    </p>
+                                  </div>
+                                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                </div>
+
+                                <AnimatePresence>
+                                  {isExpanded && (
+                                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                                      <div className="px-4 pb-3 space-y-1.5 border-t border-border/50 pt-2 mx-4">
+                                        <DetailRow label={t("profit.feeType")} value={meta.label} />
+                                        <DetailRow label={t("profit.feeAmount")} value={`${fmtAmount(amount)} ${tx.fee_currency || "AED"}`} highlight />
+                                        <DetailRow label={t("profit.baseAmount")} value={`${fmtAmount(baseAmount)} ${tx.base_currency || ""}`} />
+                                        {feePercent > 0 && <DetailRow label={t("profit.percent")} value={`${feePercent}%`} />}
+                                        <DetailRow label={t("profit.userId")} value={tx.user_id} />
+                                        <DetailRow label={t("profit.date")} value={tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm:ss") : "—"} />
+                                        {tx.transaction_id && <DetailRow label={t("profit.transactionId")} value={tx.transaction_id.slice(0, 8) + "..."} />}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {/* Load more */}
           {transactions.length < txCount && (
