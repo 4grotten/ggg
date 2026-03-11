@@ -361,11 +361,18 @@ const ConfirmPasswordInput = ({
           type="text"
           value={confirmPassword}
           onChange={(e) => onConfirmPasswordChange(e.target.value)}
+          onPaste={(e) => {
+            const pasted = e.clipboardData?.getData('text');
+            if (pasted) {
+              e.preventDefault();
+              onConfirmPasswordChange(pasted);
+            }
+          }}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={t('editProfile.changePassword.confirmPlaceholder') || 'Повторите пароль'}
           className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-text"
-          autoComplete="off"
+          autoComplete="new-password"
         />
         
         {/* Visual representation */}
@@ -1058,7 +1065,15 @@ const ProfileSteps = () => {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onPaste={(e) => {
+                      const pasted = e.clipboardData?.getData('text');
+                      if (pasted) {
+                        e.preventDefault();
+                        setPassword(pasted);
+                      }
+                    }}
                     placeholder="••••••••"
+                    autoComplete="new-password"
                     autoFocus
                     className={`flex h-14 w-full rounded-2xl border bg-card px-4 pr-12 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                       showError 
