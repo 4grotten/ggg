@@ -8,11 +8,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { format, subDays, startOfMonth, startOfYear } from "date-fns";
 
+interface RevenueSummaryRaw {
+  total_revenue: string | number;
+  by_type?: Record<string, { total: string | number; count: number }>;
+  by_fee_type?: Record<string, { total: string | number; count: number }>;
+  by_day?: Array<{ date: string; total: string | number }>;
+}
+
 interface RevenueSummary {
   total_revenue: number;
   total_transactions: number;
   by_fee_type: Record<string, { total: number; count: number }>;
-  period: { start_date: string; end_date: string };
 }
 
 interface RevenueTransaction {
