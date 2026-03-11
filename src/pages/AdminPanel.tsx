@@ -668,7 +668,7 @@ export default function AdminPanel() {
     { value: "limits", label: t("admin.tabs.limits"), icon: Wallet },
     { value: "clients", label: t("admin.tabs.clients"), icon: UsersRound, link: "/settings/admin/clients" },
     { value: "admins", label: t("admin.tabs.admins"), icon: Users, link: "/settings/admin/admins" },
-    ...(isRoot ? [{ value: "profit", label: "Profit", icon: DollarSign }] : []),
+    ...(isRoot ? [{ value: "profit", label: "Profit", icon: DollarSign, link: "/settings/admin/profit" }] : []),
     { value: "system", label: t("admin.system.title", "Система"), icon: Settings },
   ];
 
