@@ -409,7 +409,9 @@ export default function AdminProfitPage() {
                         <p className="text-[10px] text-white/40 uppercase tracking-wider">{cur}</p>
                       </div>
                     </div>
+                  ))}
                 </div>
+              
               </motion.div>
 
               {/* Type Breakdown */}
