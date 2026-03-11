@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAdminManagement, BackendClient } from "@/hooks/useAdminManagement";
 
+type StatusFilter = "all" | "active" | "inactive" | "blocked";
 type RoleFilter = "all" | "root" | "admin" | "moderator" | "user";
 type VerificationFilter = "all" | "verified" | "unverified";
 type AssetsFilter = "all" | "has_cards" | "has_accounts" | "has_crypto";
@@ -23,6 +24,7 @@ export default function AdminClients() {
   const { clients, clientsLoading, clientsError, searchClients, refetchClients } = useAdminManagement();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
   const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("all");
   const [assetsFilter, setAssetsFilter] = useState<AssetsFilter>("all");
@@ -43,6 +45,15 @@ export default function AdminClients() {
         const uid = (c.user_id || "").toLowerCase();
         return phone.includes(q) || name.includes(q) || uid.includes(q);
       });
+    }
+
+    // Status filter
+    if (statusFilter === "active") {
+      result = result.filter((c) => c.is_active !== false && !(c.is_blocked || (c.limits as any)?.is_blocked));
+    } else if (statusFilter === "inactive") {
+      result = result.filter((c) => c.is_active === false);
+    } else if (statusFilter === "blocked") {
+      result = result.filter((c) => c.is_blocked || (c.limits as any)?.is_blocked);
     }
 
     // Role filter
@@ -67,7 +78,7 @@ export default function AdminClients() {
     }
 
     return result;
-  }, [clients, searchQuery, roleFilter, verificationFilter, assetsFilter]);
+  }, [clients, searchQuery, statusFilter, roleFilter, verificationFilter, assetsFilter]);
 
   const activeFiltersCount = [
     roleFilter !== "all",
@@ -150,6 +161,29 @@ export default function AdminClients() {
                 </span>
               )}
             </Button>
+          </div>
+
+          {/* Status tabs */}
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+            {([
+              { key: "all" as StatusFilter, label: t("admin.clients.all", "Все") },
+              { key: "inactive" as StatusFilter, label: t("admin.clients.inactive", "Неактивен") },
+              { key: "active" as StatusFilter, label: t("admin.clients.active", "Активен") },
+              { key: "blocked" as StatusFilter, label: t("admin.clients.blocked", "Заблокирован") },
+            ]).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setStatusFilter(tab.key)}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
+                  statusFilter === tab.key
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-muted/60 text-muted-foreground hover:bg-muted"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           {/* Filters panel */}

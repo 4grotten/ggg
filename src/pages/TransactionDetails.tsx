@@ -2154,8 +2154,8 @@ const TransactionDetails = () => {
             (() => {
               const meta = (receipt as any)?.metadata || (receipt as any) || {};
               const amountUsdt = meta.amount_usdt || transaction.amountUSDT;
-              const svcFeePct = meta.service_fee_percent || 1;
-              const svcFee = meta.service_fee_usdt ?? (amountUsdt * svcFeePct / 100);
+              const svcFeePct = meta.service_fee_percent ?? 0;
+              const svcFee = meta.service_fee_usdt ?? (svcFeePct > 0 ? (amountUsdt * svcFeePct / 100) : 0);
               const netFee = meta.network_fee_usdt ?? 5.90;
               const totalFee = meta.fee_usdt || (svcFee + netFee);
               const totalDebit = meta.total_debited_usdt || (amountUsdt + totalFee);
@@ -2167,11 +2167,14 @@ const TransactionDetails = () => {
                     <span className="text-muted-foreground">{t("transaction.sentAmount")}</span>
                     <span className="font-medium">{Number(amountUsdt).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                   </div>
+                  {svcFee > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">{t("transaction.serviceFee", "Комиссия")} ({svcFeePct}%)</span>
+                      <span className="font-medium">{Number(svcFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t("transaction.fee")} ({svcFeePct}%)</span>
-                    <span className="font-medium">{Number(svcFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
-                  </div>
-                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t("transaction.networkFeeFlat", "Сбор сети")}</span>
                     <span className="text-muted-foreground">{t("transaction.networkFeeFlat")}</span>
                     <span className="font-medium">{Number(netFee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                   </div>
