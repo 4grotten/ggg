@@ -437,7 +437,9 @@ export default function AdminProfitPage() {
                     ))
                   ) : (
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black bg-[#007AFF]/20 text-[#007AFF]">د</div>
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#007AFF]/20">
+                        <img src={aedCurrency} alt="AED" className="w-5 h-5 brightness-0 invert" />
+                      </div>
                       <div className="flex-1">
                         <p className="text-2xl font-bold text-white tracking-tight font-mono">{fmtAmount(summary.totalRevenue)}</p>
                         <p className="text-[10px] text-white/40 uppercase tracking-wider">AED · {summary.totalTransactions} операций</p>
