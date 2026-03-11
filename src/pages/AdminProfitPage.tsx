@@ -163,6 +163,26 @@ export default function AdminProfitPage() {
   const prevSubTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === prevSubTab);
   const slideDirection = subTabIndex >= prevSubTabIndex ? 1 : -1;
 
+  // Tab pill sliding refs
+  const tabRefs = useRef<Record<string, HTMLButtonElement>>({});
+  const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = tabRefs.current[subTab];
+    if (el) {
+      const parent = el.parentElement;
+      if (parent) {
+        const parentRect = parent.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        setPillStyle({
+          left: elRect.left - parentRect.left + parent.scrollLeft,
+          width: elRect.width,
+          height: elRect.height,
+        });
+      }
+    }
+  }, [subTab, summary]);
+
   const today = new Date();
 
   const getStartDate = useCallback((p: PeriodPreset): string | null => {
