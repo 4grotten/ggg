@@ -396,7 +396,7 @@ export default function AdminProfitPage() {
                     </button>
                     <span className="text-xs text-white/50 uppercase tracking-widest font-semibold">Total Profit</span>
                   </div>
-                  <div className="flex flex-col items-end gap-1.5">
+                  <div className="flex items-center">
                     <button
                       onClick={(e) => { e.stopPropagation(); setIsDateDrawerOpen(true); }}
                       className="flex items-center gap-1.5 text-sm text-[#007AFF] font-semibold"
@@ -404,17 +404,13 @@ export default function AdminProfitPage() {
                       {getSelectedPeriodLabel()}
                       <ChevronDown className="w-4 h-4" />
                     </button>
-                    <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
-                      <TrendingUp className="w-3.5 h-3.5 text-[#007AFF]" />
-                      <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} транзакций</span>
-                    </div>
                   </div>
                 </div>
 
                 {/* Currency amounts from API by_currency, fallback to totalRevenue */}
                 <div className="relative space-y-3">
                   {Object.keys(summary.byCurrency).length > 0 ? (
-                    Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data]) => (
+                    Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data], i) => (
                       <div key={cur} className="flex items-center gap-3">
                         {cur === "USDT" 
                           ? <UsdtIcon size={28} /> 
@@ -424,6 +420,12 @@ export default function AdminProfitPage() {
                           {fmtAmount(data.total)}
                         </p>
                         <span className="text-2xl font-bold text-white/70">{cur}</span>
+                        {i === 0 && (
+                          <div className="ml-auto flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
+                            <TrendingUp className="w-3.5 h-3.5 text-[#007AFF]" />
+                            <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} транзакций</span>
+                          </div>
+                        )}
                       </div>
                     ))
                   ) : (
@@ -431,6 +433,10 @@ export default function AdminProfitPage() {
                       <img src={aedCurrency} alt="AED" className="w-7 h-7 brightness-0 invert" />
                       <p className="text-2xl font-bold text-white tracking-tight font-mono">{fmtAmount(summary.totalRevenue)}</p>
                       <span className="text-2xl font-bold text-white/70">AED</span>
+                      <div className="ml-auto flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
+                        <TrendingUp className="w-3.5 h-3.5 text-[#007AFF]" />
+                        <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} транзакций</span>
+                      </div>
                     </div>
                   )}
                 </div>
