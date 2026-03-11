@@ -68,6 +68,16 @@ const SUB_TABS: { value: SubTab; label: string; icon: typeof DollarSign }[] = [
 
 const num = (v: string | number | null | undefined): number => parseFloat(String(v ?? 0)) || 0;
 
+// Map raw backend fee_type to tab category
+const feeTypeToTab = (ft: string): SubTab => {
+  if (["card_transfer", "card_to_card", "card_activation"].includes(ft)) return "cards";
+  if (["bank_withdrawal", "bank_transfer", "top_up_bank"].includes(ft)) return "banks";
+  if (["crypto_withdrawal", "crypto_to_card", "crypto_to_iban", "top_up_crypto"].includes(ft)) return "crypto";
+  if (ft === "network_fee") return "network";
+  if (["currency_conversion", "exchange_spread"].includes(ft)) return "conversion";
+  return "all";
+};
+
 const fmtAmount = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const getMeta = (type: string) => FEE_META[type] || { label: type, icon: DollarSign, colorClass: "bg-muted text-muted-foreground" };
@@ -134,6 +144,8 @@ export function AdminProfitTab() {
     params.set("limit", String(TX_LIMIT));
     params.set("offset", String(offset));
     if (subTab !== "all") params.set("fee_type", subTab);
+    const startDate = getStartDate(period);
+    if (startDate) params.set("start_date", startDate);
     const res = await apiRequest<any>(
       `/transactions/admin/revenue/transactions/?${params.toString()}`,
       { method: "GET" },
@@ -150,7 +162,7 @@ export function AdminProfitTab() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, [subTab]);
+  }, [subTab, period, getStartDate]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
@@ -175,12 +187,12 @@ export function AdminProfitTab() {
     return totals;
   }, [filteredTx, transactions, subTab]);
 
-  // Sub-tab counts
+  // Sub-tab counts (map raw fee_type → tab category)
   const subTabCounts = useMemo(() => {
     const counts: Record<string, number> = { all: transactions.length };
     for (const tx of transactions) {
-      const type = tx.fee_type === "card_to_card" ? "card_transfer" : tx.fee_type;
-      counts[type] = (counts[type] || 0) + 1;
+      const tab = feeTypeToTab(tx.fee_type);
+      if (tab !== "all") counts[tab] = (counts[tab] || 0) + 1;
     }
     return counts;
   }, [transactions]);
