@@ -474,7 +474,7 @@ export default function AdminProfitPage() {
                 <div className="rounded-2xl bg-card border border-border p-4 space-y-2.5">
                   <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Percent className="w-4 h-4 text-primary" />
-                    По типу комиссии
+                    {t("profit.byFeeType")}
                   </h3>
                   {sortedTypes.map(([type, data], i) => {
                     const pct = summary.totalRevenue > 0 ? (data.total / summary.totalRevenue) * 100 : 0;
