@@ -346,8 +346,9 @@ export default function AdminProfitPage() {
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-bold tracking-tight">Profit</span>
+                  <span className="text-base font-bold tracking-tight">Profit</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-xs text-muted-foreground">{user?.full_name || "Admin"}</span>
                     <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
                       <Crown className="w-2.5 h-2.5" />Root
                     </Badge>
@@ -408,26 +409,36 @@ export default function AdminProfitPage() {
                   </div>
                 </div>
 
-                {/* Currency amounts from API by_currency */}
+                {/* Currency amounts from API by_currency, fallback to totalRevenue */}
                 <div className="relative space-y-3">
-                  {Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data]) => (
-                    <div key={cur} className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black",
-                        cur === "USDT" 
-                          ? "bg-[#26A17B]/20 text-[#26A17B]" 
-                          : "bg-[#007AFF]/20 text-[#007AFF]"
-                      )}>
-                        {cur === "USDT" ? "₮" : "د"}
+                  {Object.keys(summary.byCurrency).length > 0 ? (
+                    Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data]) => (
+                      <div key={cur} className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black",
+                          cur === "USDT" 
+                            ? "bg-[#26A17B]/20 text-[#26A17B]" 
+                            : "bg-[#007AFF]/20 text-[#007AFF]"
+                        )}>
+                          {cur === "USDT" ? "₮" : "د"}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-2xl font-bold text-white tracking-tight font-mono">
+                            {fmtAmount(data.total)}
+                          </p>
+                          <p className="text-[10px] text-white/40 uppercase tracking-wider">{cur} · {data.count} операций</p>
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black bg-[#007AFF]/20 text-[#007AFF]">د</div>
                       <div className="flex-1">
-                        <p className="text-2xl font-bold text-white tracking-tight font-mono">
-                          {fmtAmount(data.total)}
-                        </p>
-                        <p className="text-[10px] text-white/40 uppercase tracking-wider">{cur} · {data.count} операций</p>
+                        <p className="text-2xl font-bold text-white tracking-tight font-mono">{fmtAmount(summary.totalRevenue)}</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-wider">AED · {summary.totalTransactions} операций</p>
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 {/* Category breakdown: service / network / exchange */}
