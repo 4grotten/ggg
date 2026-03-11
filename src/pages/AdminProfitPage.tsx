@@ -602,12 +602,12 @@ export default function AdminProfitPage() {
                             {isExpanded && (
                               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                                 <div className="px-4 pb-3 space-y-1.5 border-t border-border/50 pt-2 mx-4">
-                                  <DetailRow label="Тип комиссии" value={meta.label} />
-                                  <DetailRow label="Сумма комиссии" value={`${fmtAmount(amount)} ${tx.fee_currency || "AED"}`} highlight />
-                                  <DetailRow label="Базовая сумма" value={`${fmtAmount(baseAmount)} ${tx.base_currency || ""}`} />
-                                  {feePercent > 0 && <DetailRow label="Процент" value={`${feePercent}%`} />}
-                                  <DetailRow label="User ID" value={tx.user_id} />
-                                  <DetailRow label="Дата" value={tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm:ss") : "—"} />
+                                  <DetailRow label={t("profit.feeType")} value={meta.label} />
+                                  <DetailRow label={t("profit.feeAmount")} value={`${fmtAmount(amount)} ${tx.fee_currency || "AED"}`} highlight />
+                                  <DetailRow label={t("profit.baseAmount")} value={`${fmtAmount(baseAmount)} ${tx.base_currency || ""}`} />
+                                  {feePercent > 0 && <DetailRow label={t("profit.percent")} value={`${feePercent}%`} />}
+                                  <DetailRow label={t("profit.userId")} value={tx.user_id} />
+                                  <DetailRow label={t("profit.date")} value={tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm:ss") : "—"} />
                                   {tx.transaction_id && <DetailRow label="ID транзакции" value={tx.transaction_id.slice(0, 8) + "..."} />}
                                 </div>
                               </motion.div>
