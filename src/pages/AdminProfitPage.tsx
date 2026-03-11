@@ -286,12 +286,12 @@ export default function AdminProfitPage() {
   };
 
   const presetOptions: { key: PeriodPreset; label: string; dateRange: string }[] = [
-    { key: "allTime", label: "За всё время", dateRange: "" },
-    { key: "today", label: "Сегодня", dateRange: formatDateRange(today, today) },
-    { key: "thisWeek", label: "Неделя", dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
-    { key: "month", label: "Месяц", dateRange: formatDateRange(subMonths(today, 1), today) },
-    { key: "threeMonths", label: "3 месяца", dateRange: formatDateRange(subMonths(today, 3), today) },
-    { key: "year", label: "Год", dateRange: formatDateRange(subMonths(today, 12), today) },
+    { key: "allTime", label: t("profit.allTime"), dateRange: "" },
+    { key: "today", label: t("profit.today"), dateRange: formatDateRange(today, today) },
+    { key: "thisWeek", label: t("profit.week"), dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
+    { key: "month", label: t("profit.month"), dateRange: formatDateRange(subMonths(today, 1), today) },
+    { key: "threeMonths", label: t("profit.threeMonths"), dateRange: formatDateRange(subMonths(today, 3), today) },
+    { key: "year", label: t("profit.year"), dateRange: formatDateRange(subMonths(today, 12), today) },
   ];
 
   const handlePresetSelect = (preset: PeriodPreset) => {
