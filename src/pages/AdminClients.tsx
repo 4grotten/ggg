@@ -255,7 +255,7 @@ export default function AdminClients() {
                             </div>
                           )}
                         </div>
-                        <div className={cn("absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-card", (client.is_blocked || (client.limits as any)?.is_blocked) ? "bg-destructive" : "bg-emerald-500")} />
+                        <div className={cn("absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-card", (client.is_blocked || (client.limits as any)?.is_blocked) ? "bg-destructive" : client.is_active === false ? "bg-muted-foreground" : "bg-emerald-500")} />
                       </div>
 
                       <div className="flex-1 min-w-0">
