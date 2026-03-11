@@ -16,7 +16,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useAdminManagement } from "@/hooks/useAdminManagement";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AdminSetting, AppRole } from "@/types/admin";
 import { cn } from "@/lib/utils";
 import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
@@ -421,11 +421,13 @@ export default function AdminPanel() {
 
   // Log admin panel entry to audit history — once per visit to /settings/admin
   // Flag is cleared when user leaves this page (unmount), so re-entering logs again.
-  useEffect(() => {
-    const SESSION_KEY = 'admin_panel_login_logged';
+  const adminLoginLoggedRef = useRef(false);
 
-    // Already logged during this visit — skip (prevents re-log on tab switch within admin)
-    if (sessionStorage.getItem(SESSION_KEY)) return;
+  useEffect(() => {
+    // Wait until user is loaded
+    if (!user) return;
+    // Already logged during this mount — skip (prevents re-log on tab switch within admin)
+    if (adminLoginLoggedRef.current) return;
 
     const logAdminEntry = async () => {
       try {
@@ -462,21 +464,23 @@ export default function AdminPanel() {
           details,
         });
 
-        sessionStorage.setItem(SESSION_KEY, '1');
+        adminLoginLoggedRef.current = true;
       } catch {
         // silent fail
       }
     };
 
-    if (user && (user as any)?.role && ['admin', 'root'].includes((user as any).role.toLowerCase())) {
+    if (['admin', 'root'].includes(((user as any)?.role || '').toLowerCase())) {
       logAdminEntry();
     }
+  }, [user]); // re-run when user loads
 
-    // Cleanup: clear flag when leaving /settings/admin so next visit logs again
+  // Cleanup: reset ref on unmount so next visit logs again
+  useEffect(() => {
     return () => {
-      sessionStorage.removeItem(SESSION_KEY);
+      adminLoginLoggedRef.current = false;
     };
-  }, []); // only on mount/unmount
+  }, []);
 
   // Sync selected model with status
   useEffect(() => {
