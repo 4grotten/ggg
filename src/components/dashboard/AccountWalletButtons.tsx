@@ -73,7 +73,7 @@ export const AccountWalletButtons = ({
 
   return (
     <>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-3">
       {/* AED Account */}
       <div
         className="flex-1 rounded-2xl bg-secondary/50 p-4 flex flex-col gap-3 cursor-pointer group hover:bg-secondary/70 transition-colors"
