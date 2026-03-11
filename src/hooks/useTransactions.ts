@@ -64,8 +64,7 @@ export const useCryptoTransactionGroups = () => {
     queryKey: transactionKeys.cryptoGroups(),
     queryFn: fetchCryptoTransactionGroups,
     enabled: !!token,
-    staleTime: 1000 * 30,
-    refetchInterval: 15000,
+    staleTime: 1000 * 60 * 5,
     retry: 1,
   });
 };
