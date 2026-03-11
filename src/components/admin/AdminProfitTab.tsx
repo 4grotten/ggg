@@ -102,9 +102,16 @@ export function AdminProfitTab() {
       { method: "GET" },
       true
     );
+    console.log('[AdminProfitTab] raw response:', JSON.stringify(res.data).slice(0, 500));
     if (res.data) {
-      setTransactions(prev => offset === 0 ? res.data!.results : [...prev, ...res.data!.results]);
-      setTxCount(res.data.count);
+      const results = Array.isArray(res.data) 
+        ? res.data 
+        : Array.isArray((res.data as any).results) 
+          ? (res.data as any).results 
+          : [];
+      const count = Array.isArray(res.data) ? res.data.length : ((res.data as any).count ?? results.length);
+      setTransactions(prev => offset === 0 ? results : [...prev, ...results]);
+      setTxCount(count);
     }
     setIsLoadingTx(false);
   }, []);
