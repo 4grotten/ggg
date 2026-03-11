@@ -68,6 +68,16 @@ const SUB_TABS: { value: SubTab; label: string; icon: typeof DollarSign }[] = [
 
 const num = (v: string | number | null | undefined): number => parseFloat(String(v ?? 0)) || 0;
 
+// Map raw backend fee_type to tab category
+const feeTypeToTab = (ft: string): SubTab => {
+  if (["card_transfer", "card_to_card", "card_activation"].includes(ft)) return "cards";
+  if (["bank_withdrawal", "bank_transfer", "top_up_bank"].includes(ft)) return "banks";
+  if (["crypto_withdrawal", "crypto_to_card", "crypto_to_iban", "top_up_crypto"].includes(ft)) return "crypto";
+  if (ft === "network_fee") return "network";
+  if (["currency_conversion", "exchange_spread"].includes(ft)) return "conversion";
+  return "all";
+};
+
 const fmtAmount = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const getMeta = (type: string) => FEE_META[type] || { label: type, icon: DollarSign, colorClass: "bg-muted text-muted-foreground" };
