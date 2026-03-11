@@ -482,7 +482,7 @@ const handleClick = (transaction: Transaction) => {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right shrink-0 ml-2">
+                  <div className="text-right shrink-0 ml-1 sm:ml-2">
                     {(isOutgoingCryptoToBank || isIncomingCryptoToBank) ? (
                       <>
                         <p className={`font-semibold ${colorClass}`}>
