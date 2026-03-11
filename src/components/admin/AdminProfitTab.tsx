@@ -130,8 +130,12 @@ export function AdminProfitTab() {
   // ─── Fetch transactions ────────────────────────────────────
   const fetchTransactions = useCallback(async (offset = 0) => {
     setIsLoadingTx(true);
+    const params = new URLSearchParams();
+    params.set("limit", String(TX_LIMIT));
+    params.set("offset", String(offset));
+    if (subTab !== "all") params.set("fee_type", subTab);
     const res = await apiRequest<any>(
-      `/transactions/admin/revenue/transactions/?limit=${TX_LIMIT}&offset=${offset}`,
+      `/transactions/admin/revenue/transactions/?${params.toString()}`,
       { method: "GET" },
       true
     );
@@ -146,7 +150,7 @@ export function AdminProfitTab() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, []);
+  }, [subTab]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
