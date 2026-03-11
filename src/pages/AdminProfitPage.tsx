@@ -63,7 +63,7 @@ interface RevenueTransaction {
 }
 
 type PeriodPreset = "allTime" | "today" | "thisWeek" | "month" | "threeMonths" | "year" | "custom";
-type SubTab = "all" | "card_transfer" | "bank_withdrawal" | "crypto_withdrawal" | "network_fee" | "currency_conversion";
+type SubTab = "all" | "cards" | "banks" | "crypto" | "network" | "conversion";
 
 // ─── Constants ───────────────────────────────────────────────
 const FEE_META_KEYS: Record<string, { labelKey: string; icon: typeof DollarSign; colorClass: string }> = {
@@ -72,6 +72,8 @@ const FEE_META_KEYS: Record<string, { labelKey: string; icon: typeof DollarSign;
   bank_withdrawal:     { labelKey: "feeBankWithdrawal",   icon: Landmark,      colorClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
   bank_transfer:       { labelKey: "feeBankTransfer",     icon: Landmark,      colorClass: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
   crypto_withdrawal:   { labelKey: "feeCryptoWithdrawal", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  crypto_to_card:      { labelKey: "feeCryptoWithdrawal", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
+  crypto_to_iban:      { labelKey: "feeCryptoWithdrawal", icon: Bitcoin,       colorClass: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
   top_up_crypto:       { labelKey: "feeCryptoTopUp",      icon: Bitcoin,       colorClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
   top_up_bank:         { labelKey: "feeBankTopUp",        icon: Landmark,      colorClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
   network_fee:         { labelKey: "feeNetworkFee",       icon: Zap,           colorClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
@@ -81,17 +83,26 @@ const FEE_META_KEYS: Record<string, { labelKey: string; icon: typeof DollarSign;
 };
 
 const SUB_TAB_KEYS: { value: SubTab; labelKey: string; icon: typeof DollarSign }[] = [
-  { value: "all",                labelKey: "tabAll",        icon: Layers },
-  { value: "card_transfer",      labelKey: "tabTransfers",  icon: CreditCard },
-  { value: "bank_withdrawal",    labelKey: "tabBank",       icon: Landmark },
-  { value: "crypto_withdrawal",  labelKey: "tabCrypto",     icon: Bitcoin },
-  { value: "network_fee",        labelKey: "tabNetwork",    icon: Zap },
-  { value: "currency_conversion", labelKey: "tabConversion", icon: ArrowRightLeft },
+  { value: "all",        labelKey: "tabAll",        icon: Layers },
+  { value: "cards",      labelKey: "tabTransfers",  icon: CreditCard },
+  { value: "banks",      labelKey: "tabBank",       icon: Landmark },
+  { value: "crypto",     labelKey: "tabCrypto",     icon: Bitcoin },
+  { value: "network",    labelKey: "tabNetwork",    icon: Zap },
+  { value: "conversion", labelKey: "tabConversion", icon: ArrowRightLeft },
 ];
 
 const num = (v: string | number | null | undefined): number => parseFloat(String(v ?? 0)) || 0;
 const fmtAmount = (v: number) => v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const getMetaRaw = (type: string) => FEE_META_KEYS[type] || { labelKey: type, icon: DollarSign, colorClass: "bg-muted text-muted-foreground" };
+
+const feeTypeToTab = (feeType: string): SubTab => {
+  if (["card_transfer", "card_to_card", "card_activation"].includes(feeType)) return "cards";
+  if (["bank_withdrawal", "bank_transfer", "top_up_bank"].includes(feeType)) return "banks";
+  if (["crypto_withdrawal", "crypto_to_card", "crypto_to_iban", "top_up_crypto"].includes(feeType)) return "crypto";
+  if (feeType === "network_fee") return "network";
+  if (["currency_conversion", "exchange_spread"].includes(feeType)) return "conversion";
+  return "all";
+};
 
 function formatDateHeader(dateStr: string): string {
   try {
@@ -205,11 +216,14 @@ export default function AdminProfitPage() {
     setIsLoadingTx(true);
     const startDate = getStartDate(period);
     const endDate = getEndDate(period);
-    let qs = `?limit=${TX_LIMIT}&offset=${offset}`;
-    if (startDate) qs += `&start_date=${startDate}`;
-    if (endDate) qs += `&end_date=${endDate}`;
+    const params = new URLSearchParams();
+    params.set("limit", String(TX_LIMIT));
+    params.set("offset", String(offset));
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    if (subTab !== "all") params.set("fee_type", subTab);
     const res = await apiRequest<any>(
-      `/transactions/admin/revenue/transactions/${qs}`,
+      `/transactions/admin/revenue/transactions/?${params.toString()}`,
       { method: "GET" },
       true
     );
@@ -220,7 +234,7 @@ export default function AdminProfitPage() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, [period, getStartDate, getEndDate]);
+  }, [period, subTab, getStartDate, getEndDate]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
@@ -231,12 +245,8 @@ export default function AdminProfitPage() {
     fetchTransactions(newOffset);
   };
 
-  // ─── Derived data ──────────────────────────────────────────
-  const filteredTx = useMemo(() => {
-    if (subTab === "all") return transactions;
-    if (subTab === "card_transfer") return transactions.filter(tx => tx.fee_type === "card_transfer" || tx.fee_type === "card_to_card");
-    return transactions.filter(tx => tx.fee_type === subTab);
-  }, [transactions, subTab]);
+  // ─── Derived data (server-side filtered by fee_type) ───────
+  const filteredTx = transactions;
 
   // Group transactions by date
   const dateGroups = useMemo((): DateGroup[] => {
@@ -260,8 +270,8 @@ export default function AdminProfitPage() {
   const subTabCounts = useMemo(() => {
     const counts: Record<string, number> = { all: transactions.length };
     for (const tx of transactions) {
-      const type = tx.fee_type === "card_to_card" ? "card_transfer" : tx.fee_type;
-      counts[type] = (counts[type] || 0) + 1;
+      const tab = feeTypeToTab(tx.fee_type);
+      if (tab !== "all") counts[tab] = (counts[tab] || 0) + 1;
     }
     return counts;
   }, [transactions]);
@@ -595,7 +605,7 @@ export default function AdminProfitPage() {
           )}
 
           {/* Load more */}
-          {transactions.length < txCount && subTab === "all" && (
+          {transactions.length < txCount && (
             <Button variant="ghost" size="sm" className="w-full text-xs" onClick={handleLoadMore} disabled={isLoadingTx}>
               {isLoadingTx ? t("profit.loading") : `${t("profit.loadMore")} (${transactions.length}/${txCount})`}
             </Button>
