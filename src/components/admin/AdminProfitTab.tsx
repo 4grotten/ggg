@@ -41,7 +41,7 @@ interface RevenueTransaction {
 }
 
 type PeriodPreset = "today" | "week" | "month" | "year" | "all";
-type SubTab = "all" | "card_transfer" | "bank_withdrawal" | "crypto_withdrawal" | "network_fee" | "currency_conversion";
+type SubTab = "all" | "cards" | "banks" | "crypto" | "network" | "conversion";
 
 // ─── Constants ───────────────────────────────────────────────
 const FEE_META: Record<string, { label: string; icon: typeof DollarSign; colorClass: string }> = {
