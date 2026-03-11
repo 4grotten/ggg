@@ -196,8 +196,8 @@ const handleClick = (transaction: Transaction) => {
                     index < group.transactions.length - 1 ? 'border-b border-border/50' : ''
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                     <div className="relative shrink-0">
                       {isCardActivation ? (
                         <div 
                           className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
@@ -332,7 +332,7 @@ const handleClick = (transaction: Transaction) => {
                       )}
                     </div>
                     <div className="text-left min-w-0 flex-1 overflow-hidden">
-                      <p className="font-medium truncate">
+                      <p className="font-medium truncate text-xs sm:text-sm md:text-base">
                       {isOutgoingCryptoToBank
                           ? t("transaction.walletToIban")
                           : isIncomingCryptoToBank
@@ -362,7 +362,7 @@ const handleClick = (transaction: Transaction) => {
                            : translateMerchant(transaction.merchant, transaction.type, t)
                         }
                       </p>
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground truncate">
                         {transaction.time}
                         {isInternalCardTransfer
                           ? (() => {
@@ -482,64 +482,64 @@ const handleClick = (transaction: Transaction) => {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right shrink-0 ml-2">
+                  <div className="text-right shrink-0 ml-1 sm:ml-2">
                     {(isOutgoingCryptoToBank || isIncomingCryptoToBank) ? (
                       <>
-                        <p className={`font-semibold ${colorClass}`}>
+                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
                           {prefix}{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
                           {transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                         </p>
                       </>
                     ) : isCryptoToIban ? (
                       <>
-                        <p className={`font-semibold ${colorClass}`}>
+                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
                           {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
                           {transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                       </>
                     ) : walletView ? (
                       <>
-                        <p className={`font-semibold ${colorClass}`}>
+                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
                           {prefix}{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
                           {prefix}{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                       </>
                     ) : isInternalCardTransfer ? (
                       <>
-                        <p className="font-semibold text-[#007AFF]">
+                        <p className="font-semibold text-xs sm:text-sm md:text-base text-[#007AFF]">
                           -{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">
                           -{(transaction.amountLocal + (transaction.fee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                       </>
                     ) : (
                       <>
-                        <p className={`font-semibold ${colorClass}`}>
+                        <p className={`font-semibold text-xs sm:text-sm md:text-base ${colorClass}`}>
                           {prefix}{(isCryptoDeposit || isCryptoSend) ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {(isCryptoDeposit || isCryptoSend) ? 'USDT' : 'AED'}
                         </p>
                         {isIncomingCryptoToCard && (
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">
                             {transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                           </p>
                         )}
                       </>
                     )}
                     {transaction.status === 'processing' && (
-                      <p className="flex items-center justify-end gap-0.5 text-[#FFA000] text-xs mt-0.5">
-                        <Clock className="w-3 h-3" />
+                      <p className="flex items-center justify-end gap-0.5 text-[#FFA000] text-[10px] sm:text-xs mt-0.5">
+                        <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         {t("transactions.processing")}
                       </p>
                     )}
                     {transaction.status === 'settled' && (
-                      <p className="flex items-center justify-end gap-0.5 text-green-500 text-xs mt-0.5">
-                        <CheckCircle className="w-3 h-3" />
+                      <p className="flex items-center justify-end gap-0.5 text-green-500 text-[10px] sm:text-xs mt-0.5">
+                        <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         {t("transactions.settled")}
                       </p>
                     )}
