@@ -423,14 +423,14 @@ export default function AdminProfitPage() {
                         <p className="text-2xl font-bold text-white tracking-tight font-mono">
                           {fmtAmount(data.total)}
                         </p>
-                        <span className="text-base font-normal text-white/50">{cur}</span>
+                        <span className="text-2xl font-bold text-white/70">{cur}</span>
                       </div>
                     ))
                   ) : (
                     <div className="flex items-center gap-3">
                       <img src={aedCurrency} alt="AED" className="w-7 h-7 brightness-0 invert" />
                       <p className="text-2xl font-bold text-white tracking-tight font-mono">{fmtAmount(summary.totalRevenue)}</p>
-                      <span className="text-base font-normal text-white/50">AED</span>
+                      <span className="text-2xl font-bold text-white/70">AED</span>
                     </div>
                   )}
                 </div>
