@@ -395,14 +395,29 @@ export default function AdminProfitPage() {
                 <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full opacity-5"
                   style={{ background: "radial-gradient(circle, #27AE60 0%, transparent 70%)" }} />
                 
-                {/* Top row: label + tx count */}
+                {/* Top row: refresh + label | date + tx count */}
                 <div className="relative flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); fetchSummary(); fetchTransactions(0); setTxOffset(0); }}
+                      className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-white/60" />
+                    </button>
                     <span className="text-[11px] text-white/50 uppercase tracking-widest font-medium">Total Profit</span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
-                    <TrendingUp className="w-3 h-3 text-[#007AFF]" />
-                    <span className="text-[11px] text-white/70 font-mono">{summary.totalTransactions} ops</span>
+                  <div className="flex flex-col items-end gap-1">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setIsDateDrawerOpen(true); }}
+                      className="flex items-center gap-1 text-[10px] text-[#007AFF] font-medium"
+                    >
+                      {getSelectedPeriodLabel()}
+                      <ChevronDown className="w-3 h-3" />
+                    </button>
+                    <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
+                      <TrendingUp className="w-3 h-3 text-[#007AFF]" />
+                      <span className="text-[11px] text-white/70 font-mono">{summary.totalTransactions} транзакций</span>
+                    </div>
                   </div>
                 </div>
 
