@@ -532,14 +532,14 @@ const handleClick = (transaction: Transaction) => {
                       </>
                     )}
                     {transaction.status === 'processing' && (
-                      <p className="flex items-center justify-end gap-0.5 text-[#FFA000] text-xs mt-0.5">
-                        <Clock className="w-3 h-3" />
+                      <p className="flex items-center justify-end gap-0.5 text-[#FFA000] text-[10px] sm:text-xs mt-0.5">
+                        <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         {t("transactions.processing")}
                       </p>
                     )}
                     {transaction.status === 'settled' && (
-                      <p className="flex items-center justify-end gap-0.5 text-green-500 text-xs mt-0.5">
-                        <CheckCircle className="w-3 h-3" />
+                      <p className="flex items-center justify-end gap-0.5 text-green-500 text-[10px] sm:text-xs mt-0.5">
+                        <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         {t("transactions.settled")}
                       </p>
                     )}
