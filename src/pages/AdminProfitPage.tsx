@@ -429,7 +429,7 @@ export default function AdminProfitPage() {
                         {i === 0 && (
                           <div className="ml-auto flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
                             <TrendingUp className="w-3.5 h-3.5 text-[#007AFF]" />
-                            <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} транзакций</span>
+                            <span className="text-xs text-white/70 font-mono">{summary.totalTransactions} {t("profit.transactions")}</span>
                           </div>
                         )}
                       </div>
