@@ -228,7 +228,16 @@ export default function AdminProfitPage() {
     setIsLoadingSummary(false);
   }, [period, getStartDate, getEndDate]);
 
-  const fetchTransactions = useCallback(async (offset = 0) => {
+  const fetchTransactions = useCallback(async (offset = 0, forceRefresh = false) => {
+    const cacheKey = `${cacheKeyBase}_${subTab}`;
+    
+    // Return cached data instantly if available (only for first page)
+    if (offset === 0 && !forceRefresh && txCache[cacheKey]) {
+      setTransactions(txCache[cacheKey].transactions);
+      setTxCount(txCache[cacheKey].count);
+      return; // no loading state needed
+    }
+    
     setIsLoadingTx(true);
     const startDate = getStartDate(period);
     const endDate = getEndDate(period);
@@ -247,11 +256,19 @@ export default function AdminProfitPage() {
     if (res.data) {
       const results: RevenueTransaction[] = Array.isArray(res.data) ? res.data : Array.isArray(res.data.results) ? res.data.results : [];
       const count = Array.isArray(res.data) ? res.data.length : (res.data.count ?? results.length);
-      setTransactions(prev => offset === 0 ? results : [...prev, ...results]);
+      const newTx = offset === 0 ? results : [...transactions, ...results];
+      setTransactions(newTx);
       setTxCount(count);
+      // Cache first-page results
+      if (offset === 0) {
+        setTxCache(prev => ({ ...prev, [cacheKey]: { transactions: results, count } }));
+      }
     }
     setIsLoadingTx(false);
-  }, [period, subTab, getStartDate, getEndDate]);
+  }, [period, subTab, getStartDate, getEndDate, cacheKeyBase, txCache, transactions]);
+
+  // Clear cache when period changes
+  useEffect(() => { setTxCache({}); }, [cacheKeyBase]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
