@@ -290,7 +290,7 @@ export default function AdminProfitPage() {
     { key: "today", label: t("profit.today"), dateRange: formatDateRange(today, today) },
     { key: "thisWeek", label: t("profit.week"), dateRange: formatDateRange(startOfWeek(today, { weekStartsOn: 1 }), today) },
     { key: "month", label: t("profit.month"), dateRange: formatDateRange(subMonths(today, 1), today) },
-    { key: "threeMonths", label: t("profit.threeMonths"), dateRange: formatDateRange(subMonths(today, 3), today) },
+    
     { key: "year", label: t("profit.year"), dateRange: formatDateRange(subMonths(today, 12), today) },
   ];
 
