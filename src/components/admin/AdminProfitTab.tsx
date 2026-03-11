@@ -307,9 +307,9 @@ export function AdminProfitTab() {
                       {FEE_TYPE_LABELS[tx.fee_type] || tx.fee_type}
                     </p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">
-                      {format(new Date(tx.created_at), "dd.MM.yyyy HH:mm")}
+                      {tx.created_at ? format(new Date(tx.created_at), "dd.MM.yyyy HH:mm") : "—"}
                       {tx.fee_percent != null && ` · ${tx.fee_percent}%`}
-                      {` · Base: ${tx.base_amount ?? 0} ${tx.base_currency ?? ""}`}
+                      {tx.base_amount != null && ` · Base: ${tx.base_amount} ${tx.base_currency ?? ""}`}
                     </p>
                   </div>
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
