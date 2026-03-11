@@ -214,11 +214,14 @@ export default function AdminProfitPage() {
     setIsLoadingTx(true);
     const startDate = getStartDate(period);
     const endDate = getEndDate(period);
-    let qs = `?limit=${TX_LIMIT}&offset=${offset}`;
-    if (startDate) qs += `&start_date=${startDate}`;
-    if (endDate) qs += `&end_date=${endDate}`;
+    const params = new URLSearchParams();
+    params.set("limit", String(TX_LIMIT));
+    params.set("offset", String(offset));
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    if (subTab !== "all") params.set("fee_type", subTab);
     const res = await apiRequest<any>(
-      `/transactions/admin/revenue/transactions/${qs}`,
+      `/transactions/admin/revenue/transactions/?${params.toString()}`,
       { method: "GET" },
       true
     );
@@ -229,7 +232,7 @@ export default function AdminProfitPage() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, [period, getStartDate, getEndDate]);
+  }, [period, subTab, getStartDate, getEndDate]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
