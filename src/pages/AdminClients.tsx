@@ -47,6 +47,15 @@ export default function AdminClients() {
       });
     }
 
+    // Status filter
+    if (statusFilter === "active") {
+      result = result.filter((c) => c.is_active !== false && !(c.is_blocked || (c.limits as any)?.is_blocked));
+    } else if (statusFilter === "inactive") {
+      result = result.filter((c) => c.is_active === false);
+    } else if (statusFilter === "blocked") {
+      result = result.filter((c) => c.is_blocked || (c.limits as any)?.is_blocked);
+    }
+
     // Role filter
     if (roleFilter !== "all") {
       result = result.filter((c) => (c.role || "user") === roleFilter);
