@@ -29,6 +29,9 @@ interface RevenueSummaryRaw {
   total_revenue: string | number;
   by_type?: Record<string, { total: string | number; count: number }>;
   by_fee_type?: Record<string, { total: string | number; count: number }>;
+  by_currency?: Record<string, { total: string | number; count: number }>;
+  by_category?: Record<string, { total: string | number; count: number }>;
+  by_currency_and_type?: Record<string, Record<string, { total: string | number; count: number }>>;
   by_day?: Array<{ date: string; total: string | number }>;
 }
 
@@ -36,6 +39,9 @@ interface ParsedSummary {
   totalRevenue: number;
   totalTransactions: number;
   byType: Record<string, { total: number; count: number }>;
+  byCurrency: Record<string, { total: number; count: number }>;
+  byCategory: Record<string, { total: number; count: number }>;
+  byCurrencyAndType: Record<string, Record<string, { total: number; count: number }>>;
   byDay: Array<{ date: string; total: number }>;
 }
 
