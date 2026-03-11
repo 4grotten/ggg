@@ -193,6 +193,7 @@ const AppContent = () => {
             <Route path="/settings/admin/clients" element={<AdminClients />} />
             <Route path="/settings/admin/admins" element={<AdminAdmins />} />
             <Route path="/settings/admin/audit/:auditId" element={<AuditHistoryDetail />} />
+            <Route path="/settings/admin/profit" element={<AdminProfitPage />} />
             <Route path="/settings/admin/staff/:staffId" element={<AdminStaffDetail />} />
             <Route path="/settings/admin/clients/details/:userId" element={<AdminClientDetails />} />
             <Route path="/settings/admin/clients/details/:userId/history" element={<AdminClientTransactionHistory />} />
