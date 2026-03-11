@@ -112,6 +112,7 @@ export function AdminProfitTab() {
         by_fee_type: byFeeType,
       });
     }
+    setIsLoadingSummary(false);
   }, [period, getStartDate]);
 
   const fetchTransactions = useCallback(async (offset = 0) => {
