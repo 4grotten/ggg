@@ -526,6 +526,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true }));
     }
 
+    const msgBody = msgPayload;
     if (msgBody.fromMe) {
       return new Response(JSON.stringify({ ok: true }));
     }
