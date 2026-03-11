@@ -333,7 +333,7 @@ export function AdminProfitTab() {
                     </p>
                   </div>
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
-                    +{(tx.fee_amount ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} {tx.fee_currency ?? ""}
+                    +{(parseFloat(String(tx.fee_amount ?? 0))).toLocaleString("en-US", { minimumFractionDigits: 2 })} {tx.fee_currency ?? ""}
                   </span>
                 </motion.div>
               ))}
