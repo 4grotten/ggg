@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,45 +25,56 @@ serve(async (req) => {
     const body = await req.json();
     console.log("[transaction-webhook] Received:", JSON.stringify(body));
 
-    // Extract relevant info from webhook payload
     const { event, user_id, transaction_id, type, amount, currency } = body;
 
-    // Broadcast to all connected clients via Supabase Realtime
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Broadcast on a channel that all clients listen to
-    const channel = supabase.channel("transaction-updates");
+    // Use Realtime REST API directly to broadcast — no subscribe/unsubscribe race
+    const realtimeUrl = `${supabaseUrl}/realtime/v1/api/broadcast`;
     
-    // We need to subscribe first, then send
-    await new Promise<void>((resolve, reject) => {
-      channel
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            resolve();
-          } else if (status === "CHANNEL_ERROR") {
-            reject(new Error("Channel error"));
-          }
-        });
-    });
+    const broadcastPayload = {
+      messages: [
+        {
+          topic: "realtime:transaction-updates",
+          event: "new_transaction",
+          payload: {
+            event: event || "transaction_created",
+            user_id,
+            transaction_id,
+            type,
+            amount,
+            currency,
+            timestamp: new Date().toISOString(),
+          },
+        },
+      ],
+    };
 
-    await channel.send({
-      type: "broadcast",
-      event: "new_transaction",
-      payload: {
-        event: event || "transaction_created",
-        user_id,
-        transaction_id,
-        type,
-        amount,
-        currency,
-        timestamp: new Date().toISOString(),
+    const broadcastRes = await fetch(realtimeUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": supabaseKey,
+        "Authorization": `Bearer ${supabaseKey}`,
       },
+      body: JSON.stringify(broadcastPayload),
     });
 
-    // Cleanup
-    await supabase.removeChannel(channel);
+    const broadcastStatus = broadcastRes.status;
+    const broadcastBody = await broadcastRes.text();
+    console.log(`[transaction-webhook] Broadcast REST response: ${broadcastStatus} ${broadcastBody}`);
+
+    if (!broadcastRes.ok) {
+      console.error("[transaction-webhook] Broadcast failed:", broadcastBody);
+      return new Response(
+        JSON.stringify({ error: "Broadcast failed", detail: broadcastBody }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     console.log("[transaction-webhook] Broadcast sent for user:", user_id);
 
