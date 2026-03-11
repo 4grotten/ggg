@@ -415,9 +415,9 @@ export default function AdminProfitPage() {
                   </div>
                 </div>
 
-                {/* Currency amounts — each currency on its own row */}
+                {/* Currency amounts from API by_currency */}
                 <div className="relative space-y-3">
-                  {Object.entries(currencyTotals).sort(([,a],[,b]) => b - a).map(([cur, total]) => (
+                  {Object.entries(summary.byCurrency).sort(([,a],[,b]) => b.total - a.total).map(([cur, data]) => (
                     <div key={cur} className="flex items-center gap-3">
                       <div className={cn(
                         "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black",
@@ -427,12 +427,36 @@ export default function AdminProfitPage() {
                       )}>
                         {cur === "USDT" ? "₮" : "د"}
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="text-2xl font-bold text-white tracking-tight font-mono">
-                          {fmtAmount(total)}
+                          {fmtAmount(data.total)}
                         </p>
-                        <p className="text-[10px] text-white/40 uppercase tracking-wider">{cur}</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-wider">{cur} · {data.count} операций</p>
                       </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Category breakdown: service / network / exchange */}
+                {Object.keys(summary.byCategory).length > 0 && (
+                  <div className="relative flex gap-2 pt-3 mt-3 border-t border-white/10">
+                    {Object.entries(summary.byCategory).sort(([,a],[,b]) => b.total - a.total).map(([cat, data]) => {
+                      const catMeta: Record<string, { label: string; color: string }> = {
+                        service: { label: "Сервис", color: "text-[#007AFF]" },
+                        network: { label: "Сеть", color: "text-amber-400" },
+                        exchange: { label: "Обмен", color: "text-indigo-400" },
+                      };
+                      const m = catMeta[cat] || { label: cat, color: "text-white/60" };
+                      return (
+                        <div key={cat} className="flex-1 bg-white/5 rounded-xl px-3 py-2">
+                          <p className={cn("text-[10px] font-medium uppercase tracking-wider", m.color)}>{m.label}</p>
+                          <p className="text-sm font-bold text-white font-mono mt-0.5">{fmtAmount(data.total)}</p>
+                          <p className="text-[9px] text-white/30">{data.count} шт</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                     </div>
                   ))}
                 </div>
