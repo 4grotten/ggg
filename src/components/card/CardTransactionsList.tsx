@@ -525,8 +525,8 @@ const handleClick = (transaction: Transaction) => {
                           {prefix}{(isCryptoDeposit || isCryptoSend) ? transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {(isCryptoDeposit || isCryptoSend) ? 'USDT' : 'AED'}
                         </p>
                         {isIncomingCryptoToCard && (
-                          <p className="text-[10px] sm:text-xs text-muted-foreground">
-                            {transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+                          <p className="text-[10px] sm:text-xs text-[#007AFF]">
+                            -{transaction.amountUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
                           </p>
                         )}
                       </>
