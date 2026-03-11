@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { apiRequest } from "@/services/api/apiClient";
@@ -162,6 +162,26 @@ export default function AdminProfitPage() {
   const subTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === subTab);
   const prevSubTabIndex = SUB_TAB_KEYS.findIndex(t => t.value === prevSubTab);
   const slideDirection = subTabIndex >= prevSubTabIndex ? 1 : -1;
+
+  // Tab pill sliding refs
+  const tabRefs = useRef<Record<string, HTMLButtonElement>>({});
+  const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = tabRefs.current[subTab];
+    if (el) {
+      const parent = el.parentElement;
+      if (parent) {
+        const parentRect = parent.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        setPillStyle({
+          left: elRect.left - parentRect.left + parent.scrollLeft,
+          width: elRect.width,
+          height: elRect.height,
+        });
+      }
+    }
+  }, [subTab, summary]);
 
   const today = new Date();
 
@@ -525,7 +545,7 @@ export default function AdminProfitPage() {
           )}
 
           {/* ─── Sub-tabs (fee type filter) ─────────────────────── */}
-          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
+          <div className="relative flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
             {SUB_TAB_KEYS.map(tab => {
               const count = subTabCounts[tab.value] || 0;
               const isActive = subTab === tab.value;
@@ -533,10 +553,11 @@ export default function AdminProfitPage() {
               return (
                 <button
                   key={tab.value}
+                  ref={(el) => { if (el) tabRefs.current[tab.value] = el; }}
                   onClick={() => handleSubTabChange(tab.value)}
                   className={cn(
-                    "shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
-                    isActive ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
+                    "relative shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors duration-200 border z-[1]",
+                    isActive ? "text-primary-foreground border-transparent" : "bg-transparent text-muted-foreground border-border hover:text-foreground hover:border-foreground/20"
                   )}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -547,6 +568,17 @@ export default function AdminProfitPage() {
                 </button>
               );
             })}
+            {/* Sliding background pill */}
+            <motion.div
+              className="absolute top-0 rounded-xl bg-primary shadow-sm z-0"
+              layoutId="profit-subtab-pill"
+              style={{
+                left: pillStyle.left,
+                width: pillStyle.width,
+                height: pillStyle.height,
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            />
           </div>
 
           {/* ─── Grouped Transactions ───────────────────────────── */}
