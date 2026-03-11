@@ -474,11 +474,57 @@ Deno.serve(async (req) => {
     console.log("[whatsapp-ai] payload:", JSON.stringify(payload).slice(0, 500));
 
     const event = payload.event;
+
+    // ── Detect outgoing transaction notifications and broadcast to Realtime ──
+    if ((event === "message.any" || event === "message.ack") && msgBody.fromMe) {
+      const body = msgBody.body || "";
+      const isTransactionNotification = 
+        body.includes("Поступление средств") || 
+        body.includes("Успешное списание") ||
+        body.includes("Перевод выполнен") ||
+        body.includes("Пополнение") ||
+        body.includes("incoming") ||
+        body.includes("outgoing");
+      
+      if (isTransactionNotification && event === "message.any") {
+        // Broadcast only once per transaction (on message.any, not ack)
+        try {
+          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+          const sb = createClient(supabaseUrl, supabaseKey);
+          
+          const channel = sb.channel("transaction-updates");
+          await new Promise<void>((resolve, reject) => {
+            channel.subscribe((status) => {
+              if (status === "SUBSCRIBED") resolve();
+              else if (status === "CHANNEL_ERROR") reject(new Error("Channel error"));
+            });
+          });
+          
+          await channel.send({
+            type: "broadcast",
+            event: "new_transaction",
+            payload: {
+              event: "transaction_notification",
+              body: body.substring(0, 200),
+              timestamp: new Date().toISOString(),
+            },
+          });
+          
+          await sb.removeChannel(channel);
+          console.log("[whatsapp-ai] Transaction broadcast sent");
+        } catch (e) {
+          console.error("[whatsapp-ai] Broadcast error:", e);
+        }
+      }
+      
+      return new Response(JSON.stringify({ ok: true }));
+    }
+
     if (event !== "message") {
       return new Response(JSON.stringify({ ok: true }));
     }
 
-    const msgBody = payload.payload;
     if (msgBody.fromMe) {
       return new Response(JSON.stringify({ ok: true }));
     }
