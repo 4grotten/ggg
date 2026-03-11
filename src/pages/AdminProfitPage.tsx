@@ -169,8 +169,13 @@ export default function AdminProfitPage() {
 
   const fetchTransactions = useCallback(async (offset = 0) => {
     setIsLoadingTx(true);
+    const startDate = getStartDate(period);
+    const endDate = getEndDate(period);
+    let qs = `?limit=${TX_LIMIT}&offset=${offset}`;
+    if (startDate) qs += `&start_date=${startDate}`;
+    if (endDate) qs += `&end_date=${endDate}`;
     const res = await apiRequest<any>(
-      `/transactions/admin/revenue/transactions/?limit=${TX_LIMIT}&offset=${offset}`,
+      `/transactions/admin/revenue/transactions/${qs}`,
       { method: "GET" },
       true
     );
@@ -181,7 +186,7 @@ export default function AdminProfitPage() {
       setTxCount(count);
     }
     setIsLoadingTx(false);
-  }, []);
+  }, [period, getStartDate, getEndDate]);
 
   useEffect(() => { fetchSummary(); }, [fetchSummary]);
   useEffect(() => { fetchTransactions(0); setTxOffset(0); }, [fetchTransactions]);
