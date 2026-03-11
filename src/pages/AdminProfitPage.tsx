@@ -456,6 +456,7 @@ export default function AdminProfitPage() {
                       );
                     })}
                   </div>
+                )}
               </motion.div>
 
               {/* Type Breakdown */}
