@@ -512,7 +512,7 @@ const handleClick = (transaction: Transaction) => {
                       </>
                     ) : isInternalCardTransfer ? (
                       <>
-                        <p className="font-semibold text-xs sm:text-sm md:text-base text-[#007AFF]">
+                        <p className="font-semibold text-xs sm:text-sm text-[#007AFF]">
                           -{transaction.amountLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AED
                         </p>
                         <p className="text-[10px] sm:text-xs text-muted-foreground">
