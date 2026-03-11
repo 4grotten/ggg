@@ -23,6 +23,7 @@ import { ClientDetailsDrawer } from "@/components/admin/ClientDetailsDrawer";
 import { useOpenAISettings } from "@/hooks/useOpenAISettings";
 import { apiPost } from "@/services/api/apiClient";
 import { WelcomeMessagesEditor } from "@/components/admin/WelcomeMessagesEditor";
+import { AdminProfitTab } from "@/components/admin/AdminProfitTab";
 
 // Settings field configuration with i18n keys
 const exchangeRateFields = [
