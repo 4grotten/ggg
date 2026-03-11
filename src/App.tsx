@@ -67,6 +67,7 @@ import AdminClientDetails from "./pages/AdminClientDetails";
 import AdminClientTransactionHistory from "./pages/AdminClientTransactionHistory";
 import AuditHistoryDetail from "./pages/AuditHistoryDetail";
 import AdminStaffDetail from "./pages/AdminStaffDetail";
+import AdminProfitPage from "./pages/AdminProfitPage";
 import AccountPage from "./pages/AccountPage";
 import WalletPage from "./pages/WalletPage";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
