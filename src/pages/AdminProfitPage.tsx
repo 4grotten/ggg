@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import aedCurrency from "@/assets/aed-currency.png";
+import { UsdtIcon } from "@/components/icons/CryptoIcons";
 import { format, subDays, subMonths, startOfWeek, parseISO } from "date-fns";
 import {
   Drawer,
