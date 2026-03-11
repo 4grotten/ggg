@@ -77,6 +77,7 @@ const FEE_META_KEYS: Record<string, { labelKey: string; icon: typeof DollarSign;
   network_fee:         { labelKey: "feeNetworkFee",       icon: Zap,           colorClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
   currency_conversion: { labelKey: "feeConversion",       icon: ArrowRightLeft, colorClass: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
   card_activation:     { labelKey: "feeCardActivation",   icon: CreditCard,    colorClass: "bg-teal-500/10 text-teal-600 dark:text-teal-400" },
+  exchange_spread:     { labelKey: "feeExchangeSpread",   icon: ArrowRightLeft, colorClass: "bg-violet-500/10 text-violet-600 dark:text-violet-400" },
 };
 
 const SUB_TAB_KEYS: { value: SubTab; labelKey: string; icon: typeof DollarSign }[] = [

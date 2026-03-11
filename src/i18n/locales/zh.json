@@ -2141,6 +2141,7 @@
     "feeNetworkFee": "网络费用",
     "feeConversion": "币种兑换",
     "feeCardActivation": "卡片激活",
+    "feeExchangeSpread": "汇率差价",
     "records": "条记录",
     "operations": "次操作"
   }

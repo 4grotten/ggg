@@ -2230,6 +2230,7 @@
     "feeNetworkFee": "Network fee",
     "feeConversion": "Conversion",
     "feeCardActivation": "Card activation",
+    "feeExchangeSpread": "Exchange spread",
     "records": "records",
     "operations": "operations"
   }

@@ -2134,6 +2134,7 @@
     "feeNetworkFee": "Netzwerkgebühr",
     "feeConversion": "Umrechnung",
     "feeCardActivation": "Kartenaktivierung",
+    "feeExchangeSpread": "Wechselkursspanne",
     "records": "Einträge",
     "operations": "Operationen"
   }
