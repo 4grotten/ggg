@@ -246,20 +246,10 @@ export default function AdminProfitPage() {
     fetchTransactions(newOffset);
   };
 
-  // ─── Derived data (front-side filtered + sorted) ───────────
-  const filteredTx = useMemo(() => {
-    const byTab = subTab === "all"
-      ? transactions
-      : transactions.filter((tx) => feeTypeToTab(tx.fee_type) === subTab);
+  // ─── Derived data (backend-filtered, no front sorting) ─────
+  const filteredTx = transactions;
 
-    return [...byTab].sort((a, b) => {
-      const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
-      const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
-      return bTime - aTime;
-    });
-  }, [transactions, subTab]);
-
-  // Group transactions by date
+  // Group transactions by date (preserve backend order)
   const dateGroups = useMemo((): DateGroup[] => {
     const groups: Record<string, { txs: RevenueTransaction[]; total: number }> = {};
     for (const tx of filteredTx) {
@@ -268,14 +258,12 @@ export default function AdminProfitPage() {
       groups[dateKey].txs.push(tx);
       groups[dateKey].total += num(tx.fee_amount);
     }
-    return Object.entries(groups)
-      .sort(([a], [b]) => b.localeCompare(a))
-      .map(([date, { txs, total }]) => ({
-        date,
-        label: formatDateHeader(date),
-        dayTotal: total,
-        transactions: txs,
-      }));
+    return Object.entries(groups).map(([date, { txs, total }]) => ({
+      date,
+      label: formatDateHeader(date),
+      dayTotal: total,
+      transactions: txs,
+    }));
   }, [filteredTx]);
 
   const subTabCounts = useMemo(() => {
