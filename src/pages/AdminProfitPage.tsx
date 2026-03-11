@@ -668,7 +668,7 @@ export default function AdminProfitPage() {
                     onClick={handleCustomDateConfirm}
                     className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium"
                   >
-                    Применить
+                    {t("profit.apply")}
                   </button>
                 )}
               </div>
