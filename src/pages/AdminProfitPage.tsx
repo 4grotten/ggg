@@ -505,7 +505,7 @@ export default function AdminProfitPage() {
               )}
             </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground text-sm">Нет данных за выбранный период</div>
+            <div className="text-center py-8 text-muted-foreground text-sm">{t("profit.noData")}</div>
           )}
 
           {/* ─── Sub-tabs (fee type filter) ─────────────────────── */}
