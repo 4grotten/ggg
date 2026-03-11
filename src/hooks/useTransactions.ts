@@ -50,8 +50,7 @@ export const useApiTransactionGroups = () => {
     queryKey: transactionKeys.apiGroups(),
     queryFn: fetchApiTransactionGroups,
     enabled: !!token,
-    staleTime: 1000 * 30,
-    refetchInterval: 15000,
+    staleTime: 1000 * 60 * 5,
     retry: 1,
   });
 };
