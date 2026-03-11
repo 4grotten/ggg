@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { apiRequest } from "@/services/api/apiClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
