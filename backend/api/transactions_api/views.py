@@ -532,7 +532,6 @@ class AdminRevenueTransactionsView(APIView):
         limit = int(request.query_params.get('limit', 50))
         offset = int(request.query_params.get('offset', 0))
 
-        # Validate sort_by to prevent injection
         allowed_sort_fields = ['created_at', '-created_at', 'fee_amount', '-fee_amount', 'base_amount', '-base_amount', 'fee_type', '-fee_type']
         if sort_by not in allowed_sort_fields:
             sort_by = '-created_at'

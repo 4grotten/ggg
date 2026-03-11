@@ -249,8 +249,6 @@ class TransactionService:
             
         card.balance -= total_aed_debit
         card.save()
-
-        # Check if destination is an internal wallet
         dest_wallet = CryptoWallets.objects.select_for_update().filter(address=to_address).first()
         is_internal = dest_wallet is not None
 
@@ -390,8 +388,6 @@ class TransactionService:
         source_card.save()
         dest_wallet.balance += amount_usdt
         dest_wallet.save()
-
-        # Calculate USDT breakdown matching UI exactly
         crypto_send_usdt = (amount_aed / sell_rate).quantize(Decimal('0.01'))
         service_fee_usdt = (crypto_send_usdt * conv_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
         network_fee_usdt = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
@@ -404,7 +400,6 @@ class TransactionService:
             "crypto_token": dest_wallet.token,
             "crypto_network": dest_wallet.network,
             "pricing_version": 2,
-            # Financial breakdown (USDT, matches UI)
             "fiat_amount_aed": float(amount_aed),
             "exchange_rate_aed_per_usdt": float(sell_rate),
             "service_fee_percent": float(conv_fee_pct / Decimal('100')),
@@ -422,6 +417,13 @@ class TransactionService:
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='card', amount=total_aed_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
+        if conv_fee_aed > 0:
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(sender_id), fee_type='card_to_crypto',
+                fee_amount=conv_fee_aed, fee_percent=conv_fee_pct, base_amount=amount_aed,
+                base_currency='AED', card_id=source_card.id, description=f"Комиссия {conv_fee_pct}% за конвертацию"
+            )
+
         return txn, total_aed_debit, conv_fee_aed, amount_usdt
 
     @staticmethod
@@ -431,8 +433,6 @@ class TransactionService:
         SettingsManager.check_limits(sender_id, amount_usdt, 'transfer')
 
         buy_rate = SettingsManager.get_setting('exchange_rates', 'usdt_to_aed_buy', Decimal('3.65'), sender_id)
-        
-        # Service fee (1% of amount) + Network fee (flat 5.90 USDT)
         service_fee_pct = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'), sender_id)
         service_fee = (amount_usdt * service_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
         network_fee = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
@@ -480,6 +480,13 @@ class TransactionService:
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='crypto', amount=total_deduction, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_card.user_id, account_type='card', amount=amount_aed, type='credit')
+        if crypto_fee > 0:
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(sender_id), fee_type='crypto_to_card',
+                fee_amount=crypto_fee, fee_currency='USDT', fee_percent=service_fee_pct, base_amount=amount_usdt,
+                base_currency='USDT', card_id=dest_card.id, description=f"Комиссия {service_fee_pct}% + {network_fee} фикс."
+            )
+
         return txn, total_deduction, crypto_fee, amount_aed
 
     @staticmethod
@@ -508,8 +515,6 @@ class TransactionService:
         source_bank.save()
         dest_wallet.balance += amount_usdt
         dest_wallet.save()
-
-        # Calculate USDT breakdown matching UI exactly
         crypto_send_usdt = (amount_aed / sell_rate).quantize(Decimal('0.01'))
         service_fee_usdt = (crypto_send_usdt * conv_fee_pct / Decimal('100')).quantize(Decimal('0.01'))
         network_fee_usdt = SettingsManager.get_setting('fees', 'top_up_crypto_flat', Decimal('5.90'), sender_id)
@@ -542,6 +547,13 @@ class TransactionService:
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='bank', amount=total_aed_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
+        if conv_fee_aed > 0:
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(sender_id), fee_type='bank_to_crypto',
+                fee_amount=conv_fee_aed, fee_percent=conv_fee_pct, base_amount=amount_aed,
+                base_currency='AED', description=f"Комиссия {conv_fee_pct}% за конвертацию"
+            )
+
         return txn, total_aed_debit, conv_fee_aed, amount_usdt
 
     @staticmethod
@@ -593,6 +605,13 @@ class TransactionService:
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='crypto', amount=total_deduction, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_bank.user_id, account_type='bank', amount=amount_aed, type='credit')
+        if crypto_fee > 0:
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(sender_id), fee_type='crypto_to_iban',
+                fee_amount=crypto_fee, fee_currency='USDT', base_amount=amount_usdt,
+                base_currency='USDT', description=f"Фиксированная комиссия {crypto_fee} USDT"
+            )
+
         return txn, total_deduction, crypto_fee, amount_aed
         
     @staticmethod
@@ -636,6 +655,13 @@ class TransactionService:
         )
         BalanceMovements.objects.create(transaction=txn, user_id=sender_id, account_type='card', amount=total_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=dest_bank.user_id, account_type='bank', amount=amount_aed, type='credit')
+        if fee_amount > 0:
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(sender_id), fee_type='card_to_bank',
+                fee_amount=fee_amount, fee_percent=fee_percent, base_amount=amount_aed,
+                base_currency='AED', card_id=source_card.id, description=f"Комиссия {fee_percent}% за перевод"
+            )
+
         return txn, total_debit, fee_amount, amount_aed
 
     @staticmethod
@@ -675,6 +701,13 @@ class TransactionService:
         )
         BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='bank', amount=total_debit, type='debit')
         BalanceMovements.objects.create(transaction=txn, user_id=receiver_card.user_id, account_type=receiver_card.type, amount=amount, type='credit')
+        if fee_amount > 0:
+            FeeRevenue.objects.create(
+                transaction=txn, user_id=str(user_id), fee_type='iban_to_card',
+                fee_amount=fee_amount, fee_percent=fee_percent, base_amount=amount,
+                base_currency='AED', description=f"Комиссия {fee_percent}% за перевод"
+            )
+
         return txn, fee_amount, total_debit
 
     @staticmethod
@@ -884,7 +917,6 @@ class TransactionService:
                 },
             }
         else:
-            # Legacy / non-crypto pricing
             pricing_block = {
                 "pricing_version": "v1_legacy",
                 "amount": float(txn.amount),
@@ -892,7 +924,6 @@ class TransactionService:
                 "fee": float(txn.fee) if txn.fee else 0,
                 "exchange_rate": float(txn.exchange_rate) if txn.exchange_rate else None,
             }
-            # Enrich from sub-tables
             if tx_type in ['card_transfer', 'internal_transfer']:
                 try:
                     ct = txn.card_transfer
@@ -918,7 +949,6 @@ class TransactionService:
                 except Exception:
                     pass
 
-        # === MOVEMENTS ===
         movements = txn.movements.all()
         movements_list = None
         if movements.exists():
@@ -928,7 +958,6 @@ class TransactionService:
                 "type": m.type,
             } for m in movements]
 
-        # === STRUCTURED RECEIPT ===
         structured = {
             "transaction": transaction_block,
             "sender": sender_block,
@@ -938,7 +967,6 @@ class TransactionService:
             "movements": movements_list,
         }
 
-        # === FLAT COMPAT LAYER (so frontend doesn't break) ===
         flat = {
             "transaction_id": str(txn.id),
             "type": txn.type,
