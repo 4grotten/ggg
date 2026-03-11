@@ -320,24 +320,38 @@ export default function AdminProfitPage() {
   return (
     <MobileLayout>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-background">
-        {/* ─── Sticky Header ────────────────────────────────────── */}
+        {/* ─── Premium Header ────────────────────────────────────── */}
         <div className="sticky top-0 z-50">
           <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" />
-          <div className="relative px-4 py-4">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate("/settings/admin")} className="shrink-0 rounded-xl bg-muted/50 hover:bg-muted">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold truncate">💵 Profit</span>
-                  <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5 shrink-0">
-                    <Crown className="w-2.5 h-2.5" />Root
-                  </Badge>
+          <div className="relative px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" size="icon" onClick={() => navigate("/settings/admin")} className="shrink-0 rounded-xl bg-muted/50 hover:bg-muted">
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-base font-bold tracking-tight">Revenue</span>
+                    <Badge className="text-[9px] px-1.5 py-0 h-4 bg-amber-500 hover:bg-amber-600 text-white gap-0.5">
+                      <Crown className="w-2.5 h-2.5" />Root
+                    </Badge>
+                  </div>
                 </div>
-                <p className="text-[11px] text-muted-foreground truncate">Доходы платформы</p>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => { fetchSummary(); fetchTransactions(0); setTxOffset(0); }}
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setIsDateDrawerOpen(true)}
+                  className="flex items-center gap-1 text-[#007AFF] font-medium text-sm"
+                >
+                  {getSelectedPeriodLabel()}
+                  <ChevronDown className="w-4 h-4" />
+                </button>
                 <ThemeSwitcher />
                 <LanguageSwitcher />
               </div>
@@ -346,66 +360,69 @@ export default function AdminProfitPage() {
         </div>
 
         <div className="px-4 pb-24 space-y-4">
-          {/* Title with Period Selector */}
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold">💵 Profit</h1>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => { fetchSummary(); fetchTransactions(0); setTxOffset(0); }}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setIsDateDrawerOpen(true)}
-                className="flex items-center gap-1.5 text-[#007AFF]"
-              >
-                <span className="text-sm font-medium">{getSelectedPeriodLabel()}</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* ─── Summary Cards ──────────────────────────────────── */}
+          {/* ─── Hero Revenue Block ─────────────────────────────── */}
           {isLoadingSummary ? (
-            <div className="grid grid-cols-2 gap-3">
-              <Skeleton className="h-28 rounded-2xl" />
-              <Skeleton className="h-28 rounded-2xl" />
-            </div>
+            <Skeleton className="h-44 rounded-2xl" />
           ) : summary ? (
             <>
-              <div className="grid grid-cols-2 gap-3">
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-4 text-white">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-                  <DollarSign className="w-5 h-5 mb-1 opacity-80" />
-                  <p className="text-[10px] opacity-80 uppercase tracking-wide">Общий доход</p>
-                  <p className="text-xl font-bold mt-0.5">{fmtAmount(summary.totalRevenue)}</p>
-                  <p className="text-[10px] opacity-60 mt-0.5">AED</p>
-                </motion.div>
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-4 text-white">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-                  <TrendingUp className="w-5 h-5 mb-1 opacity-80" />
-                  <p className="text-[10px] opacity-80 uppercase tracking-wide">Транзакций</p>
-                  <p className="text-xl font-bold mt-0.5">{summary.totalTransactions.toLocaleString()}</p>
-                  <p className="text-[10px] opacity-60 mt-0.5">с комиссией</p>
-                </motion.div>
-              </div>
-
-              {/* Currency breakdown */}
-              {Object.keys(currencyTotals).length > 0 && (
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                  {Object.entries(currencyTotals).sort(([,a],[,b]) => b - a).map(([cur, total]) => (
-                    <div key={cur} className="shrink-0 px-3 py-2 rounded-xl bg-card border border-border flex items-center gap-2">
-                      <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded",
-                        cur === "USDT" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-[#007AFF]/10 text-[#007AFF]"
-                      )}>
-                        {cur}
-                      </span>
-                      <span className="text-sm font-bold text-foreground">{fmtAmount(total)}</span>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative overflow-hidden rounded-2xl p-5"
+                style={{
+                  background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)",
+                }}
+              >
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-10"
+                  style={{ background: "radial-gradient(circle, #007AFF 0%, transparent 70%)" }} />
+                <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full opacity-5"
+                  style={{ background: "radial-gradient(circle, #27AE60 0%, transparent 70%)" }} />
+                
+                {/* Top row: label + tx count */}
+                <div className="relative flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                      <DollarSign className="w-4 h-4 text-white/80" />
                     </div>
-                  ))}
+                    <span className="text-[11px] text-white/50 uppercase tracking-widest font-medium">Net Revenue</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-2.5 py-1">
+                    <TrendingUp className="w-3 h-3 text-[#007AFF]" />
+                    <span className="text-[11px] text-white/70 font-mono">{summary.totalTransactions} ops</span>
+                  </div>
                 </div>
-              )}
+
+                {/* Main amount */}
+                <div className="relative mb-4">
+                  <p className="text-3xl font-bold text-white tracking-tight font-mono">
+                    {fmtAmount(summary.totalRevenue)}
+                    <span className="text-base font-normal text-white/40 ml-2">AED</span>
+                  </p>
+                </div>
+
+                {/* Currency breakdown row */}
+                {Object.keys(currencyTotals).length > 0 && (
+                  <div className="relative flex gap-3 pt-3 border-t border-white/10">
+                    {Object.entries(currencyTotals).sort(([,a],[,b]) => b - a).map(([cur, total]) => (
+                      <div key={cur} className="flex items-center gap-2">
+                        <div className={cn(
+                          "w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-black",
+                          cur === "USDT" 
+                            ? "bg-[#26A17B]/20 text-[#26A17B]" 
+                            : "bg-[#007AFF]/20 text-[#007AFF]"
+                        )}>
+                          {cur === "USDT" ? "₮" : cur === "AED" ? "د" : cur.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-white font-mono">{fmtAmount(total)}</p>
+                          <p className="text-[9px] text-white/30 uppercase tracking-wider">{cur}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
 
               {/* Type Breakdown */}
               {sortedTypes.length > 0 && (
