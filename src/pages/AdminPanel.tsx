@@ -419,8 +419,13 @@ export default function AdminPanel() {
     }
   }, [activeTab, openaiStatus, openaiLoading, fetchOpenAIStatus]);
 
-  // Log admin panel entry to audit history
+  // Log admin panel entry to audit history — only ONCE per browser session
   useEffect(() => {
+    const SESSION_KEY = 'admin_panel_login_logged';
+
+    // Already logged in this session — skip
+    if (sessionStorage.getItem(SESSION_KEY)) return;
+
     const logAdminEntry = async () => {
       try {
         const ua = navigator.userAgent;
@@ -458,6 +463,9 @@ export default function AdminPanel() {
           target_user_id: (user as any)?.user_id || '',
           details,
         });
+
+        // Mark as logged for this session
+        sessionStorage.setItem(SESSION_KEY, '1');
       } catch {
         // silent fail
       }
