@@ -45,6 +45,7 @@ const FEE_TYPE_LABELS: Record<string, string> = {
   top_up_crypto: "Крипто пополнение",
   top_up_bank: "Банк пополнение",
   card_to_card: "Карта → Карта",
+  card_transfer: "Карта → Карта",
   bank_transfer: "Банковский перевод",
   crypto_withdrawal: "Крипто вывод",
   bank_withdrawal: "Банк вывод",
