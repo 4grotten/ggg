@@ -332,7 +332,7 @@ const handleClick = (transaction: Transaction) => {
                       )}
                     </div>
                     <div className="text-left min-w-0 flex-1 overflow-hidden">
-                      <p className="font-medium truncate">
+                      <p className="font-medium truncate text-xs sm:text-sm md:text-base">
                       {isOutgoingCryptoToBank
                           ? t("transaction.walletToIban")
                           : isIncomingCryptoToBank
