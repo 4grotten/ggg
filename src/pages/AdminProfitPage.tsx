@@ -144,7 +144,9 @@ export default function AdminProfitPage() {
   const fetchSummary = useCallback(async () => {
     setIsLoadingSummary(true);
     const startDate = getStartDate(period);
-    const qs = startDate ? `?start_date=${startDate}` : "";
+    const endDate = getEndDate(period);
+    let qs = startDate ? `?start_date=${startDate}` : "";
+    if (endDate) qs += `${qs ? "&" : "?"}end_date=${endDate}`;
     const res = await apiRequest<RevenueSummaryRaw>(
       `/transactions/admin/revenue/summary/${qs}`,
       { method: "GET" },
@@ -163,7 +165,7 @@ export default function AdminProfitPage() {
       setSummary({ totalRevenue: num(raw.total_revenue), totalTransactions: totalTx, byType, byDay });
     }
     setIsLoadingSummary(false);
-  }, [period, getStartDate]);
+  }, [period, getStartDate, getEndDate]);
 
   const fetchTransactions = useCallback(async (offset = 0) => {
     setIsLoadingTx(true);
