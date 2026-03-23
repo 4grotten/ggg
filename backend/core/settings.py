@@ -152,6 +152,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# --- XERIME API CONFIG ---
+XERIME_API_URL = config('XERIME_API_URL', default='https://api.xerime.com/xerimeAPI/api/v2')
+XERIME_USERNAME = config('XERIME_USERNAME', default='your_username')
+XERIME_PASSWORD = config('XERIME_PASSWORD', default='your_password')
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

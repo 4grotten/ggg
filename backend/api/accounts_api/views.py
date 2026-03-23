@@ -22,7 +22,7 @@ from django.db.models import Sum, Count
 from apps.accounts_apps.models import UserRoles, AdminActionHistory
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
-
+from apps.transactions_apps.services import TransactionService
 
 def generate_uid_tail(user_id):
     return str(user_id).zfill(6)[-6:]
@@ -92,10 +92,14 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
                 beneficiary=f"{user.first_name} {user.last_name}".strip() or "EasyCard Client", balance=Decimal('200000.00'), is_active=True
             )
         if not CryptoWallets.objects.filter(user_id=str(user.id)).exists():
-            mock_address = f"T{uuid.uuid4().hex[:33]}"
-            CryptoWallets.objects.create(
-                user_id=str(user.id), network="TRC20", token="USDT", address=mock_address, balance=Decimal('200000.000000'), is_active=True
-            )
+            try:
+                created_wallets = TransactionService.generate_crypto_wallets_for_user(user.id)
+                for wallet in created_wallets:
+                    wallet.balance = Decimal('200000.000000')
+                    wallet.save()
+                    
+            except Exception as e:
+                print(f"Ошибка создания криптокошелька Xerime для юзера {user.id}: {e}")
             
     Token.objects.filter(user=user).delete()
     if apofiz_token:

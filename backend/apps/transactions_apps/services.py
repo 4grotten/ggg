@@ -10,7 +10,7 @@ from .models import (
 from apps.cards_apps.models import Cards
 from django.contrib.auth.models import User
 from apps.accounts_apps.models import AdminSettings, Profiles
-
+from apps.transactions_apps.xerime_client import XerimeClient
 
 class SettingsManager:
     @staticmethod
@@ -111,6 +111,47 @@ class TransactionService:
     def _mask_address(addr):
         if not addr: return None
         return f"{addr[:5]}...{addr[-5:]}" if len(addr) > 12 else addr
+    
+    @staticmethod
+    @transaction.atomic
+    def generate_crypto_wallets_for_user(user_id):
+        user_id_str = str(user_id)
+        user_name = TransactionService._get_user_full_name(user_id_str)
+        if not user_name or user_name == "Unknown User":
+            user_name = f"User_{user_id_str}"
+        xerime_data = XerimeClient.get_merchant_wallets(merchant_id=user_id_str, merchant_name=user_name)
+        
+        wallets_created = []
+        wallet_addresses = xerime_data.get('wallet_addresses', [])
+        
+        for w in wallet_addresses:
+            network_raw = w.get('network')
+            address = w.get('address')
+            if network_raw == 'tron':
+                network = 'TRC20'
+                token = 'USDT'
+            elif network_raw == 'ethereum':
+                network = 'ERC20'
+                token = 'USDT'
+            elif network_raw == 'bitcoin':
+                network = 'BTC'
+                token = 'BTC'
+            else:
+                continue
+                
+            wallet, created = CryptoWallets.objects.get_or_create(
+                user_id=user_id_str,
+                network=network,
+                token=token,
+                defaults={'address': address, 'balance': Decimal('0.000000')}
+            )
+            if not created and wallet.address != address:
+                wallet.address = address
+                wallet.save()
+                
+            wallets_created.append(wallet)
+            
+        return wallets_created
 
     @staticmethod
     @transaction.atomic
@@ -208,8 +249,12 @@ class TransactionService:
     def initiate_crypto_topup(user_id, card_id, token, network):
         crypto_wallet = CryptoWallets.objects.filter(user_id=str(user_id), token=token, network=network).first()
         if not crypto_wallet:
-            raise ValueError(f"Криптокошелек не найден")
+            TransactionService.generate_crypto_wallets_for_user(user_id)
+            crypto_wallet = CryptoWallets.objects.filter(user_id=str(user_id), token=token, network=network).first()
             
+            if not crypto_wallet:
+                raise ValueError(f"Криптокошелек для сети {network} не найден и не удалось сгенерировать.")
+
         min_amount = SettingsManager.get_setting('limits', 'top_up_crypto_min', Decimal('10.00'), user_id)
 
         metadata = {
