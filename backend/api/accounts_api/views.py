@@ -92,14 +92,7 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
                 beneficiary=f"{user.first_name} {user.last_name}".strip() or "EasyCard Client", balance=Decimal('200000.00'), is_active=True
             )
         if not CryptoWallets.objects.filter(user_id=str(user.id)).exists():
-            try:
-                created_wallets = TransactionService.generate_crypto_wallets_for_user(user.id)
-                for wallet in created_wallets:
-                    wallet.balance = Decimal('200000.000000')
-                    wallet.save()
-                    
-            except Exception as e:
-                print(f"Ошибка создания криптокошелька Xerime для юзера {user.id}: {e}")
+            pass
             
     Token.objects.filter(user=user).delete()
     if apofiz_token:

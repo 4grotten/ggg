@@ -2,6 +2,8 @@ import requests
 import logging
 from django.conf import settings
 from django.core.cache import cache
+import uuid
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,3 +58,72 @@ class XerimeClient:
         except requests.RequestException as e:
             logger.error(f"XerimeAPI Get Wallets Error: {e}")
             raise ValueError("Ошибка получения реквизитов криптокошелька от провайдера.")
+        
+
+    @classmethod
+    def create_crypto_deposit(cls, merchant_id, merchant_name, email, network, token, amount, tx_hash, wallet_address):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/crypto-deposit"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        
+        payload = {
+            "crypto_amount": float(amount),
+            "crypto_currency": token,
+            "blockchain_tx_hash": tx_hash,
+            "network": network,  # ожидается 'tron', 'ethereum' и тд
+            "wallet": wallet_address,
+            "merchant_id": str(merchant_id),
+            "merchant_name": merchant_name or f"User {merchant_id}",
+            "email": email or f"user_{merchant_id}@easycard.local",
+            "review_id": f"R-{uuid.uuid4().hex[:8].upper()}" # Генерируем уникальный ID
+        }
+            
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        if response.status_code == 409:
+            raise ValueError(f"Транзакция с таким хэшем ({tx_hash}) уже зарегистрирована в сети {network}.")
+            
+        response.raise_for_status()
+        return response.json()
+    
+    @classmethod
+    def create_rub_to_crypto_deposit(cls, merchant_id, amount_rub, crypto_currency="USDT"):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/rub-to-crypto"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        
+        payload = {
+            "rub_amount": float(amount_rub),
+            "crypto_currency": crypto_currency,
+            "merchant_id": str(merchant_id),
+            "review_id": f"R-{uuid.uuid4().hex[:8].upper()}"
+        }
+            
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        response.raise_for_status()
+        return response.json()
+    
+    @classmethod
+    def get_transactions_history(cls, merchant_id=None, status=None):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/transactions"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        
+        params = {}
+        if merchant_id:
+            params["merchant_id"] = str(merchant_id)
+        if status:
+            params["status"] = status
+            
+        response = requests.get(url, headers=headers, params=params, timeout=15)
+        response.raise_for_status()
+        return response.json()
+    
+    @classmethod
+    def get_transaction_details(cls, reference_id):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/transactions/{reference_id}"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+            
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
+        return response.json()

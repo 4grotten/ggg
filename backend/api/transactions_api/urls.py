@@ -35,4 +35,9 @@ urlpatterns = [
 
     path('open/user/transactions/', views.OpenUserTransactionsView.as_view(), name='open_user_transactions'),
 
+    path('crypto/deposit/register/', views.RegisterCryptoDepositView.as_view(), name='register-crypto-deposit'),
+    path('topup/rub-to-crypto/', views.RubToCryptoTopupView.as_view(), name='rub-to-crypto-topup'),
+    path('xerime/transactions/', views.XerimeTransactionHistoryView.as_view(), name='xerime-transactions'),
+    path('xerime/transactions/<str:reference_id>/', views.XerimeTransactionHistoryView.as_view(), name='xerime-transaction-detail'),
+
 ]

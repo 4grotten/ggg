@@ -1,3 +1,4 @@
+from backend.apps.transactions_apps.xerime_client import XerimeClient
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -727,3 +728,66 @@ class OpenUserTransactionsView(APIView):
             "count": txs.count(),
             "results": serializer.data
         }, status=status.HTTP_200_OK)
+    
+
+class RegisterCryptoDepositView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        tx_hash = request.data.get('tx_hash')
+        amount = request.data.get('amount')
+        token = request.data.get('token', 'USDT')
+        network = request.data.get('network', 'TRC20')
+        
+        if not tx_hash or not amount:
+            return Response({"error": "tx_hash и amount обязательны"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            data = TransactionService.register_crypto_deposit_in_xerime(
+                request.user.id, token, network, amount, tx_hash
+            )
+            return Response({"message": "Депозит успешно зарегистрирован", "data": data}, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Ошибка Xerime: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RubToCryptoTopupView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        amount_rub = request.data.get('amount_rub')
+        card_id = request.data.get('card_id')
+        
+        if not amount_rub or not card_id:
+            return Response({"error": "amount_rub и card_id обязательны"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            transaction = TransactionService.initiate_rub_to_crypto_topup(request.user.id, card_id, amount_rub)
+            return Response({
+                "message": "Заявка на пополнение RUB создана",
+                "transaction_id": transaction.id,
+                "sbp_link": transaction.metadata.get("sbp_link"),
+                "public_link": transaction.metadata.get("public_link"),
+                "expected_crypto": transaction.metadata.get("expected_crypto_amount")
+            }, status=status.HTTP_201_CREATED)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class XerimeTransactionHistoryView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, reference_id=None):
+        try:
+            if reference_id:
+                data = XerimeClient.get_transaction_details(reference_id)
+            else:
+                status_filter = request.query_params.get('status')
+                data = XerimeClient.get_transactions_history(
+                    merchant_id=str(request.user.id), 
+                    status=status_filter
+                )
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"Ошибка Xerime API: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)

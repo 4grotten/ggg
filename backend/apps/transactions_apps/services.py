@@ -274,6 +274,61 @@ class TransactionService:
             qr_payload=f"{token.lower()}:{crypto_wallet.address}", min_amount=min_amount
         )
         return topup
+    
+    @staticmethod
+    def register_crypto_deposit_in_xerime(user_id, token, network, amount, tx_hash):
+        user_id_str = str(user_id)
+        user = User.objects.get(id=user_id)
+        profile = user.profiles
+        
+        user_name = f"{profile.first_name} {profile.last_name}".strip() or f"User_{user_id_str}"
+        email = user.email or f"user_{user_id_str}@easycard.local"
+        crypto_wallet = CryptoWallets.objects.filter(user_id=user_id_str, token=token, network=network).first()
+        if not crypto_wallet:
+            raise ValueError("Кошелек не найден.")
+            
+        xerime_network = 'tron' if network == 'TRC20' else network.lower()
+        deposit_data = XerimeClient.create_crypto_deposit(
+            merchant_id=user_id_str,
+            merchant_name=user_name,
+            email=email,
+            network=xerime_network,
+            token=token,
+            amount=amount,
+            tx_hash=tx_hash,
+            wallet_address=crypto_wallet.address
+        )
+        return deposit_data
+    
+    @staticmethod
+    def initiate_rub_to_crypto_topup(user_id, card_id, amount_rub):
+        try:
+            xerime_response = XerimeClient.create_rub_to_crypto_deposit(
+                merchant_id=str(user_id), 
+                amount_rub=amount_rub,
+                crypto_currency="USDT"
+            )
+        except Exception as e:
+            raise ValueError(f"Ошибка получения реквизитов DoverkaPay: {str(e)}")
+        transaction = Transactions.objects.create(
+            sender_id="EXTERNAL_RUB",
+            receiver_id=str(user_id),
+            receiver_name="Crypto Wallet",
+            type="top_up",
+            amount=Decimal(amount_rub),
+            currency="RUB",
+            status="pending",
+            reference_id=xerime_response.get("reference_id", f"RUB-{uuid.uuid4().hex[:8].upper()}"),
+            metadata={
+                "target_card_id": str(card_id),
+                "gateway": "DoverkaPay",
+                "sbp_link": xerime_response.get("sbp_link"),
+                "public_link": xerime_response.get("public_link"),
+                "expected_crypto_amount": xerime_response.get("crypto_amount"),
+                "exchange_rate": xerime_response.get("rate")
+            }
+        )
+        return transaction
 
     @staticmethod
     @transaction.atomic
