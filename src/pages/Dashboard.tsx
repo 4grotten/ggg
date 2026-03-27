@@ -94,7 +94,8 @@ const Dashboard = () => {
   const { data: bankAccountsData } = useBankAccounts();
 
   // Get USDT balance from crypto wallets API
-  const usdtWallet = cryptoWalletsData?.data?.find(w => w.token === 'USDT' || w.token === 'usdt');
+  const cryptoWallets = Array.isArray(cryptoWalletsData?.data) ? cryptoWalletsData.data : [];
+  const usdtWallet = cryptoWallets.find(w => w.token === 'USDT' || w.token === 'usdt');
   const usdtBalance = usdtWallet ? parseFloat(usdtWallet.balance) : 0;
 
   // Map wallet summary to cards format
