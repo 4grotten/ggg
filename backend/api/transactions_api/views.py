@@ -1,4 +1,4 @@
-from backend.apps.transactions_apps.xerime_client import XerimeClient
+from apps.transactions_apps.xerime_client import XerimeClient
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -788,6 +788,34 @@ class XerimeTransactionHistoryView(APIView):
                     merchant_id=str(request.user.id), 
                     status=status_filter
                 )
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"Ошибка Xerime API: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class XerimeWithdrawalStatusView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, reference_id):
+        try:
+            data = XerimeClient.get_crypto_withdrawal_details(reference_id)
+            transaction = Transactions.objects.filter(reference_id=reference_id, sender_id=str(request.user.id)).first()
+            if transaction:
+                xerime_status = data.get("status")
+                if xerime_status == "completed":
+                    transaction.status = "success"
+                elif xerime_status in ["failed", "on_chain_failed"]:
+                    transaction.status = "failed"
+                    if transaction.metadata.get("refunded") != True:
+                        wallet_id = transaction.metadata.get("from_wallet_id")
+                        wallet = CryptoWallets.objects.filter(id=wallet_id).first()
+                        if wallet:
+                            wallet.balance += transaction.amount
+                            wallet.save()
+                            transaction.metadata["refunded"] = True       
+                transaction.metadata["xerime_status"] = xerime_status
+                transaction.metadata["tx_hash"] = data.get("tx_hash")
+                transaction.save()
             return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": f"Ошибка Xerime API: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)

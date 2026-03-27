@@ -127,3 +127,56 @@ class XerimeClient:
         response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
+
+    @classmethod
+    def create_crypto_withdrawal(cls, merchant_id, network, token, amount, destination_address, external_reference):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/crypto-withdrawal"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        
+        payload = {
+            "merchant_id": str(merchant_id),
+            "crypto_currency": token,
+            "crypto_amount": float(amount),
+            "destination_address": destination_address,
+            "network": network,
+            "external_reference": external_reference
+        }
+            
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        if response.status_code == 422:
+            raise ValueError("Недостаточно средств на балансе провайдера (Xerime) для совершения вывода.")
+        if response.status_code == 409:
+            raise ValueError(f"Заявка на вывод с ID {external_reference} уже существует (Дубликат).")
+        if response.status_code == 400:
+            err_data = response.json()
+            raise ValueError(f"Ошибка параметров вывода: {err_data.get('detail', 'Неверная сеть или токен')}")
+            
+        response.raise_for_status()
+        return response.json()
+
+    @classmethod
+    def get_crypto_withdrawals_history(cls, merchant_id=None, status=None):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/crypto-withdrawals"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        
+        params = {}
+        if merchant_id:
+            params["merchant_id"] = str(merchant_id)
+        if status:
+            params["status"] = status
+            
+        response = requests.get(url, headers=headers, params=params, timeout=15)
+        response.raise_for_status()
+        return response.json()
+
+    @classmethod
+    def get_crypto_withdrawal_details(cls, reference_id):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/crypto-withdrawals/{reference_id}"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+            
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
+        return response.json()

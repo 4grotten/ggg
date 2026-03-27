@@ -1,3 +1,5 @@
+import uuid
+
 from django.utils import timezone
 from decimal import Decimal
 from django.db import transaction
@@ -823,73 +825,46 @@ class TransactionService:
 
     @staticmethod
     @transaction.atomic
-    def execute_crypto_wallet_withdrawal(user_id, from_wallet_id, to_address, amount_usdt, token='USDT', network='TRC20'):
-        amount_usdt = Decimal(str(amount_usdt))
-        SettingsManager.check_limits(user_id, amount_usdt, 'withdrawal')
-        
-        fee_percent = SettingsManager.get_setting('fees', 'network_fee_percent', Decimal('1.0'), user_id)
-        crypto_fee = (amount_usdt * fee_percent / Decimal('100')).quantize(Decimal('0.000000'))
-        total_deduction = amount_usdt + crypto_fee
-
-        source_wallet = CryptoWallets.objects.select_for_update().get(id=from_wallet_id, user_id=str(user_id))
-
-        if source_wallet.address == to_address:
-            raise ValueError("Нельзя отправить на свой же кошелёк.")
-
-        if source_wallet.balance < total_deduction:
-            raise ValueError("Недостаточно средств.")
-
-        dest_wallet = CryptoWallets.objects.select_for_update().filter(address=to_address).first()
-        is_internal = dest_wallet is not None
-
-        metadata = {
-            "crypto_token": token,
-            "crypto_network": network,
-            "crypto_address": to_address,
-            "from_address": source_wallet.address
-        }
-
-        if is_internal:
-            source_wallet.balance -= total_deduction
-            source_wallet.save()
-            dest_wallet.balance += amount_usdt
-            dest_wallet.save()
-
-            txn = Transactions.objects.create(
-                user_id=user_id, sender_id=str(user_id), receiver_id=str(dest_wallet.user_id),
-                sender_name=TransactionService._get_user_full_name(user_id), receiver_name=TransactionService._get_user_full_name(dest_wallet.user_id),
-                type='crypto_to_crypto', status='completed', amount=amount_usdt, currency=token, fee=crypto_fee, metadata=metadata
+    def execute_crypto_wallet_withdrawal(sender_id, from_wallet_id, crypto_address, amount, token, network):
+        user_id_str = str(sender_id)
+        from_wallet = CryptoWallets.objects.select_for_update().get(id=from_wallet_id, user_id=user_id_str)
+        amount_decimal = Decimal(str(amount))
+        if from_wallet.balance < amount_decimal:
+            raise ValueError("Недостаточно средств на криптокошельке.")
+        external_ref = f"WD-{uuid.uuid4().hex[:12].upper()}"
+        xerime_network = 'tron' if network == 'TRC20' else network.lower()
+        try:
+            withdrawal_response = XerimeClient.create_crypto_withdrawal(
+                merchant_id=user_id_str,
+                network=xerime_network,
+                token=token,
+                amount=amount_decimal,
+                destination_address=crypto_address,
+                external_reference=external_ref
             )
-            CryptoWithdrawals.objects.create(
-                transaction=txn, user_id=user_id, token=token, network=network, to_address=to_address, 
-                amount_crypto=amount_usdt, fee_amount=crypto_fee, fee_type='network', total_debit=total_deduction
-            )
-            BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='crypto', amount=total_deduction, type='debit')
-            BalanceMovements.objects.create(transaction=txn, user_id=dest_wallet.user_id, account_type='crypto', amount=amount_usdt, type='credit')
-        else:
-            source_wallet.balance -= total_deduction
-            source_wallet.save()
-
-            txn = Transactions.objects.create(
-                user_id=user_id, sender_id=str(user_id), receiver_id='EXTERNAL',
-                sender_name=TransactionService._get_user_full_name(user_id), receiver_name="Внешний криптокошелек",
-                type='crypto_to_crypto', status='pending', amount=amount_usdt, currency=token, fee=crypto_fee, metadata=metadata
-            )
-            CryptoWithdrawals.objects.create(
-                transaction=txn, user_id=user_id, token=token, network=network, to_address=to_address, 
-                amount_crypto=amount_usdt, fee_amount=crypto_fee, fee_type='network', total_debit=total_deduction
-            )
-            BalanceMovements.objects.create(transaction=txn, user_id=user_id, account_type='crypto', amount=total_deduction, type='debit')
-
-        return {
-            "message": "Перевод выполнен" if is_internal else "Перевод в обработке",
-            "transaction_id": str(txn.id),
-            "status": txn.status,
-            "is_internal": is_internal,
-            "deducted_amount": str(total_deduction),
-            "fee": str(crypto_fee),
-            "credited_amount": str(amount_usdt),
-        }
+            xerime_reference_id = withdrawal_response.get("reference_id")
+            xerime_status = withdrawal_response.get("status", "pending")
+        except Exception as e:
+            raise ValueError(f"Ошибка провайдера при выводе: {str(e)}")
+        from_wallet.balance -= amount_decimal
+        from_wallet.save()
+        transaction_record = Transactions.objects.create(
+            sender_id=user_id_str,
+            receiver_id="EXTERNAL_WALLET",
+            receiver_name=crypto_address,
+            type="crypto_withdrawal",
+            amount=amount_decimal,
+            currency=token,
+            status="pending", # Теперь статус зависит от провайдера
+            reference_id=xerime_reference_id, # Сохраняем их ID, чтобы потом проверять статус!
+            metadata={
+                "network": network,
+                "external_reference": external_ref,
+                "xerime_status": xerime_status,
+                "from_wallet_id": str(from_wallet.id)
+            }
+        )
+        return transaction_record
 
     @staticmethod
     def get_transaction_receipt(transaction_id, user_id=None):
