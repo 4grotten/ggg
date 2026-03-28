@@ -6,6 +6,22 @@ import { getAuthToken, AUTH_USER_KEY } from "@/services/api/apiClient";
 import type { UserProfile } from "@/services/api/authApi";
 import { fetchCards } from "@/services/api/cards";
 import { supabase } from "@/integrations/supabase/client";
+import i18n from "@/i18n";
+
+// Get the user's current language for the voice agent
+const getUserLanguageName = (): string => {
+  const lang = i18n.language || navigator.language?.slice(0, 2) || 'en';
+  const map: Record<string, string> = {
+    ru: 'Russian',
+    en: 'English',
+    de: 'German',
+    tr: 'Turkish',
+    zh: 'Chinese',
+    ar: 'Arabic',
+    es: 'Spanish',
+  };
+  return map[lang] || 'English';
+};
 // Agent IDs
 export const AGENTS = {
   EVA: "agent_2601khm8sswzemb9v7tgg9s62yry",      // Main chat assistant (Card support)
