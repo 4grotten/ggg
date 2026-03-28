@@ -491,12 +491,14 @@ export const VoiceCallProvider = ({ children }: { children: ReactNode }) => {
       // IMPORTANT: reset / pin the agent to tool-based truth to avoid hallucinations from prior context.
       // This does not trigger a spoken response, but updates the agent context.
       try {
+        const userLang = getUserLanguageName();
         conversation.sendContextualUpdate(
           [
-            "ВАЖНО: Игнорируй любую ранее сказанную финансовую информацию.",
-            "Единственный источник правды по транзакциям — результат инструмента get_transactions / get_balance_summary.",
-            "Если инструмент не вызывался, скажи что нужно запросить данные инструментом.",
-            "КРИТИЧЕСКИ ВАЖНО: Все суммы, балансы и числа ВСЕГДА произноси цифрами, а не словами. Например: '57 895,02 AED', а не 'пятьдесят семь тысяч восемьсот девяносто пять дирхамов два копейки'. Это касается и голосовых ответов.",
+            `CRITICAL: You MUST speak and respond ONLY in ${userLang}. The user's app language is ${userLang}. Always use ${userLang} for all responses.`,
+            "IMPORTANT: Ignore any previously stated financial information.",
+            "The only source of truth for transactions is the get_transactions / get_balance_summary tool result.",
+            "If the tool has not been called, say you need to fetch the data first.",
+            "CRITICAL: Always pronounce amounts, balances and numbers as digits, not words. For example: '57,895.02 AED', not 'fifty seven thousand...'.",
           ].join(" ")
         );
       } catch (e) {
