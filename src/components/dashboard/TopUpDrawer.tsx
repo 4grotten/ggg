@@ -53,7 +53,8 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     },
     {
       id: "rub",
-      icon: () => <span className="text-white text-lg font-bold">₽</span>,
+      icon: null as any,
+      customIcon: <span className="text-white text-lg font-bold">₽</span>,
       title: t("drawer.rubTopUp", "Пополнить рублями"),
       subtitle: t("drawer.rubTopUpDesc", "RUB → USDT обмен"),
       iconBg: "bg-[#FF6B35]",
@@ -112,7 +113,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
                     }`}
                   >
                     <div className={`w-10 h-10 rounded-full ${option.iconBg} flex items-center justify-center`}>
-                      {typeof option.icon === 'function' && !option.icon.prototype ? option.icon({}) : <option.icon className="w-5 h-5 text-white" />}
+                      {option.customIcon ? option.customIcon : <option.icon className="w-5 h-5 text-white" />}
                     </div>
                     <div className="flex-1 text-left">
                       <p className="text-base font-medium text-foreground">{option.title}</p>
