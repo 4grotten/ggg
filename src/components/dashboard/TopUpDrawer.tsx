@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { AnimatedDrawerItem, AnimatedDrawerContainer } from "@/components/ui/animated-drawer-item";
-import { TronIcon, EthereumIcon, BscIcon } from "@/components/icons/CryptoIcons";
+import { TronIcon, EthereumIcon } from "@/components/icons/CryptoIcons";
 import { useAuth } from "@/contexts/AuthContext";
 
 type TokenType = "USDT" | "USDC";
