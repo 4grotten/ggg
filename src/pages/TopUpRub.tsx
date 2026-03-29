@@ -8,7 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { apiRequest } from "@/services/api/apiClient";
-import { useCardsList } from "@/hooks/useCards";
+
 
 interface TopUpRubState {
   usdtAmount: number;
@@ -28,7 +28,7 @@ const TopUpRub = () => {
   const location = useLocation();
   const { t } = useTranslation();
   const state = location.state as TopUpRubState | null;
-  const { data: cardsData } = useCardsList();
+  
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,18 +44,6 @@ const TopUpRub = () => {
       return;
     }
 
-    // Wait for cards to load
-    if (!cardsData) return;
-    
-    const cards = Array.isArray(cardsData?.data) ? cardsData.data : [];
-    const firstCard = cards[0];
-    
-    if (!firstCard?.id) {
-      setError("Карта не найдена");
-      setLoading(false);
-      return;
-    }
-
     const submitTopup = async () => {
       setLoading(true);
       setError(null);
@@ -66,7 +54,6 @@ const TopUpRub = () => {
             method: "POST",
             body: JSON.stringify({
               amount_rub: Math.round(rubAmount),
-              card_id: firstCard.id,
             }),
           },
           true
@@ -86,7 +73,7 @@ const TopUpRub = () => {
     };
 
     submitTopup();
-  }, [rubAmount, cardsData]);
+  }, [rubAmount]);
 
   const paymentUrl = paymentData?.public_link || paymentData?.sbp_link || "";
 
