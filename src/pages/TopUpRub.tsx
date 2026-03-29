@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Share2 } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -15,6 +15,17 @@ const TopUpRub = () => {
 
   const handleOpenLink = () => {
     window.open(PAYMENT_URL, "_blank");
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "USDT", url: PAYMENT_URL });
+      } catch {}
+    } else {
+      navigator.clipboard.writeText(PAYMENT_URL);
+      toast.success(t("toast.copied", "Ссылка скопирована"));
+    }
   };
 
   const handleCopyLink = () => {
@@ -100,7 +111,16 @@ const TopUpRub = () => {
                 {t("topUpRub.openLinkDesc", "Открыть страницу пополнения")}
               </p>
             </div>
-            <Share2 className="w-5 h-5 text-muted-foreground/60" />
+            <button
+              onClick={(e) => { e.stopPropagation(); handleShare(); }}
+              className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-primary-foreground">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                <polyline points="16 6 12 2 8 6" />
+                <line x1="12" y1="2" x2="12" y2="15" />
+              </svg>
+            </button>
           </button>
         </motion.div>
       </div>
