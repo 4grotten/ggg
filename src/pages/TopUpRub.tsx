@@ -44,10 +44,11 @@ const TopUpRub = () => {
       return;
     }
 
-    // Get card_id from cards list
-    const cards = Array.isArray((cardsData as any)?.data) ? (cardsData as any).data : [];
+    // Wait for cards to load
+    if (!cardsData) return;
+    
+    const cards = Array.isArray(cardsData?.data) ? cardsData.data : [];
     const firstCard = cards[0];
-    if (!cardsData) return; // still loading cards
     
     if (!firstCard?.id) {
       setError("Карта не найдена");
