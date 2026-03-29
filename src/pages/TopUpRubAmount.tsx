@@ -22,39 +22,58 @@ const parseFormattedNumber = (value: string): string => {
 const TopUpRubAmount = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [displayValue, setDisplayValue] = useState("");
-  const [rawValue, setRawValue] = useState("");
+  const [usdtDisplay, setUsdtDisplay] = useState("");
+  const [usdtRaw, setUsdtRaw] = useState("");
+  const [rubDisplay, setRubDisplay] = useState("");
+  const [rubRaw, setRubRaw] = useState("");
 
-  const numericValue = parseFloat(rawValue) || 0;
-  const rubAmount = numericValue > 0 ? (numericValue * EXCHANGE_RATE) : 0;
-  const isValid = numericValue > 0;
+  const numericUsdt = parseFloat(usdtRaw) || 0;
+  const numericRub = parseFloat(rubRaw) || 0;
+  const isValid = numericUsdt > 0;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUsdtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = parseFormattedNumber(e.target.value);
-    // Allow only numbers and one decimal point
     if (input && !/^\d*\.?\d{0,2}$/.test(input)) return;
-    setRawValue(input);
-    setDisplayValue(formatNumber(input));
+    setUsdtRaw(input);
+    setUsdtDisplay(formatNumber(input));
+    const num = parseFloat(input) || 0;
+    const rub = num > 0 ? (num * EXCHANGE_RATE) : 0;
+    const rubStr = rub > 0 ? rub.toFixed(2) : "";
+    setRubRaw(rubStr);
+    setRubDisplay(rub > 0 ? formatNumber(rubStr) : "");
+  };
+
+  const handleRubChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = parseFormattedNumber(e.target.value);
+    if (input && !/^\d*\.?\d{0,2}$/.test(input)) return;
+    setRubRaw(input);
+    setRubDisplay(formatNumber(input));
+    const num = parseFloat(input) || 0;
+    const usdt = num > 0 ? (num / EXCHANGE_RATE) : 0;
+    const usdtStr = usdt > 0 ? usdt.toFixed(2) : "";
+    setUsdtRaw(usdtStr);
+    setUsdtDisplay(usdt > 0 ? formatNumber(usdtStr) : "");
   };
 
   const handleQuickAmount = (amount: number) => {
     const str = amount.toString();
-    setRawValue(str);
-    setDisplayValue(formatNumber(str));
+    setUsdtRaw(str);
+    setUsdtDisplay(formatNumber(str));
+    const rub = (amount * EXCHANGE_RATE).toFixed(2);
+    setRubRaw(rub);
+    setRubDisplay(formatNumber(rub));
   };
 
   const handleContinue = () => {
     if (!isValid) return;
     navigate("/top-up/rub/payment", {
-      state: { usdtAmount: numericValue, rubAmount },
+      state: { usdtAmount: numericUsdt, rubAmount: numericRub },
     });
   };
 
   const quickAmounts = [50, 100, 500, 1000];
 
-  const formattedRub = rubAmount > 0
-    ? rubAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : "0.00";
+  const hasValue = numericUsdt > 0;
 
   return (
     <MobileLayout
@@ -107,10 +126,10 @@ const TopUpRubAmount = () => {
             <input
               type="text"
               inputMode="decimal"
-              value={displayValue}
-              onChange={handleInputChange}
+              value={usdtDisplay}
+              onChange={handleUsdtChange}
               placeholder="0.00"
-              className="flex-1 text-right text-3xl font-bold bg-transparent outline-none text-[#22C55E] placeholder:text-muted-foreground/40 min-w-0 ml-3"
+              className={`flex-1 text-right text-3xl font-bold bg-transparent outline-none min-w-0 ml-3 ${hasValue ? 'text-[#22C55E]' : 'text-muted-foreground/40'} placeholder:text-muted-foreground/40`}
             />
           </div>
         </motion.div>
@@ -130,9 +149,14 @@ const TopUpRubAmount = () => {
               <span className="text-lg leading-none">🇷🇺</span>
               <span className="text-sm font-medium">RUB</span>
             </div>
-            <p className="flex-1 text-right text-3xl font-bold text-[#22C55E] min-w-0 ml-3 truncate">
-              {formattedRub}
-            </p>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={rubDisplay}
+              onChange={handleRubChange}
+              placeholder="0.00"
+              className={`flex-1 text-right text-3xl font-bold bg-transparent outline-none min-w-0 ml-3 ${hasValue ? 'text-[#22C55E]' : 'text-muted-foreground/40'} placeholder:text-muted-foreground/40`}
+            />
           </div>
         </motion.div>
 
