@@ -197,7 +197,7 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
     } else if (optionId === "crypto-bank") {
       navigateAuth("/send/bank");
     } else if (optionId === "crypto-rub") {
-      navigateAuth("/top-up/rub");
+      navigateAuth("/send/usdt-to-rub");
     }
   };
 
