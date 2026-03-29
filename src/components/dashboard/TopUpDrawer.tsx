@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, QrCode, Landmark, Wallet, X, CreditCard } from "lucide-react";
+import { ChevronRight, QrCode, Landmark, Wallet, X, CreditCard, Banknote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Drawer,
