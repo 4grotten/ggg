@@ -26,8 +26,8 @@ const AccountPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: walletData, isLoading: walletLoading } = useWalletSummary();
-  const { data: bankAccountsData, isLoading: bankLoading } = useBankAccounts();
-  const isLoading = walletLoading || bankLoading;
+  const { data: bankAccountsData, isLoading: bankLoading, refetch: refetchBankAccounts } = useBankAccounts();
+  const [provisioning, setProvisioning] = useState(false);
   
   // Prefer bank-accounts API data, fallback to wallet summary
   const bankAccount = bankAccountsData?.data?.[0];
@@ -43,22 +43,29 @@ const AccountPage = () => {
     id: bankAccount?.id,
   } : null;
   
-  // Register AED recipient in Xerime when account data is available
-  const registeredRef = useRef(false);
+  // Auto-provision bank account if none exists
+  const provisionedRef = useRef(false);
   useEffect(() => {
-    if (account?.iban && account?.beneficiary && !registeredRef.current) {
-      registeredRef.current = true;
+    if (bankLoading || provisionedRef.current) return;
+    // If no bank account exists, call provision endpoint to create one
+    if (!bankAccount) {
+      provisionedRef.current = true;
+      setProvisioning(true);
       apiRequest('/transactions/register-aed-recipient/', {
         method: 'POST',
-        body: JSON.stringify({
-          iban: account.iban,
-          business_name: account.beneficiary,
-        }),
-      }, true).catch(() => {
-        // Silent fail — registration is best-effort
-      });
+      }, true)
+        .then((res) => {
+          if (res?.data && !res.error) {
+            // Refetch bank accounts to show the newly created one
+            refetchBankAccounts();
+          }
+        })
+        .catch(() => {})
+        .finally(() => setProvisioning(false));
     }
-  }, [account?.iban, account?.beneficiary]);
+  }, [bankLoading, bankAccount]);
+
+  const isLoading = walletLoading || bankLoading || provisioning;
 
   const [qrOpen, setQrOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
