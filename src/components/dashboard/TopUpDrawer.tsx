@@ -53,8 +53,8 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     },
     {
       id: "rub",
-      icon: Banknote,
-      title: t("drawer.rubTopUp", "Пополнить рублём"),
+      icon: () => <span className="text-white text-lg font-bold">₽</span>,
+      title: t("drawer.rubTopUp", "Пополнить рублями"),
       subtitle: t("drawer.rubTopUpDesc", "RUB → USDT обмен"),
       iconBg: "bg-[#FF6B35]",
     },
@@ -94,7 +94,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
         <DrawerContent className="bg-background/95 backdrop-blur-xl">
           <DrawerHeader className="relative flex items-center justify-center py-4">
             <DrawerTitle className="text-center text-base font-semibold">
-              {t("drawer.addMoneyWith")}
+              {t("drawer.topUp", "Пополнить")}
             </DrawerTitle>
             <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
               <X className="w-3.5 h-3.5 text-primary" />
