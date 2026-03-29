@@ -119,20 +119,41 @@ class TransactionService:
         uid = str(user_id)
         account = BankDepositAccounts.objects.filter(user_id=uid, is_active=True).first()
         
-        if not account:
-            tail = uid.zfill(6)[-6:]
-            user_name = TransactionService._get_user_full_name(uid)
-            if not user_name or user_name == "Unknown User":
-                user_name = "EasyCard Client"
-                
-            account = BankDepositAccounts.objects.create(
-                user_id=uid, 
-                iban=f"AE070331234567890{tail}", 
-                bank_name="EasyCard Default Bank",
-                beneficiary=user_name, 
-                balance=Decimal('0.00'), # Баланс строго 0!
-                is_active=True
+        if account:
+            return account
+
+        # Получаем имя пользователя
+        user_name = TransactionService._get_user_full_name(uid)
+        if not user_name or user_name == "Unknown User":
+            user_name = "EasyCard Client"
+
+        # Регистрируем AED получателя в Xerime — он возвращает реальный IBAN
+        try:
+            xerime_resp = XerimeClient.register_aed_recipient(
+                merchant_id=uid,
+                business_name=user_name,
+                iban=""  # Xerime назначит IBAN
             )
+            # Извлекаем данные из ответа Xerime
+            real_iban = xerime_resp.get('iban') or xerime_resp.get('account', {}).get('iban', '')
+            bank_name = xerime_resp.get('bank_name') or xerime_resp.get('account', {}).get('bank_name', 'Xerime Bank')
+            beneficiary = xerime_resp.get('beneficiary') or xerime_resp.get('account', {}).get('beneficiary', user_name)
+            
+            if not real_iban:
+                raise ValueError("Xerime не вернул IBAN в ответе")
+
+        except Exception as e:
+            logger.error(f"Xerime AED recipient registration failed for user {uid}: {e}")
+            raise ValueError(f"Не удалось зарегистрировать банковский счёт: {e}")
+
+        account = BankDepositAccounts.objects.create(
+            user_id=uid,
+            iban=real_iban,
+            bank_name=bank_name if bank_name else "Xerime Bank",
+            beneficiary=beneficiary if beneficiary else user_name,
+            balance=Decimal('0.00'),
+            is_active=True
+        )
         return account
     
     @staticmethod

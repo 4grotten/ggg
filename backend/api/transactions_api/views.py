@@ -931,20 +931,9 @@ class RegisterAedRecipientView(APIView):
     def post(self, request):
         user_id = request.user.id
         try:
-            # 1. Создаём / получаем банковский счёт пользователя
+            # _ensure_bank_account сам вызовет Xerime и получит реальный IBAN
             account = TransactionService._ensure_bank_account(user_id)
 
-            # 2. Регистрируем получателя в Xerime (idempotent — повторный вызов не страшен)
-            try:
-                XerimeClient.register_aed_recipient(
-                    merchant_id=str(user_id),
-                    business_name=account.beneficiary,
-                    iban=account.iban
-                )
-            except Exception as e:
-                logger.warning(f"AED recipient registration in Xerime failed (non-critical): {e}")
-
-            # 3. Возвращаем данные счёта
             return Response({
                 "id": str(account.id),
                 "iban": account.iban,
