@@ -97,7 +97,7 @@ const TopUpRub = () => {
                 {t("topUpRub.openLink", "Перейти по ссылке")}
               </p>
               <p className="text-sm text-muted-foreground">
-                {t("topUpRub.openLinkDesc", "Открыть страницу оплаты")}
+                {t("topUpRub.openLinkDesc", "Открыть страницу пополнения")}
               </p>
             </div>
             <ExternalLink className="w-5 h-5 text-muted-foreground/60" />
