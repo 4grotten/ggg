@@ -24,6 +24,11 @@ const parseFormattedNumber = (value: string): string => {
 const SendUsdtToRub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { data: cryptoWalletsData } = useCryptoWallets();
+  const cryptoWallets = Array.isArray(cryptoWalletsData?.data) ? cryptoWalletsData.data : [];
+  const usdtWallet = cryptoWallets.find((w: any) => w.token === 'USDT' || w.token === 'usdt');
+  const WALLET_BALANCE = usdtWallet ? parseFloat(usdtWallet.balance) : 0;
+
   const [usdtDisplay, setUsdtDisplay] = useState("");
   const [usdtRaw, setUsdtRaw] = useState("");
   const [rubDisplay, setRubDisplay] = useState("");
