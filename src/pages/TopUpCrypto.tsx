@@ -125,7 +125,7 @@ const TopUpCrypto = () => {
         {/* Title */}
         <div className="pt-4 pb-6">
           <h1 className="text-2xl font-bold text-center text-foreground">
-            {t("topUp.topUpToUsdt", "Пополнить на USDT")}
+            {t("topUp.topUpToUsdt", `Пополнить ${selectedToken}`)}
           </h1>
         </div>
 
