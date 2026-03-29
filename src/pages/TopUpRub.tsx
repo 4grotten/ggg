@@ -55,12 +55,12 @@ const TopUpRub = () => {
                 {t("topUpRub.rubToUsdt", "RUB → USDT")}
               </p>
               <p className="text-sm text-muted-foreground">
-                {t("topUpRub.exchangeDescription", "Обмен рублей на USDT")}
+                {t("topUpRub.exchangeDescription", "Пополнение USDT через рубли")}
               </p>
             </div>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {t("topUpRub.howItWorks", "Отсканируйте QR-код или перейдите по ссылке для оплаты. После пополнения USDT поступят на ваш кошелёк.")}
+            {t("topUpRub.howItWorks", "Отсканируйте QR-код или перейдите по ссылке для пополнения. После оплаты USDT будут зачислены на ваш кошелёк.")}
           </p>
         </motion.div>
 
@@ -75,7 +75,7 @@ const TopUpRub = () => {
             <QRCodeSVG value={PAYMENT_URL} size={200} level="M" />
           </div>
           <p className="text-sm text-muted-foreground text-center mt-3">
-            {t("topUpRub.scanToOpen", "Отсканируйте для перехода к оплате")}
+            {t("topUpRub.scanToOpen", "Отсканируйте для перехода к пополнению")}
           </p>
         </motion.div>
 
