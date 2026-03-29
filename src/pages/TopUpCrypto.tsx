@@ -10,6 +10,7 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCryptoIcon } from "@/components/icons/CryptoIcons";
 
 type TokenType = "USDT" | "USDC";
 type NetworkId = "trc20" | "erc20" | "bep20";
@@ -184,7 +185,10 @@ const TopUpCrypto = () => {
 
           <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
             <span className="text-muted-foreground">{t("topUp.network")}</span>
-            <span className="font-semibold text-foreground">{selectedNetwork.name}</span>
+            <div className="flex items-center gap-2">
+              {getCryptoIcon(selectedNetworkId, 22)}
+              <span className="font-semibold text-foreground">{selectedNetwork.name}</span>
+            </div>
           </div>
 
           {/* Fees */}
