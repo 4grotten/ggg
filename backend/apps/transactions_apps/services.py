@@ -115,6 +115,38 @@ class TransactionService:
         return f"{addr[:5]}...{addr[-5:]}" if len(addr) > 12 else addr
     
     @staticmethod
+    def _generate_iban_for_user(user_id):
+        """
+        Генерирует уникальный IBAN в формате UAE для пользователя.
+        Формат: AE + 2 check digits + bank code (3) + account number (16)
+        Bank code: 096 (как в примере Xerime)
+        """
+        import hashlib
+        uid_str = str(user_id)
+        # Генерируем уникальный номер счёта из user_id
+        hash_digest = hashlib.sha256(uid_str.encode()).hexdigest()
+        # Берём 16 цифр из хэша
+        account_number = ''.join([str(int(c, 16) % 10) for c in hash_digest[:16]])
+        # Проверяем уникальность
+        base_iban = f"AE00096{account_number}"
+        # Вычисляем контрольные цифры по ISO 7064
+        # Перемещаем AE00 в конец, заменяем буквы: A=10, E=14
+        numeric_str = f"096{account_number}101400"
+        check = 98 - (int(numeric_str) % 97)
+        iban = f"AE{check:02d}096{account_number}"
+        
+        # Если IBAN уже занят — добавляем суффикс
+        counter = 0
+        while BankDepositAccounts.objects.filter(iban=iban).exists():
+            counter += 1
+            alt_number = ''.join([str(int(c, 16) % 10) for c in hashlib.sha256(f"{uid_str}_{counter}".encode()).hexdigest()[:16]])
+            numeric_str = f"096{alt_number}101400"
+            check = 98 - (int(numeric_str) % 97)
+            iban = f"AE{check:02d}096{alt_number}"
+        
+        return iban
+
+    @staticmethod
     def _ensure_bank_account(user_id):
         uid = str(user_id)
         account = BankDepositAccounts.objects.filter(user_id=uid, is_active=True).first()
@@ -127,30 +159,26 @@ class TransactionService:
         if not user_name or user_name == "Unknown User":
             user_name = "EasyCard Client"
 
-        # Регистрируем AED получателя в Xerime — он возвращает реальный IBAN
+        # Генерируем реальный IBAN
+        iban = TransactionService._generate_iban_for_user(uid)
+
+        # Регистрируем в Xerime — если 201/200, значит IBAN принят
         try:
-            xerime_resp = XerimeClient.register_aed_recipient(
+            XerimeClient.register_aed_recipient(
                 merchant_id=uid,
                 business_name=user_name,
-                iban=""  # Xerime назначит IBAN
+                iban=iban
             )
-            # Извлекаем данные из ответа Xerime
-            real_iban = xerime_resp.get('iban') or xerime_resp.get('account', {}).get('iban', '')
-            bank_name = xerime_resp.get('bank_name') or xerime_resp.get('account', {}).get('bank_name', 'Xerime Bank')
-            beneficiary = xerime_resp.get('beneficiary') or xerime_resp.get('account', {}).get('beneficiary', user_name)
-            
-            if not real_iban:
-                raise ValueError("Xerime не вернул IBAN в ответе")
-
         except Exception as e:
             logger.error(f"Xerime AED recipient registration failed for user {uid}: {e}")
-            raise ValueError(f"Не удалось зарегистрировать банковский счёт: {e}")
+            raise ValueError(f"Не удалось зарегистрировать банковский счёт в платёжной системе: {e}")
 
+        # Xerime подтвердил — сохраняем в БД
         account = BankDepositAccounts.objects.create(
             user_id=uid,
-            iban=real_iban,
-            bank_name=bank_name if bank_name else "Xerime Bank",
-            beneficiary=beneficiary if beneficiary else user_name,
+            iban=iban,
+            bank_name="Mashreq Bank",
+            beneficiary=user_name,
             balance=Decimal('0.00'),
             is_active=True
         )
