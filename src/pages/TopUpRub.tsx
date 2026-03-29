@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -100,7 +100,7 @@ const TopUpRub = () => {
                 {t("topUpRub.openLinkDesc", "Открыть страницу пополнения")}
               </p>
             </div>
-            <ExternalLink className="w-5 h-5 text-muted-foreground/60" />
+            <Share2 className="w-5 h-5 text-muted-foreground/60" />
           </button>
         </motion.div>
       </div>
