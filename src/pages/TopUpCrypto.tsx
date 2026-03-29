@@ -101,8 +101,8 @@ const TopUpCrypto = () => {
         await navigator.share(shareData);
       } else if (navigator.share) {
         await navigator.share({
-          title: "USDT Wallet Address",
-          text: `USDT (${selectedNetwork.shortName}) Address: ${walletAddress}`,
+          title: `${selectedToken} Wallet Address`,
+          text: `${selectedToken} (${selectedNetwork.shortName}) Address: ${walletAddress}`,
         });
       } else {
         handleCopy();
