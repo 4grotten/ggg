@@ -21,7 +21,7 @@ import { TronIcon, EthereumIcon, BscIcon } from "@/components/icons/CryptoIcons"
 import { useAuth } from "@/contexts/AuthContext";
 
 type TokenType = "USDT" | "USDC";
-type NetworkId = "trc20" | "erc20" | "bep20";
+type NetworkId = "trc20" | "erc20";
 
 const TOKENS: { id: TokenType; name: string; color: string; symbol: string }[] = [
   { id: "USDT", name: "Tether USDT", color: "#26A17B", symbol: "₮" },
@@ -31,7 +31,6 @@ const TOKENS: { id: TokenType; name: string; color: string; symbol: string }[] =
 const NETWORKS: { id: NetworkId; name: string; icon: JSX.Element }[] = [
   { id: "trc20", name: "Tron (TRC20)", icon: <TronIcon size={24} /> },
   { id: "erc20", name: "Ethereum (ERC20)", icon: <EthereumIcon size={24} /> },
-  { id: "bep20", name: "BSC (BEP20)", icon: <BscIcon size={24} /> },
 ];
 
 type DrawerView = "main" | "select-token" | "select-network";

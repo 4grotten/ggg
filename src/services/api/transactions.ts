@@ -961,15 +961,19 @@ export const submitBankTopup = async (
 // =============================================
 
 export interface CryptoTopupRequest {
-  card_id: string;
   token: 'USDT' | 'USDC';
-  network: 'TRC20' | 'ERC20' | 'BEP20' | 'SOL';
+  network: 'TRC20' | 'ERC20';
+  amount?: number;
 }
 
 export interface CryptoTopupResponse {
   message: string;
-  deposit_address: string;
-  qr_payload: string;
+  transaction_id: string;
+  metadata: {
+    crypto_token: string;
+    crypto_network: string;
+    crypto_address: string;
+  };
 }
 
 /**
@@ -994,7 +998,7 @@ export const submitCryptoTopup = async (
       return { success: false, error: result.error.detail || result.error.message || 'Topup initiation failed' };
     }
 
-    if (result.data?.deposit_address) {
+    if (result.data?.metadata?.crypto_address) {
       return { success: true, data: result.data };
     }
 
