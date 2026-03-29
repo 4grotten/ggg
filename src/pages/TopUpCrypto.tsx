@@ -10,13 +10,6 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 type TokenType = "USDT" | "USDC";
 type NetworkId = "trc20" | "erc20" | "bep20";
@@ -178,48 +171,20 @@ const TopUpCrypto = () => {
             </div>
           </div>
 
-          {/* Receive Token - Selectable */}
-          <div className="bg-muted rounded-2xl p-4">
-            <span className="text-muted-foreground text-sm mb-2 block">{t("topUp.receiveToken")}</span>
-            <Select value={selectedToken} onValueChange={(v: TokenType) => setSelectedToken(v)}>
-              <SelectTrigger className="w-full h-12 bg-background border-border/50 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: selectedTokenInfo.color }}>
-                    <span className="text-white text-xs font-bold">{selectedTokenInfo.symbol}</span>
-                  </div>
-                  <span className="font-semibold">{selectedToken}</span>
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                {TOKENS.map((tk) => (
-                  <SelectItem key={tk.id} value={tk.id}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: tk.color }}>
-                        <span className="text-white text-[10px] font-bold">{tk.symbol}</span>
-                      </div>
-                      <span>{tk.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Token & Network info (read-only) */}
+          <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
+            <span className="text-muted-foreground">{t("topUp.receiveToken")}</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: selectedTokenInfo.color }}>
+                <span className="text-white text-xs font-bold">{selectedTokenInfo.symbol}</span>
+              </div>
+              <span className="font-semibold text-foreground">{selectedToken}</span>
+            </div>
           </div>
 
-          {/* Network - Selectable */}
-          <div className="bg-muted rounded-2xl p-4">
-            <span className="text-muted-foreground text-sm mb-2 block">{t("topUp.network")}</span>
-            <Select value={selectedNetworkId} onValueChange={(v: NetworkId) => setSelectedNetworkId(v)}>
-              <SelectTrigger className="w-full h-12 bg-background border-border/50 rounded-xl">
-                <SelectValue>{selectedNetwork.name}</SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {NETWORKS.map((net) => (
-                  <SelectItem key={net.id} value={net.id}>
-                    {net.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
+            <span className="text-muted-foreground">{t("topUp.network")}</span>
+            <span className="font-semibold text-foreground">{selectedNetwork.name}</span>
           </div>
 
           {/* Fees */}
