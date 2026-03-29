@@ -1124,6 +1124,11 @@ const Settings = () => {
             label={t("settings.apiThirdParty")}
             onClick={() => navigate("/settings/api-third-party")}
           />
+          <SettingsItem
+            icon={<ColoredIcon colorKey="code"><ArrowLeftRight className="w-4 h-4" /></ColoredIcon>}
+            label="API BME и Xerime"
+            onClick={() => navigate("/settings/api-bme-xerime")}
+          />
         </AnimatedMenuSection>
 
         {/* Support & Legal */}
