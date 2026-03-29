@@ -198,8 +198,8 @@ const TopUpRubAmount = () => {
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-            <div className="w-9 h-9 rounded-full bg-[#FF6B35]/15 flex items-center justify-center shrink-0">
-              <span className="text-[#FF6B35] text-sm font-bold">₽</span>
+            <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+              <span className="text-primary text-sm font-bold">₽</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-muted-foreground">

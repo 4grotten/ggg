@@ -57,7 +57,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
       customIcon: <span className="text-white text-lg font-bold">₽</span>,
       title: t("drawer.rubTopUp", "Пополнить рублями"),
       subtitle: t("drawer.rubTopUpDesc", "RUB → USDT"),
-      iconBg: "bg-[#FF6B35]",
+      iconBg: "bg-primary",
     },
     {
       id: "share-card",
