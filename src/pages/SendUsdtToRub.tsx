@@ -25,7 +25,7 @@ const SendUsdtToRub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { data: cryptoWalletsData } = useCryptoWallets();
-  const cryptoWallets = Array.isArray(cryptoWalletsData?.data) ? cryptoWalletsData.data : [];
+  const cryptoWallets = Array.isArray((cryptoWalletsData as any)?.data) ? (cryptoWalletsData as any).data : [];
   const usdtWallet = cryptoWallets.find((w: any) => w.token === 'USDT' || w.token === 'usdt');
   const WALLET_BALANCE = usdtWallet ? parseFloat(usdtWallet.balance) : 0;
 
