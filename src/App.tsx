@@ -32,7 +32,7 @@ import FeesAndLimits from "./pages/FeesAndLimits";
 import LimitsSettings from "./pages/LimitsSettings";
 import ProfileVerification from "./pages/ProfileVerification";
 import TopUpCrypto from "./pages/TopUpCrypto";
-import CryptoTopUpSelect from "./pages/CryptoTopUpSelect";
+
 import TopUpBank from "./pages/TopUpBank";
 import TopUpBankDetails from "./pages/TopUpBankDetails";
 import SendCrypto from "./pages/SendCrypto";
@@ -213,7 +213,6 @@ const AppContent = () => {
             <Route path="/card/:type" element={<CardPage />} />
             <Route path="/Transaction_History" element={<TransactionHistory />} />
             <Route path="/send-to-card" element={<SendToCard />} />
-            <Route path="/top-up/crypto/select" element={<CryptoTopUpSelect />} />
             <Route path="/top-up/crypto" element={<TopUpCrypto />} />
             <Route path="/top-up/bank" element={<TopUpBank />} />
             <Route path="/top-up/usdt-balance" element={<TopUpFromUsdtBalance />} />
