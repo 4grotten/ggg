@@ -99,7 +99,6 @@ const TopUpCrypto = () => {
 
       const networkApiValue = selectedNetworkId.toUpperCase() as "TRC20" | "ERC20";
       const result = await submitCryptoTopup({
-        user_id: userId,
         token: selectedToken,
         network: networkApiValue,
       });

@@ -961,7 +961,6 @@ export const submitBankTopup = async (
 // =============================================
 
 export interface CryptoTopupRequest {
-  user_id: string;
   token: 'USDT' | 'USDC';
   network: 'TRC20' | 'ERC20';
 }

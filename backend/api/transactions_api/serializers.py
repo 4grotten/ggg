@@ -13,7 +13,7 @@ class BankTopupResponseSerializer(serializers.Serializer):
     instructions = serializers.JSONField(help_text="Банковские реквизиты, на которые клиент должен отправить деньги")
 
 class CryptoTopupRequestSerializer(serializers.Serializer):
-    card_id = serializers.UUIDField(help_text="ID карты, на которую зачислятся средства после конвертации")
+    card_id = serializers.UUIDField(required=False, allow_null=True, help_text="ID карты (опционально)")
     token = serializers.ChoiceField(choices=['USDT', 'USDC'], help_text="Стейблкоин для пополнения")
     network = serializers.ChoiceField(choices=['TRC20', 'ERC20', 'BEP20', 'SOL'], help_text="Блокчейн сеть")
 

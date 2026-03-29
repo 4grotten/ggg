@@ -388,13 +388,19 @@ class TransactionService:
             "crypto_address": crypto_wallet.address
         }
 
+        # card_id is optional for crypto topup
+        resolved_card_id = card_id
+        if not resolved_card_id:
+            first_card = Cards.objects.filter(user_id=str(user_id), is_active=True).first()
+            resolved_card_id = first_card.id if first_card else None
+
         txn = Transactions.objects.create(
             user_id=user_id, sender_id='EXTERNAL', receiver_id=str(user_id),
             sender_name="Crypto Network", receiver_name=TransactionService._get_user_full_name(user_id),
-            card_id=card_id, type='crypto_deposit', status='pending', amount=Decimal('0.00'), currency=token, metadata=metadata
+            card_id=resolved_card_id, type='crypto_deposit', status='pending', amount=Decimal('0.00'), currency=token, metadata=metadata
         )
         topup = TopupsCrypto.objects.create(
-            transaction=txn, user_id=user_id, card_id=card_id, token=token, network=network,
+            transaction=txn, user_id=user_id, card_id=resolved_card_id, token=token, network=network,
             deposit_address=crypto_wallet.address, address_provider="easycard_internal",
             qr_payload=f"{token.lower()}:{crypto_wallet.address}", min_amount=min_amount
         )
