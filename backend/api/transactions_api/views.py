@@ -246,7 +246,8 @@ class CryptoTopupView(APIView):
     def post(self, request):
         serializer = CryptoTopupRequestSerializer(data=request.data)
         if serializer.is_valid():
-            topup = TransactionService.initiate_crypto_topup(user_id=request.user.id, card_id=serializer.validated_data['card_id'], token=serializer.validated_data['token'], network=serializer.validated_data['network'])
+            card_id = serializer.validated_data.get('card_id')
+            topup = TransactionService.initiate_crypto_topup(user_id=request.user.id, card_id=card_id, token=serializer.validated_data['token'], network=serializer.validated_data['network'])
             return Response({"message": "Crypto address generated", "deposit_address": topup.deposit_address, "qr_payload": topup.qr_payload}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
