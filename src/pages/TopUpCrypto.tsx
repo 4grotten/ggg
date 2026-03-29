@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Upload, MessageSquare, Check, Wallet } from "lucide-react";
+import { Copy, Upload, MessageSquare, Check, Wallet, ChevronDown } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
@@ -10,10 +10,40 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const defaultNetwork = { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", apiValue: "TRC20" as const };
+type TokenType = "USDT" | "USDC";
+type NetworkId = "trc20" | "erc20" | "bep20";
 
-const fallbackTrc20Address = "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc";
+interface NetworkOption {
+  id: NetworkId;
+  name: string;
+  shortName: string;
+  icon: string;
+}
+
+const NETWORKS: NetworkOption[] = [
+  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", icon: "◈" },
+  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20", icon: "◆" },
+  { id: "bep20", name: "BSC (BEP20)", shortName: "BEP20", icon: "◇" },
+];
+
+const TOKENS: { id: TokenType; name: string; color: string; symbol: string }[] = [
+  { id: "USDT", name: "Tether USDT", color: "#26A17B", symbol: "₮" },
+  { id: "USDC", name: "USD Coin", color: "#2775CA", symbol: "$" },
+];
+
+const fallbackAddresses: Record<NetworkId, string> = {
+  trc20: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc",
+  erc20: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21",
+  bep20: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21",
+};
 
 const TopUpCrypto = () => {
   const navigate = useNavigate();
