@@ -8,7 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { apiRequest } from "@/services/api/apiClient";
-
+import { useWalletSummary } from "@/hooks/useCards";
 
 interface TopUpRubState {
   usdtAmount: number;
