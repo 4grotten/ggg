@@ -8,10 +8,11 @@ import { useTranslation } from "react-i18next";
 import { useSettings } from "@/contexts/SettingsContext";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
+import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCryptoIcon } from "@/components/icons/CryptoIcons";
 import { submitCryptoTopup } from "@/services/api/transactions";
-import { useCardsList, useCryptoWallets } from "@/hooks/useCards";
+import { useCryptoWallets } from "@/hooks/useCards";
 
 type TokenType = "USDT" | "USDC";
 type NetworkId = "trc20" | "erc20";
@@ -36,10 +37,10 @@ const TopUpCrypto = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const settings = useSettings();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
-  const { data: cardsData } = useCardsList();
   const { data: cryptoWalletsData, isLoading: cryptoWalletsLoading } = useCryptoWallets();
 
   const tokenParam = (searchParams.get("token") as TokenType) || "USDT";
@@ -81,12 +82,11 @@ const TopUpCrypto = () => {
       return;
     }
 
-    const cards = cardsData?.data;
-    const firstCardId = Array.isArray(cards) && cards.length > 0 ? cards[0].id : null;
+    const userId = user?.user_id;
 
-    if (!firstCardId) {
+    if (!userId) {
       setWalletAddress("");
-      setError("Не удалось получить адрес пополнения");
+      setError("Не удалось получить user id");
       setLoading(false);
       return;
     }
@@ -99,7 +99,7 @@ const TopUpCrypto = () => {
 
       const networkApiValue = selectedNetworkId.toUpperCase() as "TRC20" | "ERC20";
       const result = await submitCryptoTopup({
-        card_id: firstCardId,
+        user_id: userId,
         token: selectedToken,
         network: networkApiValue,
       });
@@ -125,7 +125,7 @@ const TopUpCrypto = () => {
     return () => {
       cancelled = true;
     };
-  }, [cardsData, cryptoWalletsData, cryptoWalletsLoading, selectedNetworkId, selectedToken]);
+  }, [cryptoWalletsData, cryptoWalletsLoading, selectedNetworkId, selectedToken, user]);
 
   const truncateAddress = (address: string) => `${address.slice(0, 6)}...${address.slice(-6)}`;
 
