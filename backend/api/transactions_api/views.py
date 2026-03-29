@@ -919,3 +919,45 @@ class XerimeInfoView(APIView):
             return Response({"error": "Неизвестный action"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterAedRecipientView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Регистрация AED получателя в Xerime",
+        tags=["Счета и Кошельки"],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['iban', 'business_name'],
+            properties={
+                'iban': openapi.Schema(type=openapi.TYPE_STRING, description='IBAN получателя'),
+                'business_name': openapi.Schema(type=openapi.TYPE_STRING, description='Имя получателя / компании'),
+            }
+        )
+    )
+    def post(self, request):
+        iban = request.data.get('iban')
+        business_name = request.data.get('business_name')
+
+        if not iban or not business_name:
+            return Response(
+                {"error": "Поля 'iban' и 'business_name' обязательны."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            result = XerimeClient.register_aed_recipient(
+                merchant_id=str(request.user.id),
+                business_name=business_name,
+                iban=iban
+            )
+            return Response({
+                "status": "registered",
+                "iban": iban,
+                "business_name": business_name,
+                "provider_response": result
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(f"AED recipient registration error: {e}")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

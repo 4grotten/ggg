@@ -47,5 +47,6 @@ urlpatterns = [
     path('fiat/withdrawal/', views.FiatWithdrawalView.as_view(), name='fiat-withdrawal'),
     
     path('xerime/info/<str:action>/', views.XerimeInfoView.as_view(), name='xerime-info'),
+    path('register-aed-recipient/', views.RegisterAedRecipientView.as_view(), name='register-aed-recipient'),
 
 ]
