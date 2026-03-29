@@ -56,11 +56,14 @@ const AccountPage = () => {
       }, true)
         .then((res) => {
           if (res?.data && !res.error) {
-            // Refetch bank accounts to show the newly created one
             refetchBankAccounts();
+          } else {
+            toast.error(res?.error || t('accountPage.provisionError', 'Не удалось создать банковский счёт'));
           }
         })
-        .catch(() => {})
+        .catch((err) => {
+          toast.error(t('accountPage.provisionError', 'Не удалось создать банковский счёт'));
+        })
         .finally(() => setProvisioning(false));
     }
   }, [bankLoading, bankAccount]);
