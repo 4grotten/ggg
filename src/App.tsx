@@ -44,6 +44,7 @@ import OpenCardPayBalance from "./pages/OpenCardPayBalance";
 import TariffPayBalance from "./pages/TariffPayBalance";
 import TariffPayCrypto from "./pages/TariffPayCrypto";
 import TopUpFromUsdtBalance from "./pages/TopUpFromUsdtBalance";
+import TopUpRub from "./pages/TopUpRub";
 import SendIbanToCard from "./pages/SendIbanToCard";
 import SendIbanToExternalCard from "./pages/SendIbanToExternalCard";
 import NotFound from "./pages/NotFound";
@@ -213,6 +214,7 @@ const AppContent = () => {
             <Route path="/top-up/bank" element={<TopUpBank />} />
             <Route path="/top-up/usdt-balance" element={<TopUpFromUsdtBalance />} />
             <Route path="/top-up/bank/details" element={<TopUpBankDetails />} />
+            <Route path="/top-up/rub" element={<TopUpRub />} />
             <Route path="/send/crypto" element={<SendCrypto />} />
             <Route path="/send/crypto-to-card" element={<SendCryptoToCard />} />
             <Route path="/send/bank" element={<SendBank />} />

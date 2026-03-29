@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, QrCode, Landmark, Wallet, X, CreditCard } from "lucide-react";
+import { ChevronRight, QrCode, Landmark, Wallet, X, CreditCard, Banknote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Drawer,
@@ -52,6 +52,13 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
       iconBg: "bg-purple-500",
     },
     {
+      id: "rub",
+      icon: Banknote,
+      title: t("drawer.rubTopUp", "Пополнить рублём"),
+      subtitle: t("drawer.rubTopUpDesc", "RUB → USDT обмен"),
+      iconBg: "bg-[#FF6B35]",
+    },
+    {
       id: "share-card",
       icon: CreditCard,
       title: t("drawer.shareCardDetails", "Поделиться данными карты"),
@@ -76,6 +83,8 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
       navigate("/top-up/bank");
     } else if (optionId === "share-card") {
       navigate("/card/virtual");
+    } else if (optionId === "rub") {
+      navigate("/top-up/rub");
     }
   };
 
