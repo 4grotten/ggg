@@ -27,10 +27,10 @@ const TOKENS: { id: TokenType; name: string; color: string; symbol: string }[] =
   { id: "USDC", name: "USD Coin", color: "#2775CA", symbol: "$" },
 ];
 
-const NETWORKS: { id: NetworkId; name: string }[] = [
-  { id: "trc20", name: "Tron (TRC20)" },
-  { id: "erc20", name: "Ethereum (ERC20)" },
-  { id: "bep20", name: "BSC (BEP20)" },
+const NETWORKS: { id: NetworkId; name: string; color: string; letter: string }[] = [
+  { id: "trc20", name: "Tron (TRC20)", color: "#EF0027", letter: "T" },
+  { id: "erc20", name: "Ethereum (ERC20)", color: "#627EEA", letter: "E" },
+  { id: "bep20", name: "BSC (BEP20)", color: "#F0B90B", letter: "B" },
 ];
 
 type DrawerView = "main" | "select-token" | "select-network";
@@ -158,8 +158,11 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
                     index < NETWORKS.length - 1 ? "border-b border-border/50" : ""
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-xs font-bold text-foreground">{net.id.toUpperCase()}</span>
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: net.color }}
+                  >
+                    <span className="text-sm font-bold text-white">{net.letter}</span>
                   </div>
                   <div className="flex-1 text-left">
                     <p className="text-base font-medium text-foreground">{net.name}</p>
