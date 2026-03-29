@@ -11,6 +11,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCryptoIcon } from "@/components/icons/CryptoIcons";
 import { submitCryptoTopup } from "@/services/api/transactions";
+import { useCardsList } from "@/hooks/useCards";
 
 type TokenType = "USDT" | "USDC";
 type NetworkId = "trc20" | "erc20";
