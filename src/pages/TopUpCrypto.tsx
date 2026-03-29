@@ -11,6 +11,7 @@ import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCryptoIcon } from "@/components/icons/CryptoIcons";
 import { submitCryptoTopup } from "@/services/api/transactions";
+import { useCardsList } from "@/hooks/useCards";
 
 type TokenType = "USDT" | "USDC";
 type NetworkId = "trc20" | "erc20";
@@ -38,6 +39,7 @@ const TopUpCrypto = () => {
   const [searchParams] = useSearchParams();
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
+  const { data: cardsData } = useCardsList();
 
   const tokenParam = (searchParams.get("token") as TokenType) || "USDT";
   const networkParam = (searchParams.get("network") as NetworkId) || "trc20";
@@ -48,6 +50,7 @@ const TopUpCrypto = () => {
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const selectedNetwork = NETWORKS.find(n => n.id === selectedNetworkId) || NETWORKS[0];
   const selectedTokenInfo = TOKENS.find(tk => tk.id === selectedToken) || TOKENS[0];
@@ -60,11 +63,19 @@ const TopUpCrypto = () => {
 
   // Call API to get wallet address
   useEffect(() => {
+    if (hasFetched) return;
+    
+    // Get first card_id from cards list
+    const cards = cardsData?.data;
+    const firstCardId = Array.isArray(cards) && cards.length > 0 ? cards[0].id : null;
+    if (!firstCardId) return; // wait until cards are loaded
+
     const fetchAddress = async () => {
       setLoading(true);
       setError(null);
       const networkApiValue = selectedNetworkId.toUpperCase() as "TRC20" | "ERC20";
       const result = await submitCryptoTopup({
+        card_id: firstCardId,
         token: selectedToken,
         network: networkApiValue,
       });
@@ -76,10 +87,11 @@ const TopUpCrypto = () => {
         toast.error(result.error || t("toast.copyFailed"));
       }
       setLoading(false);
+      setHasFetched(true);
     };
 
     fetchAddress();
-  }, [selectedToken, selectedNetworkId]);
+  }, [selectedToken, selectedNetworkId, cardsData, hasFetched]);
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
