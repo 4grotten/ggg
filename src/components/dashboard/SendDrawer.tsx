@@ -264,7 +264,7 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
                     </div>
                     <div className="flex-1 text-left">
                       <p className="text-base font-medium text-foreground">{option.title}</p>
-                      <p className="text-sm text-muted-foreground">{option.subtitle}</p>
+                      {'customSubtitle' in option && option.customSubtitle ? option.customSubtitle : <p className="text-sm text-muted-foreground">{option.subtitle}</p>}
                     </div>
                     <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
                   </button>
