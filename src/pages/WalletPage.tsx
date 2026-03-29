@@ -126,7 +126,7 @@ const WalletPage = () => {
           </div>
           <div className="flex gap-3 mt-4">
             <button
-              onClick={() => navigate("/top-up/crypto/select")}
+              onClick={() => navigate("/top-up/crypto")}
               className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#27AE60] text-white py-2.5 font-medium text-sm hover:bg-[#219653] transition-colors"
             >
               <ArrowDownLeft className="w-4 h-4" />
