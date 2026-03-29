@@ -53,19 +53,22 @@ const TopUpCrypto = () => {
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
   const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
 
+  const [selectedToken, setSelectedToken] = useState<TokenType>("USDT");
+  const [selectedNetworkId, setSelectedNetworkId] = useState<NetworkId>("trc20");
+  const [copied, setCopied] = useState(false);
+
+  const selectedNetwork = NETWORKS.find(n => n.id === selectedNetworkId) || NETWORKS[0];
+  const selectedTokenInfo = TOKENS.find(tk => tk.id === selectedToken) || TOKENS[0];
+
   const walletAddress = useMemo(() => {
     if (cryptoWalletsData?.data) {
-      const trc20Wallet = cryptoWalletsData.data.find(w => w.network.toLowerCase() === "trc20");
-      if (trc20Wallet) return trc20Wallet.address;
+      const wallet = cryptoWalletsData.data.find(w => w.network.toLowerCase() === selectedNetworkId);
+      if (wallet) return wallet.address;
     }
-    return fallbackTrc20Address;
-  }, [cryptoWalletsData]);
+    return fallbackAddresses[selectedNetworkId];
+  }, [cryptoWalletsData, selectedNetworkId]);
 
-  const walletLabel = t("topUp.usdtWallet", "Кошелек USDT");
-  const selectedNetwork = defaultNetwork;
-
-  const [selectedToken] = useState("USDT");
-  const [copied, setCopied] = useState(false);
+  const walletLabel = t("topUp.usdtWallet", `Кошелек ${selectedToken}`);
 
   useEffect(() => {
     window.scrollTo(0, 0);
