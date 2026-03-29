@@ -43,6 +43,23 @@ const AccountPage = () => {
     id: bankAccount?.id,
   } : null;
   
+  // Register AED recipient in Xerime when account data is available
+  const registeredRef = useRef(false);
+  useEffect(() => {
+    if (account?.iban && account?.beneficiary && !registeredRef.current) {
+      registeredRef.current = true;
+      apiRequest('/transactions/register-aed-recipient/', {
+        method: 'POST',
+        body: JSON.stringify({
+          iban: account.iban,
+          business_name: account.beneficiary,
+        }),
+      }, true).catch(() => {
+        // Silent fail — registration is best-effort
+      });
+    }
+  }, [account?.iban, account?.beneficiary]);
+
   const [qrOpen, setQrOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const { data: ibanTxData, isLoading: ibanLoading } = useIbanTransactionGroups();
