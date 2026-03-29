@@ -39,6 +39,7 @@ const TopUpCrypto = () => {
   const [searchParams] = useSearchParams();
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
+  const { data: cardsData } = useCardsList();
 
   const tokenParam = (searchParams.get("token") as TokenType) || "USDT";
   const networkParam = (searchParams.get("network") as NetworkId) || "trc20";
@@ -49,6 +50,7 @@ const TopUpCrypto = () => {
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasFetched, setHasFetched] = useState(false);
 
   const selectedNetwork = NETWORKS.find(n => n.id === selectedNetworkId) || NETWORKS[0];
   const selectedTokenInfo = TOKENS.find(tk => tk.id === selectedToken) || TOKENS[0];
