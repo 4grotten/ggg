@@ -72,7 +72,7 @@ const TopUpRub = () => {
         );
 
         if (result.error) {
-          setError(result.error);
+          setError(result.error.detail || result.error.message || "Ошибка API");
         } else if (result.data) {
           setPaymentData(result.data);
         } else {
