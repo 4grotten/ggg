@@ -11,6 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { useWalletSummary, useBankAccounts } from "@/hooks/useCards";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { apiRequest } from "@/services/api/apiClient";
 import { useIbanTransactionGroups, useTransactionGroups, useApiTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
