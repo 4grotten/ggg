@@ -8,7 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { apiRequest } from "@/services/api/apiClient";
-
+import { useWalletSummary } from "@/hooks/useCards";
 
 interface TopUpRubState {
   usdtAmount: number;
@@ -28,7 +28,7 @@ const TopUpRub = () => {
   const location = useLocation();
   const { t } = useTranslation();
   const state = location.state as TopUpRubState | null;
-  
+  const { data: walletData } = useWalletSummary();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,10 +37,18 @@ const TopUpRub = () => {
   const rubAmount = state?.rubAmount || 0;
   const usdtAmount = state?.usdtAmount || 0;
 
+  // Get the first card ID from wallet summary
+  const firstCardId = walletData?.data?.cards?.[0]?.id || null;
+
   useEffect(() => {
     if (!rubAmount || rubAmount <= 0) {
       setError("Сумма не указана");
       setLoading(false);
+      return;
+    }
+
+    if (!firstCardId) {
+      // Still loading wallet data, wait
       return;
     }
 
@@ -54,6 +62,7 @@ const TopUpRub = () => {
             method: "POST",
             body: JSON.stringify({
               amount_rub: Math.round(rubAmount),
+              card_id: firstCardId,
             }),
           },
           true
@@ -73,7 +82,7 @@ const TopUpRub = () => {
     };
 
     submitTopup();
-  }, [rubAmount]);
+  }, [rubAmount, firstCardId]);
 
   const paymentUrl = paymentData?.public_link || paymentData?.sbp_link || "";
 
