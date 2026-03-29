@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Upload, MessageSquare, Check, Wallet } from "lucide-react";
+import { Copy, Upload, MessageSquare, Check, Wallet, ChevronDown } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
@@ -10,10 +10,40 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const defaultNetwork = { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", apiValue: "TRC20" as const };
+type TokenType = "USDT" | "USDC";
+type NetworkId = "trc20" | "erc20" | "bep20";
 
-const fallbackTrc20Address = "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc";
+interface NetworkOption {
+  id: NetworkId;
+  name: string;
+  shortName: string;
+  icon: string;
+}
+
+const NETWORKS: NetworkOption[] = [
+  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", icon: "◈" },
+  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20", icon: "◆" },
+  { id: "bep20", name: "BSC (BEP20)", shortName: "BEP20", icon: "◇" },
+];
+
+const TOKENS: { id: TokenType; name: string; color: string; symbol: string }[] = [
+  { id: "USDT", name: "Tether USDT", color: "#26A17B", symbol: "₮" },
+  { id: "USDC", name: "USD Coin", color: "#2775CA", symbol: "$" },
+];
+
+const fallbackAddresses: Record<NetworkId, string> = {
+  trc20: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc",
+  erc20: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21",
+  bep20: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21",
+};
 
 const TopUpCrypto = () => {
   const navigate = useNavigate();
@@ -23,19 +53,22 @@ const TopUpCrypto = () => {
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
   const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
 
+  const [selectedToken, setSelectedToken] = useState<TokenType>("USDT");
+  const [selectedNetworkId, setSelectedNetworkId] = useState<NetworkId>("trc20");
+  const [copied, setCopied] = useState(false);
+
+  const selectedNetwork = NETWORKS.find(n => n.id === selectedNetworkId) || NETWORKS[0];
+  const selectedTokenInfo = TOKENS.find(tk => tk.id === selectedToken) || TOKENS[0];
+
   const walletAddress = useMemo(() => {
     if (cryptoWalletsData?.data) {
-      const trc20Wallet = cryptoWalletsData.data.find(w => w.network.toLowerCase() === "trc20");
-      if (trc20Wallet) return trc20Wallet.address;
+      const wallet = cryptoWalletsData.data.find(w => w.network.toLowerCase() === selectedNetworkId);
+      if (wallet) return wallet.address;
     }
-    return fallbackTrc20Address;
-  }, [cryptoWalletsData]);
+    return fallbackAddresses[selectedNetworkId];
+  }, [cryptoWalletsData, selectedNetworkId]);
 
-  const walletLabel = t("topUp.usdtWallet", "Кошелек USDT");
-  const selectedNetwork = defaultNetwork;
-
-  const [selectedToken] = useState("USDT");
-  const [copied, setCopied] = useState(false);
+  const walletLabel = t("topUp.usdtWallet", `Кошелек ${selectedToken}`);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -58,8 +91,8 @@ const TopUpCrypto = () => {
 
   const handleShare = async () => {
     const shareData = {
-      title: "USDT Wallet Address",
-      text: `USDT (${selectedNetwork.shortName}) Address: ${walletAddress}`,
+      title: `${selectedToken} Wallet Address`,
+      text: `${selectedToken} (${selectedNetwork.shortName}) Address: ${walletAddress}`,
       url: window.location.href,
     };
 
@@ -68,8 +101,8 @@ const TopUpCrypto = () => {
         await navigator.share(shareData);
       } else if (navigator.share) {
         await navigator.share({
-          title: "USDT Wallet Address",
-          text: `USDT (${selectedNetwork.shortName}) Address: ${walletAddress}`,
+          title: `${selectedToken} Wallet Address`,
+          text: `${selectedToken} (${selectedNetwork.shortName}) Address: ${walletAddress}`,
         });
       } else {
         handleCopy();
@@ -92,7 +125,7 @@ const TopUpCrypto = () => {
         {/* Title */}
         <div className="pt-4 pb-6">
           <h1 className="text-2xl font-bold text-center text-foreground">
-            {t("topUp.topUpToUsdt", "Пополнить на USDT")}
+            {t("topUp.topUpToUsdt", `Пополнить ${selectedToken}`)}
           </h1>
         </div>
 
@@ -141,26 +174,48 @@ const TopUpCrypto = () => {
             </div>
           </div>
 
-          {/* Receive Token */}
-          <div className="bg-muted rounded-2xl p-4 flex items-center justify-between">
-            <span className="text-muted-foreground">{t("topUp.receiveToken")}</span>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-[#26A17B] flex items-center justify-center">
-                <span className="text-white text-xs font-bold">₮</span>
-              </div>
-              <span className="font-semibold text-foreground">{selectedToken}</span>
-            </div>
+          {/* Receive Token - Selectable */}
+          <div className="bg-muted rounded-2xl p-4">
+            <span className="text-muted-foreground text-sm mb-2 block">{t("topUp.receiveToken")}</span>
+            <Select value={selectedToken} onValueChange={(v: TokenType) => setSelectedToken(v)}>
+              <SelectTrigger className="w-full h-12 bg-background border-border/50 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: selectedTokenInfo.color }}>
+                    <span className="text-white text-xs font-bold">{selectedTokenInfo.symbol}</span>
+                  </div>
+                  <span className="font-semibold">{selectedToken}</span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                {TOKENS.map((tk) => (
+                  <SelectItem key={tk.id} value={tk.id}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: tk.color }}>
+                        <span className="text-white text-[10px] font-bold">{tk.symbol}</span>
+                      </div>
+                      <span>{tk.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Network (fixed: Tron) */}
-          <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
-            <span className="text-muted-foreground">{t("topUp.network")}</span>
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-foreground" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="font-semibold text-foreground">{selectedNetwork.name}</span>
-            </div>
+          {/* Network - Selectable */}
+          <div className="bg-muted rounded-2xl p-4">
+            <span className="text-muted-foreground text-sm mb-2 block">{t("topUp.network")}</span>
+            <Select value={selectedNetworkId} onValueChange={(v: NetworkId) => setSelectedNetworkId(v)}>
+              <SelectTrigger className="w-full h-12 bg-background border-border/50 rounded-xl">
+                <SelectValue>{selectedNetwork.name}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {NETWORKS.map((net) => (
+                  <SelectItem key={net.id} value={net.id}>
+                    {net.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Fees */}
