@@ -63,11 +63,19 @@ const TopUpCrypto = () => {
 
   // Call API to get wallet address
   useEffect(() => {
+    if (hasFetched) return;
+    
+    // Get first card_id from cards list
+    const cards = cardsData?.data;
+    const firstCardId = Array.isArray(cards) && cards.length > 0 ? cards[0].id : null;
+    if (!firstCardId) return; // wait until cards are loaded
+
     const fetchAddress = async () => {
       setLoading(true);
       setError(null);
       const networkApiValue = selectedNetworkId.toUpperCase() as "TRC20" | "ERC20";
       const result = await submitCryptoTopup({
+        card_id: firstCardId,
         token: selectedToken,
         network: networkApiValue,
       });
@@ -79,10 +87,11 @@ const TopUpCrypto = () => {
         toast.error(result.error || t("toast.copyFailed"));
       }
       setLoading(false);
+      setHasFetched(true);
     };
 
     fetchAddress();
-  }, [selectedToken, selectedNetworkId]);
+  }, [selectedToken, selectedNetworkId, cardsData, hasFetched]);
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
