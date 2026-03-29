@@ -58,7 +58,7 @@ const AccountPage = () => {
           if (res?.data && !res.error) {
             refetchBankAccounts();
           } else {
-            toast.error(res?.error || t('accountPage.provisionError', 'Не удалось создать банковский счёт'));
+            toast.error(String(res?.error || '') || t('accountPage.provisionError', 'Не удалось создать банковский счёт'));
           }
         })
         .catch((err) => {
