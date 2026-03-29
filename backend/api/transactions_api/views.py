@@ -766,7 +766,7 @@ class RubToCryptoTopupView(APIView):
             return Response({"error": "amount_rub и card_id обязательны"}, status=status.HTTP_400_BAD_REQUEST)
             
         try:
-            transaction = TransactionService.initiate_rub_to_crypto_topup(request.user.id, card_id, amount_rub)
+            transaction = TransactionService.initiate_rub_to_crypto_topup(request, request.user.id, card_id, amount_rub)
             return Response({
                 "message": "Заявка на пополнение RUB создана",
                 "transaction_id": transaction.id,
