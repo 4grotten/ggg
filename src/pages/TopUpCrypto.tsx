@@ -91,8 +91,8 @@ const TopUpCrypto = () => {
 
   const handleShare = async () => {
     const shareData = {
-      title: "USDT Wallet Address",
-      text: `USDT (${selectedNetwork.shortName}) Address: ${walletAddress}`,
+      title: `${selectedToken} Wallet Address`,
+      text: `${selectedToken} (${selectedNetwork.shortName}) Address: ${walletAddress}`,
       url: window.location.href,
     };
 
