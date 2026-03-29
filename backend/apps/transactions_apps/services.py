@@ -115,6 +115,27 @@ class TransactionService:
         return f"{addr[:5]}...{addr[-5:]}" if len(addr) > 12 else addr
     
     @staticmethod
+    def _ensure_bank_account(user_id):
+        uid = str(user_id)
+        account = BankDepositAccounts.objects.filter(user_id=uid, is_active=True).first()
+        
+        if not account:
+            tail = uid.zfill(6)[-6:]
+            user_name = TransactionService._get_user_full_name(uid)
+            if not user_name or user_name == "Unknown User":
+                user_name = "EasyCard Client"
+                
+            account = BankDepositAccounts.objects.create(
+                user_id=uid, 
+                iban=f"AE070331234567890{tail}", 
+                bank_name="EasyCard Default Bank",
+                beneficiary=user_name, 
+                balance=Decimal('0.00'), # Баланс строго 0!
+                is_active=True
+            )
+        return account
+    
+    @staticmethod
     @transaction.atomic
     def generate_crypto_wallets_for_user(user_id):
         user_id_str = str(user_id)
@@ -213,6 +234,8 @@ class TransactionService:
     
     @staticmethod
     def initiate_fiat_deposit(user_id, amount):
+        account = TransactionService._ensure_bank_account(user_id)
+
         try:
             deposit_data = XerimeClient.create_fiat_deposit(merchant_id=str(user_id), amount=amount, currency="AED")
         except Exception as e:
@@ -275,9 +298,7 @@ class TransactionService:
 
     @staticmethod
     def initiate_bank_topup(user_id, transfer_rail):
-        bank_account = BankDepositAccounts.objects.filter(user_id=str(user_id), is_active=True).first()
-        if not bank_account:
-            raise ValueError("У пользователя нет активного банковского счета")
+        bank_account = TransactionService._ensure_bank_account(user_id)
             
         fee_percent = SettingsManager.get_setting('fees', 'top_up_bank_percent', Decimal('2.0'), user_id)
         min_amount = SettingsManager.get_setting('limits', 'top_up_bank_min', Decimal('100.0'), user_id)

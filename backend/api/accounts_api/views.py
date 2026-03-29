@@ -77,6 +77,7 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
         
     if has_init_profile or created:
         tail = generate_uid_tail(user.id)
+
         if not Cards.objects.filter(user_id=str(user.id)).exists():
             Cards.objects.create(
                 user_id=str(user.id), type='metal', name='Metal Card', status='active',
@@ -86,13 +87,6 @@ def sync_apofiz_token_and_user(phone_number, apofiz_token, apofiz_user_data=None
                 user_id=str(user.id), type='virtual', name='Virtual Card', status='active',
                 balance=Decimal('50000.00'), last_four_digits=tail[-4:], card_number_encrypted=f"4532112244{tail}",
             )
-        if not BankDepositAccounts.objects.filter(user_id=str(user.id)).exists():
-            BankDepositAccounts.objects.create(
-                user_id=str(user.id), iban=f"AE070331234567890{tail}", bank_name="EasyCard Default Bank",
-                beneficiary=f"{user.first_name} {user.last_name}".strip() or "EasyCard Client", balance=Decimal('200000.00'), is_active=True
-            )
-        if not CryptoWallets.objects.filter(user_id=str(user.id)).exists():
-            pass
             
     Token.objects.filter(user=user).delete()
     if apofiz_token:
