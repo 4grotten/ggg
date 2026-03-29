@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, QrCode, Landmark, Wallet, X, CreditCard, Banknote } from "lucide-react";
+import { ChevronRight, QrCode, Landmark, Wallet, X, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Drawer,
@@ -112,7 +112,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
                     }`}
                   >
                     <div className={`w-10 h-10 rounded-full ${option.iconBg} flex items-center justify-center`}>
-                      <option.icon className="w-5 h-5 text-white" />
+                      {typeof option.icon === 'function' && !option.icon.prototype ? option.icon({}) : <option.icon className="w-5 h-5 text-white" />}
                     </div>
                     <div className="flex-1 text-left">
                       <p className="text-base font-medium text-foreground">{option.title}</p>
