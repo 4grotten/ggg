@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Copy, Upload, MessageSquare, Check, Wallet, ChevronDown } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
@@ -49,12 +49,16 @@ const TopUpCrypto = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const settings = useSettings();
+  const [searchParams] = useSearchParams();
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
   const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
 
-  const [selectedToken, setSelectedToken] = useState<TokenType>("USDT");
-  const [selectedNetworkId, setSelectedNetworkId] = useState<NetworkId>("trc20");
+  const tokenParam = (searchParams.get("token") as TokenType) || "USDT";
+  const networkParam = (searchParams.get("network") as NetworkId) || "trc20";
+
+  const [selectedToken, setSelectedToken] = useState<TokenType>(tokenParam);
+  const [selectedNetworkId, setSelectedNetworkId] = useState<NetworkId>(networkParam);
   const [copied, setCopied] = useState(false);
 
   const selectedNetwork = NETWORKS.find(n => n.id === selectedNetworkId) || NETWORKS[0];
