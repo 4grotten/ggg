@@ -7,6 +7,7 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
 import { useCryptoWallets } from "@/hooks/useCards";
+import sbpLogo from "@/assets/sbp-logo.png";
 
 const EXCHANGE_RATE = 92.5; // 1 USDT = 92.5 RUB (placeholder)
 
