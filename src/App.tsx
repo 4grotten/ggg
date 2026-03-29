@@ -72,6 +72,7 @@ import AdminStaffDetail from "./pages/AdminStaffDetail";
 import AdminProfitPage from "./pages/AdminProfitPage";
 import AccountPage from "./pages/AccountPage";
 import WalletPage from "./pages/WalletPage";
+import SendUsdtToRub from "./pages/SendUsdtToRub";
 import { BottomNavigation } from "./components/layout/BottomNavigation";
 import { AvatarProvider } from "./contexts/AvatarContext";
 import { VoiceCallProvider } from "./contexts/VoiceCallContext";
@@ -217,6 +218,7 @@ const AppContent = () => {
             <Route path="/top-up/bank/details" element={<TopUpBankDetails />} />
             <Route path="/top-up/rub" element={<TopUpRubAmount />} />
             <Route path="/top-up/rub/payment" element={<TopUpRub />} />
+            <Route path="/send/usdt-to-rub" element={<SendUsdtToRub />} />
             <Route path="/send/crypto" element={<SendCrypto />} />
             <Route path="/send/crypto-to-card" element={<SendCryptoToCard />} />
             <Route path="/send/bank" element={<SendBank />} />
