@@ -3,22 +3,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from apps.cards_apps.models import Cards
+from apps.transactions_apps.models import Transactions, BankDepositAccounts # <-- Добавили импорт BankDepositAccounts
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from decimal import Decimal
-from apps.transactions_apps.models import Transactions
 from django.db.models import Q
-
-def get_user_tail(user_id):
-    return str(user_id).zfill(6)[-6:]
 
 
 class UserBalancesView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
     @swagger_auto_schema(
-        operation_summary="Получить балансы пользователя (Legacy)",
-        operation_description="Возвращает общий баланс в AED и детализацию по картам. Требует передачи токена авторизации в заголовке.",
+        operation_summary="Получить балансы пользователя по картам",
+        operation_description="Возвращает общий баланс в AED и детализацию по картам.",
         tags=["Cards"]
     )
     def get(self, request):
@@ -32,14 +29,14 @@ class UserBalancesView(APIView):
             cards_data.append({
                 "card_id": card.id,
                 "type": card.type,
-                "balance": card.balance,
+                "balance": f"{card.balance:.2f}",
                 "last_four_digits": card.last_four_digits,
                 "status": card.status
             })
             
         return Response({
             "user_id": user_id,
-            "total_balance_aed": total_balance,
+            "total_balance_aed": f"{total_balance:.2f}",
             "cards": cards_data
         }, status=status.HTTP_200_OK)
 
@@ -49,21 +46,25 @@ class UserIbanView(APIView):
     
     @swagger_auto_schema(
         operation_summary="Получить банковский счёт (IBAN) и баланс",
-        operation_description="Возвращает уникальный IBAN пользователя (генерируется по шаблону ОАЭ) и общую сумму балансов всех карт в AED.",
+        operation_description="Берет реальный IBAN из БД. Если счета еще нет, возвращает null.",
         tags=["Wallet & Cards"]
     )
     def get(self, request):
-        tail = get_user_tail(request.user.id)
-        iban = f"AE070331234567890{tail}"
+        user_id = str(request.user.id)
+        account = BankDepositAccounts.objects.filter(user_id=user_id, is_active=True).first()
         
-        cards = Cards.objects.filter(user_id=str(request.user.id))
-        total_balance = sum((card.balance for card in cards), Decimal('0.00'))
-        
-        return Response({
-            "iban": iban,
-            "currency": "AED",
-            "balance": f"{total_balance:.2f}"
-        }, status=status.HTTP_200_OK)
+        if account:
+            return Response({
+                "iban": account.iban,
+                "currency": "AED",
+                "balance": f"{account.balance:.2f}"
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "iban": None,
+                "currency": "AED",
+                "balance": "0.00"
+            }, status=status.HTTP_200_OK)
 
 
 class UserCardsView(APIView):
@@ -71,7 +72,6 @@ class UserCardsView(APIView):
     
     @swagger_auto_schema(
         operation_summary="Посмотреть карты и балансы",
-        operation_description="Возвращает список всех карт пользователя (Metal и Virtual). Номера карт состоят из 16 цифр.",
         tags=["Wallet & Cards"]
     )
     def get(self, request):
@@ -93,16 +93,12 @@ class WalletSummaryView(APIView):
     
     @swagger_auto_schema(
         operation_summary="Сводка по кошельку (Счёт + Карты)",
-        operation_description="Возвращает объединенную информацию: общий банковский счет (IBAN) и детализацию по выпущенным картам одним запросом.",
+        operation_description="Сводка с реальными данными из БД.",
         tags=["Wallet & Cards"]
     )
     def get(self, request):
-        tail = get_user_tail(request.user.id)
-        iban = f"AE070331234567890{tail}"
-        
-        cards = Cards.objects.filter(user_id=str(request.user.id))
-        total_balance = sum((card.balance for card in cards), Decimal('0.00'))
-        
+        user_id = str(request.user.id)
+        cards = Cards.objects.filter(user_id=user_id)
         cards_data = []
         for card in cards:
             cards_data.append({
@@ -112,13 +108,23 @@ class WalletSummaryView(APIView):
                 "currency": "AED",
                 "balance": f"{card.balance:.2f}"
             })
+        account = BankDepositAccounts.objects.filter(user_id=user_id, is_active=True).first()
+        
+        if account:
+            physical_account = {
+                "iban": account.iban,
+                "balance": f"{account.balance:.2f}",
+                "currency": "AED"
+            }
+        else:
+            physical_account = {
+                "iban": None,
+                "balance": "0.00",
+                "currency": "AED"
+            }
             
         return Response({
-            "physical_account": {
-                "iban": iban,
-                "balance": f"{total_balance:.2f}",
-                "currency": "AED"
-            },
+            "physical_account": physical_account,
             "cards": cards_data
         }, status=status.HTTP_200_OK)
     
@@ -128,18 +134,19 @@ class CardTransactionsListView(APIView):
 
     @swagger_auto_schema(
         operation_summary="История транзакций по ID карты",
-        operation_description="Возвращает список всех транзакций, привязанных к конкретной карте (пополнения, списания, переводы), используя умный форматтер данных.",
         tags=["Cards"]
     )
     def get(self, request, card_id):
         card = Cards.objects.filter(id=card_id, user_id=str(request.user.id)).first()
         if not card:
             return Response({"error": "Карта не найдена или доступ запрещен"}, status=status.HTTP_404_NOT_FOUND)
+            
         transactions_qs = Transactions.objects.filter(
             Q(card_id=card.id) | 
             Q(sender_card=card.card_number_encrypted) | 
             Q(recipient_card=card.card_number_encrypted)
         ).order_by('-created_at')
+        
         serializer = AdminTransactionSerializerDirect(
             transactions_qs, 
             many=True, 
