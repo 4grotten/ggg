@@ -8,22 +8,53 @@ import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 
 const EXCHANGE_RATE = 92.5; // 1 USDT = 92.5 RUB (placeholder)
 
+const formatNumber = (value: string): string => {
+  if (!value) return "";
+  const parts = value.split(".");
+  const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.length > 1 ? `${intPart}.${parts[1]}` : intPart;
+};
+
+const parseFormattedNumber = (value: string): string => {
+  return value.replace(/,/g, "");
+};
+
 const TopUpRubAmount = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [usdtAmount, setUsdtAmount] = useState("");
+  const [displayValue, setDisplayValue] = useState("");
+  const [rawValue, setRawValue] = useState("");
 
-  const rubAmount = usdtAmount ? (parseFloat(usdtAmount) * EXCHANGE_RATE).toFixed(2) : "0.00";
-  const isValid = parseFloat(usdtAmount) > 0;
+  const numericValue = parseFloat(rawValue) || 0;
+  const rubAmount = numericValue > 0 ? (numericValue * EXCHANGE_RATE) : 0;
+  const isValid = numericValue > 0;
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = parseFormattedNumber(e.target.value);
+    // Allow only numbers and one decimal point
+    if (input && !/^\d*\.?\d{0,2}$/.test(input)) return;
+    setRawValue(input);
+    setDisplayValue(formatNumber(input));
+  };
+
+  const handleQuickAmount = (amount: number) => {
+    const str = amount.toString();
+    setRawValue(str);
+    setDisplayValue(formatNumber(str));
+  };
 
   const handleContinue = () => {
     if (!isValid) return;
     navigate("/top-up/rub/payment", {
-      state: { usdtAmount: parseFloat(usdtAmount), rubAmount: parseFloat(rubAmount) },
+      state: { usdtAmount: numericValue, rubAmount },
     });
   };
 
   const quickAmounts = [50, 100, 500, 1000];
+
+  const formattedRub = rubAmount > 0
+    ? rubAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : "0.00";
 
   return (
     <MobileLayout
@@ -42,7 +73,7 @@ const TopUpRubAmount = () => {
       }
       rightAction={<LanguageSwitcher />}
     >
-      <div className="px-4 py-6 space-y-6 pb-32">
+      <div className="px-4 py-6 space-y-4 pb-32">
         {/* Exchange rate badge */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -51,35 +82,35 @@ const TopUpRubAmount = () => {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border/50">
             <span className="text-sm text-muted-foreground">
-              1 USDT = {EXCHANGE_RATE.toLocaleString("ru-RU")} ₽
+              1 USDT = {EXCHANGE_RATE.toLocaleString("en-US")} ₽
             </span>
           </div>
         </motion.div>
 
-        {/* You send - USDT */}
+        {/* You buy - USDT */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className="p-4 rounded-2xl bg-muted/50 border border-border/50"
         >
-          <p className="text-sm text-muted-foreground mb-2">
+          <p className="text-sm text-muted-foreground mb-3">
             {t("topUpRub.youBuy", "Вы покупаете")}
           </p>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/80 border border-border/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/80 border border-border/50 shrink-0">
               <div className="w-6 h-6 rounded-full bg-[#26A17B] flex items-center justify-center">
                 <span className="text-white text-xs font-bold">₮</span>
               </div>
               <span className="text-sm font-medium">USDT</span>
             </div>
             <input
-              type="number"
+              type="text"
               inputMode="decimal"
-              value={usdtAmount}
-              onChange={(e) => setUsdtAmount(e.target.value)}
+              value={displayValue}
+              onChange={handleInputChange}
               placeholder="0.00"
-              className="flex-1 text-right text-3xl font-bold bg-transparent outline-none text-[#22C55E] placeholder:text-muted-foreground/40"
+              className="flex-1 text-right text-3xl font-bold bg-transparent outline-none text-[#22C55E] placeholder:text-muted-foreground/40 min-w-0 ml-3"
             />
           </div>
         </motion.div>
@@ -91,21 +122,16 @@ const TopUpRubAmount = () => {
           transition={{ delay: 0.1 }}
           className="p-4 rounded-2xl bg-muted/50 border border-border/50"
         >
-          <p className="text-sm text-muted-foreground mb-2">
+          <p className="text-sm text-muted-foreground mb-3">
             {t("topUpRub.youPay", "Вы оплачиваете")}
           </p>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/80 border border-border/50">
-              <span className="text-lg">🇷🇺</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/80 border border-border/50 shrink-0">
+              <span className="text-lg leading-none">🇷🇺</span>
               <span className="text-sm font-medium">RUB</span>
             </div>
-            <p className="flex-1 text-right text-3xl font-bold text-[#22C55E]">
-              {parseFloat(usdtAmount) > 0
-                ? parseFloat(rubAmount).toLocaleString("ru-RU", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })
-                : "0.00"}
+            <p className="flex-1 text-right text-3xl font-bold text-[#22C55E] min-w-0 ml-3 truncate">
+              {formattedRub}
             </p>
           </div>
         </motion.div>
@@ -115,15 +141,15 @@ const TopUpRubAmount = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="flex gap-2"
+          className="grid grid-cols-4 gap-2"
         >
           {quickAmounts.map((amount) => (
             <button
               key={amount}
-              onClick={() => setUsdtAmount(amount.toString())}
-              className="flex-1 py-2.5 rounded-xl bg-muted/50 border border-border/50 text-sm font-medium text-foreground hover:bg-muted/80 transition-colors"
+              onClick={() => handleQuickAmount(amount)}
+              className="py-2.5 rounded-xl bg-muted/50 border border-border/50 text-sm font-medium text-foreground hover:bg-muted/80 active:scale-95 transition-all"
             >
-              {amount} USDT
+              {amount.toLocaleString("en-US")}
             </button>
           ))}
         </motion.div>
@@ -133,13 +159,13 @@ const TopUpRubAmount = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="space-y-3"
+          className="space-y-2"
         >
           <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-            <div className="w-9 h-9 rounded-full bg-[#26A17B]/15 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-[#26A17B]/15 flex items-center justify-center shrink-0">
               <span className="text-[#26A17B] text-sm font-bold">₮</span>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className="text-sm text-muted-foreground">
                 {t("topUpRub.network", "Сеть")}
               </p>
@@ -148,10 +174,10 @@ const TopUpRubAmount = () => {
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-            <div className="w-9 h-9 rounded-full bg-[#FF6B35]/15 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-[#FF6B35]/15 flex items-center justify-center shrink-0">
               <span className="text-[#FF6B35] text-sm font-bold">₽</span>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className="text-sm text-muted-foreground">
                 {t("topUpRub.paymentMethod", "Способ оплаты")}
               </p>
