@@ -107,6 +107,14 @@ export const SendDrawer = ({ open, onOpenChange }: SendDrawerProps) => {
       subtitle: t("wallet.sendToBankDesc", "Перевод на банковский счет (IBAN)"),
       iconBg: "bg-purple-500",
     },
+    {
+      id: "crypto-rub",
+      icon: null as any,
+      customIcon: <span className="text-white text-lg font-bold">₽</span>,
+      title: t("drawer.sendUsdtToRub", "Отправить USDT в Рубли"),
+      subtitle: t("drawer.sendUsdtToRubDesc", "Конвертация USDT → RUB"),
+      iconBg: "bg-primary",
+    },
   ];
 
   const bankOptions = [
