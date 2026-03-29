@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock, ArrowUpRight, ArrowDownLeft, CreditCard, Building2, Wallet } from "lucide-react";
@@ -11,6 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { useWalletSummary, useBankAccounts } from "@/hooks/useCards";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { apiRequest } from "@/services/api/apiClient";
 import { useIbanTransactionGroups, useTransactionGroups, useApiTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -42,6 +43,23 @@ const AccountPage = () => {
     id: bankAccount?.id,
   } : null;
   
+  // Register AED recipient in Xerime when account data is available
+  const registeredRef = useRef(false);
+  useEffect(() => {
+    if (account?.iban && account?.beneficiary && !registeredRef.current) {
+      registeredRef.current = true;
+      apiRequest('/transactions/register-aed-recipient/', {
+        method: 'POST',
+        body: JSON.stringify({
+          iban: account.iban,
+          business_name: account.beneficiary,
+        }),
+      }, true).catch(() => {
+        // Silent fail — registration is best-effort
+      });
+    }
+  }, [account?.iban, account?.beneficiary]);
+
   const [qrOpen, setQrOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const { data: ibanTxData, isLoading: ibanLoading } = useIbanTransactionGroups();
