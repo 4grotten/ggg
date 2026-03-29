@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Copy, Upload, MessageSquare, Check, Wallet, ChevronDown } from "lucide-react";
+import { Copy, Upload, MessageSquare, Check, Wallet } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { toast } from "sonner";
@@ -8,36 +8,28 @@ import { useTranslation } from "react-i18next";
 import { useSettings } from "@/contexts/SettingsContext";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
-import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCryptoIcon } from "@/components/icons/CryptoIcons";
+import { submitCryptoTopup } from "@/services/api/transactions";
 
 type TokenType = "USDT" | "USDC";
-type NetworkId = "trc20" | "erc20" | "bep20";
+type NetworkId = "trc20" | "erc20";
 
 interface NetworkOption {
   id: NetworkId;
   name: string;
   shortName: string;
-  icon: string;
 }
 
 const NETWORKS: NetworkOption[] = [
-  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20", icon: "◈" },
-  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20", icon: "◆" },
-  { id: "bep20", name: "BSC (BEP20)", shortName: "BEP20", icon: "◇" },
+  { id: "trc20", name: "Tron (TRC20)", shortName: "TRC20" },
+  { id: "erc20", name: "Ethereum (ERC20)", shortName: "ERC20" },
 ];
 
 const TOKENS: { id: TokenType; name: string; color: string; symbol: string }[] = [
   { id: "USDT", name: "Tether USDT", color: "#26A17B", symbol: "₮" },
   { id: "USDC", name: "USD Coin", color: "#2775CA", symbol: "$" },
 ];
-
-const fallbackAddresses: Record<NetworkId, string> = {
-  trc20: "TSvgRpJKx8NaH5WyuX3RcTqHGmyuX3Rc",
-  erc20: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21",
-  bep20: "0x742d35Cc6634C0532925a3b844Bc9e7595f8aE21",
-};
 
 const TopUpCrypto = () => {
   const navigate = useNavigate();
@@ -46,37 +38,55 @@ const TopUpCrypto = () => {
   const [searchParams] = useSearchParams();
   const TOP_UP_CRYPTO_FEE = settings.TOP_UP_CRYPTO_FEE;
   const TOP_UP_CRYPTO_MIN_AMOUNT = settings.TOP_UP_CRYPTO_MIN_AMOUNT;
-  const { data: cryptoWalletsData, isLoading: walletsLoading } = useCryptoWallets();
 
   const tokenParam = (searchParams.get("token") as TokenType) || "USDT";
   const networkParam = (searchParams.get("network") as NetworkId) || "trc20";
 
-  const [selectedToken, setSelectedToken] = useState<TokenType>(tokenParam);
-  const [selectedNetworkId, setSelectedNetworkId] = useState<NetworkId>(networkParam);
+  const [selectedToken] = useState<TokenType>(tokenParam);
+  const [selectedNetworkId] = useState<NetworkId>(networkParam);
   const [copied, setCopied] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const selectedNetwork = NETWORKS.find(n => n.id === selectedNetworkId) || NETWORKS[0];
   const selectedTokenInfo = TOKENS.find(tk => tk.id === selectedToken) || TOKENS[0];
-
-  const walletAddress = useMemo(() => {
-    if (cryptoWalletsData?.data) {
-      const wallet = cryptoWalletsData.data.find(w => w.network.toLowerCase() === selectedNetworkId);
-      if (wallet) return wallet.address;
-    }
-    return fallbackAddresses[selectedNetworkId];
-  }, [cryptoWalletsData, selectedNetworkId]);
 
   const walletLabel = t("topUp.usdtWallet", `Кошелек ${selectedToken}`);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Call API to get wallet address
+  useEffect(() => {
+    const fetchAddress = async () => {
+      setLoading(true);
+      setError(null);
+      const networkApiValue = selectedNetworkId.toUpperCase() as "TRC20" | "ERC20";
+      const result = await submitCryptoTopup({
+        token: selectedToken,
+        network: networkApiValue,
+      });
+
+      if (result.success && result.data?.metadata?.crypto_address) {
+        setWalletAddress(result.data.metadata.crypto_address);
+      } else {
+        setError(result.error || t("toast.copyFailed"));
+        toast.error(result.error || t("toast.copyFailed"));
+      }
+      setLoading(false);
+    };
+
+    fetchAddress();
+  }, [selectedToken, selectedNetworkId]);
   
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
   };
 
   const handleCopy = async () => {
+    if (!walletAddress) return;
     try {
       await navigator.clipboard.writeText(walletAddress);
       setCopied(true);
@@ -88,6 +98,7 @@ const TopUpCrypto = () => {
   };
 
   const handleShare = async () => {
+    if (!walletAddress) return;
     const shareData = {
       title: `${selectedToken} Wallet Address`,
       text: `${selectedToken} (${selectedNetwork.shortName}) Address: ${walletAddress}`,
@@ -129,8 +140,12 @@ const TopUpCrypto = () => {
 
         {/* QR Code */}
         <div className="flex justify-center px-6 mb-6">
-          {walletsLoading ? (
+          {loading ? (
             <Skeleton className="w-[252px] h-[280px] rounded-2xl" />
+          ) : error ? (
+            <div className="bg-destructive/10 rounded-2xl p-6 text-center">
+              <p className="text-destructive text-sm">{error}</p>
+            </div>
           ) : (
             <div className="bg-white p-6 rounded-2xl">
               <QRCodeSVG 
@@ -161,7 +176,7 @@ const TopUpCrypto = () => {
 
         {/* Info Cards */}
         <div className="px-6 space-y-3 flex-1">
-          {/* Destination: USDT wallet (fixed) */}
+          {/* Destination: wallet (fixed) */}
           <div className="w-full bg-muted rounded-2xl p-4 flex items-center justify-between">
             <span className="text-muted-foreground">{t("topUp.topUpTo")}</span>
             <div className="flex items-center gap-2">
@@ -217,11 +232,12 @@ const TopUpCrypto = () => {
       <div className="fixed bottom-0 left-0 right-0 p-6 flex gap-3 max-w-[800px] mx-auto">
         <button
           onClick={handleCopy}
+          disabled={!walletAddress}
           className={`flex-1 flex items-center justify-center gap-2 font-semibold py-4 rounded-xl transition-all duration-300 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg ${
             copied 
               ? "bg-green-500/90 text-white" 
               : "bg-muted/80 text-foreground hover:bg-muted"
-          }`}
+          } ${!walletAddress ? "opacity-50" : ""}`}
         >
           <div className="relative w-5 h-5">
             <Copy 
@@ -241,7 +257,8 @@ const TopUpCrypto = () => {
         </button>
         <button
           onClick={handleShare}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#007AFF]/90 text-white font-semibold py-4 rounded-xl hover:bg-[#007AFF] transition-all duration-200 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg"
+          disabled={!walletAddress}
+          className={`flex-1 flex items-center justify-center gap-2 bg-[#007AFF]/90 text-white font-semibold py-4 rounded-xl hover:bg-[#007AFF] transition-all duration-200 active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg ${!walletAddress ? "opacity-50" : ""}`}
         >
           <Upload className="w-5 h-5" />
           <span>{t("topUp.share")}</span>
