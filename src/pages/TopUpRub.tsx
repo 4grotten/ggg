@@ -60,7 +60,7 @@ const TopUpRub = () => {
             </div>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {t("topUpRub.howItWorks", "Отсканируйте QR-код или перейдите по ссылке для оплаты. После покупки USDT поступят на ваш кошелёк.")}
+            {t("topUpRub.howItWorks", "Отсканируйте QR-код или перейдите по ссылке для оплаты. После пополнения USDT поступят на ваш кошелёк.")}
           </p>
         </motion.div>
 
@@ -69,10 +69,12 @@ const TopUpRub = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex flex-col items-center p-6 rounded-2xl bg-white"
+          className="flex flex-col items-center p-4 rounded-2xl bg-transparent"
         >
-          <QRCodeSVG value={PAYMENT_URL} size={200} level="M" className="mb-4" />
-          <p className="text-sm text-muted-foreground text-center">
+          <div className="bg-white p-4 rounded-2xl inline-block">
+            <QRCodeSVG value={PAYMENT_URL} size={200} level="M" />
+          </div>
+          <p className="text-sm text-muted-foreground text-center mt-3">
             {t("topUpRub.scanToOpen", "Отсканируйте для перехода к оплате")}
           </p>
         </motion.div>
@@ -100,27 +102,6 @@ const TopUpRub = () => {
             </div>
             <ExternalLink className="w-5 h-5 text-muted-foreground/60" />
           </button>
-        </motion.div>
-
-        {/* Copy Link */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="p-4 rounded-2xl bg-muted/50 border border-border/50"
-        >
-          <p className="text-xs text-muted-foreground mb-2">
-            {t("topUpRub.serviceLink", "Ссылка")}
-          </p>
-          <div className="flex items-center gap-3">
-            <p className="text-sm font-mono flex-1 break-all text-foreground">{PAYMENT_URL}</p>
-            <button
-              onClick={handleCopyLink}
-              className="p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0"
-            >
-              <Copy className="w-5 h-5" />
-            </button>
-          </div>
         </motion.div>
       </div>
     </MobileLayout>
