@@ -925,39 +925,36 @@ class RegisterAedRecipientView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Регистрация AED получателя в Xerime",
+        operation_summary="Провизия банковского счёта + регистрация AED получателя",
         tags=["Счета и Кошельки"],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['iban', 'business_name'],
-            properties={
-                'iban': openapi.Schema(type=openapi.TYPE_STRING, description='IBAN получателя'),
-                'business_name': openapi.Schema(type=openapi.TYPE_STRING, description='Имя получателя / компании'),
-            }
-        )
     )
     def post(self, request):
-        iban = request.data.get('iban')
-        business_name = request.data.get('business_name')
-
-        if not iban or not business_name:
-            return Response(
-                {"error": "Поля 'iban' и 'business_name' обязательны."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+        user_id = request.user.id
         try:
-            result = XerimeClient.register_aed_recipient(
-                merchant_id=str(request.user.id),
-                business_name=business_name,
-                iban=iban
-            )
+            # 1. Создаём / получаем банковский счёт пользователя
+            account = TransactionService._ensure_bank_account(user_id)
+
+            # 2. Регистрируем получателя в Xerime (idempotent — повторный вызов не страшен)
+            try:
+                XerimeClient.register_aed_recipient(
+                    merchant_id=str(user_id),
+                    business_name=account.beneficiary,
+                    iban=account.iban
+                )
+            except Exception as e:
+                logger.warning(f"AED recipient registration in Xerime failed (non-critical): {e}")
+
+            # 3. Возвращаем данные счёта
             return Response({
-                "status": "registered",
-                "iban": iban,
-                "business_name": business_name,
-                "provider_response": result
-            }, status=status.HTTP_201_CREATED)
+                "id": str(account.id),
+                "iban": account.iban,
+                "bank_name": account.bank_name,
+                "beneficiary": account.beneficiary,
+                "balance": str(account.balance),
+                "is_active": account.is_active,
+                "currency": "AED",
+            }, status=status.HTTP_200_OK)
+
         except Exception as e:
-            logger.error(f"AED recipient registration error: {e}")
+            logger.error(f"Bank account provision error: {e}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
