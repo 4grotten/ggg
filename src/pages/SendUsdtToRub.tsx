@@ -6,9 +6,9 @@ import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
+import { useCryptoWallets } from "@/hooks/useCards";
 
 const EXCHANGE_RATE = 92.5; // 1 USDT = 92.5 RUB (placeholder)
-const WALLET_BALANCE = 1250.00; // placeholder wallet balance
 
 const formatNumber = (value: string): string => {
   if (!value) return "";
@@ -24,6 +24,11 @@ const parseFormattedNumber = (value: string): string => {
 const SendUsdtToRub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { data: cryptoWalletsData } = useCryptoWallets();
+  const cryptoWallets = Array.isArray(cryptoWalletsData?.data) ? cryptoWalletsData.data : [];
+  const usdtWallet = cryptoWallets.find((w: any) => w.token === 'USDT' || w.token === 'usdt');
+  const WALLET_BALANCE = usdtWallet ? parseFloat(usdtWallet.balance) : 0;
+
   const [usdtDisplay, setUsdtDisplay] = useState("");
   const [usdtRaw, setUsdtRaw] = useState("");
   const [rubDisplay, setRubDisplay] = useState("");
