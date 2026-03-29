@@ -210,6 +210,68 @@ class TransactionService:
                 base_currency='AED', card_id=sender_card.id, description=f"Комиссия {fee_percent}% за перевод"
             )
         return txn
+    
+    @staticmethod
+    def initiate_fiat_deposit(user_id, amount):
+        try:
+            deposit_data = XerimeClient.create_fiat_deposit(merchant_id=str(user_id), amount=amount, currency="AED")
+        except Exception as e:
+            raise ValueError(f"Ошибка инициализации фиатного депозита: {str(e)}")
+
+        transaction = Transactions.objects.create(
+            sender_id="EXTERNAL_BANK",
+            receiver_id=str(user_id),
+            receiver_name="Bank Account",
+            type="top_up",
+            amount=Decimal(amount),
+            currency="AED",
+            status="pending",
+            reference_id=deposit_data.get("reference_id"),
+            metadata={
+                "deposit_reference": deposit_data.get("deposit_reference"),
+                "instruction": "Укажите deposit_reference в комментарии к банковскому переводу."
+            }
+        )
+        return transaction
+
+    @staticmethod
+    @transaction.atomic
+    def execute_fiat_withdrawal(sender_id, account_id, iban, amount, business_name):
+        user_id_str = str(sender_id)
+        account = BankDepositAccounts.objects.select_for_update().get(id=account_id, user_id=user_id_str)
+        amount_decimal = Decimal(str(amount))
+        
+        if account.balance < amount_decimal:
+            raise ValueError("Недостаточно средств на банковском счете.")
+        try:
+            XerimeClient.register_aed_recipient(merchant_id=user_id_str, business_name=business_name, iban=iban)
+        except Exception as e:
+            raise ValueError(f"Ошибка регистрации IBAN: {str(e)}")
+        try:
+            withdrawal_data = XerimeClient.create_fiat_withdrawal(
+                merchant_id=user_id_str, amount=amount, iban=iban, currency="AED"
+            )
+        except Exception as e:
+            raise ValueError(f"Ошибка провайдера при выводе фиата: {str(e)}")
+        account.balance -= amount_decimal
+        account.save()
+
+        transaction = Transactions.objects.create(
+            sender_id=user_id_str,
+            receiver_id="EXTERNAL_IBAN",
+            receiver_name=iban,
+            type="bank_withdrawal",
+            amount=amount_decimal,
+            currency="AED",
+            status="pending",
+            reference_id=withdrawal_data.get("reference_id"),
+            metadata={
+                "external_reference": withdrawal_data.get("external_reference"),
+                "xerime_status": withdrawal_data.get("status"),
+                "from_account_id": str(account.id)
+            }
+        )
+        return transaction
 
     @staticmethod
     def initiate_bank_topup(user_id, transfer_rail):
@@ -303,12 +365,14 @@ class TransactionService:
         return deposit_data
     
     @staticmethod
-    def initiate_rub_to_crypto_topup(user_id, card_id, amount_rub):
+    def initiate_rub_to_crypto_topup(request, user_id, card_id, amount_rub):
+        webhook_url = request.build_absolute_uri('/api/transactions/xerime/webhook/rub/')
         try:
             xerime_response = XerimeClient.create_rub_to_crypto_deposit(
                 merchant_id=str(user_id), 
                 amount_rub=amount_rub,
-                crypto_currency="USDT"
+                crypto_currency="USDT",
+                webhook_url=webhook_url
             )
         except Exception as e:
             raise ValueError(f"Ошибка получения реквизитов DoverkaPay: {str(e)}")
@@ -320,14 +384,13 @@ class TransactionService:
             amount=Decimal(amount_rub),
             currency="RUB",
             status="pending",
-            reference_id=xerime_response.get("reference_id", f"RUB-{uuid.uuid4().hex[:8].upper()}"),
+            reference_id=xerime_response.get("reference_id"),
             metadata={
                 "target_card_id": str(card_id),
                 "gateway": "DoverkaPay",
                 "sbp_link": xerime_response.get("sbp_link"),
                 "public_link": xerime_response.get("public_link"),
-                "expected_crypto_amount": xerime_response.get("crypto_amount"),
-                "exchange_rate": xerime_response.get("rate")
+                "expected_crypto_amount": xerime_response.get("crypto_amount")
             }
         )
         return transaction
@@ -1099,8 +1162,6 @@ class TransactionService:
             "fee_amount": float(txn.fee) if txn.fee else 0,
             "movements": movements_list,
         }
-
-        # Enrich flat from sub-tables (same as before)
         if tx_type in ['card_transfer', 'internal_transfer']:
             try:
                 ct = txn.card_transfer
@@ -1142,12 +1203,10 @@ class TransactionService:
             except Exception:
                 pass
 
-        # Merge metadata into flat for backward compat
         for key, value in meta.items():
             if key not in flat:
                 flat[key] = value
 
-        # Return both structured + flat merged
         result = dict(flat)
         result["receipt"] = structured
         return result

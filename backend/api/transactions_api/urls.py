@@ -39,6 +39,13 @@ urlpatterns = [
     path('topup/rub-to-crypto/', views.RubToCryptoTopupView.as_view(), name='rub-to-crypto-topup'),
     path('xerime/transactions/', views.XerimeTransactionHistoryView.as_view(), name='xerime-transactions'),
     path('xerime/transactions/<str:reference_id>/', views.XerimeTransactionHistoryView.as_view(), name='xerime-transaction-detail'),
-    path('xerime/withdrawals/<str:reference_id>/', views.XerimeWithdrawalStatusView.as_view())
+    path('xerime/withdrawals/<str:reference_id>/', views.XerimeWithdrawalStatusView.as_view()),
+
+    path('xerime/webhook/rub/', views.RubWebhookView.as_view(), name='xerime-webhook-rub'),
+    
+    path('fiat/deposit/', views.FiatDepositView.as_view(), name='fiat-deposit'),
+    path('fiat/withdrawal/', views.FiatWithdrawalView.as_view(), name='fiat-withdrawal'),
+    
+    path('xerime/info/<str:action>/', views.XerimeInfoView.as_view(), name='xerime-info'),
 
 ]

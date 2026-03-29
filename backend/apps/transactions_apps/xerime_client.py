@@ -180,3 +180,91 @@ class XerimeClient:
         response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
+
+
+    @classmethod
+    def create_rub_to_crypto_deposit(cls, merchant_id, amount_rub, crypto_currency="USDT", webhook_url=None):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/rub-to-crypto"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        
+        payload = {
+            "rub_amount": float(amount_rub),
+            "crypto_currency": crypto_currency,
+            "merchant_id": str(merchant_id),
+            "review_id": f"R-{uuid.uuid4().hex[:8].upper()}"
+        }
+        if webhook_url:
+            payload["webhook_url"] = webhook_url
+            
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        response.raise_for_status()
+        return response.json()
+
+    @classmethod
+    def get_exchange_rate(cls, from_currency, to_currency):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/rates/{from_currency}/{to_currency}"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
+        return response.json()
+
+    @classmethod
+    def register_aed_recipient(cls, merchant_id, business_name, iban):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/aed-recipients"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        payload = {
+            "merchant_id": str(merchant_id),
+            "business_name": business_name,
+            "iban": iban
+        }
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        response.raise_for_status()
+        return response.json()
+
+    @classmethod
+    def create_fiat_deposit(cls, merchant_id, amount, currency="AED"):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/fiat-deposit"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        payload = {
+            "merchant_id": str(merchant_id),
+            "fiat_amount": float(amount),
+            "fiat_currency": currency,
+            "deposit_reference": f"EC-{uuid.uuid4().hex[:8].upper()}"
+        }
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        response.raise_for_status()
+        return response.json()
+
+    @classmethod
+    def create_fiat_withdrawal(cls, merchant_id, amount, iban, currency="AED"):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/fiat-withdrawal"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        payload = {
+            "merchant_id": str(merchant_id),
+            "fiat_amount": float(amount),
+            "fiat_currency": currency,
+            "iban": iban,
+            "external_reference": f"FW-{uuid.uuid4().hex[:12].upper()}"
+        }
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        if response.status_code == 422:
+            raise ValueError("Недостаточно AED на балансе провайдера.")
+        if response.status_code == 400:
+            raise ValueError(response.json().get("detail", "Неверные параметры IBAN или перевода."))
+            
+        response.raise_for_status()
+        return response.json()
+
+    @classmethod
+    def get_merchant_balances(cls, merchant_id):
+        token_jwt = cls.get_token()
+        url = f"{cls.get_base_url()}/merchant-balances/{str(merchant_id)}"
+        headers = {"Authorization": f"Bearer {token_jwt}"}
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
+        return response.json()

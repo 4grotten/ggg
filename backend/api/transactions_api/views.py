@@ -23,6 +23,9 @@ from .serializers import (
     CryptoWalletWithdrawalRequestSerializer, CryptoWalletWithdrawalResponseSerializer
 )
 from apps.transactions_apps.services import SettingsManager, TransactionService
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RecipientInfoView(APIView):
@@ -819,3 +822,100 @@ class XerimeWithdrawalStatusView(APIView):
             return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": f"Ошибка Xerime API: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class RubWebhookView(APIView):
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        data = request.data
+        reference_id = data.get("reference_id")
+        if not reference_id:
+            logger.warning("Webhook attack blocked: No reference_id provided.")
+            return Response({"error": "Bad payload"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            verified_data = XerimeClient.get_transaction_details(reference_id)
+            real_status = verified_data.get("status")
+            real_crypto_amount = verified_data.get("crypto_amount")
+            user_id = verified_data.get("merchant_id")
+            
+        except Exception as e:
+            logger.error(f"Webhook security breach attempt for {reference_id}. Error: {e}")
+            return Response({"error": "Fake transaction"}, status=status.HTTP_403_FORBIDDEN)
+        transaction = Transactions.objects.filter(reference_id=reference_id).first()
+        if not transaction:
+            return Response({"message": "Transaction not found"}, status=status.HTTP_200_OK)
+        if real_status == "paid" and transaction.status != "success":
+            transaction.status = "success"
+            if real_crypto_amount and user_id:
+                wallet = CryptoWallets.objects.filter(user_id=user_id, token="USDT").first()
+                if wallet:
+                    wallet.balance += Decimal(str(real_crypto_amount))
+                    wallet.save()
+            transaction.save()
+            logger.info(f"Webhook success: RUB deposit {reference_id} processed and credited.")
+        elif real_status in ["expired", "cancelled", "failed"]:
+            transaction.status = "failed"
+            transaction.save()
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
+
+class FiatDepositView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        amount = request.data.get('amount')
+        if not amount:
+            return Response({"error": "amount обязателен"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            transaction = TransactionService.initiate_fiat_deposit(request.user.id, amount)
+            return Response({
+                "message": "Реквизиты депозита сформированы",
+                "deposit_reference": transaction.metadata.get("deposit_reference"),
+                "instruction": transaction.metadata.get("instruction")
+            }, status=status.HTTP_201_CREATED)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FiatWithdrawalView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        amount = request.data.get('amount')
+        iban = request.data.get('iban')
+        business_name = request.data.get('business_name', 'Default Name')
+        account_id = request.data.get('account_id')
+        
+        if not all([amount, iban, account_id]):
+            return Response({"error": "amount, iban, и account_id обязательны"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            transaction = TransactionService.execute_fiat_withdrawal(
+                request.user.id, account_id, iban, amount, business_name
+            )
+            return Response({
+                "message": "Заявка на фиатный вывод создана",
+                "reference_id": transaction.reference_id
+            }, status=status.HTTP_201_CREATED)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class XerimeInfoView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, action):
+        try:
+            if action == 'rate':
+                from_c = request.query_params.get('from', 'RUB')
+                to_c = request.query_params.get('to', 'USDT')
+                return Response(XerimeClient.get_exchange_rate(from_c, to_c))
+            elif action == 'balances':
+                return Response(XerimeClient.get_merchant_balances(request.user.id))
+            return Response({"error": "Неизвестный action"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
