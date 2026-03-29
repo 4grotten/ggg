@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, QrCode, Landmark, Wallet, X, CreditCard, Banknote } from "lucide-react";
+import { ChevronRight, QrCode, Landmark, Wallet, X, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Drawer,
@@ -53,8 +53,9 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
     },
     {
       id: "rub",
-      icon: Banknote,
-      title: t("drawer.rubTopUp", "Пополнить рублём"),
+      icon: null as any,
+      customIcon: <span className="text-white text-lg font-bold">₽</span>,
+      title: t("drawer.rubTopUp", "Пополнить рублями"),
       subtitle: t("drawer.rubTopUpDesc", "RUB → USDT обмен"),
       iconBg: "bg-[#FF6B35]",
     },
@@ -94,7 +95,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
         <DrawerContent className="bg-background/95 backdrop-blur-xl">
           <DrawerHeader className="relative flex items-center justify-center py-4">
             <DrawerTitle className="text-center text-base font-semibold">
-              {t("drawer.addMoneyWith")}
+              {t("drawer.topUp", "Пополнить")}
             </DrawerTitle>
             <DrawerClose className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
               <X className="w-3.5 h-3.5 text-primary" />
@@ -112,7 +113,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
                     }`}
                   >
                     <div className={`w-10 h-10 rounded-full ${option.iconBg} flex items-center justify-center`}>
-                      <option.icon className="w-5 h-5 text-white" />
+                      {option.customIcon ? option.customIcon : <option.icon className="w-5 h-5 text-white" />}
                     </div>
                     <div className="flex-1 text-left">
                       <p className="text-base font-medium text-foreground">{option.title}</p>
