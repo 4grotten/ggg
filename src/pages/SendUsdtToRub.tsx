@@ -6,9 +6,10 @@ import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
+import { useCryptoWallets } from "@/hooks/useCards";
+import sbpLogo from "@/assets/sbp-logo.png";
 
 const EXCHANGE_RATE = 92.5; // 1 USDT = 92.5 RUB (placeholder)
-const WALLET_BALANCE = 1250.00; // placeholder wallet balance
 
 const formatNumber = (value: string): string => {
   if (!value) return "";
@@ -24,6 +25,11 @@ const parseFormattedNumber = (value: string): string => {
 const SendUsdtToRub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { data: cryptoWalletsData } = useCryptoWallets();
+  const cryptoWallets = Array.isArray((cryptoWalletsData as any)?.data) ? (cryptoWalletsData as any).data : [];
+  const usdtWallet = cryptoWallets.find((w: any) => w.token === 'USDT' || w.token === 'usdt');
+  const WALLET_BALANCE = usdtWallet ? parseFloat(usdtWallet.balance) : 0;
+
   const [usdtDisplay, setUsdtDisplay] = useState("");
   const [usdtRaw, setUsdtRaw] = useState("");
   const [rubDisplay, setRubDisplay] = useState("");
@@ -228,15 +234,15 @@ const SendUsdtToRub = () => {
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-            <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-              <span className="text-primary text-sm font-bold">₽</span>
+            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center shrink-0 bg-white">
+              <img src={sbpLogo} alt="СБП" className="w-7 h-7 object-contain" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-muted-foreground">
                 {t("sendUsdtToRub.destination", "Получатель")}
               </p>
               <p className="text-sm font-medium">
-                {t("sendUsdtToRub.bankAccountRub", "Банковский счёт (RUB)")}
+                {t("sendUsdtToRub.sbp", "СБП (Система быстрых платежей)")}
               </p>
             </div>
           </div>
