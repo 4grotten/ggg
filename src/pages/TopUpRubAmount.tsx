@@ -126,10 +126,10 @@ const TopUpRubAmount = () => {
             <input
               type="text"
               inputMode="decimal"
-              value={displayValue}
-              onChange={handleInputChange}
+              value={usdtDisplay}
+              onChange={handleUsdtChange}
               placeholder="0.00"
-              className="flex-1 text-right text-3xl font-bold bg-transparent outline-none text-[#22C55E] placeholder:text-muted-foreground/40 min-w-0 ml-3"
+              className={`flex-1 text-right text-3xl font-bold bg-transparent outline-none min-w-0 ml-3 ${hasValue ? 'text-[#22C55E]' : 'text-muted-foreground/40'} placeholder:text-muted-foreground/40`}
             />
           </div>
         </motion.div>
@@ -149,9 +149,14 @@ const TopUpRubAmount = () => {
               <span className="text-lg leading-none">🇷🇺</span>
               <span className="text-sm font-medium">RUB</span>
             </div>
-            <p className="flex-1 text-right text-3xl font-bold text-[#22C55E] min-w-0 ml-3 truncate">
-              {formattedRub}
-            </p>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={rubDisplay}
+              onChange={handleRubChange}
+              placeholder="0.00"
+              className={`flex-1 text-right text-3xl font-bold bg-transparent outline-none min-w-0 ml-3 ${hasValue ? 'text-[#22C55E]' : 'text-muted-foreground/40'} placeholder:text-muted-foreground/40`}
+            />
           </div>
         </motion.div>
 
