@@ -234,8 +234,8 @@ const SendUsdtToRub = () => {
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-            <div className="w-9 h-9 flex items-center justify-center shrink-0">
-              <img src={sbpLogo} alt="СБП" className="w-6 h-6 object-contain" />
+            <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+              <img src={sbpLogo} alt="СБП" className="w-5 h-5 object-contain" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-muted-foreground">
