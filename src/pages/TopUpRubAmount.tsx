@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import sbpLogo from "@/assets/sbp-logo.png";
+import { apiRequest } from "@/services/api/apiClient";
 
-const EXCHANGE_RATE = 92.5; // 1 USDT = 92.5 RUB (placeholder)
+const FALLBACK_RATE = 92.5;
 
 const formatNumber = (value: string): string => {
   if (!value) return "";
@@ -27,6 +28,29 @@ const TopUpRubAmount = () => {
   const [usdtRaw, setUsdtRaw] = useState("");
   const [rubDisplay, setRubDisplay] = useState("");
   const [rubRaw, setRubRaw] = useState("");
+  const [exchangeRate, setExchangeRate] = useState<number>(FALLBACK_RATE);
+  const [rateLoading, setRateLoading] = useState(true);
+
+  // Fetch live exchange rate
+  useEffect(() => {
+    const fetchRate = async () => {
+      setRateLoading(true);
+      try {
+        const result = await apiRequest<{ rate: number; from_currency: string; to_currency: string }>(
+          `/transactions/xerime/info/rate/?from=RUB&to=USDT`,
+          { method: 'GET' },
+          true
+        );
+        if (result.data?.rate && result.data.rate > 0) {
+          setExchangeRate(result.data.rate);
+        }
+      } catch (err) {
+        console.warn('[TopUpRub] Failed to fetch rate, using fallback:', err);
+      }
+      setRateLoading(false);
+    };
+    fetchRate();
+  }, []);
 
   const numericUsdt = parseFloat(usdtRaw) || 0;
   const numericRub = parseFloat(rubRaw) || 0;
@@ -38,7 +62,7 @@ const TopUpRubAmount = () => {
     setUsdtRaw(input);
     setUsdtDisplay(formatNumber(input));
     const num = parseFloat(input) || 0;
-    const rub = num > 0 ? (num * EXCHANGE_RATE) : 0;
+    const rub = num > 0 ? (num * exchangeRate) : 0;
     const rubStr = rub > 0 ? rub.toFixed(2) : "";
     setRubRaw(rubStr);
     setRubDisplay(rub > 0 ? formatNumber(rubStr) : "");
@@ -50,7 +74,7 @@ const TopUpRubAmount = () => {
     setRubRaw(input);
     setRubDisplay(formatNumber(input));
     const num = parseFloat(input) || 0;
-    const usdt = num > 0 ? (num / EXCHANGE_RATE) : 0;
+    const usdt = num > 0 ? (num / exchangeRate) : 0;
     const usdtStr = usdt > 0 ? usdt.toFixed(2) : "";
     setUsdtRaw(usdtStr);
     setUsdtDisplay(usdt > 0 ? formatNumber(usdtStr) : "");
@@ -60,7 +84,7 @@ const TopUpRubAmount = () => {
     const str = amount.toString();
     setUsdtRaw(str);
     setUsdtDisplay(formatNumber(str));
-    const rub = (amount * EXCHANGE_RATE).toFixed(2);
+    const rub = (amount * exchangeRate).toFixed(2);
     setRubRaw(rub);
     setRubDisplay(formatNumber(rub));
   };
@@ -101,9 +125,13 @@ const TopUpRubAmount = () => {
           className="flex justify-center"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border/50">
-            <span className="text-sm text-muted-foreground">
-              1 USDT = {EXCHANGE_RATE.toLocaleString("en-US")} ₽
-            </span>
+            {rateLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                1 USDT = {exchangeRate.toLocaleString("en-US")} ₽
+              </span>
+            )}
           </div>
         </motion.div>
 
