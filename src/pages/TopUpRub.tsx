@@ -58,7 +58,7 @@ const TopUpRub = () => {
           className="p-4 rounded-2xl bg-muted/50 border border-border/50"
         >
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
               <span className="text-white text-lg font-bold">₽</span>
             </div>
             <div>
