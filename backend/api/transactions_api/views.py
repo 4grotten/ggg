@@ -760,10 +760,10 @@ class RubToCryptoTopupView(APIView):
 
     def post(self, request):
         amount_rub = request.data.get('amount_rub')
-        card_id = request.data.get('card_id')
+        card_id = request.data.get('card_id', None)
         
-        if not amount_rub or not card_id:
-            return Response({"error": "amount_rub и card_id обязательны"}, status=status.HTTP_400_BAD_REQUEST)
+        if not amount_rub:
+            return Response({"error": "amount_rub обязателен"}, status=status.HTTP_400_BAD_REQUEST)
             
         try:
             transaction = TransactionService.initiate_rub_to_crypto_topup(request, request.user.id, card_id, amount_rub)
