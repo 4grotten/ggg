@@ -779,13 +779,12 @@ class RubToCryptoTopupView(APIView):
 
     def post(self, request):
         amount_rub = request.data.get('amount_rub')
-        card_id = request.data.get('card_id', None)
         
         if not amount_rub:
             return Response({"error": "amount_rub обязателен"}, status=status.HTTP_400_BAD_REQUEST)
             
         try:
-            transaction = TransactionService.initiate_rub_to_crypto_topup(request, request.user.id, card_id, amount_rub)
+            transaction = TransactionService.initiate_rub_to_crypto_topup(request, request.user.id, amount_rub)
             return Response({
                 "message": "Заявка на пополнение RUB создана",
                 "transaction_id": transaction.id,
@@ -795,7 +794,7 @@ class RubToCryptoTopupView(APIView):
             }, status=status.HTTP_201_CREATED)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+        
 
 class XerimeTransactionHistoryView(APIView):
     permission_classes = [permissions.IsAuthenticated]

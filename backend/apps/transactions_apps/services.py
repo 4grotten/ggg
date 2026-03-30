@@ -440,7 +440,7 @@ class TransactionService:
         return deposit_data
     
     @staticmethod
-    def initiate_rub_to_crypto_topup(request, user_id, card_id, amount_rub):
+    def initiate_rub_to_crypto_topup(request, user_id, amount_rub):
         webhook_url = request.build_absolute_uri('/api/transactions/xerime/webhook/rub/')
         try:
             xerime_response = XerimeClient.create_rub_to_crypto_deposit(
@@ -451,6 +451,7 @@ class TransactionService:
             )
         except Exception as e:
             raise ValueError(f"Ошибка получения реквизитов DoverkaPay: {str(e)}")
+
         transaction = Transactions.objects.create(
             sender_id="EXTERNAL_RUB",
             receiver_id=str(user_id),
@@ -461,7 +462,6 @@ class TransactionService:
             status="pending",
             reference_id=xerime_response.get("reference_id"),
             metadata={
-                "target_card_id": str(card_id),
                 "gateway": "DoverkaPay",
                 "sbp_link": xerime_response.get("sbp_link"),
                 "public_link": xerime_response.get("public_link"),
