@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { ArrowLeft, Copy, Landmark, Share2, QrCode, Clock, ArrowUpRight, ArrowDownLeft, CreditCard, Building2, Wallet } from "lucide-react";
@@ -11,6 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { useWalletSummary, useBankAccounts } from "@/hooks/useCards";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
+import { apiRequest } from "@/services/api/apiClient";
 import { useIbanTransactionGroups, useTransactionGroups, useApiTransactionGroups } from "@/hooks/useTransactions";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -25,8 +26,8 @@ const AccountPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: walletData, isLoading: walletLoading } = useWalletSummary();
-  const { data: bankAccountsData, isLoading: bankLoading } = useBankAccounts();
-  const isLoading = walletLoading || bankLoading;
+  const { data: bankAccountsData, isLoading: bankLoading, refetch: refetchBankAccounts } = useBankAccounts();
+  const [provisioning, setProvisioning] = useState(false);
   
   // Prefer bank-accounts API data, fallback to wallet summary
   const bankAccount = bankAccountsData?.data?.[0];
@@ -42,6 +43,33 @@ const AccountPage = () => {
     id: bankAccount?.id,
   } : null;
   
+  // Auto-provision bank account if none exists
+  const provisionedRef = useRef(false);
+  useEffect(() => {
+    if (bankLoading || provisionedRef.current) return;
+    // If no bank account exists, call provision endpoint to create one
+    if (!bankAccount) {
+      provisionedRef.current = true;
+      setProvisioning(true);
+      apiRequest('/transactions/register-aed-recipient/', {
+        method: 'POST',
+      }, true)
+        .then((res) => {
+          if (res?.data && !res.error) {
+            refetchBankAccounts();
+          } else {
+            toast.error(String(res?.error || '') || t('accountPage.provisionError', 'Не удалось создать банковский счёт'));
+          }
+        })
+        .catch((err) => {
+          toast.error(t('accountPage.provisionError', 'Не удалось создать банковский счёт'));
+        })
+        .finally(() => setProvisioning(false));
+    }
+  }, [bankLoading, bankAccount]);
+
+  const isLoading = walletLoading || bankLoading || provisioning;
+
   const [qrOpen, setQrOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const { data: ibanTxData, isLoading: ibanLoading } = useIbanTransactionGroups();

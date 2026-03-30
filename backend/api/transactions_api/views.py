@@ -246,7 +246,8 @@ class CryptoTopupView(APIView):
     def post(self, request):
         serializer = CryptoTopupRequestSerializer(data=request.data)
         if serializer.is_valid():
-            topup = TransactionService.initiate_crypto_topup(user_id=request.user.id, card_id=serializer.validated_data['card_id'], token=serializer.validated_data['token'], network=serializer.validated_data['network'])
+            card_id = serializer.validated_data.get('card_id')
+            topup = TransactionService.initiate_crypto_topup(user_id=request.user.id, card_id=card_id, token=serializer.validated_data['token'], network=serializer.validated_data['network'])
             return Response({"message": "Crypto address generated", "deposit_address": topup.deposit_address, "qr_payload": topup.qr_payload}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -760,13 +761,13 @@ class RubToCryptoTopupView(APIView):
 
     def post(self, request):
         amount_rub = request.data.get('amount_rub')
-        card_id = request.data.get('card_id')
+        card_id = request.data.get('card_id', None)
         
-        if not amount_rub or not card_id:
-            return Response({"error": "amount_rub и card_id обязательны"}, status=status.HTTP_400_BAD_REQUEST)
+        if not amount_rub:
+            return Response({"error": "amount_rub обязателен"}, status=status.HTTP_400_BAD_REQUEST)
             
         try:
-            transaction = TransactionService.initiate_rub_to_crypto_topup(request.user.id, card_id, amount_rub)
+            transaction = TransactionService.initiate_rub_to_crypto_topup(request, request.user.id, card_id, amount_rub)
             return Response({
                 "message": "Заявка на пополнение RUB создана",
                 "transaction_id": transaction.id,
@@ -918,4 +919,32 @@ class XerimeInfoView(APIView):
                 return Response(XerimeClient.get_merchant_balances(request.user.id))
             return Response({"error": "Неизвестный action"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterAedRecipientView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Провизия банковского счёта + регистрация AED получателя",
+        tags=["Счета и Кошельки"],
+    )
+    def post(self, request):
+        user_id = request.user.id
+        try:
+            # _ensure_bank_account сам вызовет Xerime и получит реальный IBAN
+            account = TransactionService._ensure_bank_account(user_id)
+
+            return Response({
+                "id": str(account.id),
+                "iban": account.iban,
+                "bank_name": account.bank_name,
+                "beneficiary": account.beneficiary,
+                "balance": str(account.balance),
+                "is_active": account.is_active,
+                "currency": "AED",
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Bank account provision error: {e}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

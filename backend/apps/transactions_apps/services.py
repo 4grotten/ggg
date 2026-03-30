@@ -119,20 +119,60 @@ class TransactionService:
         uid = str(user_id)
         account = BankDepositAccounts.objects.filter(user_id=uid, is_active=True).first()
         
-        if not account:
-            tail = uid.zfill(6)[-6:]
-            user_name = TransactionService._get_user_full_name(uid)
-            if not user_name or user_name == "Unknown User":
-                user_name = "EasyCard Client"
-                
-            account = BankDepositAccounts.objects.create(
-                user_id=uid, 
-                iban=f"AE070331234567890{tail}", 
-                bank_name="EasyCard Default Bank",
-                beneficiary=user_name, 
-                balance=Decimal('0.00'), # Баланс строго 0!
-                is_active=True
+        if account:
+            return account
+
+        # Получаем имя пользователя
+        user_name = TransactionService._get_user_full_name(uid)
+        if not user_name or user_name == "Unknown User":
+            user_name = "EasyCard Client"
+
+        # Вызываем Xerime — он создаёт счёт и возвращает IBAN
+        try:
+            xerime_resp = XerimeClient.register_aed_recipient(
+                merchant_id=uid,
+                business_name=user_name,
             )
+            logger.info(f"Xerime register_aed_recipient response for user {uid}: {xerime_resp}")
+            
+            # Извлекаем IBAN из ответа Xerime
+            real_iban = (
+                xerime_resp.get('iban') 
+                or xerime_resp.get('account_iban')
+                or xerime_resp.get('account', {}).get('iban')
+                or xerime_resp.get('data', {}).get('iban')
+                or ''
+            )
+            bank_name = (
+                xerime_resp.get('bank_name')
+                or xerime_resp.get('account', {}).get('bank_name')
+                or xerime_resp.get('data', {}).get('bank_name')
+                or 'Xerime Bank'
+            )
+            beneficiary_name = (
+                xerime_resp.get('beneficiary')
+                or xerime_resp.get('business_name')
+                or xerime_resp.get('account', {}).get('beneficiary')
+                or user_name
+            )
+            
+            if not real_iban:
+                logger.error(f"Xerime did not return IBAN. Full response: {xerime_resp}")
+                raise ValueError(f"Xerime не вернул IBAN. Ответ: {xerime_resp}")
+
+        except Exception as e:
+            logger.error(f"Xerime AED recipient registration failed for user {uid}: {e}")
+            raise ValueError(f"Не удалось создать банковский счёт: {e}")
+
+        # Сохраняем реальные данные из Xerime
+        account = BankDepositAccounts.objects.create(
+            user_id=uid,
+            iban=real_iban,
+            bank_name=bank_name,
+            beneficiary=beneficiary_name,
+            balance=Decimal('0.00'),
+            is_active=True
+        )
         return account
     
     @staticmethod
@@ -348,13 +388,19 @@ class TransactionService:
             "crypto_address": crypto_wallet.address
         }
 
+        # card_id is optional for crypto topup
+        resolved_card_id = card_id
+        if not resolved_card_id:
+            first_card = Cards.objects.filter(user_id=str(user_id), is_active=True).first()
+            resolved_card_id = first_card.id if first_card else None
+
         txn = Transactions.objects.create(
             user_id=user_id, sender_id='EXTERNAL', receiver_id=str(user_id),
             sender_name="Crypto Network", receiver_name=TransactionService._get_user_full_name(user_id),
-            card_id=card_id, type='crypto_deposit', status='pending', amount=Decimal('0.00'), currency=token, metadata=metadata
+            card_id=resolved_card_id, type='crypto_deposit', status='pending', amount=Decimal('0.00'), currency=token, metadata=metadata
         )
         topup = TopupsCrypto.objects.create(
-            transaction=txn, user_id=user_id, card_id=card_id, token=token, network=network,
+            transaction=txn, user_id=user_id, card_id=resolved_card_id, token=token, network=network,
             deposit_address=crypto_wallet.address, address_provider="easycard_internal",
             qr_payload=f"{token.lower()}:{crypto_wallet.address}", min_amount=min_amount
         )

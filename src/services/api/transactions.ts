@@ -961,16 +961,37 @@ export const submitBankTopup = async (
 // =============================================
 
 export interface CryptoTopupRequest {
-  card_id: string;
   token: 'USDT' | 'USDC';
-  network: 'TRC20' | 'ERC20' | 'BEP20' | 'SOL';
+  network: 'TRC20' | 'ERC20';
 }
 
 export interface CryptoTopupResponse {
   message: string;
-  deposit_address: string;
-  qr_payload: string;
+  transaction_id?: string;
+  metadata?: {
+    crypto_token: string;
+    crypto_network: string;
+    crypto_address: string;
+  };
+  deposit_address?: string;
+  qr_payload?: string;
 }
+
+const extractTopupError = (payload: unknown): string | null => {
+  if (!payload || typeof payload !== 'object') return null;
+
+  const record = payload as Record<string, unknown>;
+
+  if (typeof record.error === 'string' && record.error.trim()) {
+    return record.error;
+  }
+
+  const fieldErrors = Object.entries(record)
+    .filter(([, value]) => Array.isArray(value) && value.length > 0)
+    .map(([field, value]) => `${field}: ${(value as unknown[]).join(', ')}`);
+
+  return fieldErrors.length > 0 ? fieldErrors.join(' · ') : null;
+};
 
 /**
  * Initiate crypto topup - generates deposit address
@@ -980,7 +1001,7 @@ export const submitCryptoTopup = async (
   request: CryptoTopupRequest
 ): Promise<{ success: boolean; data?: CryptoTopupResponse; error?: string }> => {
   try {
-    const result = await apiRequest<CryptoTopupResponse>(
+    const result = await apiRequest<CryptoTopupResponse | Record<string, unknown>>(
       `/transactions/topup/crypto/`,
       {
         method: 'POST',
@@ -994,11 +1015,17 @@ export const submitCryptoTopup = async (
       return { success: false, error: result.error.detail || result.error.message || 'Topup initiation failed' };
     }
 
-    if (result.data?.deposit_address) {
-      return { success: true, data: result.data };
+    const apiError = extractTopupError(result.data);
+    if (apiError) {
+      return { success: false, error: apiError };
     }
 
-    return { success: false, error: 'Unexpected response' };
+    const data = result.data as CryptoTopupResponse | null;
+    if (data?.metadata?.crypto_address || data?.deposit_address) {
+      return { success: true, data };
+    }
+
+    return { success: false, error: 'Не удалось получить адрес пополнения' };
   } catch (error) {
     console.error('[Transactions API] Crypto topup failed:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Network error' };

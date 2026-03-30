@@ -211,15 +211,16 @@ class XerimeClient:
         return response.json()
 
     @classmethod
-    def register_aed_recipient(cls, merchant_id, business_name, iban):
+    def register_aed_recipient(cls, merchant_id, business_name, iban=None):
         token_jwt = cls.get_token()
         url = f"{cls.get_base_url()}/aed-recipients"
         headers = {"Authorization": f"Bearer {token_jwt}"}
         payload = {
             "merchant_id": str(merchant_id),
             "business_name": business_name,
-            "iban": iban
         }
+        if iban:
+            payload["iban"] = iban
         response = requests.post(url, headers=headers, json=payload, timeout=15)
         response.raise_for_status()
         return response.json()
