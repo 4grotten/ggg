@@ -95,7 +95,7 @@ class TopupsCrypto(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.OneToOneField('Transactions', on_delete=models.CASCADE, related_name='crypto_topup')
     user_id = models.CharField(max_length=50)
-    card_id = models.UUIDField()
+    card_id = models.UUIDField(null=True, blank=True)
     token = models.CharField(max_length=20)
     network = models.CharField(max_length=20)
     deposit_address = models.CharField(max_length=255)
