@@ -371,40 +371,48 @@ class TransactionService:
         return topup
 
     @staticmethod
-    def initiate_crypto_topup(user_id, card_id, token, network):
-        crypto_wallet = CryptoWallets.objects.filter(user_id=str(user_id), token=token, network=network).first()
+    def initiate_crypto_topup(user_id, token, network, amount=None):
+        user_id_str = str(user_id)
+        crypto_wallet = CryptoWallets.objects.filter(user_id=user_id_str, token=token, network=network).first()
         if not crypto_wallet:
             TransactionService.generate_crypto_wallets_for_user(user_id)
-            crypto_wallet = CryptoWallets.objects.filter(user_id=str(user_id), token=token, network=network).first()
+            crypto_wallet = CryptoWallets.objects.filter(user_id=user_id_str, token=token, network=network).first()
             
             if not crypto_wallet:
                 raise ValueError(f"Криптокошелек для сети {network} не найден и не удалось сгенерировать.")
 
         min_amount = SettingsManager.get_setting('limits', 'top_up_crypto_min', Decimal('10.00'), user_id)
+        amount_decimal = Decimal(str(amount)) if amount else Decimal('0.00')
 
         metadata = {
             "crypto_token": token,
             "crypto_network": network,
             "crypto_address": crypto_wallet.address
         }
-
-        # card_id is optional for crypto topup
-        resolved_card_id = card_id
-        if not resolved_card_id:
-            first_card = Cards.objects.filter(user_id=str(user_id), is_active=True).first()
-            resolved_card_id = first_card.id if first_card else None
-
         txn = Transactions.objects.create(
-            user_id=user_id, sender_id='EXTERNAL', receiver_id=str(user_id),
-            sender_name="Crypto Network", receiver_name=TransactionService._get_user_full_name(user_id),
-            card_id=resolved_card_id, type='crypto_deposit', status='pending', amount=Decimal('0.00'), currency=token, metadata=metadata
+            user_id=user_id_str, 
+            sender_id='EXTERNAL', 
+            receiver_id=user_id_str,
+            sender_name="Crypto Network", 
+            receiver_name=TransactionService._get_user_full_name(user_id),
+            type='crypto_deposit', 
+            status='pending', 
+            amount=amount_decimal, 
+            currency=token, 
+            metadata=metadata
         )
-        topup = TopupsCrypto.objects.create(
-            transaction=txn, user_id=user_id, card_id=resolved_card_id, token=token, network=network,
-            deposit_address=crypto_wallet.address, address_provider="easycard_internal",
-            qr_payload=f"{token.lower()}:{crypto_wallet.address}", min_amount=min_amount
+        TopupsCrypto.objects.create(
+            transaction=txn, 
+            user_id=user_id_str, 
+            token=token, 
+            network=network,
+            deposit_address=crypto_wallet.address, 
+            address_provider="easycard_internal",
+            qr_payload=f"{token.lower()}:{crypto_wallet.address}", 
+            min_amount=min_amount
         )
-        return topup
+        
+        return txn
     
     @staticmethod
     def register_crypto_deposit_in_xerime(user_id, token, network, amount, tx_hash):

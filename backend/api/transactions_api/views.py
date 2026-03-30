@@ -242,13 +242,31 @@ class BankTopupView(APIView):
 
 class CryptoTopupView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    @swagger_auto_schema(operation_summary="Инициация пополнения стейблкоинами (Crypto Topup)", request_body=CryptoTopupRequestSerializer, responses={201: CryptoTopupResponseSerializer, 400: ErrorResponseSerializer}, tags=["Topups (Пополнения)"])
+    
+    @swagger_auto_schema(
+        operation_summary="Инициация пополнения криптой", 
+        request_body=CryptoTopupRequestSerializer, 
+        responses={201: CryptoTopupResponseSerializer, 400: ErrorResponseSerializer}, 
+        tags=["Topups (Пополнения)"]
+    )
+
     def post(self, request):
         serializer = CryptoTopupRequestSerializer(data=request.data)
         if serializer.is_valid():
-            card_id = serializer.validated_data.get('card_id')
-            topup = TransactionService.initiate_crypto_topup(user_id=request.user.id, card_id=card_id, token=serializer.validated_data['token'], network=serializer.validated_data['network'])
-            return Response({"message": "Crypto address generated", "deposit_address": topup.deposit_address, "qr_payload": topup.qr_payload}, status=status.HTTP_201_CREATED)
+            try:
+                txn = TransactionService.initiate_crypto_topup(
+                    user_id=request.user.id, 
+                    token=serializer.validated_data['token'], 
+                    network=serializer.validated_data['network'],
+                    amount=serializer.validated_data.get('amount')
+                )
+                return Response({
+                    "message": "Заявка на пополнение создана",
+                    "transaction_id": txn.id,
+                    "metadata": txn.metadata
+                }, status=status.HTTP_201_CREATED)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

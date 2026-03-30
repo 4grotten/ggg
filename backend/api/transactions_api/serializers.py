@@ -14,12 +14,13 @@ class BankTopupResponseSerializer(serializers.Serializer):
 
 class CryptoTopupRequestSerializer(serializers.Serializer):
     token = serializers.ChoiceField(choices=['USDT', 'USDC'], help_text="Стейблкоин для пополнения")
-    network = serializers.ChoiceField(choices=['TRC20', 'ERC20', 'BEP20', 'SOL'], help_text="Блокчейн сеть")
+    network = serializers.ChoiceField(choices=['TRC20', 'ERC20'], help_text="Блокчейн сеть (только Tron и Ethereum)")
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, help_text="Сумма (опционально)")
 
 class CryptoTopupResponseSerializer(serializers.Serializer):
-    message = serializers.CharField(default="Crypto address generated")
-    deposit_address = serializers.CharField(help_text="Сгенерированный крипто-адрес для депозита")
-    qr_payload = serializers.CharField(help_text="Строка для генерации QR-кода на фронтенде")
+    message = serializers.CharField(default="Заявка на пополнение создана")
+    transaction_id = serializers.UUIDField()
+    metadata = serializers.DictField()
 
 class CardTransferRequestSerializer(serializers.Serializer):
     sender_card_id = serializers.UUIDField(help_text="ID карты отправителя (ваша карта)")
