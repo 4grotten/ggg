@@ -13,6 +13,10 @@ from apps.cards_apps.models import Cards
 from django.contrib.auth.models import User
 from apps.accounts_apps.models import AdminSettings, Profiles
 from apps.transactions_apps.xerime_client import XerimeClient
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class SettingsManager:
     @staticmethod
@@ -122,20 +126,16 @@ class TransactionService:
         if account:
             return account
 
-        # Получаем имя пользователя
         user_name = TransactionService._get_user_full_name(uid)
         if not user_name or user_name == "Unknown User":
             user_name = "EasyCard Client"
-
-        # Вызываем Xerime — он создаёт счёт и возвращает IBAN
         try:
             xerime_resp = XerimeClient.register_aed_recipient(
                 merchant_id=uid,
                 business_name=user_name,
             )
             logger.info(f"Xerime register_aed_recipient response for user {uid}: {xerime_resp}")
-            
-            # Извлекаем IBAN из ответа Xerime
+
             real_iban = (
                 xerime_resp.get('iban') 
                 or xerime_resp.get('account_iban')
@@ -163,8 +163,6 @@ class TransactionService:
         except Exception as e:
             logger.error(f"Xerime AED recipient registration failed for user {uid}: {e}")
             raise ValueError(f"Не удалось создать банковский счёт: {e}")
-
-        # Сохраняем реальные данные из Xerime
         account = BankDepositAccounts.objects.create(
             user_id=uid,
             iban=real_iban,
@@ -303,26 +301,32 @@ class TransactionService:
         user_id_str = str(sender_id)
         account = BankDepositAccounts.objects.select_for_update().get(id=account_id, user_id=user_id_str)
         amount_decimal = Decimal(str(amount))
-        
+
         if account.balance < amount_decimal:
             raise ValueError("Недостаточно средств на банковском счете.")
+        dest_account = BankDepositAccounts.objects.filter(iban=iban).first()
+        is_internal = dest_account is not None
+
         try:
             XerimeClient.register_aed_recipient(merchant_id=user_id_str, business_name=business_name, iban=iban)
         except Exception as e:
-            raise ValueError(f"Ошибка регистрации IBAN: {str(e)}")
+            raise ValueError(f"Ошибка регистрации IBAN в Xerime: {str(e)}")
         try:
             withdrawal_data = XerimeClient.create_fiat_withdrawal(
                 merchant_id=user_id_str, amount=amount, iban=iban, currency="AED"
             )
         except Exception as e:
             raise ValueError(f"Ошибка провайдера при выводе фиата: {str(e)}")
+
         account.balance -= amount_decimal
         account.save()
+        receiver_id = str(dest_account.user_id) if is_internal else "EXTERNAL_IBAN"
+        receiver_name = TransactionService._get_user_full_name(dest_account.user_id) if is_internal else iban
 
         transaction = Transactions.objects.create(
             sender_id=user_id_str,
-            receiver_id="EXTERNAL_IBAN",
-            receiver_name=iban,
+            receiver_id=receiver_id,
+            receiver_name=receiver_name,
             type="bank_withdrawal",
             amount=amount_decimal,
             currency="AED",
@@ -331,7 +335,8 @@ class TransactionService:
             metadata={
                 "external_reference": withdrawal_data.get("external_reference"),
                 "xerime_status": withdrawal_data.get("status"),
-                "from_account_id": str(account.id)
+                "from_account_id": str(account.id),
+                "is_internal": is_internal
             }
         )
         return transaction
@@ -415,18 +420,22 @@ class TransactionService:
         return txn
     
     @staticmethod
+    @transaction.atomic
     def register_crypto_deposit_in_xerime(user_id, token, network, amount, tx_hash):
         user_id_str = str(user_id)
         user = User.objects.get(id=user_id)
-        profile = user.profiles
+        profile = Profiles.objects.filter(user_id=user_id_str).first()
         
-        user_name = f"{profile.first_name} {profile.last_name}".strip() or f"User_{user_id_str}"
+        user_name = f"{profile.first_name or ''} {profile.last_name or ''}".strip() if profile else f"User_{user_id_str}"
         email = user.email or f"user_{user_id_str}@easycard.local"
         crypto_wallet = CryptoWallets.objects.filter(user_id=user_id_str, token=token, network=network).first()
         if not crypto_wallet:
-            raise ValueError("Кошелек не найден.")
+            raise ValueError("Кошелек не найден. Необходимо сгенерировать кошелек перед депозитом.")
+        if Transactions.objects.filter(metadata__tx_hash=tx_hash).exists():
+            raise ValueError(f"Транзакция с хэшем {tx_hash} уже зарегистрирована в системе.")
             
         xerime_network = 'tron' if network == 'TRC20' else network.lower()
+        
         deposit_data = XerimeClient.create_crypto_deposit(
             merchant_id=user_id_str,
             merchant_name=user_name,
@@ -436,6 +445,25 @@ class TransactionService:
             amount=amount,
             tx_hash=tx_hash,
             wallet_address=crypto_wallet.address
+        )
+        Transactions.objects.create(
+            user_id=user_id_str,
+            sender_id='EXTERNAL',
+            receiver_id=user_id_str,
+            sender_name="Crypto Network",
+            receiver_name=TransactionService._get_user_full_name(user_id_str),
+            type='crypto_deposit',
+            status='processing',
+            amount=Decimal(str(amount)),
+            currency=token,
+            reference_id=deposit_data.get("reference_id"),
+            metadata={
+                "crypto_token": token,
+                "crypto_network": network,
+                "crypto_address": crypto_wallet.address,
+                "tx_hash": tx_hash,
+                "xerime_status": deposit_data.get("status")
+            }
         )
         return deposit_data
     
@@ -967,8 +995,12 @@ class TransactionService:
         user_id_str = str(sender_id)
         from_wallet = CryptoWallets.objects.select_for_update().get(id=from_wallet_id, user_id=user_id_str)
         amount_decimal = Decimal(str(amount))
+
         if from_wallet.balance < amount_decimal:
             raise ValueError("Недостаточно средств на криптокошельке.")
+        dest_wallet = CryptoWallets.objects.filter(address=crypto_address).first()
+        is_internal = dest_wallet is not None
+
         external_ref = f"WD-{uuid.uuid4().hex[:12].upper()}"
         xerime_network = 'tron' if network == 'TRC20' else network.lower()
         try:
@@ -986,20 +1018,23 @@ class TransactionService:
             raise ValueError(f"Ошибка провайдера при выводе: {str(e)}")
         from_wallet.balance -= amount_decimal
         from_wallet.save()
+        receiver_id = str(dest_wallet.user_id) if is_internal else "EXTERNAL_WALLET"
+        receiver_name = TransactionService._get_user_full_name(dest_wallet.user_id) if is_internal else crypto_address
         transaction_record = Transactions.objects.create(
             sender_id=user_id_str,
-            receiver_id="EXTERNAL_WALLET",
-            receiver_name=crypto_address,
+            receiver_id=receiver_id,
+            receiver_name=receiver_name,
             type="crypto_withdrawal",
             amount=amount_decimal,
             currency=token,
-            status="pending", # Теперь статус зависит от провайдера
-            reference_id=xerime_reference_id, # Сохраняем их ID, чтобы потом проверять статус!
+            status="pending",
+            reference_id=xerime_reference_id,
             metadata={
                 "network": network,
                 "external_reference": external_ref,
                 "xerime_status": xerime_status,
-                "from_wallet_id": str(from_wallet.id)
+                "from_wallet_id": str(from_wallet.id),
+                "is_internal": is_internal
             }
         )
         return transaction_record

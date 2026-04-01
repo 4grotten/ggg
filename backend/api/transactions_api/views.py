@@ -858,7 +858,6 @@ class RubWebhookView(APIView):
             real_status = verified_data.get("status")
             real_crypto_amount = verified_data.get("crypto_amount")
             user_id = verified_data.get("merchant_id")
-            
         except Exception as e:
             logger.error(f"Webhook security breach attempt for {reference_id}. Error: {e}")
             return Response({"error": "Fake transaction"}, status=status.HTTP_403_FORBIDDEN)
@@ -949,7 +948,6 @@ class RegisterAedRecipientView(APIView):
     def post(self, request):
         user_id = request.user.id
         try:
-            # _ensure_bank_account сам вызовет Xerime и получит реальный IBAN
             account = TransactionService._ensure_bank_account(user_id)
 
             return Response({
@@ -965,3 +963,29 @@ class RegisterAedRecipientView(APIView):
         except Exception as e:
             logger.error(f"Bank account provision error: {e}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class RegisterCryptoWalletView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Сгенерировать и получить криптокошельки (API Новое)",
+        operation_description="Обращается к Xerime для получения привязанных к мерчанту кошельков и сохраняет их в БД.",
+        tags=["Счета и Кошельки"]
+    )
+    def post(self, request):
+        try:
+            wallets = TransactionService.generate_crypto_wallets_for_user(request.user.id)
+            data = [{
+                "id": w.id,
+                "network": w.network,
+                "token": w.token,
+                "address": w.address,
+                "balance": str(w.balance),
+                "is_active": w.is_active
+            } for w in wallets]
+            return Response(data, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Ошибка генерации кошелька: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

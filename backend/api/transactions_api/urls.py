@@ -49,4 +49,6 @@ urlpatterns = [
     path('xerime/info/<str:action>/', views.XerimeInfoView.as_view(), name='xerime-info'),
     path('register-aed-recipient/', views.RegisterAedRecipientView.as_view(), name='register-aed-recipient'),
 
+    path('crypto-wallets/register/', views.RegisterCryptoWalletView.as_view(), name='register-crypto-wallets'),
+
 ]
