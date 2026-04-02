@@ -327,8 +327,8 @@ const SendBank = () => {
   }, [step, isSubmitting, selectedSource, cardsData, iban, recipientName, bankName, amountAED, isReferralWithdrawal, navigate, queryClient, t]);
 
   const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
+    if (step > 0) {
+      setStep(step === 3 && fieldsReadOnly ? 0 : step - 1);
     } else {
       navigate(-1);
     }
@@ -336,6 +336,7 @@ const SendBank = () => {
 
   const getStepValid = () => {
     switch (step) {
+      case 0: return true;
       case 1: return isStep1Valid;
       case 2: return isStep2Valid;
       case 3: return isStep3Valid;
