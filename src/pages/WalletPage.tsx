@@ -13,7 +13,7 @@ import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { useMergedTransactionGroups, useCryptoTransactionGroups } from "@/hooks/useTransactions";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
-import { submitCryptoTopup } from "@/services/api/transactions";
+import { registerCryptoWallets } from "@/services/api/transactions";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
@@ -556,10 +556,7 @@ const WalletPage = () => {
                     setCreating(true);
                     setCreateError(null);
                     try {
-                      const result = await submitCryptoTopup({
-                        token: newToken,
-                        network: newNetwork.toUpperCase() as "TRC20" | "ERC20",
-                      });
+                      const result = await registerCryptoWallets();
                       if (result.success) {
                         queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
                         setWalletStep('success');
