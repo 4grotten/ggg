@@ -322,24 +322,33 @@ const WalletPage = () => {
                           : 'border-border bg-background/60 hover:bg-background'
                       }`}
                     >
-                      <div className="flex items-center gap-2 mb-2">
-                        {getCryptoIcon(item.network?.toLowerCase() ?? '', 18)}
-                        <p className="text-sm font-semibold">{item.token?.toUpperCase()} · {networkUpper}</p>
+                      <div className="mb-2">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.network', 'Сеть')}</p>
+                        <div className="flex items-center gap-2">
+                          {getCryptoIcon(item.network?.toLowerCase() ?? '', 18)}
+                          <p className="text-sm font-semibold">{networkUpper}</p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <p className="text-xs font-mono text-muted-foreground break-all flex-1">{item.address}</p>
-                        <span
-                          role="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyToClipboard(item.address);
-                          }}
-                          className="flex-shrink-0 rounded-lg p-1.5 transition-colors hover:bg-background"
-                        >
-                          <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-                        </span>
+                      <div className="mb-2">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.walletAddress', 'Адрес кошелька')}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-mono text-muted-foreground break-all flex-1">{item.address}</p>
+                          <span
+                            role="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copyToClipboard(item.address);
+                            }}
+                            className="flex-shrink-0 rounded-lg p-1.5 transition-colors hover:bg-background"
+                          >
+                            <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                          </span>
+                        </div>
                       </div>
-                      <p className="text-sm font-bold">{formatBalance(parseFloat(String(item.balance ?? 0)))} {item.token?.toUpperCase()}</p>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.currency', 'Валюта')}</p>
+                        <p className="text-sm font-bold">{formatBalance(parseFloat(String(item.balance ?? 0)))} {item.token?.toUpperCase()}</p>
+                      </div>
                     </button>
                   );
                 })}
