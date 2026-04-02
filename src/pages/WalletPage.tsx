@@ -41,6 +41,7 @@ const WalletPage = () => {
   const [qrOpen, setQrOpen] = useState(false);
   const [sendDrawerOpen, setSendDrawerOpen] = useState(false);
   const [openWalletDrawer, setOpenWalletDrawer] = useState(false);
+  const [walletStep, setWalletStep] = useState<'token' | 'network' | 'success'>('token');
   const [newToken, setNewToken] = useState<TokenType>("USDT");
   const [newNetwork, setNewNetwork] = useState<NetworkId>("trc20");
   const [creating, setCreating] = useState(false);
