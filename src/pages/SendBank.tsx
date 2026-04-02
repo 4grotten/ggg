@@ -156,6 +156,10 @@ const SendBank = () => {
   const [recipientName, setRecipientName] = useState("");
   const [bankName, setBankName] = useState("");
   const [fieldsReadOnly, setFieldsReadOnly] = useState(false);
+  const [recipientError, setRecipientError] = useState("");
+
+  // Step 3: Comment
+  const [comment, setComment] = useState("");
   
   // Step 3: Amount (in USDT when wallet, in AED otherwise)
   const [amountAED, setAmountAED] = useState("");
