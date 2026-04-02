@@ -16,7 +16,6 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
-// fees now from useSettings()
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
@@ -25,6 +24,7 @@ import { submitInternalTransfer } from "@/services/api/transactions";
 import { getAuthToken } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { BankRecipientsList, saveBankRecipient, type BankRecipient } from "@/components/bank/BankRecipientsList";
 
 // Check if IBAN exists in the system
 const lookupIbanRecipient = async (iban: string): Promise<{ found: boolean; name: string | null; bankName: string | null }> => {
