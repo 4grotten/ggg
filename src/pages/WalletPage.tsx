@@ -346,46 +346,6 @@ const WalletPage = () => {
               </div>
             </motion.div>
 
-            <motion.div
-              className="rounded-2xl bg-secondary/50 p-5 space-y-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-            >
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('walletPage.walletDetails')}</h3>
-
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('walletPage.network')}</p>
-                  <div className="mt-0.5 flex items-center gap-2">
-                    {walletNetwork === "TRC20" && <TronIcon size={16} />}
-                    <p className="text-sm font-medium">{walletNetwork}</p>
-                  </div>
-                </div>
-
-                <div className="h-px bg-border/50" />
-
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-muted-foreground">{t('walletPage.walletAddress')}</p>
-                    <p className="mt-0.5 break-all font-mono text-sm font-medium">{walletAddress}</p>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(walletAddress)}
-                    className="flex-shrink-0 rounded-lg p-2 transition-colors hover:bg-background"
-                  >
-                    <Copy className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
-
-                <div className="h-px bg-border/50" />
-
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('walletPage.currency')}</p>
-                  <p className="text-sm font-medium">{walletToken}</p>
-                </div>
-              </div>
-            </motion.div>
           </>
         )}
 
