@@ -239,6 +239,27 @@ const TopUpCrypto = () => {
             </div>
           </div>
 
+          {/* Wallet Address Field */}
+          {walletAddress && (
+            <div className="w-full bg-muted rounded-2xl p-4 space-y-2">
+              <span className="text-muted-foreground text-sm">{t("topUp.walletAddress", "Адрес кошелька")}</span>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-mono break-all flex-1 text-foreground">{walletAddress}</p>
+                <button
+                  onClick={handleCopy}
+                  className="p-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0"
+                  aria-label={t("topUp.copy")}
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="bg-muted rounded-2xl p-4 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t("topUp.topUpFee")}</span>
