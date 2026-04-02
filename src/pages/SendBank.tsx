@@ -19,7 +19,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
-import { submitBankWithdrawal, submitCryptoToBank } from "@/services/api/transactions";
+import { submitBankWithdrawal, submitCryptoToBank, registerAedRecipient } from "@/services/api/transactions";
 import { submitInternalTransfer } from "@/services/api/transactions";
 import { getAuthToken } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
