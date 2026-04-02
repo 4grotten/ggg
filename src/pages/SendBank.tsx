@@ -362,22 +362,39 @@ const SendBank = () => {
           {/* Header */}
           <div>
             <h1 className="text-2xl font-bold">{t("send.sendLocalBankTransfer")}</h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              {t("send.stepOf", { step, total: 3 })}
-            </p>
+            {step > 0 && (
+              <p className="text-muted-foreground text-sm mt-1">
+                {t("send.stepOf", { step, total: 3 })}
+              </p>
+            )}
+            {step === 0 && (
+              <p className="text-muted-foreground text-sm mt-1">
+                {t("send.selectOrAddRecipient", "Выберите получателя или добавьте нового")}
+              </p>
+            )}
           </div>
 
-          {/* Progress Bar */}
-          <div className="flex gap-2">
-            {[1, 2, 3].map((s) => (
-              <div
-                key={s}
-                className={`flex-1 h-1 rounded-full transition-colors ${
-                  s <= step ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            ))}
-          </div>
+          {/* Progress Bar — only for steps 1-3 */}
+          {step > 0 && (
+            <div className="flex gap-2">
+              {[1, 2, 3].map((s) => (
+                <div
+                  key={s}
+                  className={`flex-1 h-1 rounded-full transition-colors ${
+                    s <= step ? "bg-primary" : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Step 0: Recipients List */}
+          {step === 0 && (
+            <BankRecipientsList
+              onSelectRecipient={handleSelectRecipient}
+              onAddNew={handleAddNewRecipient}
+            />
+          )}
 
           {/* Step 1: IBAN */}
           {step === 1 && (
