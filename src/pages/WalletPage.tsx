@@ -311,6 +311,7 @@ const WalletPage = () => {
               <div className="space-y-2">
                 {cryptoWallets.map((item) => {
                   const isSelected = item.id === wallet?.id;
+                  const networkUpper = item.network?.toUpperCase() ?? "";
                   return (
                     <button
                       key={item.id}
@@ -321,13 +322,24 @@ const WalletPage = () => {
                           : 'border-border bg-background/60 hover:bg-background'
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-medium">{item.token?.toUpperCase()} {item.network?.toUpperCase()}</p>
-                          <p className="text-xs text-muted-foreground font-mono">{shortenAddress(item.address)}</p>
-                        </div>
-                        <p className="text-sm font-semibold">{formatBalance(parseFloat(String(item.balance ?? 0)))}</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        {getCryptoIcon(item.network?.toLowerCase() ?? '', 18)}
+                        <p className="text-sm font-semibold">{item.token?.toUpperCase()} · {networkUpper}</p>
                       </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <p className="text-xs font-mono text-muted-foreground break-all flex-1">{item.address}</p>
+                        <span
+                          role="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(item.address);
+                          }}
+                          className="flex-shrink-0 rounded-lg p-1.5 transition-colors hover:bg-background"
+                        >
+                          <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                        </span>
+                      </div>
+                      <p className="text-sm font-bold">{formatBalance(parseFloat(String(item.balance ?? 0)))} {item.token?.toUpperCase()}</p>
                     </button>
                   );
                 })}
