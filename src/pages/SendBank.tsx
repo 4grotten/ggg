@@ -16,7 +16,6 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
-// fees now from useSettings()
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
@@ -25,6 +24,7 @@ import { submitInternalTransfer } from "@/services/api/transactions";
 import { getAuthToken } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { BankRecipientsList, saveBankRecipient, type BankRecipient } from "@/components/bank/BankRecipientsList";
 
 // Check if IBAN exists in the system
 const lookupIbanRecipient = async (iban: string): Promise<{ found: boolean; name: string | null; bankName: string | null }> => {
@@ -120,7 +120,7 @@ const SendBank = () => {
     return options;
   }, [cardsData, bankAccountsData, cryptoWalletsData, t]);
   
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [selectedSource, setSelectedSource] = useState<SourceOption | null>(null);
   const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -207,7 +207,30 @@ const SendBank = () => {
   const isStep2Valid = recipientName.trim().length >= 2 && bankName.trim().length >= 2;
   const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= (isWalletSource ? availableBalance : availableBalanceAed);
 
+  const handleSelectRecipient = (recipient: BankRecipient) => {
+    setIban(formatIban(recipient.iban));
+    setRecipientName(recipient.name);
+    setBankName(recipient.bankName);
+    setFieldsReadOnly(true);
+    setIsSystemIban(true);
+    setStep(3); // skip to amount
+  };
+
+  const handleAddNewRecipient = () => {
+    setIban("");
+    setRecipientName("");
+    setBankName("");
+    setFieldsReadOnly(false);
+    setIsSystemIban(false);
+    setStep(1);
+  };
+
   const handleNext = useCallback(async () => {
+    if (step === 0) {
+      handleAddNewRecipient();
+      return;
+    }
+
     // Step 1 → check IBAN in the system before moving to step 2
     if (step === 1) {
       setIbanLookupLoading(true);
@@ -257,6 +280,7 @@ const SendBank = () => {
         const result = await submitCryptoToBank(request);
 
         if (result.success) {
+          saveBankRecipient({ iban: iban.replace(/\s/g, ""), name: recipientName.trim(), bankName: bankName.trim() });
           toast.success(t("send.transferSuccess", "Перевод отправлен"));
           sendNotification({ title: t("notifications.transferSent") || "Перевод отправлен", body: t("send.transferSuccess", "Перевод отправлен"), type: "transaction" });
           queryClient.invalidateQueries({ queryKey: ["cards"] });
@@ -284,6 +308,7 @@ const SendBank = () => {
         const result = await submitBankWithdrawal(request);
 
         if (result.success) {
+          saveBankRecipient({ iban: iban.replace(/\s/g, ""), name: recipientName.trim(), bankName: bankName.trim() });
           toast.success(t("send.transferSuccess", "Перевод отправлен"));
           sendNotification({ title: t("notifications.transferSent") || "Перевод отправлен", body: t("send.transferSuccess", "Перевод отправлен"), type: "transaction" });
           queryClient.invalidateQueries({ queryKey: ["cards"] });
@@ -302,8 +327,8 @@ const SendBank = () => {
   }, [step, isSubmitting, selectedSource, cardsData, iban, recipientName, bankName, amountAED, isReferralWithdrawal, navigate, queryClient, t]);
 
   const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
+    if (step > 0) {
+      setStep(step === 3 && fieldsReadOnly ? 0 : step - 1);
     } else {
       navigate(-1);
     }
@@ -311,6 +336,7 @@ const SendBank = () => {
 
   const getStepValid = () => {
     switch (step) {
+      case 0: return true;
       case 1: return isStep1Valid;
       case 2: return isStep2Valid;
       case 3: return isStep3Valid;
@@ -336,22 +362,39 @@ const SendBank = () => {
           {/* Header */}
           <div>
             <h1 className="text-2xl font-bold">{t("send.sendLocalBankTransfer")}</h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              {t("send.stepOf", { step, total: 3 })}
-            </p>
+            {step > 0 && (
+              <p className="text-muted-foreground text-sm mt-1">
+                {t("send.stepOf", { step, total: 3 })}
+              </p>
+            )}
+            {step === 0 && (
+              <p className="text-muted-foreground text-sm mt-1">
+                {t("send.selectOrAddRecipient", "Выберите получателя или добавьте нового")}
+              </p>
+            )}
           </div>
 
-          {/* Progress Bar */}
-          <div className="flex gap-2">
-            {[1, 2, 3].map((s) => (
-              <div
-                key={s}
-                className={`flex-1 h-1 rounded-full transition-colors ${
-                  s <= step ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            ))}
-          </div>
+          {/* Progress Bar — only for steps 1-3 */}
+          {step > 0 && (
+            <div className="flex gap-2">
+              {[1, 2, 3].map((s) => (
+                <div
+                  key={s}
+                  className={`flex-1 h-1 rounded-full transition-colors ${
+                    s <= step ? "bg-primary" : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Step 0: Recipients List */}
+          {step === 0 && (
+            <BankRecipientsList
+              onSelectRecipient={handleSelectRecipient}
+              onAddNew={handleAddNewRecipient}
+            />
+          )}
 
           {/* Step 1: IBAN */}
           {step === 1 && (
@@ -616,28 +659,30 @@ const SendBank = () => {
           </div>
         </div>
 
-        {/* Fixed Continue Button */}
-        <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
-          <Button
-            onClick={handleNext}
-            disabled={!getStepValid() || isSubmitting || ibanLookupLoading}
-            className="w-full h-14 rounded-2xl text-base font-semibold bg-primary/90 hover:bg-primary active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
-          >
-            {(isSubmitting || ibanLookupLoading) ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                {ibanLookupLoading ? t("send.checkingIban", "Проверка IBAN...") : t("send.processing", "Обработка...")}
-              </span>
-            ) : step === 3 ? (
-              `${t("send.continue")} ${isWalletSource ? (parseFloat(amountAED || "0") * USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2 }) : parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
-            ) : (
-              <span className="flex items-center gap-2">
-                {t("send.continue")}
-                <ArrowRight className="w-5 h-5" />
-              </span>
-            )}
-          </Button>
-        </div>
+        {/* Fixed Continue Button — hidden on step 0 */}
+        {step > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
+            <Button
+              onClick={handleNext}
+              disabled={!getStepValid() || isSubmitting || ibanLookupLoading}
+              className="w-full h-14 rounded-2xl text-base font-semibold bg-primary/90 hover:bg-primary active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
+            >
+              {(isSubmitting || ibanLookupLoading) ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {ibanLookupLoading ? t("send.checkingIban", "Проверка IBAN...") : t("send.processing", "Обработка...")}
+                </span>
+              ) : step === 3 ? (
+                `${t("send.continue")} ${isWalletSource ? (parseFloat(amountAED || "0") * USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2 }) : parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
+              ) : (
+                <span className="flex items-center gap-2">
+                  {t("send.continue")}
+                  <ArrowRight className="w-5 h-5" />
+                </span>
+              )}
+            </Button>
+          </div>
+        )}
       </MobileLayout>
 
       {/* Source Selection Drawer */}
