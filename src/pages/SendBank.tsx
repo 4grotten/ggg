@@ -489,6 +489,13 @@ const SendBank = () => {
                   className={`h-14 rounded-2xl bg-secondary border-0 text-base ${fieldsReadOnly ? 'opacity-80' : ''}`}
                 />
               </div>
+              {recipientError && (
+                <div className="bg-destructive/10 rounded-2xl px-4 py-3">
+                  <p className="text-sm text-destructive font-medium">
+                    ⚠️ {recipientError}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
