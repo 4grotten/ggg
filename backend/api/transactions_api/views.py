@@ -20,7 +20,7 @@ from .serializers import (
     BankWithdrawalRequestSerializer, BankWithdrawalResponseSerializer,
     BankToCardTransferRequestSerializer, BankToCardTransferResponseSerializer,
     ErrorResponseSerializer, TransactionFullSerializer, TransferResponseSerializer,
-    CryptoWalletWithdrawalRequestSerializer, CryptoWalletWithdrawalResponseSerializer
+    CryptoWalletWithdrawalRequestSerializer, CryptoWalletWithdrawalResponseSerializer, ValidateFiatRecipientSerializer
 )
 from apps.transactions_apps.services import SettingsManager, TransactionService
 import logging
