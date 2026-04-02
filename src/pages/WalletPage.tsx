@@ -595,7 +595,8 @@ const WalletPage = () => {
                     .replace('{{network}}', newNetwork.toUpperCase())}
                 </p>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
+                    await queryClient.refetchQueries({ queryKey: ['crypto-wallets'] });
                     setOpenWalletDrawer(false);
                     setWalletStep('token');
                   }}
