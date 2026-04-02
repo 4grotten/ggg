@@ -280,6 +280,7 @@ const SendBank = () => {
         const result = await submitCryptoToBank(request);
 
         if (result.success) {
+          saveBankRecipient({ iban: iban.replace(/\s/g, ""), name: recipientName.trim(), bankName: bankName.trim() });
           toast.success(t("send.transferSuccess", "Перевод отправлен"));
           sendNotification({ title: t("notifications.transferSent") || "Перевод отправлен", body: t("send.transferSuccess", "Перевод отправлен"), type: "transaction" });
           queryClient.invalidateQueries({ queryKey: ["cards"] });
