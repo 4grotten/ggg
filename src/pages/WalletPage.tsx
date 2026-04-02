@@ -163,26 +163,25 @@ const WalletPage = () => {
           </>
         ) : !hasWallets ? (
           <motion.div
-            className="rounded-2xl border border-border bg-card p-5"
+            className="rounded-2xl border border-border bg-card p-6 text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <UsdtIcon size={22} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Крипто-кошельки не найдены</p>
-                <p className="text-xs text-muted-foreground">После первого создания они появятся здесь автоматически.</p>
+            <div className="flex justify-center mb-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Wallet className="w-7 h-7" />
               </div>
             </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              {t('walletPage.noWalletsYet', 'У вас пока нет криптокошельков')}
+            </p>
             <button
-              onClick={() => navigate("/top-up/crypto")}
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              onClick={() => setOpenWalletDrawer(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              <ArrowDownLeft className="h-4 w-4" />
-              {t('dashboard.topUp')}
+              <Plus className="h-4 w-4" />
+              {t('walletPage.openWallet', 'Открыть кошелёк')}
             </button>
           </motion.div>
         ) : (
