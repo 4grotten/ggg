@@ -659,28 +659,30 @@ const SendBank = () => {
           </div>
         </div>
 
-        {/* Fixed Continue Button */}
-        <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
-          <Button
-            onClick={handleNext}
-            disabled={!getStepValid() || isSubmitting || ibanLookupLoading}
-            className="w-full h-14 rounded-2xl text-base font-semibold bg-primary/90 hover:bg-primary active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
-          >
-            {(isSubmitting || ibanLookupLoading) ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                {ibanLookupLoading ? t("send.checkingIban", "Проверка IBAN...") : t("send.processing", "Обработка...")}
-              </span>
-            ) : step === 3 ? (
-              `${t("send.continue")} ${isWalletSource ? (parseFloat(amountAED || "0") * USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2 }) : parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
-            ) : (
-              <span className="flex items-center gap-2">
-                {t("send.continue")}
-                <ArrowRight className="w-5 h-5" />
-              </span>
-            )}
-          </Button>
-        </div>
+        {/* Fixed Continue Button — hidden on step 0 */}
+        {step > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 p-6 max-w-[800px] mx-auto">
+            <Button
+              onClick={handleNext}
+              disabled={!getStepValid() || isSubmitting || ibanLookupLoading}
+              className="w-full h-14 rounded-2xl text-base font-semibold bg-primary/90 hover:bg-primary active:scale-95 backdrop-blur-2xl border-2 border-white/50 shadow-lg transition-all"
+            >
+              {(isSubmitting || ibanLookupLoading) ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {ibanLookupLoading ? t("send.checkingIban", "Проверка IBAN...") : t("send.processing", "Обработка...")}
+                </span>
+              ) : step === 3 ? (
+                `${t("send.continue")} ${isWalletSource ? (parseFloat(amountAED || "0") * USDT_TO_AED_BUY).toLocaleString('en-US', { minimumFractionDigits: 2 }) : parseFloat(amountAED || "0").toLocaleString('en-US', { minimumFractionDigits: 2 })} AED`
+              ) : (
+                <span className="flex items-center gap-2">
+                  {t("send.continue")}
+                  <ArrowRight className="w-5 h-5" />
+                </span>
+              )}
+            </Button>
+          </div>
+        )}
       </MobileLayout>
 
       {/* Source Selection Drawer */}
