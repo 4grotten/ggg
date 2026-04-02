@@ -218,6 +218,7 @@ Deno.serve(async (req) => {
 
     const { response, data } = await fetchWithRetries(backendUrl, fetchOptions);
     let status = mapStatusForClient(response.status);
+    console.log(`[cards-proxy] ${req.method} ${endpoint} → ${response.status} body=${data.substring(0, 500)}`);
 
     if (response.status >= 502 && response.status <= 504) {
       return jsonOk({ error: "Backend temporarily unavailable", status: response.status });
