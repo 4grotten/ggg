@@ -467,6 +467,105 @@ const WalletPage = () => {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {/* Open Wallet Drawer */}
+      <Drawer open={openWalletDrawer} onOpenChange={setOpenWalletDrawer}>
+        <DrawerContent className="pb-8">
+          <div className="px-6 pt-4 pb-2 space-y-5">
+            <h3 className="text-lg font-bold">{t('walletPage.openWallet', 'Открыть кошелёк')}</h3>
+
+            {/* Token selection */}
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">{t('walletPage.selectToken', 'Выберите монету')}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {TOKENS_LIST.map((tk) => (
+                  <button
+                    key={tk.id}
+                    onClick={() => setNewToken(tk.id)}
+                    className={`flex items-center gap-2 p-3 rounded-xl border transition-colors ${
+                      newToken === tk.id
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border bg-secondary/50 hover:bg-secondary'
+                    }`}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: tk.color }}
+                    >
+                      <span className="text-white text-sm font-bold">{tk.symbol}</span>
+                    </div>
+                    <span className="font-medium text-sm">{tk.id}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Network selection */}
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">{t('walletPage.selectNetwork', 'Выберите сеть')}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {NETWORKS_LIST.map((net) => (
+                  <button
+                    key={net.id}
+                    onClick={() => setNewNetwork(net.id)}
+                    className={`flex items-center gap-2 p-3 rounded-xl border transition-colors ${
+                      newNetwork === net.id
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border bg-secondary/50 hover:bg-secondary'
+                    }`}
+                  >
+                    {getCryptoIcon(net.id, 20)}
+                    <span className="font-medium text-sm">{net.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {createError && (
+              <div className="bg-destructive/10 border border-destructive/30 rounded-2xl px-4 py-3 space-y-1">
+                <p className="text-sm text-destructive font-semibold">⚠️ Не удалось создать кошелёк</p>
+                <details className="mt-1">
+                  <summary className="text-[11px] text-muted-foreground cursor-pointer select-none">
+                    Системная информация
+                  </summary>
+                  <div className="mt-1 bg-muted/50 rounded-lg px-3 py-2 text-[11px] text-muted-foreground font-mono break-all space-y-0.5">
+                    <p>API: POST /transactions/topup/crypto/</p>
+                    <p>Error: {createError}</p>
+                  </div>
+                </details>
+              </div>
+            )}
+
+            <button
+              onClick={async () => {
+                setCreating(true);
+                setCreateError(null);
+                try {
+                  const result = await submitCryptoTopup({
+                    token: newToken,
+                    network: newNetwork.toUpperCase() as "TRC20" | "ERC20",
+                  });
+                  if (result.success) {
+                    toast.success(t('walletPage.walletCreated', 'Кошелёк успешно создан'));
+                    setOpenWalletDrawer(false);
+                    queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+                  } else {
+                    setCreateError(result.error || 'Unknown error');
+                  }
+                } catch (err: any) {
+                  setCreateError(err?.message || 'Network error');
+                } finally {
+                  setCreating(false);
+                }
+              }}
+              disabled={creating}
+              className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50 transition-opacity hover:opacity-90 active:scale-[0.98]"
+            >
+              {creating ? t('common.loading', 'Загрузка...') : t('walletPage.addWallet', 'Добавить')}
+            </button>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </MobileLayout>
   );
 };
