@@ -556,10 +556,7 @@ const WalletPage = () => {
                     setCreating(true);
                     setCreateError(null);
                     try {
-                      const result = await submitCryptoTopup({
-                        token: newToken,
-                        network: newNetwork.toUpperCase() as "TRC20" | "ERC20",
-                      });
+                      const result = await registerCryptoWallets();
                       if (result.success) {
                         queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
                         setWalletStep('success');
