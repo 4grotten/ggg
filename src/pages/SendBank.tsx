@@ -120,7 +120,7 @@ const SendBank = () => {
     return options;
   }, [cardsData, bankAccountsData, cryptoWalletsData, t]);
   
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [selectedSource, setSelectedSource] = useState<SourceOption | null>(null);
   const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
