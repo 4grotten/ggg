@@ -199,11 +199,7 @@ const WalletPage = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">{t('walletPage.cryptoWallet')}</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{walletToken}</p>
-                    {walletNetwork === "TRC20" && <TronIcon size={12} className="opacity-60" />}
-                    <span className="text-xs text-muted-foreground">{walletNetwork}</span>
-                  </div>
+                  <p className="text-sm font-medium">{walletToken}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
