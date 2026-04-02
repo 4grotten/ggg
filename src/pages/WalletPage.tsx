@@ -308,46 +308,50 @@ const WalletPage = () => {
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Список кошельков</h3>
                 <span className="text-xs text-muted-foreground">{cryptoWallets.length}</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {cryptoWallets.map((item) => {
                   const isSelected = item.id === wallet?.id;
                   const networkUpper = item.network?.toUpperCase() ?? "";
+                  const balance = formatBalance(parseFloat(String(item.balance ?? 0)));
                   return (
                     <button
                       key={item.id}
                       onClick={() => setSelectedWalletId(item.id)}
-                      className={`w-full rounded-xl border px-4 py-3 text-left transition-colors ${
+                      className={`w-full rounded-2xl border px-4 py-4 text-left transition-all ${
                         isSelected
-                          ? 'border-primary bg-primary/10'
-                          : 'border-border bg-background/60 hover:bg-background'
+                          ? 'border-primary bg-primary/10 shadow-sm'
+                          : 'border-border bg-card hover:bg-accent/50'
                       }`}
                     >
-                      <div className="mb-2">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.network', 'Сеть')}</p>
+                      {/* Header: network + balance */}
+                      <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          {getCryptoIcon(item.network?.toLowerCase() ?? '', 18)}
-                          <p className="text-sm font-semibold">{networkUpper}</p>
+                          {getCryptoIcon(item.network?.toLowerCase() ?? '', 20)}
+                          <span className="text-sm font-bold text-foreground">{item.token?.toUpperCase()}</span>
+                          <span className="text-xs rounded-md bg-muted px-2 py-0.5 text-muted-foreground font-medium">{networkUpper}</span>
                         </div>
+                        <span className="text-base font-bold text-foreground">${balance}</span>
                       </div>
-                      <div className="mb-2">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.walletAddress', 'Адрес кошелька')}</p>
+
+                      {/* Divider */}
+                      <div className="h-px bg-border/60 mb-3" />
+
+                      {/* Address */}
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t('walletPage.walletAddress', 'Адрес кошелька')}</p>
                         <div className="flex items-center gap-2">
-                          <p className="text-xs font-mono text-muted-foreground break-all flex-1">{item.address}</p>
+                          <p className="text-[11px] font-mono text-foreground/70 break-all flex-1 leading-relaxed">{item.address}</p>
                           <span
                             role="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               copyToClipboard(item.address);
                             }}
-                            className="flex-shrink-0 rounded-lg p-1.5 transition-colors hover:bg-background"
+                            className="flex-shrink-0 rounded-lg p-2 bg-primary/10 text-primary transition-colors hover:bg-primary/20"
                           >
-                            <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                            <Copy className="w-3.5 h-3.5" />
                           </span>
                         </div>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.currency', 'Валюта')}</p>
-                        <p className="text-sm font-bold">{formatBalance(parseFloat(String(item.balance ?? 0)))} {item.token?.toUpperCase()}</p>
                       </div>
                     </button>
                   );
