@@ -91,10 +91,8 @@ const SendBank = () => {
       });
     });
 
-    // Cards from API
-    const cards = cardsData?.data ?? [];
-    cards.forEach((card) => {
-      const last4 = (card as any).card_number?.slice(-4) || card.lastFourDigits || "****";
+    cards.forEach((card: any) => {
+      const last4 = card.card_number?.slice(-4) || card.lastFourDigits || "****";
       options.push({
         id: card.id,
         type: "card",
@@ -105,8 +103,6 @@ const SendBank = () => {
       });
     });
 
-    // Crypto wallets from API — all of them
-    const wallets = cryptoWalletsData?.data ?? [];
     wallets.forEach((wallet: any) => {
       const token = wallet.token || "USDT";
       const network = wallet.network || "TRC20";
