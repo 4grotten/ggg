@@ -270,8 +270,16 @@ const SendBank = () => {
         const cleanIban = iban.replace(/\s/g, "");
         const regResult = await registerAedRecipient(recipientName.trim(), cleanIban);
         if (!regResult.success) {
-          setRecipientError(t("send.changeIbanOrName", "Измените IBAN и/или Имя получателя"));
+          setRecipientError(regResult.error || t("send.changeIbanOrName", "Измените IBAN и/или Имя получателя"));
           return;
+        }
+        // Don't proceed if no source accounts available
+        if (sourceOptions.length === 0) {
+          setRecipientError(t("send.noSourceAccounts", "Нет доступных счетов для отправки. Пожалуйста, войдите в систему."));
+          return;
+        }
+        if (!selectedSource) {
+          setSelectedSource(sourceOptions[0]);
         }
         setStep(3);
       } catch {
