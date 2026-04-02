@@ -1095,7 +1095,7 @@ export const registerAedRecipient = async (
   iban: string
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    const result = await apiRequest<{ status: string; message: string }>(
+    const result = await apiRequest<{ status: string; message: string; detail?: string }>(
       `/transactions/register-aed-recipient/`,
       {
         method: 'POST',
@@ -1108,11 +1108,18 @@ export const registerAedRecipient = async (
       return { success: false, error: result.error.detail || result.error.message || 'Registration failed' };
     }
 
-    if (result.data?.status === 'created' || result.data?.status === 'exists') {
+    // Check for error hidden in 200 response (proxy maps 4xx→200)
+    const d = result.data as any;
+    if (d?.detail || d?.error) {
+      return { success: false, error: d.detail || d.error || 'Registration failed' };
+    }
+
+    if (d?.status === 'created' || d?.status === 'exists') {
       return { success: true };
     }
 
-    return { success: true };
+    // Unknown response shape — treat as failure
+    return { success: false, error: 'Unexpected response from server' };
   } catch (error) {
     console.error('[Transactions API] Register AED recipient failed:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Network error' };
