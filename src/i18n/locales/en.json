@@ -1040,7 +1040,9 @@
     "verifying": "Verifying address...",
     "dailyLimitExceeded": "Daily limit exceeded ({{limit}}). Available: {{available}}",
     "limitReachedTitle": "Daily limit reached",
-    "limitResetsIn": "Limit resets in"
+    "limitResetsIn": "Limit resets in",
+    "invalidRecipientTitle": "Recipient data is invalid",
+    "invalidRecipientDesc": "Please check the IBAN and recipient name, correct them and try again."
   },
   "drawer": {
     "addMoneyWith": "Add Money with",

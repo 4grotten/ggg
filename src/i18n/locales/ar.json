@@ -931,7 +931,9 @@
     "verifying": "جاري التحقق من العنوان...",
     "dailyLimitExceeded": "تم تجاوز الحد اليومي ({{limit}}). المتاح: {{available}}",
     "limitReachedTitle": "تم الوصول للحد اليومي",
-    "limitResetsIn": "يتجدد الحد خلال"
+    "limitResetsIn": "يتجدد الحد خلال",
+    "invalidRecipientTitle": "بيانات المستلم غير صالحة",
+    "invalidRecipientDesc": "يرجى التحقق من رقم IBAN واسم المستلم، وتصحيحهما والمحاولة مرة أخرى."
   },
   "drawer": {
     "addMoneyWith": "الشحن عبر",

@@ -931,7 +931,9 @@
     "verifying": "Adres doğrulanıyor...",
     "dailyLimitExceeded": "Günlük limit aşıldı ({{limit}}). Kullanılabilir: {{available}}",
     "limitReachedTitle": "Günlük limit aşıldı",
-    "limitResetsIn": "Limit yenilenme süresi"
+    "limitResetsIn": "Limit yenilenme süresi",
+    "invalidRecipientTitle": "Alıcı bilgileri geçersiz",
+    "invalidRecipientDesc": "Lütfen IBAN ve alıcı adını kontrol edin, düzeltin ve tekrar deneyin."
   },
   "drawer": {
     "addMoneyWith": "Şununla Yükle",

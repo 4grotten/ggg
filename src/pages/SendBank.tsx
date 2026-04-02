@@ -503,10 +503,10 @@ const SendBank = () => {
               {recipientError && (
                 <div className="bg-destructive/10 border border-destructive/30 rounded-2xl px-4 py-4 space-y-2">
                   <p className="text-sm text-destructive font-semibold">
-                    ⚠️ Данные получателя невалидны
+                    ⚠️ {t("send.invalidRecipientTitle", "Данные получателя невалидны")}
                   </p>
                   <p className="text-xs text-destructive/80">
-                    Проверьте правильность IBAN и имени получателя, исправьте и попробуйте снова.
+                    {t("send.invalidRecipientDesc", "Проверьте правильность IBAN и имени получателя, исправьте и попробуйте снова.")}
                   </p>
                 </div>
               )}
