@@ -1086,7 +1086,39 @@ export const submitBankWithdrawal = async (
 };
 
 // =============================================
-// INTERNAL TRANSFER (Swap between own accounts)
+// REGISTER AED RECIPIENT
+// POST /api/v1/transactions/register-aed-recipient/
+// =============================================
+
+export const registerAedRecipient = async (
+  businessName: string,
+  iban: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const result = await apiRequest<{ status: string; message: string }>(
+      `/transactions/register-aed-recipient/`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ business_name: businessName, iban }),
+      },
+      true
+    );
+
+    if (result.error) {
+      return { success: false, error: result.error.detail || result.error.message || 'Registration failed' };
+    }
+
+    if (result.data?.status === 'created' || result.data?.status === 'exists') {
+      return { success: true };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('[Transactions API] Register AED recipient failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
 // POST /api/v1/transactions/transfer/internal/
 // =============================================
 

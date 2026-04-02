@@ -19,7 +19,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useCards, useBankAccounts, useCryptoWallets } from "@/hooks/useCards";
-import { submitBankWithdrawal, submitCryptoToBank } from "@/services/api/transactions";
+import { submitBankWithdrawal, submitCryptoToBank, registerAedRecipient } from "@/services/api/transactions";
 import { submitInternalTransfer } from "@/services/api/transactions";
 import { getAuthToken } from "@/services/api/apiClient";
 import { useQueryClient } from "@tanstack/react-query";
@@ -258,7 +258,21 @@ const SendBank = () => {
     }
 
     if (step === 2) {
-      setStep(3);
+      // Register AED recipient in Xerime before proceeding
+      setIbanLookupLoading(true);
+      try {
+        const cleanIban = iban.replace(/\s/g, "");
+        const regResult = await registerAedRecipient(recipientName.trim(), cleanIban);
+        if (!regResult.success) {
+          toast.error(regResult.error || t("send.recipientRegistrationFailed", "Не удалось зарегистрировать получателя"));
+          return;
+        }
+        setStep(3);
+      } catch {
+        toast.error(t("send.recipientRegistrationFailed", "Не удалось зарегистрировать получателя"));
+      } finally {
+        setIbanLookupLoading(false);
+      }
       return;
     }
 
