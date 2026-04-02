@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Share2, QrCode, Clock, ArrowDownLeft, ArrowUpRight, CreditCard, ChevronRight, Wallet, Landmark } from "lucide-react";
+import { ArrowLeft, Copy, Share2, QrCode, Clock, ArrowDownLeft, ArrowUpRight, CreditCard, ChevronRight, Wallet, Landmark, Plus } from "lucide-react";
 import { ThemeSwitcher } from "@/components/dashboard/ThemeSwitcher";
 import { LanguageSwitcher } from "@/components/dashboard/LanguageSwitcher";
 import { motion } from "framer-motion";
@@ -8,22 +8,43 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileLayout } from "@/components/layout/MobileLayout";
-import { UsdtIcon, TronIcon } from "@/components/icons/CryptoIcons";
+import { UsdtIcon, TronIcon, getCryptoIcon } from "@/components/icons/CryptoIcons";
 import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { useMergedTransactionGroups, useCryptoTransactionGroups } from "@/hooks/useTransactions";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
+import { submitCryptoTopup } from "@/services/api/transactions";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
   DrawerContent,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 
+type TokenType = "USDT" | "USDC";
+type NetworkId = "trc20" | "erc20";
+
+const TOKENS_LIST: { id: TokenType; name: string; color: string; symbol: string }[] = [
+  { id: "USDT", name: "Tether USDT", color: "#26A17B", symbol: "₮" },
+  { id: "USDC", name: "USD Coin", color: "#2775CA", symbol: "$" },
+];
+
+const NETWORKS_LIST: { id: NetworkId; name: string }[] = [
+  { id: "trc20", name: "Tron (TRC20)" },
+  { id: "erc20", name: "Ethereum (ERC20)" },
+];
+
 const WalletPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [qrOpen, setQrOpen] = useState(false);
   const [sendDrawerOpen, setSendDrawerOpen] = useState(false);
+  const [openWalletDrawer, setOpenWalletDrawer] = useState(false);
+  const [newToken, setNewToken] = useState<TokenType>("USDT");
+  const [newNetwork, setNewNetwork] = useState<NetworkId>("trc20");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
   const { data: transactionsData, isLoading: transactionsLoading } = useMergedTransactionGroups();
   const { data: cryptoApiGroups, isLoading: cryptoApiLoading } = useCryptoTransactionGroups();
