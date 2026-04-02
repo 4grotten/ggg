@@ -18,9 +18,8 @@ class CryptoTopupRequestSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, help_text="Сумма (опционально)")
 
 class CryptoTopupResponseSerializer(serializers.Serializer):
-    message = serializers.CharField(default="Заявка на пополнение создана")
-    transaction_id = serializers.UUIDField()
-    metadata = serializers.DictField()
+    message = serializers.CharField(default="Реквизиты для пополнения получены")
+    metadata = serializers.DictField(help_text="Адрес, QR-код и минимальная сумма")
 
 class CardTransferRequestSerializer(serializers.Serializer):
     sender_card_id = serializers.UUIDField(help_text="ID карты отправителя (ваша карта)")
@@ -430,3 +429,14 @@ class AdminTransactionSerializerDirect(serializers.ModelSerializer):
             return f"{float(value):,.2f}"
         except (ValueError, TypeError):
             return '0.00'
+        
+
+class ValidateFiatRecipientSerializer(serializers.Serializer):
+    iban = serializers.CharField(max_length=34, help_text="IBAN номер счета (начинается с AE)")
+    beneficiary_name = serializers.CharField(max_length=255, help_text="Полное имя получателя или название компании")
+    bank_name = serializers.CharField(max_length=255, required=False, allow_blank=True, default="UAE Bank")
+
+    def validate_iban(self, value):
+        if not value.startswith('AE') or len(value) != 23:
+            raise serializers.ValidationError("Неверный формат UAE IBAN (должен начинаться с AE и содержать 23 символа).")
+        return value

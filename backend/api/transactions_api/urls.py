@@ -51,4 +51,7 @@ urlpatterns = [
 
     path('crypto-wallets/register/', views.RegisterCryptoWalletView.as_view(), name='register-crypto-wallets'),
 
+    path('fiat/recipients/validate/', views.ValidateFiatRecipientView.as_view(), name='fiat-recipient-validate'),
+    path('fiat/recipients/saved/', views.SavedFiatRecipientsView.as_view(), name='fiat-recipients-saved'),
+
 ]

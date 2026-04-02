@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.db import transaction
 from django.db.models import Sum
 from .models import (
-    Transactions, TopupsBank, TopupsCrypto, CardTransfers, 
+    SavedFiatRecipients, Transactions, TopupsBank, TopupsCrypto, CardTransfers, 
     CryptoWithdrawals, BankWithdrawals, BalanceMovements,
     BankDepositAccounts, CryptoWallets, FeeRevenue
 )
@@ -297,29 +297,64 @@ class TransactionService:
 
     @staticmethod
     @transaction.atomic
-    def execute_fiat_withdrawal(sender_id, account_id, iban, amount, business_name):
+    def execute_fiat_withdrawal(sender_id, iban, amount, business_name, from_card_id=None, from_bank_account_id=None):
         user_id_str = str(sender_id)
-        account = BankDepositAccounts.objects.select_for_update().get(id=account_id, user_id=user_id_str)
         amount_decimal = Decimal(str(amount))
+        
+        source_model = None
+        source_id_str = None
 
-        if account.balance < amount_decimal:
-            raise ValueError("Недостаточно средств на банковском счете.")
+        # 1. Локальное списание с правильного источника
+        if from_bank_account_id:
+            account = BankDepositAccounts.objects.select_for_update().filter(id=from_bank_account_id, user_id=user_id_str).first()
+            if not account or account.balance < amount_decimal:
+                raise ValueError("Недостаточно средств на банковском счете.")
+            account.balance -= amount_decimal
+            account.save()
+            source_model = 'bank_account'
+            source_id_str = str(account.id)
+            
+        elif from_card_id:
+            from apps.cards_apps.models import Cards # Убедись, что импорт правильный
+            card = Cards.objects.select_for_update().filter(id=from_card_id, user_id=user_id_str).first()
+            if not card or card.balance < amount_decimal:
+                raise ValueError("Недостаточно средств на карте.")
+            card.balance -= amount_decimal
+            card.save()
+            source_model = 'card'
+            source_id_str = str(card.id)
+        else:
+            raise ValueError("Не указан источник списания.")
+
+        # 2. Проверка: внутренний ли это перевод?
         dest_account = BankDepositAccounts.objects.filter(iban=iban).first()
         is_internal = dest_account is not None
 
+        # 3. Интеграция Xerime
         try:
             XerimeClient.register_aed_recipient(merchant_id=user_id_str, business_name=business_name, iban=iban)
         except Exception as e:
             raise ValueError(f"Ошибка регистрации IBAN в Xerime: {str(e)}")
+
         try:
             withdrawal_data = XerimeClient.create_fiat_withdrawal(
-                merchant_id=user_id_str, amount=amount, iban=iban, currency="AED"
+                merchant_id=user_id_str, amount=amount_decimal, iban=iban, currency="AED"
             )
         except Exception as e:
             raise ValueError(f"Ошибка провайдера при выводе фиата: {str(e)}")
 
-        account.balance -= amount_decimal
-        account.save()
+        # 4. Сохранение получателя в БД (для Рината)
+        from .models import SavedFiatRecipients
+        SavedFiatRecipients.objects.get_or_create(
+            user_id=user_id_str,
+            iban=iban,
+            defaults={
+                'beneficiary_name': business_name,
+                'bank_name': 'Bank Transfer'
+            }
+        )
+
+        # 5. Запись красивой транзакции в историю
         receiver_id = str(dest_account.user_id) if is_internal else "EXTERNAL_IBAN"
         receiver_name = TransactionService._get_user_full_name(dest_account.user_id) if is_internal else iban
 
@@ -335,7 +370,7 @@ class TransactionService:
             metadata={
                 "external_reference": withdrawal_data.get("external_reference"),
                 "xerime_status": withdrawal_data.get("status"),
-                "from_account_id": str(account.id),
+                f"from_{source_model}_id": source_id_str,
                 "is_internal": is_internal
             }
         )
@@ -379,6 +414,7 @@ class TransactionService:
     def initiate_crypto_topup(user_id, token, network, amount=None):
         user_id_str = str(user_id)
         crypto_wallet = CryptoWallets.objects.filter(user_id=user_id_str, token=token, network=network).first()
+        
         if not crypto_wallet:
             TransactionService.generate_crypto_wallets_for_user(user_id)
             crypto_wallet = CryptoWallets.objects.filter(user_id=user_id_str, token=token, network=network).first()
@@ -387,37 +423,16 @@ class TransactionService:
                 raise ValueError(f"Криптокошелек для сети {network} не найден и не удалось сгенерировать.")
 
         min_amount = SettingsManager.get_setting('limits', 'top_up_crypto_min', Decimal('10.00'), user_id)
-        amount_decimal = Decimal(str(amount)) if amount else Decimal('0.00')
 
         metadata = {
             "crypto_token": token,
             "crypto_network": network,
-            "crypto_address": crypto_wallet.address
+            "crypto_address": crypto_wallet.address,
+            "qr_payload": f"{token.lower()}:{crypto_wallet.address}",
+            "min_amount": float(min_amount)
         }
-        txn = Transactions.objects.create(
-            user_id=user_id_str, 
-            sender_id='EXTERNAL', 
-            receiver_id=user_id_str,
-            sender_name="Crypto Network", 
-            receiver_name=TransactionService._get_user_full_name(user_id),
-            type='crypto_deposit', 
-            status='pending', 
-            amount=amount_decimal, 
-            currency=token, 
-            metadata=metadata
-        )
-        TopupsCrypto.objects.create(
-            transaction=txn, 
-            user_id=user_id_str, 
-            token=token, 
-            network=network,
-            deposit_address=crypto_wallet.address, 
-            address_provider="easycard_internal",
-            qr_payload=f"{token.lower()}:{crypto_wallet.address}", 
-            min_amount=min_amount
-        )
         
-        return txn
+        return metadata
     
     @staticmethod
     @transaction.atomic

@@ -222,3 +222,18 @@ class FeeRevenue(models.Model):
             models.Index(fields=['user_id']),
             models.Index(fields=['created_at']),
         ]
+
+
+class SavedFiatRecipients(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=255, db_index=True)
+    iban = models.CharField(max_length=34)
+    beneficiary_name = models.CharField(max_length=255)
+    bank_name = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'saved_fiat_recipients'
+        unique_together = ('user_id', 'iban')
+        ordering = ['-created_at']

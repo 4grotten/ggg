@@ -10,7 +10,7 @@ from django.db.models import Sum, Count
 from django.db.models.functions import TruncDate
 from apps.cards_apps.models import Cards
 from apps.accounts_apps.models import Profiles
-from apps.transactions_apps.models import FeeRevenue, Transactions, BankDepositAccounts, CryptoWallets
+from apps.transactions_apps.models import FeeRevenue, SavedFiatRecipients, Transactions, BankDepositAccounts, CryptoWallets
 from decimal import Decimal
 from .serializers import (
     AdminTransactionSerializerDirect, BankToCryptoTransferSerializer, BankTopupRequestSerializer, BankTopupResponseSerializer, CardToBankTransferSerializer, CardToCryptoTransferSerializer, CryptoToBankTransferSerializer, CryptoToCardTransferSerializer,
@@ -244,27 +244,25 @@ class CryptoTopupView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
     @swagger_auto_schema(
-        operation_summary="Инициация пополнения криптой", 
+        operation_summary="Получение реквизитов пополнения криптой (без создания транзакции)", 
         request_body=CryptoTopupRequestSerializer, 
-        responses={201: CryptoTopupResponseSerializer, 400: ErrorResponseSerializer}, 
+        responses={200: CryptoTopupResponseSerializer, 400: ErrorResponseSerializer}, 
         tags=["Topups (Пополнения)"]
     )
-
     def post(self, request):
         serializer = CryptoTopupRequestSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                txn = TransactionService.initiate_crypto_topup(
+                metadata = TransactionService.initiate_crypto_topup(
                     user_id=request.user.id, 
                     token=serializer.validated_data['token'], 
                     network=serializer.validated_data['network'],
                     amount=serializer.validated_data.get('amount')
                 )
                 return Response({
-                    "message": "Заявка на пополнение создана",
-                    "transaction_id": txn.id,
-                    "metadata": txn.metadata
-                }, status=status.HTTP_201_CREATED)
+                    "message": "Реквизиты для пополнения получены",
+                    "metadata": metadata
+                }, status=status.HTTP_200_OK)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -303,17 +301,23 @@ class BankWithdrawalView(APIView):
         serializer = BankWithdrawalRequestSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                withdrawal = TransactionService.execute_bank_withdrawal(
-                    user_id=request.user.id,
-                    card_id=serializer.validated_data.get('from_card_id'),
-                    bank_account_id=serializer.validated_data.get('from_bank_account_id'),
+                transaction_record = TransactionService.execute_fiat_withdrawal(
+                    sender_id=request.user.id,
                     iban=serializer.validated_data['iban'],
-                    beneficiary_name=serializer.validated_data['beneficiary_name'],
-                    bank_name=serializer.validated_data['bank_name'],
-                    amount_aed=serializer.validated_data['amount_aed']
+                    amount=serializer.validated_data['amount_aed'],
+                    business_name=serializer.validated_data['beneficiary_name'],
+                    from_card_id=serializer.validated_data.get('from_card_id'),
+                    from_bank_account_id=serializer.validated_data.get('from_bank_account_id')
                 )
-                return Response({"message": "Bank wire processing", "transaction_id": withdrawal.transaction.id, "fee_amount": withdrawal.fee_amount, "total_debit_aed": withdrawal.total_debit}, status=status.HTTP_200_OK)
-            except ValueError as e: return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    "reference_id": transaction_record.reference_id,
+                    "fiat_amount": str(transaction_record.amount),
+                    "fiat_currency": "AED",
+                    "status": "pending",
+                    "message": "Fiat withdrawal processing"
+                }, status=status.HTTP_202_ACCEPTED)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -989,3 +993,80 @@ class RegisterCryptoWalletView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": f"Ошибка генерации кошелька: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+class ValidateFiatRecipientView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Шаг 1-2: Валидация нового получателя AED (Xerime)",
+        operation_description="Отправляет IBAN и Имя в Xerime. Возвращает 200 OK, если данные верны и можно идти на шаг 3.",
+        request_body=ValidateFiatRecipientSerializer,
+        tags=["Withdrawals (Выводы)"]
+    )
+    def post(self, request):
+        serializer = ValidateFiatRecipientSerializer(data=request.data)
+        if serializer.is_valid():
+            iban = serializer.validated_data['iban']
+            name = serializer.validated_data['beneficiary_name']
+            try:
+                # Регистрация/проверка IBAN в Xerime
+                result = XerimeClient.register_aed_recipient(
+                    merchant_id=str(request.user.id),
+                    business_name=name,
+                    iban=iban
+                )
+                return Response({
+                    "message": "Получатель успешно проверен",
+                    "xerime_status": result.get("status", "ok")
+                }, status=status.HTTP_200_OK)
+            except Exception as e:
+                # Xerime вернул ошибку валидации (неверный банк и тп)
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SavedFiatRecipientsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Получить список сохраненных получателей AED",
+        tags=["Withdrawals (Выводы)"]
+    )
+    def get(self, request):
+        recipients = SavedFiatRecipients.objects.filter(
+            user_id=str(request.user.id), 
+            is_active=True
+        )
+        data = [{
+            "id": r.id,
+            "iban": r.iban,
+            "beneficiary_name": r.beneficiary_name,
+            "bank_name": r.bank_name
+        } for r in recipients]
+        
+        return Response(data, status=status.HTTP_200_OK)
+    
+
+class SavedFiatRecipientsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Получить список сохраненных получателей AED",
+        tags=["Withdrawals (Выводы)"]
+    )
+    def get(self, request):
+        recipients = SavedFiatRecipients.objects.filter(
+            user_id=str(request.user.id), 
+            is_active=True
+        )
+        data = [{
+            "id": r.id,
+            "iban": r.iban,
+            "beneficiary_name": r.beneficiary_name,
+            "bank_name": r.bank_name
+        } for r in recipients]
+        
+        return Response(data, status=status.HTTP_200_OK)
