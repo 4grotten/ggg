@@ -299,7 +299,7 @@ async function sendTelegramMessage(botToken: string, chatId: string, text: strin
 async function sendTelegramDocument(botToken: string, chatId: string, fileBytes: Uint8Array, fileName: string, caption: string) {
   const formData = new FormData();
   formData.append("chat_id", chatId);
-  formData.append("document", new Blob([fileBytes], { type: "text/html" }), fileName);
+  formData.append("document", new Blob([fileBytes as unknown as BlobPart], { type: "text/html" }), fileName);
   formData.append("caption", caption);
 
   await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
