@@ -156,9 +156,8 @@ export const BalanceCard = ({ balance, currency = "AED", cards = [], usdtBalance
             <div className="flex items-center gap-1.5 mb-1">
               <UsdtIcon size={14} />
               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-                USDT TRC20<span className="ml-1 opacity-60">•TRC20</span>
+                {t("walletPage.cryptoWallet", "Крипто кошелёк")} USDT
               </p>
-              <TronIcon size={10} className="opacity-50" />
             </div>
             <AnimatePresence mode="wait">
               <motion.span

@@ -199,11 +199,7 @@ const WalletPage = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">{t('walletPage.cryptoWallet')}</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{walletToken}</p>
-                    {walletNetwork === "TRC20" && <TronIcon size={12} className="opacity-60" />}
-                    <span className="text-xs text-muted-foreground">{walletNetwork}</span>
-                  </div>
+                  <p className="text-sm font-medium">{walletToken}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -315,6 +311,7 @@ const WalletPage = () => {
               <div className="space-y-2">
                 {cryptoWallets.map((item) => {
                   const isSelected = item.id === wallet?.id;
+                  const networkUpper = item.network?.toUpperCase() ?? "";
                   return (
                     <button
                       key={item.id}
@@ -325,12 +322,32 @@ const WalletPage = () => {
                           : 'border-border bg-background/60 hover:bg-background'
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-medium">{item.token?.toUpperCase()} {item.network?.toUpperCase()}</p>
-                          <p className="text-xs text-muted-foreground font-mono">{shortenAddress(item.address)}</p>
+                      <div className="mb-2">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.network', 'Сеть')}</p>
+                        <div className="flex items-center gap-2">
+                          {getCryptoIcon(item.network?.toLowerCase() ?? '', 18)}
+                          <p className="text-sm font-semibold">{networkUpper}</p>
                         </div>
-                        <p className="text-sm font-semibold">{formatBalance(parseFloat(String(item.balance ?? 0)))}</p>
+                      </div>
+                      <div className="mb-2">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.walletAddress', 'Адрес кошелька')}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-mono text-muted-foreground break-all flex-1">{item.address}</p>
+                          <span
+                            role="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copyToClipboard(item.address);
+                            }}
+                            className="flex-shrink-0 rounded-lg p-1.5 transition-colors hover:bg-background"
+                          >
+                            <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">{t('walletPage.currency', 'Валюта')}</p>
+                        <p className="text-sm font-bold">{formatBalance(parseFloat(String(item.balance ?? 0)))} {item.token?.toUpperCase()}</p>
                       </div>
                     </button>
                   );
@@ -338,46 +355,6 @@ const WalletPage = () => {
               </div>
             </motion.div>
 
-            <motion.div
-              className="rounded-2xl bg-secondary/50 p-5 space-y-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-            >
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('walletPage.walletDetails')}</h3>
-
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('walletPage.network')}</p>
-                  <div className="mt-0.5 flex items-center gap-2">
-                    {walletNetwork === "TRC20" && <TronIcon size={16} />}
-                    <p className="text-sm font-medium">{walletNetwork}</p>
-                  </div>
-                </div>
-
-                <div className="h-px bg-border/50" />
-
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-muted-foreground">{t('walletPage.walletAddress')}</p>
-                    <p className="mt-0.5 break-all font-mono text-sm font-medium">{walletAddress}</p>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(walletAddress)}
-                    className="flex-shrink-0 rounded-lg p-2 transition-colors hover:bg-background"
-                  >
-                    <Copy className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
-
-                <div className="h-px bg-border/50" />
-
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('walletPage.currency')}</p>
-                  <p className="text-sm font-medium">{walletToken}</p>
-                </div>
-              </div>
-            </motion.div>
           </>
         )}
 
@@ -595,7 +572,8 @@ const WalletPage = () => {
                     .replace('{{network}}', newNetwork.toUpperCase())}
                 </p>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
+                    await queryClient.refetchQueries({ queryKey: ['crypto-wallets'] });
                     setOpenWalletDrawer(false);
                     setWalletStep('token');
                   }}
