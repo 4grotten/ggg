@@ -262,16 +262,17 @@ const SendBank = () => {
     if (step === 2) {
       // Register AED recipient in Xerime before proceeding
       setIbanLookupLoading(true);
+      setRecipientError("");
       try {
         const cleanIban = iban.replace(/\s/g, "");
         const regResult = await registerAedRecipient(recipientName.trim(), cleanIban);
         if (!regResult.success) {
-          toast.error(regResult.error || t("send.recipientRegistrationFailed", "Не удалось зарегистрировать получателя"));
+          setRecipientError(t("send.changeIbanOrName", "Измените IBAN и/или Имя получателя"));
           return;
         }
         setStep(3);
       } catch {
-        toast.error(t("send.recipientRegistrationFailed", "Не удалось зарегистрировать получателя"));
+        setRecipientError(t("send.changeIbanOrName", "Измените IBAN и/или Имя получателя"));
       } finally {
         setIbanLookupLoading(false);
       }
