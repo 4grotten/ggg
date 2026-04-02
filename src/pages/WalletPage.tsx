@@ -41,6 +41,7 @@ const WalletPage = () => {
   const [qrOpen, setQrOpen] = useState(false);
   const [sendDrawerOpen, setSendDrawerOpen] = useState(false);
   const [openWalletDrawer, setOpenWalletDrawer] = useState(false);
+  const [walletStep, setWalletStep] = useState<'token' | 'network' | 'success'>('token');
   const [newToken, setNewToken] = useState<TokenType>("USDT");
   const [newNetwork, setNewNetwork] = useState<NetworkId>("trc20");
   const [creating, setCreating] = useState(false);
@@ -469,100 +470,144 @@ const WalletPage = () => {
       </Drawer>
 
       {/* Open Wallet Drawer */}
-      <Drawer open={openWalletDrawer} onOpenChange={setOpenWalletDrawer}>
+      <Drawer open={openWalletDrawer} onOpenChange={(open) => {
+        setOpenWalletDrawer(open);
+        if (!open) {
+          setWalletStep('token');
+          setCreateError(null);
+        }
+      }}>
         <DrawerContent className="pb-8">
           <div className="px-6 pt-4 pb-2 space-y-5">
-            <h3 className="text-lg font-bold">{t('walletPage.openWallet', 'Открыть кошелёк')}</h3>
-
-            {/* Token selection */}
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">{t('walletPage.selectToken', 'Выберите монету')}</p>
-              <div className="grid grid-cols-2 gap-2">
-                {TOKENS_LIST.map((tk) => (
-                  <button
-                    key={tk.id}
-                    onClick={() => setNewToken(tk.id)}
-                    className={`flex items-center gap-2 p-3 rounded-xl border transition-colors ${
-                      newToken === tk.id
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border bg-secondary/50 hover:bg-secondary'
-                    }`}
-                  >
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: tk.color }}
+            {walletStep === 'token' && (
+              <>
+                <h3 className="text-lg font-bold">{t('walletPage.selectToken', 'Выберите монету')}</h3>
+                <div className="space-y-2">
+                  {TOKENS_LIST.map((tk) => (
+                    <button
+                      key={tk.id}
+                      onClick={() => {
+                        setNewToken(tk.id);
+                        setWalletStep('network');
+                      }}
+                      className="w-full flex items-center gap-3 p-4 rounded-xl border border-border bg-secondary/50 hover:bg-secondary transition-colors group"
                     >
-                      <span className="text-white text-sm font-bold">{tk.symbol}</span>
-                    </div>
-                    <span className="font-medium text-sm">{tk.id}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Network selection */}
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">{t('walletPage.selectNetwork', 'Выберите сеть')}</p>
-              <div className="grid grid-cols-2 gap-2">
-                {NETWORKS_LIST.map((net) => (
-                  <button
-                    key={net.id}
-                    onClick={() => setNewNetwork(net.id)}
-                    className={`flex items-center gap-2 p-3 rounded-xl border transition-colors ${
-                      newNetwork === net.id
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border bg-secondary/50 hover:bg-secondary'
-                    }`}
-                  >
-                    {getCryptoIcon(net.id, 20)}
-                    <span className="font-medium text-sm">{net.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {createError && (
-              <div className="bg-destructive/10 border border-destructive/30 rounded-2xl px-4 py-3 space-y-1">
-                <p className="text-sm text-destructive font-semibold">⚠️ Не удалось создать кошелёк</p>
-                <details className="mt-1">
-                  <summary className="text-[11px] text-muted-foreground cursor-pointer select-none">
-                    Системная информация
-                  </summary>
-                  <div className="mt-1 bg-muted/50 rounded-lg px-3 py-2 text-[11px] text-muted-foreground font-mono break-all space-y-0.5">
-                    <p>API: POST /transactions/topup/crypto/</p>
-                    <p>Error: {createError}</p>
-                  </div>
-                </details>
-              </div>
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: tk.color }}
+                      >
+                        <span className="text-white text-base font-bold">{tk.symbol}</span>
+                      </div>
+                      <div className="text-left flex-1">
+                        <p className="font-semibold text-sm">{tk.id}</p>
+                        <p className="text-xs text-muted-foreground">{tk.name}</p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
 
-            <button
-              onClick={async () => {
-                setCreating(true);
-                setCreateError(null);
-                try {
-                  const result = await submitCryptoTopup({
-                    token: newToken,
-                    network: newNetwork.toUpperCase() as "TRC20" | "ERC20",
-                  });
-                  if (result.success) {
-                    toast.success(t('walletPage.walletCreated', 'Кошелёк успешно создан'));
+            {walletStep === 'network' && (
+              <>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setWalletStep('token')} className="p-1">
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
+                  <h3 className="text-lg font-bold">
+                    {t('walletPage.selectNetwork', 'Выберите сеть')} — {newToken}
+                  </h3>
+                </div>
+                <div className="space-y-2">
+                  {NETWORKS_LIST.map((net) => (
+                    <button
+                      key={net.id}
+                      onClick={() => setNewNetwork(net.id)}
+                      className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+                        newNetwork === net.id
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border bg-secondary/50 hover:bg-secondary'
+                      }`}
+                    >
+                      {getCryptoIcon(net.id, 24)}
+                      <span className="font-medium text-sm">{net.name}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {createError && (
+                  <div className="bg-destructive/10 border border-destructive/30 rounded-2xl px-4 py-3 space-y-1">
+                    <p className="text-sm text-destructive font-semibold">⚠️ Не удалось создать кошелёк</p>
+                    <details className="mt-1">
+                      <summary className="text-[11px] text-muted-foreground cursor-pointer select-none">
+                        Системная информация
+                      </summary>
+                      <div className="mt-1 bg-muted/50 rounded-lg px-3 py-2 text-[11px] text-muted-foreground font-mono break-all space-y-0.5">
+                        <p>API: POST /transactions/topup/crypto/</p>
+                        <p>Error: {createError}</p>
+                      </div>
+                    </details>
+                  </div>
+                )}
+
+                <button
+                  onClick={async () => {
+                    setCreating(true);
+                    setCreateError(null);
+                    try {
+                      const result = await submitCryptoTopup({
+                        token: newToken,
+                        network: newNetwork.toUpperCase() as "TRC20" | "ERC20",
+                      });
+                      if (result.success) {
+                        queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
+                        setWalletStep('success');
+                      } else {
+                        setCreateError(result.error || 'Unknown error');
+                      }
+                    } catch (err: any) {
+                      setCreateError(err?.message || 'Network error');
+                    } finally {
+                      setCreating(false);
+                    }
+                  }}
+                  disabled={creating}
+                  className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50 transition-opacity hover:opacity-90 active:scale-[0.98]"
+                >
+                  {creating ? t('common.loading', 'Загрузка...') : t('walletPage.addWallet', 'Добавить')}
+                </button>
+              </>
+            )}
+
+            {walletStep === 'success' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center py-4 space-y-4"
+              >
+                <div className="w-16 h-16 rounded-full bg-green-500/15 flex items-center justify-center">
+                  <span className="text-4xl">🎉</span>
+                </div>
+                <h3 className="text-lg font-bold text-center">
+                  {t('walletPage.walletCreatedTitle', 'Поздравляем!')}
+                </h3>
+                <p className="text-sm text-muted-foreground text-center">
+                  {t('walletPage.walletCreatedDesc', 'Ваш кошелёк {{token}} ({{network}}) успешно создан')
+                    .replace('{{token}}', newToken)
+                    .replace('{{network}}', newNetwork.toUpperCase())}
+                </p>
+                <button
+                  onClick={() => {
                     setOpenWalletDrawer(false);
-                    queryClient.invalidateQueries({ queryKey: ['crypto-wallets'] });
-                  } else {
-                    setCreateError(result.error || 'Unknown error');
-                  }
-                } catch (err: any) {
-                  setCreateError(err?.message || 'Network error');
-                } finally {
-                  setCreating(false);
-                }
-              }}
-              disabled={creating}
-              className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50 transition-opacity hover:opacity-90 active:scale-[0.98]"
-            >
-              {creating ? t('common.loading', 'Загрузка...') : t('walletPage.addWallet', 'Добавить')}
-            </button>
+                    setWalletStep('token');
+                  }}
+                  className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-opacity hover:opacity-90 active:scale-[0.98]"
+                >
+                  {t('walletPage.goToWallet', 'Перейти к кошельку')}
+                </button>
+              </motion.div>
+            )}
           </div>
         </DrawerContent>
       </Drawer>
