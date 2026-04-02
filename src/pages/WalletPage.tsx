@@ -13,7 +13,7 @@ import { CardTransactionsList } from "@/components/card/CardTransactionsList";
 import { useMergedTransactionGroups, useCryptoTransactionGroups } from "@/hooks/useTransactions";
 import { useCryptoWallets } from "@/hooks/useCards";
 import { Skeleton } from "@/components/ui/skeleton";
-import { submitCryptoTopup } from "@/services/api/transactions";
+import { registerCryptoWallets } from "@/services/api/transactions";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Drawer,
