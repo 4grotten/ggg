@@ -207,7 +207,30 @@ const SendBank = () => {
   const isStep2Valid = recipientName.trim().length >= 2 && bankName.trim().length >= 2;
   const isStep3Valid = parseFloat(amountAED) > 0 && parseFloat(totalAmount) <= (isWalletSource ? availableBalance : availableBalanceAed);
 
+  const handleSelectRecipient = (recipient: BankRecipient) => {
+    setIban(formatIban(recipient.iban));
+    setRecipientName(recipient.name);
+    setBankName(recipient.bankName);
+    setFieldsReadOnly(true);
+    setIsSystemIban(true);
+    setStep(3); // skip to amount
+  };
+
+  const handleAddNewRecipient = () => {
+    setIban("");
+    setRecipientName("");
+    setBankName("");
+    setFieldsReadOnly(false);
+    setIsSystemIban(false);
+    setStep(1);
+  };
+
   const handleNext = useCallback(async () => {
+    if (step === 0) {
+      handleAddNewRecipient();
+      return;
+    }
+
     // Step 1 → check IBAN in the system before moving to step 2
     if (step === 1) {
       setIbanLookupLoading(true);
