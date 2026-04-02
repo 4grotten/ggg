@@ -78,6 +78,19 @@ const SendBank = () => {
   const sourceOptions = useMemo<SourceOption[]>(() => {
     const options: SourceOption[] = [];
 
+    // Bank accounts from API — all of them
+    const banks = bankAccountsData?.data ?? [];
+    banks.forEach((bank: any) => {
+      const ibanLast = bank.iban?.slice(-4) || "0000";
+      options.push({
+        id: bank.id,
+        type: "bank",
+        name: t("send.bankAccountAed", "Банковский счёт AED"),
+        subtitle: `IBAN •••• ${ibanLast}`,
+        balance: parseFloat(bank.balance || "0"),
+      });
+    });
+
     // Cards from API
     const cards = cardsData?.data ?? [];
     cards.forEach((card) => {
@@ -92,30 +105,19 @@ const SendBank = () => {
       });
     });
 
-    // Bank account from API
-    const bank = bankAccountsData?.data?.[0];
-    if (bank) {
-      const ibanLast = bank.iban?.slice(-4) || "0000";
-      options.push({
-        id: bank.id,
-        type: "bank",
-        name: t("send.bankAccountAed", "Банковский счёт AED"),
-        subtitle: `IBAN •••• ${ibanLast}`,
-        balance: parseFloat(bank.balance || "0"),
-      });
-    }
-
-    // Crypto wallet from API
-    const wallet = cryptoWalletsData?.data?.[0];
-    if (wallet) {
+    // Crypto wallets from API — all of them
+    const wallets = cryptoWalletsData?.data ?? [];
+    wallets.forEach((wallet: any) => {
+      const token = wallet.token || "USDT";
+      const network = wallet.network || "TRC20";
       options.push({
         id: wallet.id,
         type: "wallet",
-        name: t("drawer.usdtBalance", "USDT TRC20 Кошелек"),
-        subtitle: "TRC20",
+        name: `${token} ${network}`,
+        subtitle: network,
         balance: parseFloat(wallet.balance || "0"),
       });
-    }
+    });
 
     return options;
   }, [cardsData, bankAccountsData, cryptoWalletsData, t]);
