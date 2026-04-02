@@ -508,6 +508,15 @@ const SendBank = () => {
                   <p className="text-xs text-destructive/80">
                     {t("send.invalidRecipientDesc", "Проверьте правильность IBAN и имени получателя, исправьте и попробуйте снова.")}
                   </p>
+                  <details className="mt-1">
+                    <summary className="text-[11px] text-muted-foreground cursor-pointer select-none">
+                      Системная информация
+                    </summary>
+                    <div className="mt-1 bg-muted/50 rounded-lg px-3 py-2 text-[11px] text-muted-foreground font-mono break-all space-y-0.5">
+                      <p>API: POST /transactions/register-aed-recipient/</p>
+                      <p>Error: {recipientError}</p>
+                    </div>
+                  </details>
                 </div>
               )}
             </div>
