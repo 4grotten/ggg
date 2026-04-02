@@ -156,6 +156,10 @@ const SendBank = () => {
   const [recipientName, setRecipientName] = useState("");
   const [bankName, setBankName] = useState("");
   const [fieldsReadOnly, setFieldsReadOnly] = useState(false);
+  const [recipientError, setRecipientError] = useState("");
+
+  // Step 3: Comment
+  const [comment, setComment] = useState("");
   
   // Step 3: Amount (in USDT when wallet, in AED otherwise)
   const [amountAED, setAmountAED] = useState("");
@@ -258,16 +262,17 @@ const SendBank = () => {
     if (step === 2) {
       // Register AED recipient in Xerime before proceeding
       setIbanLookupLoading(true);
+      setRecipientError("");
       try {
         const cleanIban = iban.replace(/\s/g, "");
         const regResult = await registerAedRecipient(recipientName.trim(), cleanIban);
         if (!regResult.success) {
-          toast.error(regResult.error || t("send.recipientRegistrationFailed", "Не удалось зарегистрировать получателя"));
+          setRecipientError(t("send.changeIbanOrName", "Измените IBAN и/или Имя получателя"));
           return;
         }
         setStep(3);
       } catch {
-        toast.error(t("send.recipientRegistrationFailed", "Не удалось зарегистрировать получателя"));
+        setRecipientError(t("send.changeIbanOrName", "Измените IBAN и/или Имя получателя"));
       } finally {
         setIbanLookupLoading(false);
       }
@@ -484,6 +489,13 @@ const SendBank = () => {
                   className={`h-14 rounded-2xl bg-secondary border-0 text-base ${fieldsReadOnly ? 'opacity-80' : ''}`}
                 />
               </div>
+              {recipientError && (
+                <div className="bg-destructive/10 rounded-2xl px-4 py-3">
+                  <p className="text-sm text-destructive font-medium">
+                    ⚠️ {recipientError}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -656,9 +668,23 @@ const SendBank = () => {
                 </div>
               )}
 
+              {/* Comment field */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">
+                  {t("send.comment", "Комментарий")}
+                </label>
+                <Input
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={t("send.commentPlaceholder", "Назначение платежа (необязательно)")}
+                  className="h-14 rounded-2xl bg-secondary border-0 text-base"
+                  maxLength={140}
+                />
+              </div>
+
               {parseFloat(totalAmount) > (isWalletSource ? availableBalance : availableBalanceAed) && (
-                <div className="bg-red-500/10 rounded-2xl p-4">
-                  <p className="text-sm text-red-500">
+                <div className="bg-destructive/10 rounded-2xl p-4">
+                  <p className="text-sm text-destructive">
                     ⚠️ {t("send.insufficientBalanceWarning")}
                   </p>
                 </div>
