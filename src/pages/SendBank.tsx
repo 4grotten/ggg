@@ -77,9 +77,12 @@ const SendBank = () => {
 
   const sourceOptions = useMemo<SourceOption[]>(() => {
     const options: SourceOption[] = [];
-    const banks = Array.isArray(bankAccountsData?.data) ? bankAccountsData.data : [];
-    const cards = Array.isArray(cardsData?.data) ? cardsData.data : [];
-    const wallets = Array.isArray(cryptoWalletsData?.data) ? cryptoWalletsData.data : [];
+    const rawBanks = bankAccountsData as any;
+    const rawCards = cardsData as any;
+    const rawWallets = cryptoWalletsData as any;
+    const banks: any[] = Array.isArray(rawBanks) ? rawBanks : Array.isArray(rawBanks?.data) ? rawBanks.data : [];
+    const cards: any[] = Array.isArray(rawCards) ? rawCards : Array.isArray(rawCards?.data) ? rawCards.data : [];
+    const wallets: any[] = Array.isArray(rawWallets) ? rawWallets : Array.isArray(rawWallets?.data) ? rawWallets.data : [];
     banks.forEach((bank: any) => {
       const ibanLast = bank.iban?.slice(-4) || "0000";
       options.push({
