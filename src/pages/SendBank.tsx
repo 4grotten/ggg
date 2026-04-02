@@ -668,9 +668,23 @@ const SendBank = () => {
                 </div>
               )}
 
+              {/* Comment field */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">
+                  {t("send.comment", "Комментарий")}
+                </label>
+                <Input
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={t("send.commentPlaceholder", "Назначение платежа (необязательно)")}
+                  className="h-14 rounded-2xl bg-secondary border-0 text-base"
+                  maxLength={140}
+                />
+              </div>
+
               {parseFloat(totalAmount) > (isWalletSource ? availableBalance : availableBalanceAed) && (
-                <div className="bg-red-500/10 rounded-2xl p-4">
-                  <p className="text-sm text-red-500">
+                <div className="bg-destructive/10 rounded-2xl p-4">
+                  <p className="text-sm text-destructive">
                     ⚠️ {t("send.insufficientBalanceWarning")}
                   </p>
                 </div>
