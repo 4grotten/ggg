@@ -1026,7 +1026,9 @@
     "verifying": "Проверка адреса...",
     "dailyLimitExceeded": "Превышен дневной лимит ({{limit}}). Доступно: {{available}}",
     "limitReachedTitle": "Дневной лимит исчерпан",
-    "limitResetsIn": "Лимит обновится через"
+    "limitResetsIn": "Лимит обновится через",
+    "invalidRecipientTitle": "Данные получателя невалидны",
+    "invalidRecipientDesc": "Проверьте правильность IBAN и имени получателя, исправьте и попробуйте снова."
   },
   "drawer": {
     "addMoneyWith": "Куда пополнить",

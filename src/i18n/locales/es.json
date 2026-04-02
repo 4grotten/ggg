@@ -931,7 +931,9 @@
     "verifying": "Verificando dirección...",
     "dailyLimitExceeded": "Límite diario superado ({{limit}}). Disponible: {{available}}",
     "limitReachedTitle": "Límite diario alcanzado",
-    "limitResetsIn": "El límite se renueva en"
+    "limitResetsIn": "El límite se renueva en",
+    "invalidRecipientTitle": "Los datos del destinatario no son válidos",
+    "invalidRecipientDesc": "Verifique el IBAN y el nombre del destinatario, corríjalos e intente de nuevo."
   },
   "drawer": {
     "addMoneyWith": "Recargar con",

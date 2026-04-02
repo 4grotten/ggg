@@ -937,7 +937,9 @@
     "verifying": "正在验证地址...",
     "dailyLimitExceeded": "已超过每日限额 ({{limit}})。可用: {{available}}",
     "limitReachedTitle": "已达每日限额",
-    "limitResetsIn": "限额将在以下时间重置"
+    "limitResetsIn": "限额将在以下时间重置",
+    "invalidRecipientTitle": "收款人信息无效",
+    "invalidRecipientDesc": "请检查IBAN和收款人姓名，更正后重试。"
   },
   "drawer": {
     "addMoneyWith": "充值方式",

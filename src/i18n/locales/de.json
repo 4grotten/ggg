@@ -931,7 +931,9 @@
     "verifying": "Adresse wird überprüft...",
     "dailyLimitExceeded": "Tageslimit überschritten ({{limit}}). Verfügbar: {{available}}",
     "limitReachedTitle": "Tageslimit erreicht",
-    "limitResetsIn": "Limit wird erneuert in"
+    "limitResetsIn": "Limit wird erneuert in",
+    "invalidRecipientTitle": "Empfängerdaten sind ungültig",
+    "invalidRecipientDesc": "Bitte überprüfen Sie die IBAN und den Empfängernamen, korrigieren Sie sie und versuchen Sie es erneut."
   },
   "drawer": {
     "addMoneyWith": "Aufladen mit",
