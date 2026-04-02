@@ -1033,6 +1033,34 @@ export const submitCryptoTopup = async (
 };
 
 // =============================================
+// REGISTER CRYPTO WALLETS (Initialize)
+// POST /api/v1/transactions/crypto-wallets/register/
+// =============================================
+
+export const registerCryptoWallets = async (): Promise<{ success: boolean; data?: any; error?: string }> => {
+  try {
+    const result = await apiRequest<any>(
+      `/transactions/crypto-wallets/register/`,
+      {
+        method: 'POST',
+        body: JSON.stringify({}),
+      },
+      true
+    );
+
+    if (result.error) {
+      console.warn('[Transactions API] Register crypto wallets error:', result.error);
+      return { success: false, error: result.error.detail || result.error.message || 'Registration failed' };
+    }
+
+    return { success: true, data: result.data };
+  } catch (error) {
+    console.error('[Transactions API] Register crypto wallets failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Network error' };
+  }
+};
+
+
 // BANK WITHDRAWAL (Bank Wire to external bank)
 // POST /api/v1/transactions/withdrawal/bank/
 // =============================================
